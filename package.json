@@ -1,0 +1,11 @@
+{
+  "name": "nowdatabase",
+  "version": "1.0.0",
+  "description": "**NOW - New and Old Worlds - Database of fossil mammals**",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC"
+}
