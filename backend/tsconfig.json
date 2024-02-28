@@ -1,8 +1,9 @@
 {
   "compilerOptions": {
-    "target": "ES6",
+    "target": "ES2022",
     "outDir": "./build/",
-    "module": "commonjs",
+    "module": "ES2022",
+    "moduleResolution": "node",
     "strict": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
