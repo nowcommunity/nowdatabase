@@ -1,3 +1,4 @@
+```mermaid
 classDiagram
     com_people --|> com_users : user_id
     com_people --|> now_bau : "bau_coordinator, bau_authorizer"
@@ -300,3 +301,4 @@ classDiagram
       +varchar sequence (PK)
       +varchar seq_name
     }
+```
