@@ -7,7 +7,7 @@ services:
     ports:
       - 5173:5173
     command: >
-        sh -c "cd /usr/src/app && npm ci && npm run dev -- --host"
+        sh -c "cd /usr/src/app && npm ci && npm run build && npm start -- --host"
   now-db-backend:
     container_name: nowdb-backend
     image: node:20-alpine3.16
@@ -16,4 +16,4 @@ services:
     ports:
       - 4000:4000
     command: >
-        sh -c "cd /usr/src/app && npm ci && npm run dev"
+        sh -c "cd /usr/src/app && npm ci && npx tsc && npm run start"
