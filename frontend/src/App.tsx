@@ -1,5 +1,7 @@
 /* eslint-disable no-console */
 import { useState } from 'react'
+import Box from '@mui/material/Box';
+import { Typography } from '@mui/material';
 
 const App = () => {
   const [text, setText] = useState('___')
@@ -12,12 +14,12 @@ const App = () => {
 
   return (
     <>
-      <div>
-        <h1>NOW Database</h1>
+      <Box>
+        <Typography component="h1">NOW Database</Typography>
         <p>Hello world</p>
         <button onClick={onClick}>Ping backend</button>
         <p>Result: {text === 'pong' ? 'Connection to backend works!' : 'Backend has not responded.'}</p>
-      </div>
+      </Box>
     </>
   )
 }
