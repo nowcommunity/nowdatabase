@@ -34,3 +34,7 @@ The mariadb-container by default executes all .sql files it finds in the contain
 Select database with `USE now_test;`.
 
 Execute query: `select loc_name from now_loc where loc_name like "amb%";` which should print 9 rows if everything went right.
+
+### Sequelize models
+
+The sequelize model definitions in `backend/src/models` were generated automatically by [sequelize-auto](https://github.com/sequelize/sequelize-auto). This generates the model files from the database, plus an `init-models.ts` file, which exports initModels-function that you can use to initialize all models. So to access database, you simply import `models` from utils/db.ts.

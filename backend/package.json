@@ -23,6 +23,8 @@
     "cors": "^2.8.5",
     "express": "^4.18.2",
     "mariadb": "^3.3.0",
-    "sequelize": "^6.37.2"
+    "mysql2": "^3.9.3",
+    "sequelize": "^6.37.2",
+    "sequelize-auto": "^0.8.8"
   }
 }
