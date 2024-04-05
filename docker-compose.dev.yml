@@ -17,16 +17,11 @@ services:
       - 4000:4000
     command: >
         sh -c "cd /usr/src/app && npm ci && npm run dev"
+    env_file: .db.dev.env
   now-db:
     container_name: nowdb-db
     image: mariadb
-    environment:
-      MARIADB_ROOT_PASSWORD: admin
-      MARIADB_HOST: localhost
-      MARIADB_DATABASE: now_test
-      MARIADB_LOG_DATABASE: now_log_test.log
-      MARIADB_USER: now_test
-      MARIADB_PASSWORD: mariadb_password
+    env_file: .db.dev.env
     volumes:
       - ./data/:/docker-entrypoint-initdb.d
 volumes:

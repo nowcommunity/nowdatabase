@@ -3,4 +3,9 @@ const info = (msg: string) => {
   console.log(msg)
 }
 
-export default { info }
+const error = (msg: string) => {
+  // eslint-disable-next-line no-console
+  console.error(msg)
+}
+
+export default { info, error }

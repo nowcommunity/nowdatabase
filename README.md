@@ -2,23 +2,30 @@
 
 **NOW - New and Old Worlds - Database of fossil mammals**
 
-Rebuild of a fossil database application, old version at https://nowdatabase.luomus.fi/ 
+Rebuild of a fossil database application, old version at https://nowdatabase.luomus.fi/ (New version not deployed yet)
 
-New version not deployed yet.
+_____
 
-## Developer instructions
+# Developer instructions
 
-Run `npm install` in all three folders: Project root, frontend, and backend.
+### Running the project
 
-If you have docker compose installed, run `npm run dev` in root to launch docker in development mode. Then, open `localhost:5173` in browser.
+1. Run `npm install` in all three folders: Project root, frontend, and backend.
+2. Add a file named `.db.env` into project root with necessary environment variables.
+3. At this point, do the db-restore things as instructed below.
+4. If you have docker compose installed, run `npm run dev` in project root to launch docker in development mode.
+5. Check if it worked: The docker logs should have a line saying database connected successfully. Open `localhost:5173` in browser to check if frontend works.
 
 ### Restoring db from dump :cd:
 
-Make an empty directory `sqlfiles` inside `data` folder which is in the repository root. Then, put the database dump files `now_test.sql`, `now_log_test.sql` and `now_view.sql` inside it. Notice, that the container will have to be able to read these files and execute `data/restore_and_create_user.sql`, so you may have to adjust the necessary rights depending on your operating system.
+1. Make an empty directory `sqlfiles` inside `data` folder which is in the repository root. 
+2. Place the database dump files `now_test.sql`, `now_log_test.sql` and `now_view.sql` inside it.
+3. Notice, that the container will have to be able to read these files and execute `data/restore_and_create_user.sql`, so you may have to adjust the necessary rights depending on your operating system.
+4. Then simply run everything by `npm run dev`.
 
-Then simply run everything by `npm run dev`.
+**How does it work?**
 
-The initialization file (`restore_and_create.sql`) will then restore the database from these files when the container is first run, and also creates a user `'now_test'@'localhost'` with password `mariadb_password` for the database. The root users password will be `admin`.
+The mariadb-container by default executes all .sql files it finds in the containers `/docker-entrypoint-initdb.d/` directory when the container is run the first time. The `data` directory is mounted there. It cotnains an initialization file (`restore_and_create.sql`) which will then restore the database from the sql-dumpfiles in `sqlfiles/`, and also create a user `'now_test'@'localhost'` with password `mariadb_password` for the database.
 
 **Test that it worked:**
 
