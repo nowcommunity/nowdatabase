@@ -7,6 +7,7 @@ export const NavBar = () => {
     { title: 'Locality', url: '/locality' },
     { title: 'Species', url: '/species' },
     { title: 'Time unit', url: '/time-unit' },
+    { title: 'Login', url: '/login' },
   ]
   return (
     <AppBar position="static">
@@ -16,7 +17,7 @@ export const NavBar = () => {
         </Typography>
         <MenuList style={{ alignContent: 'center' }}>
           {pages.map(page => (
-            <MenuItem component={Link} to={page.url} style={{ display: 'inline-block' }}>
+            <MenuItem component={Link} key={page.url} to={page.url} style={{ display: 'inline-block' }}>
               <Typography component="h4" textAlign="center">
                 {page.title}
               </Typography>

@@ -3,11 +3,13 @@ import cors from 'cors'
 import logger from './utils/logger'
 import { testDb } from './services/loc_name'
 import { sequelize } from './utils/db'
+import userRouter from './routes/user'
 
 const app = express()
 
 app.use(express.json())
 app.use(cors())
+app.use('/user', userRouter)
 
 const PORT = 4000
 
