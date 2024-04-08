@@ -8,22 +8,20 @@ import { Localities } from './components/Localities'
 const App = () => {
   return (
     <BrowserRouter>
-      <>
-        <Grid container>
-          <Grid item xs={12}>
-            <NavBar />
-          </Grid>
-          <Grid item>
-            <Container maxWidth="xl" fixed>
-              <Routes>
-                <Route element={<Localities />} path="/locality" />
-                <Route element={<FrontPage />} path="/" />
-                <Route element={<Container style={{ marginTop: '3em' }}>Page not found.</Container>} path="*" />
-              </Routes>
-            </Container>
-          </Grid>
+      <Grid container>
+        <Grid item xs={12}>
+          <NavBar />
         </Grid>
-      </>
+        <Grid item>
+          <Container maxWidth="xl" fixed style={{ marginTop: '3em' }}>
+            <Routes>
+              <Route element={<Localities />} path="/locality" />
+              <Route element={<FrontPage />} path="/" />
+              <Route element={<div>Page not found.</div>} path="*" />
+            </Routes>
+          </Container>
+        </Grid>
+      </Grid>
     </BrowserRouter>
   )
 }
