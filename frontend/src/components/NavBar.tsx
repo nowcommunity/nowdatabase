@@ -1,7 +1,11 @@
-import { AppBar, MenuItem, MenuList, Stack, Typography } from '@mui/material'
+import { AppBar, Box, MenuItem, MenuList, Stack, Typography } from '@mui/material'
 import { Link } from 'react-router-dom'
+import { useSelector } from 'react-redux'
+import { RootState } from '../redux/store'
 
 export const NavBar = () => {
+  const user = useSelector((store: RootState) => store.user)
+
   const pages = [
     { title: 'Front page', url: '/' },
     { title: 'Locality', url: '/locality' },
@@ -24,6 +28,7 @@ export const NavBar = () => {
             </MenuItem>
           ))}
         </MenuList>
+        <Box alignContent="center">{user.token ? `Logged in as ${user.token}` : 'Not logged in'}</Box>
       </Stack>
     </AppBar>
   )

@@ -1,14 +1,21 @@
-import { useState } from 'react'
-import { useTryLoginMutation } from '../redux/userReducer'
+import { useEffect, useState } from 'react'
+import { useTryLoginMutation, setToken } from '../redux/userReducer'
+import { useDispatch } from 'react-redux'
 
 export const Login = () => {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
-  const [loginMutation, result] = useTryLoginMutation()
-
+  const [loginMutation, { data }] = useTryLoginMutation()
+  const dispatch = useDispatch()
   const login = async () => {
-    await loginMutation({ username, password })
+    loginMutation({ username, password })
   }
+
+  useEffect(() => {
+    if (data && data.token) {
+      dispatch(setToken(data.token))
+    }
+  }, [data, dispatch])
 
   return (
     <div>
@@ -25,7 +32,6 @@ export const Login = () => {
         <input type="password" onChange={event => setPassword(event.currentTarget.value)} value={password}></input>
       </p>
       <button onClick={login}>Login</button>
-      {result.isSuccess && <div>{JSON.stringify(result, null, 2)}</div>}
     </div>
   )
 }
