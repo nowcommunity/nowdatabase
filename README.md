@@ -11,10 +11,9 @@ _____
 ### Running the project
 
 1. Run `npm install` in all three folders: Project root, frontend, and backend.
-2. Add a file named `.db.env` into project root with necessary environment variables.
-3. At this point, do the db-restore things as instructed below.
-4. If you have docker compose installed, run `npm run dev` in project root to launch docker in development mode.
-5. Check if it worked: The docker logs should have a line saying database connected successfully. Open `localhost:5173` in browser to check if frontend works.
+2. At this point, do the db-restore things as instructed below.
+3. If you have docker compose installed, run `npm run dev` in project root to launch docker in development mode.
+4. Check if it worked: The docker logs should have a line saying database connected successfully. Open `localhost:5173` in browser to check if frontend works.
 
 ### Restoring db from dump :cd:
 
