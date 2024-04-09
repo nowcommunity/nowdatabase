@@ -5,7 +5,6 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 
 type LoginData = { username: string; password: string }
 
-// Define a service using a base URL and expected endpoints
 export const userApi = createApi({
   reducerPath: 'userApi',
   baseQuery: fetchBaseQuery({ baseUrl: apiUrl }),

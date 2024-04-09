@@ -1,11 +1,12 @@
+/* eslint-disable no-console */
+const getLogString = (msg: string) => [new Date().toLocaleTimeString('FI-fi'), msg].join(' ')
+
 const info = (msg: string) => {
-  // eslint-disable-next-line no-console
-  console.log(msg)
+  console.log(getLogString(msg))
 }
 
 const error = (msg: string) => {
-  // eslint-disable-next-line no-console
-  console.error(msg)
+  console.error(getLogString(msg))
 }
 
 export default { info, error }
