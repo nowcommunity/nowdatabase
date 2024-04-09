@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { useTryLoginMutation, setToken } from '../redux/userReducer'
+import { useTryLoginMutation, setUser } from '../redux/userReducer'
 import { useDispatch } from 'react-redux'
 
 export const Login = () => {
@@ -13,7 +13,7 @@ export const Login = () => {
 
   useEffect(() => {
     if (data && data.token) {
-      dispatch(setToken(data.token))
+      dispatch(setUser({ username: data.username, token: data.token }))
     }
   }, [data, dispatch])
 

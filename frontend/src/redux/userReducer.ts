@@ -10,7 +10,7 @@ export const userApi = createApi({
   reducerPath: 'userApi',
   baseQuery: fetchBaseQuery({ baseUrl: apiUrl }),
   endpoints: builder => ({
-    tryLogin: builder.mutation<UserState, LoginData>({
+    tryLogin: builder.mutation<{ token: string; username: string }, LoginData>({
       query: ({ username, password }: LoginData) => ({
         url: `/user/login`,
         body: {
@@ -25,25 +25,29 @@ export const userApi = createApi({
 
 interface UserState {
   token: string | null
+  username: string | null
 }
 
 const initialState: UserState = {
   token: null,
+  username: null,
 }
 
 const userSlice = createSlice({
   name: 'user',
   initialState,
   reducers: {
-    setToken(state, action: PayloadAction<string>) {
-      state.token = action.payload
+    setUser(state, action: PayloadAction<{ token: string; username: string }>) {
+      state.token = action.payload.token
+      state.username = action.payload.username
     },
-    clearToken(state) {
+    clearUser(state) {
       state.token = null
+      state.username = null
     },
   },
 })
 
-export const { setToken, clearToken } = userSlice.actions
+export const { setUser, clearUser } = userSlice.actions
 export const userReducer = userSlice.reducer
 export const { useTryLoginMutation } = userApi
