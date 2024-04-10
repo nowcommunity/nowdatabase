@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useTryLoginMutation, setUser } from '../redux/userReducer'
 import { useDispatch } from 'react-redux'
-import { CircularProgress } from '@mui/material'
+import { Button, CircularProgress, Container, TextField } from '@mui/material'
 import { useNavigate } from 'react-router-dom'
 
 export const Login = () => {
@@ -23,21 +23,31 @@ export const Login = () => {
   }, [data, dispatch, navigate])
 
   return (
-    <div>
+    <Container maxWidth="sm">
       <p>
-        <b>Username</b>
+        <TextField
+          id="username-basic"
+          label="Username"
+          variant="outlined"
+          type="text"
+          onChange={(event: React.ChangeEvent<HTMLInputElement>) => setUsername(event?.currentTarget?.value)}
+          value={username}
+        />
       </p>
       <p>
-        <input type="text" onChange={event => setUsername(event.currentTarget.value)} value={username}></input>
+        <TextField
+          id="password-basic"
+          label="Password"
+          variant="outlined"
+          type="password"
+          onChange={(event: React.ChangeEvent<HTMLInputElement>) => setPassword(event?.currentTarget?.value)}
+          value={password}
+        />
       </p>
-      <p>
-        <b>Password</b>
-      </p>
-      <p>
-        <input type="password" onChange={event => setPassword(event.currentTarget.value)} value={password}></input>
-      </p>
-      <button onClick={login}>Login</button>
+      <Button onClick={login} size="large">
+        Login
+      </Button>
       {(isLoading || data) && <CircularProgress style={{ marginLeft: '1em' }} />}
-    </div>
+    </Container>
   )
 }
