@@ -26,7 +26,7 @@ export const NavBar = () => {
 
   return (
     <AppBar position="static">
-      <Stack spacing={10} direction="row" marginLeft={2}>
+      <Stack spacing={10} direction="row" marginLeft={2} justifyContent="space-between">
         <Typography component="h1" fontSize={'2.2em'}>
           Now Database
         </Typography>
@@ -46,7 +46,9 @@ export const NavBar = () => {
             </MenuItem>
           )}
         </MenuList>
-        <Box alignContent="center">{user.username ? `Logged in as ${user.username}` : 'Not logged in'}</Box>
+        <Box alignContent="center" paddingRight="1em">
+          {user.username ? `Logged in as ${user.username}` : 'Not logged in'}
+        </Box>
       </Stack>
     </AppBar>
   )
