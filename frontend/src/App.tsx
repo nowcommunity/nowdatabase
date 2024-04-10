@@ -11,18 +11,20 @@ const App = () => {
     <BrowserRouter>
       <Grid container>
         <Grid item xs={12}>
-          <NavBar />
+          <Container maxWidth="xl">
+            <NavBar />
+          </Container>
         </Grid>
-        <Grid item>
-          <Container maxWidth="xl" fixed style={{ marginTop: '3em' }}>
+        <Container maxWidth="xl" fixed style={{ marginTop: '3em' }}>
+          <Grid item>
             <Routes>
               <Route element={<Localities />} path="/locality" />
               <Route element={<FrontPage />} path="/" />
               <Route element={<Login />} path="/login" />
               <Route element={<div>Page not found.</div>} path="*" />
             </Routes>
-          </Container>
-        </Grid>
+          </Grid>
+        </Container>
       </Grid>
     </BrowserRouter>
   )
