@@ -1,17 +1,31 @@
 import { useEffect, useState } from 'react'
 import { useTryLoginMutation, setUser } from '../redux/userReducer'
 import { useDispatch } from 'react-redux'
-import { Button, CircularProgress, Container, TextField } from '@mui/material'
+import { Button, CircularProgress, Container, Stack, TextField } from '@mui/material'
 import { useNavigate } from 'react-router-dom'
 
 export const Login = () => {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
+  const [usernameError, setUsernameError] = useState('')
+  const [passwordError, setPasswordError] = useState('')
   const [loginMutation, { data, isLoading }] = useTryLoginMutation()
   const dispatch = useDispatch()
   const navigate = useNavigate()
 
   const login = async () => {
+    let error = false
+    if (username.length < 1) {
+      setUsernameError('Input username')
+      error = true
+    }
+    if (password.length < 1) {
+      setPasswordError('Input password')
+      error = true
+    }
+    if (error) return
+    setUsernameError('')
+    setPasswordError('')
     loginMutation({ username, password })
   }
 
@@ -23,8 +37,8 @@ export const Login = () => {
   }, [data, dispatch, navigate])
 
   return (
-    <Container maxWidth="sm">
-      <p>
+    <Container style={{ alignContent: 'center' }} maxWidth="sm">
+      <Stack rowGap="1em">
         <TextField
           id="username-basic"
           label="Username"
@@ -32,9 +46,10 @@ export const Login = () => {
           type="text"
           onChange={(event: React.ChangeEvent<HTMLInputElement>) => setUsername(event?.currentTarget?.value)}
           value={username}
+          error={usernameError.length > 0}
+          helperText={usernameError}
+          fullWidth
         />
-      </p>
-      <p>
         <TextField
           id="password-basic"
           label="Password"
@@ -42,11 +57,14 @@ export const Login = () => {
           type="password"
           onChange={(event: React.ChangeEvent<HTMLInputElement>) => setPassword(event?.currentTarget?.value)}
           value={password}
+          error={passwordError.length > 0}
+          helperText={passwordError}
+          fullWidth
         />
-      </p>
-      <Button onClick={login} size="large">
-        Login
-      </Button>
+        <Button onClick={login} size="large" style={{ fontSize: '1.4em' }}>
+          Login
+        </Button>
+      </Stack>
       {(isLoading || data) && <CircularProgress style={{ marginLeft: '1em' }} />}
     </Container>
   )
