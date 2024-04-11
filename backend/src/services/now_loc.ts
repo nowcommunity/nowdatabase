@@ -9,3 +9,8 @@ export const testDb = async () => {
     logger.error('Database connection does not work')
   }
 }
+
+export const getAllLocalities = async () => {
+  const result = await models.now_loc.findAll({ raw: true })
+  return result
+}
