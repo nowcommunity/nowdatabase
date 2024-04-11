@@ -1,7 +1,8 @@
-import { useMemo } from 'react'
-import { MaterialReactTable, useMaterialReactTable, type MRT_ColumnDef } from 'material-react-table'
+import { useEffect, useMemo, useState } from 'react'
+import { type MRT_ColumnFiltersState, MaterialReactTable, type MRT_ColumnDef } from 'material-react-table'
 import { useGetAllLocalitiesQuery } from '../redux/localityReducer'
 import { CircularProgress } from '@mui/material'
+import { useLocation, useNavigate } from 'react-router-dom'
 
 interface Locality {
   loc_name: string
@@ -12,6 +13,21 @@ interface Locality {
 
 export const Localities = () => {
   const localitiesQuery = useGetAllLocalitiesQuery({})
+  const navigate = useNavigate()
+  const location = useLocation()
+  const [columnFilters, setColumnFilters] = useState<MRT_ColumnFiltersState>([])
+
+  useEffect(() => {
+    const searchParams = new URLSearchParams(location.search)
+    const stateFromUrl = searchParams.get('columnfilters')
+    if (stateFromUrl !== 'undefined') setColumnFilters(JSON.parse(searchParams.get('columnfilters') ?? '[]'))
+  }, [location.search])
+
+  useEffect(() => {
+    if (columnFilters.length === 0) return
+    navigate(`${location.pathname}?columnfilters=${JSON.stringify(columnFilters)}`, { replace: true })
+  }, [columnFilters, location.pathname, navigate])
+
   const columns = useMemo<MRT_ColumnDef<Locality>[]>(
     () => [
       {
@@ -38,16 +54,16 @@ export const Localities = () => {
     []
   )
 
-  const table = useMaterialReactTable({
-    columns,
-    data: localitiesQuery.data ?? [],
-  })
-
   if (!localitiesQuery.data) return <CircularProgress />
 
   return (
     <div>
-      <MaterialReactTable table={table} />
+      <MaterialReactTable
+        columns={columns}
+        data={localitiesQuery.data}
+        state={{ columnFilters }}
+        onColumnFiltersChange={setColumnFilters}
+      />
     </div>
   )
 }
