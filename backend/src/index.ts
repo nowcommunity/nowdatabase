@@ -5,6 +5,7 @@ import 'express-async-errors'
 import { testDb } from './services/now_loc'
 import { sequelize } from './utils/db'
 import userRouter from './routes/user'
+import localityRouter from './routes/locality'
 import { requestLogger } from './utils/requestLogger'
 import { sleep } from './utils/common'
 
@@ -14,6 +15,7 @@ app.use(express.json())
 app.use(cors())
 app.use(requestLogger)
 app.use('/user', userRouter)
+app.use('/locality', localityRouter)
 
 const PORT = 4000
 
