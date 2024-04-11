@@ -8,11 +8,13 @@ import userRouter from './routes/user'
 import localityRouter from './routes/locality'
 import { requestLogger } from './utils/requestLogger'
 import { sleep } from './utils/common'
+import compression from 'compression'
 
 const app = express()
 
 app.use(express.json())
 app.use(cors())
+app.use(compression())
 app.use(requestLogger)
 app.use('/user', userRouter)
 app.use('/locality', localityRouter)
