@@ -1,13 +1,10 @@
 // Need to use the React-specific entry point to import createApi
-import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
-import { apiUrl } from '../util/config'
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
+import { api } from './api'
 
 type LoginData = { username: string; password: string }
 
-export const userApi = createApi({
-  reducerPath: 'userApi',
-  baseQuery: fetchBaseQuery({ baseUrl: apiUrl }),
+const userApi = api.injectEndpoints({
   endpoints: builder => ({
     tryLogin: builder.mutation<{ token: string; username: string }, LoginData>({
       query: ({ username, password }: LoginData) => ({

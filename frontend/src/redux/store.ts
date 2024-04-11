@@ -1,5 +1,6 @@
 import { configureStore, Middleware } from '@reduxjs/toolkit'
-import { userApi, userReducer } from './userReducer'
+import { userReducer } from './userReducer'
+import { api } from './api'
 
 const localStorageMiddleware: Middleware = store => next => action => {
   const result = next(action)
@@ -20,12 +21,13 @@ const loadFromLocalStorage = () => {
     return undefined
   }
 }
+
 export const store = configureStore({
   reducer: {
-    [userApi.reducerPath]: userApi.reducer,
+    [api.reducerPath]: api.reducer,
     user: userReducer,
   },
-  middleware: getDefaultMiddleware => getDefaultMiddleware().concat(userApi.middleware).concat(localStorageMiddleware),
+  middleware: getDefaultMiddleware => getDefaultMiddleware().concat(api.middleware).concat(localStorageMiddleware),
   preloadedState: loadFromLocalStorage(),
 })
 
