@@ -11,6 +11,6 @@ export const testDb = async () => {
 }
 
 export const getAllLocalities = async () => {
-  const result = await models.now_loc.findAll({ raw: true })
+  const result = await models.now_loc.findAll({ attributes: ['loc_name', 'max_age', 'min_age', 'country'], raw: true })
   return result
 }
