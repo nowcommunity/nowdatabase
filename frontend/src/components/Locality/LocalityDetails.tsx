@@ -31,7 +31,8 @@ export const LocalityDetails = () => {
     <Stack rowGap={4}>
       <Box>
         <Button onClick={() => navigate(-1)}>
-          <ArrowBackIcon color="primary" /> Return to localities table
+          <ArrowBackIcon color="primary" style={{ marginRight: '0.35em' }} />
+          Return to table
         </Button>
       </Box>
       <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
