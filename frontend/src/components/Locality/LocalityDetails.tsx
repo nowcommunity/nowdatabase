@@ -39,7 +39,6 @@ export const LocalityDetails = () => {
           {tabs.map(tab => (
             <Tab label={tab.title} />
           ))}
-          <Tab label="" />
         </Tabs>
       </Box>
       {tabs[tab].component}
