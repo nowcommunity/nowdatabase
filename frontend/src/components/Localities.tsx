@@ -17,12 +17,15 @@ export const Localities = () => {
   const location = useLocation()
   const [columnFilters, setColumnFilters] = useState<MRT_ColumnFiltersState>([])
 
+  // Load table state from url
   useEffect(() => {
     const searchParams = new URLSearchParams(location.search)
     const stateFromUrl = searchParams.get('columnfilters')
-    if (stateFromUrl !== 'undefined') setColumnFilters(JSON.parse(searchParams.get('columnfilters') ?? '[]'))
-  }, [location.search])
+    setColumnFilters(JSON.parse(stateFromUrl ?? '[]'))
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
+  // Save table state to url
   useEffect(() => {
     if (columnFilters.length === 0) return
     navigate(`${location.pathname}?columnfilters=${JSON.stringify(columnFilters)}`, { replace: true })
