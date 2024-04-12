@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { type MRT_ColumnFiltersState, MaterialReactTable, type MRT_ColumnDef } from 'material-react-table'
-import { useGetAllLocalitiesQuery } from '../redux/localityReducer'
-import { CircularProgress } from '@mui/material'
+import { useGetAllLocalitiesQuery } from '../../redux/localityReducer'
+import { Button, CircularProgress } from '@mui/material'
 import { useLocation, useNavigate } from 'react-router-dom'
 
 interface Locality {
@@ -9,6 +9,7 @@ interface Locality {
   min_age: number
   max_age: number
   country: string
+  lid: string
 }
 
 export const Localities = () => {
@@ -34,19 +35,24 @@ export const Localities = () => {
   const columns = useMemo<MRT_ColumnDef<Locality>[]>(
     () => [
       {
+        accessorFn: row => <Button onClick={() => navigate(`/locality/${row.lid}`)}>Details</Button>,
+        header: 'View',
+        size: 12,
+      },
+      {
         accessorKey: 'loc_name',
         header: 'Name',
-        size: 150,
+        size: 220,
       },
       {
         accessorKey: 'min_age',
         header: 'Min age',
-        size: 150,
+        size: 5,
       },
       {
         accessorKey: 'max_age',
         header: 'Max age',
-        size: 150,
+        size: 5,
       },
       {
         accessorKey: 'country',
@@ -54,7 +60,7 @@ export const Localities = () => {
         size: 150,
       },
     ],
-    []
+    [navigate]
   )
 
   if (!localitiesQuery.data) return <CircularProgress />

@@ -8,7 +8,12 @@ const localitiesApi = api.injectEndpoints({
         url: `/locality/all`,
       }),
     }),
+    getLocalityDetails: builder.query<any, any>({
+      query: (id: number) => ({
+        url: `/locality/${id}`,
+      }),
+    }),
   }),
 })
 
-export const { useGetAllLocalitiesQuery } = localitiesApi
+export const { useGetAllLocalitiesQuery, useGetLocalityDetailsQuery } = localitiesApi
