@@ -1,48 +1,41 @@
-import { useNavigate, useParams } from 'react-router-dom'
+import { useParams } from 'react-router-dom'
 import { useGetLocalityDetailsQuery } from '../../redux/localityReducer'
-import { Box, Button, CircularProgress, Stack, Tab, Tabs } from '@mui/material'
-import ArrowBackIcon from '@mui/icons-material/ArrowBack'
-import { useState } from 'react'
+import { Box, Card, CircularProgress, Typography } from '@mui/material'
+import { DetailView, TabType } from '../DetailView'
+import { ReactNode } from 'react'
+import { AgeTab } from './Tabs/AgeTab'
+import { LocalityTab } from './Tabs/LocalityTab'
+
+export const Grouped = ({ title, children }: { title?: string; children: ReactNode }) => {
+  return (
+    <Card style={{ margin: '1em', padding: '10px' }} variant="outlined">
+      {title && (
+        <Typography sx={{ fontSize: 16 }} color="text.secondary" gutterBottom>
+          {title}
+        </Typography>
+      )}
+      <Box marginTop="15px">{children}</Box>
+    </Card>
+  )
+}
 
 export const LocalityDetails = () => {
   const { id } = useParams()
   const { isLoading, isError, data } = useGetLocalityDetailsQuery(id)
-  const navigate = useNavigate()
-  const [tab, setTab] = useState(0)
-  if (isError) return <div>Error loading locality details</div>
+
+  if (isError) return <div>Error loading data</div>
   if (isLoading || !data) return <CircularProgress />
 
-  const tabs = [
+  const tabs: TabType[] = [
     {
       title: 'Age',
-      component: <div>Age stuff</div>,
+      content: <AgeTab />,
     },
     {
       title: 'Locality',
-      component: <div>Locality stuff</div>,
-    },
-    {
-      title: 'Species',
-      component: <div>Species stuff</div>,
+      content: <LocalityTab />,
     },
   ]
 
-  return (
-    <Stack rowGap={4}>
-      <Box>
-        <Button onClick={() => navigate(-1)}>
-          <ArrowBackIcon color="primary" style={{ marginRight: '0.35em' }} />
-          Return to table
-        </Button>
-      </Box>
-      <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-        <Tabs value={tab} onChange={(_event, newValue) => setTab(newValue)}>
-          {tabs.map(tab => (
-            <Tab label={tab.title} />
-          ))}
-        </Tabs>
-      </Box>
-      {tabs[tab].component}
-    </Stack>
-  )
+  return <DetailView tabs={tabs} data={data} />
 }
