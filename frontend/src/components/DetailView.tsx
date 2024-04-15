@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router-dom'
-import { Box, Button, Paper, Stack, Tab, Tabs } from '@mui/material'
+import { Box, Button, Icon, Paper, Stack, Tab, Tabs } from '@mui/material'
 import ArrowBackIcon from '@mui/icons-material/ArrowBack'
+import EditIcon from '@mui/icons-material/Edit'
 import { ReactNode, useState } from 'react'
 import { DetailContextProvider, ModeType } from './Locality/Tabs/Context/DetailContext'
 import { useDetailContext } from './Locality/Tabs/Context/hook'
@@ -37,8 +38,12 @@ export const DetailView = <T,>({ tabs, data }: { tabs: TabType[]; data: T }) => 
   return (
     <Stack rowGap={4}>
       <ReturnButton />
-      <Button onClick={() => setMode(mode === 'edit' ? 'read' : 'edit')}>
-        {mode === 'read' ? 'Edit' : 'Stop editing'}
+      <Button
+        onClick={() => setMode(mode === 'edit' ? 'read' : 'edit')}
+        variant={mode === 'edit' ? 'contained' : 'outlined'}
+        style={{ maxWidth: '20em' }}
+      >
+        <EditIcon /> {mode === 'read' ? 'Edit' : 'Stop editing'}
       </Button>
       <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
         <Tabs value={tab} onChange={(_event, newValue) => setTab(newValue)}>
