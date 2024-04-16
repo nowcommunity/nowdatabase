@@ -1,37 +1,30 @@
-import { ReactNode, createContext } from 'react'
-
-/* 
-  These correspond to actions that can be done in a field.
-*/
-export type EditingActionType = ['edited', 'added', 'deleted']
-export type EditingAction = {
-  field: string // The field that was edited
-  action: EditingActionType
-  value: unknown
-}
+import { ReactNode, createContext, useState } from 'react'
 
 export type ModeType = 'read' | 'new' | 'edit'
 
 export type DetailContextType<T> = {
   data: T
   mode: ModeType
-  actions: EditingAction[]
+  editData: T
+  setEditData: (editData: T) => void
 }
 
-const initialMode = {
-  mode: 'read' as ModeType,
-  actions: [] as EditingAction[],
-  data: null,
-}
+export const DetailContext = createContext<DetailContextType<unknown>>(null!)
 
-export const DetailContext = createContext<DetailContextType<unknown>>(initialMode)
-
-export const DetailContextProvider = <T,>({
+export const DetailContextProvider = <T extends object>({
   children,
   contextState,
 }: {
   children: ReactNode | ReactNode[]
-  contextState: DetailContextType<T>
+  contextState: Omit<DetailContextType<T>, 'setEditData'>
 }) => {
-  return <DetailContext.Provider value={{ ...contextState }}>{children}</DetailContext.Provider>
+  const [editData, setEditData] = useState<T>(contextState.editData)
+
+  return (
+    <DetailContext.Provider
+      value={{ ...contextState, editData, setEditData: (data: unknown) => setEditData(data as T) }}
+    >
+      {children}
+    </DetailContext.Provider>
+  )
 }

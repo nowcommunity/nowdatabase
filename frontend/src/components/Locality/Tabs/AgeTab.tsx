@@ -3,6 +3,7 @@ import { TextField } from '@mui/material'
 import { Locality } from '../../../redux/localityReducer'
 import { useDetailContext } from './Context/hook'
 import { LabeledItem, LabeledItems } from './LabeledItems'
+import { DataValue } from '../../DetailView'
 
 export const AgeTab = () => {
   const { data: locality } = useDetailContext<Locality>()
@@ -10,7 +11,7 @@ export const AgeTab = () => {
     {
       label: 'Dating Method',
       display: locality.date_meth,
-      editable: <TextField variant="standard" />,
+      editable: <DataValue<Locality> field="date_meth" element={<div></div>} />,
     },
     {
       label: 'Minimum Age',

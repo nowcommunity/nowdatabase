@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom'
-import { Box, Button, Icon, Paper, Stack, Tab, Tabs } from '@mui/material'
+import { Box, Button, Paper, Stack, Tab, Tabs } from '@mui/material'
 import ArrowBackIcon from '@mui/icons-material/ArrowBack'
 import EditIcon from '@mui/icons-material/Edit'
 import { ReactNode, useState } from 'react'
@@ -11,7 +11,13 @@ export type TabType = {
   content: JSX.Element
 }
 
-export const DataValue = <T, K extends keyof T>({ field, element: editElement }: { field: K; element: ReactNode }) => {
+export const DataValue = <T extends object>({
+  field,
+  element: editElement,
+}: {
+  field: keyof T
+  element: ReactNode
+}) => {
   const { data, mode } = useDetailContext<T>()
   if (mode === 'edit') {
     return editElement
@@ -31,9 +37,15 @@ const ReturnButton = () => {
   )
 }
 
-export const DetailView = <T,>({ tabs, data }: { tabs: TabType[]; data: T }) => {
+export const DetailView = <T extends object>({ tabs, data }: { tabs: TabType[]; data: T }) => {
   const [tab, setTab] = useState(0)
   const [mode, setMode] = useState<ModeType>('read')
+
+  const initialState = {
+    data,
+    mode,
+    editData: { ...data }, // TODO deepcopy,
+  }
 
   return (
     <Stack rowGap={4}>
@@ -52,7 +64,7 @@ export const DetailView = <T,>({ tabs, data }: { tabs: TabType[]; data: T }) => 
           ))}
         </Tabs>
       </Box>
-      <DetailContextProvider contextState={{ actions: [], mode, data }}>
+      <DetailContextProvider contextState={{ ...initialState }}>
         <Paper style={{ minHeight: '10em' }}>{tabs[tab].content}</Paper>
       </DetailContextProvider>
     </Stack>
