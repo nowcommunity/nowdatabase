@@ -1,26 +1,39 @@
 import { useNavigate } from 'react-router-dom'
-import { Box, Button, Paper, Stack, Tab, Tabs } from '@mui/material'
+import { Box, Button, Card, Paper, Stack, Tab, Tabs, Typography } from '@mui/material'
 import ArrowBackIcon from '@mui/icons-material/ArrowBack'
 import EditIcon from '@mui/icons-material/Edit'
 import { ReactNode, useState } from 'react'
-import { DetailContextProvider, ModeType } from './Locality/Tabs/Context/DetailContext'
-import { useDetailContext } from './Locality/Tabs/Context/hook'
+import { DetailContextProvider, ModeType } from './Context/DetailContext'
+import { useDetailContext } from './hooks'
 
 export type TabType = {
   title: string
   content: JSX.Element
 }
 
+export const Grouped = ({ title, children }: { title?: string; children: ReactNode }) => {
+  return (
+    <Card style={{ margin: '1em', padding: '10px' }} variant="outlined">
+      {title && (
+        <Typography sx={{ fontSize: 16 }} color="text.secondary" gutterBottom>
+          {title}
+        </Typography>
+      )}
+      <Box marginTop="15px">{children}</Box>
+    </Card>
+  )
+}
+
 export const DataValue = <T extends object>({
   field,
-  element: editElement,
+  editElement: getEditElement,
 }: {
   field: keyof T
-  element: ReactNode
+  editElement: (fieldName: keyof T) => ReactNode
 }) => {
   const { data, mode } = useDetailContext<T>()
   if (mode === 'edit') {
-    return editElement
+    return getEditElement(field)
   }
   return data[field]
 }

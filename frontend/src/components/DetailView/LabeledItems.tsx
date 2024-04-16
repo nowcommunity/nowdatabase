@@ -1,6 +1,6 @@
 import { Box, Grid } from '@mui/material'
-import { useDetailContext } from './Context/hook'
 import { ReactNode } from 'react'
+import { useDetailContext } from './hooks'
 
 export type LabeledItem = {
   label: string

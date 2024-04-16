@@ -1,4 +1,4 @@
-import { Grouped } from '../LocalityDetails'
+import { Grouped } from '../../DetailView/DetailView'
 
 export const LocalityTab = () => {
   return (
