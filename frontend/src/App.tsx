@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 import { Container, Grid } from '@mui/material'
 import { FrontPage } from './components/FrontPage'
 import { NavBar } from './components/NavBar'

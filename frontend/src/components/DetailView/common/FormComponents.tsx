@@ -39,7 +39,7 @@ export const LabeledItems = ({ items }: { items: LabeledItem[] }) => {
     <Box>
       <Grid direction="column" container rowGap={'0.4em'}>
         {items.map(item => (
-          <Grid key={item.label} direction="row" container gap="2em">
+          <Grid key={item.label} direction="row" container gap="2em" minHeight="2.5em">
             <Grid xs={4} item>
               <b>{item.label}</b>
             </Grid>

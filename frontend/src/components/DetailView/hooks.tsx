@@ -15,6 +15,7 @@ export const useGetEditableTextField = <T,>() => {
       onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
         setEditData({ ...editData, [fieldName]: event?.currentTarget?.value })
       }
+      value={editData[fieldName]}
       variant="outlined"
       size="small"
     />
