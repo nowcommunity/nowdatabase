@@ -1,6 +1,5 @@
 import { Locality } from '../../../redux/localityReducer'
-import { LabeledItems } from '../../DetailView/LabeledItems'
-import { DataValue, Grouped } from '../../DetailView/common/FormComponents'
+import { DataValue, Grouped, LabeledItems } from '../../DetailView/common/FormComponents'
 import { useGetEditableTextField } from '../../DetailView/hooks'
 
 export const AgeTab = () => {
