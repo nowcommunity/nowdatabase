@@ -26,7 +26,7 @@ export const DataValue = <T extends object>({
   if (mode === 'edit') {
     return getEditElement(field)
   }
-  return data[field]
+  return <b>{data[field] as ReactNode}</b>
 }
 
 export type LabeledItem = {
