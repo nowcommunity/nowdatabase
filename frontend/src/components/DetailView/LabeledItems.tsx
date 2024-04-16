@@ -1,15 +1,12 @@
 import { Box, Grid } from '@mui/material'
 import { ReactNode } from 'react'
-import { useDetailContext } from './hooks'
 
 export type LabeledItem = {
   label: string
-  display: ReactNode
-  editable?: ReactNode
+  component?: ReactNode
 }
 
 export const LabeledItems = ({ items }: { items: LabeledItem[] }) => {
-  const mode = useDetailContext()
   return (
     <Box>
       <Grid direction="column" container rowGap={'0.4em'}>
@@ -19,7 +16,7 @@ export const LabeledItems = ({ items }: { items: LabeledItem[] }) => {
               <b>{item.label}</b>
             </Grid>
             <Grid xs={4} item>
-              {mode.mode !== 'read' && item.editable ? item.editable : item.display}
+              {item.component}
             </Grid>
           </Grid>
         ))}

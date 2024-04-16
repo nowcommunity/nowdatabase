@@ -1,4 +1,4 @@
-import { Grouped } from '../../DetailView/DetailView'
+import { Grouped } from '../../DetailView/common/FormComponents'
 
 export const LocalityTab = () => {
   return (

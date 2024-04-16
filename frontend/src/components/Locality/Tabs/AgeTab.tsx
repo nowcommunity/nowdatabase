@@ -1,39 +1,36 @@
-import { TextField } from '@mui/material'
 import { Locality } from '../../../redux/localityReducer'
-import { LabeledItem, LabeledItems } from '../../DetailView/LabeledItems'
-import { DataValue, Grouped } from '../../DetailView/DetailView'
-import { useDetailContext, useGetEditableTextField } from '../../DetailView/hooks'
+import { LabeledItems } from '../../DetailView/LabeledItems'
+import { DataValue, Grouped } from '../../DetailView/common/FormComponents'
+import { useGetEditableTextField } from '../../DetailView/hooks'
 
 export const AgeTab = () => {
-  const { data: locality } = useDetailContext<Locality>()
   const getEditableTextField = useGetEditableTextField<Locality>()
-  const ageItems: LabeledItem[] = [
+  const labelFields: { label: string; field: keyof Locality }[] = [
     {
       label: 'Dating Method',
-      display: locality.date_meth,
-      editable: <DataValue<Locality> field="date_meth" editElement={getEditableTextField} />,
+      field: 'date_meth',
     },
     {
       label: 'Minimum Age',
-      display: locality.min_age,
-      editable: <TextField variant="standard" />,
+      field: 'min_age',
     },
     {
       label: 'Maximum Age',
-      display: locality.max_age,
-      editable: <TextField variant="standard" />,
+      field: 'max_age',
     },
     {
       label: 'Chronostratigraphic Age',
-      display: locality.chron,
-      editable: <TextField variant="standard" />,
+      field: 'chron',
     },
     {
       label: 'Age Comment',
-      display: locality.max_age,
-      editable: <TextField variant="standard" />,
+      field: 'age_comm',
     },
   ]
+  const ageItems = labelFields.map(({ label, field }) => ({
+    label,
+    component: <DataValue<Locality> field={field as keyof Locality} editElement={getEditableTextField} />,
+  }))
 
   return (
     <>

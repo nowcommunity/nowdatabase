@@ -1,41 +1,14 @@
 import { useNavigate } from 'react-router-dom'
-import { Box, Button, Card, Paper, Stack, Tab, Tabs, Typography } from '@mui/material'
+import { Box, Button, Paper, Stack, Tab, Tabs } from '@mui/material'
 import ArrowBackIcon from '@mui/icons-material/ArrowBack'
 import EditIcon from '@mui/icons-material/Edit'
-import { ReactNode, useState } from 'react'
+import { useState } from 'react'
 import { DetailContextProvider, ModeType } from './Context/DetailContext'
-import { useDetailContext } from './hooks'
+import { cloneDeep } from 'lodash-es'
 
 export type TabType = {
   title: string
   content: JSX.Element
-}
-
-export const Grouped = ({ title, children }: { title?: string; children: ReactNode }) => {
-  return (
-    <Card style={{ margin: '1em', padding: '10px' }} variant="outlined">
-      {title && (
-        <Typography sx={{ fontSize: 16 }} color="text.secondary" gutterBottom>
-          {title}
-        </Typography>
-      )}
-      <Box marginTop="15px">{children}</Box>
-    </Card>
-  )
-}
-
-export const DataValue = <T extends object>({
-  field,
-  editElement: getEditElement,
-}: {
-  field: keyof T
-  editElement: (fieldName: keyof T) => ReactNode
-}) => {
-  const { data, mode } = useDetailContext<T>()
-  if (mode === 'edit') {
-    return getEditElement(field)
-  }
-  return data[field]
 }
 
 const ReturnButton = () => {
@@ -57,7 +30,7 @@ export const DetailView = <T extends object>({ tabs, data }: { tabs: TabType[]; 
   const initialState = {
     data,
     mode,
-    editData: { ...data }, // TODO deepcopy,
+    editData: cloneDeep(data),
   }
 
   return (
