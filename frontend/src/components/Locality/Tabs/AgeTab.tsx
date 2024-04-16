@@ -18,14 +18,20 @@ const ArrayToTable = ({ array }: { array: Array<Array<ReactNode>> }) => (
   </Grid>
 )
 
-const Age = () => {
+export const ArrayFrame = ({ array, title }: { array: Array<Array<ReactNode>>; title: string }) => (
+  <Grouped title={title}>
+    <ArrayToTable array={array} />
+  </Grouped>
+)
+
+export const AgeTab = () => {
   const getEditableTextField = useGetEditableTextField<Locality>()
 
   const valueField = (field: keyof Locality) => (
     <DataValue<Locality> field={field as keyof Locality} editElement={getEditableTextField} />
   )
 
-  const arr = [
+  const age = [
     ['Dating method', valueField('date_meth')],
     ['Age (Ma)', 'Basis for age (Absolute)', 'Basis for age (Time Unit)', 'Basis for age (Fraction)'],
     ['Minimum age', valueField('bfa_min_abs'), valueField('bfa_min'), valueField('frac_min')],
@@ -34,79 +40,30 @@ const Age = () => {
     ['Age Comment', valueField('age_comm')],
   ]
 
-  return (
-    <Grouped title="Age">
-      <ArrayToTable array={arr} />
-    </Grouped>
-  )
-}
-
-const Lithostratigraphy = () => {
-  const getEditableTextField = useGetEditableTextField<Locality>()
-
-  const valueField = (field: keyof Locality) => (
-    <DataValue<Locality> field={field as keyof Locality} editElement={getEditableTextField} />
-  )
-
-  const arr = [
+  const lithostratigraphy = [
     ['Group', valueField('lgroup')],
     ['Formation', valueField('formation')],
     ['Member', valueField('member')],
     ['Bed', valueField('bed')],
   ]
 
-  return (
-    <Grouped title="Lithostratigraphy">
-      <ArrayToTable array={arr} />
-    </Grouped>
-  )
-}
-
-const SampleUnit = () => {
-  const getEditableTextField = useGetEditableTextField<Locality>()
-
-  const valueField = (field: keyof Locality) => (
-    <DataValue<Locality> field={field as keyof Locality} editElement={getEditableTextField} />
-  )
-
-  const arr = [
+  const sampleUnit = [
     ['Datum Plane', valueField('datum_plane')],
     ['Top of Sample Unit(m)', valueField('tos')],
     ['Bottom of Sample Unit (m)', valueField('bos')],
   ]
 
-  return (
-    <Grouped title="Lithostratigraphy">
-      <ArrayToTable array={arr} />
-    </Grouped>
-  )
-}
-
-const BasinInformation = () => {
-  const getEditableTextField = useGetEditableTextField<Locality>()
-
-  const valueField = (field: keyof Locality) => (
-    <DataValue<Locality> field={field as keyof Locality} editElement={getEditableTextField} />
-  )
-
-  const arr = [
+  const basinInformation = [
     ['Basin', valueField('basin')],
     ['Subbasin', valueField('subbasin')],
   ]
 
   return (
-    <Grouped title="Lithostratigraphy">
-      <ArrayToTable array={arr} />
-    </Grouped>
-  )
-}
-export const AgeTab = () => {
-  return (
     <Box>
-      <Age />
-      <Lithostratigraphy />
-      <SampleUnit />
-      <BasinInformation />
+      <ArrayFrame array={age} title="Age" />
+      <ArrayFrame array={lithostratigraphy} title="Lithostratigraphy" />
+      <ArrayFrame array={sampleUnit} title="Sample Unit" />
+      <ArrayFrame array={basinInformation} title="Basin Information" />
     </Box>
   )
 }
