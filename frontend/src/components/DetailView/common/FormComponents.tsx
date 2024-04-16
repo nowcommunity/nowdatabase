@@ -2,6 +2,25 @@ import { Card, Typography, Box, Grid } from '@mui/material'
 import { ReactNode } from 'react'
 import { useDetailContext } from '../hooks'
 
+export const ArrayToTable = ({ array }: { array: Array<Array<ReactNode>> }) => (
+  <Grid container direction="row">
+    {array.map(row => (
+      <Grid container direction="row" height="2.5em">
+        {row.map((item, index) => (
+          <Grid key={index} item xs={2} padding="5px">
+            {item}
+          </Grid>
+        ))}
+      </Grid>
+    ))}
+  </Grid>
+)
+
+export const ArrayFrame = ({ array, title }: { array: Array<Array<ReactNode>>; title: string }) => (
+  <Grouped title={title}>
+    <ArrayToTable array={array} />
+  </Grouped>
+)
 export const Grouped = ({ title, children }: { title?: string; children: ReactNode }) => {
   return (
     <Card style={{ margin: '1em', padding: '10px' }} variant="outlined">

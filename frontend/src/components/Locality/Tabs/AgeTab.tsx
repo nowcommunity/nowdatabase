@@ -1,28 +1,7 @@
-import { Box, Grid } from '@mui/material'
+import { Box } from '@mui/material'
 import { Locality } from '../../../redux/localityReducer'
-import { DataValue, Grouped } from '../../DetailView/common/FormComponents'
+import { ArrayFrame, DataValue } from '../../DetailView/common/FormComponents'
 import { useGetEditableTextField } from '../../DetailView/hooks'
-import { ReactNode } from 'react'
-
-const ArrayToTable = ({ array }: { array: Array<Array<ReactNode>> }) => (
-  <Grid container direction="row">
-    {array.map(row => (
-      <Grid container direction="row" height="2.5em">
-        {row.map((item, index) => (
-          <Grid key={index} item xs={2} padding="5px">
-            {item}
-          </Grid>
-        ))}
-      </Grid>
-    ))}
-  </Grid>
-)
-
-export const ArrayFrame = ({ array, title }: { array: Array<Array<ReactNode>>; title: string }) => (
-  <Grouped title={title}>
-    <ArrayToTable array={array} />
-  </Grouped>
-)
 
 export const AgeTab = () => {
   const getEditableTextField = useGetEditableTextField<Locality>()
