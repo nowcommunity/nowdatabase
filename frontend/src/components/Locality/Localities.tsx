@@ -1,8 +1,6 @@
 import { useMemo } from 'react'
 import { type MRT_ColumnDef } from 'material-react-table'
 import { useGetAllLocalitiesQuery } from '../../redux/localityReducer'
-import { Button } from '@mui/material'
-import { useNavigate } from 'react-router-dom'
 import { TableView } from '../TableView/TableView'
 
 interface Locality {
