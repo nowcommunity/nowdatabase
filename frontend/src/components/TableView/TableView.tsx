@@ -10,7 +10,7 @@ import { useLocation, useNavigate } from 'react-router-dom'
 
 /*
   TableView takes in the data and columns of a table, and handles
-  the actual table and saving & loading its state via url.
+  rendering the actual table and saving & loading its state via url.
 */
 export const TableView = <T extends MRT_RowData>({
   data,
@@ -33,7 +33,6 @@ export const TableView = <T extends MRT_RowData>({
 
   // Save state to url when columnFilters change
   useEffect(() => {
-    if (columnFilters.length === 0) return
     navigate(`${location.pathname}?columnfilters=${JSON.stringify(columnFilters)}`, { replace: true })
   }, [columnFilters, location.pathname, navigate])
 
