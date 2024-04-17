@@ -26,6 +26,16 @@ export const Localities = () => {
     ],
     []
   )
+  const checkRowRestriction = (row: Locality) => {
+    return row.loc_status !== 0
+  }
 
-  return <TableView<Locality> idFieldName="lid" columns={columns} data={localitiesQuery.data} />
+  return (
+    <TableView<Locality>
+      checkRowRestriction={checkRowRestriction}
+      idFieldName="lid"
+      columns={columns}
+      data={localitiesQuery.data}
+    />
+  )
 }
