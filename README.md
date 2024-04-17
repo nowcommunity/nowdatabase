@@ -12,5 +12,5 @@ _____
 
 The [documentation](documentation)-folder has documentation for developers. Remember to update it if you modify something important like project architecture.
 
-+ [Initializing the application & restoring database from dumps :rocket: :cd:](documentation/init.md)
-+ [Technical explanations - how do things work, used technologies etc. :wrench:](documentation/technical_explanations.md)
++ [Initialize app & restore db :rocket: :cd:](documentation/init.md) How to get the app up & running, and initialize database from sql-dumps
++ [Technical explanations :wrench:](documentation/technical_explanations.md) How do things work, used technologies etc.
