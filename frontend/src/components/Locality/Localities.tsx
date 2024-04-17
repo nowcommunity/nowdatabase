@@ -15,42 +15,32 @@ interface Locality {
 
 export const Localities = () => {
   const localitiesQuery = useGetAllLocalitiesQuery({})
-  const navigate = useNavigate()
 
   const columns = useMemo<MRT_ColumnDef<Locality>[]>(
     () => [
       {
-        accessorFn: row => <Button onClick={() => navigate(`/locality/${row.lid}`)}>Details</Button>,
-        header: 'View',
-        size: 12,
-      },
-      {
         accessorKey: 'loc_name',
         header: 'Name',
-        size: 220,
       },
       {
         accessorKey: 'min_age',
         header: 'Min age',
-        size: 5,
       },
       {
         accessorKey: 'max_age',
         header: 'Max age',
-        size: 5,
       },
       {
         accessorKey: 'country',
         header: 'Country',
-        size: 150,
       },
     ],
-    [navigate]
+    []
   )
 
   return (
     <div>
-      <TableView columns={columns} data={localitiesQuery.data} />
+      <TableView<Locality> idFieldName="lid" columns={columns} data={localitiesQuery.data} />
     </div>
   )
 }

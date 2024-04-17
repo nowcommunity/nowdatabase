@@ -4,9 +4,11 @@ import {
   MaterialReactTable,
   type MRT_ColumnDef,
   type MRT_RowData,
+  MRT_Row,
 } from 'material-react-table'
-import { CircularProgress } from '@mui/material'
+import { Button, CircularProgress } from '@mui/material'
 import { useLocation, useNavigate } from 'react-router-dom'
+import ManageSearchIcon from '@mui/icons-material/ManageSearch'
 
 /*
   TableView takes in the data and columns of a table, and handles
@@ -15,9 +17,11 @@ import { useLocation, useNavigate } from 'react-router-dom'
 export const TableView = <T extends MRT_RowData>({
   data,
   columns,
+  idFieldName,
 }: {
   data: T[] | null
   columns: MRT_ColumnDef<T>[]
+  idFieldName: keyof MRT_RowData
 }) => {
   const navigate = useNavigate()
   const location = useLocation()
@@ -45,6 +49,13 @@ export const TableView = <T extends MRT_RowData>({
         data={data}
         state={{ columnFilters, showColumnFilters: true }}
         onColumnFiltersChange={setColumnFilters}
+        renderRowActions={({ row }) => (
+          <Button onClick={() => navigate(`/locality/${row.original[idFieldName as keyof MRT_Row<T>]}`)}>
+            <ManageSearchIcon />
+          </Button>
+        )}
+        displayColumnDefOptions={{ 'mrt-row-actions': { size: 50 } }}
+        enableRowActions
       />
     </div>
   )
