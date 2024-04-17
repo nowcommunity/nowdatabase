@@ -43,24 +43,22 @@ export const TableView = <T extends MRT_RowData>({
   if (!data) return <CircularProgress />
 
   return (
-    <div>
-      <MaterialReactTable
-        columns={columns}
-        data={data}
-        state={{ columnFilters, showColumnFilters: true }}
-        onColumnFiltersChange={setColumnFilters}
-        renderRowActions={({ row }) => (
-          <Button
-            variant="contained"
-            style={{ width: '2em' }}
-            onClick={() => navigate(`/locality/${row.original[idFieldName as keyof MRT_Row<T>]}`)}
-          >
-            <ManageSearchIcon />
-          </Button>
-        )}
-        displayColumnDefOptions={{ 'mrt-row-actions': { size: 50, header: '' } }}
-        enableRowActions
-      />
-    </div>
+    <MaterialReactTable
+      columns={columns}
+      data={data}
+      state={{ columnFilters, showColumnFilters: true }}
+      onColumnFiltersChange={setColumnFilters}
+      renderRowActions={({ row }) => (
+        <Button
+          variant="contained"
+          style={{ width: '2em' }}
+          onClick={() => navigate(`/locality/${row.original[idFieldName as keyof MRT_Row<T>]}`)}
+        >
+          <ManageSearchIcon />
+        </Button>
+      )}
+      displayColumnDefOptions={{ 'mrt-row-actions': { size: 50, header: '' } }}
+      enableRowActions
+    />
   )
 }

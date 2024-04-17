@@ -27,9 +27,5 @@ export const Localities = () => {
     []
   )
 
-  return (
-    <div>
-      <TableView<Locality> idFieldName="lid" columns={columns} data={localitiesQuery.data} />
-    </div>
-  )
+  return <TableView<Locality> idFieldName="lid" columns={columns} data={localitiesQuery.data} />
 }
