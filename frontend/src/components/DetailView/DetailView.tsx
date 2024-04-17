@@ -51,7 +51,9 @@ export const DetailView = <T extends object>({ tabs, data }: { tabs: TabType[]; 
         </Tabs>
       </Box>
       <DetailContextProvider contextState={{ ...initialState }}>
-        <Paper style={{ minHeight: '10em', backgroundColor: '#dee0dd' }}>{tabs[tab].content}</Paper>
+        <Paper style={{ minHeight: '10em' }} elevation={14}>
+          {tabs[tab].content}
+        </Paper>
       </DetailContextProvider>
     </Stack>
   )

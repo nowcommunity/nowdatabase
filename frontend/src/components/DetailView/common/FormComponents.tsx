@@ -24,7 +24,10 @@ export const ArrayFrame = ({ array, title }: { array: Array<Array<ReactNode>>; t
 
 export const Grouped = ({ title, children }: { title?: string; children: ReactNode }) => {
   return (
-    <Card style={{ margin: '1em', padding: '10px', paddingBottom: '15px' }} variant="outlined">
+    <Card
+      style={{ margin: '1em', padding: '10px', paddingBottom: '15px', backgroundColor: 'ivory' }}
+      variant="elevation"
+    >
       {title && (
         <Typography sx={{ fontSize: 16 }} color="text.secondary" gutterBottom>
           {title}
