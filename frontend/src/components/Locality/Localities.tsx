@@ -1,19 +1,10 @@
 import { useMemo } from 'react'
 import { type MRT_ColumnDef } from 'material-react-table'
-import { useGetAllLocalitiesQuery } from '../../redux/localityReducer'
+import { Locality, useGetAllLocalitiesQuery } from '../../redux/localityReducer'
 import { TableView } from '../TableView/TableView'
-
-interface Locality {
-  loc_name: string
-  min_age: number
-  max_age: number
-  country: string
-  lid: string
-}
 
 export const Localities = () => {
   const localitiesQuery = useGetAllLocalitiesQuery({})
-
   const columns = useMemo<MRT_ColumnDef<Locality>[]>(
     () => [
       {
