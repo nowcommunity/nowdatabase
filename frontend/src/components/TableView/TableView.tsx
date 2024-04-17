@@ -54,7 +54,7 @@ export const TableView = <T extends MRT_RowData>({
             <ManageSearchIcon />
           </Button>
         )}
-        displayColumnDefOptions={{ 'mrt-row-actions': { size: 50 } }}
+        displayColumnDefOptions={{ 'mrt-row-actions': { size: 50, header: '' } }}
         enableRowActions
       />
     </div>
