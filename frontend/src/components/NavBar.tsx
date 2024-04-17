@@ -46,7 +46,7 @@ export const NavBar = () => {
             </MenuItem>
           )}
         </MenuList>
-        <Box alignContent="center" paddingRight="1em">
+        <Box alignContent="center" style={{ marginTop: 'auto', marginBottom: 'auto' }} paddingRight="1em">
           {user.username ? `Logged in as ${user.username}` : 'Not logged in'}
         </Box>
       </Stack>
