@@ -50,7 +50,11 @@ export const TableView = <T extends MRT_RowData>({
         state={{ columnFilters, showColumnFilters: true }}
         onColumnFiltersChange={setColumnFilters}
         renderRowActions={({ row }) => (
-          <Button onClick={() => navigate(`/locality/${row.original[idFieldName as keyof MRT_Row<T>]}`)}>
+          <Button
+            variant="contained"
+            style={{ width: '2em' }}
+            onClick={() => navigate(`/locality/${row.original[idFieldName as keyof MRT_Row<T>]}`)}
+          >
             <ManageSearchIcon />
           </Button>
         )}
