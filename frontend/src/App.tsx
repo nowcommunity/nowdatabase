@@ -15,7 +15,7 @@ const App = () => {
             <NavBar />
           </Container>
         </Grid>
-        <Container maxWidth="xl" fixed style={{ marginTop: '3em' }}>
+        <Container maxWidth="xl" fixed style={{ marginTop: '3em', marginBottom: '3em' }}>
           <Grid item>
             <Routes>
               <Route element={<LocalityDetails />} path="/locality/:id" />

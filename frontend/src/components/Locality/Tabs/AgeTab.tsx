@@ -12,9 +12,11 @@ export const AgeTab = () => {
 
   const age = [
     ['Dating method', valueField('date_meth')],
+    [''],
     ['Age (Ma)', 'Basis for age (Absolute)', 'Basis for age (Time Unit)', 'Basis for age (Fraction)'],
     ['Minimum age', valueField('bfa_min_abs'), valueField('bfa_min'), valueField('frac_min')],
     ['Maximum age', valueField('bfa_max_abs'), valueField('bfa_max'), valueField('frac_max')],
+    [''],
     ['Chronostrathigraphic age', valueField('chron')],
     ['Age Comment', valueField('age_comm')],
   ]

@@ -8,7 +8,7 @@ export const ArrayToTable = ({ array }: { array: Array<Array<ReactNode>> }) => (
       <Grid container direction="row" height="2.5em">
         {row.map((item, index) => (
           <Grid key={index} item xs={2} padding="5px">
-            {item}
+            {typeof item === 'string' ? <b>{item}</b> : item}
           </Grid>
         ))}
       </Grid>
@@ -21,9 +21,10 @@ export const ArrayFrame = ({ array, title }: { array: Array<Array<ReactNode>>; t
     <ArrayToTable array={array} />
   </Grouped>
 )
+
 export const Grouped = ({ title, children }: { title?: string; children: ReactNode }) => {
   return (
-    <Card style={{ margin: '1em', padding: '10px' }} variant="outlined">
+    <Card style={{ margin: '1em', padding: '10px', paddingBottom: '15px' }} variant="outlined">
       {title && (
         <Typography sx={{ fontSize: 16 }} color="text.secondary" gutterBottom>
           {title}
