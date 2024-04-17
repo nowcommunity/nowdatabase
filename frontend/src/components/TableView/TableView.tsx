@@ -44,7 +44,7 @@ export const TableView = <T extends MRT_RowData>({
       <MaterialReactTable
         columns={columns}
         data={data}
-        state={{ columnFilters }}
+        state={{ columnFilters, showColumnFilters: true }}
         onColumnFiltersChange={setColumnFilters}
       />
     </div>
