@@ -5,13 +5,16 @@ import {
   type MRT_ColumnDef,
   type MRT_RowData,
   MRT_SortingState,
+  MRT_PaginationState,
 } from 'material-react-table'
 import { Box, Button, CircularProgress, Tooltip } from '@mui/material'
 import { useLocation, useNavigate } from 'react-router-dom'
 import ManageSearchIcon from '@mui/icons-material/ManageSearch'
 import PolicyIcon from '@mui/icons-material/Policy'
 
-type TableStateInUrl = 'sorting' | 'columnfilters'
+type TableStateInUrl = 'sorting' | 'columnfilters' | 'pagination'
+
+const defaultPagination: MRT_PaginationState = { pageIndex: 0, pageSize: 10 }
 
 /*
   TableView takes in the data and columns of a table, and handles
@@ -32,25 +35,34 @@ export const TableView = <T extends MRT_RowData>({
   const location = useLocation()
   const [columnFilters, setColumnFilters] = useState<MRT_ColumnFiltersState>([])
   const [sorting, setSorting] = useState<MRT_SortingState>([])
+  const [pagination, setPagination] = useState<MRT_PaginationState>(defaultPagination)
 
-  const loadStateFromUrl = (state: TableStateInUrl) => {
+  const loadStateFromUrl = (state: TableStateInUrl, defaultState: [] | MRT_PaginationState) => {
     const searchParams = new URLSearchParams(location.search)
-    return JSON.parse(searchParams.get(state) ?? '[]')
+    const stateFromUrl = searchParams.get(state)
+    if (!stateFromUrl) return defaultState
+    console.log(`setting ${state} to ${JSON.stringify(stateFromUrl)}`)
+    return JSON.parse(stateFromUrl)
   }
 
   // Load state from url only on first render
   useEffect(() => {
-    setColumnFilters(loadStateFromUrl('columnfilters'))
-    setSorting(loadStateFromUrl('sorting'))
+    setColumnFilters(loadStateFromUrl('columnfilters', []))
+    setSorting(loadStateFromUrl('sorting', []))
+    setPagination(loadStateFromUrl('pagination', defaultPagination))
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   // Save state to url whenever it changes
   useEffect(() => {
-    navigate(`${location.pathname}?columnfilters=${JSON.stringify(columnFilters)}&sorting=${JSON.stringify(sorting)}`, {
+    console.log(JSON.stringify(pagination, null, 2))
+    const columnFilterToUrl = `columnfilters=${JSON.stringify(columnFilters)}`
+    const sortingToUrl = `sorting=${JSON.stringify(sorting)}`
+    const paginationToUrl = `pagination=${JSON.stringify(pagination)}`
+    navigate(`${location.pathname}?&${columnFilterToUrl}&${sortingToUrl}&${paginationToUrl}`, {
       replace: true,
     })
-  }, [columnFilters, sorting, location.pathname, navigate])
+  }, [columnFilters, sorting, pagination, location.pathname, navigate])
 
   if (!data) return <CircularProgress />
 
@@ -58,7 +70,7 @@ export const TableView = <T extends MRT_RowData>({
     <MaterialReactTable
       columns={columns}
       data={data}
-      state={{ columnFilters, showColumnFilters: true, sorting }}
+      state={{ columnFilters, showColumnFilters: true, sorting, pagination }}
       onColumnFiltersChange={setColumnFilters}
       renderRowActions={({ row }) => (
         <Box display="flex" gap="1em" alignItems="center" width="3.6em">
@@ -79,6 +91,8 @@ export const TableView = <T extends MRT_RowData>({
       displayColumnDefOptions={{ 'mrt-row-actions': { size: 50, header: '' } }}
       enableRowActions
       onSortingChange={setSorting}
+      onPaginationChange={setPagination}
+      autoResetPageIndex={false}
     />
   )
 }
