@@ -27,7 +27,7 @@ export const Localities = () => {
     []
   )
   const checkRowRestriction = (row: Locality) => {
-    return row.loc_status !== 0
+    return !!row.loc_status
   }
 
   return (
