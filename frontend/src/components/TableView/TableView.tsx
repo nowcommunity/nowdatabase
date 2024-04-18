@@ -41,7 +41,6 @@ export const TableView = <T extends MRT_RowData>({
     const searchParams = new URLSearchParams(location.search)
     const stateFromUrl = searchParams.get(state)
     if (!stateFromUrl) return defaultState
-    console.log(`setting ${state} to ${JSON.stringify(stateFromUrl)}`)
     return JSON.parse(stateFromUrl)
   }
 
@@ -55,7 +54,6 @@ export const TableView = <T extends MRT_RowData>({
 
   // Save state to url whenever it changes
   useEffect(() => {
-    console.log(JSON.stringify(pagination, null, 2))
     const columnFilterToUrl = `columnfilters=${JSON.stringify(columnFilters)}`
     const sortingToUrl = `sorting=${JSON.stringify(sorting)}`
     const paginationToUrl = `pagination=${JSON.stringify(pagination)}`
