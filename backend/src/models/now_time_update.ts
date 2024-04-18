@@ -1,41 +1,69 @@
 import * as Sequelize from 'sequelize'
-import { CreationOptional, DataTypes, InferCreationAttributes, InferAttributes, Model } from 'sequelize'
-
+import { DataTypes, Model, Optional } from 'sequelize'
 import type { now_bau, now_bauId } from './now_bau'
 import type { now_tau, now_tauId } from './now_tau'
 import type { now_time_unit, now_time_unitId } from './now_time_unit'
 
-export class now_time_update extends Model<InferAttributes<now_time_update>, InferCreationAttributes<now_time_update>> {
-  declare time_update_id: CreationOptional<number>
-  declare tu_name: string
-  declare tuid?: number
-  declare lower_buid?: number
-  declare upper_buid?: number
-  declare coordinator: string
-  declare authorizer: string
-  declare date?: string
-  declare comment?: string
+export interface now_time_updateAttributes {
+  time_update_id: number
+  tu_name: string
+  tuid?: number
+  lower_buid?: number
+  upper_buid?: number
+  coordinator: string
+  authorizer: string
+  date?: string
+  comment?: string
+}
+
+export type now_time_updatePk = 'time_update_id'
+export type now_time_updateId = now_time_update[now_time_updatePk]
+export type now_time_updateOptionalAttributes =
+  | 'time_update_id'
+  | 'tu_name'
+  | 'tuid'
+  | 'lower_buid'
+  | 'upper_buid'
+  | 'coordinator'
+  | 'authorizer'
+  | 'date'
+  | 'comment'
+export type now_time_updateCreationAttributes = Optional<now_time_updateAttributes, now_time_updateOptionalAttributes>
+
+export class now_time_update
+  extends Model<now_time_updateAttributes, now_time_updateCreationAttributes>
+  implements now_time_updateAttributes
+{
+  time_update_id!: number
+  tu_name!: string
+  tuid?: number
+  lower_buid?: number
+  upper_buid?: number
+  coordinator!: string
+  authorizer!: string
+  date?: string
+  comment?: string
 
   // now_time_update belongsTo now_bau via lower_buid
-  declare lower_bu?: Sequelize.NonAttribute<now_bau>
-  declare getLower_bu: Sequelize.BelongsToGetAssociationMixin<now_bau>
-  declare setLower_bu: Sequelize.BelongsToSetAssociationMixin<now_bau, number>
-  declare createLower_bu: Sequelize.BelongsToCreateAssociationMixin<now_bau>
+  lower_bu!: now_bau
+  getLower_bu!: Sequelize.BelongsToGetAssociationMixin<now_bau>
+  setLower_bu!: Sequelize.BelongsToSetAssociationMixin<now_bau, now_bauId>
+  createLower_bu!: Sequelize.BelongsToCreateAssociationMixin<now_bau>
   // now_time_update belongsTo now_bau via upper_buid
-  declare upper_bu?: Sequelize.NonAttribute<now_bau>
-  declare getUpper_bu: Sequelize.BelongsToGetAssociationMixin<now_bau>
-  declare setUpper_bu: Sequelize.BelongsToSetAssociationMixin<now_bau, number>
-  declare createUpper_bu: Sequelize.BelongsToCreateAssociationMixin<now_bau>
+  upper_bu!: now_bau
+  getUpper_bu!: Sequelize.BelongsToGetAssociationMixin<now_bau>
+  setUpper_bu!: Sequelize.BelongsToSetAssociationMixin<now_bau, now_bauId>
+  createUpper_bu!: Sequelize.BelongsToCreateAssociationMixin<now_bau>
   // now_time_update belongsTo now_tau via tuid
-  declare tu?: Sequelize.NonAttribute<now_tau>
-  declare getTu: Sequelize.BelongsToGetAssociationMixin<now_tau>
-  declare setTu: Sequelize.BelongsToSetAssociationMixin<now_tau, number>
-  declare createTu: Sequelize.BelongsToCreateAssociationMixin<now_tau>
+  tu!: now_tau
+  getTu!: Sequelize.BelongsToGetAssociationMixin<now_tau>
+  setTu!: Sequelize.BelongsToSetAssociationMixin<now_tau, now_tauId>
+  createTu!: Sequelize.BelongsToCreateAssociationMixin<now_tau>
   // now_time_update belongsTo now_time_unit via tu_name
-  declare tu_name_now_time_unit?: Sequelize.NonAttribute<now_time_unit>
-  declare getTu_name_now_time_unit: Sequelize.BelongsToGetAssociationMixin<now_time_unit>
-  declare setTu_name_now_time_unit: Sequelize.BelongsToSetAssociationMixin<now_time_unit, number>
-  declare createTu_name_now_time_unit: Sequelize.BelongsToCreateAssociationMixin<now_time_unit>
+  tu_name_now_time_unit!: now_time_unit
+  getTu_name_now_time_unit!: Sequelize.BelongsToGetAssociationMixin<now_time_unit>
+  setTu_name_now_time_unit!: Sequelize.BelongsToSetAssociationMixin<now_time_unit, now_time_unitId>
+  createTu_name_now_time_unit!: Sequelize.BelongsToCreateAssociationMixin<now_time_unit>
 
   static initModel(sequelize: Sequelize.Sequelize): typeof now_time_update {
     return now_time_update.init(

@@ -1,9 +1,22 @@
 import * as Sequelize from 'sequelize'
-import { CreationOptional, DataTypes, InferCreationAttributes, InferAttributes, Model } from 'sequelize'
+import { DataTypes, Model, Optional } from 'sequelize'
 
-export class now_ss_values extends Model<InferAttributes<now_ss_values>, InferCreationAttributes<now_ss_values>> {
-  declare ss_value: CreationOptional<string>
-  declare category?: string
+export interface now_ss_valuesAttributes {
+  ss_value: string
+  category?: string
+}
+
+export type now_ss_valuesPk = 'ss_value'
+export type now_ss_valuesId = now_ss_values[now_ss_valuesPk]
+export type now_ss_valuesOptionalAttributes = 'ss_value' | 'category'
+export type now_ss_valuesCreationAttributes = Optional<now_ss_valuesAttributes, now_ss_valuesOptionalAttributes>
+
+export class now_ss_values
+  extends Model<now_ss_valuesAttributes, now_ss_valuesCreationAttributes>
+  implements now_ss_valuesAttributes
+{
+  ss_value!: string
+  category?: string
 
   static initModel(sequelize: Sequelize.Sequelize): typeof now_ss_values {
     return now_ss_values.init(

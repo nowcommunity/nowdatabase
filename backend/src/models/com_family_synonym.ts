@@ -1,12 +1,25 @@
 import * as Sequelize from 'sequelize'
-import { CreationOptional, DataTypes, InferCreationAttributes, InferAttributes, Model } from 'sequelize'
+import { DataTypes, Model, Optional } from 'sequelize'
 
-export class com_family_synonym extends Model<
-  InferAttributes<com_family_synonym>,
-  InferCreationAttributes<com_family_synonym>
-> {
-  declare syn_family_name: CreationOptional<string>
-  declare family_name?: string
+export interface com_family_synonymAttributes {
+  syn_family_name: string
+  family_name?: string
+}
+
+export type com_family_synonymPk = 'syn_family_name'
+export type com_family_synonymId = com_family_synonym[com_family_synonymPk]
+export type com_family_synonymOptionalAttributes = 'syn_family_name' | 'family_name'
+export type com_family_synonymCreationAttributes = Optional<
+  com_family_synonymAttributes,
+  com_family_synonymOptionalAttributes
+>
+
+export class com_family_synonym
+  extends Model<com_family_synonymAttributes, com_family_synonymCreationAttributes>
+  implements com_family_synonymAttributes
+{
+  syn_family_name!: string
+  family_name?: string
 
   static initModel(sequelize: Sequelize.Sequelize): typeof com_family_synonym {
     return com_family_synonym.init(

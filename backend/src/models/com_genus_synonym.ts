@@ -1,12 +1,25 @@
 import * as Sequelize from 'sequelize'
-import { CreationOptional, DataTypes, InferCreationAttributes, InferAttributes, Model } from 'sequelize'
+import { DataTypes, Model, Optional } from 'sequelize'
 
-export class com_genus_synonym extends Model<
-  InferAttributes<com_genus_synonym>,
-  InferCreationAttributes<com_genus_synonym>
-> {
-  declare syn_genus_name: CreationOptional<string>
-  declare genus_name?: string
+export interface com_genus_synonymAttributes {
+  syn_genus_name: string
+  genus_name?: string
+}
+
+export type com_genus_synonymPk = 'syn_genus_name'
+export type com_genus_synonymId = com_genus_synonym[com_genus_synonymPk]
+export type com_genus_synonymOptionalAttributes = 'syn_genus_name' | 'genus_name'
+export type com_genus_synonymCreationAttributes = Optional<
+  com_genus_synonymAttributes,
+  com_genus_synonymOptionalAttributes
+>
+
+export class com_genus_synonym
+  extends Model<com_genus_synonymAttributes, com_genus_synonymCreationAttributes>
+  implements com_genus_synonymAttributes
+{
+  syn_genus_name!: string
+  genus_name?: string
 
   static initModel(sequelize: Sequelize.Sequelize): typeof com_genus_synonym {
     return com_genus_synonym.init(

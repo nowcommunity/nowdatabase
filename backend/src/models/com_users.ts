@@ -1,14 +1,36 @@
 import * as Sequelize from 'sequelize'
-import { CreationOptional, DataTypes, InferCreationAttributes, InferAttributes, Model } from 'sequelize'
+import { DataTypes, Model, Optional } from 'sequelize'
 
-export class com_users extends Model<InferAttributes<com_users>, InferCreationAttributes<com_users>> {
-  declare user_id: CreationOptional<number>
-  declare user_name?: string
-  declare password?: string
-  declare last_login?: string
-  declare now_user_group?: string
-  declare mor_user_group?: string
-  declare gen_user_group?: string
+export interface com_usersAttributes {
+  user_id: number
+  user_name?: string
+  password?: string
+  last_login?: string
+  now_user_group?: string
+  mor_user_group?: string
+  gen_user_group?: string
+}
+
+export type com_usersPk = 'user_id'
+export type com_usersId = com_users[com_usersPk]
+export type com_usersOptionalAttributes =
+  | 'user_id'
+  | 'user_name'
+  | 'password'
+  | 'last_login'
+  | 'now_user_group'
+  | 'mor_user_group'
+  | 'gen_user_group'
+export type com_usersCreationAttributes = Optional<com_usersAttributes, com_usersOptionalAttributes>
+
+export class com_users extends Model<com_usersAttributes, com_usersCreationAttributes> implements com_usersAttributes {
+  user_id!: number
+  user_name?: string
+  password?: string
+  last_login?: string
+  now_user_group?: string
+  mor_user_group?: string
+  gen_user_group?: string
 
   static initModel(sequelize: Sequelize.Sequelize): typeof com_users {
     return com_users.init(

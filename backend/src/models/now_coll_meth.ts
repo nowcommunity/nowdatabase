@@ -1,17 +1,29 @@
 import * as Sequelize from 'sequelize'
-import { CreationOptional, DataTypes, InferCreationAttributes, InferAttributes, Model } from 'sequelize'
-
+import { DataTypes, Model, Optional } from 'sequelize'
 import type { now_loc, now_locId } from './now_loc'
 
-export class now_coll_meth extends Model<InferAttributes<now_coll_meth>, InferCreationAttributes<now_coll_meth>> {
-  declare lid: CreationOptional<number>
-  declare coll_meth: CreationOptional<string>
+export interface now_coll_methAttributes {
+  lid: number
+  coll_meth: string
+}
+
+export type now_coll_methPk = 'lid' | 'coll_meth'
+export type now_coll_methId = now_coll_meth[now_coll_methPk]
+export type now_coll_methOptionalAttributes = 'lid'
+export type now_coll_methCreationAttributes = Optional<now_coll_methAttributes, now_coll_methOptionalAttributes>
+
+export class now_coll_meth
+  extends Model<now_coll_methAttributes, now_coll_methCreationAttributes>
+  implements now_coll_methAttributes
+{
+  lid!: number
+  coll_meth!: string
 
   // now_coll_meth belongsTo now_loc via lid
-  declare lid_now_loc?: Sequelize.NonAttribute<now_loc>
-  declare getLid_now_loc: Sequelize.BelongsToGetAssociationMixin<now_loc>
-  declare setLid_now_loc: Sequelize.BelongsToSetAssociationMixin<now_loc, number>
-  declare createLid_now_loc: Sequelize.BelongsToCreateAssociationMixin<now_loc>
+  lid_now_loc!: now_loc
+  getLid_now_loc!: Sequelize.BelongsToGetAssociationMixin<now_loc>
+  setLid_now_loc!: Sequelize.BelongsToSetAssociationMixin<now_loc, now_locId>
+  createLid_now_loc!: Sequelize.BelongsToCreateAssociationMixin<now_loc>
 
   static initModel(sequelize: Sequelize.Sequelize): typeof now_coll_meth {
     return now_coll_meth.init(

@@ -1,12 +1,25 @@
 import * as Sequelize from 'sequelize'
-import { CreationOptional, DataTypes, InferCreationAttributes, InferAttributes, Model } from 'sequelize'
+import { DataTypes, Model, Optional } from 'sequelize'
 
-export class com_order_synonym extends Model<
-  InferAttributes<com_order_synonym>,
-  InferCreationAttributes<com_order_synonym>
-> {
-  declare syn_order_name: CreationOptional<string>
-  declare order_name?: string
+export interface com_order_synonymAttributes {
+  syn_order_name: string
+  order_name?: string
+}
+
+export type com_order_synonymPk = 'syn_order_name'
+export type com_order_synonymId = com_order_synonym[com_order_synonymPk]
+export type com_order_synonymOptionalAttributes = 'syn_order_name' | 'order_name'
+export type com_order_synonymCreationAttributes = Optional<
+  com_order_synonymAttributes,
+  com_order_synonymOptionalAttributes
+>
+
+export class com_order_synonym
+  extends Model<com_order_synonymAttributes, com_order_synonymCreationAttributes>
+  implements com_order_synonymAttributes
+{
+  syn_order_name!: string
+  order_name?: string
 
   static initModel(sequelize: Sequelize.Sequelize): typeof com_order_synonym {
     return com_order_synonym.init(

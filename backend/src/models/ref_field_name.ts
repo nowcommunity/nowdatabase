@@ -1,24 +1,52 @@
 import * as Sequelize from 'sequelize'
-import { CreationOptional, DataTypes, InferCreationAttributes, InferAttributes, Model } from 'sequelize'
-
+import { DataTypes, Model, Optional } from 'sequelize'
 import type { ref_ref_type, ref_ref_typeId } from './ref_ref_type'
 
-export class ref_field_name extends Model<InferAttributes<ref_field_name>, InferCreationAttributes<ref_field_name>> {
-  declare field_ID: CreationOptional<number>
-  declare ref_type_id: CreationOptional<number>
-  declare ref_field_name?: string
-  declare display?: number
-  declare label_x?: number
-  declare label_y?: number
-  declare field_x?: number
-  declare field_y?: number
-  declare field_name?: string
+export interface ref_field_nameAttributes {
+  field_ID: number
+  ref_type_id: number
+  ref_field_name?: string
+  display?: number
+  label_x?: number
+  label_y?: number
+  field_x?: number
+  field_y?: number
+  field_name?: string
+}
+
+export type ref_field_namePk = 'field_ID' | 'ref_type_id'
+export type ref_field_nameId = ref_field_name[ref_field_namePk]
+export type ref_field_nameOptionalAttributes =
+  | 'field_ID'
+  | 'ref_type_id'
+  | 'ref_field_name'
+  | 'display'
+  | 'label_x'
+  | 'label_y'
+  | 'field_x'
+  | 'field_y'
+  | 'field_name'
+export type ref_field_nameCreationAttributes = Optional<ref_field_nameAttributes, ref_field_nameOptionalAttributes>
+
+export class ref_field_name
+  extends Model<ref_field_nameAttributes, ref_field_nameCreationAttributes>
+  implements ref_field_nameAttributes
+{
+  field_ID!: number
+  ref_type_id!: number
+  ref_field_name?: string
+  display?: number
+  label_x?: number
+  label_y?: number
+  field_x?: number
+  field_y?: number
+  field_name?: string
 
   // ref_field_name belongsTo ref_ref_type via ref_type_id
-  declare ref_type?: Sequelize.NonAttribute<ref_ref_type>
-  declare getRef_type: Sequelize.BelongsToGetAssociationMixin<ref_ref_type>
-  declare setRef_type: Sequelize.BelongsToSetAssociationMixin<ref_ref_type, number>
-  declare createRef_type: Sequelize.BelongsToCreateAssociationMixin<ref_ref_type>
+  ref_type!: ref_ref_type
+  getRef_type!: Sequelize.BelongsToGetAssociationMixin<ref_ref_type>
+  setRef_type!: Sequelize.BelongsToSetAssociationMixin<ref_ref_type, ref_ref_typeId>
+  createRef_type!: Sequelize.BelongsToCreateAssociationMixin<ref_ref_type>
 
   static initModel(sequelize: Sequelize.Sequelize): typeof ref_field_name {
     return ref_field_name.init(

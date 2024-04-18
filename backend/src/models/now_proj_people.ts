@@ -1,23 +1,34 @@
 import * as Sequelize from 'sequelize'
-import { CreationOptional, DataTypes, InferCreationAttributes, InferAttributes, Model } from 'sequelize'
-
+import { DataTypes, Model, Optional } from 'sequelize'
 import type { com_people, com_peopleId } from './com_people'
 import type { now_proj, now_projId } from './now_proj'
 
-export class now_proj_people extends Model<InferAttributes<now_proj_people>, InferCreationAttributes<now_proj_people>> {
-  declare pid: CreationOptional<number>
-  declare initials: CreationOptional<string>
+export interface now_proj_peopleAttributes {
+  pid: number
+  initials: string
+}
+
+export type now_proj_peoplePk = 'pid' | 'initials'
+export type now_proj_peopleId = now_proj_people[now_proj_peoplePk]
+export type now_proj_peopleCreationAttributes = now_proj_peopleAttributes
+
+export class now_proj_people
+  extends Model<now_proj_peopleAttributes, now_proj_peopleCreationAttributes>
+  implements now_proj_peopleAttributes
+{
+  pid!: number
+  initials!: string
 
   // now_proj_people belongsTo com_people via initials
-  declare initials_com_person?: Sequelize.NonAttribute<com_people>
-  declare getInitials_com_person: Sequelize.BelongsToGetAssociationMixin<com_people>
-  declare setInitials_com_person: Sequelize.BelongsToSetAssociationMixin<com_people, number>
-  declare createInitials_com_person: Sequelize.BelongsToCreateAssociationMixin<com_people>
+  initials_com_person!: com_people
+  getInitials_com_person!: Sequelize.BelongsToGetAssociationMixin<com_people>
+  setInitials_com_person!: Sequelize.BelongsToSetAssociationMixin<com_people, com_peopleId>
+  createInitials_com_person!: Sequelize.BelongsToCreateAssociationMixin<com_people>
   // now_proj_people belongsTo now_proj via pid
-  declare pid_now_proj?: Sequelize.NonAttribute<now_proj>
-  declare getPid_now_proj: Sequelize.BelongsToGetAssociationMixin<now_proj>
-  declare setPid_now_proj: Sequelize.BelongsToSetAssociationMixin<now_proj, number>
-  declare createPid_now_proj: Sequelize.BelongsToCreateAssociationMixin<now_proj>
+  pid_now_proj!: now_proj
+  getPid_now_proj!: Sequelize.BelongsToGetAssociationMixin<now_proj>
+  setPid_now_proj!: Sequelize.BelongsToSetAssociationMixin<now_proj, now_projId>
+  createPid_now_proj!: Sequelize.BelongsToCreateAssociationMixin<now_proj>
 
   static initModel(sequelize: Sequelize.Sequelize): typeof now_proj_people {
     return now_proj_people.init(

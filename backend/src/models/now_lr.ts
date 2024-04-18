@@ -1,23 +1,32 @@
 import * as Sequelize from 'sequelize'
-import { CreationOptional, DataTypes, InferCreationAttributes, InferAttributes, Model } from 'sequelize'
-
+import { DataTypes, Model, Optional } from 'sequelize'
 import type { now_lau, now_lauId } from './now_lau'
 import type { ref_ref, ref_refId } from './ref_ref'
 
-export class now_lr extends Model<InferAttributes<now_lr>, InferCreationAttributes<now_lr>> {
-  declare luid: CreationOptional<number>
-  declare rid: CreationOptional<number>
+export interface now_lrAttributes {
+  luid: number
+  rid: number
+}
+
+export type now_lrPk = 'luid' | 'rid'
+export type now_lrId = now_lr[now_lrPk]
+export type now_lrOptionalAttributes = 'luid' | 'rid'
+export type now_lrCreationAttributes = Optional<now_lrAttributes, now_lrOptionalAttributes>
+
+export class now_lr extends Model<now_lrAttributes, now_lrCreationAttributes> implements now_lrAttributes {
+  luid!: number
+  rid!: number
 
   // now_lr belongsTo now_lau via luid
-  declare lu?: Sequelize.NonAttribute<now_lau>
-  declare getLu: Sequelize.BelongsToGetAssociationMixin<now_lau>
-  declare setLu: Sequelize.BelongsToSetAssociationMixin<now_lau, number>
-  declare createLu: Sequelize.BelongsToCreateAssociationMixin<now_lau>
+  lu!: now_lau
+  getLu!: Sequelize.BelongsToGetAssociationMixin<now_lau>
+  setLu!: Sequelize.BelongsToSetAssociationMixin<now_lau, now_lauId>
+  createLu!: Sequelize.BelongsToCreateAssociationMixin<now_lau>
   // now_lr belongsTo ref_ref via rid
-  declare rid_ref_ref?: Sequelize.NonAttribute<ref_ref>
-  declare getRid_ref_ref: Sequelize.BelongsToGetAssociationMixin<ref_ref>
-  declare setRid_ref_ref: Sequelize.BelongsToSetAssociationMixin<ref_ref, number>
-  declare createRid_ref_ref: Sequelize.BelongsToCreateAssociationMixin<ref_ref>
+  rid_ref_ref!: ref_ref
+  getRid_ref_ref!: Sequelize.BelongsToGetAssociationMixin<ref_ref>
+  setRid_ref_ref!: Sequelize.BelongsToSetAssociationMixin<ref_ref, ref_refId>
+  createRid_ref_ref!: Sequelize.BelongsToCreateAssociationMixin<ref_ref>
 
   static initModel(sequelize: Sequelize.Sequelize): typeof now_lr {
     return now_lr.init(
