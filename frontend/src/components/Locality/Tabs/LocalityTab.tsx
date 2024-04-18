@@ -6,9 +6,7 @@ import { useGetEditableTextField } from '../../DetailView/hooks'
 export const LocalityTab = () => {
   const getEditableTextField = useGetEditableTextField<Locality>()
 
-  const valueField = (field: keyof Locality) => (
-    <DataValue<Locality> field={field as keyof Locality} editElement={getEditableTextField} />
-  )
+  const valueField = (field: keyof Locality) => <DataValue<Locality> field={field} editElement={getEditableTextField} />
 
   const name = [['Name', valueField('loc_name')]]
   const locality = [['Country', valueField('country')]]
