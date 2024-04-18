@@ -1,32 +1,20 @@
 import * as Sequelize from 'sequelize'
-import { DataTypes, Model, Optional } from 'sequelize'
+import { CreationOptional, DataTypes, InferCreationAttributes, InferAttributes, Model } from 'sequelize'
+
 import type { now_reg_coord, now_reg_coordId } from './now_reg_coord'
 
-export interface now_reg_coord_countryAttributes {
-  reg_coord_id: number
-  country: string
-}
-
-export type now_reg_coord_countryPk = 'reg_coord_id' | 'country'
-export type now_reg_coord_countryId = now_reg_coord_country[now_reg_coord_countryPk]
-export type now_reg_coord_countryOptionalAttributes = 'reg_coord_id' | 'country'
-export type now_reg_coord_countryCreationAttributes = Optional<
-  now_reg_coord_countryAttributes,
-  now_reg_coord_countryOptionalAttributes
->
-
-export class now_reg_coord_country
-  extends Model<now_reg_coord_countryAttributes, now_reg_coord_countryCreationAttributes>
-  implements now_reg_coord_countryAttributes
-{
-  reg_coord_id!: number
-  country!: string
+export class now_reg_coord_country extends Model<
+  InferAttributes<now_reg_coord_country>,
+  InferCreationAttributes<now_reg_coord_country>
+> {
+  declare reg_coord_id: CreationOptional<number>
+  declare country: CreationOptional<string>
 
   // now_reg_coord_country belongsTo now_reg_coord via reg_coord_id
-  reg_coord!: now_reg_coord
-  getReg_coord!: Sequelize.BelongsToGetAssociationMixin<now_reg_coord>
-  setReg_coord!: Sequelize.BelongsToSetAssociationMixin<now_reg_coord, now_reg_coordId>
-  createReg_coord!: Sequelize.BelongsToCreateAssociationMixin<now_reg_coord>
+  declare reg_coord?: Sequelize.NonAttribute<now_reg_coord>
+  declare getReg_coord: Sequelize.BelongsToGetAssociationMixin<now_reg_coord>
+  declare setReg_coord: Sequelize.BelongsToSetAssociationMixin<now_reg_coord, number>
+  declare createReg_coord: Sequelize.BelongsToCreateAssociationMixin<now_reg_coord>
 
   static initModel(sequelize: Sequelize.Sequelize): typeof now_reg_coord_country {
     return now_reg_coord_country.init(

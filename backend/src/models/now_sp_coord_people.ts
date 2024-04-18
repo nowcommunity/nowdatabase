@@ -1,38 +1,26 @@
 import * as Sequelize from 'sequelize'
-import { DataTypes, Model, Optional } from 'sequelize'
+import { CreationOptional, DataTypes, InferCreationAttributes, InferAttributes, Model } from 'sequelize'
+
 import type { com_people, com_peopleId } from './com_people'
 import type { now_sp_coord, now_sp_coordId } from './now_sp_coord'
 
-export interface now_sp_coord_peopleAttributes {
-  sp_coord_id: number
-  initials: string
-}
-
-export type now_sp_coord_peoplePk = 'sp_coord_id' | 'initials'
-export type now_sp_coord_peopleId = now_sp_coord_people[now_sp_coord_peoplePk]
-export type now_sp_coord_peopleOptionalAttributes = 'sp_coord_id' | 'initials'
-export type now_sp_coord_peopleCreationAttributes = Optional<
-  now_sp_coord_peopleAttributes,
-  now_sp_coord_peopleOptionalAttributes
->
-
-export class now_sp_coord_people
-  extends Model<now_sp_coord_peopleAttributes, now_sp_coord_peopleCreationAttributes>
-  implements now_sp_coord_peopleAttributes
-{
-  sp_coord_id!: number
-  initials!: string
+export class now_sp_coord_people extends Model<
+  InferAttributes<now_sp_coord_people>,
+  InferCreationAttributes<now_sp_coord_people>
+> {
+  declare sp_coord_id: CreationOptional<number>
+  declare initials: CreationOptional<string>
 
   // now_sp_coord_people belongsTo com_people via initials
-  initials_com_person!: com_people
-  getInitials_com_person!: Sequelize.BelongsToGetAssociationMixin<com_people>
-  setInitials_com_person!: Sequelize.BelongsToSetAssociationMixin<com_people, com_peopleId>
-  createInitials_com_person!: Sequelize.BelongsToCreateAssociationMixin<com_people>
+  declare initials_com_person?: Sequelize.NonAttribute<com_people>
+  declare getInitials_com_person: Sequelize.BelongsToGetAssociationMixin<com_people>
+  declare setInitials_com_person: Sequelize.BelongsToSetAssociationMixin<com_people, number>
+  declare createInitials_com_person: Sequelize.BelongsToCreateAssociationMixin<com_people>
   // now_sp_coord_people belongsTo now_sp_coord via sp_coord_id
-  sp_coord!: now_sp_coord
-  getSp_coord!: Sequelize.BelongsToGetAssociationMixin<now_sp_coord>
-  setSp_coord!: Sequelize.BelongsToSetAssociationMixin<now_sp_coord, now_sp_coordId>
-  createSp_coord!: Sequelize.BelongsToCreateAssociationMixin<now_sp_coord>
+  declare sp_coord?: Sequelize.NonAttribute<now_sp_coord>
+  declare getSp_coord: Sequelize.BelongsToGetAssociationMixin<now_sp_coord>
+  declare setSp_coord: Sequelize.BelongsToSetAssociationMixin<now_sp_coord, number>
+  declare createSp_coord: Sequelize.BelongsToCreateAssociationMixin<now_sp_coord>
 
   static initModel(sequelize: Sequelize.Sequelize): typeof now_sp_coord_people {
     return now_sp_coord_people.init(

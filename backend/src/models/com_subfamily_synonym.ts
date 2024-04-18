@@ -1,25 +1,12 @@
 import * as Sequelize from 'sequelize'
-import { DataTypes, Model, Optional } from 'sequelize'
+import { CreationOptional, DataTypes, InferCreationAttributes, InferAttributes, Model } from 'sequelize'
 
-export interface com_subfamily_synonymAttributes {
-  syn_subfamily_name: string
-  subfamily_name?: string
-}
-
-export type com_subfamily_synonymPk = 'syn_subfamily_name'
-export type com_subfamily_synonymId = com_subfamily_synonym[com_subfamily_synonymPk]
-export type com_subfamily_synonymOptionalAttributes = 'syn_subfamily_name' | 'subfamily_name'
-export type com_subfamily_synonymCreationAttributes = Optional<
-  com_subfamily_synonymAttributes,
-  com_subfamily_synonymOptionalAttributes
->
-
-export class com_subfamily_synonym
-  extends Model<com_subfamily_synonymAttributes, com_subfamily_synonymCreationAttributes>
-  implements com_subfamily_synonymAttributes
-{
-  syn_subfamily_name!: string
-  subfamily_name?: string
+export class com_subfamily_synonym extends Model<
+  InferAttributes<com_subfamily_synonym>,
+  InferCreationAttributes<com_subfamily_synonym>
+> {
+  declare syn_subfamily_name: CreationOptional<string>
+  declare subfamily_name?: string
 
   static initModel(sequelize: Sequelize.Sequelize): typeof com_subfamily_synonym {
     return com_subfamily_synonym.init(

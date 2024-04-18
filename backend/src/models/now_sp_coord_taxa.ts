@@ -1,34 +1,21 @@
 import * as Sequelize from 'sequelize'
-import { DataTypes, Model, Optional } from 'sequelize'
+import { CreationOptional, DataTypes, InferCreationAttributes, InferAttributes, Model } from 'sequelize'
+
 import type { now_sp_coord, now_sp_coordId } from './now_sp_coord'
 
-export interface now_sp_coord_taxaAttributes {
-  sp_coord_id: number
-  order_name: string
-  family_name: string
-}
-
-export type now_sp_coord_taxaPk = 'sp_coord_id' | 'order_name' | 'family_name'
-export type now_sp_coord_taxaId = now_sp_coord_taxa[now_sp_coord_taxaPk]
-export type now_sp_coord_taxaOptionalAttributes = 'sp_coord_id' | 'order_name' | 'family_name'
-export type now_sp_coord_taxaCreationAttributes = Optional<
-  now_sp_coord_taxaAttributes,
-  now_sp_coord_taxaOptionalAttributes
->
-
-export class now_sp_coord_taxa
-  extends Model<now_sp_coord_taxaAttributes, now_sp_coord_taxaCreationAttributes>
-  implements now_sp_coord_taxaAttributes
-{
-  sp_coord_id!: number
-  order_name!: string
-  family_name!: string
+export class now_sp_coord_taxa extends Model<
+  InferAttributes<now_sp_coord_taxa>,
+  InferCreationAttributes<now_sp_coord_taxa>
+> {
+  declare sp_coord_id: CreationOptional<number>
+  declare order_name: CreationOptional<string>
+  declare family_name: CreationOptional<string>
 
   // now_sp_coord_taxa belongsTo now_sp_coord via sp_coord_id
-  sp_coord!: now_sp_coord
-  getSp_coord!: Sequelize.BelongsToGetAssociationMixin<now_sp_coord>
-  setSp_coord!: Sequelize.BelongsToSetAssociationMixin<now_sp_coord, now_sp_coordId>
-  createSp_coord!: Sequelize.BelongsToCreateAssociationMixin<now_sp_coord>
+  declare sp_coord?: Sequelize.NonAttribute<now_sp_coord>
+  declare getSp_coord: Sequelize.BelongsToGetAssociationMixin<now_sp_coord>
+  declare setSp_coord: Sequelize.BelongsToSetAssociationMixin<now_sp_coord, number>
+  declare createSp_coord: Sequelize.BelongsToCreateAssociationMixin<now_sp_coord>
 
   static initModel(sequelize: Sequelize.Sequelize): typeof now_sp_coord_taxa {
     return now_sp_coord_taxa.init(

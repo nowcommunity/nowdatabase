@@ -1,32 +1,23 @@
 import * as Sequelize from 'sequelize'
-import { DataTypes, Model, Optional } from 'sequelize'
+import { CreationOptional, DataTypes, InferCreationAttributes, InferAttributes, Model } from 'sequelize'
+
 import type { com_species, com_speciesId } from './com_species'
 import type { now_proj, now_projId } from './now_proj'
 
-export interface now_psrAttributes {
-  pid: number
-  species_id: number
-}
-
-export type now_psrPk = 'pid' | 'species_id'
-export type now_psrId = now_psr[now_psrPk]
-export type now_psrOptionalAttributes = 'pid' | 'species_id'
-export type now_psrCreationAttributes = Optional<now_psrAttributes, now_psrOptionalAttributes>
-
-export class now_psr extends Model<now_psrAttributes, now_psrCreationAttributes> implements now_psrAttributes {
-  pid!: number
-  species_id!: number
+export class now_psr extends Model<InferAttributes<now_psr>, InferCreationAttributes<now_psr>> {
+  declare pid: CreationOptional<number>
+  declare species_id: CreationOptional<number>
 
   // now_psr belongsTo com_species via species_id
-  species!: com_species
-  getSpecies!: Sequelize.BelongsToGetAssociationMixin<com_species>
-  setSpecies!: Sequelize.BelongsToSetAssociationMixin<com_species, com_speciesId>
-  createSpecies!: Sequelize.BelongsToCreateAssociationMixin<com_species>
+  declare species?: Sequelize.NonAttribute<com_species>
+  declare getSpecies: Sequelize.BelongsToGetAssociationMixin<com_species>
+  declare setSpecies: Sequelize.BelongsToSetAssociationMixin<com_species, number>
+  declare createSpecies: Sequelize.BelongsToCreateAssociationMixin<com_species>
   // now_psr belongsTo now_proj via pid
-  pid_now_proj!: now_proj
-  getPid_now_proj!: Sequelize.BelongsToGetAssociationMixin<now_proj>
-  setPid_now_proj!: Sequelize.BelongsToSetAssociationMixin<now_proj, now_projId>
-  createPid_now_proj!: Sequelize.BelongsToCreateAssociationMixin<now_proj>
+  declare pid_now_proj?: Sequelize.NonAttribute<now_proj>
+  declare getPid_now_proj: Sequelize.BelongsToGetAssociationMixin<now_proj>
+  declare setPid_now_proj: Sequelize.BelongsToSetAssociationMixin<now_proj, number>
+  declare createPid_now_proj: Sequelize.BelongsToCreateAssociationMixin<now_proj>
 
   static initModel(sequelize: Sequelize.Sequelize): typeof now_psr {
     return now_psr.init(

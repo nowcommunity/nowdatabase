@@ -1,286 +1,241 @@
 import * as Sequelize from 'sequelize'
-import { DataTypes, Model, Optional } from 'sequelize'
-import type { now_bau, now_bauId } from './now_bau'
-import type { now_lau, now_lauId } from './now_lau'
-import type { now_proj, now_projId } from './now_proj'
-import type { now_proj_people, now_proj_peopleId } from './now_proj_people'
-import type { now_reg_coord, now_reg_coordId } from './now_reg_coord'
-import type { now_reg_coord_people, now_reg_coord_peopleId } from './now_reg_coord_people'
-import type { now_sau, now_sauId } from './now_sau'
-import type { now_sp_coord, now_sp_coordId } from './now_sp_coord'
-import type { now_sp_coord_people, now_sp_coord_peopleId } from './now_sp_coord_people'
-import type { now_strat_coord, now_strat_coordId } from './now_strat_coord'
-import type { now_strat_coord_people, now_strat_coord_peopleId } from './now_strat_coord_people'
-import type { now_tau, now_tauId } from './now_tau'
+import { CreationOptional, DataTypes, InferCreationAttributes, InferAttributes, Model } from 'sequelize'
 
-export interface com_peopleAttributes {
-  initials: string
-  first_name?: string
-  surname: string
-  full_name: string
-  format?: string
-  email?: string
-  user_id?: number
-  organization?: string
-  country?: string
-  password_set?: string
-  used_morph?: number
-  used_now?: number
-  used_gene?: number
-}
+import type { now_bau } from './now_bau'
+import type { now_lau } from './now_lau'
+import type { now_proj } from './now_proj'
+import type { now_proj_people } from './now_proj_people'
+import type { now_reg_coord } from './now_reg_coord'
+import type { now_reg_coord_people } from './now_reg_coord_people'
+import type { now_sau } from './now_sau'
+import type { now_sp_coord } from './now_sp_coord'
+import type { now_sp_coord_people } from './now_sp_coord_people'
+import type { now_strat_coord } from './now_strat_coord'
+import type { now_strat_coord_people } from './now_strat_coord_people'
+import type { now_tau } from './now_tau'
 
-export type com_peoplePk = 'initials'
-export type com_peopleId = com_people[com_peoplePk]
-export type com_peopleOptionalAttributes =
-  | 'initials'
-  | 'first_name'
-  | 'surname'
-  | 'full_name'
-  | 'format'
-  | 'email'
-  | 'user_id'
-  | 'organization'
-  | 'country'
-  | 'password_set'
-  | 'used_morph'
-  | 'used_now'
-  | 'used_gene'
-export type com_peopleCreationAttributes = Optional<com_peopleAttributes, com_peopleOptionalAttributes>
-
-export class com_people
-  extends Model<com_peopleAttributes, com_peopleCreationAttributes>
-  implements com_peopleAttributes
-{
-  initials!: string
-  first_name?: string
-  surname!: string
-  full_name!: string
-  format?: string
-  email?: string
-  user_id?: number
-  organization?: string
-  country?: string
-  password_set?: string
-  used_morph?: number
-  used_now?: number
-  used_gene?: number
+export class com_people extends Model<InferAttributes<com_people>, InferCreationAttributes<com_people>> {
+  declare initials: CreationOptional<string>
+  declare first_name?: string
+  declare surname: string
+  declare full_name: string
+  declare format?: string
+  declare email?: string
+  declare user_id?: number
+  declare organization?: string
+  declare country?: string
+  declare password_set?: string
+  declare used_morph?: number
+  declare used_now?: number
+  declare used_gene?: number
 
   // com_people hasMany now_bau via bau_coordinator
-  now_baus!: now_bau[]
-  getNow_baus!: Sequelize.HasManyGetAssociationsMixin<now_bau>
-  setNow_baus!: Sequelize.HasManySetAssociationsMixin<now_bau, now_bauId>
-  addNow_bau!: Sequelize.HasManyAddAssociationMixin<now_bau, now_bauId>
-  addNow_baus!: Sequelize.HasManyAddAssociationsMixin<now_bau, now_bauId>
-  createNow_bau!: Sequelize.HasManyCreateAssociationMixin<now_bau>
-  removeNow_bau!: Sequelize.HasManyRemoveAssociationMixin<now_bau, now_bauId>
-  removeNow_baus!: Sequelize.HasManyRemoveAssociationsMixin<now_bau, now_bauId>
-  hasNow_bau!: Sequelize.HasManyHasAssociationMixin<now_bau, now_bauId>
-  hasNow_baus!: Sequelize.HasManyHasAssociationsMixin<now_bau, now_bauId>
-  countNow_baus!: Sequelize.HasManyCountAssociationsMixin
+  declare now_baus?: Sequelize.NonAttribute<now_bau[]>
+  declare getNow_baus: Sequelize.HasManyGetAssociationsMixin<now_bau>
+  declare setNow_baus: Sequelize.HasManySetAssociationsMixin<now_bau, number>
+  declare addNow_bau: Sequelize.HasManyAddAssociationMixin<now_bau, number>
+  declare addNow_baus: Sequelize.HasManyAddAssociationsMixin<now_bau, number>
+  declare createNow_bau: Sequelize.HasManyCreateAssociationMixin<now_bau, 'bau_coordinator'>
+  declare removeNow_bau: Sequelize.HasManyRemoveAssociationMixin<now_bau, number>
+  declare removeNow_baus: Sequelize.HasManyRemoveAssociationsMixin<now_bau, number>
+  declare hasNow_bau: Sequelize.HasManyHasAssociationMixin<now_bau, number>
+  declare hasNow_baus: Sequelize.HasManyHasAssociationsMixin<now_bau, number>
+  declare countNow_baus: Sequelize.HasManyCountAssociationsMixin
   // com_people hasMany now_bau via bau_authorizer
-  bau_authorizer_now_baus!: now_bau[]
-  getBau_authorizer_now_baus!: Sequelize.HasManyGetAssociationsMixin<now_bau>
-  setBau_authorizer_now_baus!: Sequelize.HasManySetAssociationsMixin<now_bau, now_bauId>
-  addBau_authorizer_now_bau!: Sequelize.HasManyAddAssociationMixin<now_bau, now_bauId>
-  addBau_authorizer_now_baus!: Sequelize.HasManyAddAssociationsMixin<now_bau, now_bauId>
-  createBau_authorizer_now_bau!: Sequelize.HasManyCreateAssociationMixin<now_bau>
-  removeBau_authorizer_now_bau!: Sequelize.HasManyRemoveAssociationMixin<now_bau, now_bauId>
-  removeBau_authorizer_now_baus!: Sequelize.HasManyRemoveAssociationsMixin<now_bau, now_bauId>
-  hasBau_authorizer_now_bau!: Sequelize.HasManyHasAssociationMixin<now_bau, now_bauId>
-  hasBau_authorizer_now_baus!: Sequelize.HasManyHasAssociationsMixin<now_bau, now_bauId>
-  countBau_authorizer_now_baus!: Sequelize.HasManyCountAssociationsMixin
+  declare bau_authorizer_now_baus?: Sequelize.NonAttribute<now_bau[]>
+  declare getBau_authorizer_now_baus: Sequelize.HasManyGetAssociationsMixin<now_bau>
+  declare setBau_authorizer_now_baus: Sequelize.HasManySetAssociationsMixin<now_bau, number>
+  declare addBau_authorizer_now_bau: Sequelize.HasManyAddAssociationMixin<now_bau, number>
+  declare addBau_authorizer_now_baus: Sequelize.HasManyAddAssociationsMixin<now_bau, number>
+  declare createBau_authorizer_now_bau: Sequelize.HasManyCreateAssociationMixin<now_bau, 'bau_authorizer'>
+  declare removeBau_authorizer_now_bau: Sequelize.HasManyRemoveAssociationMixin<now_bau, number>
+  declare removeBau_authorizer_now_baus: Sequelize.HasManyRemoveAssociationsMixin<now_bau, number>
+  declare hasBau_authorizer_now_bau: Sequelize.HasManyHasAssociationMixin<now_bau, number>
+  declare hasBau_authorizer_now_baus: Sequelize.HasManyHasAssociationsMixin<now_bau, number>
+  declare countBau_authorizer_now_baus: Sequelize.HasManyCountAssociationsMixin
   // com_people hasMany now_lau via lau_coordinator
-  now_laus!: now_lau[]
-  getNow_laus!: Sequelize.HasManyGetAssociationsMixin<now_lau>
-  setNow_laus!: Sequelize.HasManySetAssociationsMixin<now_lau, now_lauId>
-  addNow_lau!: Sequelize.HasManyAddAssociationMixin<now_lau, now_lauId>
-  addNow_laus!: Sequelize.HasManyAddAssociationsMixin<now_lau, now_lauId>
-  createNow_lau!: Sequelize.HasManyCreateAssociationMixin<now_lau>
-  removeNow_lau!: Sequelize.HasManyRemoveAssociationMixin<now_lau, now_lauId>
-  removeNow_laus!: Sequelize.HasManyRemoveAssociationsMixin<now_lau, now_lauId>
-  hasNow_lau!: Sequelize.HasManyHasAssociationMixin<now_lau, now_lauId>
-  hasNow_laus!: Sequelize.HasManyHasAssociationsMixin<now_lau, now_lauId>
-  countNow_laus!: Sequelize.HasManyCountAssociationsMixin
+  declare now_laus?: Sequelize.NonAttribute<now_lau[]>
+  declare getNow_laus: Sequelize.HasManyGetAssociationsMixin<now_lau>
+  declare setNow_laus: Sequelize.HasManySetAssociationsMixin<now_lau, number>
+  declare addNow_lau: Sequelize.HasManyAddAssociationMixin<now_lau, number>
+  declare addNow_laus: Sequelize.HasManyAddAssociationsMixin<now_lau, number>
+  declare createNow_lau: Sequelize.HasManyCreateAssociationMixin<now_lau, 'lau_coordinator'>
+  declare removeNow_lau: Sequelize.HasManyRemoveAssociationMixin<now_lau, number>
+  declare removeNow_laus: Sequelize.HasManyRemoveAssociationsMixin<now_lau, number>
+  declare hasNow_lau: Sequelize.HasManyHasAssociationMixin<now_lau, number>
+  declare hasNow_laus: Sequelize.HasManyHasAssociationsMixin<now_lau, number>
+  declare countNow_laus: Sequelize.HasManyCountAssociationsMixin
   // com_people hasMany now_lau via lau_authorizer
-  lau_authorizer_now_laus!: now_lau[]
-  getLau_authorizer_now_laus!: Sequelize.HasManyGetAssociationsMixin<now_lau>
-  setLau_authorizer_now_laus!: Sequelize.HasManySetAssociationsMixin<now_lau, now_lauId>
-  addLau_authorizer_now_lau!: Sequelize.HasManyAddAssociationMixin<now_lau, now_lauId>
-  addLau_authorizer_now_laus!: Sequelize.HasManyAddAssociationsMixin<now_lau, now_lauId>
-  createLau_authorizer_now_lau!: Sequelize.HasManyCreateAssociationMixin<now_lau>
-  removeLau_authorizer_now_lau!: Sequelize.HasManyRemoveAssociationMixin<now_lau, now_lauId>
-  removeLau_authorizer_now_laus!: Sequelize.HasManyRemoveAssociationsMixin<now_lau, now_lauId>
-  hasLau_authorizer_now_lau!: Sequelize.HasManyHasAssociationMixin<now_lau, now_lauId>
-  hasLau_authorizer_now_laus!: Sequelize.HasManyHasAssociationsMixin<now_lau, now_lauId>
-  countLau_authorizer_now_laus!: Sequelize.HasManyCountAssociationsMixin
+  declare lau_authorizer_now_laus?: Sequelize.NonAttribute<now_lau[]>
+  declare getLau_authorizer_now_laus: Sequelize.HasManyGetAssociationsMixin<now_lau>
+  declare setLau_authorizer_now_laus: Sequelize.HasManySetAssociationsMixin<now_lau, number>
+  declare addLau_authorizer_now_lau: Sequelize.HasManyAddAssociationMixin<now_lau, number>
+  declare addLau_authorizer_now_laus: Sequelize.HasManyAddAssociationsMixin<now_lau, number>
+  declare createLau_authorizer_now_lau: Sequelize.HasManyCreateAssociationMixin<now_lau, 'lau_authorizer'>
+  declare removeLau_authorizer_now_lau: Sequelize.HasManyRemoveAssociationMixin<now_lau, number>
+  declare removeLau_authorizer_now_laus: Sequelize.HasManyRemoveAssociationsMixin<now_lau, number>
+  declare hasLau_authorizer_now_lau: Sequelize.HasManyHasAssociationMixin<now_lau, number>
+  declare hasLau_authorizer_now_laus: Sequelize.HasManyHasAssociationsMixin<now_lau, number>
+  declare countLau_authorizer_now_laus: Sequelize.HasManyCountAssociationsMixin
   // com_people hasMany now_proj via contact
-  now_projs!: now_proj[]
-  getNow_projs!: Sequelize.HasManyGetAssociationsMixin<now_proj>
-  setNow_projs!: Sequelize.HasManySetAssociationsMixin<now_proj, now_projId>
-  addNow_proj!: Sequelize.HasManyAddAssociationMixin<now_proj, now_projId>
-  addNow_projs!: Sequelize.HasManyAddAssociationsMixin<now_proj, now_projId>
-  createNow_proj!: Sequelize.HasManyCreateAssociationMixin<now_proj>
-  removeNow_proj!: Sequelize.HasManyRemoveAssociationMixin<now_proj, now_projId>
-  removeNow_projs!: Sequelize.HasManyRemoveAssociationsMixin<now_proj, now_projId>
-  hasNow_proj!: Sequelize.HasManyHasAssociationMixin<now_proj, now_projId>
-  hasNow_projs!: Sequelize.HasManyHasAssociationsMixin<now_proj, now_projId>
-  countNow_projs!: Sequelize.HasManyCountAssociationsMixin
+  declare now_projs?: Sequelize.NonAttribute<now_proj[]>
+  declare getNow_projs: Sequelize.HasManyGetAssociationsMixin<now_proj>
+  declare setNow_projs: Sequelize.HasManySetAssociationsMixin<now_proj, number>
+  declare addNow_proj: Sequelize.HasManyAddAssociationMixin<now_proj, number>
+  declare addNow_projs: Sequelize.HasManyAddAssociationsMixin<now_proj, number>
+  declare createNow_proj: Sequelize.HasManyCreateAssociationMixin<now_proj, 'contact'>
+  declare removeNow_proj: Sequelize.HasManyRemoveAssociationMixin<now_proj, number>
+  declare removeNow_projs: Sequelize.HasManyRemoveAssociationsMixin<now_proj, number>
+  declare hasNow_proj: Sequelize.HasManyHasAssociationMixin<now_proj, number>
+  declare hasNow_projs: Sequelize.HasManyHasAssociationsMixin<now_proj, number>
+  declare countNow_projs: Sequelize.HasManyCountAssociationsMixin
   // com_people belongsToMany now_proj via initials and pid
-  pid_now_proj_now_proj_people!: now_proj[]
-  getPid_now_proj_now_proj_people!: Sequelize.BelongsToManyGetAssociationsMixin<now_proj>
-  setPid_now_proj_now_proj_people!: Sequelize.BelongsToManySetAssociationsMixin<now_proj, now_projId>
-  addPid_now_proj_now_proj_person!: Sequelize.BelongsToManyAddAssociationMixin<now_proj, now_projId>
-  addPid_now_proj_now_proj_people!: Sequelize.BelongsToManyAddAssociationsMixin<now_proj, now_projId>
-  createPid_now_proj_now_proj_person!: Sequelize.BelongsToManyCreateAssociationMixin<now_proj>
-  removePid_now_proj_now_proj_person!: Sequelize.BelongsToManyRemoveAssociationMixin<now_proj, now_projId>
-  removePid_now_proj_now_proj_people!: Sequelize.BelongsToManyRemoveAssociationsMixin<now_proj, now_projId>
-  hasPid_now_proj_now_proj_person!: Sequelize.BelongsToManyHasAssociationMixin<now_proj, now_projId>
-  hasPid_now_proj_now_proj_people!: Sequelize.BelongsToManyHasAssociationsMixin<now_proj, now_projId>
-  countPid_now_proj_now_proj_people!: Sequelize.BelongsToManyCountAssociationsMixin
+  declare pid_now_proj_now_proj_people: Sequelize.NonAttribute<now_proj[]>
+  declare getPid_now_proj_now_proj_people: Sequelize.BelongsToManyGetAssociationsMixin<now_proj>
+  declare setPid_now_proj_now_proj_people: Sequelize.BelongsToManySetAssociationsMixin<now_proj, number>
+  declare addPid_now_proj_now_proj_person: Sequelize.BelongsToManyAddAssociationMixin<now_proj, number>
+  declare addPid_now_proj_now_proj_people: Sequelize.BelongsToManyAddAssociationsMixin<now_proj, number>
+  declare createPid_now_proj_now_proj_person: Sequelize.BelongsToManyCreateAssociationMixin<now_proj, 'initials'>
+  declare removePid_now_proj_now_proj_person: Sequelize.BelongsToManyRemoveAssociationMixin<now_proj, number>
+  declare removePid_now_proj_now_proj_people: Sequelize.BelongsToManyRemoveAssociationsMixin<now_proj, number>
+  declare hasPid_now_proj_now_proj_person: Sequelize.BelongsToManyHasAssociationMixin<now_proj, number>
+  declare hasPid_now_proj_now_proj_people: Sequelize.BelongsToManyHasAssociationsMixin<now_proj, number>
+  declare countPid_now_proj_now_proj_people: Sequelize.BelongsToManyCountAssociationsMixin
   // com_people hasMany now_proj_people via initials
-  now_proj_people!: now_proj_people[]
-  getNow_proj_people!: Sequelize.HasManyGetAssociationsMixin<now_proj_people>
-  setNow_proj_people!: Sequelize.HasManySetAssociationsMixin<now_proj_people, now_proj_peopleId>
-  addNow_proj_person!: Sequelize.HasManyAddAssociationMixin<now_proj_people, now_proj_peopleId>
-  addNow_proj_people!: Sequelize.HasManyAddAssociationsMixin<now_proj_people, now_proj_peopleId>
-  createNow_proj_person!: Sequelize.HasManyCreateAssociationMixin<now_proj_people>
-  removeNow_proj_person!: Sequelize.HasManyRemoveAssociationMixin<now_proj_people, now_proj_peopleId>
-  removeNow_proj_people!: Sequelize.HasManyRemoveAssociationsMixin<now_proj_people, now_proj_peopleId>
-  hasNow_proj_person!: Sequelize.HasManyHasAssociationMixin<now_proj_people, now_proj_peopleId>
-  hasNow_proj_people!: Sequelize.HasManyHasAssociationsMixin<now_proj_people, now_proj_peopleId>
-  countNow_proj_people!: Sequelize.HasManyCountAssociationsMixin
+  declare now_proj_people?: Sequelize.NonAttribute<now_proj_people[]>
+  declare getNow_proj_people: Sequelize.HasManyGetAssociationsMixin<now_proj_people>
+  declare setNow_proj_people: Sequelize.HasManySetAssociationsMixin<now_proj_people, number>
+  declare addNow_proj_person: Sequelize.HasManyAddAssociationMixin<now_proj_people, number>
+  declare addNow_proj_people: Sequelize.HasManyAddAssociationsMixin<now_proj_people, number>
+  declare createNow_proj_person: Sequelize.HasManyCreateAssociationMixin<now_proj_people, 'initials'>
+  declare removeNow_proj_person: Sequelize.HasManyRemoveAssociationMixin<now_proj_people, number>
+  declare removeNow_proj_people: Sequelize.HasManyRemoveAssociationsMixin<now_proj_people, number>
+  declare hasNow_proj_person: Sequelize.HasManyHasAssociationMixin<now_proj_people, number>
+  declare hasNow_proj_people: Sequelize.HasManyHasAssociationsMixin<now_proj_people, number>
+  declare countNow_proj_people: Sequelize.HasManyCountAssociationsMixin
   // com_people belongsToMany now_reg_coord via initials and reg_coord_id
-  reg_coord_id_now_reg_coords!: now_reg_coord[]
-  getReg_coord_id_now_reg_coords!: Sequelize.BelongsToManyGetAssociationsMixin<now_reg_coord>
-  setReg_coord_id_now_reg_coords!: Sequelize.BelongsToManySetAssociationsMixin<now_reg_coord, now_reg_coordId>
-  addReg_coord_id_now_reg_coord!: Sequelize.BelongsToManyAddAssociationMixin<now_reg_coord, now_reg_coordId>
-  addReg_coord_id_now_reg_coords!: Sequelize.BelongsToManyAddAssociationsMixin<now_reg_coord, now_reg_coordId>
-  createReg_coord_id_now_reg_coord!: Sequelize.BelongsToManyCreateAssociationMixin<now_reg_coord>
-  removeReg_coord_id_now_reg_coord!: Sequelize.BelongsToManyRemoveAssociationMixin<now_reg_coord, now_reg_coordId>
-  removeReg_coord_id_now_reg_coords!: Sequelize.BelongsToManyRemoveAssociationsMixin<now_reg_coord, now_reg_coordId>
-  hasReg_coord_id_now_reg_coord!: Sequelize.BelongsToManyHasAssociationMixin<now_reg_coord, now_reg_coordId>
-  hasReg_coord_id_now_reg_coords!: Sequelize.BelongsToManyHasAssociationsMixin<now_reg_coord, now_reg_coordId>
-  countReg_coord_id_now_reg_coords!: Sequelize.BelongsToManyCountAssociationsMixin
+  declare reg_coord_id_now_reg_coords: Sequelize.NonAttribute<now_reg_coord[]>
+  declare getReg_coord_id_now_reg_coords: Sequelize.BelongsToManyGetAssociationsMixin<now_reg_coord>
+  declare setReg_coord_id_now_reg_coords: Sequelize.BelongsToManySetAssociationsMixin<now_reg_coord, number>
+  declare addReg_coord_id_now_reg_coord: Sequelize.BelongsToManyAddAssociationMixin<now_reg_coord, number>
+  declare addReg_coord_id_now_reg_coords: Sequelize.BelongsToManyAddAssociationsMixin<now_reg_coord, number>
+  declare createReg_coord_id_now_reg_coord: Sequelize.BelongsToManyCreateAssociationMixin<now_reg_coord, 'initials'>
+  declare removeReg_coord_id_now_reg_coord: Sequelize.BelongsToManyRemoveAssociationMixin<now_reg_coord, number>
+  declare removeReg_coord_id_now_reg_coords: Sequelize.BelongsToManyRemoveAssociationsMixin<now_reg_coord, number>
+  declare hasReg_coord_id_now_reg_coord: Sequelize.BelongsToManyHasAssociationMixin<now_reg_coord, number>
+  declare hasReg_coord_id_now_reg_coords: Sequelize.BelongsToManyHasAssociationsMixin<now_reg_coord, number>
+  declare countReg_coord_id_now_reg_coords: Sequelize.BelongsToManyCountAssociationsMixin
   // com_people hasMany now_reg_coord_people via initials
-  now_reg_coord_people!: now_reg_coord_people[]
-  getNow_reg_coord_people!: Sequelize.HasManyGetAssociationsMixin<now_reg_coord_people>
-  setNow_reg_coord_people!: Sequelize.HasManySetAssociationsMixin<now_reg_coord_people, now_reg_coord_peopleId>
-  addNow_reg_coord_person!: Sequelize.HasManyAddAssociationMixin<now_reg_coord_people, now_reg_coord_peopleId>
-  addNow_reg_coord_people!: Sequelize.HasManyAddAssociationsMixin<now_reg_coord_people, now_reg_coord_peopleId>
-  createNow_reg_coord_person!: Sequelize.HasManyCreateAssociationMixin<now_reg_coord_people>
-  removeNow_reg_coord_person!: Sequelize.HasManyRemoveAssociationMixin<now_reg_coord_people, now_reg_coord_peopleId>
-  removeNow_reg_coord_people!: Sequelize.HasManyRemoveAssociationsMixin<now_reg_coord_people, now_reg_coord_peopleId>
-  hasNow_reg_coord_person!: Sequelize.HasManyHasAssociationMixin<now_reg_coord_people, now_reg_coord_peopleId>
-  hasNow_reg_coord_people!: Sequelize.HasManyHasAssociationsMixin<now_reg_coord_people, now_reg_coord_peopleId>
-  countNow_reg_coord_people!: Sequelize.HasManyCountAssociationsMixin
+  declare now_reg_coord_people?: Sequelize.NonAttribute<now_reg_coord_people[]>
+  declare getNow_reg_coord_people: Sequelize.HasManyGetAssociationsMixin<now_reg_coord_people>
+  declare setNow_reg_coord_people: Sequelize.HasManySetAssociationsMixin<now_reg_coord_people, number>
+  declare addNow_reg_coord_person: Sequelize.HasManyAddAssociationMixin<now_reg_coord_people, number>
+  declare addNow_reg_coord_people: Sequelize.HasManyAddAssociationsMixin<now_reg_coord_people, number>
+  declare createNow_reg_coord_person: Sequelize.HasManyCreateAssociationMixin<now_reg_coord_people, 'initials'>
+  declare removeNow_reg_coord_person: Sequelize.HasManyRemoveAssociationMixin<now_reg_coord_people, number>
+  declare removeNow_reg_coord_people: Sequelize.HasManyRemoveAssociationsMixin<now_reg_coord_people, number>
+  declare hasNow_reg_coord_person: Sequelize.HasManyHasAssociationMixin<now_reg_coord_people, number>
+  declare hasNow_reg_coord_people: Sequelize.HasManyHasAssociationsMixin<now_reg_coord_people, number>
+  declare countNow_reg_coord_people: Sequelize.HasManyCountAssociationsMixin
   // com_people hasMany now_sau via sau_coordinator
-  now_saus!: now_sau[]
-  getNow_saus!: Sequelize.HasManyGetAssociationsMixin<now_sau>
-  setNow_saus!: Sequelize.HasManySetAssociationsMixin<now_sau, now_sauId>
-  addNow_sau!: Sequelize.HasManyAddAssociationMixin<now_sau, now_sauId>
-  addNow_saus!: Sequelize.HasManyAddAssociationsMixin<now_sau, now_sauId>
-  createNow_sau!: Sequelize.HasManyCreateAssociationMixin<now_sau>
-  removeNow_sau!: Sequelize.HasManyRemoveAssociationMixin<now_sau, now_sauId>
-  removeNow_saus!: Sequelize.HasManyRemoveAssociationsMixin<now_sau, now_sauId>
-  hasNow_sau!: Sequelize.HasManyHasAssociationMixin<now_sau, now_sauId>
-  hasNow_saus!: Sequelize.HasManyHasAssociationsMixin<now_sau, now_sauId>
-  countNow_saus!: Sequelize.HasManyCountAssociationsMixin
+  declare now_saus?: Sequelize.NonAttribute<now_sau[]>
+  declare getNow_saus: Sequelize.HasManyGetAssociationsMixin<now_sau>
+  declare setNow_saus: Sequelize.HasManySetAssociationsMixin<now_sau, number>
+  declare addNow_sau: Sequelize.HasManyAddAssociationMixin<now_sau, number>
+  declare addNow_saus: Sequelize.HasManyAddAssociationsMixin<now_sau, number>
+  declare createNow_sau: Sequelize.HasManyCreateAssociationMixin<now_sau, 'sau_coordinator'>
+  declare removeNow_sau: Sequelize.HasManyRemoveAssociationMixin<now_sau, number>
+  declare removeNow_saus: Sequelize.HasManyRemoveAssociationsMixin<now_sau, number>
+  declare hasNow_sau: Sequelize.HasManyHasAssociationMixin<now_sau, number>
+  declare hasNow_saus: Sequelize.HasManyHasAssociationsMixin<now_sau, number>
+  declare countNow_saus: Sequelize.HasManyCountAssociationsMixin
   // com_people hasMany now_sau via sau_authorizer
-  sau_authorizer_now_saus!: now_sau[]
-  getSau_authorizer_now_saus!: Sequelize.HasManyGetAssociationsMixin<now_sau>
-  setSau_authorizer_now_saus!: Sequelize.HasManySetAssociationsMixin<now_sau, now_sauId>
-  addSau_authorizer_now_sau!: Sequelize.HasManyAddAssociationMixin<now_sau, now_sauId>
-  addSau_authorizer_now_saus!: Sequelize.HasManyAddAssociationsMixin<now_sau, now_sauId>
-  createSau_authorizer_now_sau!: Sequelize.HasManyCreateAssociationMixin<now_sau>
-  removeSau_authorizer_now_sau!: Sequelize.HasManyRemoveAssociationMixin<now_sau, now_sauId>
-  removeSau_authorizer_now_saus!: Sequelize.HasManyRemoveAssociationsMixin<now_sau, now_sauId>
-  hasSau_authorizer_now_sau!: Sequelize.HasManyHasAssociationMixin<now_sau, now_sauId>
-  hasSau_authorizer_now_saus!: Sequelize.HasManyHasAssociationsMixin<now_sau, now_sauId>
-  countSau_authorizer_now_saus!: Sequelize.HasManyCountAssociationsMixin
+  declare sau_authorizer_now_saus?: Sequelize.NonAttribute<now_sau[]>
+  declare getSau_authorizer_now_saus: Sequelize.HasManyGetAssociationsMixin<now_sau>
+  declare setSau_authorizer_now_saus: Sequelize.HasManySetAssociationsMixin<now_sau, number>
+  declare addSau_authorizer_now_sau: Sequelize.HasManyAddAssociationMixin<now_sau, number>
+  declare addSau_authorizer_now_saus: Sequelize.HasManyAddAssociationsMixin<now_sau, number>
+  declare createSau_authorizer_now_sau: Sequelize.HasManyCreateAssociationMixin<now_sau, 'sau_authorizer'>
+  declare removeSau_authorizer_now_sau: Sequelize.HasManyRemoveAssociationMixin<now_sau, number>
+  declare removeSau_authorizer_now_saus: Sequelize.HasManyRemoveAssociationsMixin<now_sau, number>
+  declare hasSau_authorizer_now_sau: Sequelize.HasManyHasAssociationMixin<now_sau, number>
+  declare hasSau_authorizer_now_saus: Sequelize.HasManyHasAssociationsMixin<now_sau, number>
+  declare countSau_authorizer_now_saus: Sequelize.HasManyCountAssociationsMixin
   // com_people belongsToMany now_sp_coord via initials and sp_coord_id
-  sp_coord_id_now_sp_coords!: now_sp_coord[]
-  getSp_coord_id_now_sp_coords!: Sequelize.BelongsToManyGetAssociationsMixin<now_sp_coord>
-  setSp_coord_id_now_sp_coords!: Sequelize.BelongsToManySetAssociationsMixin<now_sp_coord, now_sp_coordId>
-  addSp_coord_id_now_sp_coord!: Sequelize.BelongsToManyAddAssociationMixin<now_sp_coord, now_sp_coordId>
-  addSp_coord_id_now_sp_coords!: Sequelize.BelongsToManyAddAssociationsMixin<now_sp_coord, now_sp_coordId>
-  createSp_coord_id_now_sp_coord!: Sequelize.BelongsToManyCreateAssociationMixin<now_sp_coord>
-  removeSp_coord_id_now_sp_coord!: Sequelize.BelongsToManyRemoveAssociationMixin<now_sp_coord, now_sp_coordId>
-  removeSp_coord_id_now_sp_coords!: Sequelize.BelongsToManyRemoveAssociationsMixin<now_sp_coord, now_sp_coordId>
-  hasSp_coord_id_now_sp_coord!: Sequelize.BelongsToManyHasAssociationMixin<now_sp_coord, now_sp_coordId>
-  hasSp_coord_id_now_sp_coords!: Sequelize.BelongsToManyHasAssociationsMixin<now_sp_coord, now_sp_coordId>
-  countSp_coord_id_now_sp_coords!: Sequelize.BelongsToManyCountAssociationsMixin
+  declare sp_coord_id_now_sp_coords: Sequelize.NonAttribute<now_sp_coord[]>
+  declare getSp_coord_id_now_sp_coords: Sequelize.BelongsToManyGetAssociationsMixin<now_sp_coord>
+  declare setSp_coord_id_now_sp_coords: Sequelize.BelongsToManySetAssociationsMixin<now_sp_coord, number>
+  declare addSp_coord_id_now_sp_coord: Sequelize.BelongsToManyAddAssociationMixin<now_sp_coord, number>
+  declare addSp_coord_id_now_sp_coords: Sequelize.BelongsToManyAddAssociationsMixin<now_sp_coord, number>
+  declare createSp_coord_id_now_sp_coord: Sequelize.BelongsToManyCreateAssociationMixin<now_sp_coord, 'initials'>
+  declare removeSp_coord_id_now_sp_coord: Sequelize.BelongsToManyRemoveAssociationMixin<now_sp_coord, number>
+  declare removeSp_coord_id_now_sp_coords: Sequelize.BelongsToManyRemoveAssociationsMixin<now_sp_coord, number>
+  declare hasSp_coord_id_now_sp_coord: Sequelize.BelongsToManyHasAssociationMixin<now_sp_coord, number>
+  declare hasSp_coord_id_now_sp_coords: Sequelize.BelongsToManyHasAssociationsMixin<now_sp_coord, number>
+  declare countSp_coord_id_now_sp_coords: Sequelize.BelongsToManyCountAssociationsMixin
   // com_people hasMany now_sp_coord_people via initials
-  now_sp_coord_people!: now_sp_coord_people[]
-  getNow_sp_coord_people!: Sequelize.HasManyGetAssociationsMixin<now_sp_coord_people>
-  setNow_sp_coord_people!: Sequelize.HasManySetAssociationsMixin<now_sp_coord_people, now_sp_coord_peopleId>
-  addNow_sp_coord_person!: Sequelize.HasManyAddAssociationMixin<now_sp_coord_people, now_sp_coord_peopleId>
-  addNow_sp_coord_people!: Sequelize.HasManyAddAssociationsMixin<now_sp_coord_people, now_sp_coord_peopleId>
-  createNow_sp_coord_person!: Sequelize.HasManyCreateAssociationMixin<now_sp_coord_people>
-  removeNow_sp_coord_person!: Sequelize.HasManyRemoveAssociationMixin<now_sp_coord_people, now_sp_coord_peopleId>
-  removeNow_sp_coord_people!: Sequelize.HasManyRemoveAssociationsMixin<now_sp_coord_people, now_sp_coord_peopleId>
-  hasNow_sp_coord_person!: Sequelize.HasManyHasAssociationMixin<now_sp_coord_people, now_sp_coord_peopleId>
-  hasNow_sp_coord_people!: Sequelize.HasManyHasAssociationsMixin<now_sp_coord_people, now_sp_coord_peopleId>
-  countNow_sp_coord_people!: Sequelize.HasManyCountAssociationsMixin
+  declare now_sp_coord_people?: Sequelize.NonAttribute<now_sp_coord_people[]>
+  declare getNow_sp_coord_people: Sequelize.HasManyGetAssociationsMixin<now_sp_coord_people>
+  declare setNow_sp_coord_people: Sequelize.HasManySetAssociationsMixin<now_sp_coord_people, number>
+  declare addNow_sp_coord_person: Sequelize.HasManyAddAssociationMixin<now_sp_coord_people, number>
+  declare addNow_sp_coord_people: Sequelize.HasManyAddAssociationsMixin<now_sp_coord_people, number>
+  declare createNow_sp_coord_person: Sequelize.HasManyCreateAssociationMixin<now_sp_coord_people, 'initials'>
+  declare removeNow_sp_coord_person: Sequelize.HasManyRemoveAssociationMixin<now_sp_coord_people, number>
+  declare removeNow_sp_coord_people: Sequelize.HasManyRemoveAssociationsMixin<now_sp_coord_people, number>
+  declare hasNow_sp_coord_person: Sequelize.HasManyHasAssociationMixin<now_sp_coord_people, number>
+  declare hasNow_sp_coord_people: Sequelize.HasManyHasAssociationsMixin<now_sp_coord_people, number>
+  declare countNow_sp_coord_people: Sequelize.HasManyCountAssociationsMixin
   // com_people belongsToMany now_strat_coord via initials and strat_coord_id
-  strat_coord_id_now_strat_coords!: now_strat_coord[]
-  getStrat_coord_id_now_strat_coords!: Sequelize.BelongsToManyGetAssociationsMixin<now_strat_coord>
-  setStrat_coord_id_now_strat_coords!: Sequelize.BelongsToManySetAssociationsMixin<now_strat_coord, now_strat_coordId>
-  addStrat_coord_id_now_strat_coord!: Sequelize.BelongsToManyAddAssociationMixin<now_strat_coord, now_strat_coordId>
-  addStrat_coord_id_now_strat_coords!: Sequelize.BelongsToManyAddAssociationsMixin<now_strat_coord, now_strat_coordId>
-  createStrat_coord_id_now_strat_coord!: Sequelize.BelongsToManyCreateAssociationMixin<now_strat_coord>
-  removeStrat_coord_id_now_strat_coord!: Sequelize.BelongsToManyRemoveAssociationMixin<
+  declare strat_coord_id_now_strat_coords: Sequelize.NonAttribute<now_strat_coord[]>
+  declare getStrat_coord_id_now_strat_coords: Sequelize.BelongsToManyGetAssociationsMixin<now_strat_coord>
+  declare setStrat_coord_id_now_strat_coords: Sequelize.BelongsToManySetAssociationsMixin<now_strat_coord, number>
+  declare addStrat_coord_id_now_strat_coord: Sequelize.BelongsToManyAddAssociationMixin<now_strat_coord, number>
+  declare addStrat_coord_id_now_strat_coords: Sequelize.BelongsToManyAddAssociationsMixin<now_strat_coord, number>
+  declare createStrat_coord_id_now_strat_coord: Sequelize.BelongsToManyCreateAssociationMixin<
     now_strat_coord,
-    now_strat_coordId
+    'initials'
   >
-  removeStrat_coord_id_now_strat_coords!: Sequelize.BelongsToManyRemoveAssociationsMixin<
-    now_strat_coord,
-    now_strat_coordId
-  >
-  hasStrat_coord_id_now_strat_coord!: Sequelize.BelongsToManyHasAssociationMixin<now_strat_coord, now_strat_coordId>
-  hasStrat_coord_id_now_strat_coords!: Sequelize.BelongsToManyHasAssociationsMixin<now_strat_coord, now_strat_coordId>
-  countStrat_coord_id_now_strat_coords!: Sequelize.BelongsToManyCountAssociationsMixin
+  declare removeStrat_coord_id_now_strat_coord: Sequelize.BelongsToManyRemoveAssociationMixin<now_strat_coord, number>
+  declare removeStrat_coord_id_now_strat_coords: Sequelize.BelongsToManyRemoveAssociationsMixin<now_strat_coord, number>
+  declare hasStrat_coord_id_now_strat_coord: Sequelize.BelongsToManyHasAssociationMixin<now_strat_coord, number>
+  declare hasStrat_coord_id_now_strat_coords: Sequelize.BelongsToManyHasAssociationsMixin<now_strat_coord, number>
+  declare countStrat_coord_id_now_strat_coords: Sequelize.BelongsToManyCountAssociationsMixin
   // com_people hasMany now_strat_coord_people via initials
-  now_strat_coord_people!: now_strat_coord_people[]
-  getNow_strat_coord_people!: Sequelize.HasManyGetAssociationsMixin<now_strat_coord_people>
-  setNow_strat_coord_people!: Sequelize.HasManySetAssociationsMixin<now_strat_coord_people, now_strat_coord_peopleId>
-  addNow_strat_coord_person!: Sequelize.HasManyAddAssociationMixin<now_strat_coord_people, now_strat_coord_peopleId>
-  addNow_strat_coord_people!: Sequelize.HasManyAddAssociationsMixin<now_strat_coord_people, now_strat_coord_peopleId>
-  createNow_strat_coord_person!: Sequelize.HasManyCreateAssociationMixin<now_strat_coord_people>
-  removeNow_strat_coord_person!: Sequelize.HasManyRemoveAssociationMixin<
-    now_strat_coord_people,
-    now_strat_coord_peopleId
-  >
-  removeNow_strat_coord_people!: Sequelize.HasManyRemoveAssociationsMixin<
-    now_strat_coord_people,
-    now_strat_coord_peopleId
-  >
-  hasNow_strat_coord_person!: Sequelize.HasManyHasAssociationMixin<now_strat_coord_people, now_strat_coord_peopleId>
-  hasNow_strat_coord_people!: Sequelize.HasManyHasAssociationsMixin<now_strat_coord_people, now_strat_coord_peopleId>
-  countNow_strat_coord_people!: Sequelize.HasManyCountAssociationsMixin
+  declare now_strat_coord_people?: Sequelize.NonAttribute<now_strat_coord_people[]>
+  declare getNow_strat_coord_people: Sequelize.HasManyGetAssociationsMixin<now_strat_coord_people>
+  declare setNow_strat_coord_people: Sequelize.HasManySetAssociationsMixin<now_strat_coord_people, number>
+  declare addNow_strat_coord_person: Sequelize.HasManyAddAssociationMixin<now_strat_coord_people, number>
+  declare addNow_strat_coord_people: Sequelize.HasManyAddAssociationsMixin<now_strat_coord_people, number>
+  declare createNow_strat_coord_person: Sequelize.HasManyCreateAssociationMixin<now_strat_coord_people, 'initials'>
+  declare removeNow_strat_coord_person: Sequelize.HasManyRemoveAssociationMixin<now_strat_coord_people, number>
+  declare removeNow_strat_coord_people: Sequelize.HasManyRemoveAssociationsMixin<now_strat_coord_people, number>
+  declare hasNow_strat_coord_person: Sequelize.HasManyHasAssociationMixin<now_strat_coord_people, number>
+  declare hasNow_strat_coord_people: Sequelize.HasManyHasAssociationsMixin<now_strat_coord_people, number>
+  declare countNow_strat_coord_people: Sequelize.HasManyCountAssociationsMixin
   // com_people hasMany now_tau via tau_coordinator
-  now_taus!: now_tau[]
-  getNow_taus!: Sequelize.HasManyGetAssociationsMixin<now_tau>
-  setNow_taus!: Sequelize.HasManySetAssociationsMixin<now_tau, now_tauId>
-  addNow_tau!: Sequelize.HasManyAddAssociationMixin<now_tau, now_tauId>
-  addNow_taus!: Sequelize.HasManyAddAssociationsMixin<now_tau, now_tauId>
-  createNow_tau!: Sequelize.HasManyCreateAssociationMixin<now_tau>
-  removeNow_tau!: Sequelize.HasManyRemoveAssociationMixin<now_tau, now_tauId>
-  removeNow_taus!: Sequelize.HasManyRemoveAssociationsMixin<now_tau, now_tauId>
-  hasNow_tau!: Sequelize.HasManyHasAssociationMixin<now_tau, now_tauId>
-  hasNow_taus!: Sequelize.HasManyHasAssociationsMixin<now_tau, now_tauId>
-  countNow_taus!: Sequelize.HasManyCountAssociationsMixin
+  declare now_taus?: Sequelize.NonAttribute<now_tau[]>
+  declare getNow_taus: Sequelize.HasManyGetAssociationsMixin<now_tau>
+  declare setNow_taus: Sequelize.HasManySetAssociationsMixin<now_tau, number>
+  declare addNow_tau: Sequelize.HasManyAddAssociationMixin<now_tau, number>
+  declare addNow_taus: Sequelize.HasManyAddAssociationsMixin<now_tau, number>
+  declare createNow_tau: Sequelize.HasManyCreateAssociationMixin<now_tau, 'tau_coordinator'>
+  declare removeNow_tau: Sequelize.HasManyRemoveAssociationMixin<now_tau, number>
+  declare removeNow_taus: Sequelize.HasManyRemoveAssociationsMixin<now_tau, number>
+  declare hasNow_tau: Sequelize.HasManyHasAssociationMixin<now_tau, number>
+  declare hasNow_taus: Sequelize.HasManyHasAssociationsMixin<now_tau, number>
+  declare countNow_taus: Sequelize.HasManyCountAssociationsMixin
   // com_people hasMany now_tau via tau_authorizer
-  tau_authorizer_now_taus!: now_tau[]
-  getTau_authorizer_now_taus!: Sequelize.HasManyGetAssociationsMixin<now_tau>
-  setTau_authorizer_now_taus!: Sequelize.HasManySetAssociationsMixin<now_tau, now_tauId>
-  addTau_authorizer_now_tau!: Sequelize.HasManyAddAssociationMixin<now_tau, now_tauId>
-  addTau_authorizer_now_taus!: Sequelize.HasManyAddAssociationsMixin<now_tau, now_tauId>
-  createTau_authorizer_now_tau!: Sequelize.HasManyCreateAssociationMixin<now_tau>
-  removeTau_authorizer_now_tau!: Sequelize.HasManyRemoveAssociationMixin<now_tau, now_tauId>
-  removeTau_authorizer_now_taus!: Sequelize.HasManyRemoveAssociationsMixin<now_tau, now_tauId>
-  hasTau_authorizer_now_tau!: Sequelize.HasManyHasAssociationMixin<now_tau, now_tauId>
-  hasTau_authorizer_now_taus!: Sequelize.HasManyHasAssociationsMixin<now_tau, now_tauId>
-  countTau_authorizer_now_taus!: Sequelize.HasManyCountAssociationsMixin
+  declare tau_authorizer_now_taus?: Sequelize.NonAttribute<now_tau[]>
+  declare getTau_authorizer_now_taus: Sequelize.HasManyGetAssociationsMixin<now_tau>
+  declare setTau_authorizer_now_taus: Sequelize.HasManySetAssociationsMixin<now_tau, number>
+  declare addTau_authorizer_now_tau: Sequelize.HasManyAddAssociationMixin<now_tau, number>
+  declare addTau_authorizer_now_taus: Sequelize.HasManyAddAssociationsMixin<now_tau, number>
+  declare createTau_authorizer_now_tau: Sequelize.HasManyCreateAssociationMixin<now_tau, 'tau_authorizer'>
+  declare removeTau_authorizer_now_tau: Sequelize.HasManyRemoveAssociationMixin<now_tau, number>
+  declare removeTau_authorizer_now_taus: Sequelize.HasManyRemoveAssociationsMixin<now_tau, number>
+  declare hasTau_authorizer_now_tau: Sequelize.HasManyHasAssociationMixin<now_tau, number>
+  declare hasTau_authorizer_now_taus: Sequelize.HasManyHasAssociationsMixin<now_tau, number>
+  declare countTau_authorizer_now_taus: Sequelize.HasManyCountAssociationsMixin
 
   static initModel(sequelize: Sequelize.Sequelize): typeof com_people {
     return com_people.init(

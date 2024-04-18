@@ -1,38 +1,26 @@
 import * as Sequelize from 'sequelize'
-import { DataTypes, Model, Optional } from 'sequelize'
+import { CreationOptional, DataTypes, InferCreationAttributes, InferAttributes, Model } from 'sequelize'
+
 import type { ref_keywords, ref_keywordsId } from './ref_keywords'
 import type { ref_ref, ref_refId } from './ref_ref'
 
-export interface ref_keywords_refAttributes {
-  keywords_id: number
-  rid: number
-}
-
-export type ref_keywords_refPk = 'keywords_id' | 'rid'
-export type ref_keywords_refId = ref_keywords_ref[ref_keywords_refPk]
-export type ref_keywords_refOptionalAttributes = 'keywords_id' | 'rid'
-export type ref_keywords_refCreationAttributes = Optional<
-  ref_keywords_refAttributes,
-  ref_keywords_refOptionalAttributes
->
-
-export class ref_keywords_ref
-  extends Model<ref_keywords_refAttributes, ref_keywords_refCreationAttributes>
-  implements ref_keywords_refAttributes
-{
-  keywords_id!: number
-  rid!: number
+export class ref_keywords_ref extends Model<
+  InferAttributes<ref_keywords_ref>,
+  InferCreationAttributes<ref_keywords_ref>
+> {
+  declare keywords_id: CreationOptional<number>
+  declare rid: CreationOptional<number>
 
   // ref_keywords_ref belongsTo ref_keywords via keywords_id
-  keyword!: ref_keywords
-  getKeyword!: Sequelize.BelongsToGetAssociationMixin<ref_keywords>
-  setKeyword!: Sequelize.BelongsToSetAssociationMixin<ref_keywords, ref_keywordsId>
-  createKeyword!: Sequelize.BelongsToCreateAssociationMixin<ref_keywords>
+  declare keyword?: Sequelize.NonAttribute<ref_keywords>
+  declare getKeyword: Sequelize.BelongsToGetAssociationMixin<ref_keywords>
+  declare setKeyword: Sequelize.BelongsToSetAssociationMixin<ref_keywords, number>
+  declare createKeyword: Sequelize.BelongsToCreateAssociationMixin<ref_keywords>
   // ref_keywords_ref belongsTo ref_ref via rid
-  rid_ref_ref!: ref_ref
-  getRid_ref_ref!: Sequelize.BelongsToGetAssociationMixin<ref_ref>
-  setRid_ref_ref!: Sequelize.BelongsToSetAssociationMixin<ref_ref, ref_refId>
-  createRid_ref_ref!: Sequelize.BelongsToCreateAssociationMixin<ref_ref>
+  declare rid_ref_ref?: Sequelize.NonAttribute<ref_ref>
+  declare getRid_ref_ref: Sequelize.BelongsToGetAssociationMixin<ref_ref>
+  declare setRid_ref_ref: Sequelize.BelongsToSetAssociationMixin<ref_ref, number>
+  declare createRid_ref_ref: Sequelize.BelongsToCreateAssociationMixin<ref_ref>
 
   static initModel(sequelize: Sequelize.Sequelize): typeof ref_keywords_ref {
     return ref_keywords_ref.init(

@@ -14,7 +14,6 @@ export const getAllLocalities = async () => {
   // TODO: Send only public rows unless user has access
   const result = await models.now_loc.findAll({
     attributes: ['lid', 'loc_name', 'max_age', 'min_age', 'country', 'loc_status'],
-    raw: true,
   })
   return result
 }
