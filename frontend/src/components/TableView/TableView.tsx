@@ -4,11 +4,14 @@ import {
   MaterialReactTable,
   type MRT_ColumnDef,
   type MRT_RowData,
+  MRT_SortingState,
 } from 'material-react-table'
 import { Box, Button, CircularProgress, Tooltip } from '@mui/material'
 import { useLocation, useNavigate } from 'react-router-dom'
 import ManageSearchIcon from '@mui/icons-material/ManageSearch'
 import PolicyIcon from '@mui/icons-material/Policy'
+
+type TableStateInUrl = 'sorting' | 'columnfilters'
 
 /*
   TableView takes in the data and columns of a table, and handles
@@ -28,19 +31,26 @@ export const TableView = <T extends MRT_RowData>({
   const navigate = useNavigate()
   const location = useLocation()
   const [columnFilters, setColumnFilters] = useState<MRT_ColumnFiltersState>([])
+  const [sorting, setSorting] = useState<MRT_SortingState>([])
 
-  // Load state from url on first render
-  useEffect(() => {
+  const loadStateFromUrl = (state: TableStateInUrl) => {
     const searchParams = new URLSearchParams(location.search)
-    const stateFromUrl = JSON.parse(searchParams.get('columnfilters') ?? '[]')
-    setColumnFilters(stateFromUrl)
+    return JSON.parse(searchParams.get(state) ?? '[]')
+  }
+
+  // Load state from url only on first render
+  useEffect(() => {
+    setColumnFilters(loadStateFromUrl('columnfilters'))
+    setSorting(loadStateFromUrl('sorting'))
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  // Save state to url when columnFilters change
+  // Save state to url whenever it changes
   useEffect(() => {
-    navigate(`${location.pathname}?columnfilters=${JSON.stringify(columnFilters)}`, { replace: true })
-  }, [columnFilters, location.pathname, navigate])
+    navigate(`${location.pathname}?columnfilters=${JSON.stringify(columnFilters)}&sorting=${JSON.stringify(sorting)}`, {
+      replace: true,
+    })
+  }, [columnFilters, sorting, location.pathname, navigate])
 
   if (!data) return <CircularProgress />
 
@@ -48,7 +58,7 @@ export const TableView = <T extends MRT_RowData>({
     <MaterialReactTable
       columns={columns}
       data={data}
-      state={{ columnFilters, showColumnFilters: true }}
+      state={{ columnFilters, showColumnFilters: true, sorting }}
       onColumnFiltersChange={setColumnFilters}
       renderRowActions={({ row }) => (
         <Box display="flex" gap="1em" alignItems="center" width="3.6em">
@@ -68,6 +78,7 @@ export const TableView = <T extends MRT_RowData>({
       )}
       displayColumnDefOptions={{ 'mrt-row-actions': { size: 50, header: '' } }}
       enableRowActions
+      onSortingChange={setSorting}
     />
   )
 }
