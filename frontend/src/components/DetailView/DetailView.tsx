@@ -14,12 +14,10 @@ export type TabType = {
 const ReturnButton = () => {
   const navigate = useNavigate()
   return (
-    <Box>
-      <Button onClick={() => navigate(-1)}>
-        <ArrowBackIcon color="primary" style={{ marginRight: '0.35em' }} />
-        Return to table
-      </Button>
-    </Box>
+    <Button onClick={() => navigate(-1)}>
+      <ArrowBackIcon color="primary" style={{ marginRight: '0.35em' }} />
+      Return to table
+    </Button>
   )
 }
 
@@ -34,15 +32,17 @@ export const DetailView = <T extends object>({ tabs, data }: { tabs: TabType[]; 
   }
 
   return (
-    <Stack rowGap={4}>
-      <ReturnButton />
-      <Button
-        onClick={() => setMode(mode === 'edit' ? 'read' : 'edit')}
-        variant={mode === 'edit' ? 'contained' : 'outlined'}
-        style={{ maxWidth: '20em' }}
-      >
-        <EditIcon /> {mode === 'read' ? 'Edit' : 'Stop editing'}
-      </Button>
+    <Stack rowGap={2}>
+      <Box sx={{ display: 'flex' }} gap={10}>
+        <ReturnButton />
+        <Button
+          onClick={() => setMode(mode === 'edit' ? 'read' : 'edit')}
+          variant={mode === 'edit' ? 'contained' : 'outlined'}
+          style={{ width: '12em' }}
+        >
+          <EditIcon /> {mode === 'read' ? 'Edit' : 'Stop editing'}
+        </Button>
+      </Box>
       <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
         <Tabs value={tab} onChange={(_event, newValue) => setTab(newValue)}>
           {tabs.map(tab => (
@@ -51,7 +51,7 @@ export const DetailView = <T extends object>({ tabs, data }: { tabs: TabType[]; 
         </Tabs>
       </Box>
       <DetailContextProvider contextState={{ ...initialState }}>
-        <Paper style={{ minHeight: '10em' }} elevation={14}>
+        <Paper style={{ minHeight: '10em', backgroundColor: 'lightgray' }} elevation={5}>
           {tabs[tab].content}
         </Paper>
       </DetailContextProvider>

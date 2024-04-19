@@ -1,4 +1,4 @@
-import { Card, Typography, Box, Grid } from '@mui/material'
+import { Card, Typography, Box, Grid, Divider } from '@mui/material'
 import { ReactNode } from 'react'
 import { useDetailContext } from '../hooks'
 
@@ -24,14 +24,14 @@ export const ArrayFrame = ({ array, title }: { array: Array<Array<ReactNode>>; t
 
 export const Grouped = ({ title, children }: { title?: string; children: ReactNode }) => {
   return (
-    <Card
-      style={{ margin: '1em', padding: '10px', paddingBottom: '15px', backgroundColor: 'ivory' }}
-      variant="elevation"
-    >
+    <Card style={{ margin: '1em', padding: '10px', paddingBottom: '15px', backgroundColor: 'white' }}>
       {title && (
-        <Typography sx={{ fontSize: 16 }} color="text.secondary" gutterBottom>
-          {title}
-        </Typography>
+        <>
+          <Typography sx={{ fontSize: 16 }} color="text.secondary" gutterBottom>
+            {title}
+          </Typography>
+          <Divider />
+        </>
       )}
       <Box marginTop="15px">{children}</Box>
     </Card>
