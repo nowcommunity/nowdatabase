@@ -1,5 +1,5 @@
 import express from 'express'
-import { logger } from './logger'
+import { logger } from '../utils/logger'
 
 export const errorHandler = (error: Error, _req: express.Request, res: express.Response) => {
   if ('status' in error) {

@@ -1,4 +1,4 @@
-import { logger } from './logger'
+import { logger } from '../utils/logger'
 import { Middleware } from '../types'
 
 export const requestLogger: Middleware = (req, _res, next) => {
