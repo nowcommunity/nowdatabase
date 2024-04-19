@@ -10,10 +10,12 @@ export const testDb = async () => {
   }
 }
 
-export const getAllLocalities = async () => {
+export const getAllLocalities = async (onlyPublic: boolean) => {
   // TODO: Send only public rows unless user has access
+  const where = onlyPublic ? { loc_status: 0 } : {}
   const result = await models.now_loc.findAll({
     attributes: ['lid', 'loc_name', 'max_age', 'min_age', 'country', 'loc_status'],
+    where,
     raw: true,
   })
   return result

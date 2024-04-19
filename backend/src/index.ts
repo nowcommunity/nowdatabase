@@ -8,7 +8,7 @@ import { requestLogger, responseLogger } from './middlewares/requestLogger'
 import compression from 'compression'
 import { logger } from './utils/logger'
 import { PORT } from './utils/config'
-import { tokenExtractor } from './middlewares/authenticator'
+import { tokenExtractor, userExtractor } from './middlewares/authenticator'
 import { errorHandler } from './middlewares/errorHandler'
 
 const app = express()
@@ -18,6 +18,7 @@ app.use(cors())
 app.use(compression())
 app.use(requestLogger)
 app.use(tokenExtractor)
+app.use(userExtractor)
 app.use(responseLogger)
 app.use('/user', userRouter)
 app.use('/locality', localityRouter)

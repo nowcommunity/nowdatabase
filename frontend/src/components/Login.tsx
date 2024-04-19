@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useTryLoginMutation, setUser } from '../redux/userReducer'
 import { useDispatch } from 'react-redux'
-import { Button, CircularProgress, Container, Stack, TextField } from '@mui/material'
+import { Box, Button, CircularProgress, Container, Stack, TextField, Typography } from '@mui/material'
 import { useNavigate } from 'react-router-dom'
 import { api } from '../redux/api'
 
@@ -10,7 +10,7 @@ export const Login = () => {
   const [password, setPassword] = useState('')
   const [usernameError, setUsernameError] = useState('')
   const [passwordError, setPasswordError] = useState('')
-  const [loginMutation, { data, isLoading }] = useTryLoginMutation()
+  const [loginMutation, { data, isLoading, isError }] = useTryLoginMutation()
   const dispatch = useDispatch()
   const navigate = useNavigate()
 
@@ -67,6 +67,11 @@ export const Login = () => {
         <Button onClick={login} size="large" style={{ fontSize: '1.4em' }}>
           Login
         </Button>
+        <Box>
+          <Typography color="red" align="center">
+            {isError && 'Login failed. Please check username and password.'}
+          </Typography>
+        </Box>
       </Stack>
       {(isLoading || data) && <CircularProgress style={{ marginLeft: '1em' }} />}
     </Container>

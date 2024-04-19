@@ -22,18 +22,15 @@ export const tokenExtractor: Middleware = (req, _res, next) => {
 const verify = async (token: string, secret: Secret) => {
   return new Promise((resolve, reject) => {
     jwt.verify(token, secret, (err, decoded) => {
-      if (err) {
-        reject(err)
-      } else {
-        resolve(decoded)
-      }
+      if (err) reject(err)
+      else resolve(decoded)
     })
   })
 }
 
 export const userExtractor: Middleware = async (req, res, next) => {
   if (req.token === undefined || req.token === null) {
-    return res.status(400).json({ message: 'Invalid token field' })
+    return next()
   }
 
   try {
