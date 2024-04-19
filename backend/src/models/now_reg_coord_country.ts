@@ -19,14 +19,14 @@ export class now_reg_coord_country
   extends Model<now_reg_coord_countryAttributes, now_reg_coord_countryCreationAttributes>
   implements now_reg_coord_countryAttributes
 {
-  reg_coord_id!: number
-  country!: string
+  declare reg_coord_id: number
+  declare country: string
 
   // now_reg_coord_country belongsTo now_reg_coord via reg_coord_id
-  reg_coord!: now_reg_coord
-  getReg_coord!: Sequelize.BelongsToGetAssociationMixin<now_reg_coord>
-  setReg_coord!: Sequelize.BelongsToSetAssociationMixin<now_reg_coord, now_reg_coordId>
-  createReg_coord!: Sequelize.BelongsToCreateAssociationMixin<now_reg_coord>
+  declare reg_coord: now_reg_coord
+  declare getReg_coord: Sequelize.BelongsToGetAssociationMixin<now_reg_coord>
+  declare setReg_coord: Sequelize.BelongsToSetAssociationMixin<now_reg_coord, now_reg_coordId>
+  declare createReg_coord: Sequelize.BelongsToCreateAssociationMixin<now_reg_coord>
 
   static initModel(sequelize: Sequelize.Sequelize): typeof now_reg_coord_country {
     return now_reg_coord_country.init(

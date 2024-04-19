@@ -14,19 +14,19 @@ export type now_psrOptionalAttributes = 'pid' | 'species_id'
 export type now_psrCreationAttributes = Optional<now_psrAttributes, now_psrOptionalAttributes>
 
 export class now_psr extends Model<now_psrAttributes, now_psrCreationAttributes> implements now_psrAttributes {
-  pid!: number
-  species_id!: number
+  declare pid: number
+  declare species_id: number
 
   // now_psr belongsTo com_species via species_id
-  species!: com_species
-  getSpecies!: Sequelize.BelongsToGetAssociationMixin<com_species>
-  setSpecies!: Sequelize.BelongsToSetAssociationMixin<com_species, com_speciesId>
-  createSpecies!: Sequelize.BelongsToCreateAssociationMixin<com_species>
+  declare species: com_species
+  declare getSpecies: Sequelize.BelongsToGetAssociationMixin<com_species>
+  declare setSpecies: Sequelize.BelongsToSetAssociationMixin<com_species, com_speciesId>
+  declare createSpecies: Sequelize.BelongsToCreateAssociationMixin<com_species>
   // now_psr belongsTo now_proj via pid
-  pid_now_proj!: now_proj
-  getPid_now_proj!: Sequelize.BelongsToGetAssociationMixin<now_proj>
-  setPid_now_proj!: Sequelize.BelongsToSetAssociationMixin<now_proj, now_projId>
-  createPid_now_proj!: Sequelize.BelongsToCreateAssociationMixin<now_proj>
+  declare pid_now_proj: now_proj
+  declare getPid_now_proj: Sequelize.BelongsToGetAssociationMixin<now_proj>
+  declare setPid_now_proj: Sequelize.BelongsToSetAssociationMixin<now_proj, now_projId>
+  declare createPid_now_proj: Sequelize.BelongsToCreateAssociationMixin<now_proj>
 
   static initModel(sequelize: Sequelize.Sequelize): typeof now_psr {
     return now_psr.init(

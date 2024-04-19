@@ -32,21 +32,21 @@ export class ref_field_name
   extends Model<ref_field_nameAttributes, ref_field_nameCreationAttributes>
   implements ref_field_nameAttributes
 {
-  field_ID!: number
-  ref_type_id!: number
-  ref_field_name?: string
-  display?: number
-  label_x?: number
-  label_y?: number
-  field_x?: number
-  field_y?: number
-  field_name?: string
+  declare field_ID: number
+  declare ref_type_id: number
+  declare ref_field_name?: string
+  declare display?: number
+  declare label_x?: number
+  declare label_y?: number
+  declare field_x?: number
+  declare field_y?: number
+  declare field_name?: string
 
   // ref_field_name belongsTo ref_ref_type via ref_type_id
-  ref_type!: ref_ref_type
-  getRef_type!: Sequelize.BelongsToGetAssociationMixin<ref_ref_type>
-  setRef_type!: Sequelize.BelongsToSetAssociationMixin<ref_ref_type, ref_ref_typeId>
-  createRef_type!: Sequelize.BelongsToCreateAssociationMixin<ref_ref_type>
+  declare ref_type: ref_ref_type
+  declare getRef_type: Sequelize.BelongsToGetAssociationMixin<ref_ref_type>
+  declare setRef_type: Sequelize.BelongsToSetAssociationMixin<ref_ref_type, ref_ref_typeId>
+  declare createRef_type: Sequelize.BelongsToCreateAssociationMixin<ref_ref_type>
 
   static initModel(sequelize: Sequelize.Sequelize): typeof ref_field_name {
     return ref_field_name.init(

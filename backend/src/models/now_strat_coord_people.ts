@@ -20,19 +20,19 @@ export class now_strat_coord_people
   extends Model<now_strat_coord_peopleAttributes, now_strat_coord_peopleCreationAttributes>
   implements now_strat_coord_peopleAttributes
 {
-  strat_coord_id!: number
-  initials!: string
+  declare strat_coord_id: number
+  declare initials: string
 
   // now_strat_coord_people belongsTo com_people via initials
-  initials_com_person!: com_people
-  getInitials_com_person!: Sequelize.BelongsToGetAssociationMixin<com_people>
-  setInitials_com_person!: Sequelize.BelongsToSetAssociationMixin<com_people, com_peopleId>
-  createInitials_com_person!: Sequelize.BelongsToCreateAssociationMixin<com_people>
+  declare initials_com_person: com_people
+  declare getInitials_com_person: Sequelize.BelongsToGetAssociationMixin<com_people>
+  declare setInitials_com_person: Sequelize.BelongsToSetAssociationMixin<com_people, com_peopleId>
+  declare createInitials_com_person: Sequelize.BelongsToCreateAssociationMixin<com_people>
   // now_strat_coord_people belongsTo now_strat_coord via strat_coord_id
-  strat_coord!: now_strat_coord
-  getStrat_coord!: Sequelize.BelongsToGetAssociationMixin<now_strat_coord>
-  setStrat_coord!: Sequelize.BelongsToSetAssociationMixin<now_strat_coord, now_strat_coordId>
-  createStrat_coord!: Sequelize.BelongsToCreateAssociationMixin<now_strat_coord>
+  declare strat_coord: now_strat_coord
+  declare getStrat_coord: Sequelize.BelongsToGetAssociationMixin<now_strat_coord>
+  declare setStrat_coord: Sequelize.BelongsToSetAssociationMixin<now_strat_coord, now_strat_coordId>
+  declare createStrat_coord: Sequelize.BelongsToCreateAssociationMixin<now_strat_coord>
 
   static initModel(sequelize: Sequelize.Sequelize): typeof now_strat_coord_people {
     return now_strat_coord_people.init(

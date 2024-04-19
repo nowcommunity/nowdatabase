@@ -11,7 +11,7 @@ export type com_mainOptionalAttributes = 'one'
 export type com_mainCreationAttributes = Optional<com_mainAttributes, com_mainOptionalAttributes>
 
 export class com_main extends Model<com_mainAttributes, com_mainCreationAttributes> implements com_mainAttributes {
-  one!: number
+  declare one: number
 
   static initModel(sequelize: Sequelize.Sequelize): typeof com_main {
     return com_main.init(

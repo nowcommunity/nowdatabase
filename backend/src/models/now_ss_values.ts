@@ -15,8 +15,8 @@ export class now_ss_values
   extends Model<now_ss_valuesAttributes, now_ss_valuesCreationAttributes>
   implements now_ss_valuesAttributes
 {
-  ss_value!: string
-  category?: string
+  declare ss_value: string
+  declare category?: string
 
   static initModel(sequelize: Sequelize.Sequelize): typeof now_ss_values {
     return now_ss_values.init(

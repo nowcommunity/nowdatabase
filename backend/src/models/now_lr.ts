@@ -14,19 +14,19 @@ export type now_lrOptionalAttributes = 'luid' | 'rid'
 export type now_lrCreationAttributes = Optional<now_lrAttributes, now_lrOptionalAttributes>
 
 export class now_lr extends Model<now_lrAttributes, now_lrCreationAttributes> implements now_lrAttributes {
-  luid!: number
-  rid!: number
+  declare luid: number
+  declare rid: number
 
   // now_lr belongsTo now_lau via luid
-  lu!: now_lau
-  getLu!: Sequelize.BelongsToGetAssociationMixin<now_lau>
-  setLu!: Sequelize.BelongsToSetAssociationMixin<now_lau, now_lauId>
-  createLu!: Sequelize.BelongsToCreateAssociationMixin<now_lau>
+  declare lu: now_lau
+  declare getLu: Sequelize.BelongsToGetAssociationMixin<now_lau>
+  declare setLu: Sequelize.BelongsToSetAssociationMixin<now_lau, now_lauId>
+  declare createLu: Sequelize.BelongsToCreateAssociationMixin<now_lau>
   // now_lr belongsTo ref_ref via rid
-  rid_ref_ref!: ref_ref
-  getRid_ref_ref!: Sequelize.BelongsToGetAssociationMixin<ref_ref>
-  setRid_ref_ref!: Sequelize.BelongsToSetAssociationMixin<ref_ref, ref_refId>
-  createRid_ref_ref!: Sequelize.BelongsToCreateAssociationMixin<ref_ref>
+  declare rid_ref_ref: ref_ref
+  declare getRid_ref_ref: Sequelize.BelongsToGetAssociationMixin<ref_ref>
+  declare setRid_ref_ref: Sequelize.BelongsToSetAssociationMixin<ref_ref, ref_refId>
+  declare createRid_ref_ref: Sequelize.BelongsToCreateAssociationMixin<ref_ref>
 
   static initModel(sequelize: Sequelize.Sequelize): typeof now_lr {
     return now_lr.init(

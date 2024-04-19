@@ -18,8 +18,8 @@ export class com_order_synonym
   extends Model<com_order_synonymAttributes, com_order_synonymCreationAttributes>
   implements com_order_synonymAttributes
 {
-  syn_order_name!: string
-  order_name?: string
+  declare syn_order_name: string
+  declare order_name?: string
 
   static initModel(sequelize: Sequelize.Sequelize): typeof com_order_synonym {
     return com_order_synonym.init(

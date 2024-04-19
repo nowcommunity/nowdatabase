@@ -16,14 +16,14 @@ export class now_coll_meth
   extends Model<now_coll_methAttributes, now_coll_methCreationAttributes>
   implements now_coll_methAttributes
 {
-  lid!: number
-  coll_meth!: string
+  declare lid: number
+  declare coll_meth: string
 
   // now_coll_meth belongsTo now_loc via lid
-  lid_now_loc!: now_loc
-  getLid_now_loc!: Sequelize.BelongsToGetAssociationMixin<now_loc>
-  setLid_now_loc!: Sequelize.BelongsToSetAssociationMixin<now_loc, now_locId>
-  createLid_now_loc!: Sequelize.BelongsToCreateAssociationMixin<now_loc>
+  declare lid_now_loc: now_loc
+  declare getLid_now_loc: Sequelize.BelongsToGetAssociationMixin<now_loc>
+  declare setLid_now_loc: Sequelize.BelongsToSetAssociationMixin<now_loc, now_locId>
+  declare createLid_now_loc: Sequelize.BelongsToCreateAssociationMixin<now_loc>
 
   static initModel(sequelize: Sequelize.Sequelize): typeof now_coll_meth {
     return now_coll_meth.init(

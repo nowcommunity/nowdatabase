@@ -14,19 +14,19 @@ export type now_turOptionalAttributes = 'bid' | 'rid'
 export type now_turCreationAttributes = Optional<now_turAttributes, now_turOptionalAttributes>
 
 export class now_tur extends Model<now_turAttributes, now_turCreationAttributes> implements now_turAttributes {
-  bid!: number
-  rid!: number
+  declare bid: number
+  declare rid: number
 
   // now_tur belongsTo now_tu_bound via bid
-  bid_now_tu_bound!: now_tu_bound
-  getBid_now_tu_bound!: Sequelize.BelongsToGetAssociationMixin<now_tu_bound>
-  setBid_now_tu_bound!: Sequelize.BelongsToSetAssociationMixin<now_tu_bound, now_tu_boundId>
-  createBid_now_tu_bound!: Sequelize.BelongsToCreateAssociationMixin<now_tu_bound>
+  declare bid_now_tu_bound: now_tu_bound
+  declare getBid_now_tu_bound: Sequelize.BelongsToGetAssociationMixin<now_tu_bound>
+  declare setBid_now_tu_bound: Sequelize.BelongsToSetAssociationMixin<now_tu_bound, now_tu_boundId>
+  declare createBid_now_tu_bound: Sequelize.BelongsToCreateAssociationMixin<now_tu_bound>
   // now_tur belongsTo ref_ref via rid
-  rid_ref_ref!: ref_ref
-  getRid_ref_ref!: Sequelize.BelongsToGetAssociationMixin<ref_ref>
-  setRid_ref_ref!: Sequelize.BelongsToSetAssociationMixin<ref_ref, ref_refId>
-  createRid_ref_ref!: Sequelize.BelongsToCreateAssociationMixin<ref_ref>
+  declare rid_ref_ref: ref_ref
+  declare getRid_ref_ref: Sequelize.BelongsToGetAssociationMixin<ref_ref>
+  declare setRid_ref_ref: Sequelize.BelongsToSetAssociationMixin<ref_ref, ref_refId>
+  declare createRid_ref_ref: Sequelize.BelongsToCreateAssociationMixin<ref_ref>
 
   static initModel(sequelize: Sequelize.Sequelize): typeof now_tur {
     return now_tur.init(

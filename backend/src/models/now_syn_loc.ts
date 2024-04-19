@@ -17,15 +17,15 @@ export class now_syn_loc
   extends Model<now_syn_locAttributes, now_syn_locCreationAttributes>
   implements now_syn_locAttributes
 {
-  syn_id!: number
-  lid!: number
-  synonym?: string
+  declare syn_id: number
+  declare lid: number
+  declare synonym?: string
 
   // now_syn_loc belongsTo now_loc via lid
-  lid_now_loc!: now_loc
-  getLid_now_loc!: Sequelize.BelongsToGetAssociationMixin<now_loc>
-  setLid_now_loc!: Sequelize.BelongsToSetAssociationMixin<now_loc, now_locId>
-  createLid_now_loc!: Sequelize.BelongsToCreateAssociationMixin<now_loc>
+  declare lid_now_loc: now_loc
+  declare getLid_now_loc: Sequelize.BelongsToGetAssociationMixin<now_loc>
+  declare setLid_now_loc: Sequelize.BelongsToSetAssociationMixin<now_loc, now_locId>
+  declare createLid_now_loc: Sequelize.BelongsToCreateAssociationMixin<now_loc>
 
   static initModel(sequelize: Sequelize.Sequelize): typeof now_syn_loc {
     return now_syn_loc.init(

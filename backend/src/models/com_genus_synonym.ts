@@ -18,8 +18,8 @@ export class com_genus_synonym
   extends Model<com_genus_synonymAttributes, com_genus_synonymCreationAttributes>
   implements com_genus_synonymAttributes
 {
-  syn_genus_name!: string
-  genus_name?: string
+  declare syn_genus_name: string
+  declare genus_name?: string
 
   static initModel(sequelize: Sequelize.Sequelize): typeof com_genus_synonym {
     return com_genus_synonym.init(

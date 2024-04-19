@@ -20,19 +20,19 @@ export class now_reg_coord_people
   extends Model<now_reg_coord_peopleAttributes, now_reg_coord_peopleCreationAttributes>
   implements now_reg_coord_peopleAttributes
 {
-  reg_coord_id!: number
-  initials!: string
+  declare reg_coord_id: number
+  declare initials: string
 
   // now_reg_coord_people belongsTo com_people via initials
-  initials_com_person!: com_people
-  getInitials_com_person!: Sequelize.BelongsToGetAssociationMixin<com_people>
-  setInitials_com_person!: Sequelize.BelongsToSetAssociationMixin<com_people, com_peopleId>
-  createInitials_com_person!: Sequelize.BelongsToCreateAssociationMixin<com_people>
+  declare initials_com_person: com_people
+  declare getInitials_com_person: Sequelize.BelongsToGetAssociationMixin<com_people>
+  declare setInitials_com_person: Sequelize.BelongsToSetAssociationMixin<com_people, com_peopleId>
+  declare createInitials_com_person: Sequelize.BelongsToCreateAssociationMixin<com_people>
   // now_reg_coord_people belongsTo now_reg_coord via reg_coord_id
-  reg_coord!: now_reg_coord
-  getReg_coord!: Sequelize.BelongsToGetAssociationMixin<now_reg_coord>
-  setReg_coord!: Sequelize.BelongsToSetAssociationMixin<now_reg_coord, now_reg_coordId>
-  createReg_coord!: Sequelize.BelongsToCreateAssociationMixin<now_reg_coord>
+  declare reg_coord: now_reg_coord
+  declare getReg_coord: Sequelize.BelongsToGetAssociationMixin<now_reg_coord>
+  declare setReg_coord: Sequelize.BelongsToSetAssociationMixin<now_reg_coord, now_reg_coordId>
+  declare createReg_coord: Sequelize.BelongsToCreateAssociationMixin<now_reg_coord>
 
   static initModel(sequelize: Sequelize.Sequelize): typeof now_reg_coord_people {
     return now_reg_coord_people.init(

@@ -156,136 +156,136 @@ export class com_species
   extends Model<com_speciesAttributes, com_speciesCreationAttributes>
   implements com_speciesAttributes
 {
-  species_id!: number
-  class_name!: string
-  order_name!: string
-  family_name!: string
-  subclass_or_superorder_name?: string
-  suborder_or_superfamily_name?: string
-  subfamily_name?: string
-  genus_name!: string
-  species_name!: string
-  unique_identifier!: string
-  taxonomic_status?: string
-  common_name?: string
-  sp_author?: string
-  strain?: string
-  gene?: string
-  taxon_status?: string
-  diet1?: string
-  diet2?: string
-  diet3?: string
-  diet_description?: string
-  rel_fib?: string
-  selectivity?: string
-  digestion?: string
-  feedinghab1?: string
-  feedinghab2?: string
-  shelterhab1?: string
-  shelterhab2?: string
-  locomo1?: string
-  locomo2?: string
-  locomo3?: string
-  hunt_forage?: string
-  body_mass?: number
-  brain_mass?: number
-  sv_length?: string
-  activity?: string
-  sd_size?: string
-  sd_display?: string
-  tshm?: string
-  symph_mob?: string
-  relative_blade_length?: number
-  tht?: string
-  crowntype?: string
-  microwear?: string
-  horizodonty?: string
-  cusp_shape?: string
-  cusp_count_buccal?: string
-  cusp_count_lingual?: string
-  loph_count_lon?: string
-  loph_count_trs?: string
-  fct_al?: string
-  fct_ol?: string
-  fct_sf?: string
-  fct_ot?: string
-  fct_cm?: string
-  mesowear?: string
-  mw_or_high?: number
-  mw_or_low?: number
-  mw_cs_sharp?: number
-  mw_cs_round?: number
-  mw_cs_blunt?: number
-  mw_scale_min?: number
-  mw_scale_max?: number
-  mw_value?: number
-  pop_struc?: string
-  sp_status?: number
-  used_morph?: number
-  used_now?: number
-  used_gene?: number
-  sp_comment?: string
+  declare species_id: number
+  declare class_name: string
+  declare order_name: string
+  declare family_name: string
+  declare subclass_or_superorder_name?: string
+  declare suborder_or_superfamily_name?: string
+  declare subfamily_name?: string
+  declare genus_name: string
+  declare species_name: string
+  declare unique_identifier: string
+  declare taxonomic_status?: string
+  declare common_name?: string
+  declare sp_author?: string
+  declare strain?: string
+  declare gene?: string
+  declare taxon_status?: string
+  declare diet1?: string
+  declare diet2?: string
+  declare diet3?: string
+  declare diet_description?: string
+  declare rel_fib?: string
+  declare selectivity?: string
+  declare digestion?: string
+  declare feedinghab1?: string
+  declare feedinghab2?: string
+  declare shelterhab1?: string
+  declare shelterhab2?: string
+  declare locomo1?: string
+  declare locomo2?: string
+  declare locomo3?: string
+  declare hunt_forage?: string
+  declare body_mass?: number
+  declare brain_mass?: number
+  declare sv_length?: string
+  declare activity?: string
+  declare sd_size?: string
+  declare sd_display?: string
+  declare tshm?: string
+  declare symph_mob?: string
+  declare relative_blade_length?: number
+  declare tht?: string
+  declare crowntype?: string
+  declare microwear?: string
+  declare horizodonty?: string
+  declare cusp_shape?: string
+  declare cusp_count_buccal?: string
+  declare cusp_count_lingual?: string
+  declare loph_count_lon?: string
+  declare loph_count_trs?: string
+  declare fct_al?: string
+  declare fct_ol?: string
+  declare fct_sf?: string
+  declare fct_ot?: string
+  declare fct_cm?: string
+  declare mesowear?: string
+  declare mw_or_high?: number
+  declare mw_or_low?: number
+  declare mw_cs_sharp?: number
+  declare mw_cs_round?: number
+  declare mw_cs_blunt?: number
+  declare mw_scale_min?: number
+  declare mw_scale_max?: number
+  declare mw_value?: number
+  declare pop_struc?: string
+  declare sp_status?: number
+  declare used_morph?: number
+  declare used_now?: number
+  declare used_gene?: number
+  declare sp_comment?: string
 
   // com_species belongsToMany now_loc via species_id and lid
-  lid_now_locs!: now_loc[]
-  getLid_now_locs!: Sequelize.BelongsToManyGetAssociationsMixin<now_loc>
-  setLid_now_locs!: Sequelize.BelongsToManySetAssociationsMixin<now_loc, now_locId>
-  addLid_now_loc!: Sequelize.BelongsToManyAddAssociationMixin<now_loc, now_locId>
-  addLid_now_locs!: Sequelize.BelongsToManyAddAssociationsMixin<now_loc, now_locId>
-  createLid_now_loc!: Sequelize.BelongsToManyCreateAssociationMixin<now_loc>
-  removeLid_now_loc!: Sequelize.BelongsToManyRemoveAssociationMixin<now_loc, now_locId>
-  removeLid_now_locs!: Sequelize.BelongsToManyRemoveAssociationsMixin<now_loc, now_locId>
-  hasLid_now_loc!: Sequelize.BelongsToManyHasAssociationMixin<now_loc, now_locId>
-  hasLid_now_locs!: Sequelize.BelongsToManyHasAssociationsMixin<now_loc, now_locId>
-  countLid_now_locs!: Sequelize.BelongsToManyCountAssociationsMixin
+  declare lid_now_locs: now_loc[]
+  declare getLid_now_locs: Sequelize.BelongsToManyGetAssociationsMixin<now_loc>
+  declare setLid_now_locs: Sequelize.BelongsToManySetAssociationsMixin<now_loc, now_locId>
+  declare addLid_now_loc: Sequelize.BelongsToManyAddAssociationMixin<now_loc, now_locId>
+  declare addLid_now_locs: Sequelize.BelongsToManyAddAssociationsMixin<now_loc, now_locId>
+  declare createLid_now_loc: Sequelize.BelongsToManyCreateAssociationMixin<now_loc>
+  declare removeLid_now_loc: Sequelize.BelongsToManyRemoveAssociationMixin<now_loc, now_locId>
+  declare removeLid_now_locs: Sequelize.BelongsToManyRemoveAssociationsMixin<now_loc, now_locId>
+  declare hasLid_now_loc: Sequelize.BelongsToManyHasAssociationMixin<now_loc, now_locId>
+  declare hasLid_now_locs: Sequelize.BelongsToManyHasAssociationsMixin<now_loc, now_locId>
+  declare countLid_now_locs: Sequelize.BelongsToManyCountAssociationsMixin
   // com_species hasMany now_ls via species_id
-  now_ls!: now_ls[]
-  getNow_ls!: Sequelize.HasManyGetAssociationsMixin<now_ls>
-  setNow_ls!: Sequelize.HasManySetAssociationsMixin<now_ls, now_lsId>
-  addNow_l!: Sequelize.HasManyAddAssociationMixin<now_ls, now_lsId>
-  addNow_ls!: Sequelize.HasManyAddAssociationsMixin<now_ls, now_lsId>
-  createNow_l!: Sequelize.HasManyCreateAssociationMixin<now_ls>
-  removeNow_l!: Sequelize.HasManyRemoveAssociationMixin<now_ls, now_lsId>
-  removeNow_ls!: Sequelize.HasManyRemoveAssociationsMixin<now_ls, now_lsId>
-  hasNow_l!: Sequelize.HasManyHasAssociationMixin<now_ls, now_lsId>
-  hasNow_ls!: Sequelize.HasManyHasAssociationsMixin<now_ls, now_lsId>
-  countNow_ls!: Sequelize.HasManyCountAssociationsMixin
+  declare now_ls: now_ls[]
+  declare getNow_ls: Sequelize.HasManyGetAssociationsMixin<now_ls>
+  declare setNow_ls: Sequelize.HasManySetAssociationsMixin<now_ls, now_lsId>
+  declare addNow_l: Sequelize.HasManyAddAssociationMixin<now_ls, now_lsId>
+  declare addNow_ls: Sequelize.HasManyAddAssociationsMixin<now_ls, now_lsId>
+  declare createNow_l: Sequelize.HasManyCreateAssociationMixin<now_ls>
+  declare removeNow_l: Sequelize.HasManyRemoveAssociationMixin<now_ls, now_lsId>
+  declare removeNow_ls: Sequelize.HasManyRemoveAssociationsMixin<now_ls, now_lsId>
+  declare hasNow_l: Sequelize.HasManyHasAssociationMixin<now_ls, now_lsId>
+  declare hasNow_ls: Sequelize.HasManyHasAssociationsMixin<now_ls, now_lsId>
+  declare countNow_ls: Sequelize.HasManyCountAssociationsMixin
   // com_species belongsToMany now_proj via species_id and pid
-  pid_now_proj_now_psrs!: now_proj[]
-  getPid_now_proj_now_psrs!: Sequelize.BelongsToManyGetAssociationsMixin<now_proj>
-  setPid_now_proj_now_psrs!: Sequelize.BelongsToManySetAssociationsMixin<now_proj, now_projId>
-  addPid_now_proj_now_psr!: Sequelize.BelongsToManyAddAssociationMixin<now_proj, now_projId>
-  addPid_now_proj_now_psrs!: Sequelize.BelongsToManyAddAssociationsMixin<now_proj, now_projId>
-  createPid_now_proj_now_psr!: Sequelize.BelongsToManyCreateAssociationMixin<now_proj>
-  removePid_now_proj_now_psr!: Sequelize.BelongsToManyRemoveAssociationMixin<now_proj, now_projId>
-  removePid_now_proj_now_psrs!: Sequelize.BelongsToManyRemoveAssociationsMixin<now_proj, now_projId>
-  hasPid_now_proj_now_psr!: Sequelize.BelongsToManyHasAssociationMixin<now_proj, now_projId>
-  hasPid_now_proj_now_psrs!: Sequelize.BelongsToManyHasAssociationsMixin<now_proj, now_projId>
-  countPid_now_proj_now_psrs!: Sequelize.BelongsToManyCountAssociationsMixin
+  declare pid_now_proj_now_psrs: now_proj[]
+  declare getPid_now_proj_now_psrs: Sequelize.BelongsToManyGetAssociationsMixin<now_proj>
+  declare setPid_now_proj_now_psrs: Sequelize.BelongsToManySetAssociationsMixin<now_proj, now_projId>
+  declare addPid_now_proj_now_psr: Sequelize.BelongsToManyAddAssociationMixin<now_proj, now_projId>
+  declare addPid_now_proj_now_psrs: Sequelize.BelongsToManyAddAssociationsMixin<now_proj, now_projId>
+  declare createPid_now_proj_now_psr: Sequelize.BelongsToManyCreateAssociationMixin<now_proj>
+  declare removePid_now_proj_now_psr: Sequelize.BelongsToManyRemoveAssociationMixin<now_proj, now_projId>
+  declare removePid_now_proj_now_psrs: Sequelize.BelongsToManyRemoveAssociationsMixin<now_proj, now_projId>
+  declare hasPid_now_proj_now_psr: Sequelize.BelongsToManyHasAssociationMixin<now_proj, now_projId>
+  declare hasPid_now_proj_now_psrs: Sequelize.BelongsToManyHasAssociationsMixin<now_proj, now_projId>
+  declare countPid_now_proj_now_psrs: Sequelize.BelongsToManyCountAssociationsMixin
   // com_species hasMany now_psr via species_id
-  now_psrs!: now_psr[]
-  getNow_psrs!: Sequelize.HasManyGetAssociationsMixin<now_psr>
-  setNow_psrs!: Sequelize.HasManySetAssociationsMixin<now_psr, now_psrId>
-  addNow_psr!: Sequelize.HasManyAddAssociationMixin<now_psr, now_psrId>
-  addNow_psrs!: Sequelize.HasManyAddAssociationsMixin<now_psr, now_psrId>
-  createNow_psr!: Sequelize.HasManyCreateAssociationMixin<now_psr>
-  removeNow_psr!: Sequelize.HasManyRemoveAssociationMixin<now_psr, now_psrId>
-  removeNow_psrs!: Sequelize.HasManyRemoveAssociationsMixin<now_psr, now_psrId>
-  hasNow_psr!: Sequelize.HasManyHasAssociationMixin<now_psr, now_psrId>
-  hasNow_psrs!: Sequelize.HasManyHasAssociationsMixin<now_psr, now_psrId>
-  countNow_psrs!: Sequelize.HasManyCountAssociationsMixin
+  declare now_psrs: now_psr[]
+  declare getNow_psrs: Sequelize.HasManyGetAssociationsMixin<now_psr>
+  declare setNow_psrs: Sequelize.HasManySetAssociationsMixin<now_psr, now_psrId>
+  declare addNow_psr: Sequelize.HasManyAddAssociationMixin<now_psr, now_psrId>
+  declare addNow_psrs: Sequelize.HasManyAddAssociationsMixin<now_psr, now_psrId>
+  declare createNow_psr: Sequelize.HasManyCreateAssociationMixin<now_psr>
+  declare removeNow_psr: Sequelize.HasManyRemoveAssociationMixin<now_psr, now_psrId>
+  declare removeNow_psrs: Sequelize.HasManyRemoveAssociationsMixin<now_psr, now_psrId>
+  declare hasNow_psr: Sequelize.HasManyHasAssociationMixin<now_psr, now_psrId>
+  declare hasNow_psrs: Sequelize.HasManyHasAssociationsMixin<now_psr, now_psrId>
+  declare countNow_psrs: Sequelize.HasManyCountAssociationsMixin
   // com_species hasMany now_sau via species_id
-  now_saus!: now_sau[]
-  getNow_saus!: Sequelize.HasManyGetAssociationsMixin<now_sau>
-  setNow_saus!: Sequelize.HasManySetAssociationsMixin<now_sau, now_sauId>
-  addNow_sau!: Sequelize.HasManyAddAssociationMixin<now_sau, now_sauId>
-  addNow_saus!: Sequelize.HasManyAddAssociationsMixin<now_sau, now_sauId>
-  createNow_sau!: Sequelize.HasManyCreateAssociationMixin<now_sau>
-  removeNow_sau!: Sequelize.HasManyRemoveAssociationMixin<now_sau, now_sauId>
-  removeNow_saus!: Sequelize.HasManyRemoveAssociationsMixin<now_sau, now_sauId>
-  hasNow_sau!: Sequelize.HasManyHasAssociationMixin<now_sau, now_sauId>
-  hasNow_saus!: Sequelize.HasManyHasAssociationsMixin<now_sau, now_sauId>
-  countNow_saus!: Sequelize.HasManyCountAssociationsMixin
+  declare now_saus: now_sau[]
+  declare getNow_saus: Sequelize.HasManyGetAssociationsMixin<now_sau>
+  declare setNow_saus: Sequelize.HasManySetAssociationsMixin<now_sau, now_sauId>
+  declare addNow_sau: Sequelize.HasManyAddAssociationMixin<now_sau, now_sauId>
+  declare addNow_saus: Sequelize.HasManyAddAssociationsMixin<now_sau, now_sauId>
+  declare createNow_sau: Sequelize.HasManyCreateAssociationMixin<now_sau>
+  declare removeNow_sau: Sequelize.HasManyRemoveAssociationMixin<now_sau, now_sauId>
+  declare removeNow_saus: Sequelize.HasManyRemoveAssociationsMixin<now_sau, now_sauId>
+  declare hasNow_sau: Sequelize.HasManyHasAssociationMixin<now_sau, now_sauId>
+  declare hasNow_saus: Sequelize.HasManyHasAssociationsMixin<now_sau, now_sauId>
+  declare countNow_saus: Sequelize.HasManyCountAssociationsMixin
 
   static initModel(sequelize: Sequelize.Sequelize): typeof com_species {
     return com_species.init(

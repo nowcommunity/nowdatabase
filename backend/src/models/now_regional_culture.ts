@@ -18,8 +18,8 @@ export class now_regional_culture
   extends Model<now_regional_cultureAttributes, now_regional_cultureCreationAttributes>
   implements now_regional_cultureAttributes
 {
-  regional_culture_id!: string
-  regional_culture_name!: string
+  declare regional_culture_id: string
+  declare regional_culture_name: string
 
   static initModel(sequelize: Sequelize.Sequelize): typeof now_regional_culture {
     return now_regional_culture.init(

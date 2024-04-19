@@ -20,15 +20,15 @@ export class now_sp_coord_taxa
   extends Model<now_sp_coord_taxaAttributes, now_sp_coord_taxaCreationAttributes>
   implements now_sp_coord_taxaAttributes
 {
-  sp_coord_id!: number
-  order_name!: string
-  family_name!: string
+  declare sp_coord_id: number
+  declare order_name: string
+  declare family_name: string
 
   // now_sp_coord_taxa belongsTo now_sp_coord via sp_coord_id
-  sp_coord!: now_sp_coord
-  getSp_coord!: Sequelize.BelongsToGetAssociationMixin<now_sp_coord>
-  setSp_coord!: Sequelize.BelongsToSetAssociationMixin<now_sp_coord, now_sp_coordId>
-  createSp_coord!: Sequelize.BelongsToCreateAssociationMixin<now_sp_coord>
+  declare sp_coord: now_sp_coord
+  declare getSp_coord: Sequelize.BelongsToGetAssociationMixin<now_sp_coord>
+  declare setSp_coord: Sequelize.BelongsToSetAssociationMixin<now_sp_coord, now_sp_coordId>
+  declare createSp_coord: Sequelize.BelongsToCreateAssociationMixin<now_sp_coord>
 
   static initModel(sequelize: Sequelize.Sequelize): typeof now_sp_coord_taxa {
     return now_sp_coord_taxa.init(

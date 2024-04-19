@@ -19,24 +19,24 @@ export class ref_journal
   extends Model<ref_journalAttributes, ref_journalCreationAttributes>
   implements ref_journalAttributes
 {
-  journal_id!: number
-  journal_title?: string
-  short_title?: string
-  alt_title?: string
-  ISSN?: string
+  declare journal_id: number
+  declare journal_title?: string
+  declare short_title?: string
+  declare alt_title?: string
+  declare ISSN?: string
 
   // ref_journal hasMany ref_ref via journal_id
-  ref_refs!: ref_ref[]
-  getRef_refs!: Sequelize.HasManyGetAssociationsMixin<ref_ref>
-  setRef_refs!: Sequelize.HasManySetAssociationsMixin<ref_ref, ref_refId>
-  addRef_ref!: Sequelize.HasManyAddAssociationMixin<ref_ref, ref_refId>
-  addRef_refs!: Sequelize.HasManyAddAssociationsMixin<ref_ref, ref_refId>
-  createRef_ref!: Sequelize.HasManyCreateAssociationMixin<ref_ref>
-  removeRef_ref!: Sequelize.HasManyRemoveAssociationMixin<ref_ref, ref_refId>
-  removeRef_refs!: Sequelize.HasManyRemoveAssociationsMixin<ref_ref, ref_refId>
-  hasRef_ref!: Sequelize.HasManyHasAssociationMixin<ref_ref, ref_refId>
-  hasRef_refs!: Sequelize.HasManyHasAssociationsMixin<ref_ref, ref_refId>
-  countRef_refs!: Sequelize.HasManyCountAssociationsMixin
+  declare ref_refs: ref_ref[]
+  declare getRef_refs: Sequelize.HasManyGetAssociationsMixin<ref_ref>
+  declare setRef_refs: Sequelize.HasManySetAssociationsMixin<ref_ref, ref_refId>
+  declare addRef_ref: Sequelize.HasManyAddAssociationMixin<ref_ref, ref_refId>
+  declare addRef_refs: Sequelize.HasManyAddAssociationsMixin<ref_ref, ref_refId>
+  declare createRef_ref: Sequelize.HasManyCreateAssociationMixin<ref_ref>
+  declare removeRef_ref: Sequelize.HasManyRemoveAssociationMixin<ref_ref, ref_refId>
+  declare removeRef_refs: Sequelize.HasManyRemoveAssociationsMixin<ref_ref, ref_refId>
+  declare hasRef_ref: Sequelize.HasManyHasAssociationMixin<ref_ref, ref_refId>
+  declare hasRef_refs: Sequelize.HasManyHasAssociationsMixin<ref_ref, ref_refId>
+  declare countRef_refs: Sequelize.HasManyCountAssociationsMixin
 
   static initModel(sequelize: Sequelize.Sequelize): typeof ref_journal {
     return ref_journal.init(

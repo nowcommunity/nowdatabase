@@ -11,18 +11,16 @@ export const testDb = async () => {
 }
 
 export const getAllLocalities = async (onlyPublic: boolean) => {
-  // TODO: Send only public rows unless user has access
   const where = onlyPublic ? { loc_status: 0 } : {}
   const result = await models.now_loc.findAll({
     attributes: ['lid', 'loc_name', 'max_age', 'min_age', 'country', 'loc_status'],
     where,
-    raw: true,
   })
   return result
 }
 
 export const getLocalityDetails = async (id: number) => {
   // TODO: Check if user has access
-  const result = await models.now_loc.findByPk(id, { raw: true })
+  const result = await models.now_loc.findByPk(id)
   return result
 }

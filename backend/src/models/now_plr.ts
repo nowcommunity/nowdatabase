@@ -14,19 +14,19 @@ export type now_plrOptionalAttributes = 'lid' | 'pid'
 export type now_plrCreationAttributes = Optional<now_plrAttributes, now_plrOptionalAttributes>
 
 export class now_plr extends Model<now_plrAttributes, now_plrCreationAttributes> implements now_plrAttributes {
-  lid!: number
-  pid!: number
+  declare lid: number
+  declare pid: number
 
   // now_plr belongsTo now_loc via lid
-  lid_now_loc!: now_loc
-  getLid_now_loc!: Sequelize.BelongsToGetAssociationMixin<now_loc>
-  setLid_now_loc!: Sequelize.BelongsToSetAssociationMixin<now_loc, now_locId>
-  createLid_now_loc!: Sequelize.BelongsToCreateAssociationMixin<now_loc>
+  declare lid_now_loc: now_loc
+  declare getLid_now_loc: Sequelize.BelongsToGetAssociationMixin<now_loc>
+  declare setLid_now_loc: Sequelize.BelongsToSetAssociationMixin<now_loc, now_locId>
+  declare createLid_now_loc: Sequelize.BelongsToCreateAssociationMixin<now_loc>
   // now_plr belongsTo now_proj via pid
-  pid_now_proj!: now_proj
-  getPid_now_proj!: Sequelize.BelongsToGetAssociationMixin<now_proj>
-  setPid_now_proj!: Sequelize.BelongsToSetAssociationMixin<now_proj, now_projId>
-  createPid_now_proj!: Sequelize.BelongsToCreateAssociationMixin<now_proj>
+  declare pid_now_proj: now_proj
+  declare getPid_now_proj: Sequelize.BelongsToGetAssociationMixin<now_proj>
+  declare setPid_now_proj: Sequelize.BelongsToSetAssociationMixin<now_proj, now_projId>
+  declare createPid_now_proj: Sequelize.BelongsToCreateAssociationMixin<now_proj>
 
   static initModel(sequelize: Sequelize.Sequelize): typeof now_plr {
     return now_plr.init(

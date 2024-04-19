@@ -19,17 +19,17 @@ export class ref_authors
   extends Model<ref_authorsAttributes, ref_authorsCreationAttributes>
   implements ref_authorsAttributes
 {
-  rid!: number
-  field_id!: number
-  au_num!: number
-  author_surname?: string
-  author_initials?: string
+  declare rid: number
+  declare field_id: number
+  declare au_num: number
+  declare author_surname?: string
+  declare author_initials?: string
 
   // ref_authors belongsTo ref_ref via rid
-  rid_ref_ref!: ref_ref
-  getRid_ref_ref!: Sequelize.BelongsToGetAssociationMixin<ref_ref>
-  setRid_ref_ref!: Sequelize.BelongsToSetAssociationMixin<ref_ref, ref_refId>
-  createRid_ref_ref!: Sequelize.BelongsToCreateAssociationMixin<ref_ref>
+  declare rid_ref_ref: ref_ref
+  declare getRid_ref_ref: Sequelize.BelongsToGetAssociationMixin<ref_ref>
+  declare setRid_ref_ref: Sequelize.BelongsToSetAssociationMixin<ref_ref, ref_refId>
+  declare createRid_ref_ref: Sequelize.BelongsToCreateAssociationMixin<ref_ref>
 
   static initModel(sequelize: Sequelize.Sequelize): typeof ref_authors {
     return ref_authors.init(

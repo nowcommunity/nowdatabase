@@ -13,14 +13,14 @@ export type now_ssOptionalAttributes = 'lid' | 'sed_struct'
 export type now_ssCreationAttributes = Optional<now_ssAttributes, now_ssOptionalAttributes>
 
 export class now_ss extends Model<now_ssAttributes, now_ssCreationAttributes> implements now_ssAttributes {
-  lid!: number
-  sed_struct!: string
+  declare lid: number
+  declare sed_struct: string
 
   // now_ss belongsTo now_loc via lid
-  lid_now_loc!: now_loc
-  getLid_now_loc!: Sequelize.BelongsToGetAssociationMixin<now_loc>
-  setLid_now_loc!: Sequelize.BelongsToSetAssociationMixin<now_loc, now_locId>
-  createLid_now_loc!: Sequelize.BelongsToCreateAssociationMixin<now_loc>
+  declare lid_now_loc: now_loc
+  declare getLid_now_loc: Sequelize.BelongsToGetAssociationMixin<now_loc>
+  declare setLid_now_loc: Sequelize.BelongsToSetAssociationMixin<now_loc, now_locId>
+  declare createLid_now_loc: Sequelize.BelongsToCreateAssociationMixin<now_loc>
 
   static initModel(sequelize: Sequelize.Sequelize): typeof now_ss {
     return now_ss.init(

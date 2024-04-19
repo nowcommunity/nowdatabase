@@ -17,33 +17,33 @@ export class ref_keywords
   extends Model<ref_keywordsAttributes, ref_keywordsCreationAttributes>
   implements ref_keywordsAttributes
 {
-  keywords_id!: number
-  keyword!: string
+  declare keywords_id: number
+  declare keyword: string
 
   // ref_keywords hasMany ref_keywords_ref via keywords_id
-  ref_keywords_refs!: ref_keywords_ref[]
-  getRef_keywords_refs!: Sequelize.HasManyGetAssociationsMixin<ref_keywords_ref>
-  setRef_keywords_refs!: Sequelize.HasManySetAssociationsMixin<ref_keywords_ref, ref_keywords_refId>
-  addRef_keywords_ref!: Sequelize.HasManyAddAssociationMixin<ref_keywords_ref, ref_keywords_refId>
-  addRef_keywords_refs!: Sequelize.HasManyAddAssociationsMixin<ref_keywords_ref, ref_keywords_refId>
-  createRef_keywords_ref!: Sequelize.HasManyCreateAssociationMixin<ref_keywords_ref>
-  removeRef_keywords_ref!: Sequelize.HasManyRemoveAssociationMixin<ref_keywords_ref, ref_keywords_refId>
-  removeRef_keywords_refs!: Sequelize.HasManyRemoveAssociationsMixin<ref_keywords_ref, ref_keywords_refId>
-  hasRef_keywords_ref!: Sequelize.HasManyHasAssociationMixin<ref_keywords_ref, ref_keywords_refId>
-  hasRef_keywords_refs!: Sequelize.HasManyHasAssociationsMixin<ref_keywords_ref, ref_keywords_refId>
-  countRef_keywords_refs!: Sequelize.HasManyCountAssociationsMixin
+  declare ref_keywords_refs: ref_keywords_ref[]
+  declare getRef_keywords_refs: Sequelize.HasManyGetAssociationsMixin<ref_keywords_ref>
+  declare setRef_keywords_refs: Sequelize.HasManySetAssociationsMixin<ref_keywords_ref, ref_keywords_refId>
+  declare addRef_keywords_ref: Sequelize.HasManyAddAssociationMixin<ref_keywords_ref, ref_keywords_refId>
+  declare addRef_keywords_refs: Sequelize.HasManyAddAssociationsMixin<ref_keywords_ref, ref_keywords_refId>
+  declare createRef_keywords_ref: Sequelize.HasManyCreateAssociationMixin<ref_keywords_ref>
+  declare removeRef_keywords_ref: Sequelize.HasManyRemoveAssociationMixin<ref_keywords_ref, ref_keywords_refId>
+  declare removeRef_keywords_refs: Sequelize.HasManyRemoveAssociationsMixin<ref_keywords_ref, ref_keywords_refId>
+  declare hasRef_keywords_ref: Sequelize.HasManyHasAssociationMixin<ref_keywords_ref, ref_keywords_refId>
+  declare hasRef_keywords_refs: Sequelize.HasManyHasAssociationsMixin<ref_keywords_ref, ref_keywords_refId>
+  declare countRef_keywords_refs: Sequelize.HasManyCountAssociationsMixin
   // ref_keywords belongsToMany ref_ref via keywords_id and rid
-  rid_ref_ref_ref_keywords_refs!: ref_ref[]
-  getRid_ref_ref_ref_keywords_refs!: Sequelize.BelongsToManyGetAssociationsMixin<ref_ref>
-  setRid_ref_ref_ref_keywords_refs!: Sequelize.BelongsToManySetAssociationsMixin<ref_ref, ref_refId>
-  addRid_ref_ref_ref_keywords_ref!: Sequelize.BelongsToManyAddAssociationMixin<ref_ref, ref_refId>
-  addRid_ref_ref_ref_keywords_refs!: Sequelize.BelongsToManyAddAssociationsMixin<ref_ref, ref_refId>
-  createRid_ref_ref_ref_keywords_ref!: Sequelize.BelongsToManyCreateAssociationMixin<ref_ref>
-  removeRid_ref_ref_ref_keywords_ref!: Sequelize.BelongsToManyRemoveAssociationMixin<ref_ref, ref_refId>
-  removeRid_ref_ref_ref_keywords_refs!: Sequelize.BelongsToManyRemoveAssociationsMixin<ref_ref, ref_refId>
-  hasRid_ref_ref_ref_keywords_ref!: Sequelize.BelongsToManyHasAssociationMixin<ref_ref, ref_refId>
-  hasRid_ref_ref_ref_keywords_refs!: Sequelize.BelongsToManyHasAssociationsMixin<ref_ref, ref_refId>
-  countRid_ref_ref_ref_keywords_refs!: Sequelize.BelongsToManyCountAssociationsMixin
+  declare rid_ref_ref_ref_keywords_refs: ref_ref[]
+  declare getRid_ref_ref_ref_keywords_refs: Sequelize.BelongsToManyGetAssociationsMixin<ref_ref>
+  declare setRid_ref_ref_ref_keywords_refs: Sequelize.BelongsToManySetAssociationsMixin<ref_ref, ref_refId>
+  declare addRid_ref_ref_ref_keywords_ref: Sequelize.BelongsToManyAddAssociationMixin<ref_ref, ref_refId>
+  declare addRid_ref_ref_ref_keywords_refs: Sequelize.BelongsToManyAddAssociationsMixin<ref_ref, ref_refId>
+  declare createRid_ref_ref_ref_keywords_ref: Sequelize.BelongsToManyCreateAssociationMixin<ref_ref>
+  declare removeRid_ref_ref_ref_keywords_ref: Sequelize.BelongsToManyRemoveAssociationMixin<ref_ref, ref_refId>
+  declare removeRid_ref_ref_ref_keywords_refs: Sequelize.BelongsToManyRemoveAssociationsMixin<ref_ref, ref_refId>
+  declare hasRid_ref_ref_ref_keywords_ref: Sequelize.BelongsToManyHasAssociationMixin<ref_ref, ref_refId>
+  declare hasRid_ref_ref_ref_keywords_refs: Sequelize.BelongsToManyHasAssociationsMixin<ref_ref, ref_refId>
+  declare countRid_ref_ref_ref_keywords_refs: Sequelize.BelongsToManyCountAssociationsMixin
 
   static initModel(sequelize: Sequelize.Sequelize): typeof ref_keywords {
     return ref_keywords.init(

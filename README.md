@@ -16,7 +16,7 @@ The :open_file_folder: [documentation](documentation)-directory has documentatio
 + How to get the app up & running, and initialize database from sql-dumps
 
 :wrench: [Technical explanations](documentation/technical_explanations.md) 
-+ How do things work, used technologies etc.
++ Explanations of how things work, and guides for some more rare tasks like generating sequelize models.
 
 :memo: [Frontend](documentation/frontend.md) 
 + Explanation of the frontend logic and how to add views

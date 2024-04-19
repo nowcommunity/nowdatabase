@@ -16,19 +16,19 @@ export class now_proj_people
   extends Model<now_proj_peopleAttributes, now_proj_peopleCreationAttributes>
   implements now_proj_peopleAttributes
 {
-  pid!: number
-  initials!: string
+  declare pid: number
+  declare initials: string
 
   // now_proj_people belongsTo com_people via initials
-  initials_com_person!: com_people
-  getInitials_com_person!: Sequelize.BelongsToGetAssociationMixin<com_people>
-  setInitials_com_person!: Sequelize.BelongsToSetAssociationMixin<com_people, com_peopleId>
-  createInitials_com_person!: Sequelize.BelongsToCreateAssociationMixin<com_people>
+  declare initials_com_person: com_people
+  declare getInitials_com_person: Sequelize.BelongsToGetAssociationMixin<com_people>
+  declare setInitials_com_person: Sequelize.BelongsToSetAssociationMixin<com_people, com_peopleId>
+  declare createInitials_com_person: Sequelize.BelongsToCreateAssociationMixin<com_people>
   // now_proj_people belongsTo now_proj via pid
-  pid_now_proj!: now_proj
-  getPid_now_proj!: Sequelize.BelongsToGetAssociationMixin<now_proj>
-  setPid_now_proj!: Sequelize.BelongsToSetAssociationMixin<now_proj, now_projId>
-  createPid_now_proj!: Sequelize.BelongsToCreateAssociationMixin<now_proj>
+  declare pid_now_proj: now_proj
+  declare getPid_now_proj: Sequelize.BelongsToGetAssociationMixin<now_proj>
+  declare setPid_now_proj: Sequelize.BelongsToSetAssociationMixin<now_proj, now_projId>
+  declare createPid_now_proj: Sequelize.BelongsToCreateAssociationMixin<now_proj>
 
   static initModel(sequelize: Sequelize.Sequelize): typeof now_proj_people {
     return now_proj_people.init(

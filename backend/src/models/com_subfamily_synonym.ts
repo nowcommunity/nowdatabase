@@ -18,8 +18,8 @@ export class com_subfamily_synonym
   extends Model<com_subfamily_synonymAttributes, com_subfamily_synonymCreationAttributes>
   implements com_subfamily_synonymAttributes
 {
-  syn_subfamily_name!: string
-  subfamily_name?: string
+  declare syn_subfamily_name: string
+  declare subfamily_name?: string
 
   static initModel(sequelize: Sequelize.Sequelize): typeof com_subfamily_synonym {
     return com_subfamily_synonym.init(

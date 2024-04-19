@@ -34,36 +34,36 @@ export class now_time_update
   extends Model<now_time_updateAttributes, now_time_updateCreationAttributes>
   implements now_time_updateAttributes
 {
-  time_update_id!: number
-  tu_name!: string
-  tuid?: number
-  lower_buid?: number
-  upper_buid?: number
-  coordinator!: string
-  authorizer!: string
-  date?: string
-  comment?: string
+  declare time_update_id: number
+  declare tu_name: string
+  declare tuid?: number
+  declare lower_buid?: number
+  declare upper_buid?: number
+  declare coordinator: string
+  declare authorizer: string
+  declare date?: string
+  declare comment?: string
 
   // now_time_update belongsTo now_bau via lower_buid
-  lower_bu!: now_bau
-  getLower_bu!: Sequelize.BelongsToGetAssociationMixin<now_bau>
-  setLower_bu!: Sequelize.BelongsToSetAssociationMixin<now_bau, now_bauId>
-  createLower_bu!: Sequelize.BelongsToCreateAssociationMixin<now_bau>
+  declare lower_bu: now_bau
+  declare getLower_bu: Sequelize.BelongsToGetAssociationMixin<now_bau>
+  declare setLower_bu: Sequelize.BelongsToSetAssociationMixin<now_bau, now_bauId>
+  declare createLower_bu: Sequelize.BelongsToCreateAssociationMixin<now_bau>
   // now_time_update belongsTo now_bau via upper_buid
-  upper_bu!: now_bau
-  getUpper_bu!: Sequelize.BelongsToGetAssociationMixin<now_bau>
-  setUpper_bu!: Sequelize.BelongsToSetAssociationMixin<now_bau, now_bauId>
-  createUpper_bu!: Sequelize.BelongsToCreateAssociationMixin<now_bau>
+  declare upper_bu: now_bau
+  declare getUpper_bu: Sequelize.BelongsToGetAssociationMixin<now_bau>
+  declare setUpper_bu: Sequelize.BelongsToSetAssociationMixin<now_bau, now_bauId>
+  declare createUpper_bu: Sequelize.BelongsToCreateAssociationMixin<now_bau>
   // now_time_update belongsTo now_tau via tuid
-  tu!: now_tau
-  getTu!: Sequelize.BelongsToGetAssociationMixin<now_tau>
-  setTu!: Sequelize.BelongsToSetAssociationMixin<now_tau, now_tauId>
-  createTu!: Sequelize.BelongsToCreateAssociationMixin<now_tau>
+  declare tu: now_tau
+  declare getTu: Sequelize.BelongsToGetAssociationMixin<now_tau>
+  declare setTu: Sequelize.BelongsToSetAssociationMixin<now_tau, now_tauId>
+  declare createTu: Sequelize.BelongsToCreateAssociationMixin<now_tau>
   // now_time_update belongsTo now_time_unit via tu_name
-  tu_name_now_time_unit!: now_time_unit
-  getTu_name_now_time_unit!: Sequelize.BelongsToGetAssociationMixin<now_time_unit>
-  setTu_name_now_time_unit!: Sequelize.BelongsToSetAssociationMixin<now_time_unit, now_time_unitId>
-  createTu_name_now_time_unit!: Sequelize.BelongsToCreateAssociationMixin<now_time_unit>
+  declare tu_name_now_time_unit: now_time_unit
+  declare getTu_name_now_time_unit: Sequelize.BelongsToGetAssociationMixin<now_time_unit>
+  declare setTu_name_now_time_unit: Sequelize.BelongsToSetAssociationMixin<now_time_unit, now_time_unitId>
+  declare createTu_name_now_time_unit: Sequelize.BelongsToCreateAssociationMixin<now_time_unit>
 
   static initModel(sequelize: Sequelize.Sequelize): typeof now_time_update {
     return now_time_update.init(

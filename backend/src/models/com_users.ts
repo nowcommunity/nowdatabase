@@ -24,13 +24,13 @@ export type com_usersOptionalAttributes =
 export type com_usersCreationAttributes = Optional<com_usersAttributes, com_usersOptionalAttributes>
 
 export class com_users extends Model<com_usersAttributes, com_usersCreationAttributes> implements com_usersAttributes {
-  user_id!: number
-  user_name?: string
-  password?: string
-  last_login?: string
-  now_user_group?: string
-  mor_user_group?: string
-  gen_user_group?: string
+  declare user_id: number
+  declare user_name?: string
+  declare password?: string
+  declare last_login?: string
+  declare now_user_group?: string
+  declare mor_user_group?: string
+  declare gen_user_group?: string
 
   static initModel(sequelize: Sequelize.Sequelize): typeof com_users {
     return com_users.init(

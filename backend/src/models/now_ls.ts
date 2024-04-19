@@ -74,48 +74,48 @@ export type now_lsOptionalAttributes =
 export type now_lsCreationAttributes = Optional<now_lsAttributes, now_lsOptionalAttributes>
 
 export class now_ls extends Model<now_lsAttributes, now_lsCreationAttributes> implements now_lsAttributes {
-  lid!: number
-  species_id!: number
-  nis?: number
-  pct?: number
-  quad?: number
-  mni?: number
-  qua?: string
-  id_status?: string
-  orig_entry?: string
-  source_name?: string
-  body_mass?: number
-  mesowear?: string
-  mw_or_high?: number
-  mw_or_low?: number
-  mw_cs_sharp?: number
-  mw_cs_round?: number
-  mw_cs_blunt?: number
-  mw_scale_min?: number
-  mw_scale_max?: number
-  mw_value?: number
-  microwear?: string
-  dc13_mean?: number
-  dc13_n?: number
-  dc13_max?: number
-  dc13_min?: number
-  dc13_stdev?: number
-  do18_mean?: number
-  do18_n?: number
-  do18_max?: number
-  do18_min?: number
-  do18_stdev?: number
+  declare lid: number
+  declare species_id: number
+  declare nis?: number
+  declare pct?: number
+  declare quad?: number
+  declare mni?: number
+  declare qua?: string
+  declare id_status?: string
+  declare orig_entry?: string
+  declare source_name?: string
+  declare body_mass?: number
+  declare mesowear?: string
+  declare mw_or_high?: number
+  declare mw_or_low?: number
+  declare mw_cs_sharp?: number
+  declare mw_cs_round?: number
+  declare mw_cs_blunt?: number
+  declare mw_scale_min?: number
+  declare mw_scale_max?: number
+  declare mw_value?: number
+  declare microwear?: string
+  declare dc13_mean?: number
+  declare dc13_n?: number
+  declare dc13_max?: number
+  declare dc13_min?: number
+  declare dc13_stdev?: number
+  declare do18_mean?: number
+  declare do18_n?: number
+  declare do18_max?: number
+  declare do18_min?: number
+  declare do18_stdev?: number
 
   // now_ls belongsTo com_species via species_id
-  species!: com_species
-  getSpecies!: Sequelize.BelongsToGetAssociationMixin<com_species>
-  setSpecies!: Sequelize.BelongsToSetAssociationMixin<com_species, com_speciesId>
-  createSpecies!: Sequelize.BelongsToCreateAssociationMixin<com_species>
+  declare species: com_species
+  declare getSpecies: Sequelize.BelongsToGetAssociationMixin<com_species>
+  declare setSpecies: Sequelize.BelongsToSetAssociationMixin<com_species, com_speciesId>
+  declare createSpecies: Sequelize.BelongsToCreateAssociationMixin<com_species>
   // now_ls belongsTo now_loc via lid
-  lid_now_loc!: now_loc
-  getLid_now_loc!: Sequelize.BelongsToGetAssociationMixin<now_loc>
-  setLid_now_loc!: Sequelize.BelongsToSetAssociationMixin<now_loc, now_locId>
-  createLid_now_loc!: Sequelize.BelongsToCreateAssociationMixin<now_loc>
+  declare lid_now_loc: now_loc
+  declare getLid_now_loc: Sequelize.BelongsToGetAssociationMixin<now_loc>
+  declare setLid_now_loc: Sequelize.BelongsToSetAssociationMixin<now_loc, now_locId>
+  declare createLid_now_loc: Sequelize.BelongsToCreateAssociationMixin<now_loc>
 
   static initModel(sequelize: Sequelize.Sequelize): typeof now_ls {
     return now_ls.init(

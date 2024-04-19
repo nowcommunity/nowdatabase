@@ -13,7 +13,7 @@ export class now_coll_meth_values
   extends Model<now_coll_meth_valuesAttributes, now_coll_meth_valuesCreationAttributes>
   implements now_coll_meth_valuesAttributes
 {
-  coll_meth_value!: string
+  declare coll_meth_value: string
 
   static initModel(sequelize: Sequelize.Sequelize): typeof now_coll_meth_values {
     return now_coll_meth_values.init(
