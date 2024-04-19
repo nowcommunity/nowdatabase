@@ -1,7 +1,7 @@
 import { Router } from 'express'
 import { models } from '../utils/db'
 import jwt from 'jsonwebtoken'
-import { SECRET } from '../utils/config'
+import { SECRET, LOGIN_VALID_MS } from '../utils/config'
 import bcrypt from 'bcrypt'
 
 const router = Router()
@@ -20,7 +20,9 @@ router.post('/login', async (req, res) => {
 
   if (!passwordMatches) return res.status(403).send()
 
-  const token = jwt.sign({ username: result.user_name, id: result.user_id }, SECRET)
+  const token = jwt.sign({ username: result.user_name, id: result.user_id }, SECRET, {
+    expiresIn: LOGIN_VALID_MS,
+  })
 
   return res.status(200).send({ token, username: result.user_name })
 })
