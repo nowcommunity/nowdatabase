@@ -1,12 +1,18 @@
 import express from 'express'
 import { logger } from '../utils/logger'
 
-export const errorHandler = (error: Error, _req: express.Request, res: express.Response) => {
+export const errorHandler = (
+  error: Error,
+  _req: express.Request,
+  res: express.Response,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  _next: express.NextFunction
+) => {
   if ('status' in error) {
     return res.status(error.status as number).json({ message: error.message })
   }
   logger.error('Internal server error occurred. Error and stacktrace:')
   logger.error(error.message)
-  if (error.stack) logger.error(JSON.stringify(error.stack, null, 2))
+  if (error.stack) logger.error(error.stack)
   return res.status(500).json('Internal server error: ' + error)
 }
