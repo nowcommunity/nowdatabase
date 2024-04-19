@@ -1,17 +1,25 @@
-FROM node:20
+FROM node:20-alpine3.19 AS build
 
 ENV TZ="Europe/Helsinki"
 
-WORKDIR /usr/src/app
+WORKDIR /app
+
+COPY package*.json ./
+
+RUN npm install
+
+COPY . .
+
+RUN npm run build
+
+FROM node:20-alpine3.19 AS serve
+
+RUN npm install -g serve
+
+WORKDIR /app
+
+COPY --from=build /app/dist /app
 
 EXPOSE 5173
 
-ENV NODE_ENV=production
-
-COPY ./package* ./
-RUN npm ci --include=dev
-COPY . .
-
-RUN npm run build && npm install -g serve@12.0.0
-
-CMD ["serve", "--single", "--listen", "5173", "dist"]
+CMD ["serve", "-s", "/app", "-l", "5173"]
