@@ -21,12 +21,12 @@ The custom fork was needed due to sequelize-auto not working well with Sequelize
 
 Compile it: `npm run tsc`
 
-Run it. Easiest is to navigate into this repository's backend folder, and there run something like:
+Run it. Easiest is to navigate into `nowdatabase/backend`, and there run something like:
 
-`*path-to-sequelize-auto-directory*/bin/sequelize-auto -h localhost -d now_test -u now_test -x mariadb_password -p 3306  --dialect mariadb -o test -l ts`
+`*path-to-sequelize-auto-repository*/bin/sequelize-auto -h localhost -d now_test -u now_test -x mariadb_password -p 3306  --dialect mariadb -o src/models -l ts`
 
 * Put a relative or absolute path to the sequelize-auto repository in the beginning of the command.
-* If needed, also change the host, port, user and password.
+* Have the nowdb application running (or only the mariadb container). If needed, also change the host, port, user and password in the command to whatever you use.
 * Notice that this is for one db only, defined with: `-d now_test`. Change this for the other db's.
 * Before the command, probably best to delete the whole models-folder and it's content: `rm src/models/*` (in backend-directory of course)
 * After the command, you may have to lint it: `npx prettier --write src/models/*`
