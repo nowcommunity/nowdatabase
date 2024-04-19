@@ -1,5 +1,5 @@
 import * as Sequelize from 'sequelize'
-import { DataTypes, Model, Optional } from 'sequelize'
+import { DataTypes, Model } from 'sequelize'
 import type { com_people, com_peopleId } from './com_people'
 import type { now_proj, now_projId } from './now_proj'
 

@@ -1,5 +1,5 @@
 import * as Sequelize from 'sequelize'
-import { DataTypes, Model, Optional } from 'sequelize'
+import { DataTypes, Model } from 'sequelize'
 
 export interface now_coll_meth_valuesAttributes {
   coll_meth_value: string

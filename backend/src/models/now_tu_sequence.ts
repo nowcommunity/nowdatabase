@@ -1,5 +1,5 @@
 import * as Sequelize from 'sequelize'
-import { DataTypes, Model, Optional } from 'sequelize'
+import { DataTypes, Model } from 'sequelize'
 import type { now_time_unit, now_time_unitId } from './now_time_unit'
 
 export interface now_tu_sequenceAttributes {
