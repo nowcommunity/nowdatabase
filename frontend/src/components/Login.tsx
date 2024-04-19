@@ -3,6 +3,7 @@ import { useTryLoginMutation, setUser } from '../redux/userReducer'
 import { useDispatch } from 'react-redux'
 import { Button, CircularProgress, Container, Stack, TextField } from '@mui/material'
 import { useNavigate } from 'react-router-dom'
+import { api } from '../redux/api'
 
 export const Login = () => {
   const [username, setUsername] = useState('')
@@ -32,6 +33,8 @@ export const Login = () => {
   useEffect(() => {
     if (data && data.token) {
       dispatch(setUser({ username: data.username, token: data.token }))
+      // Reset api cache, so that we won't show guest data to logged user
+      dispatch(api.util.resetApiState())
       navigate('/')
     }
   }, [data, dispatch, navigate])

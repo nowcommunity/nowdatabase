@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import { RootState } from '../redux/store'
 import { clearUser } from '../redux/userReducer'
+import { api } from '../redux/api'
 
 export const NavBar = () => {
   const user = useSelector((store: RootState) => store.user)
@@ -20,6 +21,8 @@ export const NavBar = () => {
 
   const logout = () => {
     dispatch(clearUser())
+    // Reset api, so that we won't show cached private data to guest user
+    dispatch(api.util.resetApiState())
     localStorage.clear()
     navigate('/')
   }
