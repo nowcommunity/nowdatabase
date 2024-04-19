@@ -9,4 +9,4 @@ const error = (msg: string) => {
   console.error(getLogString(msg))
 }
 
-export default { info, error }
+export const logger = { info, error }
