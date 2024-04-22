@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { api } from './api'
-import { now_locAttributes as Locality } from '@backend/models/now_loc'
+import { type now_locAttributes as Locality } from '@backend/models/now_loc'
 
 const localitiesApi = api.injectEndpoints({
   endpoints: builder => ({

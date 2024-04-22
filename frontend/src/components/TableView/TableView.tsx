@@ -79,9 +79,9 @@ export const TableView = <T extends MRT_RowData>({
       }}
       onColumnFiltersChange={setColumnFilters}
       renderRowActions={({ row }) => (
-        <Box display="flex" gap="1em" alignItems="center" width="3.6em">
+        <Box display="flex" gap="0.2em" alignItems="center" width="3.6em">
           <Button
-            variant="contained"
+            variant="text"
             style={{ width: '2em' }}
             onClick={() => navigate(`/locality/${row.original[idFieldName]}`)}
           >
@@ -89,7 +89,7 @@ export const TableView = <T extends MRT_RowData>({
           </Button>
           {checkRowRestriction(row.original) && (
             <Tooltip placement="top" title="This item has restricted visibility">
-              <PolicyIcon color="primary" fontSize="large" />
+              <PolicyIcon color="primary" fontSize="medium" />
             </Tooltip>
           )}
         </Box>
