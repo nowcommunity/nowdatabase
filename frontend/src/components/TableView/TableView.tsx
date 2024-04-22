@@ -6,6 +6,8 @@ import {
   type MRT_RowData,
   MRT_SortingState,
   MRT_PaginationState,
+  MRT_ShowHideColumnsButton,
+  MRT_ToggleFullScreenButton,
 } from 'material-react-table'
 import { Box, Button, CircularProgress, Tooltip } from '@mui/material'
 import { useLocation, useNavigate } from 'react-router-dom'
@@ -14,7 +16,7 @@ import PolicyIcon from '@mui/icons-material/Policy'
 
 type TableStateInUrl = 'sorting' | 'columnfilters' | 'pagination'
 
-const defaultPagination: MRT_PaginationState = { pageIndex: 0, pageSize: 10 }
+const defaultPagination: MRT_PaginationState = { pageIndex: 0, pageSize: 15 }
 
 /*
   TableView takes in the data and columns of a table, and handles
@@ -68,7 +70,13 @@ export const TableView = <T extends MRT_RowData>({
     <MaterialReactTable
       columns={columns}
       data={data}
-      state={{ columnFilters, showColumnFilters: true, sorting, pagination }}
+      state={{
+        columnFilters,
+        showColumnFilters: true,
+        sorting,
+        pagination,
+        density: 'compact',
+      }}
       onColumnFiltersChange={setColumnFilters}
       renderRowActions={({ row }) => (
         <Box display="flex" gap="1em" alignItems="center" width="3.6em">
@@ -91,6 +99,25 @@ export const TableView = <T extends MRT_RowData>({
       onSortingChange={setSorting}
       onPaginationChange={setPagination}
       autoResetPageIndex={false}
+      positionPagination="both"
+      paginationDisplayMode="pages"
+      enableDensityToggle={false}
+      enableGlobalFilter={false}
+      enableColumnActions={false}
+      enableHiding={true}
+      renderToolbarInternalActions={
+        /*
+          Custom rendering of the toolbar menu in the top-right: this is needed because there's no setting to hide the "show/hide column filters" button which we don't want
+          See https://github.com/KevinVandy/material-react-table/blob/85b98f9aaa038df48aa1dd35123560abce78ee58/packages/material-react-table/src/components/toolbar/MRT_ToolbarInternalButtons.tsx#L45
+          To know what components you can render here if necessary
+        */
+        ({ table }) => (
+          <Box>
+            <MRT_ShowHideColumnsButton table={table} />
+            <MRT_ToggleFullScreenButton table={table} />
+          </Box>
+        )
+      }
     />
   )
 }
