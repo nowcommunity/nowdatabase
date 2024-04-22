@@ -1,12 +1,13 @@
 // Need to use the React-specific entry point to import createApi
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
-import { api } from './api'
+import { api } from '@/redux/api'
+import { LoginData as UserFields } from '@backend/routes/user'
 
 type LoginData = { username: string; password: string }
 
 const userApi = api.injectEndpoints({
   endpoints: builder => ({
-    tryLogin: builder.mutation<{ token: string; username: string }, LoginData>({
+    tryLogin: builder.mutation<UserFields, LoginData>({
       query: ({ username, password }: LoginData) => ({
         url: `/user/login`,
         body: {
