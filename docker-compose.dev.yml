@@ -5,7 +5,7 @@ services:
     volumes:
       - ./frontend/:/usr/src/app
     ports:
-      - 5173:5173
+      - 127.0.0.1:5173:5173
     command: >
         sh -c "cd /usr/src/app && npm ci && npm run dev -- --host"
   now-db-backend:
@@ -14,7 +14,7 @@ services:
     volumes:
       - ./backend/:/usr/src/app
     ports:
-      - 4000:4000
+      - 127.0.0.1:4000:4000
     command: >
         sh -c "cd /usr/src/app && npm ci && npm run dev"
     env_file: .db.dev.env
@@ -25,7 +25,7 @@ services:
     volumes:
       - ./data/:/docker-entrypoint-initdb.d
     ports:
-      - 3306:3306
+      - 127.0.0.1:3306:3306
 volumes:
   nowdb-db:
 
