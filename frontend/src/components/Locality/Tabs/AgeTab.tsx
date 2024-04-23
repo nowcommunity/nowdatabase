@@ -30,7 +30,7 @@ export const AgeTab = () => {
 
   const sampleUnit = [
     ['Datum Plane', valueField('datum_plane')],
-    ['Top of Sample Unit(m)', valueField('tos')],
+    ['Top of Sample Unit (m)', valueField('tos')],
     ['Bottom of Sample Unit (m)', valueField('bos')],
   ]
 
