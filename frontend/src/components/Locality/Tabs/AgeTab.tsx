@@ -1,5 +1,5 @@
 import { Box } from '@mui/material'
-import { Locality } from '../../../redux/localityReducer'
+import { Locality } from '@/backendTypes'
 import { ArrayFrame, DataValue } from '../../DetailView/common/FormComponents'
 import { useGetEditableTextField } from '../../DetailView/hooks'
 

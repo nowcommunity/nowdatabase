@@ -1,7 +1,7 @@
 import { useMemo } from 'react'
 import { type MRT_ColumnDef } from 'material-react-table'
 import { useGetAllLocalitiesQuery } from '../../redux/localityReducer'
-import { type now_locAttributes as Locality } from '@backend/models/now_loc'
+import { Locality } from '@/backendTypes'
 import { TableView } from '../TableView/TableView'
 
 export const Localities = () => {
