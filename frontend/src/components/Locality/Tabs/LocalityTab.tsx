@@ -27,6 +27,7 @@ export const LocalityTab = () => {
     ['Approximate Coordinates', textField('approx_coord')],
     ['Altitude (m)', textField('altitude')],
   ]
+
   return (
     <Box>
       <ArrayFrame array={name} title="Name" />
