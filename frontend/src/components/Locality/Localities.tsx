@@ -9,6 +9,11 @@ export const Localities = () => {
   const columns = useMemo<MRT_ColumnDef<Locality>[]>(
     () => [
       {
+        accessorKey: 'lid',
+        header: 'Id',
+        size: 20,
+      },
+      {
         accessorKey: 'loc_name',
         header: 'Name',
       },

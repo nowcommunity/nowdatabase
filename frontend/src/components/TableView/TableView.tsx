@@ -77,6 +77,9 @@ export const TableView = <T extends MRT_RowData>({
         pagination,
         density: 'compact',
       }}
+      initialState={{
+        columnVisibility: { lid: false }
+      }}
       onColumnFiltersChange={setColumnFilters}
       renderRowActions={({ row }) => (
         <Box display="flex" gap="0.2em" alignItems="center" width="3.6em">
