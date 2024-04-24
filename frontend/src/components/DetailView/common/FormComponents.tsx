@@ -7,7 +7,7 @@ export const ArrayToTable = ({ array }: { array: Array<Array<ReactNode>> }) => (
     {array.map((row, index) => (
       <Grid key={index} container direction="row" height="2.5em">
         {row.map((item, index) => (
-          <Grid key={index} item xs={2} padding="5px">
+          <Grid key={index} item xs={index === 0 ? 2 : Math.min((12 / row.length), 4)} padding="5px">
             {typeof item === 'string' ? <b>{item}</b> : item}
           </Grid>
         ))}
