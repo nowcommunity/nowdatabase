@@ -1,12 +1,14 @@
-import { Box } from '@mui/material'
+import { Box, Grid } from '@mui/material'
 import { Locality } from '@/backendTypes'
-import { ArrayFrame, DataValue } from '../../DetailView/common/FormComponents'
+import { ArrayFrame, DataValue, EditingModal, Grouped } from '../../DetailView/common/FormComponents'
 import { useGetEditableTextField } from '../../DetailView/hooks'
 
 export const LocalityTab = () => {
   const getEditableTextField = useGetEditableTextField<Locality>()
 
-  const textField = (field: keyof Locality) => <DataValue<Locality> field={field} EditElement={getEditableTextField(field)} />
+  const textField = (field: keyof Locality) => (
+    <DataValue<Locality> field={field} EditElement={getEditableTextField(field)} />
+  )
 
   const name = [['Name', textField('loc_name')]]
   const locality = [['Country', textField('country')]]
@@ -35,6 +37,24 @@ export const LocalityTab = () => {
       <ArrayFrame array={country} title="Country" />
       <ArrayFrame array={status} title="Status" />
       <ArrayFrame array={latlong} title="Latitude & Longitude" />
+      <Grouped title="Synonym">
+        <EditingModal buttonText="Add synonym">
+          <Grid container direction="column">
+            <Grid container direction="row">
+              <Grid item xs={6}>1</Grid>
+              <Grid item xs={6}>2</Grid>
+            </Grid>
+            <Grid container direction="row">
+              <Grid item xs={6}>1</Grid>
+              <Grid item xs={6}>2</Grid>
+            </Grid>
+            <Grid container direction="row">
+              <Grid item xs={6}>1</Grid>
+              <Grid item xs={6}>2</Grid>
+            </Grid>
+          </Grid>
+        </EditingModal>
+      </Grouped>
     </Box>
   )
 }

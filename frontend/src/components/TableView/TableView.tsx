@@ -78,7 +78,7 @@ export const TableView = <T extends MRT_RowData>({
         density: 'compact',
       }}
       initialState={{
-        columnVisibility: { lid: false }
+        columnVisibility: { id: false }
       }}
       onColumnFiltersChange={setColumnFilters}
       renderRowActions={({ row }) => (
