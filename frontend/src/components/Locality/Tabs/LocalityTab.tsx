@@ -6,26 +6,26 @@ import { useGetEditableTextField } from '../../DetailView/hooks'
 export const LocalityTab = () => {
   const getEditableTextField = useGetEditableTextField<Locality>()
 
-  const valueField = (field: keyof Locality) => <DataValue<Locality> field={field} editElement={getEditableTextField} />
+  const textField = (field: keyof Locality) => <DataValue<Locality> field={field} EditElement={getEditableTextField(field)} />
 
-  const name = [['Name', valueField('loc_name')]]
-  const locality = [['Country', valueField('country')]]
+  const name = [['Name', textField('loc_name')]]
+  const locality = [['Country', textField('country')]]
   const country = [
-    ['Country', valueField('country')],
-    ['State', valueField('state')],
-    ['County', valueField('county')],
-    ['Detail', valueField('loc_detail')],
-    ['Site Area', valueField('site_area')],
-    ['General Locality', valueField('gen_loc')],
-    ['Plate', valueField('plate')],
+    ['Country', textField('country')],
+    ['State', textField('state')],
+    ['County', textField('county')],
+    ['Detail', textField('loc_detail')],
+    ['Site Area', textField('site_area')],
+    ['General Locality', textField('gen_loc')],
+    ['Plate', textField('plate')],
   ]
-  const status = [['Status', valueField('loc_status')]]
+  const status = [['Status', textField('loc_status')]]
   const latlong = [
     ['', 'dms', 'dec'],
-    ['Latitude', valueField('dms_lat'), valueField('dec_lat')],
-    ['Longitude', valueField('dms_long'), valueField('dec_long')],
-    ['Approximate Coordinates', valueField('approx_coord')],
-    ['Altitude (m)', valueField('altitude')],
+    ['Latitude', textField('dms_lat'), textField('dec_lat')],
+    ['Longitude', textField('dms_long'), textField('dec_long')],
+    ['Approximate Coordinates', textField('approx_coord')],
+    ['Altitude (m)', textField('altitude')],
   ]
   return (
     <Box>

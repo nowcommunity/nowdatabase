@@ -1,4 +1,4 @@
-import { TextField } from '@mui/material'
+import { FormControl, FormControlLabel, Radio, RadioGroup, TextField } from '@mui/material'
 import { useContext, Context } from 'react'
 import { DetailContextType, DetailContext } from './Context/DetailContext'
 
@@ -19,5 +19,22 @@ export const useGetEditableTextField = <T,>() => {
       variant="outlined"
       size="small"
     />
+  )
+}
+
+export const useGetRadioSelection = <T,>() => {
+  const { setEditData, editData } = useDetailContext<T>()
+  return ({ options, name, fieldName }: { options: string[], name: string, fieldName: keyof T }) => 
+    (<FormControl>
+      <RadioGroup
+        aria-labelledby={`${name}-radio-selection`}
+        name={name}
+        onChange={(event: React.ChangeEvent<HTMLInputElement>) => setEditData({ ...editData, [fieldName]: event?.currentTarget?.value })}
+        value={editData[fieldName]}
+        sx={{ display: 'flex', flexDirection: 'row' }}
+        >
+        {options.map(option => <FormControlLabel key={option} value={option} control={<Radio />} label={option} />)}
+      </RadioGroup>
+    </FormControl>
   )
 }

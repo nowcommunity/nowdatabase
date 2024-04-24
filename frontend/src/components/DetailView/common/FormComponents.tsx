@@ -40,14 +40,14 @@ export const Grouped = ({ title, children }: { title?: string; children: ReactNo
 
 export const DataValue = <T extends object>({
   field,
-  editElement: getEditElement,
+  EditElement,
 }: {
   field: keyof T
-  editElement: (fieldName: keyof T) => ReactNode
+  EditElement: ReactNode
 }) => {
   const { data, mode } = useDetailContext<T>()
   if (mode === 'edit') {
-    return getEditElement(field)
+    return EditElement
   }
   return data[field]
 }

@@ -12,6 +12,7 @@ export const testDb = async () => {
 
 export const getAllLocalities = async (onlyPublic: boolean) => {
   const where = onlyPublic ? { loc_status: 0 } : {}
+
   const result = await models.now_loc.findAll({
     attributes: ['lid', 'loc_name', 'max_age', 'min_age', 'country', 'loc_status'],
     where,
