@@ -26,9 +26,11 @@
       "@/*": ["./src/*"],
       "@components/*": ["./src/components/*"],
       "@util/*": ["./src/util/*"],
-      "@backend/*": ["../backend/src/*"],
+      "@shared/*": ["../shared/*"]
     }
   },
   "include": ["src"],
+  "exclude": ["../backend/**/*"],
+  
   "references": [{ "path": "./tsconfig.node.json" }]
 }

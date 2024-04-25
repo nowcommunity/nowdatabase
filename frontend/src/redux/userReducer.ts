@@ -1,7 +1,7 @@
 // Need to use the React-specific entry point to import createApi
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { api } from '@/redux/api'
-import { LoginData as UserFields } from '@backend/routes/user'
+import { UserFields } from '@shared/types'
 
 type LoginData = { username: string; password: string }
 

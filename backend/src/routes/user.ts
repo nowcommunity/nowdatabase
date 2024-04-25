@@ -6,11 +6,6 @@ import bcrypt from 'bcrypt'
 
 const router = Router()
 
-export type LoginData = {
-  token: string
-  username: string
-}
-
 router.post('/login', async (req, res) => {
   const { username, password } = req.body
   const result = await models.com_users.findOne({

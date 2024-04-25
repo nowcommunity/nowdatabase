@@ -15,6 +15,7 @@
       "@/*": ["./src/*"],
       "@utils/*": ["./src/utils/*"],
       "@services/*": ["./src/services/*"],
+      "@shared/*": ["../shared/*"],
     }
   },
   "include": ["src"],
