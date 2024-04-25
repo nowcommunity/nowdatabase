@@ -1,3 +1,4 @@
+import { com_mlist } from '@/models/com_mlist'
 import { models } from '../utils/db'
 import { logger } from '../utils/logger'
 
@@ -22,6 +23,6 @@ export const getAllLocalities = async (onlyPublic: boolean) => {
 
 export const getLocalityDetails = async (id: number) => {
   // TODO: Check if user has access
-  const result = await models.now_loc.findByPk(id)
+  const result = await models.now_loc.findByPk(id, { include: { model: com_mlist, as: 'museum_com_mlists' } })
   return result
 }
