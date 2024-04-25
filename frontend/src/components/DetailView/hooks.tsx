@@ -53,7 +53,7 @@ export const useGetMultiSelection = <T,>() => {
         sx={{ width: '10em' }}
         size="small"
       >
-        {options.map(item => <MenuItem value={item}>{item}</MenuItem>)}
+        {options.map(item => <MenuItem key={item} value={item}>{item}</MenuItem>)}
       </Select>
     </FormControl>
   )
