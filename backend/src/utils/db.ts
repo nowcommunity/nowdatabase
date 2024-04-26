@@ -1,5 +1,5 @@
 import { Sequelize } from 'sequelize'
-import { MARIADB_DATABASE, MARIADB_USER, MARIADB_PASSWORD } from './config'
+import { MARIADB_DATABASE, MARIADB_USER, MARIADB_PASSWORD, MARIADB_HOST, MARIADB_PORT } from './config'
 import { initModels } from '../models/init-models'
 import { testDb } from '../services/locality'
 import { sleep } from './common'
@@ -7,8 +7,8 @@ import { logger } from './logger'
 
 export const sequelize = new Sequelize(MARIADB_DATABASE, MARIADB_USER, MARIADB_PASSWORD, {
   dialect: 'mariadb',
-  host: 'nowdb-db',
-  port: 3306,
+  host: MARIADB_HOST,
+  port: MARIADB_PORT,
   logging: false,
 })
 

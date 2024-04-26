@@ -1,4 +1,4 @@
-import { com_mlist } from '@/models/com_mlist'
+import { com_mlist } from '../models/com_mlist'
 import { models } from '../utils/db'
 import { logger } from '../utils/logger'
 

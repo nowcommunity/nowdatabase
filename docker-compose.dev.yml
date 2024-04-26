@@ -1,6 +1,7 @@
+# For running in local development: hot reload etc
 services:
-  now-db-frontend:
-    container_name: nowdb-frontend
+  frontend:
+    container_name: nowdb-frontend-dev
     image: node:20-alpine3.16
     volumes:
       - ./frontend/:/usr/src/app
@@ -8,8 +9,8 @@ services:
       - 127.0.0.1:5173:5173
     command: >
         sh -c "cd /usr/src/app && npm ci && npm run dev -- --host"
-  now-db-backend:
-    container_name: nowdb-backend
+  backend:
+    container_name: nowdb-backend-dev
     image: node:20-alpine3.16
     volumes:
       - ./backend/:/usr/src/app
@@ -18,14 +19,13 @@ services:
     command: >
         sh -c "cd /usr/src/app && npm ci && npm run dev"
     env_file: .db.dev.env
-  now-db:
-    container_name: nowdb-db
+  db:
+    container_name: nowdb-db-dev
     image: mariadb
     env_file: .db.dev.env
     volumes:
       - ./data/:/docker-entrypoint-initdb.d
-    ports:
-      - 127.0.0.1:3306:3306
+      - nowdb-db:/var/lib/mysql/data
 volumes:
   nowdb-db:
 

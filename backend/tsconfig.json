@@ -11,12 +11,6 @@
     "noFallthroughCasesInSwitch": true,
     "esModuleInterop": true,
     "noImplicitAny": true,
-    "paths": {
-      "@/*": ["./src/*"],
-      "@utils/*": ["./src/utils/*"],
-      "@services/*": ["./src/services/*"],
-      "@shared/*": ["../shared/*"],
-    }
   },
   "include": ["src"],
 }

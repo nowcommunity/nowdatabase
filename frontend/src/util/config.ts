@@ -1,1 +1,3 @@
-export const BACKEND_URL = import.meta.env.DEV ? 'http://localhost:4000/' : import.meta.env.BACKEND_URL
+export const IS_LOCAL = import.meta.env.VITE_IS_LOCAL
+export const BACKEND_URL = IS_LOCAL ? 'http://localhost:4000/' : import.meta.env.VITE_BACKEND_URL
+

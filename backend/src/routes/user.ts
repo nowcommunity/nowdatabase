@@ -1,7 +1,7 @@
 import { Router } from 'express'
 import { models } from '../utils/db'
 import jwt from 'jsonwebtoken'
-import { SECRET, LOGIN_VALID_MS } from '@/utils/config'
+import { SECRET, LOGIN_VALID_MS } from '../utils/config'
 import bcrypt from 'bcrypt'
 
 const router = Router()

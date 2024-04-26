@@ -1,5 +1,6 @@
+# Static builds, but for running locally
 services:
-  now-db-frontend:
+  frontend:
     container_name: nowdb-frontend
     build:
       context: frontend/
@@ -9,22 +10,21 @@ services:
       - 5173:5173
     environment:
       - BACKEND_URL=http://localhost:4000
-  now-db-backend:
+  backend:
     container_name: nowdb-backend
-    image: node:20-alpine3.16
+    build:
+      context: backend/
+    env_file: .db.dev.env
     volumes:
       - ./backend/:/usr/src/app
     ports:
       - 4000:4000
-    command: >
-        sh -c "cd /usr/src/app && npm ci && npx tsc && npm run start"
-  now-db:
+  db:
     container_name: nowdb-db
     image: mariadb
     env_file: .db.dev.env
     volumes:
       - ./data/:/docker-entrypoint-initdb.d
-    ports:
-      - 127.0.0.1:3306:3306
+      - nowdb-db:/var/lib/mysql/data
 volumes:
   nowdb-db:
