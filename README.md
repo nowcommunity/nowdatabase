@@ -10,6 +10,13 @@ _____
 
 ### Developer documentation :page_with_curl:
 
+** Basic commands **
+
++ `npm run dev` Run in development mode: with hot reload. Uses `docker-composed.dev.yml`
++ `npm start` Code is compiled like in production, but using local test database like the above command. Uses `docker-compose.yml`
+
+**Further documentation**
+
 The :open_file_folder: [documentation](documentation)-directory has documentation for developers. Remember to update it if you modify something important like project architecture.
 
 :rocket: [Initialize app & restore db](documentation/init.md) 
