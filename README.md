@@ -10,7 +10,7 @@ _____
 
 ### Developer documentation :page_with_curl:
 
-** Basic commands **
+**Basic commands**
 
 + `npm run dev` Run in development mode: with hot reload. Uses `docker-composed.dev.yml`
 + `npm start` Code is compiled like in production, but using local test database like the above command. Uses `docker-compose.yml`
