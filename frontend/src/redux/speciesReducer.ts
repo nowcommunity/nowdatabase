@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { api } from './api'
-import { Species } from '@/backendTypes'
+import { Taxon } from '@/backendTypes'
 
 const speciesApi = api.injectEndpoints({
   endpoints: builder => ({
@@ -9,7 +9,7 @@ const speciesApi = api.injectEndpoints({
         url: `/species/all`,
       }),
     }),
-    getSpeciesDetails: builder.query<Species, any>({
+    getSpeciesDetails: builder.query<Taxon, any>({
       query: (id: number) => ({
         url: `/species/${id}`,
       }),
