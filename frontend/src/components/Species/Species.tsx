@@ -30,6 +30,22 @@ export const SpeciesTable = ({ selectorFn, selectedList }: { selectorFn?: ((id: 
         accessorKey: 'family_name',
         header: 'Family',
       },
+      {
+        accessorKey: 'subfamily_name',
+        header: 'Subfamily or Tribe',
+      },
+      {
+        accessorKey: 'genus_name',
+        header: 'Genus',
+      },
+      {
+        accessorKey: 'species_name',
+        header: 'Species',
+      },
+      {
+        accessorKey: 'unique_identifier',
+        header: 'Unique Identifier',
+      },
     ],
     []
   )
