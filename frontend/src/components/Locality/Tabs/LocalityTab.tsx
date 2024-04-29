@@ -1,14 +1,26 @@
-import { Box, Grid } from '@mui/material'
+import { Box } from '@mui/material'
 import { Locality } from '@/backendTypes'
-import { ArrayFrame, DataValue, EditingModal, Grouped } from '../../DetailView/common/FormComponents'
-import { useGetEditableTextField } from '../../DetailView/hooks'
+import { ArrayFrame, DataValue, EditableTable, Grouped } from '../../DetailView/common/FormComponents'
+import { useDetailContext, useGetEditableTextField } from '../../DetailView/hooks'
+import { MRT_ColumnDef } from 'material-react-table'
 
 export const LocalityTab = () => {
   const getEditableTextField = useGetEditableTextField<Locality>()
+  const { editData } = useDetailContext<Locality>()
+
+  const originalSynonyms = editData.synonyms ?? []
 
   const textField = (field: keyof Locality) => (
     <DataValue<Locality> field={field} EditElement={getEditableTextField(field)} />
   )
+
+  const synonymColumns: MRT_ColumnDef<{ synonym: string }>[] = [
+    {
+      accessorKey: 'synonym',
+      header: 'Synonym',
+      id: 'synonym',
+    },
+  ]
 
   const name = [['Name', textField('loc_name')]]
   const locality = [['Country', textField('country')]]
@@ -30,6 +42,21 @@ export const LocalityTab = () => {
     ['Altitude (m)', textField('altitude')],
   ]
 
+  const data = [
+    {
+      synonym: 'Synonyymi 1',
+      index: 0,
+    },
+    {
+      synonym: 'Synonyymi 2',
+      index: 1,
+    },
+  ]
+
+  const clickRow = (index: number) => {
+    
+  }
+
   return (
     <Box>
       <ArrayFrame array={name} title="Name" />
@@ -38,22 +65,7 @@ export const LocalityTab = () => {
       <ArrayFrame array={status} title="Status" />
       <ArrayFrame array={latlong} title="Latitude & Longitude" />
       <Grouped title="Synonym">
-        <EditingModal buttonText="Add synonym">
-          <Grid container direction="column">
-            <Grid container direction="row">
-              <Grid item xs={6}>1</Grid>
-              <Grid item xs={6}>2</Grid>
-            </Grid>
-            <Grid container direction="row">
-              <Grid item xs={6}>1</Grid>
-              <Grid item xs={6}>2</Grid>
-            </Grid>
-            <Grid container direction="row">
-              <Grid item xs={6}>1</Grid>
-              <Grid item xs={6}>2</Grid>
-            </Grid>
-          </Grid>
-        </EditingModal>
+        <EditableTable columns={synonymColumns} data={data} clickRow={clickRow} />
       </Grouped>
     </Box>
   )

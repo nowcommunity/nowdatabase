@@ -1,6 +1,9 @@
-import { Card, Typography, Box, Grid, Divider, Modal, Button } from '@mui/material'
+import { Card, Typography, Box, Grid, Divider, Modal, Button, CircularProgress } from '@mui/material'
 import { ReactNode, useState } from 'react'
 import { useDetailContext } from '../hooks'
+import { type MRT_ColumnDef, type MRT_RowData, MaterialReactTable, MRT_Row } from 'material-react-table'
+import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline'
+import RemoveCircleOutlineIcon from '@mui/icons-material/RemoveCircleOutline'
 
 export const ArrayToTable = ({ array }: { array: Array<Array<ReactNode>> }) => (
   <Grid container direction="row">
@@ -73,5 +76,37 @@ export const EditingModal = ({ buttonText, children }: { buttonText: string; chi
         </Box>
       </Modal>
     </Box>
+  )
+}
+
+export const EditableTable = <T extends MRT_RowData>({
+  data,
+  columns,
+}: {
+  data: T[] | null
+  columns: MRT_ColumnDef<T>[]
+  clickRow: (index: number) => void
+  
+}) => {
+  if (!data) return <CircularProgress />
+  const actionRow = ({ row }: { row: MRT_Row<T> }) => {
+    return (
+      <Box>
+        <Button>
+          {<RemoveCircleOutlineIcon />}
+        </Button>
+      </Box>
+    )
+  }
+  return (
+    <MaterialReactTable
+      enableRowActions
+      renderRowActions={actionRow}
+      columns={columns}
+      data={data}
+      enableTopToolbar={false}
+      enableColumnActions={false}
+      enablePagination={false}
+    />
   )
 }
