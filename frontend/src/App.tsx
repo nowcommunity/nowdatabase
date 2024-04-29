@@ -2,7 +2,7 @@ import { Container, Grid } from '@mui/material'
 import { FrontPage } from './components/FrontPage'
 import { NavBar } from './components/NavBar'
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
-import { LocalityTable } from './components/Locality/Localities'
+import { LocalityTable } from './components/Locality/LocalityTable'
 import { Login } from './components/Login'
 import { LocalityDetails } from './components/Locality/LocalityDetails'
 
