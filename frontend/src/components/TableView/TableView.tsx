@@ -97,6 +97,7 @@ export const TableView = <T extends MRT_RowData>({
 
   // Load state from url only on first render
   useEffect(() => {
+    if (selectorFn) return
     setColumnFilters(loadStateFromUrl('columnfilters', []))
     setSorting(loadStateFromUrl('sorting', []))
     setPagination(loadStateFromUrl('pagination', defaultPagination))
@@ -105,6 +106,7 @@ export const TableView = <T extends MRT_RowData>({
 
   // Save state to url whenever it changes
   useEffect(() => {
+    if (selectorFn) return
     const columnFilterToUrl = `columnfilters=${JSON.stringify(columnFilters)}`
     const sortingToUrl = `sorting=${JSON.stringify(sorting)}`
     const paginationToUrl = `pagination=${JSON.stringify(pagination)}`
