@@ -8,15 +8,60 @@ import {
   MRT_PaginationState,
   MRT_ShowHideColumnsButton,
   MRT_ToggleFullScreenButton,
+  MRT_Row,
 } from 'material-react-table'
 import { Box, Button, CircularProgress, Tooltip } from '@mui/material'
 import { useLocation, useNavigate } from 'react-router-dom'
 import ManageSearchIcon from '@mui/icons-material/ManageSearch'
 import PolicyIcon from '@mui/icons-material/Policy'
+import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline'
+import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline'
 
 type TableStateInUrl = 'sorting' | 'columnfilters' | 'pagination'
 
 const defaultPagination: MRT_PaginationState = { pageIndex: 0, pageSize: 15 }
+
+const ActionComponent = <T extends MRT_RowData>({
+  row,
+  idFieldName,
+  selectorFn,
+  selectedList,
+  checkRowRestriction,
+}: {
+  row: MRT_Row<T>
+  idFieldName: keyof T
+  selectorFn?: (id: string) => void
+  selectedList?: string[]
+  checkRowRestriction: (row: T) => boolean
+}) => {
+  const navigate = useNavigate()
+  const id = row.original[idFieldName]
+  const currentSelected = selectedList && selectedList.find(sel => sel === id)
+  const getIconToShow = () => {
+    if (currentSelected) return <CheckCircleOutlineIcon color="success" />
+    if (selectorFn) return <AddCircleOutlineIcon />
+    return <ManageSearchIcon />
+  }
+  const onClick = () => {
+    if (selectorFn) {
+      selectorFn(id)
+    } else {
+      navigate(`/locality/${id}`)
+    }
+  }
+  return (
+    <Box display="flex" gap="0.2em" alignItems="center" width="3.6em">
+      <Button variant="text" style={{ width: '2em' }} onClick={onClick}>
+        {getIconToShow()}
+      </Button>
+      {checkRowRestriction(row.original) && (
+        <Tooltip placement="top" title="This item has restricted visibility">
+          <PolicyIcon color="primary" fontSize="medium" />
+        </Tooltip>
+      )}
+    </Box>
+  )
+}
 
 /*
   TableView takes in the data and columns of a table, and handles
@@ -27,11 +72,15 @@ export const TableView = <T extends MRT_RowData>({
   columns,
   idFieldName,
   checkRowRestriction,
+  selectorFn,
+  selectedList,
 }: {
   data: T[] | null
   columns: MRT_ColumnDef<T>[]
   idFieldName: keyof MRT_RowData
   checkRowRestriction: (row: T) => boolean
+  selectorFn?: (id: string) => void
+  selectedList?: string[]
 }) => {
   const navigate = useNavigate()
   const location = useLocation()
@@ -82,20 +131,13 @@ export const TableView = <T extends MRT_RowData>({
       }}
       onColumnFiltersChange={setColumnFilters}
       renderRowActions={({ row }) => (
-        <Box display="flex" gap="0.2em" alignItems="center" width="3.6em">
-          <Button
-            variant="text"
-            style={{ width: '2em' }}
-            onClick={() => navigate(`/locality/${row.original[idFieldName]}`)}
-          >
-            <ManageSearchIcon />
-          </Button>
-          {checkRowRestriction(row.original) && (
-            <Tooltip placement="top" title="This item has restricted visibility">
-              <PolicyIcon color="primary" fontSize="medium" />
-            </Tooltip>
-          )}
-        </Box>
+        <ActionComponent
+          row={row}
+          idFieldName={idFieldName}
+          selectorFn={selectorFn}
+          selectedList={selectedList}
+          checkRowRestriction={checkRowRestriction}
+        />
       )}
       displayColumnDefOptions={{ 'mrt-row-actions': { size: 50, header: '' } }}
       enableRowActions
@@ -111,13 +153,13 @@ export const TableView = <T extends MRT_RowData>({
       renderToolbarInternalActions={
         /*
           Custom rendering of the toolbar menu in the top-right: this is needed because there's no setting to hide the "show/hide column filters" button which we don't want
-          See https://github.com/KevinVandy/material-react-table/blob/85b98f9aaa038df48aa1dd35123560abce78ee58/packages/material-react-table/src/components/toolbar/MRT_ToolbarInternalButtons.tsx#L45
-          To know what components you can render here if necessary
+          To know what components you can render here if necessary, see the source code:
+          https://github.com/KevinVandy/material-react-table/blob/85b98f9aaa038df48aa1dd35123560abce78ee58/packages/material-react-table/src/components/toolbar/MRT_ToolbarInternalButtons.tsx#L45
         */
         ({ table }) => (
           <Box>
             <MRT_ShowHideColumnsButton table={table} />
-            <MRT_ToggleFullScreenButton table={table} />
+            {!selectorFn && <MRT_ToggleFullScreenButton table={table} />}
           </Box>
         )
       }
