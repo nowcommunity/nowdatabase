@@ -3,7 +3,7 @@ import { FrontPage } from './components/FrontPage'
 import { NavBar } from './components/NavBar'
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import { LocalityTable } from './components/Locality/LocalityTable'
-import { SpeciesTable } from './components/Species/Species'
+import { SpeciesTable } from './components/Species/SpeciesTable'
 import { Login } from './components/Login'
 import { LocalityDetails } from './components/Locality/LocalityDetails'
 
