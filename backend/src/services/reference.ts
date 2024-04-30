@@ -32,7 +32,6 @@ export const getAllReferences = async () => {
     ],
     group: ['ref_ref.rid'],  // This groups the results to ensure each reference ID only appears once
     raw: true,  // This makes sure that the data returned is only raw data objects
-    logging: console.log  // This will log the SQL query to the console
   });
     return result;
   } catch (error) {
