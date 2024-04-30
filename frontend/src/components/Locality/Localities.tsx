@@ -45,6 +45,7 @@ export const Localities = ({ selectorFn, selectedList }: { selectorFn?: ((id: st
       idFieldName="lid"
       columns={columns}
       data={localitiesQuery.data}
+      url="locality"
     />
   )
 }

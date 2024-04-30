@@ -27,12 +27,14 @@ const ActionComponent = <T extends MRT_RowData>({
   selectorFn,
   selectedList,
   checkRowRestriction,
+  url
 }: {
   row: MRT_Row<T>
   idFieldName: keyof T
   selectorFn?: (id: string) => void
   selectedList?: string[]
   checkRowRestriction: (row: T) => boolean
+  url: string
 }) => {
   const navigate = useNavigate()
   const id = row.original[idFieldName]
@@ -46,7 +48,7 @@ const ActionComponent = <T extends MRT_RowData>({
     if (selectorFn) {
       selectorFn(id)
     } else {
-      navigate(`/locality/${id}`)
+      navigate(`/${url}/${id}`)
     }
   }
   return (
@@ -74,6 +76,7 @@ export const TableView = <T extends MRT_RowData>({
   checkRowRestriction,
   selectorFn,
   selectedList,
+  url
 }: {
   data: T[] | null
   columns: MRT_ColumnDef<T>[]
@@ -81,6 +84,7 @@ export const TableView = <T extends MRT_RowData>({
   checkRowRestriction: (row: T) => boolean
   selectorFn?: (id: string) => void
   selectedList?: string[]
+  url: string
 }) => {
   const navigate = useNavigate()
   const location = useLocation()
@@ -137,6 +141,7 @@ export const TableView = <T extends MRT_RowData>({
           selectorFn={selectorFn}
           selectedList={selectedList}
           checkRowRestriction={checkRowRestriction}
+          url={url}
         />
       )}
       displayColumnDefOptions={{ 'mrt-row-actions': { size: 50, header: '' } }}

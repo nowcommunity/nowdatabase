@@ -61,6 +61,7 @@ export const SpeciesTable = ({ selectorFn, selectedList }: { selectorFn?: ((id: 
       idFieldName="species_id"
       columns={columns}
       data={speciesQuery.data}
+      url="species"
     />
   )
 }
