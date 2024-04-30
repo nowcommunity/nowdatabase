@@ -4,6 +4,7 @@ import 'express-async-errors'
 import { testDbConnection } from './utils/db'
 import userRouter from './routes/user'
 import localityRouter from './routes/locality'
+import referenceRouter from './routes/reference'
 import speciesRouter from './routes/species'
 import { requestLogger, responseLogger } from './middlewares/requestLogger'
 import compression from 'compression'
@@ -23,6 +24,7 @@ app.use(userExtractor)
 app.use(responseLogger)
 app.use('/user', userRouter)
 app.use('/locality', localityRouter)
+app.use('/reference', referenceRouter)
 app.use('/species', speciesRouter)
 app.use(errorHandler)
 app.listen(PORT, () => {
