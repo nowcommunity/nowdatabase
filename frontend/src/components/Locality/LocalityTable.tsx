@@ -51,6 +51,7 @@ export const LocalityTable = ({
       idFieldName="lid"
       columns={columns}
       data={localitiesQuery.data}
+      url="locality"
     />
   )
 }
