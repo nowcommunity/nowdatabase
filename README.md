@@ -12,8 +12,12 @@ _____
 
 **Basic commands**
 
-+ `npm run dev` Run in development mode: with hot reload. Uses `docker-composed.dev.yml`
-+ `npm start` Code is compiled like in production, but using local test database like the above command. Uses `docker-compose.yml`
++ `npm run dev` 
+  + Uses `docker-compose.dev.yml`
+  + Run in development mode: with hot reload
++ `npm start`
+  + Uses `docker-compose.yml`
+  + Code is compiled like in production, but using the same local test database as the above command. 
 
 **Further documentation**
 

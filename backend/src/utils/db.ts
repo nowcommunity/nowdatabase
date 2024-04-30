@@ -15,6 +15,7 @@ export const sequelize = new Sequelize(MARIADB_DATABASE, MARIADB_USER, MARIADB_P
 export const models = initModels(sequelize)
 
 export const testDbConnection = async () => {
+  logger.info(`Attempting to connect to database at ${MARIADB_HOST}:${MARIADB_PORT}`)
   const tryDbConnection = async () => {
     try {
       await sequelize.authenticate()

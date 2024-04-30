@@ -14,9 +14,7 @@ services:
     container_name: nowdb-backend
     build:
       context: backend/
-    env_file: .db.dev.env
-    volumes:
-      - ./backend/:/usr/src/app
+    env_file: .db.env
     ports:
       - 4000:4000
   db:

@@ -1,7 +1,7 @@
 import { Router } from 'express'
 import { models } from '../utils/db'
 import jwt from 'jsonwebtoken'
-import { SECRET, LOGIN_VALID_MS } from '../utils/config'
+import { SECRET, LOGIN_VALID_MS, USER_CREATION_SECRET } from '../utils/config'
 import bcrypt from 'bcrypt'
 
 const router = Router()
@@ -28,7 +28,8 @@ router.post('/login', async (req, res) => {
 })
 
 router.post('/create', async (req, res) => {
-  const { username, password } = req.body
+  const { username, password, secret } = req.body
+  if (!secret || secret !== USER_CREATION_SECRET) throw Error("Wrong user creation secret")
   const saltRounds = 10
   const passwordHash = await bcrypt.hash(password, saltRounds)
 
