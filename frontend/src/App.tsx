@@ -3,6 +3,7 @@ import { FrontPage } from './components/FrontPage'
 import { NavBar } from './components/NavBar'
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import { LocalityTable } from './components/Locality/LocalityTable'
+import { ReferenceTable } from './components/Reference/ReferenceTable'
 import { SpeciesTable } from './components/Species/SpeciesTable'
 import { Login } from './components/Login'
 import { LocalityDetails } from './components/Locality/LocalityDetails'
@@ -21,6 +22,7 @@ const App = () => {
             <Routes>
               <Route element={<LocalityDetails />} path="/locality/:id" />
               <Route element={<LocalityTable />} path="/locality/" />
+              <Route element={<ReferenceTable />} path="/reference/" />
               <Route element={<SpeciesTable />} path="/species/" />
               <Route element={<FrontPage />} path="/" />
               <Route element={<Login />} path="/login" />

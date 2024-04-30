@@ -14,6 +14,7 @@ export const NavBar = () => {
     { title: 'Front page', url: '/' },
     { title: 'Locality', url: '/locality' },
     { title: 'Species', url: '/species' },
+    { title: 'Reference', url: '/reference' },
     { title: 'Time unit', url: '/time-unit' },
   ]
 

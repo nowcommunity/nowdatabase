@@ -4,13 +4,13 @@ export const getAllReferences = async () => {
   try {
     const result = await models.ref_ref.findAll({
     attributes: [
-      ['rid', 'Reference Id'],
-      [sequelize.col('ref_authors.author_surname'), 'Author'],
-      [sequelize.col('journal.journal_title'), 'Journal'],
-      ['date_primary', 'Year'],
-      ['title_primary', 'Title'],
-      ['title_secondary', 'Book Title'],
-      [sequelize.col('ref_type.ref_type'), 'Type']
+      ['rid', 'rid'],
+      [sequelize.col('ref_authors.author_surname'), 'first_author'],
+      [sequelize.col('journal.journal_title'), 'journal_title'],
+      ['date_primary', 'date_primary'],
+      ['title_primary', 'title_primary'],
+      ['title_secondary', 'title_secondary'],
+      [sequelize.col('ref_type.ref_type'), 'ref_type']
     ],
     include: [
       {
