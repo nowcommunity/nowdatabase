@@ -1,5 +1,5 @@
 import { Router } from 'express'
-import { getAllTimeUnits, getTimeUnitDetails } from '../services/time_unit'
+import { getAllTimeUnits, getTimeUnitDetails } from '../services/timeUnit'
 
 const router = Router()
 

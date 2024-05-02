@@ -1,4 +1,5 @@
 import { type now_locAttributes } from '../../backend/src/models/now_loc'
+import { type now_time_unitAttributes } from '../../backend/src/models/now_time_unit'
 import { type com_mlistAttributes as Museum } from '../../backend/src/models/com_mlist'
 import { type com_speciesAttributes } from '../../backend/src/models/com_species'
 import { type ref_refAttributes } from '../../backend/src/models/ref_ref'
@@ -20,9 +21,13 @@ interface Reference extends ref_refAttributes {
 interface Species extends com_speciesAttributes {
 }
 
+interface TimeUnit extends now_time_unitAttributes {
+}
+
 export {
   Locality,
   Museum,
   Reference,
   Species,
+  TimeUnit,
 }
