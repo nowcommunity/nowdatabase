@@ -3,7 +3,7 @@ import { getAllReferences, getReferenceDetails } from '../services/reference'
 
 const router = Router()
 
-router.get('/all', async (req, res) => {
+router.get('/all', async (_req, res) => {
   const references = await getAllReferences()
   return res.status(200).send(references)
 })

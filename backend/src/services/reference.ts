@@ -1,43 +1,33 @@
-import { models, sequelize } from '../utils/db';
+import { models, sequelize } from '../utils/db'
 
 export const getAllReferences = async () => {
-  try {
-    const result = await models.ref_ref.findAll({
+  const result = await models.ref_ref.findAll({
     attributes: [
-      ['rid', 'rid'],
-      [sequelize.col('ref_authors.author_surname'), 'first_author'],
+      'rid',
+      'date_primary',
+      'title_primary',
+      'title_secondary',
       [sequelize.col('journal.journal_title'), 'journal_title'],
-      ['date_primary', 'date_primary'],
-      ['title_primary', 'title_primary'],
-      ['title_secondary', 'title_secondary'],
-      [sequelize.col('ref_type.ref_type'), 'ref_type']
     ],
     include: [
       {
         model: models.ref_authors,
         as: 'ref_authors',
-        attributes: [],
-        where: { au_num: 1 }  // field to determine the first author
+        attributes: ['au_num', 'author_surname', 'author_initials'],
       },
       {
         model: models.ref_journal,
         as: 'journal',
-        attributes: []
+        attributes: [],
       },
       {
         model: models.ref_ref_type,
         as: 'ref_type',
-        attributes: []
-      }
+        attributes: ['ref_type'],
+      },
     ],
-    group: ['ref_ref.rid'],  // This groups the results to ensure each reference ID only appears once
-    raw: true,  // This makes sure that the data returned is only raw data objects
-  });
-    return result;
-  } catch (error) {
-    console.error('Error fetching references:', error);
-    throw error;
-  }
+  })
+  return result
 }
 
 export const getReferenceDetails = async (id: number) => {
