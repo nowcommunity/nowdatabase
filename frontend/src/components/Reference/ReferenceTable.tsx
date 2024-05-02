@@ -3,8 +3,23 @@ import { type MRT_ColumnDef } from 'material-react-table'
 import { useGetAllReferencesQuery } from '../../redux/referenceReducer'
 import { Reference } from '@/backendTypes'
 import { TableView } from '../TableView/TableView'
+import { Box, Tooltip } from '@mui/material'
 
-export const ReferenceTable = ({ selectorFn, selectedList }: { selectorFn?: ((id: string) => void); selectedList?: string[] }) => {
+const Cell = ({ renderedCellValue }: { renderedCellValue: React.ReactNode }) => (
+  <Tooltip title={renderedCellValue}>
+    <Box sx={{ maxWidth: '260px', '-webkit-mask-image': 'linear-gradient(90deg, #000 90%, transparent)' }}>
+      {renderedCellValue}
+    </Box>
+  </Tooltip>
+)
+
+export const ReferenceTable = ({
+  selectorFn,
+  selectedList,
+}: {
+  selectorFn?: (id: string) => void
+  selectedList?: string[]
+}) => {
   const referenceQuery = useGetAllReferencesQuery({})
   const columns = useMemo<MRT_ColumnDef<Reference>[]>(
     () => [
@@ -15,30 +30,38 @@ export const ReferenceTable = ({ selectorFn, selectedList }: { selectorFn?: ((id
         size: 20,
       },
       {
-        accessorKey: 'first_author',
+        accessorFn: ({ ref_authors }) => ref_authors.find(author => author.au_num === 1)?.author_surname ?? 'Not found',
+        Cell,
         header: 'Author',
+        maxSize: 60,
       },
       {
         accessorKey: 'date_primary',
         header: 'Year',
-        size: 20,
+        maxSize: 60,
       },
       {
         accessorKey: 'title_primary',
+        Cell,
         header: 'Title',
-        size: 20,
+        maxSize: 60,
       },
       {
         accessorKey: 'journal_title',
+        Cell,
         header: 'Journal',
+        maxSize: 60,
       },
       {
         accessorKey: 'title_secondary',
         header: 'Book Title',
+        Cell,
+        maxSize: 60,
       },
       {
-        accessorKey: 'ref_type',
+        accessorKey: 'ref_type.ref_type',
         header: 'Type',
+        maxSize: 60,
       },
     ],
     []
