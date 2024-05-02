@@ -26,6 +26,8 @@ services:
     volumes:
       - ./data/:/docker-entrypoint-initdb.d
       - nowdb-db:/var/lib/mysql/data
+    ports:
+      - 127.0.0.1:3306:3306
 volumes:
   nowdb-db:
 
