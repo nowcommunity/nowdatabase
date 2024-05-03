@@ -29,6 +29,9 @@ The :open_file_folder: [documentation](documentation)-directory has documentatio
 :wrench: [Technical explanations](documentation/technical_explanations.md) 
 + Explanations of how things work, and guides for some more rare tasks like generating sequelize models.
 
+[Typing the API](documentation/typing.md)
++ How to bring types from backend to frontend
+
 :memo: [Frontend](documentation/frontend.md) 
 + Explanation of the frontend logic and how to add views
 
