@@ -18,11 +18,11 @@ services:
       - 127.0.0.1:4000:4000
     command: >
         sh -c "cd /usr/src/app && npm ci && npm run dev"
-    env_file: .db.dev.env
+    env_file: .dev.env
   db:
     container_name: nowdb-db-dev
     image: mariadb
-    env_file: .db.dev.env
+    env_file: .dev.env
     volumes:
       - ./data/:/docker-entrypoint-initdb.d
       - nowdb-db:/var/lib/mysql/data
