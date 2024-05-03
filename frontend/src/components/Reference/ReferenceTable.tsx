@@ -47,7 +47,7 @@ export const ReferenceTable = ({
         maxSize: 60,
       },
       {
-        accessorKey: 'journal_title',
+        accessorFn: ({ ref_journal }) => ref_journal?.journal_title || '',
         Cell,
         header: 'Journal',
         maxSize: 60,
@@ -59,7 +59,7 @@ export const ReferenceTable = ({
         maxSize: 60,
       },
       {
-        accessorKey: 'ref_type.ref_type',
+        accessorKey: 'ref_ref_type.ref_type',
         header: 'Type',
         maxSize: 60,
       },
