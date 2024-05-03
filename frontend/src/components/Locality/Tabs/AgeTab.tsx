@@ -1,28 +1,28 @@
 import { Box } from '@mui/material'
-import { Locality } from '@/backendTypes'
+import { LocalityDetails } from '@/backendTypes'
 import { ArrayFrame, DataValue } from '@components/DetailView/common/FormComponents'
 import { useGetEditableTextField, useGetMultiSelection, useGetRadioSelection } from '@components/DetailView/hooks'
 
 export const AgeTab = () => {
-  const getEditableTextField = useGetEditableTextField<Locality>()
-  const getRadioSelection = useGetRadioSelection<Locality>()
-  const getMultiSelection = useGetMultiSelection<Locality>()
+  const getEditableTextField = useGetEditableTextField<LocalityDetails>()
+  const getRadioSelection = useGetRadioSelection<LocalityDetails>()
+  const getMultiSelection = useGetMultiSelection<LocalityDetails>()
 
-  const textField = (field: keyof Locality) => (
-    <DataValue<Locality> field={field as keyof Locality} EditElement={getEditableTextField(field)} />
+  const textField = (field: keyof LocalityDetails) => (
+    <DataValue<LocalityDetails> field={field as keyof LocalityDetails} EditElement={getEditableTextField(field)} />
   )
 
-  const radioSelection = (field: keyof Locality, options: string[], name: string) => (
-    <DataValue<Locality> field={field as keyof Locality} EditElement={getRadioSelection({ fieldName: field, options, name })} />
+  const radioSelection = (field: keyof LocalityDetails, options: string[], name: string) => (
+    <DataValue<LocalityDetails> field={field as keyof LocalityDetails} EditElement={getRadioSelection({ fieldName: field, options, name })} />
   )
 
-  const multiSelection = (field: keyof Locality, options: string[], name: string) => (
-    <DataValue<Locality> field={field as keyof Locality} EditElement={getMultiSelection({ fieldName: field, options, name })} />
+  const multiSelection = (field: keyof LocalityDetails, options: string[], name: string) => (
+    <DataValue<LocalityDetails> field={field as keyof LocalityDetails} EditElement={getMultiSelection({ fieldName: field, options, name })} />
   )
 
   const fracOptions = ['', 'Early half 1:2', 'Late half 2:2', 'Early third 1:3', 'Middle third 2:3', 'Late third 3:3']
 
-  // TODO: The date_meth options should probably come from db: distinct(now_loc.date_meth)
+  // TODO: The date_meth options should come from db: distinct(now_loc.date_meth)
   const age = [
     ['Dating method', radioSelection('date_meth', ['time_unit', 'absolute', 'composite'], 'dating-method')],
     [''],

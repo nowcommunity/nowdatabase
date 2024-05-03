@@ -1,8 +1,7 @@
 import { Card, Typography, Box, Grid, Divider, Modal, Button, CircularProgress } from '@mui/material'
 import { ReactNode, useState } from 'react'
 import { useDetailContext } from '../hooks'
-import { type MRT_ColumnDef, type MRT_RowData, MaterialReactTable, MRT_Row } from 'material-react-table'
-import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline'
+import { type MRT_ColumnDef, type MRT_RowData, MaterialReactTable } from 'material-react-table'
 import RemoveCircleOutlineIcon from '@mui/icons-material/RemoveCircleOutline'
 
 export const ArrayToTable = ({ array }: { array: Array<Array<ReactNode>> }) => (
@@ -89,7 +88,7 @@ export const EditableTable = <T extends MRT_RowData>({
   
 }) => {
   if (!data) return <CircularProgress />
-  const actionRow = ({ row }: { row: MRT_Row<T> }) => {
+  const actionRow = () => {
     return (
       <Box>
         <Button>

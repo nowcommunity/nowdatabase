@@ -7,7 +7,7 @@ import { Box, Tooltip } from '@mui/material'
 
 const Cell = ({ renderedCellValue }: { renderedCellValue: React.ReactNode }) => (
   <Tooltip title={renderedCellValue}>
-    <Box sx={{ maxWidth: '260px', '-webkit-mask-image': 'linear-gradient(90deg, #000 90%, transparent)' }}>
+    <Box sx={{ maxWidth: '260px',   WebkitMaskImage: 'linear-gradient(to right, #000 90%, transparent)' }}>
       {renderedCellValue}
     </Box>
   </Tooltip>
@@ -20,7 +20,7 @@ export const ReferenceTable = ({
   selectorFn?: (id: string) => void
   selectedList?: string[]
 }) => {
-  const referenceQuery = useGetAllReferencesQuery({})
+  const referenceQuery = useGetAllReferencesQuery()
   const columns = useMemo<MRT_ColumnDef<Reference>[]>(
     () => [
       {
@@ -47,7 +47,7 @@ export const ReferenceTable = ({
         maxSize: 60,
       },
       {
-        accessorKey: 'journal_title',
+        accessorFn: ({ ref_journal }) => ref_journal?.journal_title || '',
         Cell,
         header: 'Journal',
         maxSize: 60,
@@ -59,7 +59,7 @@ export const ReferenceTable = ({
         maxSize: 60,
       },
       {
-        accessorKey: 'ref_type.ref_type',
+        accessorKey: 'ref_ref_type.ref_type',
         header: 'Type',
         maxSize: 60,
       },

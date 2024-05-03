@@ -1,0 +1,819 @@
+generator client {
+  provider = "prisma-client-js"
+  binaryTargets = ["native", "linux-musl"]
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model com_family_synonym {
+  syn_family_name String  @id @default("") @db.VarChar(30)
+  family_name     String? @db.VarChar(30)
+}
+
+model com_genus_synonym {
+  syn_genus_name String  @id @default("") @db.VarChar(30)
+  genus_name     String? @db.VarChar(30)
+}
+
+model com_main {
+  one Int @id @default(1)
+}
+
+model com_mlist {
+  museum       String    @id @default("") @db.VarChar(10)
+  institution  String    @default("") @db.VarChar(120)
+  alt_int_name String?   @db.VarChar(120)
+  city         String?   @db.VarChar(50)
+  state_code   String?   @db.VarChar(5)
+  state        String?   @db.VarChar(50)
+  country      String?   @db.VarChar(50)
+  used_morph   Boolean?
+  used_now     Boolean?
+  used_gene    Boolean?
+  now_mus      now_mus[]
+}
+
+model com_order_synonym {
+  syn_order_name String  @id @default("") @db.VarChar(30)
+  order_name     String? @db.VarChar(30)
+}
+
+model com_people {
+  initials                                    String                   @id @default("") @db.VarChar(10)
+  first_name                                  String?                  @db.VarChar(50)
+  surname                                     String                   @default("") @db.VarChar(80)
+  full_name                                   String                   @default("") @db.VarChar(80)
+  format                                      String?                  @db.VarChar(1)
+  email                                       String?                  @db.VarChar(120)
+  user_id                                     Int?
+  organization                                String?                  @db.VarChar(80)
+  country                                     String?                  @db.VarChar(80)
+  password_set                                DateTime?                @db.Date
+  used_morph                                  Boolean?
+  used_now                                    Boolean?
+  used_gene                                   Boolean?
+  now_bau_now_bau_bau_coordinatorTocom_people now_bau[]                @relation("now_bau_bau_coordinatorTocom_people")
+  now_bau_now_bau_bau_authorizerTocom_people  now_bau[]                @relation("now_bau_bau_authorizerTocom_people")
+  now_lau_now_lau_lau_coordinatorTocom_people now_lau[]                @relation("now_lau_lau_coordinatorTocom_people")
+  now_lau_now_lau_lau_authorizerTocom_people  now_lau[]                @relation("now_lau_lau_authorizerTocom_people")
+  now_proj                                    now_proj[]
+  now_proj_people                             now_proj_people[]
+  now_reg_coord_people                        now_reg_coord_people[]
+  now_sau_now_sau_sau_coordinatorTocom_people now_sau[]                @relation("now_sau_sau_coordinatorTocom_people")
+  now_sau_now_sau_sau_authorizerTocom_people  now_sau[]                @relation("now_sau_sau_authorizerTocom_people")
+  now_sp_coord_people                         now_sp_coord_people[]
+  now_strat_coord_people                      now_strat_coord_people[]
+  now_tau_now_tau_tau_coordinatorTocom_people now_tau[]                @relation("now_tau_tau_coordinatorTocom_people")
+  now_tau_now_tau_tau_authorizerTocom_people  now_tau[]                @relation("now_tau_tau_authorizerTocom_people")
+}
+
+model com_species {
+  species_id                   Int       @id @default(autoincrement())
+  class_name                   String    @default("") @db.VarChar(30)
+  order_name                   String    @default("") @db.VarChar(30)
+  family_name                  String    @default("") @db.VarChar(30)
+  subclass_or_superorder_name  String?   @default("") @db.VarChar(30)
+  suborder_or_superfamily_name String?   @default("") @db.VarChar(30)
+  subfamily_name               String?   @default("") @db.VarChar(30)
+  genus_name                   String    @default("") @db.VarChar(30)
+  species_name                 String    @default("") @db.VarChar(30)
+  unique_identifier            String    @default("") @db.VarChar(50)
+  taxonomic_status             String?   @db.VarChar(50)
+  common_name                  String?   @db.VarChar(50)
+  sp_author                    String?   @db.VarChar(50)
+  strain                       String?   @db.VarChar(50)
+  gene                         String?   @db.VarChar(30)
+  taxon_status                 String?   @db.VarChar(10)
+  diet1                        String?   @db.VarChar(1)
+  diet2                        String?   @db.VarChar(9)
+  diet3                        String?   @db.VarChar(10)
+  diet_description             String?   @db.VarChar(255)
+  rel_fib                      String?   @db.VarChar(1)
+  selectivity                  String?   @db.VarChar(1)
+  digestion                    String?   @db.VarChar(2)
+  feedinghab1                  String?   @db.VarChar(2)
+  feedinghab2                  String?   @db.VarChar(8)
+  shelterhab1                  String?   @db.VarChar(2)
+  shelterhab2                  String?   @db.VarChar(8)
+  locomo1                      String?   @db.VarChar(2)
+  locomo2                      String?   @db.VarChar(15)
+  locomo3                      String?   @db.VarChar(15)
+  hunt_forage                  String?   @db.VarChar(8)
+  body_mass                    BigInt?
+  brain_mass                   Int?
+  sv_length                    String?   @db.VarChar(7)
+  activity                     String?   @db.VarChar(1)
+  sd_size                      String?   @db.VarChar(1)
+  sd_display                   String?   @db.VarChar(1)
+  tshm                         String?   @db.VarChar(3)
+  symph_mob                    String?   @db.VarChar(1)
+  relative_blade_length        Float?
+  tht                          String?   @db.VarChar(3)
+  crowntype                    String?   @db.VarChar(6)
+  microwear                    String?   @db.VarChar(7)
+  horizodonty                  String?   @db.Char(3)
+  cusp_shape                   String?   @db.Char(1)
+  cusp_count_buccal            String?   @db.Char(1)
+  cusp_count_lingual           String?   @db.Char(1)
+  loph_count_lon               String?   @db.Char(1)
+  loph_count_trs               String?   @db.Char(1)
+  fct_al                       String?   @db.Char(1)
+  fct_ol                       String?   @db.Char(1)
+  fct_sf                       String?   @db.Char(1)
+  fct_ot                       String?   @db.Char(1)
+  fct_cm                       String?   @db.Char(1)
+  mesowear                     String?   @db.Char(3)
+  mw_or_high                   Int?
+  mw_or_low                    Int?
+  mw_cs_sharp                  Int?
+  mw_cs_round                  Int?
+  mw_cs_blunt                  Int?
+  mw_scale_min                 Int?
+  mw_scale_max                 Int?
+  mw_value                     Int?
+  pop_struc                    String?   @db.VarChar(3)
+  sp_status                    Boolean?
+  used_morph                   Boolean?
+  used_now                     Boolean?
+  used_gene                    Boolean?
+  sp_comment                   String?   @db.VarChar(255)
+  now_ls                       now_ls[]
+  now_psr                      now_psr[]
+  now_sau                      now_sau[]
+}
+
+model com_subfamily_synonym {
+  syn_subfamily_name String  @id @default("") @db.VarChar(30)
+  subfamily_name     String? @db.VarChar(30)
+}
+
+model com_taxa_synonym {
+  synonym_id       Int     @id @default(autoincrement())
+  species_id       Int     @default(0)
+  syn_genus_name   String? @db.VarChar(30)
+  syn_species_name String? @db.VarChar(30)
+  syn_comment      String? @db.VarChar(255)
+
+  @@index([species_id], map: "com_taxa_synonym_FKIndex1")
+}
+
+model com_users {
+  user_id        Int       @id @default(autoincrement())
+  user_name      String?   @db.VarChar(100)
+  password       String?   @db.VarChar(100)
+  last_login     DateTime? @db.Date
+  now_user_group String?   @db.VarChar(30)
+  mor_user_group String?   @db.VarChar(30)
+  gen_user_group String?   @db.VarChar(30)
+}
+
+model now_bau {
+  buid                                                Int               @id @default(autoincrement())
+  bau_coordinator                                     String            @default("") @db.VarChar(10)
+  bau_authorizer                                      String            @default("") @db.VarChar(10)
+  bid                                                 Int
+  bau_date                                            DateTime?         @db.Date
+  bau_comment                                         String?           @db.VarChar(255)
+  now_tu_bound                                        now_tu_bound      @relation(fields: [bid], references: [bid], onDelete: Cascade, onUpdate: NoAction, map: "now_bau_ibfk_1")
+  com_people_now_bau_bau_coordinatorTocom_people      com_people        @relation("now_bau_bau_coordinatorTocom_people", fields: [bau_coordinator], references: [initials], onDelete: NoAction, onUpdate: NoAction, map: "now_bau_ibfk_2")
+  com_people_now_bau_bau_authorizerTocom_people       com_people        @relation("now_bau_bau_authorizerTocom_people", fields: [bau_authorizer], references: [initials], onDelete: NoAction, onUpdate: NoAction, map: "now_bau_ibfk_3")
+  now_br                                              now_br[]
+  now_time_update_now_time_update_lower_buidTonow_bau now_time_update[] @relation("now_time_update_lower_buidTonow_bau")
+  now_time_update_now_time_update_upper_buidTonow_bau now_time_update[] @relation("now_time_update_upper_buidTonow_bau")
+
+  @@index([bid], map: "now_test_bau_FKIndex1")
+  @@index([bau_coordinator], map: "now_test_bau_FKIndex2")
+  @@index([bau_authorizer], map: "now_test_bau_FKIndex3")
+}
+
+model now_br {
+  buid    Int     @default(0)
+  rid     Int     @default(0)
+  now_bau now_bau @relation(fields: [buid], references: [buid], onDelete: Cascade, onUpdate: NoAction, map: "now_br_ibfk_1")
+  ref_ref ref_ref @relation(fields: [rid], references: [rid], onDelete: NoAction, onUpdate: NoAction, map: "now_br_ibfk_2")
+
+  @@id([buid, rid])
+  @@index([buid], map: "now_test_tr_FKIndex1")
+  @@index([rid], map: "now_test_tr_FKIndex2")
+}
+
+model now_coll_meth {
+  lid       Int     @default(0)
+  coll_meth String  @db.VarChar(21)
+  now_loc   now_loc @relation(fields: [lid], references: [lid], onDelete: Cascade, onUpdate: NoAction, map: "now_coll_meth_ibfk_1")
+
+  @@id([lid, coll_meth])
+  @@index([lid], map: "now_test_coll_meth_FKIndex1")
+}
+
+model now_coll_meth_values {
+  coll_meth_value String @id @db.VarChar(21)
+}
+
+model now_lau {
+  luid                                           Int        @id @default(autoincrement())
+  lau_coordinator                                String     @default("") @db.VarChar(10)
+  lau_authorizer                                 String     @default("") @db.VarChar(10)
+  lid                                            Int        @default(0)
+  lau_date                                       DateTime?  @db.Date
+  lau_comment                                    String?    @db.VarChar(255)
+  now_loc                                        now_loc    @relation(fields: [lid], references: [lid], onDelete: Cascade, onUpdate: NoAction, map: "now_lau_ibfk_1")
+  com_people_now_lau_lau_coordinatorTocom_people com_people @relation("now_lau_lau_coordinatorTocom_people", fields: [lau_coordinator], references: [initials], onDelete: NoAction, onUpdate: NoAction, map: "now_lau_ibfk_2")
+  com_people_now_lau_lau_authorizerTocom_people  com_people @relation("now_lau_lau_authorizerTocom_people", fields: [lau_authorizer], references: [initials], onDelete: NoAction, onUpdate: NoAction, map: "now_lau_ibfk_3")
+  now_lr                                         now_lr[]
+
+  @@index([lid], map: "now_test_lau_FKIndex1")
+  @@index([lau_coordinator], map: "now_test_lau_FKIndex2")
+  @@index([lau_authorizer], map: "now_test_lau_FKIndex3")
+}
+
+model now_loc {
+  lid                                          Int             @id @default(autoincrement())
+  bfa_max                                      String?         @db.VarChar(30)
+  bfa_min                                      String?         @db.VarChar(30)
+  loc_name                                     String          @default("") @db.VarChar(30)
+  date_meth                                    String          @default("") @db.VarChar(9)
+  max_age                                      Float           @default(0)
+  min_age                                      Float           @default(0)
+  bfa_max_abs                                  String?         @db.VarChar(30)
+  bfa_min_abs                                  String?         @db.VarChar(30)
+  frac_max                                     String?         @db.VarChar(9)
+  frac_min                                     String?         @db.VarChar(9)
+  chron                                        String?         @db.VarChar(40)
+  age_comm                                     String?         @db.VarChar(120)
+  basin                                        String?         @db.VarChar(120)
+  subbasin                                     String?         @db.VarChar(120)
+  dms_lat                                      String?         @db.VarChar(14)
+  dms_long                                     String?         @db.VarChar(14)
+  dec_lat                                      Float           @default(0)
+  dec_long                                     Float           @default(0)
+  approx_coord                                 Boolean?
+  altitude                                     Int?            @db.SmallInt
+  country                                      String?         @db.VarChar(50)
+  state                                        String?         @db.VarChar(20)
+  county                                       String?         @db.VarChar(20)
+  site_area                                    String?         @db.VarChar(10)
+  gen_loc                                      String?         @db.VarChar(1)
+  plate                                        String?         @db.VarChar(20)
+  loc_detail                                   String?         @db.VarChar(255)
+  lgroup                                       String?         @db.VarChar(30)
+  formation                                    String?         @db.VarChar(30)
+  member                                       String?         @db.VarChar(30)
+  bed                                          String?         @db.VarChar(30)
+  datum_plane                                  String?         @db.VarChar(50)
+  tos                                          Float?
+  bos                                          Float?
+  rock_type                                    String?         @db.VarChar(15)
+  rt_adj                                       String?         @db.VarChar(30)
+  lith_comm                                    String?         @db.VarChar(120)
+  depo_context1                                String?         @db.VarChar(10)
+  depo_context2                                String?         @db.VarChar(10)
+  depo_context3                                String?         @db.VarChar(10)
+  depo_context4                                String?         @db.VarChar(10)
+  depo_comm                                    String?         @db.VarChar(120)
+  sed_env_1                                    String?         @db.VarChar(13)
+  sed_env_2                                    String?         @db.VarChar(15)
+  event_circum                                 String?         @db.VarChar(15)
+  se_comm                                      String?         @db.VarChar(50)
+  climate_type                                 String?         @db.VarChar(15)
+  biome                                        String?         @db.VarChar(15)
+  v_ht                                         String?         @db.VarChar(4)
+  v_struct                                     String?         @db.VarChar(9)
+  v_envi_det                                   String?         @db.VarChar(80)
+  disturb                                      String?         @db.VarChar(16)
+  nutrients                                    String?         @db.VarChar(7)
+  water                                        String?         @db.VarChar(8)
+  seasonality                                  String?         @db.VarChar(16)
+  seas_intens                                  String?         @db.VarChar(3)
+  pri_prod                                     String?         @db.VarChar(4)
+  moisture                                     String?         @db.VarChar(3)
+  temperature                                  String?         @db.VarChar(4)
+  assem_fm                                     String?         @db.VarChar(12)
+  transport                                    String?         @db.VarChar(15)
+  trans_mod                                    String?         @db.VarChar(9)
+  weath_trmp                                   String?         @db.VarChar(9)
+  pt_conc                                      String?         @db.VarChar(14)
+  size_type                                    String?         @db.VarChar(5)
+  vert_pres                                    String?         @db.VarChar(12)
+  plant_pres                                   String?         @db.VarChar(12)
+  invert_pres                                  String?         @db.VarChar(12)
+  time_rep                                     String?         @db.VarChar(9)
+  appr_num_spm                                 Int?
+  num_spm                                      Int?
+  true_quant                                   String?         @db.VarChar(1)
+  complete                                     String?         @db.VarChar(1)
+  num_quad                                     Int?
+  taph_comm                                    String?         @db.VarChar(120)
+  tax_comm                                     String?         @db.VarChar(255)
+  loc_status                                   Boolean?
+  estimate_precip                              Int?
+  estimate_temp                                Decimal?        @db.Decimal(4, 1)
+  estimate_npp                                 Int?
+  pers_woody_cover                             Int?
+  pers_pollen_ap                               Int?
+  pers_pollen_nap                              Int?
+  pers_pollen_other                            Int?
+  hominin_skeletal_remains                     Boolean         @default(false)
+  bipedal_footprints                           Boolean         @default(false)
+  stone_tool_technology                        Boolean         @default(false)
+  stone_tool_cut_marks_on_bones                Boolean         @default(false)
+  technological_mode_1                         Int?
+  technological_mode_2                         Int?
+  technological_mode_3                         Int?
+  cultural_stage_1                             String?         @db.VarChar(64)
+  cultural_stage_2                             String?         @db.VarChar(64)
+  cultural_stage_3                             String?         @db.VarChar(64)
+  regional_culture_1                           String?         @db.VarChar(64)
+  regional_culture_2                           String?         @db.VarChar(64)
+  regional_culture_3                           String?         @db.VarChar(64)
+  now_coll_meth                                now_coll_meth[]
+  now_lau                                      now_lau[]
+  now_time_unit_now_loc_bfa_maxTonow_time_unit now_time_unit?  @relation("now_loc_bfa_maxTonow_time_unit", fields: [bfa_max], references: [tu_name], onDelete: NoAction, onUpdate: NoAction, map: "now_loc_ibfk_1")
+  now_time_unit_now_loc_bfa_minTonow_time_unit now_time_unit?  @relation("now_loc_bfa_minTonow_time_unit", fields: [bfa_min], references: [tu_name], onDelete: NoAction, onUpdate: NoAction, map: "now_loc_ibfk_2")
+  now_ls                                       now_ls[]
+  now_mus                                      now_mus[]
+  now_plr                                      now_plr[]
+  now_ss                                       now_ss[]
+  now_syn_loc                                  now_syn_loc[]
+
+  @@index([bfa_max], map: "now_test_loc_FKIndex1")
+  @@index([bfa_min], map: "now_test_loc_FKIndex2")
+}
+
+model now_lr {
+  luid    Int     @default(0)
+  rid     Int     @default(0)
+  now_lau now_lau @relation(fields: [luid], references: [luid], onDelete: Cascade, onUpdate: NoAction, map: "now_lr_ibfk_1")
+  ref_ref ref_ref @relation(fields: [rid], references: [rid], onDelete: NoAction, onUpdate: NoAction, map: "now_lr_ibfk_2")
+
+  @@id([luid, rid])
+  @@index([luid], map: "now_test_lr_FKIndex1")
+  @@index([rid], map: "now_test_lr_FKIndex2")
+}
+
+model now_ls {
+  lid          Int         @default(0)
+  species_id   Int         @default(0)
+  nis          Int?
+  pct          Float?
+  quad         Int?
+  mni          Int?
+  qua          String?     @db.VarChar(1)
+  id_status    String?     @db.VarChar(20)
+  orig_entry   String?     @db.VarChar(120)
+  source_name  String?     @db.VarChar(120)
+  body_mass    BigInt?
+  mesowear     String?     @db.Char(3)
+  mw_or_high   Int?
+  mw_or_low    Int?
+  mw_cs_sharp  Int?
+  mw_cs_round  Int?
+  mw_cs_blunt  Int?
+  mw_scale_min Int?
+  mw_scale_max Int?
+  mw_value     Int?
+  microwear    String?     @db.VarChar(7)
+  dc13_mean    Float?
+  dc13_n       Int?
+  dc13_max     Float?
+  dc13_min     Float?
+  dc13_stdev   Float?
+  do18_mean    Float?
+  do18_n       Int?
+  do18_max     Float?
+  do18_min     Float?
+  do18_stdev   Float?
+  com_species  com_species @relation(fields: [species_id], references: [species_id], onDelete: NoAction, onUpdate: NoAction, map: "now_ls_ibfk_1")
+  now_loc      now_loc     @relation(fields: [lid], references: [lid], onDelete: NoAction, onUpdate: NoAction, map: "now_ls_ibfk_2")
+
+  @@id([lid, species_id])
+  @@index([species_id], map: "now_test_ls_FKIndex1")
+  @@index([lid], map: "now_test_ls_FKIndex2")
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model now_ls_copy {
+  lid          Int     @default(0)
+  species_id   Int     @default(0)
+  nis          Int?
+  pct          Float?
+  quad         Int?
+  mni          Int?
+  qua          String? @db.VarChar(1)
+  id_status    String? @db.VarChar(20)
+  orig_entry   String? @db.VarChar(120)
+  source_name  String? @db.VarChar(120)
+  body_mass    BigInt?
+  mesowear     String? @db.Char(3)
+  mw_or_high   Int?
+  mw_or_low    Int?
+  mw_cs_sharp  Int?
+  mw_cs_round  Int?
+  mw_cs_blunt  Int?
+  mw_scale_min Int?
+  mw_scale_max Int?
+  mw_value     Int?
+  microwear    String? @db.VarChar(7)
+  dc13_mean    Float?
+  dc13_n       Int?
+  dc13_max     Float?
+  dc13_min     Float?
+  dc13_stdev   Float?
+  do18_mean    Float?
+  do18_n       Int?
+  do18_max     Float?
+  do18_min     Float?
+  do18_stdev   Float?
+
+  @@ignore
+}
+
+model now_mus {
+  lid       Int       @default(0)
+  museum    String    @default("") @db.VarChar(10)
+  now_loc   now_loc   @relation(fields: [lid], references: [lid], onDelete: Cascade, onUpdate: NoAction, map: "now_mus_ibfk_1")
+  com_mlist com_mlist @relation(fields: [museum], references: [museum], onDelete: NoAction, onUpdate: NoAction, map: "now_mus_ibfk_2")
+
+  @@id([lid, museum])
+  @@index([lid], map: "now_test_mus_FKIndex1")
+  @@index([museum], map: "now_test_mus_FKIndex2")
+}
+
+model now_plr {
+  lid      Int      @default(0)
+  pid      Int      @default(0)
+  now_proj now_proj @relation(fields: [pid], references: [pid], onDelete: NoAction, onUpdate: NoAction, map: "now_plr_ibfk_1")
+  now_loc  now_loc  @relation(fields: [lid], references: [lid], onDelete: Cascade, onUpdate: NoAction, map: "now_plr_ibfk_2")
+
+  @@id([lid, pid])
+  @@index([pid], map: "now_test_plr_FKIndex1")
+  @@index([lid], map: "now_test_plr_FKIndex2")
+}
+
+model now_proj {
+  pid             Int               @id @default(autoincrement())
+  contact         String            @default("") @db.VarChar(10)
+  proj_code       String?           @db.VarChar(10)
+  proj_name       String?           @db.VarChar(80)
+  proj_status     String?           @db.VarChar(10)
+  proj_records    Boolean?
+  now_plr         now_plr[]
+  com_people      com_people        @relation(fields: [contact], references: [initials], onDelete: NoAction, onUpdate: NoAction, map: "now_proj_ibfk_1")
+  now_proj_people now_proj_people[]
+  now_psr         now_psr[]
+
+  @@index([contact], map: "now_test_proj_FKIndex1")
+}
+
+model now_proj_people {
+  pid        Int
+  initials   String     @db.VarChar(10)
+  now_proj   now_proj   @relation(fields: [pid], references: [pid], onDelete: NoAction, onUpdate: NoAction, map: "now_proj_people_ibfk_1")
+  com_people com_people @relation(fields: [initials], references: [initials], onDelete: NoAction, onUpdate: NoAction, map: "now_proj_people_ibfk_2")
+
+  @@id([pid, initials])
+  @@index([pid], map: "now_test_proj_people_FKIndex1")
+  @@index([initials], map: "now_test_proj_people_FKIndex2")
+}
+
+model now_psr {
+  pid         Int         @default(0)
+  species_id  Int         @default(0)
+  now_proj    now_proj    @relation(fields: [pid], references: [pid], onDelete: NoAction, onUpdate: NoAction, map: "now_psr_ibfk_1")
+  com_species com_species @relation(fields: [species_id], references: [species_id], onDelete: NoAction, onUpdate: NoAction, map: "now_psr_ibfk_2")
+
+  @@id([pid, species_id])
+  @@index([pid], map: "now_test_psr_FKIndex1")
+  @@index([species_id], map: "now_test_psr_FKIndex2")
+}
+
+model now_reg_coord {
+  reg_coord_id          Int                     @id @default(autoincrement())
+  region                String                  @default("") @db.VarChar(80)
+  now_reg_coord_country now_reg_coord_country[]
+  now_reg_coord_people  now_reg_coord_people[]
+}
+
+model now_reg_coord_country {
+  reg_coord_id  Int           @default(0)
+  country       String        @default("") @db.VarChar(80)
+  now_reg_coord now_reg_coord @relation(fields: [reg_coord_id], references: [reg_coord_id], onDelete: NoAction, onUpdate: NoAction, map: "now_reg_coord_country_ibfk_1")
+
+  @@id([reg_coord_id, country])
+  @@index([reg_coord_id], map: "now_test_reg_coord_country_FKIndex1")
+}
+
+model now_reg_coord_people {
+  reg_coord_id  Int           @default(0)
+  initials      String        @default("") @db.VarChar(10)
+  now_reg_coord now_reg_coord @relation(fields: [reg_coord_id], references: [reg_coord_id], onDelete: NoAction, onUpdate: NoAction, map: "now_reg_coord_people_ibfk_1")
+  com_people    com_people    @relation(fields: [initials], references: [initials], onDelete: NoAction, onUpdate: NoAction, map: "now_reg_coord_people_ibfk_2")
+
+  @@id([reg_coord_id, initials])
+  @@index([reg_coord_id], map: "now_test_reg_coord_people_FKIndex1")
+  @@index([initials], map: "now_test_reg_coord_people_FKIndex2")
+}
+
+model now_regional_culture {
+  regional_culture_id   String @id @default("") @db.VarChar(50)
+  regional_culture_name String @default("") @db.VarChar(50)
+}
+
+model now_sau {
+  suid                                           Int         @id @default(autoincrement())
+  sau_coordinator                                String      @default("") @db.VarChar(10)
+  sau_authorizer                                 String      @default("") @db.VarChar(10)
+  species_id                                     Int         @default(0)
+  sau_date                                       DateTime?   @db.Date
+  sau_comment                                    String?     @db.VarChar(1024)
+  com_species                                    com_species @relation(fields: [species_id], references: [species_id], onDelete: NoAction, onUpdate: NoAction, map: "now_sau_ibfk_1")
+  com_people_now_sau_sau_coordinatorTocom_people com_people  @relation("now_sau_sau_coordinatorTocom_people", fields: [sau_coordinator], references: [initials], onDelete: NoAction, onUpdate: NoAction, map: "now_sau_ibfk_2")
+  com_people_now_sau_sau_authorizerTocom_people  com_people  @relation("now_sau_sau_authorizerTocom_people", fields: [sau_authorizer], references: [initials], onDelete: NoAction, onUpdate: NoAction, map: "now_sau_ibfk_3")
+  now_sr                                         now_sr[]
+
+  @@index([species_id], map: "now_test_sau_FKIndex1")
+  @@index([sau_coordinator], map: "now_test_sau_FKIndex2")
+  @@index([sau_authorizer], map: "now_test_sau_FKIndex3")
+}
+
+model now_sp_coord {
+  sp_coord_id         Int                   @id @default(autoincrement())
+  tax_group           String                @default("") @db.VarChar(80)
+  now_sp_coord_people now_sp_coord_people[]
+  now_sp_coord_taxa   now_sp_coord_taxa[]
+}
+
+model now_sp_coord_people {
+  sp_coord_id  Int          @default(0)
+  initials     String       @default("") @db.VarChar(10)
+  now_sp_coord now_sp_coord @relation(fields: [sp_coord_id], references: [sp_coord_id], onDelete: NoAction, onUpdate: NoAction, map: "now_sp_coord_people_ibfk_1")
+  com_people   com_people   @relation(fields: [initials], references: [initials], onDelete: NoAction, onUpdate: NoAction, map: "now_sp_coord_people_ibfk_2")
+
+  @@id([sp_coord_id, initials])
+  @@index([sp_coord_id], map: "now_test_sp_coord_people_FKIndex1")
+  @@index([initials], map: "now_test_sp_coord_people_FKIndex2")
+}
+
+model now_sp_coord_taxa {
+  sp_coord_id  Int          @default(0)
+  order_name   String       @default("") @db.VarChar(30)
+  family_name  String       @default("") @db.VarChar(30)
+  now_sp_coord now_sp_coord @relation(fields: [sp_coord_id], references: [sp_coord_id], onDelete: NoAction, onUpdate: NoAction, map: "now_sp_coord_taxa_ibfk_1")
+
+  @@id([sp_coord_id, order_name, family_name])
+  @@index([sp_coord_id], map: "now_test_sp_coord_taxa_FKIndex1")
+}
+
+model now_sr {
+  suid    Int     @default(0)
+  rid     Int     @default(0)
+  now_sau now_sau @relation(fields: [suid], references: [suid], onDelete: Cascade, onUpdate: NoAction, map: "now_sr_ibfk_1")
+  ref_ref ref_ref @relation(fields: [rid], references: [rid], onDelete: NoAction, onUpdate: NoAction, map: "now_sr_ibfk_2")
+
+  @@id([suid, rid])
+  @@index([suid], map: "now_test_sr_FKIndex1")
+  @@index([rid], map: "now_test_sr_FKIndex2")
+}
+
+model now_ss {
+  lid        Int     @default(0)
+  sed_struct String  @default("") @db.VarChar(30)
+  now_loc    now_loc @relation(fields: [lid], references: [lid], onDelete: Cascade, onUpdate: NoAction, map: "now_ss_ibfk_1")
+
+  @@id([lid, sed_struct])
+  @@index([lid], map: "now_test_ss_FKIndex1")
+}
+
+model now_ss_values {
+  ss_value String  @id @default("") @db.VarChar(30)
+  category String? @db.VarChar(80)
+}
+
+model now_strat_coord {
+  strat_coord_id         Int                      @id @default(autoincrement())
+  title                  String                   @default("") @db.VarChar(80)
+  now_strat_coord_people now_strat_coord_people[]
+}
+
+model now_strat_coord_people {
+  strat_coord_id  Int             @default(0)
+  initials        String          @default("") @db.VarChar(10)
+  now_strat_coord now_strat_coord @relation(fields: [strat_coord_id], references: [strat_coord_id], onDelete: NoAction, onUpdate: NoAction, map: "now_strat_coord_people_ibfk_1")
+  com_people      com_people      @relation(fields: [initials], references: [initials], onDelete: NoAction, onUpdate: NoAction, map: "now_strat_coord_people_ibfk_2")
+
+  @@id([strat_coord_id, initials])
+  @@index([strat_coord_id], map: "now_test_strat_coord_people_FKIndex1")
+  @@index([initials], map: "now_test_strat_coord_people_FKIndex2")
+}
+
+model now_syn_loc {
+  syn_id  Int     @id @default(autoincrement())
+  lid     Int     @default(0)
+  synonym String? @db.VarChar(30)
+  now_loc now_loc @relation(fields: [lid], references: [lid], onDelete: Cascade, onUpdate: NoAction, map: "now_syn_loc_ibfk_1")
+
+  @@index([lid], map: "now_test_syn_loc_FKIndex1")
+}
+
+model now_tau {
+  tuid                                           Int               @id @default(autoincrement())
+  tau_coordinator                                String            @default("") @db.VarChar(10)
+  tau_authorizer                                 String            @default("") @db.VarChar(10)
+  tu_name                                        String            @default("") @db.VarChar(100)
+  tau_date                                       DateTime?         @db.Date
+  tau_comment                                    String?           @db.VarChar(255)
+  now_time_unit                                  now_time_unit     @relation(fields: [tu_name], references: [tu_name], onDelete: Cascade, onUpdate: NoAction, map: "now_tau_ibfk_1")
+  com_people_now_tau_tau_coordinatorTocom_people com_people        @relation("now_tau_tau_coordinatorTocom_people", fields: [tau_coordinator], references: [initials], onDelete: NoAction, onUpdate: NoAction, map: "now_tau_ibfk_2")
+  com_people_now_tau_tau_authorizerTocom_people  com_people        @relation("now_tau_tau_authorizerTocom_people", fields: [tau_authorizer], references: [initials], onDelete: NoAction, onUpdate: NoAction, map: "now_tau_ibfk_3")
+  now_time_update                                now_time_update[]
+  now_tr                                         now_tr[]
+
+  @@index([tu_name], map: "now_test_tau_FKIndex1")
+  @@index([tau_coordinator], map: "now_test_tau_FKIndex2")
+  @@index([tau_authorizer], map: "now_test_tau_FKIndex3")
+}
+
+model now_time_unit {
+  tu_name                                          String            @id @default("") @db.VarChar(100)
+  tu_display_name                                  String            @default("") @db.VarChar(100)
+  up_bnd                                           Int               @default(0)
+  low_bnd                                          Int               @default(0)
+  rank                                             String?           @db.VarChar(15)
+  sequence                                         String            @default("") @db.VarChar(30)
+  tu_comment                                       String?           @db.VarChar(255)
+  now_loc_now_loc_bfa_maxTonow_time_unit           now_loc[]         @relation("now_loc_bfa_maxTonow_time_unit")
+  now_loc_now_loc_bfa_minTonow_time_unit           now_loc[]         @relation("now_loc_bfa_minTonow_time_unit")
+  now_tau                                          now_tau[]
+  now_tu_bound_now_time_unit_low_bndTonow_tu_bound now_tu_bound      @relation("now_time_unit_low_bndTonow_tu_bound", fields: [low_bnd], references: [bid], onDelete: NoAction, onUpdate: NoAction, map: "now_time_unit_ibfk_1")
+  now_tu_bound_now_time_unit_up_bndTonow_tu_bound  now_tu_bound      @relation("now_time_unit_up_bndTonow_tu_bound", fields: [up_bnd], references: [bid], onDelete: NoAction, onUpdate: NoAction, map: "now_time_unit_ibfk_2")
+  now_tu_sequence                                  now_tu_sequence   @relation(fields: [sequence], references: [sequence], onDelete: NoAction, onUpdate: NoAction, map: "now_time_unit_ibfk_3")
+  now_time_update                                  now_time_update[]
+
+  @@index([low_bnd], map: "now_test_time_unit_FKIndex1")
+  @@index([up_bnd], map: "now_test_time_unit_FKIndex2")
+  @@index([sequence], map: "now_test_time_unit_FKIndex3")
+}
+
+model now_time_update {
+  time_update_id                              Int           @id @default(autoincrement())
+  tu_name                                     String        @default("") @db.VarChar(100)
+  tuid                                        Int?
+  lower_buid                                  Int?
+  upper_buid                                  Int?
+  coordinator                                 String        @default("") @db.VarChar(10)
+  authorizer                                  String        @default("") @db.VarChar(10)
+  date                                        DateTime?     @db.Date
+  comment                                     String?       @db.VarChar(255)
+  now_time_unit                               now_time_unit @relation(fields: [tu_name], references: [tu_name], onDelete: Cascade, onUpdate: NoAction, map: "now_time_update_ibfk_1")
+  now_tau                                     now_tau?      @relation(fields: [tuid], references: [tuid], onDelete: Cascade, onUpdate: NoAction, map: "now_time_update_ibfk_2")
+  now_bau_now_time_update_lower_buidTonow_bau now_bau?      @relation("now_time_update_lower_buidTonow_bau", fields: [lower_buid], references: [buid], onDelete: Cascade, onUpdate: NoAction, map: "now_time_update_ibfk_3")
+  now_bau_now_time_update_upper_buidTonow_bau now_bau?      @relation("now_time_update_upper_buidTonow_bau", fields: [upper_buid], references: [buid], onDelete: Cascade, onUpdate: NoAction, map: "now_time_update_ibfk_4")
+
+  @@index([tu_name], map: "now_test_now_test_time_update_FKIndex1")
+  @@index([tuid], map: "now_test_now_test_time_update_FKIndex2")
+  @@index([lower_buid], map: "now_test_now_test_time_update_FKIndex3")
+  @@index([upper_buid], map: "now_test_now_test_time_update_FKIndex4")
+}
+
+model now_tr {
+  tuid    Int     @default(0)
+  rid     Int     @default(0)
+  now_tau now_tau @relation(fields: [tuid], references: [tuid], onDelete: Cascade, onUpdate: NoAction, map: "now_tr_ibfk_1")
+  ref_ref ref_ref @relation(fields: [rid], references: [rid], onDelete: NoAction, onUpdate: NoAction, map: "now_tr_ibfk_2")
+
+  @@id([tuid, rid])
+  @@index([tuid], map: "now_test_tr_FKIndex1")
+  @@index([rid], map: "now_test_tr_FKIndex2")
+}
+
+model now_tu_bound {
+  bid                                               Int             @id @default(autoincrement())
+  b_name                                            String?         @db.VarChar(150)
+  age                                               Float?
+  b_comment                                         String?         @db.VarChar(255)
+  now_bau                                           now_bau[]
+  now_time_unit_now_time_unit_low_bndTonow_tu_bound now_time_unit[] @relation("now_time_unit_low_bndTonow_tu_bound")
+  now_time_unit_now_time_unit_up_bndTonow_tu_bound  now_time_unit[] @relation("now_time_unit_up_bndTonow_tu_bound")
+  now_tur                                           now_tur[]
+}
+
+model now_tu_sequence {
+  sequence      String          @id @db.VarChar(30)
+  seq_name      String          @db.VarChar(30)
+  now_time_unit now_time_unit[]
+}
+
+model now_tur {
+  bid          Int          @default(0)
+  rid          Int          @default(0)
+  now_tu_bound now_tu_bound @relation(fields: [bid], references: [bid], onDelete: Cascade, onUpdate: NoAction, map: "now_tur_ibfk_1")
+  ref_ref      ref_ref      @relation(fields: [rid], references: [rid], onDelete: NoAction, onUpdate: NoAction, map: "now_tur_ibfk_2")
+
+  @@id([bid, rid])
+  @@index([bid], map: "now_test_tur_FKIndex1")
+  @@index([rid], map: "now_test_tur_FKIndex2")
+}
+
+model ref_authors {
+  rid             Int     @default(0)
+  field_id        Int     @default(0)
+  au_num          Int     @default(0)
+  author_surname  String? @db.VarChar(255)
+  author_initials String? @db.VarChar(20)
+  ref_ref         ref_ref @relation(fields: [rid], references: [rid], onDelete: NoAction, onUpdate: NoAction, map: "ref_authors_ibfk_1")
+
+  @@id([rid, field_id, au_num])
+  @@index([rid], map: "ref_authors_FKIndex1")
+}
+
+model ref_field_name {
+  field_ID       Int          @default(0)
+  ref_type_id    Int          @default(0)
+  ref_field_name String?      @db.VarChar(50)
+  display        Boolean?
+  label_x        Int?
+  label_y        Int?
+  field_x        Int?
+  field_y        Int?
+  field_name     String?      @db.VarChar(50)
+  ref_ref_type   ref_ref_type @relation(fields: [ref_type_id], references: [ref_type_id], onDelete: NoAction, onUpdate: NoAction, map: "ref_field_name_ibfk_1")
+
+  @@id([field_ID, ref_type_id])
+  @@index([ref_type_id], map: "ref_field_name_FKIndex1")
+}
+
+model ref_journal {
+  journal_id    Int       @id @default(autoincrement())
+  journal_title String?   @db.VarChar(255)
+  short_title   String?   @db.VarChar(100)
+  alt_title     String?   @db.VarChar(255)
+  ISSN          String?   @db.VarChar(10)
+  ref_ref       ref_ref[]
+}
+
+model ref_keywords {
+  keywords_id      Int                @id @default(autoincrement())
+  keyword          String             @default("") @db.VarChar(50)
+  ref_keywords_ref ref_keywords_ref[]
+}
+
+model ref_keywords_ref {
+  keywords_id  Int          @default(0)
+  rid          Int          @default(0)
+  ref_keywords ref_keywords @relation(fields: [keywords_id], references: [keywords_id], onDelete: NoAction, onUpdate: NoAction, map: "ref_keywords_ref_ibfk_1")
+  ref_ref      ref_ref      @relation(fields: [rid], references: [rid], onDelete: NoAction, onUpdate: NoAction, map: "ref_keywords_ref_ibfk_2")
+
+  @@id([keywords_id, rid])
+  @@index([keywords_id], map: "ref_keywords_ref_FKIndex1")
+  @@index([rid], map: "ref_keywords_ref_FKIndex2")
+}
+
+model ref_ref {
+  rid              Int                @id @default(autoincrement())
+  ref_type_id      Int                @default(0)
+  journal_id       Int?
+  title_primary    String?            @db.VarChar(255)
+  date_primary     Int?
+  volume           String?            @db.VarChar(10)
+  issue            String?            @db.VarChar(10)
+  start_page       Int?
+  end_page         Int?
+  publisher        String?            @db.VarChar(255)
+  pub_place        String?            @db.VarChar(255)
+  title_secondary  String?            @db.VarChar(255)
+  date_secondary   Int?
+  title_series     String?            @db.VarChar(255)
+  issn_isbn        String?            @db.VarChar(30)
+  ref_abstract     String?            @db.LongText
+  web_url          String?            @db.VarChar(255)
+  misc_1           String?            @db.VarChar(255)
+  misc_2           String?            @db.VarChar(255)
+  gen_notes        String?            @db.VarChar(255)
+  printed_language String?            @db.VarChar(50)
+  exact_date       DateTime?          @db.Date
+  used_morph       Boolean?
+  used_now         Boolean?
+  used_gene        Boolean?
+  now_br           now_br[]
+  now_lr           now_lr[]
+  now_sr           now_sr[]
+  now_tr           now_tr[]
+  now_tur          now_tur[]
+  ref_authors      ref_authors[]
+  ref_keywords_ref ref_keywords_ref[]
+  ref_journal      ref_journal?       @relation(fields: [journal_id], references: [journal_id], onDelete: NoAction, onUpdate: NoAction, map: "ref_ref_ibfk_1")
+  ref_ref_type     ref_ref_type       @relation(fields: [ref_type_id], references: [ref_type_id], onDelete: NoAction, onUpdate: NoAction, map: "ref_ref_ibfk_2")
+
+  @@index([journal_id], map: "ref_ref_FKIndex1")
+  @@index([ref_type_id], map: "ref_ref_FKIndex2")
+}
+
+model ref_ref_type {
+  ref_type_id    Int              @id @default(autoincrement())
+  ref_type       String?          @db.VarChar(30)
+  ref_field_name ref_field_name[]
+  ref_ref        ref_ref[]
+}

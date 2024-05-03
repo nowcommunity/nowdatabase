@@ -1,33 +1,67 @@
-import { type now_locAttributes } from '../../backend/src/models/now_loc'
-import { type now_time_unitAttributes } from '../../backend/src/models/now_time_unit'
-import { type com_mlistAttributes as Museum } from '../../backend/src/models/com_mlist'
-import { type com_speciesAttributes } from '../../backend/src/models/com_species'
-import { type ref_refAttributes } from '../../backend/src/models/ref_ref'
-import { type ref_authorsAttributes as Ref_Authors } from '../../backend/src/models/ref_authors';
-import { type ref_journalAttributes as Ref_Journal } from '../../backend/src/models/ref_journal';
-import { type ref_ref_type as Ref_Type } from '../../backend/src/models/ref_ref_type';
+import Prisma from '../../backend/node_modules/@prisma/client/default'
 
-interface Locality extends now_locAttributes {
-  museum_com_mlists: Museum;
-  synonyms: string[]
+export type LocalityDetails = Prisma.now_loc
+
+export type Locality = {
+  lid: number;
+  loc_name: string;
+  max_age: number;
+  min_age: number;
+  country: string | null;
+  loc_status: boolean | null;
 }
 
-interface Reference extends ref_refAttributes {
-  ref_authors: Ref_Authors[]
-  journal_title: string
-  type: Ref_Type
+export type SpeciesDetails = Prisma.com_species
+
+export type Species = {
+  species_id: number;
+  order_name: string;
+  family_name: string;
+  subclass_or_superorder_name: string | null;
+  suborder_or_superfamily_name: string | null;
+  subfamily_name: string | null;
+  genus_name: string;
+  species_name: string;
+  unique_identifier: string;
+  sp_status: boolean | null;
 }
 
-interface Species extends com_speciesAttributes {
+export type Reference = {
+  ref_authors: {
+      au_num: number;
+      author_surname: string;
+      author_initials: string;
+  }[];
+  ref_journal: {
+      journal_title: string;
+  };
+  ref_ref_type: {
+      ref_type: string;
+  };
+  rid: number;
+  title_primary: string;
+  date_primary: number;
+  title_secondary: string;
 }
 
-interface TimeUnit extends now_time_unitAttributes {
+export type ReferenceDetails = Prisma.ref_ref
+
+export type TimeUnit = {
+  low_bound: number;
+  up_bound: number;
+  seq_name: string;
+  now_tu_sequence: {
+      seq_name: string;
+  };
+  tu_name: string;
+  now_tu_bound_now_time_unit_low_bndTonow_tu_bound: {
+      age: number;
+  };
+  now_tu_bound_now_time_unit_up_bndTonow_tu_bound: {
+      age: number;
+  };
+  tu_display_name: string;
+  rank: string;
 }
 
-export {
-  Locality,
-  Museum,
-  Reference,
-  Species,
-  TimeUnit,
-}
+export type TimeUnitDetails = Prisma.now_time_unit

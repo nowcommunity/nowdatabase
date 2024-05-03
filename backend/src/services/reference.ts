@@ -1,37 +1,37 @@
-import { models, sequelize } from '../utils/db'
+import { prisma } from '../utils/db'
 
 export const getAllReferences = async () => {
-  const result = await models.ref_ref.findAll({
-    attributes: [
-      'rid',
-      'date_primary',
-      'title_primary',
-      'title_secondary',
-      [sequelize.col('journal.journal_title'), 'journal_title'],
-    ],
-    include: [
-      {
-        model: models.ref_authors,
-        as: 'ref_authors',
-        attributes: ['au_num', 'author_surname', 'author_initials'],
+  const result = await prisma.ref_ref.findMany({
+    select: {
+      rid: true,
+      date_primary: true,
+      title_primary: true,
+      title_secondary: true,
+      ref_journal: {
+        select: {
+          journal_title: true,
+        },
       },
-      {
-        model: models.ref_journal,
-        as: 'journal',
-        attributes: [],
+      ref_authors: {
+        select: {
+          au_num: true,
+          author_surname: true,
+          author_initials: true,
+        },
       },
-      {
-        model: models.ref_ref_type,
-        as: 'ref_type',
-        attributes: ['ref_type'],
+      ref_ref_type: {
+        select: {
+          ref_type: true,
+        },
       },
-    ],
+    },
   })
+
   return result
 }
 
 export const getReferenceDetails = async (id: number) => {
   // TODO: Check if user has access
-  const result = await models.ref_ref.findByPk(id)
+  const result = await prisma.ref_ref.findUnique({ where: { rid: id } })
   return result
 }

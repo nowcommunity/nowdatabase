@@ -6,6 +6,7 @@ WORKDIR /usr/src/app
 
 COPY package.json ./
 COPY package-lock.json ./
+COPY prisma prisma
 
 ENV NODE_ENV=production
 
@@ -21,6 +22,7 @@ WORKDIR /usr/src/app
 
 COPY --from=backend-build /usr/src/app/build /usr/src/app/build
 COPY --from=backend-build /usr/src/app/node_modules /usr/src/app/node_modules
+COPY --from=backend-build /usr/src/app/prisma /usr/src/app/prisma
 
 EXPOSE 4000
 ENV NODE_ENV=production

@@ -2,6 +2,7 @@ node_modules
 data/sqlfiles/*
 .env
 .db.env
+.dev.env
 dump/
 dump.zip
 local_dev

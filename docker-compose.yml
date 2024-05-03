@@ -14,13 +14,13 @@ services:
     container_name: nowdb-backend
     build:
       context: backend/
-    env_file: .db.env
+    env_file: .env
     ports:
       - 4000:4000
   db:
     container_name: nowdb-db
     image: mariadb
-    env_file: .db.dev.env
+    env_file: .env
     volumes:
       - ./data/:/docker-entrypoint-initdb.d
       - nowdb-db:/var/lib/mysql/data

@@ -1,16 +1,16 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { api } from './api'
-import { TimeUnit } from '@/backendTypes'
+import { TimeUnit, TimeUnitDetails } from '@/backendTypes'
 
 const timeunitsApi = api.injectEndpoints({
   endpoints: builder => ({
-    getAllTimeUnits: builder.query<any, any>({
+    getAllTimeUnits: builder.query<TimeUnit[], void>({
       query: () => ({
         url: `/time-unit/all`,
       }),
     }),
-    getTimeUnitDetails: builder.query<TimeUnit, any>({
-      query: (id: string) => ({
+    getTimeUnitDetails: builder.query<TimeUnitDetails, string>({
+      query: id => ({
         url: `/time-unit/${id}`,
       }),
     }),
