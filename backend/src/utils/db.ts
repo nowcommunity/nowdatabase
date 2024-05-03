@@ -1,24 +1,14 @@
-import { Sequelize } from 'sequelize'
-import { MARIADB_DATABASE, MARIADB_USER, MARIADB_PASSWORD, MARIADB_HOST, MARIADB_PORT } from './config'
-import { initModels } from '../models/init-models'
 import { testDb } from '../services/locality'
 import { sleep } from './common'
 import { logger } from './logger'
+import { PrismaClient } from '@prisma/client'
 
-export const sequelize = new Sequelize(MARIADB_DATABASE, MARIADB_USER, MARIADB_PASSWORD, {
-  dialect: 'mariadb',
-  host: MARIADB_HOST,
-  port: MARIADB_PORT,
-  logging: false,
-})
-
-export const models = initModels(sequelize)
+export const prisma = new PrismaClient()
 
 export const testDbConnection = async () => {
-  logger.info(`Attempting to connect to database at ${MARIADB_HOST}:${MARIADB_PORT}`)
+  logger.info(`Attempting to connect to database...`)
   const tryDbConnection = async () => {
     try {
-      await sequelize.authenticate()
       await testDb()
       return true
     } catch (e) {

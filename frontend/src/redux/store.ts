@@ -27,7 +27,10 @@ export const store = configureStore({
     [api.reducerPath]: api.reducer,
     user: userReducer,
   },
-  middleware: getDefaultMiddleware => getDefaultMiddleware().concat(api.middleware).concat(localStorageMiddleware),
+  middleware: getDefaultMiddleware =>
+    getDefaultMiddleware({ immutableCheck: { warnAfter: 128 }, serializableCheck: { warnAfter: 128 } })
+      .concat(api.middleware)
+      .concat(localStorageMiddleware),
   preloadedState: loadFromLocalStorage(),
 })
 

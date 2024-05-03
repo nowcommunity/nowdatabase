@@ -8,8 +8,9 @@
 
 See [technical explanations](technical_explanations.md) for how this works.
 
-**Run the project** :rocket:
+**Init the project** :rocket:
 
-1. `npm install` in project root to install the eslint & prettier packages
-2. `npm run dev` to run it - requires docker compose installed.
-3. Check if it worked: The docker logs should have a line saying database connection works. Open `localhost:5173` in browser to check if frontend works and shows data.
+1. Make copies of `.env.template` and `.env.dev.template`. Name the copies `.env` and `.dev.env`.
+2. `npm install` in project root to install the eslint & prettier packages
+3. `npm run dev` to run it - requires docker compose installed.
+4. Check if it worked: The docker logs should have a line saying database connection works. Open `localhost:5173` in browser to check if frontend works and shows data.

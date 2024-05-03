@@ -1,16 +1,16 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { api } from './api'
-import { Locality } from '@/backendTypes'
+import { Locality, LocalityDetails } from '@/backendTypes'
 
 const localitiesApi = api.injectEndpoints({
   endpoints: builder => ({
-    getAllLocalities: builder.query<any, any>({
+    getAllLocalities: builder.query<Locality[], void>({
       query: () => ({
         url: `/locality/all`,
       }),
     }),
-    getLocalityDetails: builder.query<Locality, any>({
-      query: (id: number) => ({
+    getLocalityDetails: builder.query<LocalityDetails, string>({
+      query: id => ({
         url: `/locality/${id}`,
       }),
     }),

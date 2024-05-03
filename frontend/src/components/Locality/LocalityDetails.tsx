@@ -7,7 +7,7 @@ import { LocalityTab } from './Tabs/LocalityTab'
 
 export const LocalityDetails = () => {
   const { id } = useParams()
-  const { isLoading, isError, data } = useGetLocalityDetailsQuery(id)
+  const { isLoading, isError, data } = useGetLocalityDetailsQuery(id!)
 
   if (isError) return <div>Error loading data</div>
   if (isLoading || !data) return <CircularProgress />

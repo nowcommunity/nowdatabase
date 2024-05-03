@@ -11,7 +11,7 @@ export const LocalityTable = ({
   selectorFn?: (id: string) => void
   selectedList?: string[]
 }) => {
-  const localitiesQuery = useGetAllLocalitiesQuery({})
+  const localitiesQuery = useGetAllLocalitiesQuery()
   const columns = useMemo<MRT_ColumnDef<Locality>[]>(
     () => [
       {

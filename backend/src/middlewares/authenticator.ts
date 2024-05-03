@@ -1,7 +1,7 @@
 import { Middleware, User } from '../types'
 import { SECRET } from '../utils/config'
 import jwt, { Secret, TokenExpiredError } from 'jsonwebtoken'
-import { models } from '../utils/db'
+import { prisma } from '../utils/db'
 
 /*
   This allows extractors to add user and token to request
@@ -38,10 +38,9 @@ export const userExtractor: Middleware = async (req, res, next) => {
     const username = decodedUser.username
     if (!username) throw new Error('Invalid token')
 
-    const foundUser = await models.com_users.findOne({
-      attributes: ['user_name'],
+    const foundUser = await prisma.com_users.findFirst({
+      select: { user_name: true },
       where: { user_name: username },
-      raw: true,
     })
 
     if (!foundUser) {

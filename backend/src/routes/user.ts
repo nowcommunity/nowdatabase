@@ -1,19 +1,18 @@
 import { Router } from 'express'
-import { models } from '../utils/db'
 import jwt from 'jsonwebtoken'
 import { SECRET, LOGIN_VALID_MS, USER_CREATION_SECRET } from '../utils/config'
 import bcrypt from 'bcrypt'
+import { prisma } from '../utils/db'
 
 const router = Router()
 
 router.post('/login', async (req, res) => {
   const { username, password } = req.body
-  const result = await models.com_users.findOne({
+  const result = await prisma.com_users.findFirst({
     where: {
       user_name: username,
     },
-    attributes: ['user_name', 'password', 'user_id'],
-    raw: true,
+    select: { user_name: true, password: true, user_id: true },
   })
 
   const passwordMatches = result && (await bcrypt.compare(password, result.password as string))
@@ -29,13 +28,15 @@ router.post('/login', async (req, res) => {
 
 router.post('/create', async (req, res) => {
   const { username, password, secret } = req.body
-  if (!secret || secret !== USER_CREATION_SECRET) throw Error("Wrong user creation secret")
+  if (!secret || secret !== USER_CREATION_SECRET) throw Error('Wrong user creation secret')
   const saltRounds = 10
   const passwordHash = await bcrypt.hash(password, saltRounds)
 
-  await models.com_users.create({
-    user_name: username,
-    password: passwordHash,
+  await prisma.com_users.create({
+    data: {
+      user_name: username,
+      password: passwordHash,
+    },
   })
 
   return res.status(200).send()
