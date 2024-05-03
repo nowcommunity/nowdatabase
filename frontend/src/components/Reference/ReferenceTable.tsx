@@ -7,7 +7,7 @@ import { Box, Tooltip } from '@mui/material'
 
 const Cell = ({ renderedCellValue }: { renderedCellValue: React.ReactNode }) => (
   <Tooltip title={renderedCellValue}>
-    <Box sx={{ maxWidth: '260px', '-webkit-mask-image': 'linear-gradient(90deg, #000 90%, transparent)' }}>
+    <Box sx={{ maxWidth: '260px',   WebkitMaskImage: 'linear-gradient(to right, #000 90%, transparent)' }}>
       {renderedCellValue}
     </Box>
   </Tooltip>
