@@ -9,7 +9,7 @@ router.get('/all', async (_req, res) => {
 })
 
 router.get('/:id', async (req, res) => {
-  const id = parseInt(req.params.id)
+  const id = req.params.id
   const time_unit = await getTimeUnitDetails(id)
   res.status(200).send(time_unit)
 })
