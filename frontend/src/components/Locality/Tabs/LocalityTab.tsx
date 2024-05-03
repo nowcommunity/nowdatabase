@@ -1,26 +1,14 @@
 import { Box } from '@mui/material'
-import { Locality } from '@/backendTypes'
-import { ArrayFrame, DataValue, EditableTable, Grouped } from '../../DetailView/common/FormComponents'
-import { useDetailContext, useGetEditableTextField } from '../../DetailView/hooks'
-import { MRT_ColumnDef } from 'material-react-table'
+import { LocalityDetails } from '@/backendTypes'
+import { ArrayFrame, DataValue } from '../../DetailView/common/FormComponents'
+import { useGetEditableTextField } from '../../DetailView/hooks'
 
 export const LocalityTab = () => {
-  const getEditableTextField = useGetEditableTextField<Locality>()
-  const { editData } = useDetailContext<Locality>()
+  const getEditableTextField = useGetEditableTextField<LocalityDetails>()
 
-  const originalSynonyms = editData.synonyms ?? []
-
-  const textField = (field: keyof Locality) => (
-    <DataValue<Locality> field={field} EditElement={getEditableTextField(field)} />
+  const textField = (field: keyof LocalityDetails) => (
+    <DataValue<LocalityDetails> field={field} EditElement={getEditableTextField(field)} />
   )
-
-  const synonymColumns: MRT_ColumnDef<{ synonym: string }>[] = [
-    {
-      accessorKey: 'synonym',
-      header: 'Synonym',
-      id: 'synonym',
-    },
-  ]
 
   const name = [['Name', textField('loc_name')]]
   const locality = [['Country', textField('country')]]
@@ -42,21 +30,6 @@ export const LocalityTab = () => {
     ['Altitude (m)', textField('altitude')],
   ]
 
-  const data = [
-    {
-      synonym: 'Synonyymi 1',
-      index: 0,
-    },
-    {
-      synonym: 'Synonyymi 2',
-      index: 1,
-    },
-  ]
-
-  const clickRow = (index: number) => {
-    
-  }
-
   return (
     <Box>
       <ArrayFrame array={name} title="Name" />
@@ -64,9 +37,6 @@ export const LocalityTab = () => {
       <ArrayFrame array={country} title="Country" />
       <ArrayFrame array={status} title="Status" />
       <ArrayFrame array={latlong} title="Latitude & Longitude" />
-      <Grouped title="Synonym">
-        <EditableTable columns={synonymColumns} data={data} clickRow={clickRow} />
-      </Grouped>
     </Box>
   )
 }

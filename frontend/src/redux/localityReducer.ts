@@ -4,7 +4,7 @@ import { Locality, LocalityDetails } from '@/backendTypes'
 
 const localitiesApi = api.injectEndpoints({
   endpoints: builder => ({
-    getAllLocalities: builder.query<Locality, void>({
+    getAllLocalities: builder.query<Locality[], void>({
       query: () => ({
         url: `/locality/all`,
       }),

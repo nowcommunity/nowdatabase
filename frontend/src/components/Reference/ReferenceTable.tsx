@@ -20,7 +20,7 @@ export const ReferenceTable = ({
   selectorFn?: (id: string) => void
   selectedList?: string[]
 }) => {
-  const referenceQuery = useGetAllReferencesQuery({})
+  const referenceQuery = useGetAllReferencesQuery()
   const columns = useMemo<MRT_ColumnDef<Reference>[]>(
     () => [
       {

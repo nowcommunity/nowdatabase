@@ -11,7 +11,7 @@ export const TimeUnitTable = ({
   selectorFn?: (id: string) => void
   selectedList?: string[]
 }) => {
-  const time_unitQuery = useGetAllTimeUnitsQuery({})
+  const time_unitQuery = useGetAllTimeUnitsQuery()
   const columns = useMemo<MRT_ColumnDef<TimeUnit>[]>(
     () => [
       {

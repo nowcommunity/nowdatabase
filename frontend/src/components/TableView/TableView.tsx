@@ -78,7 +78,7 @@ export const TableView = <T extends MRT_RowData>({
   selectedList,
   url
 }: {
-  data: T[] | null
+  data: T[] | undefined
   columns: MRT_ColumnDef<T>[]
   idFieldName: keyof MRT_RowData
   checkRowRestriction: (row: T) => boolean

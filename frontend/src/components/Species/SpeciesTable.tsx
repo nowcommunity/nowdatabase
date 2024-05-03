@@ -11,7 +11,7 @@ export const SpeciesTable = ({
   selectorFn?: (id: string) => void
   selectedList?: string[]
 }) => {
-  const speciesQuery = useGetAllSpeciesQuery({})
+  const speciesQuery = useGetAllSpeciesQuery()
   const columns = useMemo<MRT_ColumnDef<Species>[]>(
     () => [
       {
