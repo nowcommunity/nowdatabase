@@ -8,6 +8,7 @@ import { SpeciesTable } from './components/Species/SpeciesTable'
 import { TimeUnitTable } from './components/TimeUnit/TimeUnitTable'
 import { Login } from './components/Login'
 import { LocalityDetails } from './components/Locality/LocalityDetails'
+import { SpeciesDetails } from './components/Species/SpeciesDetails'
 
 const App = () => {
   return (
@@ -24,6 +25,7 @@ const App = () => {
               <Route element={<LocalityDetails />} path="/locality/:id" />
               <Route element={<LocalityTable />} path="/locality/" />
               <Route element={<ReferenceTable />} path="/reference/" />
+              <Route element={<SpeciesDetails />} path="/species/:id" />
               <Route element={<SpeciesTable />} path="/species/" />
               <Route element={<TimeUnitTable />} path="/time-unit/" />
               <Route element={<FrontPage />} path="/" />
