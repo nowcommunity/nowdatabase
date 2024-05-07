@@ -32,7 +32,7 @@ export type Reference = {
 }
 ```
 
-After that, delete `reference.d.ts`.
+After that, delete `reference.d.ts` and the other .d.ts files created by the compiler (it will also emit the types for the files that `reference.ts` imports).
 
 ### Typing the queries in frontend
 
