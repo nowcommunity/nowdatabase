@@ -48,7 +48,7 @@ const referencesApi = api.injectEndpoints({
         url: `/reference/all`,
       }),
     }),
-    getReferenceDetails: builder.query<ReferenceDetails, number>({
+    getReferenceDetails: builder.query<ReferenceDetails, string>({
       query: id => ({
         url: `/reference/${id}`,
       }),
@@ -60,4 +60,4 @@ const referencesApi = api.injectEndpoints({
 
 Notice:
 + Since the getAll-route returns an array, we have `Reference[]` as the result type.
-+ On the line `query: id => ({` the id does not need to be typed as it is inferred from the parameter type `number` given on the line before.
++ On the line `query: id => ({` the id does not need to be typed as it is inferred from the parameter type `string` given on the line before.
