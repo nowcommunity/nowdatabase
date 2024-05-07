@@ -39,9 +39,13 @@ export const useGetRadioSelection = <T,>() => {
   )
 }
 
+export type MultiSelectionOption = { value: string; display: string; }
+
 export const useGetMultiSelection = <T,>() => {
   const { setEditData, editData } = useDetailContext<T>()
-  return ({ options, name, fieldName }: { options: string[], name: string, fieldName: keyof T }) => (
+  const getValue = (item: MultiSelectionOption | string) => typeof item === 'string' ? item : item.value
+  const getDisplay = (item: MultiSelectionOption | string) => typeof item === 'string' ? item : item.display
+  return ({ options, name, fieldName }: { options: Array<MultiSelectionOption | string>, name: string, fieldName: keyof T }) => (
     <FormControl>
       <InputLabel id={`${name}-multiselect-label`}>{name}</InputLabel>
       <Select
@@ -53,7 +57,7 @@ export const useGetMultiSelection = <T,>() => {
         sx={{ width: '10em' }}
         size="small"
       >
-        {options.map(item => <MenuItem key={item} value={item}>{item}</MenuItem>)}
+        {options.map(item => <MenuItem key={getValue(item)} value={getValue(item)}>{getDisplay(item)}</MenuItem>)}
       </Select>
     </FormControl>
   )

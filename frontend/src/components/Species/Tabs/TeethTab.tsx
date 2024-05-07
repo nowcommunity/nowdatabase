@@ -1,7 +1,7 @@
 import { Box } from '@mui/material'
 import { SpeciesDetails } from '@/backendTypes'
 import { ArrayFrame, DataValue } from '@components/DetailView/common/FormComponents'
-import { useGetEditableTextField, useGetMultiSelection } from '@components/DetailView/hooks'
+import { MultiSelectionOption, useGetEditableTextField, useGetMultiSelection } from '@components/DetailView/hooks'
 
 export const TeethTab = () => {
   const getEditableTextField = useGetEditableTextField<SpeciesDetails>()
@@ -11,11 +11,11 @@ export const TeethTab = () => {
     <DataValue<SpeciesDetails> field={field as keyof SpeciesDetails} EditElement={getEditableTextField(field)} />
   )
 
-  const multiSelection = (field: keyof SpeciesDetails, options: string[], name: string) => (
+  const multiSelection = (field: keyof SpeciesDetails, options: Array<MultiSelectionOption | string>, name: string) => (
     <DataValue<SpeciesDetails> field={field as keyof SpeciesDetails} EditElement={getMultiSelection({ fieldName: field, options, name })} />
   )
 
-  const toothShapeMulticuspidOptions = ['', 'bil', 'bll', 'blm', 'bun',
+  const toothShapeMulticuspidOptions = [{ value: '', display: 'None'}, 'bil', 'bll', 'blm', 'bun',
     'bus', 'col', 'csc', 'cso', 'csp', 'cyl', 'dil', 'ect', 'edt',
     'lam', 'lss', 'md1', 'mdp', 'plo', 'qtb', 'sel', 'tri', 'zal']
 
