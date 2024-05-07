@@ -1,6 +1,12 @@
 import Prisma from '../../backend/node_modules/@prisma/client/default'
+import { RowState } from './components/DetailView/common/FormComponents'
 
-export type LocalityDetails = Prisma.now_loc
+// Use this for fields that include array that has to be edited by EditableTable.
+// For example see LocalityDetails: now_mus
+export type EditableArray<T> = Array<T & { rowState?: RowState }>
+
+export type Museum = Prisma.now_mus
+export type LocalityDetails = Prisma.now_loc & { now_mus: EditableArray<Museum> }
 
 export type Locality = {
   lid: number;

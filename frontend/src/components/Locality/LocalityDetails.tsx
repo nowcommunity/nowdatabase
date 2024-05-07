@@ -4,6 +4,7 @@ import { CircularProgress } from '@mui/material'
 import { DetailView, TabType } from '../DetailView/DetailView'
 import { AgeTab } from './Tabs/AgeTab'
 import { LocalityTab } from './Tabs/LocalityTab'
+import { MuseumTab } from './Tabs/MuseumTab'
 
 export const LocalityDetails = () => {
   const { id } = useParams()
@@ -20,6 +21,10 @@ export const LocalityDetails = () => {
     {
       title: 'Locality',
       content: <LocalityTab />,
+    },
+    {
+      title: 'Museum',
+      content: <MuseumTab />,
     },
   ]
 

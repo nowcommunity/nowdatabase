@@ -19,8 +19,9 @@ import {
 } from '@mui/material'
 import { ReactNode, useState } from 'react'
 import { useDetailContext } from '../hooks'
-import { type MRT_ColumnDef, type MRT_RowData, MaterialReactTable } from 'material-react-table'
+import { type MRT_ColumnDef, type MRT_RowData, MaterialReactTable, MRT_Row } from 'material-react-table'
 import RemoveCircleOutlineIcon from '@mui/icons-material/RemoveCircleOutline'
+import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline'
 
 export const ArrayToTable = ({ array }: { array: Array<Array<ReactNode>> }) => (
   <Grid container direction="row">
@@ -170,31 +171,64 @@ export const EditingModal = ({ buttonText, children }: { buttonText: string; chi
   )
 }
 
+export type RowState = 'new' | 'removed' | 'cancelled' | 'clean'
+
+const getNewState = (state: RowState) => {
+  if (!state || state === 'clean') return 'removed'
+  if (state === 'new') return 'cancelled'
+  return 'clean'
+}
+
 export const EditableTable = <T extends MRT_RowData>({
   data,
   columns,
+  clickRow,
+  editable
 }: {
-  data: T[] | null
+  data: Array<T & { rowState?: RowState }> | null
   columns: MRT_ColumnDef<T>[]
-  clickRow: (index: number) => void
+  clickRow?: (index: number, newState: RowState) => void
+  editable?: boolean
 }) => {
   if (!data) return <CircularProgress />
-  const actionRow = () => {
+
+  const actionRow = ({ row, staticRowIndex }: { row: MRT_Row<T>; staticRowIndex?: number | undefined }) => {
+    const state = row.original.rowState
+    
+    const rowClicked = (index: number | undefined) => {
+      if (!clickRow || index === undefined) return
+      clickRow(index, getNewState(state))
+    }
+
+    const getIcon = () => {
+      if (['removed', 'cancelled'].includes(state)) return <AddCircleOutlineIcon />
+      return <RemoveCircleOutlineIcon />
+    }
+
     return (
       <Box>
-        <Button>{<RemoveCircleOutlineIcon />}</Button>
+        <Button onClick={() => rowClicked(staticRowIndex)}>{getIcon()}</Button>
       </Box>
     )
   }
+
+  const actionRowProps = editable ? { enableRowActions: true, renderRowActions: actionRow } : {}
+
+  const rowStateToColor = (state: RowState | undefined) => {
+    if (state === 'new') return 'lightgreen'
+    else if (state === 'removed' || state === 'cancelled') return '#FFCCCB'
+    return null
+  }
+
   return (
     <MaterialReactTable
-      enableRowActions
-      renderRowActions={actionRow}
+      {...actionRowProps}
       columns={columns}
-      data={data}
+      data={data.map(row => ({...row, muiTableBodyRowProps: { sx: { backgroundColor: 'red' }}}))}
       enableTopToolbar={false}
       enableColumnActions={false}
       enablePagination={false}
+      muiTableBodyRowProps={({ row }: { row: MRT_Row<T> }) => ({ sx: { backgroundColor: rowStateToColor(row.original.rowState)} })}
     />
   )
 }
