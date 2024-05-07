@@ -1,20 +1,10 @@
 import { Box } from '@mui/material'
 import { SpeciesDetails } from '@/backendTypes'
 import { ArrayFrame, DataValue } from '@components/DetailView/common/FormComponents'
-import { useGetEditableTextField, useGetMultiSelection, useGetRadioSelection } from '@components/DetailView/hooks'
+import { useGetMultiSelection } from '@components/DetailView/hooks'
 
 export const LocomotionTab = () => {
-  const getEditableTextField = useGetEditableTextField<SpeciesDetails>()
-  const getRadioSelection = useGetRadioSelection<SpeciesDetails>()
   const getMultiSelection = useGetMultiSelection<SpeciesDetails>()
-
-  const textField = (field: keyof SpeciesDetails) => (
-    <DataValue<SpeciesDetails> field={field as keyof SpeciesDetails} EditElement={getEditableTextField(field)} />
-  )
-
-  const radioSelection = (field: keyof SpeciesDetails, options: string[], name: string) => (
-    <DataValue<SpeciesDetails> field={field as keyof SpeciesDetails} EditElement={getRadioSelection({ fieldName: field, options, name })} />
-  )
 
   const multiSelection = (field: keyof SpeciesDetails, options: string[], name: string) => (
     <DataValue<SpeciesDetails> field={field as keyof SpeciesDetails} EditElement={getMultiSelection({ fieldName: field, options, name })} />
