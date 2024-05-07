@@ -9,7 +9,7 @@ const speciesApi = api.injectEndpoints({
         url: `/species/all`,
       }),
     }),
-    getSpeciesDetails: builder.query<SpeciesDetails, number>({
+    getSpeciesDetails: builder.query<SpeciesDetails, string>({
       query: id => ({
         url: `/species/${id}`,
       }),

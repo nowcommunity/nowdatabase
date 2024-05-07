@@ -9,7 +9,7 @@ const referencesApi = api.injectEndpoints({
         url: `/reference/all`,
       }),
     }),
-    getReferenceDetails: builder.query<ReferenceDetails, number>({
+    getReferenceDetails: builder.query<ReferenceDetails, string>({
       query: id => ({
         url: `/reference/${id}`,
       }),
