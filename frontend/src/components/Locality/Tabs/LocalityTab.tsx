@@ -1,14 +1,11 @@
 import { Box } from '@mui/material'
 import { LocalityDetails } from '@/backendTypes'
-import { ArrayFrame, DataValue } from '../../DetailView/common/FormComponents'
-import { useGetEditableTextField } from '../../DetailView/hooks'
+import { ArrayFrame } from '../../DetailView/common/FormComponents'
+import { useDetailContext } from '@/components/DetailView/hooks'
 
 export const LocalityTab = () => {
-  const getEditableTextField = useGetEditableTextField<LocalityDetails>()
 
-  const textField = (field: keyof LocalityDetails) => (
-    <DataValue<LocalityDetails> field={field} EditElement={getEditableTextField(field)} />
-  )
+  const { textField } = useDetailContext<LocalityDetails>()
 
   const name = [['Name', textField('loc_name')]]
   const locality = [['Country', textField('country')]]

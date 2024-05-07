@@ -1,4 +1,22 @@
-import { Card, Typography, Box, Grid, Divider, Modal, Button, CircularProgress } from '@mui/material'
+import {
+  Card,
+  Typography,
+  Box,
+  Grid,
+  Divider,
+  Modal,
+  Button,
+  CircularProgress,
+  TextField,
+  FormControl,
+  InputLabel,
+  MenuItem,
+  Select,
+  SelectChangeEvent,
+  FormControlLabel,
+  Radio,
+  RadioGroup,
+} from '@mui/material'
 import { ReactNode, useState } from 'react'
 import { useDetailContext } from '../hooks'
 import { type MRT_ColumnDef, type MRT_RowData, MaterialReactTable } from 'material-react-table'
@@ -62,6 +80,80 @@ const modalStyle = {
   p: 4,
 }
 
+export const EditableTextField = <T extends object>({ field }: { field: keyof T }) => {
+  const { setEditData, editData } = useDetailContext<T>()
+
+  const editingComponent = (
+    <TextField
+      onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
+        setEditData({ ...editData, [field]: event?.currentTarget?.value })
+      }
+      value={editData[field] ?? ''}
+      variant="outlined"
+      size="small"
+    />
+  )
+
+  return <DataValue<T> field={field} EditElement={editingComponent} />
+}
+
+export type DropdownOption = { value: string; display: string }
+
+export const DropdownSelector = <T extends object>({
+  options,
+  name,
+  field,
+}: {
+  options: Array<DropdownOption | string>
+  name: string
+  field: keyof T
+}) => {
+  const { setEditData, editData } = useDetailContext<T>()
+  const getValue = (item: DropdownOption | string) => (typeof item === 'string' ? item : item.value)
+  const getDisplay = (item: DropdownOption | string) => (typeof item === 'string' ? item : item.display)
+  const editingComponent = (
+    <FormControl>
+      <InputLabel id={`${name}-multiselect-label`}>{name}</InputLabel>
+      <Select
+        labelId={`${name}-multiselect-label`}
+        label={name}
+        id={`${name}-multiselect`}
+        value={editData[field] as string}
+        onChange={(event: SelectChangeEvent) => setEditData({ ...editData, [field]: event.target.value })}
+        sx={{ width: '10em' }}
+        size="small"
+      >
+        {options.map(item => (
+          <MenuItem key={getValue(item)} value={getValue(item)}>
+            {getDisplay(item)}
+          </MenuItem>
+        ))}
+      </Select>
+    </FormControl>
+  )
+
+  return <DataValue<T> field={field} EditElement={editingComponent} />
+}
+
+export const RadioSelector = <T extends object>({ options, name, field }: { options: string[], name: string, field: keyof T }) => {
+  const { setEditData, editData } = useDetailContext<T>()
+  const editingComponent = (
+  <FormControl>
+      <RadioGroup
+        aria-labelledby={`${name}-radio-selection`}
+        name={name}
+        onChange={(event: React.ChangeEvent<HTMLInputElement>) => setEditData({ ...editData, [field]: event?.currentTarget?.value })}
+        value={editData[field]}
+        sx={{ display: 'flex', flexDirection: 'row' }}
+        >
+        {options.map(option => <FormControlLabel key={option} value={option} control={<Radio />} label={option} />)}
+      </RadioGroup>
+    </FormControl>
+  )
+
+  return <DataValue<T> field={field} EditElement={editingComponent} />
+}
+
 export const EditingModal = ({ buttonText, children }: { buttonText: string; children: ReactNode | ReactNode[] }) => {
   const [open, setOpen] = useState(false)
 
@@ -85,15 +177,12 @@ export const EditableTable = <T extends MRT_RowData>({
   data: T[] | null
   columns: MRT_ColumnDef<T>[]
   clickRow: (index: number) => void
-  
 }) => {
   if (!data) return <CircularProgress />
   const actionRow = () => {
     return (
       <Box>
-        <Button>
-          {<RemoveCircleOutlineIcon />}
-        </Button>
+        <Button>{<RemoveCircleOutlineIcon />}</Button>
       </Box>
     )
   }

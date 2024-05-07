@@ -1,14 +1,11 @@
 import { Box } from '@mui/material'
 import { SpeciesDetails } from '@/backendTypes'
-import { ArrayFrame, DataValue } from '@components/DetailView/common/FormComponents'
-import { useGetMultiSelection } from '@components/DetailView/hooks'
+import { ArrayFrame } from '@components/DetailView/common/FormComponents'
+import { useDetailContext } from '@/components/DetailView/hooks'
 
 export const DietTab = () => {
-  const getMultiSelection = useGetMultiSelection<SpeciesDetails>()
-
-  const multiSelection = (field: keyof SpeciesDetails, options: string[], name: string) => (
-    <DataValue<SpeciesDetails> field={field as keyof SpeciesDetails} EditElement={getMultiSelection({ fieldName: field, options, name })} />
-  )
+  
+  const { dropdown } = useDetailContext<SpeciesDetails>()
 
   const diet1Options = ['', 'animal', 'omnivore', 'plant']
 
@@ -29,13 +26,13 @@ export const DietTab = () => {
   const huntForageOptions = ['', 'ambush', 'dig', 'pounce/p', 'pursuit']
 
   const diet = [
-    ['Diet 1', multiSelection('diet1', diet1Options, 'Diet 1')],
-    ['Diet 2', multiSelection('diet2', diet2Options, 'Diet 2')],
-    ['Diet 3', multiSelection('diet3', diet3Options, 'Diet 3')],
-    ['Relative Fibre Content', multiSelection('rel_fib', relativeFibreContentOptions, 'Relative Fibre Content')],
-    ['Selectivity', multiSelection('selectivity', selectivityOptions, 'Selectivity')],
-    ['Digestion', multiSelection('digestion', digestionOptions, 'Digestion')],
-    ['Hunt/Forage', multiSelection('hunt_forage', huntForageOptions, 'Hunt/Forage')],
+    ['Diet 1', dropdown('diet1', diet1Options, 'Diet 1')],
+    ['Diet 2', dropdown('diet2', diet2Options, 'Diet 2')],
+    ['Diet 3', dropdown('diet3', diet3Options, 'Diet 3')],
+    ['Relative Fibre Content', dropdown('rel_fib', relativeFibreContentOptions, 'Relative Fibre Content')],
+    ['Selectivity', dropdown('selectivity', selectivityOptions, 'Selectivity')],
+    ['Digestion', dropdown('digestion', digestionOptions, 'Digestion')],
+    ['Hunt/Forage', dropdown('hunt_forage', huntForageOptions, 'Hunt/Forage')],
   ]
 
   return (

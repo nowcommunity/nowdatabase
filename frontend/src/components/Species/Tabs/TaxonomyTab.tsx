@@ -1,19 +1,10 @@
 import { Box } from '@mui/material'
 import { SpeciesDetails } from '@/backendTypes'
-import { ArrayFrame, DataValue } from '@components/DetailView/common/FormComponents'
-import { useGetEditableTextField, useGetMultiSelection } from '@components/DetailView/hooks'
+import { ArrayFrame } from '@components/DetailView/common/FormComponents'
+import { useDetailContext } from '@/components/DetailView/hooks'
 
 export const TaxonomyTab = () => {
-  const getEditableTextField = useGetEditableTextField<SpeciesDetails>()
-  const getMultiSelection = useGetMultiSelection<SpeciesDetails>()
-
-  const textField = (field: keyof SpeciesDetails) => (
-    <DataValue<SpeciesDetails> field={field as keyof SpeciesDetails} EditElement={getEditableTextField(field)} />
-  )
-
-  const multiSelection = (field: keyof SpeciesDetails, options: string[], name: string) => (
-    <DataValue<SpeciesDetails> field={field as keyof SpeciesDetails} EditElement={getMultiSelection({ fieldName: field, options, name })} />
-  )
+  const { textField, dropdown } = useDetailContext<SpeciesDetails>()
 
   const taxonStatusOptions = ['', 'family attrib of genus uncertain',
     'genus attrib of species uncertain',
@@ -29,7 +20,7 @@ export const TaxonomyTab = () => {
     ['Family', textField('family_name'), 'Subfamily or Tribe', textField('subfamily_name')],
     ['Genus', textField('genus_name'),''],
     ['Species', textField('species_name'), 'Unique Identifier', textField('unique_identifier')],
-    ['Taxon Status', multiSelection('sp_status', taxonStatusOptions, 'Taxon Status')],
+    ['Taxon Status', dropdown('sp_status', taxonStatusOptions, 'Taxon Status')],
   ]
 
   const comment = [

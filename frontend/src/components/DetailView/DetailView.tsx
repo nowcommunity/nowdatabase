@@ -5,6 +5,7 @@ import EditIcon from '@mui/icons-material/Edit'
 import { useState } from 'react'
 import { DetailContextProvider, ModeType } from './Context/DetailContext'
 import { cloneDeep } from 'lodash-es'
+import { DropdownOption, DropdownSelector, EditableTextField, RadioSelector } from './common/FormComponents'
 
 export type TabType = {
   title: string
@@ -25,10 +26,23 @@ export const DetailView = <T extends object>({ tabs, data }: { tabs: TabType[]; 
   const [tab, setTab] = useState(0)
   const [mode, setMode] = useState<ModeType>('read')
 
+  const textField = (field: keyof T) => <EditableTextField<T> field={field} />
+
+  const dropdown = (field: keyof T, options: Array<DropdownOption | string>, name: string) => (
+    <DropdownSelector field={field} options={options} name={name} />
+  )
+
+  const radioSelection = (field: keyof T, options: string[], name: string) => (
+    <RadioSelector field={field} options={options} name={name} />
+  )
+
   const initialState = {
     data,
     mode,
     editData: cloneDeep(data),
+    textField,
+    dropdown,
+    radioSelection
   }
 
   return (
