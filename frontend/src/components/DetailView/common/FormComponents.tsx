@@ -136,18 +136,30 @@ export const DropdownSelector = <T extends object>({
   return <DataValue<T> field={field} EditElement={editingComponent} />
 }
 
-export const RadioSelector = <T extends object>({ options, name, field }: { options: string[], name: string, field: keyof T }) => {
+export const RadioSelector = <T extends object>({
+  options,
+  name,
+  field,
+}: {
+  options: string[]
+  name: string
+  field: keyof T
+}) => {
   const { setEditData, editData } = useDetailContext<T>()
   const editingComponent = (
-  <FormControl>
+    <FormControl>
       <RadioGroup
         aria-labelledby={`${name}-radio-selection`}
         name={name}
-        onChange={(event: React.ChangeEvent<HTMLInputElement>) => setEditData({ ...editData, [field]: event?.currentTarget?.value })}
+        onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
+          setEditData({ ...editData, [field]: event?.currentTarget?.value })
+        }
         value={editData[field]}
         sx={{ display: 'flex', flexDirection: 'row' }}
-        >
-        {options.map(option => <FormControlLabel key={option} value={option} control={<Radio />} label={option} />)}
+      >
+        {options.map(option => (
+          <FormControlLabel key={option} value={option} control={<Radio />} label={option} />
+        ))}
       </RadioGroup>
     </FormControl>
   )
@@ -179,25 +191,27 @@ const getNewState = (state: RowState) => {
   return 'clean'
 }
 
-export const EditableTable = <T extends MRT_RowData>({
+export const EditableTable = <T extends MRT_RowData, ParentType extends MRT_RowData>({
   data,
   columns,
-  clickRow,
-  editable
+  editable,
+  field,
 }: {
-  data: Array<T & { rowState?: RowState }> | null
+  data: Array<T> | null
   columns: MRT_ColumnDef<T>[]
-  clickRow?: (index: number, newState: RowState) => void
   editable?: boolean
+  field: keyof ParentType
 }) => {
   if (!data) return <CircularProgress />
-
+  const { editData, setEditData, mode } = useDetailContext<ParentType>()
   const actionRow = ({ row, staticRowIndex }: { row: MRT_Row<T>; staticRowIndex?: number | undefined }) => {
     const state = row.original.rowState
-    
+
     const rowClicked = (index: number | undefined) => {
-      if (!clickRow || index === undefined) return
-      clickRow(index, getNewState(state))
+      if (index === undefined) return
+      const museums = [...editData[field]]
+      museums[index].rowState = getNewState(state)
+      setEditData({ ...editData, museums })
     }
 
     const getIcon = () => {
@@ -212,7 +226,7 @@ export const EditableTable = <T extends MRT_RowData>({
     )
   }
 
-  const actionRowProps = editable ? { enableRowActions: true, renderRowActions: actionRow } : {}
+  const actionRowProps = editable && mode === 'edit' ? { enableRowActions: true, renderRowActions: actionRow } : {}
 
   const rowStateToColor = (state: RowState | undefined) => {
     if (state === 'new') return 'lightgreen'
@@ -224,11 +238,13 @@ export const EditableTable = <T extends MRT_RowData>({
     <MaterialReactTable
       {...actionRowProps}
       columns={columns}
-      data={data.map(row => ({...row, muiTableBodyRowProps: { sx: { backgroundColor: 'red' }}}))}
+      data={data}
       enableTopToolbar={false}
       enableColumnActions={false}
       enablePagination={false}
-      muiTableBodyRowProps={({ row }: { row: MRT_Row<T> }) => ({ sx: { backgroundColor: rowStateToColor(row.original.rowState)} })}
+      muiTableBodyRowProps={({ row }: { row: MRT_Row<T> }) => ({
+        sx: { backgroundColor: rowStateToColor(row.original.rowState) },
+      })}
     />
   )
 }

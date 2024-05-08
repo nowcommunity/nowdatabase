@@ -1,10 +1,10 @@
-import { LocalityDetails, Museum } from '@/backendTypes'
-import { EditableTable, Grouped, RowState } from '@/components/DetailView/common/FormComponents'
+import { Editable, LocalityDetails, Museum } from '@/backendTypes'
+import { EditableTable, Grouped } from '@/components/DetailView/common/FormComponents'
 import { useDetailContext } from '@/components/DetailView/hooks'
 import { MRT_ColumnDef } from 'material-react-table'
 
 export const MuseumTab = () => {
-  const { editData, setEditData, mode } = useDetailContext<LocalityDetails>()
+  const { editData } = useDetailContext<LocalityDetails>()
 
   const columns: MRT_ColumnDef<Museum>[] = [
     {
@@ -25,15 +25,9 @@ export const MuseumTab = () => {
     },
   ]
 
-  const clickRow = (index: number, newState: RowState) => {
-    const museums = [...editData.museums]
-    museums[index].rowState = newState
-    setEditData({ ...editData, museums })
-  }
-
   return (
     <Grouped title="Museums">
-      <EditableTable<Museum & { rowState?: RowState }> columns={columns} data={editData.museums} editable={mode === 'edit'} clickRow={clickRow} />
+      <EditableTable<Editable<Museum>, LocalityDetails> columns={columns} data={editData.museums} editable field="museums" />
     </Grouped>
   )
 }
