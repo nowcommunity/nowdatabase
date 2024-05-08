@@ -15,14 +15,14 @@ export const MuseumTab = () => {
   ]
 
   const clickRow = (index: number, newState: RowState) => {
-    const museums = [...editData.now_mus]
+    const museums = [...editData.museums]
     museums[index].rowState = newState
-    setEditData({ ...editData, now_mus: museums })
+    setEditData({ ...editData, museums })
   }
 
   return (
     <Box>
-      <EditableTable<Museum> columns={columns} data={editData.now_mus} editable={mode === 'edit'} clickRow={clickRow} />
+      <EditableTable<Museum & { rowState?: RowState }> columns={columns} data={editData.museums} editable={mode === 'edit'} clickRow={clickRow} />
     </Box>
   )
 }

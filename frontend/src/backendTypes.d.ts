@@ -5,8 +5,8 @@ import { RowState } from './components/DetailView/common/FormComponents'
 // For example see LocalityDetails: now_mus
 export type EditableArray<T> = Array<T & { rowState?: RowState }>
 
-export type Museum = Prisma.now_mus
-export type LocalityDetails = Prisma.now_loc & { now_mus: EditableArray<Museum> }
+export type Museum = Prisma.com_mlist
+export type LocalityDetails = Omit<Prisma.now_mus, 'now_mus'> & { museums: EditableArray<Museum> }
 
 export type Locality = {
   lid: number;
