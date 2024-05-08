@@ -167,16 +167,31 @@ export const RadioSelector = <T extends object>({
   return <DataValue<T> field={field} EditElement={editingComponent} />
 }
 
-export const EditingModal = ({ buttonText, children }: { buttonText: string; children: ReactNode | ReactNode[] }) => {
+/* 
+  buttonText = Text for the button that opens modal
+  children = Content of modal
+  onSave = If defined, the modal will have a separate saving button.
+           onSave is a function, that will return true or false, depending
+           on if we want to proceed with closing the form (return false to cancel closing)
+*/
+export const EditingModal = ({ buttonText, children, onSave }: { buttonText: string; children: ReactNode | ReactNode[]; onSave?: () => Promise<boolean> }) => {
   const [open, setOpen] = useState(false)
+
+  const closeWithSave = async () => {
+    if (!onSave) return
+    const close = await onSave()
+    if (!close) return
+    setOpen(false)
+  }
 
   return (
     <Box>
-      <Button onClick={() => setOpen(true)}>{buttonText}</Button>
+      <Button onClick={() => setOpen(true)} variant="contained" sx={{ marginBottom: "1em"}}>{buttonText}</Button>
       <Modal open={open} aria-labelledby={`modal-${buttonText}`} aria-describedby={`modal-${buttonText}`}>
         <Box sx={{ ...modalStyle }}>
           <Box marginBottom="2em"> {children}</Box>
-          <Button onClick={() => setOpen(false)}>Close</Button>
+          {onSave && <Button onClick={closeWithSave}>Save</Button>}
+          <Button onClick={() => setOpen(false)}>{onSave ? "Cancel" : "Close"}</Button>
         </Box>
       </Modal>
     </Box>
@@ -207,6 +222,7 @@ export const EditableTable = <T extends MRT_RowData, ParentType extends MRT_RowD
   const actionRow = ({ row, staticRowIndex }: { row: MRT_Row<T>; staticRowIndex?: number | undefined }) => {
     const state = row.original.rowState
 
+    // TODO: Using static index - need to use some id, probably sorting breaks this
     const rowClicked = (index: number | undefined) => {
       if (index === undefined) return
       const museums = [...editData[field]]
