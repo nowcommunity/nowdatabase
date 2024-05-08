@@ -5,6 +5,7 @@ import { DetailView, TabType } from '../DetailView/DetailView'
 import { AgeTab } from './Tabs/AgeTab'
 import { LithologyTab } from './Tabs/LithologyTab'
 import { LocalityTab } from './Tabs/LocalityTab'
+import { TaphonomyTab } from './Tabs/TaphonomyTab'
 
 export const LocalityDetails = () => {
   const { id } = useParams()
@@ -25,6 +26,10 @@ export const LocalityDetails = () => {
     {
       title: 'Lithology',
       content: <LithologyTab />,
+    },
+    {
+      title: 'Taphonomy',
+      content: <TaphonomyTab />,
     },
   ]
 
