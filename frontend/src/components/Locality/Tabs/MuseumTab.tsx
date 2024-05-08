@@ -1,7 +1,6 @@
 import { LocalityDetails, Museum } from '@/backendTypes'
-import { EditableTable, RowState } from '@/components/DetailView/common/FormComponents'
+import { EditableTable, Grouped, RowState } from '@/components/DetailView/common/FormComponents'
 import { useDetailContext } from '@/components/DetailView/hooks'
-import { Box } from '@mui/material'
 import { MRT_ColumnDef } from 'material-react-table'
 
 export const MuseumTab = () => {
@@ -10,7 +9,19 @@ export const MuseumTab = () => {
   const columns: MRT_ColumnDef<Museum>[] = [
     {
       accessorKey: 'museum',
-      header: 'Museum name',
+      header: 'Code',
+    },
+    {
+      accessorKey: 'institution',
+      header: 'Museum',
+    },
+    {
+      accessorKey: 'city',
+      header: 'City',
+    },
+    {
+      accessorKey: 'country',
+      header: 'Country',
     },
   ]
 
@@ -21,8 +32,8 @@ export const MuseumTab = () => {
   }
 
   return (
-    <Box>
+    <Grouped title="Museums">
       <EditableTable<Museum & { rowState?: RowState }> columns={columns} data={editData.museums} editable={mode === 'edit'} clickRow={clickRow} />
-    </Box>
+    </Grouped>
   )
 }
