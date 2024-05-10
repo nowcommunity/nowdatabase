@@ -245,6 +245,7 @@ export const EditableTable = <T extends MRT_RowData, ParentType extends MRT_RowD
   const actionRowProps = editable && mode === 'edit' ? { enableRowActions: true, renderRowActions: actionRow } : {}
 
   const rowStateToColor = (state: RowState | undefined) => {
+    if (mode === 'read') return null
     if (state === 'new') return 'lightgreen'
     else if (state === 'removed' || state === 'cancelled') return '#FFCCCB'
     return null
