@@ -85,8 +85,7 @@ export const DetailView = <T extends object>({ tabs, data }: { tabs: TabType[]; 
           style={{
             minHeight: '10em',
             backgroundColor: 'lightgray',
-            paddingTop: '1em',
-            paddingBottom: '1em',
+            padding: '1em',
           }}
           elevation={5}
         >

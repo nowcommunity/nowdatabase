@@ -52,19 +52,19 @@ export const ArrayFrame = ({
   title: string
   half?: boolean
 }) => (
-  <Grouped half={half} title={title}>
+  <Grouped title={title}>
     <ArrayToTable half={half} array={array} />
   </Grouped>
 )
 
-export const HalfFrames = ({ children }: { children: ReactNode[] }) => {
+export const HalfFrames = ({ children }: { children: [ReactNode, ReactNode] }) => {
   const ArrayFrameStyle = {
     flexGrow: 1,
     flexBasis: '50%', // Each item should start at 50% of the parent's width
   }
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'row' }}>
+    <div style={{ display: 'flex', flexDirection: 'row', gap: '1em' }}>
       {children.map((child, index) => (
         <div key={index} style={ArrayFrameStyle}>
           {child}
@@ -74,13 +74,13 @@ export const HalfFrames = ({ children }: { children: ReactNode[] }) => {
   )
 }
 
-export const Grouped = ({ title, children, half }: { title?: string; children: ReactNode; half?: boolean }) => {
+export const Grouped = ({ title, children }: { title?: string; children: ReactNode; }) => {
   
   const styles = {
     padding: '10px',
     paddingBottom: '15px',
     backgroundColor: 'white',
-    margin: '0em 1em 0em 1em',
+    margin: '0em',
   }
 
   return (
