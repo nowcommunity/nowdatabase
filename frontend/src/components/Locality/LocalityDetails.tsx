@@ -3,7 +3,10 @@ import { useGetLocalityDetailsQuery } from '../../redux/localityReducer'
 import { CircularProgress } from '@mui/material'
 import { DetailView, TabType } from '../DetailView/DetailView'
 import { AgeTab } from './Tabs/AgeTab'
+import { EcometricsTab } from './Tabs/EcometricsTab'
+import { LithologyTab } from './Tabs/LithologyTab'
 import { LocalityTab } from './Tabs/LocalityTab'
+import { TaphonomyTab } from './Tabs/TaphonomyTab'
 import { MuseumTab } from './Tabs/MuseumTab'
 
 export const LocalityDetails = () => {
@@ -21,6 +24,18 @@ export const LocalityDetails = () => {
     {
       title: 'Locality',
       content: <LocalityTab />,
+    },
+    {
+      title: 'Lithology',
+      content: <LithologyTab />,
+    },
+    {
+      title: 'Taphonomy',
+      content: <TaphonomyTab />,
+    },
+    {
+      title: 'Ecometrics',
+      content: <EcometricsTab />,
     },
     {
       title: 'Museum',
