@@ -4,8 +4,7 @@ import { ArrayFrame } from '../../DetailView/common/FormComponents'
 import { useDetailContext } from '@/components/DetailView/hooks'
 
 export const LithologyTab = () => {
-  const { textField } = useDetailContext<LocalityDetails>()
-  const { dropdown } = useDetailContext<LocalityDetails>()
+  const { textField, dropdown } = useDetailContext<LocalityDetails>()
 
   const rockTypeOptions = [
     '',
