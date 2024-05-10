@@ -7,8 +7,12 @@ import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 
 export const MuseumTab = () => {
-  const { editData } = useDetailContext<LocalityDetails>()
-  const { register, handleSubmit, formState: { errors } } = useForm()
+  const { editData, mode } = useDetailContext<LocalityDetails>()
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm()
   const [data, setData] = useState('')
 
   const columns: MRT_ColumnDef<Museum>[] = [
@@ -35,19 +39,23 @@ export const MuseumTab = () => {
     return Object.keys(errors).length === 0
   }
 
+  const editingModal = (
+    <EditingModal buttonText="Add new museum" onSave={onSave}>
+      <Box sx={{ display: 'flex', flexDirection: 'column', gap: '1em' }}>
+        <TextField {...register('code', { required: true })} label="Code" required />
+        <TextField {...register('museum', { required: true })} label="Museum" required />
+        <TextField {...register('alternativeName')} label="Alternative name" />
+        <TextField {...register('city', { required: true })} label="City" required />
+        <TextField {...register('state')} label="State" />
+        <TextField {...register('stateCode')} label="State code" />
+        <TextField {...register('country', { required: true })} label="Country" required />
+      </Box>
+    </EditingModal>
+  )
+
   return (
     <Grouped title="Museums">
-      <EditingModal buttonText="Add new museum" onSave={onSave}>
-        <Box sx={{ display: 'flex', flexDirection: 'column', gap: '1em' }}>
-          <TextField {...register('code', { required: true })} label="Code" required />
-          <TextField {...register('museum', { required: true })} label="Museum" required />
-          <TextField {...register('alternativeName')} label="Alternative name" />
-          <TextField {...register('city', { required: true })} label="City" required />
-          <TextField {...register('state')} label="State" />
-          <TextField {...register('stateCode')} label="State code" />
-          <TextField {...register('country', { required: true })} label="Country" required />
-        </Box>
-      </EditingModal>
+      {mode === 'edit' && editingModal}
       <EditableTable<Editable<Museum>, LocalityDetails>
         columns={columns}
         data={editData.museums}
