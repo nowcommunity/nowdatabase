@@ -1,4 +1,3 @@
-import { Box } from '@mui/material'
 import { SpeciesDetails } from '@/backendTypes'
 import { ArrayFrame } from '@components/DetailView/common/FormComponents'
 import { useDetailContext } from '@/components/DetailView/hooks'
@@ -36,8 +35,8 @@ export const DietTab = () => {
   ]
 
   return (
-    <Box>
+    <>
       <ArrayFrame array={diet} title="Diet Information" />
-    </Box>
+    </>
   )
 }

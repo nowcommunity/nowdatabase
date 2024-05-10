@@ -1,4 +1,3 @@
-import { Box } from '@mui/material'
 import { LocalityDetails } from '@/backendTypes'
 import { ArrayFrame } from '../../DetailView/common/FormComponents'
 import { useDetailContext } from '@/components/DetailView/hooks'
@@ -156,10 +155,10 @@ export const LithologyTab = () => {
   ]
 
   return (
-    <Box>
+    <>
       <ArrayFrame array={lithology} title="Lithology" />
       <ArrayFrame array={sedimentryEnvironment} title="Sedimentry Environment" />
       <ArrayFrame array={depositionalContext} title="Depositional Context" />
-    </Box>
+    </>
   )
 }

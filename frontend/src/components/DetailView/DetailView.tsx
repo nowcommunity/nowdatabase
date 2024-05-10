@@ -33,10 +33,13 @@ export const DetailView = <T extends object>({ tabs, data }: { tabs: TabType[]; 
   const [tab, setTab] = useState(getUrl())
 
   useEffect(() => {
-    setSearchParams(params => {
-      params.set('tab', tab.toString())
-      return params
-    }, { replace: true })
+    setSearchParams(
+      params => {
+        params.set('tab', tab.toString())
+        return params
+      },
+      { replace: true }
+    )
   }, [tab])
 
   const textField = (field: keyof T) => <EditableTextField<T> field={field} />
@@ -78,8 +81,16 @@ export const DetailView = <T extends object>({ tabs, data }: { tabs: TabType[]; 
         </Tabs>
       </Box>
       <DetailContextProvider contextState={{ ...initialState }}>
-        <Paper style={{ minHeight: '10em', backgroundColor: 'lightgray' }} elevation={5}>
-          {tabs[tab].content}
+        <Paper
+          style={{
+            minHeight: '10em',
+            backgroundColor: 'lightgray',
+            paddingTop: '1em',
+            paddingBottom: '1em',
+          }}
+          elevation={5}
+        >
+          <Box sx={{ display: 'flex', flexDirection: 'column', rowGap: '1em' }}>{tabs[tab].content}</Box>
         </Paper>
       </DetailContextProvider>
     </Stack>

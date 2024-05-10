@@ -1,4 +1,3 @@
-import { Box } from '@mui/material'
 import { LocalityDetails } from '@/backendTypes'
 import { ArrayFrame } from '../../DetailView/common/FormComponents'
 import { useDetailContext } from '@/components/DetailView/hooks'
@@ -126,9 +125,9 @@ export const TaphonomyTab = () => {
   ]
 
   return (
-    <Box>
+    <>
       <ArrayFrame array={fossilAssemblage} title="Fossil Assemblage" />
       <ArrayFrame array={taphonomy} title="Taphonomy" />
-    </Box>
+    </>
   )
 }

@@ -1,10 +1,8 @@
-import { Box } from '@mui/material'
 import { LocalityDetails } from '@/backendTypes'
-import { ArrayFrame } from '../../DetailView/common/FormComponents'
+import { ArrayFrame, HalfFrames } from '../../DetailView/common/FormComponents'
 import { useDetailContext } from '@/components/DetailView/hooks'
 
 export const LocalityTab = () => {
-
   const { textField } = useDetailContext<LocalityDetails>()
 
   const name = [['Name', textField('loc_name')]]
@@ -28,12 +26,14 @@ export const LocalityTab = () => {
   ]
 
   return (
-    <Box>
-      <ArrayFrame array={name} title="Name" />
-      <ArrayFrame array={locality} title="Locality" />
+    <>
+      <HalfFrames>
+        <ArrayFrame half array={name} title="Name" />
+        <ArrayFrame half array={locality} title="Locality" />
+      </HalfFrames>
       <ArrayFrame array={country} title="Country" />
       <ArrayFrame array={status} title="Status" />
       <ArrayFrame array={latlong} title="Latitude & Longitude" />
-    </Box>
+    </>
   )
 }

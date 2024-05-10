@@ -1,4 +1,3 @@
-import { Box } from '@mui/material'
 import { SpeciesDetails } from '@/backendTypes'
 import { ArrayFrame } from '@components/DetailView/common/FormComponents'
 import { useDetailContext } from '@/components/DetailView/hooks'
@@ -33,10 +32,10 @@ export const TaxonomyTab = () => {
 
 
   return (
-    <Box>
+    <>
       <ArrayFrame array={classification} title="Taxonomic Classification" />
       <ArrayFrame array={comment} title="Comment" />
       <ArrayFrame array={author} title="Author" />
-    </Box>
+    </>
   )
 }

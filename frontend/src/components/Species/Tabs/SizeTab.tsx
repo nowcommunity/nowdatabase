@@ -1,4 +1,3 @@
-import { Box } from '@mui/material'
 import { SpeciesDetails } from '@/backendTypes'
 import { ArrayFrame } from '@components/DetailView/common/FormComponents'
 import { useDetailContext } from '@components/DetailView/hooks'
@@ -31,10 +30,10 @@ export const SizeTab = () => {
   ]
 
   return (
-    <Box>
+    <>
       <ArrayFrame array={size} title="Size" />
       <ArrayFrame array={sexualDimorphism} title="Sexual Dimorphism" />
       <ArrayFrame array={population} title="Population" />
-    </Box>
+    </>
   )
 }

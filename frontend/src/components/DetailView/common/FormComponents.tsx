@@ -23,29 +23,68 @@ import { type MRT_ColumnDef, type MRT_RowData, MaterialReactTable, MRT_Row } fro
 import RemoveCircleOutlineIcon from '@mui/icons-material/RemoveCircleOutline'
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline'
 
-export const ArrayToTable = ({ array }: { array: Array<Array<ReactNode>> }) => (
-  <Grid container direction="row">
-    {array.map((row, index) => (
-      <Grid key={index} container direction="row" height="2.5em">
-        {row.map((item, index) => (
-          <Grid key={index} item xs={index === 0 ? 2 : Math.min(12 / row.length, 4)} padding="5px">
-            {typeof item === 'string' ? <b>{item}</b> : item}
-          </Grid>
-        ))}
-      </Grid>
-    ))}
-  </Grid>
-)
+export const ArrayToTable = ({ array, half }: { array: Array<Array<ReactNode>>; half?: boolean }) => {
+  const getWidth = (index: number, rowLength: number) => {
+    if (half) return 6
+    return index === 0 ? 2 : Math.min(12 / rowLength, 4)
+  }
+  return (
+    <Grid container direction="row">
+      {array.map((row, index) => (
+        <Grid key={index} container direction="row" height="2.5em">
+          {row.map((item, index) => (
+            <Grid key={index} item xs={getWidth(index, row.length)} padding="5px">
+              {typeof item === 'string' ? <b>{item}</b> : item}
+            </Grid>
+          ))}
+        </Grid>
+      ))}
+    </Grid>
+  )
+}
 
-export const ArrayFrame = ({ array, title }: { array: Array<Array<ReactNode>>; title: string }) => (
-  <Grouped title={title}>
-    <ArrayToTable array={array} />
+export const ArrayFrame = ({
+  array,
+  title,
+  half,
+}: {
+  array: Array<Array<ReactNode>>
+  title: string
+  half?: boolean
+}) => (
+  <Grouped half={half} title={title}>
+    <ArrayToTable half={half} array={array} />
   </Grouped>
 )
 
-export const Grouped = ({ title, children }: { title?: string; children: ReactNode }) => {
+export const HalfFrames = ({ children }: { children: ReactNode[] }) => {
+  const ArrayFrameStyle = {
+    flexGrow: 1,
+    flexBasis: '50%', // Each item should start at 50% of the parent's width
+  }
+
   return (
-    <Card style={{ margin: '1em', padding: '10px', paddingBottom: '15px', backgroundColor: 'white' }}>
+    <div style={{ display: 'flex', flexDirection: 'row' }}>
+      {children.map((child, index) => (
+        <div key={index} style={ArrayFrameStyle}>
+          {child}
+        </div>
+      ))}
+    </div>
+  )
+}
+
+export const Grouped = ({ title, children, half }: { title?: string; children: ReactNode; half?: boolean }) => {
+  
+  const styles = {
+    padding: '10px',
+    paddingBottom: '15px',
+    backgroundColor: 'white',
+    margin: '0em 1em 0em 1em',
+  }
+
+  return (
+    <Card style={styles}>
       {title && (
         <>
           <Typography sx={{ fontSize: 16 }} color="text.secondary" gutterBottom>
@@ -174,7 +213,15 @@ export const RadioSelector = <T extends object>({
            onSave is a function, that will return true or false, depending
            on if we want to proceed with closing the form (return false to cancel closing)
 */
-export const EditingModal = ({ buttonText, children, onSave }: { buttonText: string; children: ReactNode | ReactNode[]; onSave?: () => Promise<boolean> }) => {
+export const EditingModal = ({
+  buttonText,
+  children,
+  onSave,
+}: {
+  buttonText: string
+  children: ReactNode | ReactNode[]
+  onSave?: () => Promise<boolean>
+}) => {
   const [open, setOpen] = useState(false)
 
   const closeWithSave = async () => {
@@ -186,12 +233,14 @@ export const EditingModal = ({ buttonText, children, onSave }: { buttonText: str
 
   return (
     <Box>
-      <Button onClick={() => setOpen(true)} variant="contained" sx={{ marginBottom: "1em"}}>{buttonText}</Button>
+      <Button onClick={() => setOpen(true)} variant="contained" sx={{ marginBottom: '1em' }}>
+        {buttonText}
+      </Button>
       <Modal open={open} aria-labelledby={`modal-${buttonText}`} aria-describedby={`modal-${buttonText}`}>
         <Box sx={{ ...modalStyle }}>
           <Box marginBottom="2em"> {children}</Box>
           {onSave && <Button onClick={closeWithSave}>Save</Button>}
-          <Button onClick={() => setOpen(false)}>{onSave ? "Cancel" : "Close"}</Button>
+          <Button onClick={() => setOpen(false)}>{onSave ? 'Cancel' : 'Close'}</Button>
         </Box>
       </Modal>
     </Box>

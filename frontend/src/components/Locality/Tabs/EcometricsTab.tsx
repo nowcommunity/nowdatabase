@@ -1,4 +1,3 @@
-import { Box } from '@mui/material'
 import { LocalityDetails } from '@/backendTypes'
 import { ArrayFrame } from '../../DetailView/common/FormComponents'
 import { useDetailContext } from '@/components/DetailView/hooks'
@@ -14,8 +13,8 @@ export const EcometricsTab = () => {
   ]
 
   return (
-    <Box>
+    <>
       <ArrayFrame array={ecometrics} title="Ecometrics" />
-    </Box>
+    </>
   )
 }
