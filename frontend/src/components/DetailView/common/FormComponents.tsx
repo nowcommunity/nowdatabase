@@ -19,8 +19,9 @@ import {
 } from '@mui/material'
 import { ReactNode, useState } from 'react'
 import { useDetailContext } from '../hooks'
-import { type MRT_ColumnDef, type MRT_RowData, MaterialReactTable } from 'material-react-table'
+import { type MRT_ColumnDef, type MRT_RowData, MaterialReactTable, MRT_Row } from 'material-react-table'
 import RemoveCircleOutlineIcon from '@mui/icons-material/RemoveCircleOutline'
+import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline'
 
 export const ArrayToTable = ({ array }: { array: Array<Array<ReactNode>> }) => (
   <Grid container direction="row">
@@ -135,18 +136,30 @@ export const DropdownSelector = <T extends object>({
   return <DataValue<T> field={field} EditElement={editingComponent} />
 }
 
-export const RadioSelector = <T extends object>({ options, name, field }: { options: string[], name: string, field: keyof T }) => {
+export const RadioSelector = <T extends object>({
+  options,
+  name,
+  field,
+}: {
+  options: string[]
+  name: string
+  field: keyof T
+}) => {
   const { setEditData, editData } = useDetailContext<T>()
   const editingComponent = (
-  <FormControl>
+    <FormControl>
       <RadioGroup
         aria-labelledby={`${name}-radio-selection`}
         name={name}
-        onChange={(event: React.ChangeEvent<HTMLInputElement>) => setEditData({ ...editData, [field]: event?.currentTarget?.value })}
+        onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
+          setEditData({ ...editData, [field]: event?.currentTarget?.value })
+        }
         value={editData[field]}
         sx={{ display: 'flex', flexDirection: 'row' }}
-        >
-        {options.map(option => <FormControlLabel key={option} value={option} control={<Radio />} label={option} />)}
+      >
+        {options.map(option => (
+          <FormControlLabel key={option} value={option} control={<Radio />} label={option} />
+        ))}
       </RadioGroup>
     </FormControl>
   )
@@ -154,47 +167,100 @@ export const RadioSelector = <T extends object>({ options, name, field }: { opti
   return <DataValue<T> field={field} EditElement={editingComponent} />
 }
 
-export const EditingModal = ({ buttonText, children }: { buttonText: string; children: ReactNode | ReactNode[] }) => {
+/* 
+  buttonText = Text for the button that opens modal
+  children = Content of modal
+  onSave = If defined, the modal will have a separate saving button.
+           onSave is a function, that will return true or false, depending
+           on if we want to proceed with closing the form (return false to cancel closing)
+*/
+export const EditingModal = ({ buttonText, children, onSave }: { buttonText: string; children: ReactNode | ReactNode[]; onSave?: () => Promise<boolean> }) => {
   const [open, setOpen] = useState(false)
+
+  const closeWithSave = async () => {
+    if (!onSave) return
+    const close = await onSave()
+    if (!close) return
+    setOpen(false)
+  }
 
   return (
     <Box>
-      <Button onClick={() => setOpen(true)}>{buttonText}</Button>
+      <Button onClick={() => setOpen(true)} variant="contained" sx={{ marginBottom: "1em"}}>{buttonText}</Button>
       <Modal open={open} aria-labelledby={`modal-${buttonText}`} aria-describedby={`modal-${buttonText}`}>
         <Box sx={{ ...modalStyle }}>
           <Box marginBottom="2em"> {children}</Box>
-          <Button onClick={() => setOpen(false)}>Close</Button>
+          {onSave && <Button onClick={closeWithSave}>Save</Button>}
+          <Button onClick={() => setOpen(false)}>{onSave ? "Cancel" : "Close"}</Button>
         </Box>
       </Modal>
     </Box>
   )
 }
 
-export const EditableTable = <T extends MRT_RowData>({
+export type RowState = 'new' | 'removed' | 'cancelled' | 'clean'
+
+const getNewState = (state: RowState) => {
+  if (!state || state === 'clean') return 'removed'
+  if (state === 'new') return 'cancelled'
+  return 'clean'
+}
+
+export const EditableTable = <T extends MRT_RowData, ParentType extends MRT_RowData>({
   data,
   columns,
+  editable,
+  field,
 }: {
-  data: T[] | null
+  data: Array<T> | null
   columns: MRT_ColumnDef<T>[]
-  clickRow: (index: number) => void
+  editable?: boolean
+  field: keyof ParentType
 }) => {
   if (!data) return <CircularProgress />
-  const actionRow = () => {
+  const { editData, setEditData, mode } = useDetailContext<ParentType>()
+  const actionRow = ({ row, staticRowIndex }: { row: MRT_Row<T>; staticRowIndex?: number | undefined }) => {
+    const state = row.original.rowState
+
+    // TODO: Using static index - need to use some id, probably sorting breaks this
+    const rowClicked = (index: number | undefined) => {
+      if (index === undefined) return
+      const museums = [...editData[field]]
+      museums[index].rowState = getNewState(state)
+      setEditData({ ...editData, museums })
+    }
+
+    const getIcon = () => {
+      if (['removed', 'cancelled'].includes(state)) return <AddCircleOutlineIcon />
+      return <RemoveCircleOutlineIcon />
+    }
+
     return (
       <Box>
-        <Button>{<RemoveCircleOutlineIcon />}</Button>
+        <Button onClick={() => rowClicked(staticRowIndex)}>{getIcon()}</Button>
       </Box>
     )
   }
+
+  const actionRowProps = editable && mode === 'edit' ? { enableRowActions: true, renderRowActions: actionRow } : {}
+
+  const rowStateToColor = (state: RowState | undefined) => {
+    if (state === 'new') return 'lightgreen'
+    else if (state === 'removed' || state === 'cancelled') return '#FFCCCB'
+    return null
+  }
+
   return (
     <MaterialReactTable
-      enableRowActions
-      renderRowActions={actionRow}
+      {...actionRowProps}
       columns={columns}
       data={data}
       enableTopToolbar={false}
       enableColumnActions={false}
       enablePagination={false}
+      muiTableBodyRowProps={({ row }: { row: MRT_Row<T> }) => ({
+        sx: { backgroundColor: rowStateToColor(row.original.rowState) },
+      })}
     />
   )
 }

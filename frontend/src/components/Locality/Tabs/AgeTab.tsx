@@ -5,7 +5,7 @@ import { useDetailContext } from '@/components/DetailView/hooks'
 
 export const AgeTab = () => {
 
-  const { textField, radioSelection } = useDetailContext<LocalityDetails>()
+  const { textField, radioSelection, dropdown } = useDetailContext<LocalityDetails>()
 
   const fracOptions = ['', 'Early half 1:2', 'Late half 2:2', 'Early third 1:3', 'Middle third 2:3', 'Late third 3:3']
 
@@ -14,8 +14,8 @@ export const AgeTab = () => {
     ['Dating method', radioSelection('date_meth', ['time_unit', 'absolute', 'composite'], 'dating-method')],
     [''],
     ['Age (Ma)', 'Basis for age (Absolute)', 'Basis for age (Time Unit)', 'Basis for age (Fraction)'],
-    ['Minimum age', textField('bfa_min_abs'), textField('bfa_min'), radioSelection('frac_min', fracOptions, 'Minimum fraction')],
-    ['Maximum age', textField('bfa_max_abs'), textField('bfa_max'), radioSelection('frac_max', fracOptions, 'Maximum fraction')],
+    ['Minimum age', textField('bfa_min_abs'), textField('bfa_min'), dropdown('frac_min', fracOptions, 'Minimum fraction')],
+    ['Maximum age', textField('bfa_max_abs'), textField('bfa_max'), dropdown('frac_max', fracOptions, 'Maximum fraction')],
     [''],
     ['Chronostrathigraphic age', textField('chron')],
     ['Age Comment', textField('age_comm')],
