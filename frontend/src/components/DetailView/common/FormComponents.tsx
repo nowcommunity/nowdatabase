@@ -119,7 +119,7 @@ export const DropdownSelector = <T extends object>({
         labelId={`${name}-multiselect-label`}
         label={name}
         id={`${name}-multiselect`}
-        value={editData[field] as string}
+        value={(editData[field] || '') as string}
         onChange={(event: SelectChangeEvent) => setEditData({ ...editData, [field]: event.target.value })}
         sx={{ width: '10em' }}
         size="small"

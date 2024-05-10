@@ -7,7 +7,7 @@ export const AgeTab = () => {
 
   const { textField, radioSelection, dropdown } = useDetailContext<LocalityDetails>()
 
-  const fracOptions = ['', 'Early half 1:2', 'Late half 2:2', 'Early third 1:3', 'Middle third 2:3', 'Late third 3:3']
+  const fracOptions = [{ value: '', display: 'None' }, 'Early half 1:2', 'Late half 2:2', 'Early third 1:3', 'Middle third 2:3', 'Late third 3:3']
 
   // TODO: The date_meth options should come from db: distinct(now_loc.date_meth)
   const age = [
