@@ -1,9 +1,8 @@
 import { SpeciesDetails } from '@/backendTypes'
-import { ArrayFrame } from '@components/DetailView/common/FormComponents'
+import { ArrayFrame, HalfFrames } from '@components/DetailView/common/FormComponents'
 import { useDetailContext } from '@components/DetailView/hooks'
 
 export const SizeTab = () => {
-  
   const { dropdown, textField } = useDetailContext<SpeciesDetails>()
 
   const snoutVentLengthOptions = ['', '<10cm', '10cm-1m', '1m-2m', '2m-5m', '>5m']
@@ -22,7 +21,10 @@ export const SizeTab = () => {
 
   const sexualDimorphism = [
     ['Sexual Dimorphism - Size', dropdown('sd_size', sexualDimorphismSizeOptions, 'Sexual Dimorphism - Size')],
-    ['Sexual Dimorphism - Display', dropdown('sd_display', sexualDimorphismDisplayOptions, 'Sexual Dimorphism - Display')],
+    [
+      'Sexual Dimorphism - Display',
+      dropdown('sd_display', sexualDimorphismDisplayOptions, 'Sexual Dimorphism - Display'),
+    ],
   ]
 
   const population = [
@@ -32,8 +34,10 @@ export const SizeTab = () => {
   return (
     <>
       <ArrayFrame array={size} title="Size" />
-      <ArrayFrame array={sexualDimorphism} title="Sexual Dimorphism" />
-      <ArrayFrame array={population} title="Population" />
+      <HalfFrames>
+        <ArrayFrame half array={sexualDimorphism} title="Sexual Dimorphism" />
+        <ArrayFrame half array={population} title="Population" />
+      </HalfFrames>
     </>
   )
 }

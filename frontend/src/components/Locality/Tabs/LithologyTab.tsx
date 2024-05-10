@@ -1,5 +1,5 @@
 import { LocalityDetails } from '@/backendTypes'
-import { ArrayFrame } from '../../DetailView/common/FormComponents'
+import { ArrayFrame, HalfFrames } from '../../DetailView/common/FormComponents'
 import { useDetailContext } from '@/components/DetailView/hooks'
 
 export const LithologyTab = () => {
@@ -156,8 +156,10 @@ export const LithologyTab = () => {
 
   return (
     <>
-      <ArrayFrame array={lithology} title="Lithology" />
-      <ArrayFrame array={sedimentryEnvironment} title="Sedimentry Environment" />
+      <HalfFrames>
+        <ArrayFrame half array={lithology} title="Lithology" />
+        <ArrayFrame half array={sedimentryEnvironment} title="Sedimentry Environment" />
+      </HalfFrames>
       <ArrayFrame array={depositionalContext} title="Depositional Context" />
     </>
   )
