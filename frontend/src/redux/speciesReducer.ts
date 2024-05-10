@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { api } from './api'
 import { Species, SpeciesDetails } from '@/backendTypes'
 
