@@ -1,8 +1,8 @@
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import { Box, Button, Paper, Stack, Tab, Tabs } from '@mui/material'
 import ArrowBackIcon from '@mui/icons-material/ArrowBack'
 import EditIcon from '@mui/icons-material/Edit'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { DetailContextProvider, ModeType } from './Context/DetailContext'
 import { cloneDeep } from 'lodash-es'
 import { DropdownOption, DropdownSelector, EditableTextField, RadioSelector } from './common/FormComponents'
@@ -23,8 +23,21 @@ const ReturnButton = () => {
 }
 
 export const DetailView = <T extends object>({ tabs, data }: { tabs: TabType[]; data: T }) => {
-  const [tab, setTab] = useState(0)
+  const [searchParams, setSearchParams] = useSearchParams()
+  const getUrl = () => {
+    const tabFromUrl = searchParams.get('tab')
+    if (typeof tabFromUrl !== 'string' || isNaN(parseInt(tabFromUrl))) return 0
+    return parseInt(tabFromUrl)
+  }
   const [mode, setMode] = useState<ModeType>('read')
+  const [tab, setTab] = useState(getUrl())
+
+  useEffect(() => {
+    setSearchParams(params => {
+      params.set('tab', tab.toString())
+      return params
+    })
+  }, [tab])
 
   const textField = (field: keyof T) => <EditableTextField<T> field={field} />
 
@@ -42,7 +55,7 @@ export const DetailView = <T extends object>({ tabs, data }: { tabs: TabType[]; 
     editData: cloneDeep(data),
     textField,
     dropdown,
-    radioSelection
+    radioSelection,
   }
 
   return (
