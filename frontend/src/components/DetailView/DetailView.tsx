@@ -36,7 +36,7 @@ export const DetailView = <T extends object>({ tabs, data }: { tabs: TabType[]; 
     setSearchParams(params => {
       params.set('tab', tab.toString())
       return params
-    })
+    }, { replace: true })
   }, [tab])
 
   const textField = (field: keyof T) => <EditableTextField<T> field={field} />
