@@ -107,7 +107,7 @@ export const TaphonomyTab = () => {
   ]
 
   const fossilAssemblage = [
-    ['Assemblage Formation', dropdown('assem_fm', timeRepresentedOptions, 'Assemblage Formation')],
+    ['Assemblage Formation', dropdown('assem_fm', assemblageFormationOptions, 'Assemblage Formation')],
     ['Transport', dropdown('transport', transportOptions, 'Transport')],
     ['Abrasion', dropdown('trans_mod', abrasionOptions, 'Abrasion')],
     ['Weathering / Trampling', dropdown('weath_trmp', weatheringTramplingOptions, 'Weathering / Trampling')],
