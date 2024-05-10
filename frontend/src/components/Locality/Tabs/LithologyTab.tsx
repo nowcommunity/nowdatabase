@@ -110,7 +110,6 @@ export const LithologyTab = () => {
     { display: 'FP-P: Patchy', value: 'FP-P' },
     { display: 'MC-L: Lower', value: 'MC-L' },
     { display: 'MC-U: Upper', value: 'MC-U' },
-    { display: 'Display value', value: 'actualvalue' },
     'multiple',
   ]
 
