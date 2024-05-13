@@ -30,6 +30,11 @@ export const getLocalityDetails = async (id: number) => {
           com_mlist: true,
         },
       },
+      now_ls: {
+        include: {
+          com_species: true,
+        },
+      },
     },
   })
 

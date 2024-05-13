@@ -110,12 +110,12 @@ export const TeethTab = () => {
   return (
     <>
       <HalfFrames>
-        <ArrayFrame half array={multicuspid} title="Shape" />
-        <ArrayFrame half array={developmental} title="Developmental" />
+        <ArrayFrame half array={multicuspid} title="" />
+        <ArrayFrame half array={developmental} title="" />
       </HalfFrames>
       <HalfFrames>
-        <ArrayFrame half array={functional} title="Functional" />
-        <ArrayFrame half array={mesowear} title="Mesowear" />
+        <ArrayFrame half array={functional} title="" />
+        <ArrayFrame half array={mesowear} title="" />
       </HalfFrames>
     </>
   )
