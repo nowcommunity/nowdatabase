@@ -1,4 +1,4 @@
-import { Editable, LocalityDetails, LocalityProject, Project } from '@/backendTypes'
+import { Editable, LocalityDetails, LocalityProject } from '@/backendTypes'
 import { EditableTable, EditingModal, Grouped } from '@/components/DetailView/common/FormComponents'
 import { useDetailContext } from '@/components/DetailView/hooks'
 import { Box, TextField } from '@mui/material'
