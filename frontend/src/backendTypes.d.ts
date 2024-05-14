@@ -15,8 +15,8 @@ export type LocalitySynonym = Prisma.now_syn_loc
 export type LocalityDetails = Omit<Prisma.now_loc, 'now_mus'> & { museums: Array<Editable<Museum>> } & {
   now_ls: Array<Editable<LocalitySpecies>>
 } & { now_plr: Array<Editable<LocalityProject>> } & LocalitySynonym[] &
-  SedimentaryStructure[] &
-  CollectingMethod[]
+  { now_ss: Editable<SedimentaryStructure>[] } &
+  { now_coll_meth: Editable<CollectingMethod>[] }
 
 export type Locality = {
   lid: number
