@@ -75,8 +75,7 @@ export const HalfFrames = ({ children }: { children: [ReactNode, ReactNode] }) =
   )
 }
 
-export const Grouped = ({ title, children }: { title?: string; children: ReactNode; }) => {
-  
+export const Grouped = ({ title, children }: { title?: string; children: ReactNode }) => {
   const styles = {
     padding: '10px',
     paddingBottom: '15px',
@@ -324,6 +323,7 @@ export const EditableTable = <T extends MRT_RowData, ParentType extends MRT_RowD
       enableTopToolbar={false}
       enableColumnActions={false}
       enablePagination={false}
+      state={{ density: 'compact' }}
       muiTableBodyRowProps={({ row }: { row: MRT_Row<T> }) => ({
         sx: { backgroundColor: rowStateToColor(row.original.rowState) },
       })}
