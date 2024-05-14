@@ -223,7 +223,6 @@ export const EditingModal = ({
   onSave?: () => Promise<boolean>
 }) => {
   const [open, setOpen] = useState(false)
-
   const closeWithSave = async () => {
     if (!onSave) return
     const close = await onSave()

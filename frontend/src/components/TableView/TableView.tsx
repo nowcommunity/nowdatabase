@@ -27,14 +27,14 @@ const ActionComponent = <T extends MRT_RowData>({
   selectorFn,
   selectedList,
   checkRowRestriction,
-  url
+  url,
 }: {
   row: MRT_Row<T>
   idFieldName: keyof T
   selectorFn?: (id: string) => void
   selectedList?: string[]
-  checkRowRestriction: (row: T) => boolean
-  url: string
+  checkRowRestriction: ((row: T) => boolean) | undefined
+  url: string | undefined
 }) => {
   const navigate = useNavigate()
   const id = row.original[idFieldName]
@@ -56,7 +56,7 @@ const ActionComponent = <T extends MRT_RowData>({
       <Button variant="text" style={{ width: '2em' }} onClick={onClick}>
         {getIconToShow()}
       </Button>
-      {checkRowRestriction(row.original) && (
+      {checkRowRestriction && checkRowRestriction(row.original) && (
         <Tooltip placement="top" title="This item has restricted visibility">
           <PolicyIcon color="primary" fontSize="medium" />
         </Tooltip>
@@ -80,15 +80,15 @@ export const TableView = <T extends MRT_RowData>({
   checkRowRestriction,
   selectorFn,
   selectedList,
-  url
+  url,
 }: {
   data: T[] | undefined
   columns: MRT_ColumnDef<T>[]
   idFieldName: keyof MRT_RowData
-  checkRowRestriction: (row: T) => boolean
+  checkRowRestriction?: (row: T) => boolean
   selectorFn?: (id: string) => void
   selectedList?: string[]
-  url: string
+  url?: string
 }) => {
   const navigate = useNavigate()
   const location = useLocation()
