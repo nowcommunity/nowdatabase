@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, ChangeEvent } from 'react'
 import { useTryLoginMutation, setUser } from '../redux/userReducer'
 import { useDispatch } from 'react-redux'
 import { Box, Button, CircularProgress, Container, Stack, TextField, Typography } from '@mui/material'
@@ -47,7 +47,7 @@ export const Login = () => {
           label="Username"
           variant="outlined"
           type="text"
-          onChange={(event: React.ChangeEvent<HTMLInputElement>) => setUsername(event?.currentTarget?.value)}
+          onChange={(event: ChangeEvent<HTMLInputElement>) => setUsername(event?.currentTarget?.value)}
           value={username}
           error={usernameError.length > 0}
           helperText={usernameError}
@@ -58,7 +58,7 @@ export const Login = () => {
           label="Password"
           variant="outlined"
           type="password"
-          onChange={(event: React.ChangeEvent<HTMLInputElement>) => setPassword(event?.currentTarget?.value)}
+          onChange={(event: ChangeEvent<HTMLInputElement>) => setPassword(event?.currentTarget?.value)}
           value={password}
           error={passwordError.length > 0}
           helperText={passwordError}

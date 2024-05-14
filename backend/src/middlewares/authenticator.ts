@@ -56,7 +56,7 @@ export const userExtractor: Middleware = async (req, res, next) => {
   }
 }
 
-export const requireLogin: Middleware = async (req, _res, next) => {
-  if (!req.user) throw Error("Login currently required for all data")
+export const requireLogin: Middleware = (req, _res, next) => {
+  if (!req.user) throw Error('Login currently required for all data')
   next()
 }

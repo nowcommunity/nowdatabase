@@ -15,5 +15,5 @@ export const errorHandler = (
   logger.error('Internal server error occurred. Error and stacktrace:')
   logger.error(error.message)
   if (error.stack) logger.error(error.stack)
-  return res.status(500).json('Internal server error: ' + error)
+  return res.status(500).json(`Internal server error: ${JSON.stringify(error, null, 2)}`)
 }

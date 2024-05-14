@@ -21,6 +21,6 @@
     "noFallthroughCasesInSwitch": true,
     "noImplicitAny": true,
   },
-  "include": ["frontend/src"],
+  "include": ["frontend/src", "backend/src"],
   "references": [{ "path": "./frontend/tsconfig.node.json" }]
 }

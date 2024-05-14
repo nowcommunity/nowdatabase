@@ -1,7 +1,8 @@
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { Router } from 'express'
-import jwt from 'jsonwebtoken'
+import * as jwt from 'jsonwebtoken'
 import { SECRET, LOGIN_VALID_MS, USER_CREATION_SECRET } from '../utils/config'
-import bcrypt from 'bcrypt'
+import * as bcrypt from 'bcrypt'
 import { prisma } from '../utils/db'
 
 const router = Router()
@@ -15,7 +16,7 @@ router.post('/login', async (req, res) => {
     select: { user_name: true, password: true, user_id: true },
   })
 
-  const passwordMatches = result && (await bcrypt.compare(password, result.password as string))
+  const passwordMatches = result && (await bcrypt.compare(password as string, result.password as string))
 
   if (!passwordMatches) return res.status(403).send()
 
@@ -27,14 +28,15 @@ router.post('/login', async (req, res) => {
 })
 
 router.post('/create', async (req, res) => {
+  // TODO type guards
   const { username, password, secret } = req.body
   if (!secret || secret !== USER_CREATION_SECRET) throw Error('Wrong user creation secret')
   const saltRounds = 10
-  const passwordHash = await bcrypt.hash(password, saltRounds)
+  const passwordHash = await bcrypt.hash(password as string, saltRounds)
 
   await prisma.com_users.create({
     data: {
-      user_name: username,
+      user_name: username as string,
       password: passwordHash,
     },
   })

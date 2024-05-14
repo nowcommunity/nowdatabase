@@ -17,7 +17,7 @@ import {
   Radio,
   RadioGroup,
 } from '@mui/material'
-import { ReactNode, useState } from 'react'
+import { ReactNode, useState, ChangeEvent } from 'react'
 import { useDetailContext } from '../hooks'
 import { type MRT_ColumnDef, type MRT_RowData, MaterialReactTable, MRT_Row } from 'material-react-table'
 import RemoveCircleOutlineIcon from '@mui/icons-material/RemoveCircleOutline'
@@ -125,7 +125,7 @@ export const EditableTextField = <T extends object>({ field }: { field: keyof T 
 
   const editingComponent = (
     <TextField
-      onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
+      onChange={(event: ChangeEvent<HTMLInputElement>) =>
         setEditData({ ...editData, [field]: event?.currentTarget?.value })
       }
       value={editData[field] ?? ''}
@@ -206,7 +206,7 @@ export const RadioSelector = <T extends object>({
       <RadioGroup
         aria-labelledby={`${name}-radio-selection`}
         name={name}
-        onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
+        onChange={(event: ChangeEvent<HTMLInputElement>) =>
           setEditData({ ...editData, [field]: event?.currentTarget?.value })
         }
         value={editData[field]}
@@ -281,8 +281,8 @@ export const EditableTable = <T extends MRT_RowData, ParentType extends MRT_RowD
   editable?: boolean
   field: keyof ParentType
 }) => {
-  if (!data) return <CircularProgress />
   const { editData, setEditData, mode } = useDetailContext<ParentType>()
+  if (!data) return <CircularProgress />
   const actionRow = ({ row, staticRowIndex }: { row: MRT_Row<T>; staticRowIndex?: number | undefined }) => {
     const state = row.original.rowState
 
