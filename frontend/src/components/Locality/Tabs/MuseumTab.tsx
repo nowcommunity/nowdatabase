@@ -36,7 +36,7 @@ const MuseumSelectingTable = () => {
       setSelected([...selected, id])
     } else {
       const newSelected = [...selected]
-      newSelected.splice(index)
+      newSelected.splice(index, 1)
       setSelected(newSelected)
     }
   }
