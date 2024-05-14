@@ -1,6 +1,11 @@
-import { LocalityDetails } from '@/backendTypes'
-import { ArrayFrame } from '../../DetailView/common/FormComponents'
+import { Editable, LocalityDetails, CollectingMethod } from '@/backendTypes'
+import { ArrayFrame, HalfFrames } from '../../DetailView/common/FormComponents'
 import { useDetailContext } from '@/components/DetailView/hooks'
+import { EditableTable, EditingModal, Grouped } from '@/components/DetailView/common/FormComponents'
+import { Box, TextField } from '@mui/material'
+import { MRT_ColumnDef } from 'material-react-table'
+import { useState } from 'react'
+import { useForm } from 'react-hook-form'
 
 export const TaphonomyTab = () => {
   const { textField, dropdown } = useDetailContext<LocalityDetails>()
@@ -93,17 +98,9 @@ export const TaphonomyTab = () => {
     'not_known',
   ]
 
-  const unbiasedCollectingOptions = [
-    '',
-    { display: 'Yes', value: 'y' },
-    { display: 'No', value: 'n' },
-  ]
+  const unbiasedCollectingOptions = ['', { display: 'Yes', value: 'y' }, { display: 'No', value: 'n' }]
 
-  const speciesListCompleteOptions = [
-    '',
-    { display: 'Yes', value: 'y' },
-    { display: 'No', value: 'n' },
-  ]
+  const speciesListCompleteOptions = ['', { display: 'Yes', value: 'y' }, { display: 'No', value: 'n' }]
 
   const fossilAssemblage = [
     ['Assemblage Formation', dropdown('assem_fm', assemblageFormationOptions, 'Assemblage Formation')],
@@ -124,10 +121,53 @@ export const TaphonomyTab = () => {
     ['Species List Complete', dropdown('complete', speciesListCompleteOptions, 'Species List Complete')],
   ]
 
+  const { editData, mode } = useDetailContext<LocalityDetails>()
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm()
+  const [data, setData] = useState('')
+
+  const columns: MRT_ColumnDef<CollectingMethod>[] = [
+    {
+      accessorKey: 'coll_meth',
+      header: 'Collecting Methods',
+    },
+  ]
+
+  const onSave = async () => {
+    // TODO: Saving logic here (add Collecting Method to editData)
+    return Object.keys(errors).length === 0
+  }
+
+  const editingModal = (
+    <EditingModal buttonText="Add new Collecting Method" onSave={onSave}>
+      <Box sx={{ display: 'flex', flexDirection: 'column', gap: '1em' }}>
+        <TextField {...register('coll_meth', { required: true })} label="Collecting Method" required />
+      </Box>
+    </EditingModal>
+  )
+
   return (
     <>
-      <ArrayFrame array={fossilAssemblage} title="Fossil Assemblage" />
-      <ArrayFrame array={taphonomy} title="Taphonomy" />
+      <HalfFrames>
+        <ArrayFrame array={fossilAssemblage} title="Fossil Assemblage" />
+        <ArrayFrame array={taphonomy} title="Taphonomy" />
+      </HalfFrames>
+
+      <HalfFrames>
+        <Grouped title="Collecting Methods">
+          {mode === 'edit' && editingModal}
+          <EditableTable<Editable<CollectingMethod>, LocalityDetails>
+            columns={columns}
+            data={editData.now_coll_meth}
+            editable
+            field="collectingMethod"
+          />
+        </Grouped>
+        <></>
+      </HalfFrames>
     </>
   )
 }
