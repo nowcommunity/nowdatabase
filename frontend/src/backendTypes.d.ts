@@ -5,10 +5,13 @@ import { RowState } from './components/DetailView/common/FormComponents'
 // For example see LocalityDetails: museums field
 export type Editable<T> = T & { rowState?: RowState }
 
+export type CollectingMethod = Prisma.now_coll_meth
 export type LocalitySpecies = Prisma.now_ls & { com_species: Prisma.com_species }
 export type Museum = Prisma.com_mlist
+export type SedimentaryStructure = Prisma.now_ss
+export type Synonym = Prisma.now_syn_loc
 export type LocalityDetails = Omit<Prisma.now_loc, 'now_mus'> & { museums: Array<Editable<Museum>> } & {
-  now_ls: Prisma.now_ls & { com_species: Prisma.com_species }
+  now_ls: Prisma.now_ls & { com_species: Prisma.com_species } & Synonym & SedimentaryStructure & CollectingMethod
 }
 
 export type Locality = {
