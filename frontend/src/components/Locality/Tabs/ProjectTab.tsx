@@ -17,23 +17,23 @@ export const ProjectTab = () => {
 
   const columns: MRT_ColumnDef<LocalityProject>[] = [
     {
-      accessorKey: 'proj_code',
+      accessorKey: 'now_proj.proj_code',
       header: 'Code',
     },
     {
-      accessorKey: 'proj_name',
+      accessorKey: 'now_proj.proj_name',
       header: 'Project',
     },
     {
-      accessorKey: 'contact',
+      accessorKey: 'now_proj.contact',
       header: 'Contact',
     },
     {
-      accessorKey: 'proj_status',
+      accessorKey: 'now_proj.proj_status',
       header: 'Status',
     },
     {
-      accessorKey: 'proj_records',
+      accessorKey: 'now_proj.proj_records',
       header: 'Records',
     },
   ]
@@ -58,11 +58,11 @@ export const ProjectTab = () => {
   return (
     <Grouped title="Projects">
       {mode === 'edit' && editingModal}
-      <EditableTable<Editable<Project>, LocalityDetails>
+      <EditableTable<Editable<LocalityProject>, LocalityDetails>
         columns={columns}
-        data={editData.now_proj}
+        data={editData.now_plr}
         editable
-        field="now_proj"
+        field="now_plr"
       />
     </Grouped>
   )

@@ -15,7 +15,7 @@ export type LocalitySynonym = Prisma.now_syn_loc
 export type LocalityDetails = Omit<Prisma.now_loc, 'now_mus'> 
   & { museums: Array<Editable<Museum>> }
   & {now_ls: Array<Prisma.now_ls[] & { com_species: Prisma.com_species }>}
-  & {now_plr: Array<Prisma.now_plr[] & { now_proj: Prisma.now_proj }>}
+  & {now_plr: Array<Editable<Prisma.now_plr & { now_proj: Prisma.now_proj }>>}
   & LocalitySynonym & SedimentaryStructure & CollectingMethod
 
 export type Locality = {
