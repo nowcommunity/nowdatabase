@@ -22,6 +22,7 @@ import { useDetailContext } from '../hooks'
 import { type MRT_ColumnDef, type MRT_RowData, MaterialReactTable, MRT_Row } from 'material-react-table'
 import RemoveCircleOutlineIcon from '@mui/icons-material/RemoveCircleOutline'
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline'
+import { RegisterOptions, FieldValues, UseFormRegisterReturn, FieldErrors } from 'react-hook-form'
 
 export const ArrayToTable = ({ array, half }: { array: Array<Array<ReactNode>>; half?: boolean }) => {
   const getWidth = (index: number, rowLength: number) => {
@@ -174,6 +175,22 @@ export const DropdownSelector = <T extends object>({
 
   return <DataValue<T> field={field} EditElement={editingComponent} />
 }
+
+export const FormTextField = <T extends string>({
+  register,
+  errors,
+  fieldName,
+  label,
+  required = false,
+}: {
+  register: (name: T, options?: RegisterOptions<FieldValues, T> | undefined) => UseFormRegisterReturn<T>
+  errors: FieldErrors<FieldValues>
+  fieldName: T
+  label: string
+  required: boolean
+}) => (
+  <TextField {...register(fieldName, { required: required })} error={!!errors[fieldName]} {...{ label, required }} />
+)
 
 export const RadioSelector = <T extends object>({
   options,
