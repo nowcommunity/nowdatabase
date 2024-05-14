@@ -38,6 +38,11 @@ export const getLocalityDetails = async (id: number) => {
       now_syn_loc: {},
       now_ss: {},
       now_coll_meth: {},
+      now_plr: {
+        include: {
+          now_proj: true,
+        },
+      },
     },
   })
 

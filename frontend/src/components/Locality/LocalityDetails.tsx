@@ -8,6 +8,7 @@ import { LithologyTab } from './Tabs/LithologyTab'
 import { LocalityTab } from './Tabs/LocalityTab'
 import { TaphonomyTab } from './Tabs/TaphonomyTab'
 import { MuseumTab } from './Tabs/MuseumTab'
+import { ProjectTab } from './Tabs/ProjectTab'
 
 export const LocalityDetails = () => {
   const { id } = useParams()
@@ -40,6 +41,10 @@ export const LocalityDetails = () => {
     {
       title: 'Museum',
       content: <MuseumTab />,
+    },
+    {
+      title: 'Projects',
+      content: <ProjectTab />,
     },
   ]
 
