@@ -138,9 +138,9 @@ export const MuseumTab = () => {
   return (
     <Grouped title="Museums">
       {mode === 'edit' && (
-        <>
+        <Box display="flex" gap={1}>
           {editingModal} {selectingTable}
-        </>
+        </Box>
       )}
       <EditableTable<Editable<Museum>, LocalityDetails>
         columns={columns}
