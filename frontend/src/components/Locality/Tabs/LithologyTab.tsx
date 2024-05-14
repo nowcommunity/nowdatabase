@@ -197,11 +197,6 @@ export const LithologyTab = () => {
       <HalfFrames>
         <Grouped title="Sedimentary Structure & Taphonomic Detail">
           {mode === 'edit' && editingModal}
-          <EditingModal buttonText="Add new Sedimentary Structure" onSave={onSave}>
-            <Box sx={{ display: 'flex', flexDirection: 'column', gap: '1em' }}>
-              <TextField {...register('sed_struct', { required: true })} label="Sedimentary Structure" required />
-            </Box>
-          </EditingModal>
           <EditableTable<Editable<SedimentaryStructure>, LocalityDetails>
             columns={columns}
             data={editData.now_ss}
