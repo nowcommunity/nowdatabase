@@ -103,6 +103,7 @@ export const MuseumTab = () => {
       <Box sx={{ display: 'flex', flexDirection: 'column', gap: '1em' }}>
         {formFields.map(field => (
           <FormTextField
+            key={field.name}
             {...{ errors, register }}
             fieldName={field.name}
             label={field.label}
