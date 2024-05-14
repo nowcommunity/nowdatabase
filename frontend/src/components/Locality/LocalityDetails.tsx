@@ -6,8 +6,10 @@ import { AgeTab } from './Tabs/AgeTab'
 import { EcometricsTab } from './Tabs/EcometricsTab'
 import { LithologyTab } from './Tabs/LithologyTab'
 import { LocalityTab } from './Tabs/LocalityTab'
-import { TaphonomyTab } from './Tabs/TaphonomyTab'
 import { MuseumTab } from './Tabs/MuseumTab'
+import { ProjectTab } from './Tabs/ProjectTab'
+import { SpeciesTab } from './Tabs/SpeciesTab'
+import { TaphonomyTab } from './Tabs/TaphonomyTab'
 
 export const LocalityDetails = () => {
   const { id } = useParams()
@@ -26,6 +28,10 @@ export const LocalityDetails = () => {
       content: <LocalityTab />,
     },
     {
+      title: 'Species',
+      content: <SpeciesTab />,
+    },
+    {
       title: 'Lithology',
       content: <LithologyTab />,
     },
@@ -40,6 +46,10 @@ export const LocalityDetails = () => {
     {
       title: 'Museum',
       content: <MuseumTab />,
+    },
+    {
+      title: 'Projects',
+      content: <ProjectTab />,
     },
   ]
 

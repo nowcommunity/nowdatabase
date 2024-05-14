@@ -1,6 +1,11 @@
-import { LocalityDetails } from '@/backendTypes'
+import { Editable, LocalityDetails, SedimentaryStructure } from '@/backendTypes'
 import { ArrayFrame, HalfFrames } from '../../DetailView/common/FormComponents'
 import { useDetailContext } from '@/components/DetailView/hooks'
+import { EditableTable, EditingModal, Grouped } from '@/components/DetailView/common/FormComponents'
+import { Box, TextField } from '@mui/material'
+import { MRT_ColumnDef } from 'material-react-table'
+import { useState } from 'react'
+import { useForm } from 'react-hook-form'
 
 export const LithologyTab = () => {
   const { textField, dropdown } = useDetailContext<LocalityDetails>()
@@ -154,13 +159,53 @@ export const LithologyTab = () => {
     ['Comments', textField('depo_comm')],
   ]
 
+  const { editData, mode } = useDetailContext<LocalityDetails>()
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm()
+  const [data, setData] = useState('')
+
+  const columns: MRT_ColumnDef<SedimentaryStructure>[] = [
+    {
+      accessorKey: 'sed_struct',
+      header: 'Sedimentary Structure',
+    },
+  ]
+
+  const onSave = async () => {
+    // TODO: Saving logic here (add Sedimentary Structure to editData)
+    return Object.keys(errors).length === 0
+  }
+
+  const editingModal = (
+    <EditingModal buttonText="Add new Sedimentary Structure" onSave={onSave}>
+      <Box sx={{ display: 'flex', flexDirection: 'column', gap: '1em' }}>
+        <TextField {...register('sed_struct', { required: true })} label="Sedimentary Structure" required />
+      </Box>
+    </EditingModal>
+  )
+
   return (
     <>
       <HalfFrames>
         <ArrayFrame half array={lithology} title="Lithology" />
         <ArrayFrame half array={sedimentryEnvironment} title="Sedimentry Environment" />
       </HalfFrames>
-      <ArrayFrame array={depositionalContext} title="Depositional Context" />
+
+      <HalfFrames>
+        <Grouped title="Sedimentary Structure & Taphonomic Detail">
+          {mode === 'edit' && editingModal}
+          <EditableTable<Editable<SedimentaryStructure>, LocalityDetails>
+            columns={columns}
+            data={editData.now_ss}
+            editable
+            field="sedimentaryStructure"
+          />
+        </Grouped>
+        <ArrayFrame array={depositionalContext} title="Depositional Context" />
+      </HalfFrames>
     </>
   )
 }
