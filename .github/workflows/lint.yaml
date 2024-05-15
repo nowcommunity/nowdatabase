@@ -15,11 +15,14 @@ jobs:
         with:
           node-version: 20
       - name: 'Install dependencies'
-        run: cd backend && node -v && npm -v && npm ci
+        working-directory: 'backend'
+        run: npm ci
       - name: 'Run backend linter'
-        run: cd backend && npm run lint
+        working-directory: 'backend'
+        run: npm run lint
       - name: 'Run backend tsc'
-        run: cd backend && npx tsc --noEmit
+        working-directory: 'backend'
+        run: npx tsc --noEmit
 
   lint_frontend:
     name: 'Lint & tsc frontend'
@@ -30,8 +33,11 @@ jobs:
         with:
           node-version: 20
       - name: 'Install dependencies'
-        run: cd frontend && npm ci
+        working-directory: 'frontend'
+        run: npm ci
       - name: 'Run frontend linter'
-        run: cd frontend && npm run lint
+        working-directory: 'frontend'
+        run: npm run lint
       - name: 'Run frontend tsc'
-        run: cd frontend && npx tsc --noEmit
+        working-directory: 'frontend'
+        run: npx tsc --noEmit
