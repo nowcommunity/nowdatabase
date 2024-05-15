@@ -6,7 +6,7 @@ on:
   push:
 
 jobs:
-  lint_backend:
+  lint:
     name: 'Lint & tsc backend'
     runs-on: ubuntu-latest
     steps:
@@ -14,7 +14,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-      - name: 'Install dependencies'
+      - name: 'Install backend dependencies'
         working-directory: 'backend'
         run: npm ci
       - name: 'Run backend linter'
@@ -23,16 +23,7 @@ jobs:
       - name: 'Run backend tsc'
         working-directory: 'backend'
         run: npx tsc --noEmit
-
-  lint_frontend:
-    name: 'Lint & tsc frontend'
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20
-      - name: 'Install dependencies'
+      - name: 'Install frontend dependencies'
         working-directory: 'frontend'
         run: npm ci
       - name: 'Run frontend linter'
