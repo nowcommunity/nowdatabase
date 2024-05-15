@@ -121,7 +121,7 @@ export const TableView = <T extends MRT_RowData>({
     navigate(`${location.pathname}?&${columnFilterToUrl}&${sortingToUrl}&${paginationToUrl}`, {
       replace: true,
     })
-  }, [columnFilters, sorting, pagination, location.pathname, navigate])
+  }, [columnFilters, sorting, pagination, location.pathname, navigate, selectorFn])
 
   if (!data) return <CircularProgress />
 

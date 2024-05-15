@@ -1,7 +1,12 @@
 import { Editable, LocalityDetails, SedimentaryStructure } from '@/backendTypes'
-import { ArrayFrame, HalfFrames } from '../../DetailView/common/FormComponents'
+import {
+  ArrayFrame,
+  HalfFrames,
+  EditableTable,
+  EditingModal,
+  Grouped,
+} from '@/components/DetailView/common/FormComponents'
 import { useDetailContext } from '@/components/DetailView/hooks'
-import { EditableTable, EditingModal, Grouped } from '@/components/DetailView/common/FormComponents'
 import { Box, TextField } from '@mui/material'
 import { MRT_ColumnDef } from 'material-react-table'
 import { useForm } from 'react-hook-form'
@@ -181,7 +186,12 @@ export const LithologyTab = () => {
   const editingModal = (
     <EditingModal buttonText="Add new Sedimentary Structure" onSave={onSave}>
       <Box sx={{ display: 'flex', flexDirection: 'column', gap: '1em' }}>
-        <TextField {...register('sed_struct', { required: true })} label="Sedimentary Structure" error={!!errors.sed_struct} required />
+        <TextField
+          {...register('sed_struct', { required: true })}
+          label="Sedimentary Structure"
+          error={!!errors.sed_struct}
+          required
+        />
       </Box>
     </EditingModal>
   )

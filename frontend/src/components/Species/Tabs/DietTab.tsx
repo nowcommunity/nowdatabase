@@ -3,18 +3,37 @@ import { ArrayFrame } from '@components/DetailView/common/FormComponents'
 import { useDetailContext } from '@/components/DetailView/hooks'
 
 export const DietTab = () => {
-  
   const { dropdown } = useDetailContext<SpeciesDetails>()
 
   const diet1Options = ['', 'animal', 'omnivore', 'plant']
 
-  const diet2Options = ['', 'carnivore', 'herbivore', 'invert',
-    'omnivore', 'piscivore']
+  const diet2Options = ['', 'carnivore', 'herbivore', 'invert', 'omnivore', 'piscivore']
 
-  const diet3Options = ['', 'anim_dom', 'br/gr', 'browse', 'cortex',
-  'exudates', 'fr_grass', 'fr-se-res', 'fruit', 'gran', 'graze',
-  'h_fruit', 'hard', 'insect_dom', 'm/bone', 'meat', 'meat_only', 'mixed',
-  'myrmec', 'plant_dom', 'roots', 'seeds', 'soft']
+  const diet3Options = [
+    '',
+    'anim_dom',
+    'br/gr',
+    'browse',
+    'cortex',
+    'exudates',
+    'fr_grass',
+    'fr-se-res',
+    'fruit',
+    'gran',
+    'graze',
+    'h_fruit',
+    'hard',
+    'insect_dom',
+    'm/bone',
+    'meat',
+    'meat_only',
+    'mixed',
+    'myrmec',
+    'plant_dom',
+    'roots',
+    'seeds',
+    'soft',
+  ]
 
   const relativeFibreContentOptions = ['', 'h', 'l', 'm']
 

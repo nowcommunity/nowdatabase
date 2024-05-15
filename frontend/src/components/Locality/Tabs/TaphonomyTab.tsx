@@ -1,10 +1,14 @@
 import { Editable, LocalityDetails, CollectingMethod } from '@/backendTypes'
-import { ArrayFrame, HalfFrames } from '../../DetailView/common/FormComponents'
 import { useDetailContext } from '@/components/DetailView/hooks'
-import { EditableTable, EditingModal, Grouped } from '@/components/DetailView/common/FormComponents'
+import {
+  EditableTable,
+  EditingModal,
+  Grouped,
+  ArrayFrame,
+  HalfFrames,
+} from '@/components/DetailView/common/FormComponents'
 import { Box, TextField } from '@mui/material'
 import { MRT_ColumnDef } from 'material-react-table'
-import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 
 export const TaphonomyTab = () => {
@@ -124,10 +128,8 @@ export const TaphonomyTab = () => {
   const { editData, mode } = useDetailContext<LocalityDetails>()
   const {
     register,
-    handleSubmit,
     formState: { errors },
   } = useForm()
-  const [data, setData] = useState('')
 
   const columns: MRT_ColumnDef<CollectingMethod>[] = [
     {
@@ -163,7 +165,7 @@ export const TaphonomyTab = () => {
             columns={columns}
             data={editData.now_coll_meth}
             editable
-            field="collectingMethod"
+            field="now_coll_meth"
           />
         </Grouped>
         <></>

@@ -3,17 +3,14 @@ import { EditableTable, EditingModal, Grouped } from '@/components/DetailView/co
 import { useDetailContext } from '@/components/DetailView/hooks'
 import { Box, TextField } from '@mui/material'
 import { MRT_ColumnDef } from 'material-react-table'
-import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 
 export const SpeciesTab = () => {
   const { editData, mode } = useDetailContext<LocalityDetails>()
   const {
     register,
-    handleSubmit,
     formState: { errors },
   } = useForm()
-  const [data, setData] = useState('')
 
   const columns: MRT_ColumnDef<LocalitySpecies>[] = [
     {
@@ -62,8 +59,14 @@ export const SpeciesTab = () => {
         <TextField {...register('com_species.family_name', { required: true })} label="Family" />
         <TextField {...register('com_species.genus_name', { required: true })} label="Genus" />
         <TextField {...register('com_species.species_name', { required: true })} label="Species" />
-        <TextField {...register('com_species.subclass_or_superorder_name', { required: true })} label="Subclass or Superorder" />
-        <TextField {...register('com_species.suborder_or_superfamily_name', { required: true })} label="Suborder or Superfamily" />
+        <TextField
+          {...register('com_species.subclass_or_superorder_name', { required: true })}
+          label="Subclass or Superorder"
+        />
+        <TextField
+          {...register('com_species.suborder_or_superfamily_name', { required: true })}
+          label="Suborder or Superfamily"
+        />
         <TextField {...register('com_species.unique_identifier', { required: true })} label="Unique Identifier" />
         <TextField {...register('com_species.taxonomic_status')} label="Taxon status" />
       </Box>

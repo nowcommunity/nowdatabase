@@ -7,7 +7,8 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "npx tsx watch --clear-screen=false src/index.ts",
     "build": "tsc",
-    "start": "node build/index.js"
+    "start": "node build/index.js",
+    "lint": ""
   },
   "author": "",
   "license": "ISC",

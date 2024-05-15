@@ -2,7 +2,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom'
 import { Box, Button, Paper, Stack, Tab, Tabs } from '@mui/material'
 import ArrowBackIcon from '@mui/icons-material/ArrowBack'
 import EditIcon from '@mui/icons-material/Edit'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, JSX } from 'react'
 import { DetailContextProvider, ModeType } from './Context/DetailContext'
 import { cloneDeep } from 'lodash-es'
 import { DropdownOption, DropdownSelector, EditableTextField, RadioSelector } from './common/FormComponents'
@@ -40,7 +40,7 @@ export const DetailView = <T extends object>({ tabs, data }: { tabs: TabType[]; 
       },
       { replace: true }
     )
-  }, [tab])
+  }, [tab, setSearchParams])
 
   const textField = (field: keyof T) => <EditableTextField<T> field={field} />
 

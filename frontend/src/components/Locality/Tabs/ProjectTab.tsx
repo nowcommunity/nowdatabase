@@ -3,17 +3,14 @@ import { EditableTable, EditingModal, Grouped } from '@/components/DetailView/co
 import { useDetailContext } from '@/components/DetailView/hooks'
 import { Box, TextField } from '@mui/material'
 import { MRT_ColumnDef } from 'material-react-table'
-import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 
 export const ProjectTab = () => {
   const { editData, mode } = useDetailContext<LocalityDetails>()
   const {
     register,
-    handleSubmit,
     formState: { errors },
   } = useForm()
-  const [data, setData] = useState('')
 
   const columns: MRT_ColumnDef<LocalityProject>[] = [
     {

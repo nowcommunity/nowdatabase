@@ -9,9 +9,9 @@ module.exports = {
     'plugin:import/recommended',
     'plugin:import/typescript',
   ],
-  ignorePatterns: ['dist', '.eslintrc.cjs', 'babel.config.js', '*/node_modules/*'],
+  ignorePatterns: ['dist', '.eslintrc.cjs', 'babel.config.js', '*/node_modules/*', 'vite.config.ts', 'vite-env.d.ts'],
   parser: '@typescript-eslint/parser',
-  plugins: ['react-refresh', '@typescript-eslint', 'react'],
+  plugins: ['react-refresh', '@typescript-eslint', 'react', 'import'],
   rules: {
     'react-refresh/only-export-components': ['warn', { allowConstantExport: true }],
     'prettier/prettier': 'error',
@@ -24,9 +24,7 @@ module.exports = {
   },
   settings: {
     'import/resolver': {
-      typescript: {
-        project: ['tsconfig.json'],
-      },
+      typescript: {},
     },
     react: {
       pragma: 'React',
@@ -34,6 +32,7 @@ module.exports = {
     },
   },
   parserOptions: {
-    project: ['tsconfig.json'],
+    project: './tsconfig.json',
+    tsconfigRootDir: './',
   },
 }

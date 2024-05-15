@@ -8,14 +8,14 @@ export default defineConfig({
   resolve: {
     alias: [
       { find: '@', replacement: path.resolve(__dirname, './src/') },
-    { find: '@components', replacement: path.resolve(__dirname, './src/components') },
-    { find: '@util', replacement: path.resolve(__dirname, './src/util') },
-    { find: '@backend', replacement: path.resolve(__dirname, '.,/src/') }
+      { find: '@components', replacement: path.resolve(__dirname, './src/components') },
+      { find: '@util', replacement: path.resolve(__dirname, './src/util') },
+      { find: '@backend', replacement: path.resolve(__dirname, '.,/src/') },
     ],
   },
   server: {
     watch: {
       usePolling: true,
-    }
-  }
+    },
+  },
 })

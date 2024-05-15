@@ -1,4 +1,4 @@
-import Prisma from '../../backend/node_modules/@prisma/client/default'
+import * as Prisma from '../../backend/node_modules/@prisma/client/default'
 import { RowState } from './components/DetailView/common/FormComponents'
 
 // Use this for fields that include array that has to be edited by EditableTable.
@@ -14,9 +14,11 @@ export type SedimentaryStructure = Prisma.now_ss
 export type LocalitySynonym = Prisma.now_syn_loc
 export type LocalityDetails = Omit<Prisma.now_loc, 'now_mus'> & { museums: Array<Editable<Museum>> } & {
   now_ls: Array<Editable<LocalitySpecies>>
-} & { now_plr: Array<Editable<LocalityProject>> } & LocalitySynonym[] &
-  { now_ss: Editable<SedimentaryStructure>[] } &
-  { now_coll_meth: Editable<CollectingMethod>[] }
+} & { now_plr: Array<Editable<LocalityProject>> } & { now_syn_loc: Array<Editable<LocalitySynonym>> } & {
+  now_ss: Editable<SedimentaryStructure>[]
+} & {
+  now_coll_meth: Editable<CollectingMethod>[]
+}
 
 export type Locality = {
   lid: number
