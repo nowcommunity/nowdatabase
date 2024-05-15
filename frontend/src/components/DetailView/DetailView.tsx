@@ -74,7 +74,7 @@ export const DetailView = <T extends object>({ tabs, data }: { tabs: TabType[]; 
         </Button>
       </Box>
       <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-        <Tabs value={tab} onChange={(_event, newValue) => setTab(newValue)}>
+        <Tabs value={tab} onChange={(_event, newValue) => setTab(newValue as number)}>
           {tabs.map(tab => (
             <Tab key={tab.title} label={tab.title} />
           ))}

@@ -1,10 +1,11 @@
 import { configureStore, Middleware } from '@reduxjs/toolkit'
 import { userReducer } from './userReducer'
 import { api } from './api'
+import { UserFields } from '@shared/types'
 
 const localStorageMiddleware: Middleware = store => next => action => {
   const result = next(action)
-  const state = store.getState()
+  const state = store.getState() as RootState
   localStorage.setItem('userState', JSON.stringify(state.user))
   return result
 }
@@ -15,7 +16,7 @@ const loadFromLocalStorage = () => {
     if (serializedState === null) {
       return undefined
     }
-    const parsedState = JSON.parse(serializedState)
+    const parsedState = JSON.parse(serializedState) as UserFields
     return { user: parsedState }
   } catch (err) {
     return undefined

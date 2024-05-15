@@ -27,7 +27,7 @@ export const Login = () => {
     if (error) return
     setUsernameError('')
     setPasswordError('')
-    loginMutation({ username, password })
+    await loginMutation({ username, password })
   }
 
   useEffect(() => {
@@ -64,7 +64,7 @@ export const Login = () => {
           helperText={passwordError}
           fullWidth
         />
-        <Button onClick={login} size="large" style={{ fontSize: '1.4em' }}>
+        <Button onClick={void login} size="large" style={{ fontSize: '1.4em' }}>
           Login
         </Button>
         <Box>

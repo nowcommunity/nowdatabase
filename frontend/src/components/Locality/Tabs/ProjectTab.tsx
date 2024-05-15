@@ -35,6 +35,7 @@ export const ProjectTab = () => {
     },
   ]
 
+  // eslint-disable-next-line @typescript-eslint/require-await
   const onSave = async () => {
     // TODO: Saving logic here (add Project to editData)
     return Object.keys(errors).length === 0

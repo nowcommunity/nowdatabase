@@ -51,15 +51,15 @@ export const TableView = <T extends MRT_RowData>({
     const searchParams = new URLSearchParams(location.search)
     const stateFromUrl = searchParams.get(state)
     if (!stateFromUrl) return defaultState
-    return JSON.parse(stateFromUrl)
+    return JSON.parse(stateFromUrl) as object
   }
 
   // Load state from url only on first render
   useEffect(() => {
     if (selectorFn) return
-    setColumnFilters(loadStateFromUrl('columnfilters', []))
-    setSorting(loadStateFromUrl('sorting', []))
-    setPagination(loadStateFromUrl('pagination', defaultPagination))
+    setColumnFilters(loadStateFromUrl('columnfilters', []) as MRT_ColumnFiltersState)
+    setSorting(loadStateFromUrl('sorting', []) as MRT_SortingState)
+    setPagination(loadStateFromUrl('pagination', defaultPagination) as MRT_PaginationState)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 

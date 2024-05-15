@@ -8,6 +8,7 @@ module.exports = {
     'plugin:react/recommended',
     'plugin:import/recommended',
     'plugin:import/typescript',
+    'plugin:@typescript-eslint/recommended-type-checked',
   ],
   ignorePatterns: ['dist', '.eslintrc.cjs', 'babel.config.js', '*/node_modules/*', 'vite.config.ts', 'vite-env.d.ts'],
   parser: '@typescript-eslint/parser',

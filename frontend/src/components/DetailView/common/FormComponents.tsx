@@ -23,6 +23,7 @@ import { type MRT_ColumnDef, type MRT_RowData, MaterialReactTable, MRT_Row } fro
 import RemoveCircleOutlineIcon from '@mui/icons-material/RemoveCircleOutline'
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline'
 import { RegisterOptions, FieldValues, UseFormRegisterReturn, FieldErrors } from 'react-hook-form'
+import { Editable } from '@/backendTypes'
 
 export const ArrayToTable = ({ array, half }: { array: Array<Array<ReactNode>>; half?: boolean }) => {
   const getWidth = (index: number, rowLength: number) => {
@@ -254,7 +255,7 @@ export const EditingModal = ({
       <Modal open={open} aria-labelledby={`modal-${buttonText}`} aria-describedby={`modal-${buttonText}`}>
         <Box sx={{ ...modalStyle }}>
           <Box marginBottom="2em"> {children}</Box>
-          {onSave && <Button onClick={closeWithSave}>Save</Button>}
+          {onSave && <Button onClick={void closeWithSave}>Save</Button>}
           <Button onClick={() => setOpen(false)}>{onSave ? 'Cancel' : 'Close'}</Button>
         </Box>
       </Modal>
@@ -270,7 +271,7 @@ const getNewState = (state: RowState) => {
   return 'clean'
 }
 
-export const EditableTable = <T extends MRT_RowData, ParentType extends MRT_RowData>({
+export const EditableTable = <T extends Editable<MRT_RowData>, ParentType extends MRT_RowData>({
   data,
   columns,
   editable,
@@ -284,7 +285,7 @@ export const EditableTable = <T extends MRT_RowData, ParentType extends MRT_RowD
   const { editData, setEditData, mode } = useDetailContext<ParentType>()
   if (!data) return <CircularProgress />
   const actionRow = ({ row, staticRowIndex }: { row: MRT_Row<T>; staticRowIndex?: number | undefined }) => {
-    const state = row.original.rowState
+    const state = row.original.rowState ?? 'clean'
 
     // TODO: Using static index - need to use some id, probably sorting breaks this
     const rowClicked = (index: number | undefined) => {
@@ -325,7 +326,7 @@ export const EditableTable = <T extends MRT_RowData, ParentType extends MRT_RowD
       enablePagination={false}
       state={{ density: 'compact' }}
       muiTableBodyRowProps={({ row }: { row: MRT_Row<T> }) => ({
-        sx: { backgroundColor: rowStateToColor(row.original.rowState) },
+        sx: { backgroundColor: rowStateToColor(row.original.rowState as RowState) },
       })}
     />
   )

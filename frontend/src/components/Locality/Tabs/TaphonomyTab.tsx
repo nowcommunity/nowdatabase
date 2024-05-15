@@ -138,6 +138,7 @@ export const TaphonomyTab = () => {
     },
   ]
 
+  // eslint-disable-next-line @typescript-eslint/require-await
   const onSave = async () => {
     // TODO: Saving logic here (add Collecting Method to editData)
     return Object.keys(errors).length === 0

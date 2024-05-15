@@ -47,6 +47,7 @@ export const SpeciesTab = () => {
     },
   ]
 
+  // eslint-disable-next-line @typescript-eslint/require-await
   const onSave = async () => {
     // TODO: Saving logic here (add Species to editData)
     return Object.keys(errors).length === 0
