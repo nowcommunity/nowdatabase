@@ -3,7 +3,7 @@ import { ArrayFrame, HalfFrames } from '@components/DetailView/common/FormCompon
 import { useDetailContext } from '@/components/DetailView/hooks'
 
 export const ClimateTab = () => {
-  const { textField, radioSelection, dropdown } = useDetailContext<LocalityDetails>()
+  const { textField, dropdown } = useDetailContext<LocalityDetails>()
 
   const climateTypeOptions = [
     '',

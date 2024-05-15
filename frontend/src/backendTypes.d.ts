@@ -19,8 +19,7 @@ export type LocalityDetails = Omit<Prisma.now_loc, 'now_mus'> & { museums: Array
   now_ss: Editable<SedimentaryStructure>[]
 } & {
   now_coll_meth: Editable<CollectingMethod>[]
-} &
-{ now_lau: Array<Editable<LocalityUpdate>> } 
+} & { now_lau: Array<Editable<LocalityUpdate>> }
 
 export type Locality = {
   lid: number
