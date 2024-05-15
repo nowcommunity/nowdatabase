@@ -15,7 +15,7 @@ jobs:
         with:
           node-version: 20
       - name: 'Install dependencies'
-        run: cd backend && npm i
+        run: cd backend && node -v && npm -v && npm ci
       - name: 'Run backend linter'
         run: cd backend && npm run lint
       - name: 'Run backend tsc'
