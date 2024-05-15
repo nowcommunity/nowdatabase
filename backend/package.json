@@ -8,7 +8,7 @@
     "dev": "npx tsx watch --clear-screen=false src/index.ts",
     "build": "tsc",
     "start": "node build/index.js",
-    "lint": ""
+    "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0"
   },
   "author": "",
   "license": "ISC",
