@@ -10,12 +10,14 @@ import {
   MRT_ToggleFullScreenButton,
   MRT_Row,
 } from 'material-react-table'
-import { Box, Button, CircularProgress, Tooltip } from '@mui/material'
+import { Box, Button, CircularProgress, IconButton, Tooltip } from '@mui/material'
 import { useLocation, useNavigate } from 'react-router-dom'
 import ManageSearchIcon from '@mui/icons-material/ManageSearch'
 import PolicyIcon from '@mui/icons-material/Policy'
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline'
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline'
+import FileDownloadIcon from '@mui/icons-material/FileDownload'
+import { mkConfig, generateCsv, download } from 'export-to-csv'
 
 type TableStateInUrl = 'sorting' | 'columnfilters' | 'pagination'
 
@@ -125,6 +127,18 @@ export const TableView = <T extends MRT_RowData>({
 
   if (!data) return <CircularProgress />
 
+  const csvConfig = mkConfig({
+    fieldSeparator: ',',
+    decimalSeparator: '.',
+    useKeysAsHeaders: true,
+  })
+
+  const exportRows = (rows: MRT_Row<T>[]) => {
+    const rowData = rows.map(row => row.original)
+    const csv = generateCsv(csvConfig)(rowData)
+    download(csvConfig)(csv)
+  }
+
   return (
     <MaterialReactTable
       columns={columns}
@@ -171,6 +185,11 @@ export const TableView = <T extends MRT_RowData>({
           <Box>
             <MRT_ShowHideColumnsButton table={table} />
             {!selectorFn && <MRT_ToggleFullScreenButton table={table} />}
+            {!selectorFn && (
+              <IconButton onClick={() => exportRows(table.getPrePaginationRowModel().rows)}>
+                <FileDownloadIcon htmlColor="grey" />
+              </IconButton>
+            )}
           </Box>
         )
       }
