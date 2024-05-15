@@ -1,0 +1,37 @@
+name: 'Lint'
+
+on:
+  pull_request:
+    types: [opened, reopened]
+  push:
+
+jobs:
+  lint_backend:
+    name: 'Lint & tsc backend'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: 'Install dependencies'
+        run: npm ci && cd backend && npm ci
+      - name: 'Run backend linter'
+        run: npm run lint
+      - name: 'Run backend tsc'
+        run: npx tsc --noEmit
+
+  lint_frontend:
+    name: 'Lint & tsc frontend'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: 'Install dependencies'
+        run: cd ../frontend && npm ci
+      - name: 'Run frontend linter'
+        run: npm run lint
+      - name: 'Run frontend tsc'
+        run: npx tsc --noEmit

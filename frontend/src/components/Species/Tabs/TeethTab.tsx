@@ -1,23 +1,35 @@
-import { Box } from '@mui/material'
 import { SpeciesDetails } from '@/backendTypes'
-import { ArrayFrame, DataValue } from '@components/DetailView/common/FormComponents'
-import { useGetEditableTextField, useGetMultiSelection } from '@components/DetailView/hooks'
+import { ArrayFrame, HalfFrames } from '@components/DetailView/common/FormComponents'
+import { useDetailContext } from '@/components/DetailView/hooks'
 
 export const TeethTab = () => {
-  const getEditableTextField = useGetEditableTextField<SpeciesDetails>()
-  const getMultiSelection = useGetMultiSelection<SpeciesDetails>()
+  const { dropdown, textField } = useDetailContext<SpeciesDetails>()
 
-  const textField = (field: keyof SpeciesDetails) => (
-    <DataValue<SpeciesDetails> field={field as keyof SpeciesDetails} EditElement={getEditableTextField(field)} />
-  )
-
-  const multiSelection = (field: keyof SpeciesDetails, options: string[], name: string) => (
-    <DataValue<SpeciesDetails> field={field as keyof SpeciesDetails} EditElement={getMultiSelection({ fieldName: field, options, name })} />
-  )
-
-  const toothShapeMulticuspidOptions = ['', 'bil', 'bll', 'blm', 'bun',
-    'bus', 'col', 'csc', 'cso', 'csp', 'cyl', 'dil', 'ect', 'edt',
-    'lam', 'lss', 'md1', 'mdp', 'plo', 'qtb', 'sel', 'tri', 'zal']
+  const toothShapeMulticuspidOptions = [
+    { value: '', display: 'None' },
+    'bil',
+    'bll',
+    'blm',
+    'bun',
+    'bus',
+    'col',
+    'csc',
+    'cso',
+    'csp',
+    'cyl',
+    'dil',
+    'ect',
+    'edt',
+    'lam',
+    'lss',
+    'md1',
+    'mdp',
+    'plo',
+    'qtb',
+    'sel',
+    'tri',
+    'zal',
+  ]
 
   const hypsodontyOptions = ['', 'bra', 'mes', 'hyp', 'hys', 'trp', 'tpl']
 
@@ -49,78 +61,62 @@ export const TeethTab = () => {
 
   const microwearOptions = ['', 'pit_dom', 'pit_str', 'str_dom']
 
-  const teeth = [
-    ['Tooth Shape - Multicuspid', multiSelection('tshm', toothShapeMulticuspidOptions, 'Tooth Shape - Multicuspid'),
-      'Developmental Crown Type',
-      'Functional Crown Type',
-      'Mesowear'
-    ],
-    ['Hypsodonty', multiSelection('crowntype', hypsodontyOptions, 'Hypsodonty'),
-      'Cusp shape', multiSelection('cusp_shape', cuspShapeOptions, 'Cusp shape'),
-      'Presence of acute lophs (AL)', multiSelection('fct_al', acuteLophsOptions, 'Presence of acute lophs (AL)'),
-      'Type', multiSelection('mesowear', mesowearOptions, 'Type')
-    ],
-    ['Horizodonty', multiSelection('horizodonty', horizodontyOptions, 'Horizodonty'),
-      'Buccal cusp count', multiSelection('cusp_count_buccal', buccalCuspCountOptions, 'Buccal cusp count'),
-      'Presence of obtuse or basin-like lophs (OL)', multiSelection('fct_ol', obtuseLophsOptions, 'Presence of obtuse or basin-like lophs (OL)'),
-      'Cusp Relief Low (OR%)', textField('mw_or_low')
-    ],
-    ['Symphyseal Mobility', multiSelection('symph_mob', symphysealMobilityOptions,'Symphyseal Mobility'),
-      'Lingual cusp count', multiSelection('cusp_count_lingual', lingualCuspCountOptions, 'Lingual cusp count'),
-      'Structural fortification of cusps (SF)', multiSelection('fct_sf', structuralFortificationOptions, 'Structural fortification of cusps (SF)'),
-      'Cusp Relief High (OR%)', textField('mw_or_high')
-    ],
-    ['Relative Blade Length of Lower Carnassial', textField('relative_blade_length'),
-      'Longitudinal loph count', multiSelection('loph_count_lon', longitudinalLophCountOptions, 'Longitudinal loph count'),
-      'Occlusal topography (OT)', multiSelection('fct_ot', occlusalTopographyOptions, 'Occlusal topography (OT)'),
-      'Cusp Shape Sharp (CS%)', textField('mw_cs_sharp')
-    ],
-    ['',
-      'Transverse loph count', multiSelection('loph_count_trs', transverseLophCountOptions, 'Transverse loph count'),
-      'Coronal cementum (CM)', multiSelection('fct_cm', coronalCementumOptions, 'Coronal cementum (CM)'),
-      'Cusp Shape Rounded (CS%)', textField('mw_cs_round')
-    ],
-    ['',
-      '',
-      '',
-      'Cusp Shape Blunt (CS%)', textField('mw_cs_blunt')
-    ],
-    ['',
-      '',
-      '',
-      'Scale Minimum', textField('mw_scale_min')
-    ],
-    ['',
-      '',
-      '',
-      'Scale Maximum', textField('mw_scale_max')
-    ],
-    ['',
-      '',
-      '',
-      'Reported Value', textField('mw_value')
-    ],
-    ['',
-      '',
-      '',
-      'Normalized Score'
-    ],
-    ['',
-      '',
-      '',
-      'Microwear '
-    ],
-    ['',
-      '',
-      '',
-      'Type', multiSelection('microwear', microwearOptions, 'Type'),
-    ],
+  const multicuspid = [
+    ['Tooth Shape - Multicuspid', dropdown('tshm', toothShapeMulticuspidOptions, 'Tooth Shape - Multicuspid')],
+    ['Hypsodonty', dropdown('crowntype', hypsodontyOptions, 'Hypsodonty')],
+    ['Horizodonty', dropdown('horizodonty', horizodontyOptions, 'Horizodonty')],
+    ['Symphyseal Mobility', dropdown('symph_mob', symphysealMobilityOptions, 'Symphyseal Mobility')],
+    ['Relative Blade Length of Lower Carnassial', textField('relative_blade_length')],
   ]
 
+  const developmental = [
+    ['Cusp shape', dropdown('cusp_shape', cuspShapeOptions, 'Cusp shape')],
+    ['Buccal cusp count', dropdown('cusp_count_buccal', buccalCuspCountOptions, 'Buccal cusp count')],
+    ['Lingual cusp count', dropdown('cusp_count_lingual', lingualCuspCountOptions, 'Lingual cusp count')],
+    ['Longitudinal loph count', dropdown('loph_count_lon', longitudinalLophCountOptions, 'Longitudinal loph count')],
+    ['Transverse loph count', dropdown('loph_count_trs', transverseLophCountOptions, 'Transeverse loph count')],
+  ]
+
+  const functional = [
+    ['Presence of acute lophs (AL)', dropdown('fct_al', acuteLophsOptions, 'Presence of acute lophs (AL)')],
+    [
+      'Presence of obtuse or basin-like lophs (OL)',
+      dropdown('fct_ol', obtuseLophsOptions, 'Presence of obtuse or basin-like lophs (OL)'),
+    ],
+    [
+      'Structural fortification of cusps (SF)',
+      dropdown('fct_sf', structuralFortificationOptions, 'Structural fortification of cusps (SF)'),
+    ],
+    ['Occlusal topography (OT)', dropdown('fct_ot', occlusalTopographyOptions, 'Occlusal topography (OT)')],
+    ['Coronal cementum (CM)', dropdown('fct_cm', coronalCementumOptions, 'Coronal cementum (CM)')],
+  ]
+
+  const mesowear = [
+    ['Mesowear'],
+    ['Type', dropdown('mesowear', mesowearOptions, 'Type')],
+    ['Cusp Relief Low (OR%)', textField('mw_or_low')],
+    ['Cusp Relief High (OR%)', textField('mw_or_high')],
+    ['Cusp Shape Sharp (CS%)', textField('mw_cs_sharp')],
+    ['Cusp Shape Rounded (CS%)', textField('mw_cs_round')],
+    ['Cusp Shape Blunt (CS%)', textField('mw_cs_blunt')],
+    ['Scale Minimum', textField('mw_scale_min')],
+    ['Scale Maximum', textField('mw_scale_max')],
+    ['Reported Value', textField('mw_value')],
+    ['Normalized score'],
+    ['Microwear'],
+    ['Type', dropdown('microwear', microwearOptions, 'Type')],
+  ]
 
   return (
-    <Box>
-      <ArrayFrame array={teeth} title="Teeth" />
-    </Box>
+    <>
+      <HalfFrames>
+        <ArrayFrame half array={multicuspid} title="" />
+        <ArrayFrame half array={developmental} title="" />
+      </HalfFrames>
+      <HalfFrames>
+        <ArrayFrame half array={functional} title="" />
+        <ArrayFrame half array={mesowear} title="" />
+      </HalfFrames>
+    </>
   )
 }

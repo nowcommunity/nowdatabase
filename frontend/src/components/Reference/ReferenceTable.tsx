@@ -1,13 +1,13 @@
-import { useMemo } from 'react'
+import { useMemo, ReactNode } from 'react'
 import { type MRT_ColumnDef } from 'material-react-table'
 import { useGetAllReferencesQuery } from '../../redux/referenceReducer'
 import { Reference } from '@/backendTypes'
 import { TableView } from '../TableView/TableView'
 import { Box, Tooltip } from '@mui/material'
 
-const Cell = ({ renderedCellValue }: { renderedCellValue: React.ReactNode }) => (
+const Cell = ({ renderedCellValue }: { renderedCellValue: ReactNode }) => (
   <Tooltip title={renderedCellValue}>
-    <Box sx={{ maxWidth: '260px',   WebkitMaskImage: 'linear-gradient(to right, #000 90%, transparent)' }}>
+    <Box sx={{ maxWidth: '260px', WebkitMaskImage: 'linear-gradient(to right, #000 90%, transparent)' }}>
       {renderedCellValue}
     </Box>
   </Tooltip>

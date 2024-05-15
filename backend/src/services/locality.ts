@@ -22,6 +22,37 @@ export const getAllLocalities = async (onlyPublic: boolean) => {
 
 export const getLocalityDetails = async (id: number) => {
   // TODO: Check if user has access
-  const result = await prisma.now_loc.findUnique({ where: { lid: id }, include: { now_mus: true } })
-  return result
+
+  const result = await prisma.now_loc.findUnique({
+    where: { lid: id },
+    include: {
+      now_mus: {
+        include: {
+          com_mlist: true,
+        },
+      },
+      now_ls: {
+        include: {
+          com_species: true,
+        },
+      },
+      now_syn_loc: {},
+      now_ss: {},
+      now_coll_meth: {},
+      now_plr: {
+        include: {
+          now_proj: true,
+        },
+      },
+      now_lau: {
+        include: {
+          now_lr: true,
+        },
+      },
+    },
+  })
+
+  if (!result) return null
+  const { now_mus, ...locality } = result
+  return { ...locality, museums: now_mus.map(museum => museum.com_mlist) }
 }

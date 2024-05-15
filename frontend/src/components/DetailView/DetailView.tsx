@@ -1,10 +1,11 @@
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import { Box, Button, Paper, Stack, Tab, Tabs } from '@mui/material'
 import ArrowBackIcon from '@mui/icons-material/ArrowBack'
 import EditIcon from '@mui/icons-material/Edit'
-import { useState } from 'react'
+import { useEffect, useState, JSX } from 'react'
 import { DetailContextProvider, ModeType } from './Context/DetailContext'
 import { cloneDeep } from 'lodash-es'
+import { DropdownOption, DropdownSelector, EditableTextField, RadioSelector } from './common/FormComponents'
 
 export type TabType = {
   title: string
@@ -22,13 +23,42 @@ const ReturnButton = () => {
 }
 
 export const DetailView = <T extends object>({ tabs, data }: { tabs: TabType[]; data: T }) => {
-  const [tab, setTab] = useState(0)
+  const [searchParams, setSearchParams] = useSearchParams()
+  const getUrl = () => {
+    const tabFromUrl = searchParams.get('tab')
+    if (typeof tabFromUrl !== 'string' || isNaN(parseInt(tabFromUrl))) return 0
+    return parseInt(tabFromUrl)
+  }
   const [mode, setMode] = useState<ModeType>('read')
+  const [tab, setTab] = useState(getUrl())
+
+  useEffect(() => {
+    setSearchParams(
+      params => {
+        params.set('tab', tab.toString())
+        return params
+      },
+      { replace: true }
+    )
+  }, [tab, setSearchParams])
+
+  const textField = (field: keyof T) => <EditableTextField<T> field={field} />
+
+  const dropdown = (field: keyof T, options: Array<DropdownOption | string>, name: string) => (
+    <DropdownSelector field={field} options={options} name={name} />
+  )
+
+  const radioSelection = (field: keyof T, options: string[], name: string) => (
+    <RadioSelector field={field} options={options} name={name} />
+  )
 
   const initialState = {
     data,
     mode,
     editData: cloneDeep(data),
+    textField,
+    dropdown,
+    radioSelection,
   }
 
   return (
@@ -44,15 +74,22 @@ export const DetailView = <T extends object>({ tabs, data }: { tabs: TabType[]; 
         </Button>
       </Box>
       <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-        <Tabs value={tab} onChange={(_event, newValue) => setTab(newValue)}>
+        <Tabs value={tab} onChange={(_event, newValue) => setTab(newValue as number)}>
           {tabs.map(tab => (
             <Tab key={tab.title} label={tab.title} />
           ))}
         </Tabs>
       </Box>
       <DetailContextProvider contextState={{ ...initialState }}>
-        <Paper style={{ minHeight: '10em', backgroundColor: 'lightgray' }} elevation={5}>
-          {tabs[tab].content}
+        <Paper
+          style={{
+            minHeight: '10em',
+            backgroundColor: 'lightgray',
+            padding: '1em',
+          }}
+          elevation={5}
+        >
+          <Box sx={{ display: 'flex', flexDirection: 'column', rowGap: '1em' }}>{tabs[tab].content}</Box>
         </Paper>
       </DetailContextProvider>
     </Stack>

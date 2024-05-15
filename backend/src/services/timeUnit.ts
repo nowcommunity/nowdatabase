@@ -1,4 +1,4 @@
-import { prisma } from "../utils/db"
+import { prisma } from '../utils/db'
 
 export const getAllTimeUnits = async () => {
   const result = await prisma.now_time_unit.findMany({
@@ -22,17 +22,18 @@ export const getAllTimeUnits = async () => {
         },
       },
     },
-  });
+  })
 
-  return result.map(item => ({ ...item, 
+  return result.map(item => ({
+    ...item,
     low_bound: item.now_tu_bound_now_time_unit_low_bndTonow_tu_bound.age,
     up_bound: item.now_tu_bound_now_time_unit_up_bndTonow_tu_bound.age,
-    seq_name: item.now_tu_sequence.seq_name
+    seq_name: item.now_tu_sequence.seq_name,
   }))
 }
 
 export const getTimeUnitDetails = async (id: string) => {
   // TODO: Check if user has access
-  const result = await prisma.now_time_unit.findUnique({ where: { tu_name: id }})
+  const result = await prisma.now_time_unit.findUnique({ where: { tu_name: id } })
   return result
 }

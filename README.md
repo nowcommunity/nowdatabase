@@ -29,7 +29,10 @@ The :open_file_folder: [documentation](documentation)-directory has documentatio
 :wrench: [Technical explanations](documentation/technical_explanations.md) 
 + Explanations of how things work, and guides for some more rare tasks like generating sequelize models.
 
-[Typing the API](documentation/typing.md)
+:raised_hands: [Contributing & integration flow](documentation/contributing.md)
++ Where to commit? Where are tests run? How is the code deployed?
+
+![Typescript](https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white) [Typing the API](documentation/typing.md)
 + How to bring types from backend to frontend
 
 :memo: [Frontend](documentation/frontend.md) 

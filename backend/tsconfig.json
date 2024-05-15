@@ -10,7 +10,7 @@
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,
     "esModuleInterop": true,
-    "noImplicitAny": true,
+    "noImplicitAny": true
   },
-  "include": ["src"],
+  "include": ["src"]
 }

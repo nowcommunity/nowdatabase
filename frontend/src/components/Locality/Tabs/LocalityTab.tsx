@@ -1,17 +1,23 @@
-import { Box } from '@mui/material'
-import { LocalityDetails } from '@/backendTypes'
-import { ArrayFrame, DataValue } from '../../DetailView/common/FormComponents'
-import { useGetEditableTextField } from '../../DetailView/hooks'
+import { Editable, LocalityDetails, LocalitySynonym } from '@/backendTypes'
+import { useDetailContext } from '@/components/DetailView/hooks'
+import {
+  EditableTable,
+  EditingModal,
+  Grouped,
+  ArrayFrame,
+  HalfFrames,
+} from '@/components/DetailView/common/FormComponents'
+import { Box, TextField } from '@mui/material'
+import { MRT_ColumnDef } from 'material-react-table'
+import { useForm } from 'react-hook-form'
 
 export const LocalityTab = () => {
-  const getEditableTextField = useGetEditableTextField<LocalityDetails>()
+  const { textField } = useDetailContext<LocalityDetails>()
 
-  const textField = (field: keyof LocalityDetails) => (
-    <DataValue<LocalityDetails> field={field} EditElement={getEditableTextField(field)} />
-  )
-
-  const name = [['Name', textField('loc_name')]]
-  const locality = [['Country', textField('country')]]
+  const info = [
+    ['Name', textField('loc_name')],
+    ['Status', textField('loc_status')],
+  ]
   const country = [
     ['Country', textField('country')],
     ['State', textField('state')],
@@ -21,7 +27,6 @@ export const LocalityTab = () => {
     ['General Locality', textField('gen_loc')],
     ['Plate', textField('plate')],
   ]
-  const status = [['Status', textField('loc_status')]]
   const latlong = [
     ['', 'dms', 'dec'],
     ['Latitude', textField('dms_lat'), textField('dec_lat')],
@@ -30,13 +35,53 @@ export const LocalityTab = () => {
     ['Altitude (m)', textField('altitude')],
   ]
 
+  const { editData, mode } = useDetailContext<LocalityDetails>()
+  const {
+    register,
+    formState: { errors },
+  } = useForm()
+
+  const columns: MRT_ColumnDef<LocalitySynonym>[] = [
+    {
+      accessorKey: 'synonym',
+      header: 'Synonym',
+    },
+  ]
+
+  // eslint-disable-next-line @typescript-eslint/require-await
+  const onSave = async () => {
+    // TODO: Saving logic here (add Synonym to editData)
+    return Object.keys(errors).length === 0
+  }
+
+  const editingModal = (
+    <EditingModal buttonText="Add new Synonym" onSave={onSave}>
+      <Box sx={{ display: 'flex', flexDirection: 'column', gap: '1em' }}>
+        <TextField {...register('synonym', { required: true })} label="Synonym" required />
+      </Box>
+    </EditingModal>
+  )
+
   return (
-    <Box>
-      <ArrayFrame array={name} title="Name" />
-      <ArrayFrame array={locality} title="Locality" />
-      <ArrayFrame array={country} title="Country" />
-      <ArrayFrame array={status} title="Status" />
-      <ArrayFrame array={latlong} title="Latitude & Longitude" />
-    </Box>
+    <>
+      <HalfFrames>
+        <ArrayFrame array={info} title="Info" />
+        <ArrayFrame array={country} title="Country" />
+      </HalfFrames>
+
+      <HalfFrames>
+        <ArrayFrame array={latlong} title="Latitude & Longitude" />
+
+        <Grouped title="Synonyms">
+          {mode === 'edit' && editingModal}
+          <EditableTable<Editable<LocalitySynonym>, LocalityDetails>
+            columns={columns}
+            data={editData.now_syn_loc}
+            editable
+            field="now_syn_loc"
+          />
+        </Grouped>
+      </HalfFrames>
+    </>
   )
 }

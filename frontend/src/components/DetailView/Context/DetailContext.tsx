@@ -1,4 +1,5 @@
-import { ReactNode, createContext, useState } from 'react'
+import { ReactNode, createContext, useState, JSX } from 'react'
+import { DropdownOption } from '../common/FormComponents'
 
 export type ModeType = 'read' | 'new' | 'edit'
 
@@ -7,6 +8,9 @@ export type DetailContextType<T> = {
   mode: ModeType
   editData: T
   setEditData: (editData: T) => void
+  textField: (field: keyof T) => JSX.Element
+  dropdown: (field: keyof T, options: Array<DropdownOption | string>, name: string) => JSX.Element
+  radioSelection: (field: keyof T, options: string[], name: string) => JSX.Element
 }
 
 export const DetailContext = createContext<DetailContextType<unknown>>(null!)
@@ -22,7 +26,11 @@ export const DetailContextProvider = <T extends object>({
 
   return (
     <DetailContext.Provider
-      value={{ ...contextState, editData, setEditData: (data: unknown) => setEditData(data as T) }}
+      value={{
+        ...contextState,
+        editData,
+        setEditData: (data: unknown) => setEditData(data as T),
+      }}
     >
       {children}
     </DetailContext.Provider>

@@ -26,6 +26,6 @@ export const getAllSpecies = async (onlyPublic: boolean) => {
 
 export const getSpeciesDetails = async (id: number) => {
   // TODO: Check if user has access
-  const result = await prisma.com_species.findUnique( { where: { species_id: id } })
+  const result = await prisma.com_species.findUnique({ where: { species_id: id } })
   return result
 }
