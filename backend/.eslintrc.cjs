@@ -28,7 +28,7 @@ module.exports = {
     },
   },
   parserOptions: {
-    project: ['tsconfig.json'],
-    tsconfigRootDir: ['backend']
+    project: true,
+    tsconfigRootDir: __dirname
   },
 }
