@@ -33,7 +33,7 @@ module.exports = {
     },
   },
   parserOptions: {
-    project: 'tsconfig.json',
-    tsconfigRootDir: ['frontend']
+    project: true,
+    tsconfigRootDir: __dirname
   },
 }
