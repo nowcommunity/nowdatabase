@@ -6,66 +6,15 @@ import {
   type MRT_RowData,
   MRT_SortingState,
   MRT_PaginationState,
-  MRT_ShowHideColumnsButton,
-  MRT_ToggleFullScreenButton,
-  MRT_Row,
 } from 'material-react-table'
-import { Box, Button, CircularProgress, IconButton, Tooltip } from '@mui/material'
+import { CircularProgress } from '@mui/material'
 import { useLocation, useNavigate } from 'react-router-dom'
-import ManageSearchIcon from '@mui/icons-material/ManageSearch'
-import PolicyIcon from '@mui/icons-material/Policy'
-import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline'
-import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline'
-import FileDownloadIcon from '@mui/icons-material/FileDownload'
-import { mkConfig, generateCsv, download } from 'export-to-csv'
+import { renderCustomToolbar, renderCustomToolbarModalVersion } from './helpers'
+import { ActionComponent } from './ActionComponent'
 
 type TableStateInUrl = 'sorting' | 'columnfilters' | 'pagination'
 
 const defaultPagination: MRT_PaginationState = { pageIndex: 0, pageSize: 15 }
-
-const ActionComponent = <T extends MRT_RowData>({
-  row,
-  idFieldName,
-  selectorFn,
-  selectedList,
-  checkRowRestriction,
-  url,
-}: {
-  row: MRT_Row<T>
-  idFieldName: keyof T
-  selectorFn?: (id: string) => void
-  selectedList?: string[]
-  checkRowRestriction: ((row: T) => boolean) | undefined
-  url: string | undefined
-}) => {
-  const navigate = useNavigate()
-  const id = row.original[idFieldName]
-  const currentSelected = selectedList && selectedList.find(sel => sel === id)
-  const getIconToShow = () => {
-    if (currentSelected) return <CheckCircleOutlineIcon color="success" />
-    if (selectorFn) return <AddCircleOutlineIcon />
-    return <ManageSearchIcon />
-  }
-  const onClick = () => {
-    if (selectorFn) {
-      selectorFn(id)
-    } else {
-      navigate(`/${url}/${id}`)
-    }
-  }
-  return (
-    <Box display="flex" gap="0.2em" alignItems="center" width="3.6em">
-      <Button variant="text" style={{ width: '2em' }} onClick={onClick}>
-        {getIconToShow()}
-      </Button>
-      {checkRowRestriction && checkRowRestriction(row.original) && (
-        <Tooltip placement="top" title="This item has restricted visibility">
-          <PolicyIcon color="primary" fontSize="medium" />
-        </Tooltip>
-      )}
-    </Box>
-  )
-}
 
 /*
   TableView takes in the data and columns of a table, and handles
@@ -127,18 +76,6 @@ export const TableView = <T extends MRT_RowData>({
 
   if (!data) return <CircularProgress />
 
-  const csvConfig = mkConfig({
-    fieldSeparator: ',',
-    decimalSeparator: '.',
-    useKeysAsHeaders: true,
-  })
-
-  const exportRows = (rows: MRT_Row<T>[]) => {
-    const rowData = rows.map(row => row.original)
-    const csv = generateCsv(csvConfig)(rowData)
-    download(csvConfig)(csv)
-  }
-
   return (
     <MaterialReactTable
       columns={columns}
@@ -177,21 +114,10 @@ export const TableView = <T extends MRT_RowData>({
       enableHiding={true}
       renderToolbarInternalActions={
         /*
-          Custom rendering of the toolbar menu in the top-right: this is needed because there's no setting to hide the "show/hide column filters" button which we don't want
           To know what components you can render here if necessary, see the source code:
           https://github.com/KevinVandy/material-react-table/blob/85b98f9aaa038df48aa1dd35123560abce78ee58/packages/material-react-table/src/components/toolbar/MRT_ToolbarInternalButtons.tsx#L45
         */
-        ({ table }) => (
-          <Box>
-            <MRT_ShowHideColumnsButton table={table} />
-            {!selectorFn && <MRT_ToggleFullScreenButton table={table} />}
-            {!selectorFn && (
-              <IconButton onClick={() => exportRows(table.getPrePaginationRowModel().rows)}>
-                <FileDownloadIcon htmlColor="grey" />
-              </IconButton>
-            )}
-          </Box>
-        )
+        selectorFn ? renderCustomToolbarModalVersion : renderCustomToolbar
       }
     />
   )
