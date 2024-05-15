@@ -8,6 +8,7 @@ export type Editable<T> = T & { rowState?: RowState }
 export type CollectingMethod = Prisma.now_coll_meth
 export type LocalityProject = Prisma.now_plr & { now_proj: Prisma.now_proj }
 export type LocalitySpecies = Prisma.now_ls & { com_species: Prisma.com_species }
+export type LocalityUpdate = Prisma.now_lau & { now_lr: Prisma.now_lr }
 export type Museum = Prisma.com_mlist
 export type Project = Prisma.now_proj
 export type SedimentaryStructure = Prisma.now_ss
@@ -18,7 +19,8 @@ export type LocalityDetails = Omit<Prisma.now_loc, 'now_mus'> & { museums: Array
   now_ss: Editable<SedimentaryStructure>[]
 } & {
   now_coll_meth: Editable<CollectingMethod>[]
-}
+} &
+{ now_lau: Array<Editable<LocalityUpdate>> } 
 
 export type Locality = {
   lid: number

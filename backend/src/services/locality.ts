@@ -44,6 +44,11 @@ export const getLocalityDetails = async (id: number) => {
           now_proj: true,
         },
       },
+      now_lau: {
+        include: {
+          now_lr: true,
+        },
+      },
     },
   })
 

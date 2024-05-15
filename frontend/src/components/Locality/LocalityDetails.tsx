@@ -11,6 +11,7 @@ import { MuseumTab } from './Tabs/MuseumTab'
 import { ProjectTab } from './Tabs/ProjectTab'
 import { SpeciesTab } from './Tabs/SpeciesTab'
 import { TaphonomyTab } from './Tabs/TaphonomyTab'
+import { UpdateTab } from './Tabs/UpdateTab'
 
 export const LocalityDetails = () => {
   const { id } = useParams()
@@ -55,6 +56,10 @@ export const LocalityDetails = () => {
     {
       title: 'Projects',
       content: <ProjectTab />,
+    },
+    {
+      title: 'Updates',
+      content: <UpdateTab />,
     },
   ]
 
