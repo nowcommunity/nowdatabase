@@ -1,6 +1,7 @@
 import { Editable, LocalityDetails, LocalityUpdate } from '@/backendTypes'
 import { EditableTable, Grouped } from '@/components/DetailView/common/FormComponents'
 import { useDetailContext } from '@/components/DetailView/hooks'
+import { Box } from '@mui/material'
 import { MRT_ColumnDef } from 'material-react-table'
 
 export const UpdateTab = () => {
@@ -26,8 +27,9 @@ export const UpdateTab = () => {
       header: 'Coordinator',
     },
     {
-      accessorKey: 'now_lr.rid',
+      accessorKey: 'now_lr',
       header: 'Reference',
+      Cell: () => <Box>not implemented</Box>,
     },
   ]
 
