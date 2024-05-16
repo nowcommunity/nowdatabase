@@ -8,11 +8,14 @@ export type Editable<T> = T & { rowState?: RowState }
 export type CollectingMethod = Prisma.now_coll_meth
 export type LocalityProject = Prisma.now_plr & { now_proj: Prisma.now_proj }
 export type LocalitySpecies = Prisma.now_ls & { com_species: Prisma.com_species }
+export type SpeciesLocality = Prisma.now_ls & { now_loc: Prisma.now_loc }
 export type LocalityUpdate = Prisma.now_lau & { now_lr: Prisma.now_lr }
+export type SpeciesUpdate = Prisma.now_sau & { now_lr: Prisma.now_sr }
 export type Museum = Prisma.com_mlist
 export type Project = Prisma.now_proj
 export type SedimentaryStructure = Prisma.now_ss
 export type LocalitySynonym = Prisma.now_syn_loc
+export type SpeciesSynonym = Prisma.com_taxa_synonym
 export type LocalityDetails = Omit<Prisma.now_loc, 'now_mus'> & { museums: Array<Editable<Museum>> } & {
   now_ls: Array<Editable<LocalitySpecies>>
 } & { now_plr: Array<Editable<LocalityProject>> } & { now_syn_loc: Array<Editable<LocalitySynonym>> } & {
@@ -30,7 +33,9 @@ export type Locality = {
   loc_status: boolean | null
 }
 
-export type SpeciesDetails = Prisma.com_species
+export type SpeciesDetails = Prisma.com_species & { now_ls: Array<Editable<SpeciesLocality>> } & {
+  com_taxa_synonym: Array<Editable<SpeciesSynonym>>
+} & { now_sau: Array<Editable<SpeciesUpdate>> }
 
 export type Species = {
   species_id: number

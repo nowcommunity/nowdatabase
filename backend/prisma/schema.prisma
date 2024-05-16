@@ -143,6 +143,7 @@ model com_species {
   now_ls                       now_ls[]
   now_psr                      now_psr[]
   now_sau                      now_sau[]
+  com_taxa_synonym             com_taxa_synonym[]
 }
 
 model com_subfamily_synonym {
@@ -157,6 +158,7 @@ model com_taxa_synonym {
   syn_species_name String? @db.VarChar(30)
   syn_comment      String? @db.VarChar(255)
 
+  com_species com_species @relation(fields: [species_id], references: [species_id], onDelete: Cascade, onUpdate: NoAction, map: "com_taxa_synonym_FKIndex1")
   @@index([species_id], map: "com_taxa_synonym_FKIndex1")
 }
 
