@@ -7,6 +7,7 @@ import { LocomotionTab } from './Tabs/LocomotionTab'
 import { SizeTab } from './Tabs/SizeTab'
 import { TaxonomyTab } from './Tabs/TaxonomyTab'
 import { TeethTab } from './Tabs/TeethTab'
+import { UpdateTab } from './Tabs/UpdateTab'
 
 export const SpeciesDetails = () => {
   const { id } = useParams()
@@ -35,6 +36,10 @@ export const SpeciesDetails = () => {
     {
       title: 'Teeth',
       content: <TeethTab />,
+    },
+    {
+      title: 'Updates',
+      content: <UpdateTab />,
     },
   ]
 
