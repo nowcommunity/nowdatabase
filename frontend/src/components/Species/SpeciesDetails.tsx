@@ -3,8 +3,11 @@ import { useGetSpeciesDetailsQuery } from '../../redux/speciesReducer'
 import { CircularProgress } from '@mui/material'
 import { DetailView, TabType } from '../DetailView/DetailView'
 import { DietTab } from './Tabs/DietTab'
+import { LocalityTab } from './Tabs/LocalityTab'
+import { LocalitySpeciesTab } from './Tabs/LocalitySpeciesTab'
 import { LocomotionTab } from './Tabs/LocomotionTab'
 import { SizeTab } from './Tabs/SizeTab'
+import { SynonymTab } from './Tabs/SynonymTab'
 import { TaxonomyTab } from './Tabs/TaxonomyTab'
 import { TeethTab } from './Tabs/TeethTab'
 import { UpdateTab } from './Tabs/UpdateTab'
@@ -22,6 +25,10 @@ export const SpeciesDetails = () => {
       content: <TaxonomyTab />,
     },
     {
+      title: 'Synonyms',
+      content: <SynonymTab />,
+    },
+    {
       title: 'Diet',
       content: <DietTab />,
     },
@@ -36,6 +43,14 @@ export const SpeciesDetails = () => {
     {
       title: 'Teeth',
       content: <TeethTab />,
+    },
+    {
+      title: 'Localities',
+      content: <LocalityTab />,
+    },
+    {
+      title: 'Locality Species',
+      content: <LocalitySpeciesTab />,
     },
     {
       title: 'Updates',
