@@ -65,23 +65,21 @@ export const LocalityTab = () => {
   return (
     <>
       <HalfFrames>
-        <ArrayFrame array={info} title="Info" />
-        <ArrayFrame array={country} title="Country" />
+        <ArrayFrame half array={info} title="Info" />
+        <ArrayFrame half array={country} title="Country" />
       </HalfFrames>
 
-      <HalfFrames>
-        <ArrayFrame array={latlong} title="Latitude & Longitude" />
+      <ArrayFrame array={latlong} title="Latitude & Longitude" />
 
-        <Grouped title="Synonyms">
-          {mode === 'edit' && editingModal}
-          <EditableTable<Editable<LocalitySynonym>, LocalityDetails>
-            columns={columns}
-            data={editData.now_syn_loc}
-            editable
-            field="now_syn_loc"
-          />
-        </Grouped>
-      </HalfFrames>
+      <Grouped title="Synonyms">
+        {mode === 'edit' && editingModal}
+        <EditableTable<Editable<LocalitySynonym>, LocalityDetails>
+          columns={columns}
+          data={editData.now_syn_loc}
+          editable
+          field="now_syn_loc"
+        />
+      </Grouped>
     </>
   )
 }

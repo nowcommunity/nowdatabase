@@ -26,16 +26,15 @@ import { RegisterOptions, FieldValues, UseFormRegisterReturn, FieldErrors } from
 import { Editable } from '@/backendTypes'
 
 export const ArrayToTable = ({ array, half }: { array: Array<Array<ReactNode>>; half?: boolean }) => {
-  const getWidth = (index: number, rowLength: number) => {
-    if (half) return 6
-    return index === 0 ? 2 : Math.min(12 / rowLength, 4)
-  }
+  const maxRowLength = Math.max(...array.map(row => row.length))
+  const width = half ? 12 / maxRowLength : Math.min(12 / maxRowLength, 4)
+
   return (
     <Grid container direction="row">
       {array.map((row, index) => (
-        <Grid key={index} container direction="row" height="2.5em">
+        <Grid key={index} container direction="row" minHeight="2.5em">
           {row.map((item, index) => (
-            <Grid key={index} item xs={getWidth(index, row.length)} padding="5px">
+            <Grid key={index} item xs={width} padding="5px">
               {typeof item === 'string' ? <b>{item}</b> : item}
             </Grid>
           ))}

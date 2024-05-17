@@ -212,7 +212,7 @@ export const LithologyTab = () => {
             field="now_ss"
           />
         </Grouped>
-        <ArrayFrame array={depositionalContext} title="Depositional Context" />
+        <ArrayFrame half array={depositionalContext} title="Depositional Context" />
       </HalfFrames>
     </>
   )

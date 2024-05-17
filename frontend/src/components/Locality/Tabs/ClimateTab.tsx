@@ -127,16 +127,16 @@ export const ClimateTab = () => {
   return (
     <>
       <HalfFrames>
-        <ArrayFrame array={environment} title="Environment" />
-        <ArrayFrame array={environmentAndVegetationDetail} title="Environment & Vegetation Detail" />
+        <ArrayFrame half array={environment} title="Environment" />
+        <ArrayFrame half array={environmentAndVegetationDetail} title="Environment & Vegetation Detail" />
       </HalfFrames>
       <HalfFrames>
-        <ArrayFrame array={vegetation} title="Vegetation" />
-        <ArrayFrame array={season} title="Season" />
+        <ArrayFrame half array={vegetation} title="Vegetation" />
+        <ArrayFrame half array={season} title="Season" />
       </HalfFrames>
       <HalfFrames>
-        <ArrayFrame array={plantSites} title="Plant Sites" />
-        <ArrayFrame array={pollenRecord} title="Pollen Record" />
+        <ArrayFrame half array={plantSites} title="Plant Sites" />
+        <ArrayFrame half array={pollenRecord} title="Pollen Record" />
       </HalfFrames>
     </>
   )

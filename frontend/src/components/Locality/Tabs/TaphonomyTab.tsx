@@ -155,8 +155,8 @@ export const TaphonomyTab = () => {
   return (
     <>
       <HalfFrames>
-        <ArrayFrame array={fossilAssemblage} title="Fossil Assemblage" />
-        <ArrayFrame array={taphonomy} title="Taphonomy" />
+        <ArrayFrame half array={fossilAssemblage} title="Fossil Assemblage" />
+        <ArrayFrame half array={taphonomy} title="Taphonomy" />
       </HalfFrames>
 
       <HalfFrames>
