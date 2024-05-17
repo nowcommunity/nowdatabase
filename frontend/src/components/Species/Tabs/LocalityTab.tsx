@@ -1,4 +1,4 @@
-import { Editable, LocalityDetails, Museum, SpeciesDetails, SpeciesLocality, Locality } from '@/backendTypes'
+import { Editable, SpeciesDetails, SpeciesLocality, Locality } from '@/backendTypes'
 
 import { EditableTable, EditingModal, FormTextField, Grouped } from '@/components/DetailView/common/FormComponents'
 import { useDetailContext } from '@/components/DetailView/hooks'
@@ -27,7 +27,7 @@ const LocalitySelectingTable = () => {
   }
 
   // Fields for selecting existing Localities
-  const columns: MRT_ColumnDef<SpeciesLocality>[] = [
+  const columns: MRT_ColumnDef<Locality>[] = [
     {
       accessorKey: 'loc_name',
       header: 'Locality',
