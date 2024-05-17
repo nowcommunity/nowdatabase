@@ -2,7 +2,6 @@ import { Box, TextField } from '@mui/material'
 import { EditingModal } from './FormComponents'
 import { useForm } from 'react-hook-form'
 import { Editable } from '@/backendTypes'
-import { useEffect } from 'react'
 import { useDetailContext } from '../hooks'
 
 export type EditingFormField = { name: string; label: string; required?: boolean }
@@ -33,9 +32,6 @@ export const EditingForm = <T extends object, PT extends object>({
   const { register, trigger, formState, getValues } = useForm({ defaultValues: getDefaultValues() })
   const { errors } = formState
   const { editData, setEditData } = useDetailContext<PT>()
-  useEffect(() => {
-    if (!existingObject) return
-  }, [existingObject])
 
   const onSave = async () => {
     const result = await trigger()
