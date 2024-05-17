@@ -254,7 +254,7 @@ export const EditingModal = ({
       <Modal open={open} aria-labelledby={`modal-${buttonText}`} aria-describedby={`modal-${buttonText}`}>
         <Box sx={{ ...modalStyle }}>
           <Box marginBottom="2em"> {children}</Box>
-          {onSave && <Button onClick={void closeWithSave}>Save</Button>}
+          {onSave && <Button onClick={() => void closeWithSave()}>Save</Button>}
           <Button onClick={() => setOpen(false)}>{onSave ? 'Cancel' : 'Close'}</Button>
         </Box>
       </Modal>
@@ -267,6 +267,7 @@ export type RowState = 'new' | 'removed' | 'cancelled' | 'clean'
 const getNewState = (state: RowState) => {
   if (!state || state === 'clean') return 'removed'
   if (state === 'new') return 'cancelled'
+  if (state === 'cancelled') return 'new'
   return 'clean'
 }
 

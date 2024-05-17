@@ -1,12 +1,12 @@
 import { Editable, LocalityDetails, Museum } from '@/backendTypes'
-import { EditableTable, EditingModal, FormTextField, Grouped } from '@/components/DetailView/common/FormComponents'
+import { EditingForm } from '@/components/DetailView/common/EditingForm'
+import { EditableTable, EditingModal, Grouped } from '@/components/DetailView/common/FormComponents'
 import { useDetailContext } from '@/components/DetailView/hooks'
 import { TableView } from '@/components/TableView/TableView'
 import { useGetAllMuseumsQuery } from '@/redux/museumReducer'
 import { Box, CircularProgress } from '@mui/material'
 import { MRT_ColumnDef } from 'material-react-table'
 import { useState } from 'react'
-import { useForm } from 'react-hook-form'
 
 const MuseumSelectingTable = () => {
   const { data, isError } = useGetAllMuseumsQuery()
@@ -56,13 +56,7 @@ const MuseumSelectingTable = () => {
 }
 
 export const MuseumTab = () => {
-  const { editData, mode } = useDetailContext<LocalityDetails>()
-  const {
-    register,
-    trigger,
-    formState: { errors },
-  } = useForm()
-
+  const { setEditData, editData, mode } = useDetailContext<LocalityDetails>()
   const columns: MRT_ColumnDef<Museum>[] = [
     {
       accessorKey: 'museum',
@@ -82,12 +76,6 @@ export const MuseumTab = () => {
     },
   ]
 
-  const onSave = async () => {
-    // TODO: Saving logic here (add museum to editData)
-    const result = await trigger()
-    return result
-  }
-
   const formFields: { name: string; label: string; required?: boolean }[] = [
     { name: 'code', label: 'Code', required: true },
     { name: 'museum', label: 'Museum', required: true },
@@ -99,23 +87,14 @@ export const MuseumTab = () => {
   ]
 
   const editingModal = (
-    <EditingModal buttonText="Add new museum" onSave={onSave}>
-      <Box sx={{ display: 'flex', flexDirection: 'column', gap: '1em' }}>
-        {formFields.map(field => (
-          <FormTextField
-            key={field.name}
-            {...{ errors, register }}
-            fieldName={field.name}
-            label={field.label}
-            required={!!field.required}
-          />
-        ))}
-      </Box>
-    </EditingModal>
+    <EditingForm<Museum>
+      buttonText="Add new museum"
+      formFields={formFields}
+      editAction={(newMuseum: Museum) => setEditData({ ...editData, museums: [...editData.museums, newMuseum] })}
+    />
   )
-
   const selectingTable = (
-    <EditingModal buttonText="Add existing museum" onSave={onSave}>
+    <EditingModal buttonText="Add existing museum">
       <MuseumSelectingTable />
     </EditingModal>
   )
