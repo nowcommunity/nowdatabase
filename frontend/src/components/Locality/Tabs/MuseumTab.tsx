@@ -57,6 +57,7 @@ const MuseumSelectingTable = () => {
 
 export const MuseumTab = () => {
   const { editData, mode } = useDetailContext<LocalityDetails>()
+
   const columns: MRT_ColumnDef<Museum>[] = [
     {
       accessorKey: 'museum',
@@ -76,6 +77,12 @@ export const MuseumTab = () => {
     },
   ]
 
+  const selectingTable = (
+    <EditingModal buttonText="Add existing museum">
+      <MuseumSelectingTable />
+    </EditingModal>
+  )
+
   const formFields: { name: string; label: string; required?: boolean }[] = [
     { name: 'code', label: 'Code', required: true },
     { name: 'museum', label: 'Museum', required: true },
@@ -92,11 +99,6 @@ export const MuseumTab = () => {
       formFields={formFields}
       arrayFieldName="museums"
     />
-  )
-  const selectingTable = (
-    <EditingModal buttonText="Add existing museum">
-      <MuseumSelectingTable />
-    </EditingModal>
   )
 
   return (
