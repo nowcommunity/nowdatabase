@@ -3,18 +3,27 @@ import { EditingModal } from './FormComponents'
 import { useForm } from 'react-hook-form'
 import { Editable } from '@/backendTypes'
 import { useEffect } from 'react'
+import { useDetailContext } from '../hooks'
 
 export type EditingFormField = { name: string; label: string; required?: boolean }
 
-export const EditingForm = <T extends object>({
+/* 
+Renders a button, that will open EditingModal, which can be used
+to add a new entry to a list, or edit existing one.
+If using for adding new, provide arrayFieldName.
+For editing existing row, use existingObject and editAction.
+*/
+export const EditingForm = <T extends object, PT extends object>({
   buttonText,
   formFields,
   editAction,
   existingObject,
+  arrayFieldName,
 }: {
   buttonText: string
   formFields: EditingFormField[]
-  editAction: (newObject: T) => void
+  arrayFieldName?: keyof PT
+  editAction?: (newObject: T) => void
   existingObject?: T | undefined
 }) => {
   const getDefaultValues: () => { [x: string]: unknown } = () => {
@@ -23,7 +32,7 @@ export const EditingForm = <T extends object>({
   }
   const { register, trigger, formState, getValues } = useForm({ defaultValues: getDefaultValues() })
   const { errors } = formState
-
+  const { editData, setEditData } = useDetailContext<PT>()
   useEffect(() => {
     if (!existingObject) return
   }, [existingObject])
@@ -33,7 +42,8 @@ export const EditingForm = <T extends object>({
     if (!result) return false
     const values = getValues()
     const newObject: Editable<T> = { ...(values as T), rowState: 'new' }
-    editAction(newObject)
+    if (arrayFieldName) setEditData({ ...editData, museums: [...(editData[arrayFieldName] as Array<T>), newObject] })
+    if (editAction) editAction(newObject)
     return true
   }
 
