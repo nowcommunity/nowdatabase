@@ -19,6 +19,12 @@ module.exports = {
     'no-console': 'error',
     'no-unused-vars': 'off',
     '@typescript-eslint/no-misused-promises': ['error', { checksVoidReturn: false }],
+    "prettier/prettier": [
+      "error",
+      {
+        "endOfLine": "auto"
+      }
+    ]    
   },
   settings: {
     'import/resolver': {

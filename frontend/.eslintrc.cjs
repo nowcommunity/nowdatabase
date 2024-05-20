@@ -22,6 +22,12 @@ module.exports = {
     'react/jsx-uses-react': 'off',
     'react/react-in-jsx-scope': 'off',
     'import/no-named-as-default-member': 'off',
+    "prettier/prettier": [
+      "error",
+      {
+        "endOfLine": "auto"
+      }
+    ]
   },
   settings: {
     'import/resolver': {
