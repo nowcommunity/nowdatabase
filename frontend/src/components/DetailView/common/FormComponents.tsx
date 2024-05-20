@@ -34,7 +34,18 @@ export const ArrayToTable = ({ array, half }: { array: Array<Array<ReactNode>>; 
       {array.map((row, index) => (
         <Grid key={index} container direction="row" minHeight="2.5em">
           {row.map((item, index) => (
-            <Grid key={index} item xs={width} padding="5px">
+            <Grid
+              key={index}
+              item
+              xs={width}
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'left',
+                height: '100%',
+              }}
+              padding="5px"
+            >
               {typeof item === 'string' ? <b>{item}</b> : item}
             </Grid>
           ))}
