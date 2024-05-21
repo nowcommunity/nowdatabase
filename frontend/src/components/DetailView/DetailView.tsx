@@ -107,7 +107,7 @@ export const DetailView = <T extends object>({
           >
             <EditIcon /> {mode === 'read' ? 'Edit' : 'Stop editing'}
           </Button>
-          {mode === 'edit' && <WriteButton onWrite={onWrite} setMode={setMode} />}
+          {mode === 'edit' && onWrite && <WriteButton onWrite={onWrite} setMode={setMode} />}
         </Box>
         <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
           <Tabs value={tab} onChange={(_event, newValue) => setTab(newValue as number)}>

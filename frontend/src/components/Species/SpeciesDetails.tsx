@@ -58,5 +58,5 @@ export const SpeciesDetails = () => {
     },
   ]
 
-  return <DetailView tabs={tabs} data={data} />
+  return <DetailView tabs={tabs} data={data} onWrite={() => {}} validator={() => null} />
 }
