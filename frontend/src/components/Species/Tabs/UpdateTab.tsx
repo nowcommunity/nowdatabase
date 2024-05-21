@@ -1,5 +1,6 @@
 import { Editable, SpeciesDetails, SpeciesUpdate } from '@/backendTypes'
-import { EditableTable, Grouped } from '@/components/DetailView/common/FormComponents'
+import { EditableTable } from '@/components/DetailView/common/EditableTable'
+import { Grouped } from '@/components/DetailView/common/FormComponents'
 import { useDetailContext } from '@/components/DetailView/hooks'
 import { Box } from '@mui/material'
 import { MRT_ColumnDef } from 'material-react-table'

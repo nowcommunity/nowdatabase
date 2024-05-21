@@ -1,6 +1,6 @@
 import { Editable, SpeciesDetails, SpeciesLocality, Locality } from '@/backendTypes'
-
-import { EditableTable, EditingModal, FormTextField, Grouped } from '@/components/DetailView/common/FormComponents'
+import { EditingModal, FormTextField, Grouped } from '@/components/DetailView/common/FormComponents'
+import { EditableTable } from '@/components/DetailView/common/EditableTable'
 import { useDetailContext } from '@/components/DetailView/hooks'
 import { TableView } from '@/components/TableView/TableView'
 import { useGetAllLocalitiesQuery } from '@/redux/localityReducer'

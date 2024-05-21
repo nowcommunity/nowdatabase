@@ -1,5 +1,6 @@
 import * as Prisma from '../../backend/node_modules/@prisma/client/default'
-import { RowState } from './components/DetailView/common/FormComponents'
+
+export type RowState = 'new' | 'removed' | 'cancelled' | 'clean'
 
 // Use this for fields that include array that has to be edited by EditableTable.
 // For example see LocalityDetails: museums field

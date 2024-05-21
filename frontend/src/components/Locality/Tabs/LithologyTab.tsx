@@ -1,11 +1,6 @@
 import { Editable, LocalityDetails, SedimentaryStructure } from '@/backendTypes'
-import {
-  ArrayFrame,
-  HalfFrames,
-  EditableTable,
-  EditingModal,
-  Grouped,
-} from '@/components/DetailView/common/FormComponents'
+import { EditableTable } from '@/components/DetailView/common/EditableTable'
+import { ArrayFrame, HalfFrames, EditingModal, Grouped } from '@/components/DetailView/common/FormComponents'
 import { useDetailContext } from '@/components/DetailView/hooks'
 import { Box, TextField } from '@mui/material'
 import { MRT_ColumnDef } from 'material-react-table'
