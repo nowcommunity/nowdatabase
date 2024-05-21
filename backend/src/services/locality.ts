@@ -70,7 +70,10 @@ export const fixEditedLocality = (editedLocality: LocalityDetails) => {
   if (editedLocality.now_ls) {
     editedLocality.now_ls = editedLocality.now_ls.map(now_ls => ({
       ...now_ls,
-      com_species: { ...now_ls.com_species, body_mass: BigInt(now_ls.com_species.body_mass!) },
+      com_species: {
+        ...now_ls.com_species,
+        body_mass: now_ls.com_species.body_mass === null ? null : BigInt(now_ls.com_species.body_mass),
+      },
     }))
   }
   return editedLocality
