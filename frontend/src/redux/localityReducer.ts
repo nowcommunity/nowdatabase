@@ -12,8 +12,17 @@ const localitiesApi = api.injectEndpoints({
       query: id => ({
         url: `/locality/${id}`,
       }),
+      providesTags: result => (result ? [{ type: 'locality', id: result.lid }] : []),
+    }),
+    editLocality: builder.mutation<LocalityDetails, LocalityDetails>({
+      query: locality => ({
+        url: `/locality/`,
+        method: 'PUT',
+        body: { locality },
+      }),
+      invalidatesTags: (result, _error, { lid }) => (result ? [{ type: 'locality', id: lid }] : []),
     }),
   }),
 })
 
-export const { useGetAllLocalitiesQuery, useGetLocalityDetailsQuery } = localitiesApi
+export const { useGetAllLocalitiesQuery, useGetLocalityDetailsQuery, useEditLocalityMutation } = localitiesApi

@@ -1,5 +1,5 @@
 import { useParams } from 'react-router-dom'
-import { useGetLocalityDetailsQuery } from '../../redux/localityReducer'
+import { useEditLocalityMutation, useGetLocalityDetailsQuery } from '../../redux/localityReducer'
 import { CircularProgress } from '@mui/material'
 import { DetailView, TabType } from '../DetailView/DetailView'
 import { AgeTab } from './Tabs/AgeTab'
@@ -12,13 +12,20 @@ import { ProjectTab } from './Tabs/ProjectTab'
 import { SpeciesTab } from './Tabs/SpeciesTab'
 import { TaphonomyTab } from './Tabs/TaphonomyTab'
 import { UpdateTab } from './Tabs/UpdateTab'
+import { LocalityDetails as LocalityDetailsType } from '@/backendTypes'
+import { validateLocality } from '@/validators/locality'
 
 export const LocalityDetails = () => {
   const { id } = useParams()
   const { isLoading, isError, data } = useGetLocalityDetailsQuery(id!)
+  const [editLocalityRequest] = useEditLocalityMutation()
 
   if (isError) return <div>Error loading data</div>
   if (isLoading || !data) return <CircularProgress />
+
+  const onWrite = (editData: LocalityDetailsType) => {
+    void editLocalityRequest(editData)
+  }
 
   const tabs: TabType[] = [
     {
@@ -63,5 +70,5 @@ export const LocalityDetails = () => {
     },
   ]
 
-  return <DetailView tabs={tabs} data={data} />
+  return <DetailView tabs={tabs} data={data} onWrite={onWrite} validator={validateLocality} />
 }

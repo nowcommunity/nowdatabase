@@ -132,8 +132,8 @@ const modalStyle = {
 }
 
 export const EditableTextField = <T extends object>({ field }: { field: keyof T }) => {
-  const { setEditData, editData } = useDetailContext<T>()
-
+  const { setEditData, editData, validator } = useDetailContext<T>()
+  const error = validator(editData, field)
   const editingComponent = (
     <TextField
       onChange={(event: ChangeEvent<HTMLInputElement>) =>
@@ -142,6 +142,8 @@ export const EditableTextField = <T extends object>({ field }: { field: keyof T 
       value={editData[field] ?? ''}
       variant="outlined"
       size="small"
+      error={error !== null}
+      helperText={error ?? ''}
     />
   )
 

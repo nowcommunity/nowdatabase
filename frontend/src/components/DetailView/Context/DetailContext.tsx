@@ -11,6 +11,7 @@ export type DetailContextType<T> = {
   textField: (field: keyof T) => JSX.Element
   dropdown: (field: keyof T, options: Array<DropdownOption | string>, name: string) => JSX.Element
   radioSelection: (field: keyof T, options: string[], name: string) => JSX.Element
+  validator: (editData: T, field: keyof T) => string | null
 }
 
 export const DetailContext = createContext<DetailContextType<unknown>>(null!)
@@ -30,6 +31,7 @@ export const DetailContextProvider = <T extends object>({
         ...contextState,
         editData,
         setEditData: (data: unknown) => setEditData(data as T),
+        validator: (editData: unknown, fieldName: keyof T) => contextState.validator(editData as T, fieldName),
       }}
     >
       {children}
