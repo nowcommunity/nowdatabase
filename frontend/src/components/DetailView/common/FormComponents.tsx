@@ -131,7 +131,13 @@ const modalStyle = {
   p: 4,
 }
 
-export const EditableTextField = <T extends object>({ field }: { field: keyof T }) => {
+export const EditableTextField = <T extends object>({
+  field,
+  type,
+}: {
+  field: keyof T
+  type?: React.HTMLInputTypeAttribute
+}) => {
   const { setEditData, editData, validator } = useDetailContext<T>()
   const error = validator(editData, field)
   const editingComponent = (
@@ -144,6 +150,7 @@ export const EditableTextField = <T extends object>({ field }: { field: keyof T 
       size="small"
       error={error !== null}
       helperText={error ?? ''}
+      type={type ?? 'text'}
     />
   )
 

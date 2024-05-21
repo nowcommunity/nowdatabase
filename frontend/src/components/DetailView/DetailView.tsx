@@ -75,7 +75,9 @@ export const DetailView = <T extends object>({
     )
   }, [tab, setSearchParams])
 
-  const textField = (field: keyof T) => <EditableTextField<T> field={field} />
+  const textField = (field: keyof T, type?: React.HTMLInputTypeAttribute) => (
+    <EditableTextField<T> field={field} type={type} />
+  )
 
   const dropdown = (field: keyof T, options: Array<DropdownOption | string>, name: string) => (
     <DropdownSelector field={field} options={options} name={name} />
