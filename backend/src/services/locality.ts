@@ -1,5 +1,7 @@
 import { logger } from '../utils/logger'
 import { prisma } from '../utils/db'
+import { LocalityDetails } from '../../../frontend/src/backendTypes'
+import Prisma from '@prisma/client'
 
 export const testDb = async () => {
   const result = await prisma.now_loc.findMany({ select: { loc_name: true }, where: { loc_name: 'Amba East' } })
@@ -55,4 +57,40 @@ export const getLocalityDetails = async (id: number) => {
   if (!result) return null
   const { now_mus, ...locality } = result
   return { ...locality, museums: now_mus.map(museum => museum.com_mlist) }
+}
+
+export const fixEditedLocality = (editedLocality: LocalityDetails) => {
+  if (editedLocality.now_lau) {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+    editedLocality.now_lau = editedLocality.now_lau.map(lau => ({
+      ...lau,
+      lau_date: new Date(lau.lau_date!),
+    }))
+  }
+  if (editedLocality.now_ls) {
+    editedLocality.now_ls = editedLocality.now_ls.map(now_ls => ({
+      ...now_ls,
+      com_species: { ...now_ls.com_species, body_mass: BigInt(now_ls.com_species.body_mass!) },
+    }))
+  }
+  return editedLocality
+}
+
+export const editLocality = async (lid: number, editedFields: Partial<LocalityDetails>) => {
+  const fields = Object.keys(prisma.now_loc.fields)
+  const filteredLoc = Object.entries(editedFields)
+    .filter(([field]) => fields.includes(field))
+    .reduce<Record<string, unknown>>((obj, cur) => {
+      obj[cur[0]] = cur[1]
+      return obj
+    }, {}) as Partial<Prisma.now_loc>
+  const result = await prisma.now_loc.update({
+    where: {
+      lid,
+    },
+    data: {
+      ...filteredLoc,
+    },
+  })
+  return result
 }
