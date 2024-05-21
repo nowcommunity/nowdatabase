@@ -163,7 +163,7 @@ export const DropdownSelector = <T extends object>({
   const getValue = (item: DropdownOption | string) => (typeof item === 'string' ? item : item.value)
   const getDisplay = (item: DropdownOption | string) => (typeof item === 'string' ? item : item.display)
   const editingComponent = (
-    <FormControl>
+    <FormControl size="small">
       <InputLabel id={`${name}-multiselect-label`}>{name}</InputLabel>
       <Select
         labelId={`${name}-multiselect-label`}
@@ -171,7 +171,7 @@ export const DropdownSelector = <T extends object>({
         id={`${name}-multiselect`}
         value={(editData[field] || '') as string}
         onChange={(event: SelectChangeEvent) => setEditData({ ...editData, [field]: event.target.value })}
-        sx={{ width: '10em' }}
+        sx={{ width: '12em' }}
         size="small"
       >
         {options.map(item => (
