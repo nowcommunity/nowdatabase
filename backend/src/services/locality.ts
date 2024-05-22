@@ -61,7 +61,6 @@ export const getLocalityDetails = async (id: number) => {
 
 export const fixEditedLocality = (editedLocality: LocalityDetails) => {
   if (editedLocality.now_lau) {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     editedLocality.now_lau = editedLocality.now_lau.map(lau => ({
       ...lau,
       lau_date: new Date(lau.lau_date!),
