@@ -1,5 +1,5 @@
 import { LocalityDetails } from '@/backendTypes'
-import { ArrayFrame } from '../../DetailView/common/FormComponents'
+import { ArrayFrame } from '../../DetailView/common/tabLayoutHelpers'
 import { useDetailContext } from '@/components/DetailView/hooks'
 
 export const EcometricsTab = () => {

@@ -1,6 +1,6 @@
 import { Editable, LocalityDetails, LocalityUpdate } from '@/backendTypes'
 import { EditableTable } from '@/components/DetailView/common/EditableTable'
-import { Grouped } from '@/components/DetailView/common/FormComponents'
+import { Grouped } from '@/components/DetailView/common/tabLayoutHelpers'
 import { useDetailContext } from '@/components/DetailView/hooks'
 import { Box } from '@mui/material'
 import { MRT_ColumnDef } from 'material-react-table'

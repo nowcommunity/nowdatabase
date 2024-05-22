@@ -12,7 +12,7 @@ import {
 import { ChangeEvent, ReactNode } from 'react'
 import { RegisterOptions, FieldValues, UseFormRegisterReturn, FieldErrors } from 'react-hook-form'
 import { useDetailContext } from '../hooks'
-import { DataValue } from './FormComponents'
+import { DataValue } from './tabLayoutHelpers'
 
 export type DropdownOption = { value: string; display: string }
 
@@ -118,4 +118,30 @@ const MultiSelector = <T extends object>({
   const option = options.find(option => getValue(option) === data[field])
   const displayValue = option ? getDisplay(option) : null
   return <DataValue<T> field={field} EditElement={editingComponent} displayValue={displayValue} />
+}
+
+export const EditableTextField = <T extends object>({
+  field,
+  type,
+}: {
+  field: keyof T
+  type?: React.HTMLInputTypeAttribute
+}) => {
+  const { setEditData, editData, validator } = useDetailContext<T>()
+  const error = validator(editData, field)
+  const editingComponent = (
+    <TextField
+      onChange={(event: ChangeEvent<HTMLInputElement>) =>
+        setEditData({ ...editData, [field]: event?.currentTarget?.value })
+      }
+      value={editData[field] ?? ''}
+      variant="outlined"
+      size="small"
+      error={error !== null}
+      helperText={error ?? ''}
+      type={type ?? 'text'}
+    />
+  )
+
+  return <DataValue<T> field={field} EditElement={editingComponent} />
 }

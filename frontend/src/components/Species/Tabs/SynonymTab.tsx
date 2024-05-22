@@ -1,6 +1,6 @@
 import { Editable, SpeciesDetails, SpeciesSynonym } from '@/backendTypes'
 import { useDetailContext } from '@/components/DetailView/hooks'
-import { Grouped } from '@/components/DetailView/common/FormComponents'
+import { Grouped } from '@/components/DetailView/common/tabLayoutHelpers'
 import { Box, TextField } from '@mui/material'
 import { MRT_ColumnDef } from 'material-react-table'
 import { useForm } from 'react-hook-form'

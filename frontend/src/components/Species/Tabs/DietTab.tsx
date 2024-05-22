@@ -1,5 +1,5 @@
 import { SpeciesDetails } from '@/backendTypes'
-import { ArrayFrame } from '@components/DetailView/common/FormComponents'
+import { ArrayFrame } from '@/components/DetailView/common/tabLayoutHelpers'
 import { useDetailContext } from '@/components/DetailView/hooks'
 
 export const DietTab = () => {

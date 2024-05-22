@@ -1,5 +1,5 @@
-import { Card, Typography, Box, Grid, Divider, Modal, Button, TextField } from '@mui/material'
-import { ReactNode, useState, ChangeEvent } from 'react'
+import { Card, Typography, Box, Grid, Divider } from '@mui/material'
+import { ReactNode } from 'react'
 import { useDetailContext } from '../hooks'
 
 export const ArrayToTable = ({ array, half }: { array: Array<Array<ReactNode>>; half?: boolean }) => {
@@ -103,87 +103,4 @@ export const DataValue = <T extends object>({
     return EditElement
   }
   return displayValue ?? data[field]
-}
-
-export const EditableTextField = <T extends object>({
-  field,
-  type,
-}: {
-  field: keyof T
-  type?: React.HTMLInputTypeAttribute
-}) => {
-  const { setEditData, editData, validator } = useDetailContext<T>()
-  const error = validator(editData, field)
-  const editingComponent = (
-    <TextField
-      onChange={(event: ChangeEvent<HTMLInputElement>) =>
-        setEditData({ ...editData, [field]: event?.currentTarget?.value })
-      }
-      value={editData[field] ?? ''}
-      variant="outlined"
-      size="small"
-      error={error !== null}
-      helperText={error ?? ''}
-      type={type ?? 'text'}
-    />
-  )
-
-  return <DataValue<T> field={field} EditElement={editingComponent} />
-}
-
-/* 
-  buttonText = Text for the button that opens modal
-  children = Content of modal
-  onSave = If defined, the modal will have a separate saving button.
-           onSave is a function, that will return true or false, depending
-           on if we want to proceed with closing the form (return false to cancel closing)
-*/
-export const EditingModal = ({
-  buttonText,
-  children,
-  onSave,
-}: {
-  buttonText: string
-  children: ReactNode | ReactNode[]
-  onSave?: () => Promise<boolean>
-}) => {
-  const [open, setOpen] = useState(false)
-  const closeWithSave = async () => {
-    if (!onSave) return
-    const close = await onSave()
-    if (!close) return
-    setOpen(false)
-  }
-
-  const modalStyle = {
-    position: 'absolute',
-    top: '50%',
-    left: '50%',
-    transform: 'translate(-50%, -50%)',
-    width: 1200,
-    maxHeight: '90%',
-    bgcolor: 'background.paper',
-    border: '2px solid #000',
-    overflow: 'auto',
-    boxShadow: 24,
-    p: 4,
-  }
-
-  return (
-    <Box>
-      <Button onClick={() => setOpen(true)} variant="contained" sx={{ marginBottom: '1em' }}>
-        {buttonText}
-      </Button>
-      <Modal open={open} aria-labelledby={`modal-${buttonText}`} aria-describedby={`modal-${buttonText}`}>
-        <Box sx={{ ...modalStyle }}>
-          <Box marginBottom="2em" marginTop="1em">
-            {' '}
-            {children}
-          </Box>
-          {onSave && <Button onClick={() => void closeWithSave()}>Save</Button>}
-          <Button onClick={() => setOpen(false)}>{onSave ? 'Cancel' : 'Close'}</Button>
-        </Box>
-      </Modal>
-    </Box>
-  )
 }

@@ -1,7 +1,7 @@
 import { Editable, LocalityDetails, Museum } from '@/backendTypes'
 import { EditableTable } from '@/components/DetailView/common/EditableTable'
 import { EditingForm } from '@/components/DetailView/common/EditingForm'
-import { Grouped } from '@/components/DetailView/common/FormComponents'
+import { Grouped } from '@/components/DetailView/common/tabLayoutHelpers'
 import { SelectingTable } from '@/components/DetailView/common/SelectingTable'
 import { useDetailContext } from '@/components/DetailView/hooks'
 import { useGetAllMuseumsQuery } from '@/redux/museumReducer'

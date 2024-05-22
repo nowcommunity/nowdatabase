@@ -1,6 +1,6 @@
 import { Editable, LocalityDetails, CollectingMethod } from '@/backendTypes'
 import { useDetailContext } from '@/components/DetailView/hooks'
-import { Grouped, ArrayFrame, HalfFrames } from '@/components/DetailView/common/FormComponents'
+import { Grouped, ArrayFrame, HalfFrames } from '@/components/DetailView/common/tabLayoutHelpers'
 import { Box, TextField } from '@mui/material'
 import { MRT_ColumnDef } from 'material-react-table'
 import { useForm } from 'react-hook-form'
