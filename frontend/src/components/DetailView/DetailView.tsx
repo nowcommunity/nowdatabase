@@ -83,7 +83,7 @@ export const DetailView = <T extends object>({
     <DropdownSelector field={field} options={options} name={name} />
   )
 
-  const radioSelection = (field: keyof T, options: string[], name: string) => (
+  const radioSelection = (field: keyof T, options: Array<DropdownOption | string>, name: string) => (
     <RadioSelector field={field} options={options} name={name} />
   )
 

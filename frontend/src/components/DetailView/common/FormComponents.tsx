@@ -107,13 +107,22 @@ export const Grouped = ({ title, children }: { title?: string; children: ReactNo
   )
 }
 
-export const DataValue = <T extends object>({ field, EditElement }: { field: keyof T; EditElement: ReactNode }) => {
+export const DataValue = <T extends object>({
+  field,
+  EditElement,
+  displayValue,
+}: {
+  field: keyof T
+  EditElement: ReactNode
+  displayValue?: ReactNode | null
+}) => {
   const { data, mode } = useDetailContext<T>()
   if (mode === 'edit') {
     return EditElement
   }
-  return data[field]
+  return displayValue ?? data[field]
 }
+
 export const EditableTextField = <T extends object>({
   field,
   type,
@@ -151,9 +160,7 @@ export const DropdownSelector = <T extends object>({
   name: string
   field: keyof T
 }) => {
-  const { setEditData, editData } = useDetailContext<T>()
-  const getValue = (item: DropdownOption | string) => (typeof item === 'string' ? item : item.value)
-  const getDisplay = (item: DropdownOption | string) => (typeof item === 'string' ? item : item.display)
+  const { data, setEditData, editData } = useDetailContext<T>()
   const editingComponent = (
     <FormControl size="small">
       <InputLabel id={`${name}-multiselect-label`}>{name}</InputLabel>
@@ -175,7 +182,9 @@ export const DropdownSelector = <T extends object>({
     </FormControl>
   )
 
-  return <DataValue<T> field={field} EditElement={editingComponent} />
+  const option = options.find(option => getValue(option) === data[field])
+  const displayValue = option ? getDisplay(option) : null
+  return <DataValue<T> field={field} EditElement={editingComponent} displayValue={displayValue} />
 }
 
 export const FormTextField = <T extends string>({
@@ -194,16 +203,19 @@ export const FormTextField = <T extends string>({
   <TextField {...register(fieldName, { required: required })} error={!!errors[fieldName]} {...{ label, required }} />
 )
 
+const getValue = (item: DropdownOption | string) => (typeof item === 'string' ? item : item.value)
+const getDisplay = (item: DropdownOption | string) => (typeof item === 'string' ? item : item.display)
+
 export const RadioSelector = <T extends object>({
   options,
   name,
   field,
 }: {
-  options: string[]
+  options: Array<DropdownOption | string>
   name: string
   field: keyof T
 }) => {
-  const { setEditData, editData } = useDetailContext<T>()
+  const { data, setEditData, editData } = useDetailContext<T>()
   const editingComponent = (
     <FormControl>
       <RadioGroup
@@ -216,13 +228,20 @@ export const RadioSelector = <T extends object>({
         sx={{ display: 'flex', flexDirection: 'row' }}
       >
         {options.map(option => (
-          <FormControlLabel key={option} value={option} control={<Radio />} label={option} />
+          <FormControlLabel
+            key={getValue(option)}
+            value={getValue(option)}
+            control={<Radio />}
+            label={getDisplay(option)}
+          />
         ))}
       </RadioGroup>
     </FormControl>
   )
 
-  return <DataValue<T> field={field} EditElement={editingComponent} />
+  const option = options.find(option => getValue(option) === data[field])
+  const displayValue = option ? getDisplay(option) : null
+  return <DataValue<T> field={field} EditElement={editingComponent} displayValue={displayValue} />
 }
 
 /* 
