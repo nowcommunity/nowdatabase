@@ -6,9 +6,12 @@ export const validateLocality = (editData: LocalityDetails, fieldName: keyof Loc
     [K in keyof LocalityDetails]?: (arg: unknown) => string | null
   } = {
     bfa_max_abs: (value: unknown) => {
-      if (typeof value !== 'number') return 'Must be a number'
-      if (value < parseInt(editData.bfa_min_abs ?? '0')) return 'Value cannot be smaller'
-      return 'ERROR'
+      if (!value) return null
+      if (typeof value !== 'string') return 'error'
+      if (Number.isNaN(parseInt(value))) return 'Must be a number'
+      const number = parseInt(value)
+      if (number < parseInt(editData.bfa_min_abs ?? '0')) return 'Value cannot be smaller'
+      return null
     },
     bfa_min_abs: (_value: unknown) => {
       return null
