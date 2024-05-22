@@ -1,10 +1,11 @@
 import { Editable, LocalityDetails, CollectingMethod } from '@/backendTypes'
 import { useDetailContext } from '@/components/DetailView/hooks'
-import { EditingModal, Grouped, ArrayFrame, HalfFrames } from '@/components/DetailView/common/FormComponents'
+import { Grouped, ArrayFrame, HalfFrames } from '@/components/DetailView/common/FormComponents'
 import { Box, TextField } from '@mui/material'
 import { MRT_ColumnDef } from 'material-react-table'
 import { useForm } from 'react-hook-form'
 import { EditableTable } from '@/components/DetailView/common/EditableTable'
+import { EditingModal } from '@/components/DetailView/common/EditingModal'
 
 export const TaphonomyTab = () => {
   const { textField, dropdown } = useDetailContext<LocalityDetails>()

@@ -1,10 +1,11 @@
 import { Editable, SpeciesDetails, SpeciesSynonym } from '@/backendTypes'
 import { useDetailContext } from '@/components/DetailView/hooks'
-import { EditingModal, Grouped } from '@/components/DetailView/common/FormComponents'
+import { Grouped } from '@/components/DetailView/common/FormComponents'
 import { Box, TextField } from '@mui/material'
 import { MRT_ColumnDef } from 'material-react-table'
 import { useForm } from 'react-hook-form'
 import { EditableTable } from '@/components/DetailView/common/EditableTable'
+import { EditingModal } from '@/components/DetailView/common/EditingModal'
 
 export const SynonymTab = () => {
   const { editData, mode } = useDetailContext<SpeciesDetails>()

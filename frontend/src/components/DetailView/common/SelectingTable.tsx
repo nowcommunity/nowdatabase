@@ -1,5 +1,5 @@
 import { MRT_ColumnDef, MRT_RowData } from 'material-react-table'
-import { EditingModal } from './FormComponents'
+import { EditingModal } from './EditingModal'
 import { TableView } from '@/components/TableView/TableView'
 import { useDetailContext } from '../hooks'
 import { useMemo } from 'react'
