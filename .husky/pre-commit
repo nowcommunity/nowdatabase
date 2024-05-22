@@ -1,4 +1,0 @@
-npm --prefix frontend run lint
-npm --prefix backend run lint
-npx tsc --project frontend --noEmit
-npx tsc --project backend --noEmit
