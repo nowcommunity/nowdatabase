@@ -4,13 +4,7 @@ import { useGetAllTimeUnitsQuery } from '../../redux/timeUnitReducer'
 import { TimeUnit } from '@/backendTypes'
 import { TableView } from '../TableView/TableView'
 
-export const TimeUnitTable = ({
-  selectorFn,
-  selectedList,
-}: {
-  selectorFn?: (id: string) => void
-  selectedList?: string[]
-}) => {
+export const TimeUnitTable = ({ selectorFn }: { selectorFn?: (newTimeUnit: TimeUnit) => void }) => {
   const time_unitQuery = useGetAllTimeUnitsQuery()
   const columns = useMemo<MRT_ColumnDef<TimeUnit>[]>(
     () => [
@@ -50,7 +44,6 @@ export const TimeUnitTable = ({
   return (
     <TableView<TimeUnit>
       selectorFn={selectorFn}
-      selectedList={selectedList}
       checkRowRestriction={checkRowRestriction}
       idFieldName="tu_name"
       columns={columns}

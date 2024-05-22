@@ -4,13 +4,7 @@ import { useGetAllLocalitiesQuery } from '../../redux/localityReducer'
 import { Locality } from '@/backendTypes'
 import { TableView } from '../TableView/TableView'
 
-export const LocalityTable = ({
-  selectorFn,
-  selectedList,
-}: {
-  selectorFn?: (id: string) => void
-  selectedList?: string[]
-}) => {
+export const LocalityTable = ({ selectorFn }: { selectorFn?: (newObject: Locality) => void }) => {
   const localitiesQuery = useGetAllLocalitiesQuery()
   const columns = useMemo<MRT_ColumnDef<Locality>[]>(
     () => [
@@ -46,7 +40,6 @@ export const LocalityTable = ({
   return (
     <TableView<Locality>
       selectorFn={selectorFn}
-      selectedList={selectedList}
       checkRowRestriction={checkRowRestriction}
       idFieldName="lid"
       columns={columns}

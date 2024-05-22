@@ -13,13 +13,7 @@ const Cell = ({ renderedCellValue }: { renderedCellValue: ReactNode }) => (
   </Tooltip>
 )
 
-export const ReferenceTable = ({
-  selectorFn,
-  selectedList,
-}: {
-  selectorFn?: (id: string) => void
-  selectedList?: string[]
-}) => {
+export const ReferenceTable = ({ selectorFn }: { selectorFn?: (id: Reference) => void }) => {
   const referenceQuery = useGetAllReferencesQuery()
   const columns = useMemo<MRT_ColumnDef<Reference>[]>(
     () => [
@@ -73,7 +67,6 @@ export const ReferenceTable = ({
   return (
     <TableView<Reference>
       selectorFn={selectorFn}
-      selectedList={selectedList}
       checkRowRestriction={checkRowRestriction}
       idFieldName="rid"
       columns={columns}

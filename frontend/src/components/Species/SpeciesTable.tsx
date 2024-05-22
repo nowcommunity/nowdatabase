@@ -4,13 +4,7 @@ import { useGetAllSpeciesQuery } from '../../redux/speciesReducer'
 import { Species } from '@/backendTypes'
 import { TableView } from '../TableView/TableView'
 
-export const SpeciesTable = ({
-  selectorFn,
-  selectedList,
-}: {
-  selectorFn?: (id: string) => void
-  selectedList?: string[]
-}) => {
+export const SpeciesTable = ({ selectorFn }: { selectorFn?: (id: Species) => void }) => {
   const speciesQuery = useGetAllSpeciesQuery()
   const columns = useMemo<MRT_ColumnDef<Species>[]>(
     () => [
@@ -62,7 +56,6 @@ export const SpeciesTable = ({
   return (
     <TableView<Species>
       selectorFn={selectorFn}
-      selectedList={selectedList}
       checkRowRestriction={checkRowRestriction}
       idFieldName="species_id"
       columns={columns}
