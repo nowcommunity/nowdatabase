@@ -23,16 +23,19 @@ import { RegisterOptions, FieldValues, UseFormRegisterReturn, FieldErrors } from
 export const ArrayToTable = ({ array, half }: { array: Array<Array<ReactNode>>; half?: boolean }) => {
   const maxRowLength = Math.max(...array.map(row => row.length))
   const width = half ? 12 / maxRowLength : Math.min(12 / maxRowLength, 4)
-
+  const getCellWidth = (row: number, index: number) => {
+    if (index === 1 && array[row].length === 2) return 12 - width
+    return width
+  }
   return (
     <Grid container direction="row">
-      {array.map((row, index) => (
-        <Grid key={index} container direction="row" minHeight="2.5em">
+      {array.map((row, rowIndex) => (
+        <Grid key={rowIndex} container direction="row" minHeight="2.5em">
           {row.map((item, index) => (
             <Grid
               key={index}
               item
-              xs={width}
+              xs={getCellWidth(rowIndex, index)}
               sx={{
                 display: 'flex',
                 alignItems: 'center',
