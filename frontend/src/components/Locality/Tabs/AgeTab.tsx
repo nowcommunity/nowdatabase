@@ -16,7 +16,18 @@ export const AgeTab = () => {
 
   // TODO: The date_meth options should come from db: distinct(now_loc.date_meth)
   const age = [
-    ['Dating method', radioSelection('date_meth', ['time_unit', 'absolute', 'composite'], 'dating-method')],
+    [
+      'Dating method',
+      radioSelection(
+        'date_meth',
+        [
+          { value: 'time_unit', display: 'Time unit' },
+          { value: 'absolute', display: 'Absolute' },
+          { value: 'composite', display: 'Composite' },
+        ],
+        'dating-method'
+      ),
+    ],
     [''],
     ['Age (Ma)', 'Basis for age (Absolute)', 'Basis for age (Time Unit)', 'Basis for age (Fraction)'],
     [
