@@ -1,5 +1,5 @@
 import { LocalityDetails } from '@/backendTypes'
-import { ArrayFrame, HalfFrames } from '@components/DetailView/common/FormComponents'
+import { ArrayFrame, HalfFrames } from '@/components/DetailView/common/tabLayoutHelpers'
 import { useDetailContext } from '@/components/DetailView/hooks'
 
 export const ClimateTab = () => {

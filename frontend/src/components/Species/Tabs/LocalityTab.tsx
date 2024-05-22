@@ -1,5 +1,5 @@
 import { Editable, Locality, SpeciesDetails } from '@/backendTypes'
-import { Grouped } from '@/components/DetailView/common/FormComponents'
+import { Grouped } from '@/components/DetailView/common/tabLayoutHelpers'
 import { EditableTable } from '@/components/DetailView/common/EditableTable'
 import { useDetailContext } from '@/components/DetailView/hooks'
 import { useGetAllLocalitiesQuery } from '@/redux/localityReducer'

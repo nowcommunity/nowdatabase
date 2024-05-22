@@ -1,6 +1,6 @@
 import { Editable, LocalityDetails, LocalityProject } from '@/backendTypes'
 import { EditableTable } from '@/components/DetailView/common/EditableTable'
-import { Grouped } from '@/components/DetailView/common/FormComponents'
+import { Grouped } from '@/components/DetailView/common/tabLayoutHelpers'
 import { EditingModal } from '@/components/DetailView/common/EditingModal'
 import { useDetailContext } from '@/components/DetailView/hooks'
 import { Box, TextField } from '@mui/material'

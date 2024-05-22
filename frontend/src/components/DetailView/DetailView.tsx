@@ -6,9 +6,8 @@ import SaveIcon from '@mui/icons-material/Save'
 import { useEffect, useState, JSX } from 'react'
 import { DetailContextProvider, ModeType } from './Context/DetailContext'
 import { cloneDeep } from 'lodash-es'
-import { EditableTextField } from './common/FormComponents'
 import { useDetailContext } from './hooks'
-import { DropdownOption, DropdownSelector, RadioSelector } from './common/editingComponents'
+import { DropdownOption, DropdownSelector, EditableTextField, RadioSelector } from './common/editingComponents'
 
 export type TabType = {
   title: string
