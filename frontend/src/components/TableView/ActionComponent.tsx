@@ -5,34 +5,29 @@ import { useNavigate } from 'react-router-dom'
 import ManageSearchIcon from '@mui/icons-material/ManageSearch'
 import PolicyIcon from '@mui/icons-material/Policy'
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline'
-import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline'
 
 export const ActionComponent = <T extends MRT_RowData>({
   row,
   idFieldName,
-  selectorFn,
-  selectedList,
   checkRowRestriction,
   url,
+  selectorFn,
 }: {
   row: MRT_Row<T>
   idFieldName: keyof T
-  selectorFn?: (id: string) => void
-  selectedList?: string[]
   checkRowRestriction: ((row: T) => boolean) | undefined
   url: string | undefined
+  selectorFn?: (id: T) => void
 }) => {
   const navigate = useNavigate()
   const id = row.original[idFieldName]
-  const currentSelected = selectedList && selectedList.find(sel => sel === id)
   const getIconToShow = () => {
-    if (currentSelected) return <CheckCircleOutlineIcon color="success" />
     if (selectorFn) return <AddCircleOutlineIcon />
     return <ManageSearchIcon />
   }
   const onClick = () => {
     if (selectorFn) {
-      selectorFn(id)
+      selectorFn(row.original)
     } else {
       navigate(`/${url}/${id}`)
     }

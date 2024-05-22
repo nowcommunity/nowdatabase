@@ -1,63 +1,19 @@
 import { Editable, LocalityDetails, Museum } from '@/backendTypes'
 import { EditableTable } from '@/components/DetailView/common/EditableTable'
 import { EditingForm } from '@/components/DetailView/common/EditingForm'
-import { EditingModal, Grouped } from '@/components/DetailView/common/FormComponents'
+import { Grouped } from '@/components/DetailView/common/FormComponents'
+import { SelectingTable } from '@/components/DetailView/common/SelectingTable'
 import { useDetailContext } from '@/components/DetailView/hooks'
-import { TableView } from '@/components/TableView/TableView'
 import { useGetAllMuseumsQuery } from '@/redux/museumReducer'
 import { Box, CircularProgress } from '@mui/material'
 import { MRT_ColumnDef } from 'material-react-table'
-import { useState } from 'react'
-
-const MuseumSelectingTable = () => {
-  const { data, isError } = useGetAllMuseumsQuery()
-  const [selected, setSelected] = useState<string[]>([])
-  if (isError) return 'Error loading museums.'
-  if (!data) return <CircularProgress />
-
-  const selectId = (id: string) => {
-    const index = selected.indexOf(id)
-    if (index < 0) {
-      setSelected([...selected, id])
-    } else {
-      const newSelected = [...selected]
-      newSelected.splice(index, 1)
-      setSelected(newSelected)
-    }
-  }
-
-  const columns: MRT_ColumnDef<Museum>[] = [
-    {
-      accessorKey: 'museum',
-      header: 'Code',
-    },
-    {
-      accessorKey: 'institution',
-      header: 'Museum',
-    },
-    {
-      accessorKey: 'city',
-      header: 'City',
-    },
-    {
-      accessorKey: 'country',
-      header: 'Country',
-    },
-  ]
-
-  return (
-    <TableView<Museum>
-      data={data}
-      columns={columns}
-      selectorFn={selectId}
-      selectedList={selected}
-      idFieldName="museum"
-    />
-  )
-}
 
 export const MuseumTab = () => {
   const { editData, mode } = useDetailContext<LocalityDetails>()
+  const { data: museumData, isError } = useGetAllMuseumsQuery()
+
+  if (isError) return 'Error loading museums.'
+  if (!museumData) return <CircularProgress />
 
   const columns: MRT_ColumnDef<Museum>[] = [
     {
@@ -77,12 +33,6 @@ export const MuseumTab = () => {
       header: 'Country',
     },
   ]
-
-  const selectingTable = (
-    <EditingModal buttonText="Add existing museum">
-      <MuseumSelectingTable />
-    </EditingModal>
-  )
 
   const formFields: { name: string; label: string; required?: boolean }[] = [
     { name: 'code', label: 'Code', required: true },
@@ -94,19 +44,22 @@ export const MuseumTab = () => {
     { name: 'country', label: 'Country', required: true },
   ]
 
-  const editingModal = (
-    <EditingForm<Museum, LocalityDetails>
-      buttonText="Add new museum"
-      formFields={formFields}
-      arrayFieldName="museums"
-    />
-  )
-
   return (
     <Grouped title="Museums">
       {mode === 'edit' && (
         <Box display="flex" gap={1}>
-          {editingModal} {selectingTable}
+          <EditingForm<Museum, LocalityDetails>
+            buttonText="Add new museum"
+            formFields={formFields}
+            arrayFieldName="museums"
+          />
+          <SelectingTable<Museum, LocalityDetails>
+            buttonText="Add existing museum"
+            data={museumData}
+            columns={columns}
+            fieldName="museums"
+            idFieldName="museum"
+          />
         </Box>
       )}
       <EditableTable<Editable<Museum>, LocalityDetails>

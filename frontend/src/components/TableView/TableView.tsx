@@ -30,15 +30,13 @@ export const TableView = <T extends MRT_RowData>({
   idFieldName,
   checkRowRestriction,
   selectorFn,
-  selectedList,
   url,
 }: {
   data: T[] | undefined
   columns: MRT_ColumnDef<T>[]
-  idFieldName: keyof MRT_RowData
+  idFieldName: keyof T
   checkRowRestriction?: (row: T) => boolean
-  selectorFn?: (id: string) => void
-  selectedList?: string[]
+  selectorFn?: (id: T) => void
   url?: string
 }) => {
   const navigate = useNavigate()
@@ -92,14 +90,7 @@ export const TableView = <T extends MRT_RowData>({
       }}
       onColumnFiltersChange={setColumnFilters}
       renderRowActions={({ row }) => (
-        <ActionComponent
-          row={row}
-          idFieldName={idFieldName}
-          selectorFn={selectorFn}
-          selectedList={selectedList}
-          checkRowRestriction={checkRowRestriction}
-          url={url}
-        />
+        <ActionComponent {...{ selectorFn, url, checkRowRestriction, row, idFieldName }} />
       )}
       displayColumnDefOptions={{ 'mrt-row-actions': { size: 50, header: '' } }}
       enableRowActions

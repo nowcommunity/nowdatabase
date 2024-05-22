@@ -31,9 +31,14 @@ export const EditableTable = <T extends Editable<MRT_RowData>, ParentType extend
     // TODO: Using static index - need to use some id, probably sorting breaks this
     const rowClicked = (index: number | undefined) => {
       if (index === undefined) return
-      const museums = [...editData[field]]
-      museums[index].rowState = getNewState(state)
-      setEditData({ ...editData, museums })
+      const items = [...editData[field]]
+      if (items[index].rowState === 'new') {
+        items.splice(index, 1)
+        setEditData({ ...editData, [field]: items })
+        return
+      }
+      items[index].rowState = getNewState(state)
+      setEditData({ ...editData, items })
     }
 
     const getIcon = () => {
