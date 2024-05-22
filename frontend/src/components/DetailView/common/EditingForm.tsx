@@ -1,5 +1,5 @@
 import { Box, TextField } from '@mui/material'
-import { EditingModal } from './FormComponents'
+import { EditingModal } from './EditingModal'
 import { useForm } from 'react-hook-form'
 import { Editable } from '@/backendTypes'
 import { useDetailContext } from '../hooks'
