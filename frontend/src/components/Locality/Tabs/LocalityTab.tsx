@@ -7,7 +7,10 @@ import { useForm } from 'react-hook-form'
 import { EditableTable } from '@/components/DetailView/common/EditableTable'
 
 export const LocalityTab = () => {
-  const { textField, dropdown } = useDetailContext<LocalityDetails>()
+  const { data, editData, textField, radioSelection, dropdown, mode } = useDetailContext<LocalityDetails>()
+
+  const approximateCoordinatesOptions = ['', { display: 'No', value: '0' }, { display: 'Yes', value: '1' }]
+  const generalLocalityOptions = ['', { display: 'No', value: 'n' }, { display: 'Yes', value: 'y' }]
 
   const siteAreaOptions = [
     '',
@@ -18,12 +21,23 @@ export const LocalityTab = () => {
     { display: '>1000 m2', value: '>1000m2' },
   ]
 
-  const approximateCoordinatesOptions = ['', { display: 'No', value: '0' }, { display: 'Yes', value: '1' }]
-  const generalLocalityOptions = ['', { display: 'No', value: 'n' }, { display: 'Yes', value: 'y' }]
+  const getStatusText = () => (data.loc_status ? <>Private</> : <>Public</>)
 
   const info = [
     ['Name', textField('loc_name')],
-    ['Status', textField('loc_status')],
+    [
+      'Visibility status',
+      mode === 'edit'
+        ? radioSelection(
+            'loc_status',
+            [
+              { value: 'false', display: 'Public' },
+              { value: 'true', display: 'Private' },
+            ],
+            'Status'
+          )
+        : getStatusText(),
+    ],
   ]
   const country = [
     ['Country', textField('country')],
@@ -42,7 +56,6 @@ export const LocalityTab = () => {
     ['Altitude (m)', textField('altitude')],
   ]
 
-  const { editData, mode } = useDetailContext<LocalityDetails>()
   const {
     register,
     formState: { errors },
