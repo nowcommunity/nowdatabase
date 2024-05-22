@@ -114,21 +114,6 @@ export const DataValue = <T extends object>({ field, EditElement }: { field: key
   }
   return data[field]
 }
-
-const modalStyle = {
-  position: 'absolute',
-  top: '50%',
-  left: '50%',
-  transform: 'translate(-50%, -50%)',
-  width: 1200,
-  height: '90%',
-  bgcolor: 'background.paper',
-  border: '2px solid #000',
-  overflow: 'auto',
-  boxShadow: 24,
-  p: 4,
-}
-
 export const EditableTextField = <T extends object>({
   field,
   type,
@@ -264,6 +249,20 @@ export const EditingModal = ({
     setOpen(false)
   }
 
+  const modalStyle = {
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    transform: 'translate(-50%, -50%)',
+    width: 1200,
+    maxHeight: '90%',
+    bgcolor: 'background.paper',
+    border: '2px solid #000',
+    overflow: 'auto',
+    boxShadow: 24,
+    p: 4,
+  }
+
   return (
     <Box>
       <Button onClick={() => setOpen(true)} variant="contained" sx={{ marginBottom: '1em' }}>
@@ -271,7 +270,10 @@ export const EditingModal = ({
       </Button>
       <Modal open={open} aria-labelledby={`modal-${buttonText}`} aria-describedby={`modal-${buttonText}`}>
         <Box sx={{ ...modalStyle }}>
-          <Box marginBottom="2em"> {children}</Box>
+          <Box marginBottom="2em" marginTop="1em">
+            {' '}
+            {children}
+          </Box>
           {onSave && <Button onClick={() => void closeWithSave()}>Save</Button>}
           <Button onClick={() => setOpen(false)}>{onSave ? 'Cancel' : 'Close'}</Button>
         </Box>
