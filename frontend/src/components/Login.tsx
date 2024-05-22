@@ -64,7 +64,7 @@ export const Login = () => {
           helperText={passwordError}
           fullWidth
         />
-        <Button onClick={void login} size="large" style={{ fontSize: '1.4em' }}>
+        <Button onClick={() => void login()} size="large" style={{ fontSize: '1.4em' }}>
           Login
         </Button>
         <Box>

@@ -13,6 +13,7 @@ import { logger } from './utils/logger'
 import { PORT, BACKEND_MODE } from './utils/config'
 import { tokenExtractor, userExtractor, requireLogin } from './middlewares/authenticator'
 import { errorHandler } from './middlewares/errorHandler'
+import { createTestUser } from './services/user'
 
 const app = express()
 
@@ -34,5 +35,9 @@ app.use('/time-unit', timeUnitRouter)
 app.use('/museum', museumRouter)
 app.use(errorHandler)
 app.listen(PORT, () => {
-  logger.info(`Server running on port ${PORT}`)
+  logger.info(`Server running on port ${PORT} in "${BACKEND_MODE}"-mode`)
+  if (BACKEND_MODE === 'dev') {
+    logger.info('Creating test-user')
+    void createTestUser()
+  }
 })
