@@ -104,7 +104,10 @@ export const ClimateTab = () => {
 
   const environmentAndVegetationDetail = [['Environment & Vegetation Detail', textField('v_envi_det')]]
 
-  const season = [['Seasonality', dropdown('seasonality', seasonalityOptions, 'Seasonality')]]
+  const season = [
+    ['Seasonality', dropdown('seasonality', seasonalityOptions, 'Seasonality')],
+    ['Seasonality Intensity', textField('seas_intens')],
+  ]
 
   const vegetation = [
     ['Biome', dropdown('biome', biomeOptions, 'Biome')],

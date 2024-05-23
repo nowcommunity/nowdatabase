@@ -7,7 +7,19 @@ import { useForm } from 'react-hook-form'
 import { EditableTable } from '@/components/DetailView/common/EditableTable'
 
 export const LocalityTab = () => {
-  const { textField } = useDetailContext<LocalityDetails>()
+  const { textField, dropdown } = useDetailContext<LocalityDetails>()
+
+  const siteAreaOptions = [
+    '',
+    { display: '<10 m2', value: '<10m2' },
+    { display: '10-50 m2', value: '10-50m2' },
+    { display: '50-100 m2', value: '50-100m2' },
+    { display: '100-1000 m2', value: '100-1000m2' },
+    { display: '>1000 m2', value: '>1000m2' },
+  ]
+
+  const approximateCoordinatesOptions = ['', { display: 'No', value: '0' }, { display: 'Yes', value: '1' }]
+  const generalLocalityOptions = ['', { display: 'No', value: 'n' }, { display: 'Yes', value: 'y' }]
 
   const info = [
     ['Name', textField('loc_name')],
@@ -18,15 +30,15 @@ export const LocalityTab = () => {
     ['State', textField('state')],
     ['County', textField('county')],
     ['Detail', textField('loc_detail')],
-    ['Site Area', textField('site_area')],
-    ['General Locality', textField('gen_loc')],
+    ['Site Area', dropdown('site_area', siteAreaOptions, 'Site Area')],
+    ['General Locality', dropdown('gen_loc', generalLocalityOptions, 'General Locality')],
     ['Plate', textField('plate')],
   ]
   const latlong = [
     ['', 'dms', 'dec'],
     ['Latitude', textField('dms_lat'), textField('dec_lat')],
     ['Longitude', textField('dms_long'), textField('dec_long')],
-    ['Approximate Coordinates', textField('approx_coord')],
+    ['Approximate Coordinates', dropdown('approx_coord', approximateCoordinatesOptions, 'Approximate Coordinates')],
     ['Altitude (m)', textField('altitude')],
   ]
 
