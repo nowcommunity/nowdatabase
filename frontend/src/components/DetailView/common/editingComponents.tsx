@@ -14,6 +14,8 @@ import { RegisterOptions, FieldValues, UseFormRegisterReturn, FieldErrors } from
 import { useDetailContext } from '../hooks'
 import { DataValue } from './tabLayoutHelpers'
 
+const fieldWidth = '16em'
+
 export type DropdownOption = { value: string; display: string }
 
 export const DropdownSelector = <T extends object>({
@@ -35,7 +37,7 @@ export const DropdownSelector = <T extends object>({
         id={`${name}-multiselect`}
         value={(editData[field] || '') as string}
         onChange={(event: SelectChangeEvent) => setEditData({ ...editData, [field]: event.target.value })}
-        sx={{ width: '12em' }}
+        sx={{ width: fieldWidth }}
         size="small"
       >
         {options.map(item => (
@@ -131,6 +133,7 @@ export const EditableTextField = <T extends object>({
   const error = validator(editData, field)
   const editingComponent = (
     <TextField
+      sx={{ width: fieldWidth }}
       onChange={(event: ChangeEvent<HTMLInputElement>) =>
         setEditData({ ...editData, [field]: event?.currentTarget?.value })
       }
