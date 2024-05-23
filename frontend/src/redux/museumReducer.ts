@@ -1,7 +1,7 @@
 import { Museum } from '@/backendTypes'
 import { api } from './api'
 
-const referencesApi = api.injectEndpoints({
+const museumsApi = api.injectEndpoints({
   endpoints: builder => ({
     getAllMuseums: builder.query<Museum[], void>({
       query: () => ({
@@ -11,4 +11,4 @@ const referencesApi = api.injectEndpoints({
   }),
 })
 
-export const { useGetAllMuseumsQuery } = referencesApi
+export const { useGetAllMuseumsQuery } = museumsApi
