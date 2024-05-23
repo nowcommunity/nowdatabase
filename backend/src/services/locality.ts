@@ -2,6 +2,7 @@ import { logger } from '../utils/logger'
 import { prisma } from '../utils/db'
 import { LocalityDetails } from '../../../frontend/src/backendTypes'
 import Prisma from '@prisma/client'
+import { validateLocality } from '../../../frontend/src/validators/locality'
 
 export const testDb = async () => {
   const result = await prisma.now_loc.findMany({ select: { loc_name: true }, where: { loc_name: 'Amba East' } })
@@ -78,7 +79,17 @@ export const fixEditedLocality = (editedLocality: LocalityDetails) => {
   return editedLocality
 }
 
-export const editLocality = async (lid: number, editedFields: Partial<LocalityDetails>) => {
+export const validateEntireLocality = (editedFields: Partial<Prisma.now_loc>) => {
+  const keys = Object.keys(editedFields)
+  const errors = []
+  for (const key of keys) {
+    const error = validateLocality(editedFields as LocalityDetails, key as keyof LocalityDetails)
+    if (error !== null) errors.push(error)
+  }
+  return errors
+}
+
+export const filterLocality = (editedFields: Partial<LocalityDetails>) => {
   const fields = Object.keys(prisma.now_loc.fields)
   const filteredLoc = Object.entries(editedFields)
     .filter(([field]) => fields.includes(field))
@@ -86,6 +97,10 @@ export const editLocality = async (lid: number, editedFields: Partial<LocalityDe
       obj[cur[0]] = cur[1]
       return obj
     }, {}) as Partial<Prisma.now_loc>
+  return filteredLoc
+}
+
+export const editLocality = async (lid: number, filteredLoc: Partial<Prisma.now_loc>) => {
   const result = await prisma.now_loc.update({
     where: {
       lid,
