@@ -1,11 +1,9 @@
 import { Editable, LocalityDetails, SedimentaryStructure } from '@/backendTypes'
 import { EditableTable } from '@/components/DetailView/common/EditableTable'
-import { EditingModal } from '@/components/DetailView/common/EditingModal'
+import { EditingForm, EditingFormField } from '@/components/DetailView/common/EditingForm'
 import { ArrayFrame, HalfFrames, Grouped } from '@/components/DetailView/common/tabLayoutHelpers'
 import { useDetailContext } from '@/components/DetailView/hooks'
-import { Box, TextField } from '@mui/material'
 import { MRT_ColumnDef } from 'material-react-table'
-import { useForm } from 'react-hook-form'
 
 export const LithologyTab = () => {
   const { textField, dropdown } = useDetailContext<LocalityDetails>()
@@ -160,11 +158,6 @@ export const LithologyTab = () => {
   ]
 
   const { editData, mode } = useDetailContext<LocalityDetails>()
-  const {
-    register,
-    trigger,
-    formState: { errors },
-  } = useForm()
 
   const columns: MRT_ColumnDef<SedimentaryStructure>[] = [
     {
@@ -173,24 +166,13 @@ export const LithologyTab = () => {
     },
   ]
 
-  const onSave = async () => {
-    // TODO: Saving logic here (add Sedimentary Structure to editData)
-    const result = await trigger()
-    return result
-  }
-
-  const editingModal = (
-    <EditingModal buttonText="Add new Sedimentary Structure" onSave={onSave}>
-      <Box sx={{ display: 'flex', flexDirection: 'column', gap: '1em' }}>
-        <TextField
-          {...register('sed_struct', { required: true })}
-          label="Sedimentary Structure"
-          error={!!errors.sed_struct}
-          required
-        />
-      </Box>
-    </EditingModal>
-  )
+  const formFields: EditingFormField[] = [
+    {
+      name: 'sed_struct',
+      label: 'Sedimentary Structure',
+      required: true,
+    },
+  ]
 
   return (
     <>
@@ -200,7 +182,13 @@ export const LithologyTab = () => {
       </HalfFrames>
       <HalfFrames>
         <Grouped title="Sedimentary Structure & Taphonomic Detail">
-          {mode === 'edit' && editingModal}
+          {mode === 'edit' && (
+            <EditingForm<Editable<SedimentaryStructure>, LocalityDetails>
+              buttonText="Add new sedimentary structure"
+              formFields={formFields}
+              arrayFieldName="now_ss"
+            />
+          )}
           <EditableTable<Editable<SedimentaryStructure>, LocalityDetails>
             columns={columns}
             data={editData.now_ss}
