@@ -38,7 +38,8 @@ export const EditingForm = <T extends object, PT extends object>({
     if (!result) return false
     const values = getValues()
     const newObject: Editable<T> = { ...(values as T), rowState: 'new' }
-    if (arrayFieldName) setEditData({ ...editData, museums: [...(editData[arrayFieldName] as Array<T>), newObject] })
+    if (arrayFieldName)
+      setEditData({ ...editData, [arrayFieldName]: [...(editData[arrayFieldName] as Array<T>), newObject] })
     if (editAction) editAction(newObject)
     return true
   }
