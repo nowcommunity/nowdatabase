@@ -1,12 +1,13 @@
 import express from 'express'
 import cors from 'cors'
 import 'express-async-errors'
-import userRouter from './routes/user'
 import localityRouter from './routes/locality'
+import museumRouter from './routes/museum'
 import referenceRouter from './routes/reference'
+import sedimentaryStructureRouter from './routes/sedimentaryStructure'
 import speciesRouter from './routes/species'
 import timeUnitRouter from './routes/timeUnit'
-import museumRouter from './routes/museum'
+import userRouter from './routes/user'
 import { requestLogger, responseLogger } from './middlewares/requestLogger'
 import compression from 'compression'
 import { logger } from './utils/logger'
@@ -33,6 +34,7 @@ app.use('/reference', referenceRouter)
 app.use('/species', speciesRouter)
 app.use('/time-unit', timeUnitRouter)
 app.use('/museum', museumRouter)
+app.use('/sedimentary-structure', sedimentaryStructureRouter)
 app.use(errorHandler)
 app.listen(PORT, () => {
   logger.info(`Server running on port ${PORT} in "${BACKEND_MODE}"-mode`)
