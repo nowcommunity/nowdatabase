@@ -5,7 +5,7 @@ export type RowState = 'new' | 'removed' | 'cancelled' | 'clean'
 // Use this for fields that include array that has to be edited by EditableTable.
 // For example see LocalityDetails: museums field
 export type Editable<T> = T & { rowState?: RowState }
-
+export type SedimentaryStructureValues = Prisma.now_ss_values
 export type CollectingMethod = Prisma.now_coll_meth
 export type LocalityProject = Prisma.now_plr & { now_proj: Prisma.now_proj }
 export type LocalitySpecies = Prisma.now_ls & { com_species: Prisma.com_species }

@@ -1,12 +1,15 @@
-import { Editable, LocalityDetails, SedimentaryStructure } from '@/backendTypes'
+import { Editable, LocalityDetails, SedimentaryStructure, SedimentaryStructureValues } from '@/backendTypes'
 import { EditableTable } from '@/components/DetailView/common/EditableTable'
 import { EditingForm, EditingFormField } from '@/components/DetailView/common/EditingForm'
+import { SelectingTable } from '@/components/DetailView/common/SelectingTable'
 import { ArrayFrame, HalfFrames, Grouped } from '@/components/DetailView/common/tabLayoutHelpers'
 import { useDetailContext } from '@/components/DetailView/hooks'
+import { useGetAllSedimentaryStructuresQuery } from '@/redux/sedimentaryStructureReducer'
 import { MRT_ColumnDef } from 'material-react-table'
 
 export const LithologyTab = () => {
-  const { textField, dropdown } = useDetailContext<LocalityDetails>()
+  const { textField, dropdown, setEditData } = useDetailContext<LocalityDetails>()
+  const { data: sedimentaryStructuresData } = useGetAllSedimentaryStructuresQuery()
 
   const rockTypeOptions = [
     '',
@@ -174,6 +177,13 @@ export const LithologyTab = () => {
     },
   ]
 
+  const selectingTableColumns: MRT_ColumnDef<SedimentaryStructureValues>[] = [
+    {
+      header: 'Sedimentary structure',
+      accessorKey: 'ss_value',
+    },
+  ]
+
   return (
     <>
       <HalfFrames>
@@ -183,11 +193,27 @@ export const LithologyTab = () => {
       <HalfFrames>
         <Grouped title="Sedimentary Structure & Taphonomic Detail">
           {mode === 'edit' && (
-            <EditingForm<Editable<SedimentaryStructure>, LocalityDetails>
-              buttonText="Add new sedimentary structure"
-              formFields={formFields}
-              arrayFieldName="now_ss"
-            />
+            <>
+              <EditingForm<Editable<SedimentaryStructure>, LocalityDetails>
+                buttonText="Add new sedimentary structure"
+                formFields={formFields}
+                arrayFieldName="now_ss"
+              />
+              <SelectingTable<SedimentaryStructureValues, LocalityDetails>
+                buttonText="Add existing sedimentary structure"
+                columns={selectingTableColumns}
+                data={sedimentaryStructuresData}
+                fieldName="now_ss"
+                idFieldName="ss_value"
+                editingAction={(newSed: SedimentaryStructureValues) => {
+                  setEditData({
+                    ...editData,
+                    now_ss: [...editData.now_ss, { lid: editData.lid, sed_struct: newSed.ss_value, rowState: 'new' }],
+                  })
+                }}
+                selectedValues={editData.now_ss.map(ss => ss.sed_struct)}
+              />
+            </>
           )}
           <EditableTable<Editable<SedimentaryStructure>, LocalityDetails>
             columns={columns}
