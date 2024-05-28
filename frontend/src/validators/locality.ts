@@ -24,6 +24,10 @@ export const validateLocality = (editData: LocalityDetails, fieldName: keyof Loc
       if (number > editData.max_age) return 'Min age must be smaller than max age'
       return null
     },
+    now_coll_meth: (value: unknown) => {
+      // Check that ...
+      return null
+    },
   }
 
   const validator = getValidator[fieldName]
