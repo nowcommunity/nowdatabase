@@ -1,16 +1,18 @@
-import { useEffect, useState } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import {
   type MRT_ColumnFiltersState,
-  MaterialReactTable,
   type MRT_ColumnDef,
   type MRT_RowData,
   MRT_SortingState,
   MRT_PaginationState,
+  useMaterialReactTable,
+  MaterialReactTable,
 } from 'material-react-table'
 import { CircularProgress } from '@mui/material'
-import { useLocation, useNavigate } from 'react-router-dom'
+import { useLocation } from 'react-router-dom'
 import { renderCustomToolbar, renderCustomToolbarModalVersion } from './helpers'
 import { ActionComponent } from './ActionComponent'
+import { PageContext } from '../Page'
 
 type TableStateInUrl = 'sorting' | 'columnfilters' | 'pagination'
 
@@ -39,18 +41,51 @@ export const TableView = <T extends MRT_RowData>({
   selectorFn?: (id: T) => void
   url?: string
 }) => {
-  const navigate = useNavigate()
   const location = useLocation()
   const [columnFilters, setColumnFilters] = useState<MRT_ColumnFiltersState>([])
   const [sorting, setSorting] = useState<MRT_SortingState>([])
   const [pagination, setPagination] = useState<MRT_PaginationState>(defaultPagination)
-
+  const { setIdList, setTableUrl } = useContext(PageContext)
   const loadStateFromUrl = (state: TableStateInUrl, defaultState: [] | MRT_PaginationState) => {
     const searchParams = new URLSearchParams(location.search)
     const stateFromUrl = searchParams.get(state)
     if (!stateFromUrl) return defaultState
     return JSON.parse(stateFromUrl) as object
   }
+
+  const table = useMaterialReactTable({
+    columns: columns,
+    data: data || [],
+    state: {
+      columnFilters,
+      showColumnFilters: true,
+      sorting,
+      pagination,
+      density: 'compact',
+    },
+    initialState: {
+      columnVisibility: { id: false },
+    },
+    onColumnFiltersChange: setColumnFilters,
+    renderRowActions: ({ row }) => <ActionComponent {...{ selectorFn, url, checkRowRestriction, row, idFieldName }} />,
+    displayColumnDefOptions: { 'mrt-row-actions': { size: 50, header: '' } },
+    enableRowActions: true,
+    onSortingChange: setSorting,
+    onPaginationChange: setPagination,
+    autoResetPageIndex: false,
+    positionPagination: 'both',
+    paginationDisplayMode: 'pages',
+    enableDensityToggle: false,
+    enableGlobalFilter: false,
+    enableColumnActions: false,
+    enableHiding: true,
+    renderToolbarInternalActions:
+      /*
+        To know what components you can render here if necessary, see the source code:
+        https://github.com/KevinVandy/material-react-table/blob/85b98f9aaa038df48aa1dd35123560abce78ee58/packages/material-react-table/src/components/toolbar/MRT_ToolbarInternalButtons.tsx#L45
+      */
+      selectorFn ? renderCustomToolbarModalVersion : renderCustomToolbar,
+  })
 
   // Load state from url only on first render
   useEffect(() => {
@@ -67,49 +102,11 @@ export const TableView = <T extends MRT_RowData>({
     const columnFilterToUrl = `columnfilters=${JSON.stringify(columnFilters)}`
     const sortingToUrl = `sorting=${JSON.stringify(sorting)}`
     const paginationToUrl = `pagination=${JSON.stringify(pagination)}`
-    navigate(`${location.pathname}?&${columnFilterToUrl}&${sortingToUrl}&${paginationToUrl}`, {
-      replace: true,
-    })
-  }, [columnFilters, sorting, pagination, location.pathname, navigate, selectorFn])
+    setTableUrl(`${location.pathname}?&${columnFilterToUrl}&${sortingToUrl}&${paginationToUrl}`)
+    setIdList(table.getPrePaginationRowModel().rows.map(row => row.original[idFieldName] as string))
+  }, [columnFilters, sorting, pagination, location.pathname, selectorFn, setIdList, table, idFieldName, setTableUrl])
 
   if (!data) return <CircularProgress />
 
-  return (
-    <MaterialReactTable
-      columns={columns}
-      data={data}
-      state={{
-        columnFilters,
-        showColumnFilters: true,
-        sorting,
-        pagination,
-        density: 'compact',
-      }}
-      initialState={{
-        columnVisibility: { id: false },
-      }}
-      onColumnFiltersChange={setColumnFilters}
-      renderRowActions={({ row }) => (
-        <ActionComponent {...{ selectorFn, url, checkRowRestriction, row, idFieldName }} />
-      )}
-      displayColumnDefOptions={{ 'mrt-row-actions': { size: 50, header: '' } }}
-      enableRowActions
-      onSortingChange={setSorting}
-      onPaginationChange={setPagination}
-      autoResetPageIndex={false}
-      positionPagination="both"
-      paginationDisplayMode="pages"
-      enableDensityToggle={false}
-      enableGlobalFilter={false}
-      enableColumnActions={false}
-      enableHiding={true}
-      renderToolbarInternalActions={
-        /*
-          To know what components you can render here if necessary, see the source code:
-          https://github.com/KevinVandy/material-react-table/blob/85b98f9aaa038df48aa1dd35123560abce78ee58/packages/material-react-table/src/components/toolbar/MRT_ToolbarInternalButtons.tsx#L45
-        */
-        selectorFn ? renderCustomToolbarModalVersion : renderCustomToolbar
-      }
-    />
-  )
+  return <MaterialReactTable table={table} />
 }

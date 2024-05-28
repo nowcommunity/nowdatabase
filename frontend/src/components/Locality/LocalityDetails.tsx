@@ -19,7 +19,6 @@ export const LocalityDetails = () => {
   const { id } = useParams()
   const { isLoading, isError, data } = useGetLocalityDetailsQuery(id!)
   const [editLocalityRequest] = useEditLocalityMutation()
-
   if (isError) return <div>Error loading data</div>
   if (isLoading || !data) return <CircularProgress />
 
