@@ -38,5 +38,8 @@ The :open_file_folder: [documentation](documentation)-directory has documentatio
 :memo: [Frontend](documentation/frontend.md) 
 + Explanation of the frontend logic and how to add views
 
+[Validators](frontend/src/validators/)
++ The readme explains how validators are written
+
 :mag_right: [Class diagram](documentation/class_diagram.md) 
 + See the relations of relevant tables. Notice that it omits some unimportant tables and does not show most columns.
