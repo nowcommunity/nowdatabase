@@ -1,6 +1,5 @@
 import { Editable, LocalityDetails, SedimentaryStructure, SedimentaryStructureValues } from '@/backendTypes'
 import { EditableTable } from '@/components/DetailView/common/EditableTable'
-import { EditingForm, EditingFormField } from '@/components/DetailView/common/EditingForm'
 import { SelectingTable } from '@/components/DetailView/common/SelectingTable'
 import { ArrayFrame, HalfFrames, Grouped } from '@/components/DetailView/common/tabLayoutHelpers'
 import { useDetailContext } from '@/components/DetailView/hooks'
@@ -169,14 +168,6 @@ export const LithologyTab = () => {
     },
   ]
 
-  const formFields: EditingFormField[] = [
-    {
-      name: 'sed_struct',
-      label: 'Sedimentary Structure',
-      required: true,
-    },
-  ]
-
   const selectingTableColumns: MRT_ColumnDef<SedimentaryStructureValues>[] = [
     {
       header: 'Sedimentary structure',
@@ -194,11 +185,6 @@ export const LithologyTab = () => {
         <Grouped title="Sedimentary Structure & Taphonomic Detail">
           {mode === 'edit' && (
             <>
-              <EditingForm<Editable<SedimentaryStructure>, LocalityDetails>
-                buttonText="Add new sedimentary structure"
-                formFields={formFields}
-                arrayFieldName="now_ss"
-              />
               <SelectingTable<SedimentaryStructureValues, LocalityDetails>
                 buttonText="Add existing sedimentary structure"
                 columns={selectingTableColumns}
