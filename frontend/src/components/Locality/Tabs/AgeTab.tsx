@@ -33,15 +33,10 @@ export const AgeTab = () => {
     [
       'Minimum age',
       textField('min_age', 'number'),
-      textField('bfa_min', 'number'),
+      textField('bfa_min'),
       dropdown('frac_min', fracOptions, 'Minimum fraction'),
     ],
-    [
-      'Maximum age',
-      textField('max_age', 'number'),
-      textField('bfa_max', 'number'),
-      dropdown('frac_max', fracOptions, 'Maximum fraction'),
-    ],
+    ['Maximum age', textField('max_age'), textField('bfa_max'), dropdown('frac_max', fracOptions, 'Maximum fraction')],
     [''],
     ['Chronostrathigraphic age', textField('chron')],
     ['Age Comment', bigTextField('age_comm')],
