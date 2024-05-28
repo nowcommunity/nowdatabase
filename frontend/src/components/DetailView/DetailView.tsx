@@ -87,6 +87,8 @@ export const DetailView = <T extends object>({
     <RadioSelector field={field} options={options} name={name} />
   )
 
+  const bigTextField = (field: keyof T) => <EditableTextField<T> field={field} type="text" big />
+
   const initialState = {
     data,
     mode,
@@ -94,6 +96,7 @@ export const DetailView = <T extends object>({
     textField,
     dropdown,
     radioSelection,
+    bigTextField,
     validator,
   }
 

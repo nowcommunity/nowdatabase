@@ -9,6 +9,7 @@ export type DetailContextType<T> = {
   editData: T
   setEditData: (editData: T) => void
   textField: (field: keyof T, type?: React.HTMLInputTypeAttribute) => JSX.Element
+  bigTextField: (field: keyof T) => JSX.Element
   dropdown: (field: keyof T, options: Array<DropdownOption | string>, name: string) => JSX.Element
   radioSelection: (field: keyof T, options: Array<DropdownOption | string>, name: string) => JSX.Element
   validator: (editData: T, field: keyof T) => string | null

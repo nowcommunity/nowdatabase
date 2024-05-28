@@ -8,7 +8,8 @@ import { EditableTable } from '@/components/DetailView/common/EditableTable'
 import { EditingModal } from '@/components/DetailView/common/EditingModal'
 
 export const LocalityTab = () => {
-  const { data, editData, textField, radioSelection, dropdown, mode } = useDetailContext<LocalityDetails>()
+  const { data, editData, textField, radioSelection, dropdown, mode, bigTextField } =
+    useDetailContext<LocalityDetails>()
 
   const approximateCoordinatesOptions = ['', { display: 'No', value: '0' }, { display: 'Yes', value: '1' }]
   const generalLocalityOptions = ['', { display: 'No', value: 'n' }, { display: 'Yes', value: 'y' }]
@@ -44,7 +45,7 @@ export const LocalityTab = () => {
     ['Country', textField('country')],
     ['State', textField('state')],
     ['County', textField('county')],
-    ['Detail', textField('loc_detail')],
+    ['Detail', bigTextField('loc_detail')],
     ['Site Area', dropdown('site_area', siteAreaOptions, 'Site Area')],
     ['General Locality', dropdown('gen_loc', generalLocalityOptions, 'General Locality')],
     ['Plate', textField('plate')],

@@ -58,15 +58,24 @@ export const FormTextField = <T extends string>({
   fieldName,
   label,
   required = false,
+  big = false,
 }: {
   register: (name: T, options?: RegisterOptions<FieldValues, T> | undefined) => UseFormRegisterReturn<T>
   errors: FieldErrors<FieldValues>
   fieldName: T
   label: string
   required: boolean
-}) => (
-  <TextField {...register(fieldName, { required: required })} error={!!errors[fieldName]} {...{ label, required }} />
-)
+  big: boolean
+}) => {
+  const props = {
+    ...register(fieldName, { required: required }),
+    error: !!errors[fieldName],
+    label,
+    required,
+    multiline: big,
+  }
+  return <TextField {...props} />
+}
 
 const getValue = (item: DropdownOption | string) => (typeof item === 'string' ? item : item.value)
 const getDisplay = (item: DropdownOption | string) => (typeof item === 'string' ? item : item.display)
@@ -125,9 +134,11 @@ const MultiSelector = <T extends object>({
 export const EditableTextField = <T extends object>({
   field,
   type,
+  big = false,
 }: {
   field: keyof T
   type?: React.HTMLInputTypeAttribute
+  big?: boolean
 }) => {
   const { setEditData, editData, validator } = useDetailContext<T>()
   const error = validator(editData, field)
@@ -143,6 +154,7 @@ export const EditableTextField = <T extends object>({
       error={error !== null}
       helperText={error ?? ''}
       type={type ?? 'text'}
+      multiline={big}
     />
   )
 
