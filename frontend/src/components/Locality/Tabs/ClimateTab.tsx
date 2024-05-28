@@ -3,7 +3,7 @@ import { ArrayFrame, HalfFrames } from '@/components/DetailView/common/tabLayout
 import { useDetailContext } from '@/components/DetailView/hooks'
 
 export const ClimateTab = () => {
-  const { textField, dropdown } = useDetailContext<LocalityDetails>()
+  const { textField, dropdown, bigTextField } = useDetailContext<LocalityDetails>()
 
   const climateTypeOptions = [
     '',
@@ -102,7 +102,7 @@ export const ClimateTab = () => {
     ['Agent(s) of Disturbance', dropdown('disturb', agentOfDisturbanceOptions, 'Agent(s) of Disturbance')],
   ]
 
-  const environmentAndVegetationDetail = [['Environment & Vegetation Detail', textField('v_envi_det')]]
+  const environmentAndVegetationDetail = [['Environment & Vegetation Detail', bigTextField('v_envi_det')]]
 
   const season = [
     ['Seasonality', dropdown('seasonality', seasonalityOptions, 'Seasonality')],

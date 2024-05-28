@@ -7,7 +7,7 @@ import { useGetAllSedimentaryStructuresQuery } from '@/redux/sedimentaryStructur
 import { MRT_ColumnDef } from 'material-react-table'
 
 export const LithologyTab = () => {
-  const { textField, dropdown, setEditData } = useDetailContext<LocalityDetails>()
+  const { textField, dropdown, setEditData, bigTextField } = useDetailContext<LocalityDetails>()
   const { data: sedimentaryStructuresData } = useGetAllSedimentaryStructuresQuery()
 
   const rockTypeOptions = [
@@ -141,14 +141,14 @@ export const LithologyTab = () => {
   const lithology = [
     ['Rock Type', dropdown('rock_type', rockTypeOptions, 'Rock Type')],
     ['Short Descriptor', textField('rt_adj')],
-    ['Comments', textField('lith_comm')],
+    ['Comments', bigTextField('lith_comm')],
   ]
 
   const sedimentryEnvironment = [
     ['General', dropdown('sed_env_1', generalOptions, 'General')],
     ['Specific', dropdown('sed_env_2', specificOptions, 'Specific')],
     ['GeneralEvent / Circumstance', dropdown('event_circum', circumstanceOptions, 'Event / Circumstance')],
-    ['Comments', textField('se_comm')],
+    ['Comments', bigTextField('se_comm')],
   ]
 
   const depositionalContext = [
@@ -156,7 +156,7 @@ export const LithologyTab = () => {
     ['Depo Context 2', dropdown('depo_context2', depoContext2Options, 'Depo Context 2')],
     ['Depo Context 3', dropdown('depo_context3', depoContext3Options, 'Depo Context 3')],
     ['Depo Context 4', dropdown('depo_context4', depoContext4Options, 'Depo Context 4')],
-    ['Comments', textField('depo_comm')],
+    ['Comments', bigTextField('depo_comm')],
   ]
 
   const { editData, mode } = useDetailContext<LocalityDetails>()

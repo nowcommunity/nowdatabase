@@ -3,7 +3,7 @@ import { ArrayFrame, HalfFrames } from '@/components/DetailView/common/tabLayout
 import { useDetailContext } from '@/components/DetailView/hooks'
 
 export const TaxonomyTab = () => {
-  const { textField, dropdown } = useDetailContext<SpeciesDetails>()
+  const { textField, dropdown, bigTextField } = useDetailContext<SpeciesDetails>()
 
   const taxonStatusOptions = [
     '',
@@ -25,7 +25,7 @@ export const TaxonomyTab = () => {
     ['Taxon Status', dropdown('sp_status', taxonStatusOptions, 'Taxon Status')],
   ]
 
-  const comment = [['Comment', textField('sp_comment')]]
+  const comment = [['Comment', bigTextField('sp_comment')]]
 
   const author = [['Author', textField('sp_author')]]
 

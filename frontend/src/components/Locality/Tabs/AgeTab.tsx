@@ -3,7 +3,7 @@ import { ArrayFrame, HalfFrames } from '@/components/DetailView/common/tabLayout
 import { useDetailContext } from '@/components/DetailView/hooks'
 
 export const AgeTab = () => {
-  const { textField, radioSelection, dropdown } = useDetailContext<LocalityDetails>()
+  const { textField, radioSelection, dropdown, bigTextField } = useDetailContext<LocalityDetails>()
 
   const fracOptions = [
     { value: '', display: 'None' },
@@ -44,7 +44,7 @@ export const AgeTab = () => {
     ],
     [''],
     ['Chronostrathigraphic age', textField('chron')],
-    ['Age Comment', textField('age_comm')],
+    ['Age Comment', bigTextField('age_comm')],
   ]
 
   const lithostratigraphy = [
