@@ -103,8 +103,14 @@ export const TableView = <T extends MRT_RowData>({
     const sortingToUrl = `sorting=${JSON.stringify(sorting)}`
     const paginationToUrl = `pagination=${JSON.stringify(pagination)}`
     setTableUrl(`${location.pathname}?&${columnFilterToUrl}&${sortingToUrl}&${paginationToUrl}`)
-    setIdList(table.getPrePaginationRowModel().rows.map(row => row.original[idFieldName] as string))
   }, [columnFilters, sorting, pagination, location.pathname, selectorFn, setIdList, table, idFieldName, setTableUrl])
+
+  useEffect(() => {
+    setIdList(table.getPrePaginationRowModel().rows.map(row => row.original[idFieldName] as string))
+
+    // Don't put setIdList in the dependency array: it will cause re-render loop.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [table, columnFilters, sorting])
 
   if (!data) return <CircularProgress />
 
