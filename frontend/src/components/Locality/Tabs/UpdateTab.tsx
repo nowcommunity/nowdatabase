@@ -1,13 +1,10 @@
 import { Editable, LocalityDetails, LocalityUpdate } from '@/backendTypes'
 import { EditableTable } from '@/components/DetailView/common/EditableTable'
 import { Grouped } from '@/components/DetailView/common/tabLayoutHelpers'
-import { useDetailContext } from '@/components/DetailView/hooks'
 import { Box } from '@mui/material'
 import { MRT_ColumnDef } from 'material-react-table'
 
 export const UpdateTab = () => {
-  const { editData } = useDetailContext<LocalityDetails>()
-
   const formatDate = (date: Date | null) => {
     if (!date) return 'No date'
     return new Date(date).toISOString().split('T')[0]
@@ -36,12 +33,7 @@ export const UpdateTab = () => {
 
   return (
     <Grouped title="Updates">
-      <EditableTable<Editable<LocalityUpdate>, LocalityDetails>
-        columns={columns}
-        data={editData.now_lau}
-        editable
-        field="now_lau"
-      />
+      <EditableTable<Editable<LocalityUpdate>, LocalityDetails> columns={columns} editable field="now_lau" />
     </Grouped>
   )
 }

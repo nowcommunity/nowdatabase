@@ -9,6 +9,7 @@ import { EditingModal } from '@/components/DetailView/common/EditingModal'
 
 export const TaphonomyTab = () => {
   const { textField, dropdown } = useDetailContext<LocalityDetails>()
+  const { mode } = useDetailContext<LocalityDetails>()
 
   const assemblageFormationOptions = [
     '',
@@ -121,7 +122,6 @@ export const TaphonomyTab = () => {
     ['Species List Complete', dropdown('complete', speciesListCompleteOptions, 'Species List Complete')],
   ]
 
-  const { editData, mode } = useDetailContext<LocalityDetails>()
   const {
     register,
     formState: { errors },
@@ -160,7 +160,6 @@ export const TaphonomyTab = () => {
           {mode === 'edit' && editingModal}
           <EditableTable<Editable<CollectingMethod>, LocalityDetails>
             columns={columns}
-            data={editData.now_coll_meth}
             editable
             field="now_coll_meth"
           />

@@ -8,7 +8,7 @@ import { EditableTable } from '@/components/DetailView/common/EditableTable'
 import { EditingModal } from '@/components/DetailView/common/EditingModal'
 
 export const SynonymTab = () => {
-  const { editData, mode } = useDetailContext<SpeciesDetails>()
+  const { mode } = useDetailContext<SpeciesDetails>()
   const {
     register,
     formState: { errors },
@@ -49,12 +49,7 @@ export const SynonymTab = () => {
     <>
       <Grouped title="Synonyms">
         {mode === 'edit' && editingModal}
-        <EditableTable<Editable<SpeciesSynonym>, SpeciesDetails>
-          columns={columns}
-          data={editData.com_taxa_synonym}
-          editable
-          field="com_taxa_synonym"
-        />
+        <EditableTable<Editable<SpeciesSynonym>, SpeciesDetails> columns={columns} editable field="com_taxa_synonym" />
       </Grouped>
     </>
   )

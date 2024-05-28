@@ -13,18 +13,21 @@ const getNewState = (state: RowState) => {
 }
 
 export const EditableTable = <T extends Editable<MRT_RowData>, ParentType extends MRT_RowData>({
-  data,
+  tableData,
+  editTableData,
   columns,
   editable,
   field,
 }: {
-  data: Array<T> | null
+  tableData?: Array<T> | null
+  editTableData?: Array<T> | null
   columns: MRT_ColumnDef<T>[]
   editable?: boolean
   field: keyof ParentType
 }) => {
-  const { editData, setEditData, mode } = useDetailContext<ParentType>()
-  if (!data) return <CircularProgress />
+  const { editData, setEditData, mode, data } = useDetailContext<ParentType>()
+  if (tableData === null || editTableData === null) return <CircularProgress />
+
   const actionRow = ({ row, staticRowIndex }: { row: MRT_Row<T>; staticRowIndex?: number | undefined }) => {
     const state = row.original.rowState ?? 'clean'
 
@@ -62,11 +65,20 @@ export const EditableTable = <T extends Editable<MRT_RowData>, ParentType extend
     return null
   }
 
+  const getData = () => {
+    if (editable && mode === 'edit') {
+      if (!editTableData) return editData[field] as T[]
+      return editTableData
+    }
+    if (!tableData) return data[field] as T[]
+    return tableData
+  }
+
   return (
     <MaterialReactTable
       {...actionRowProps}
       columns={columns}
-      data={data}
+      data={getData()}
       enableTopToolbar={false}
       enableColumnActions={false}
       enablePagination={false}

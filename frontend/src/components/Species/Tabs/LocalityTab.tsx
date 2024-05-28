@@ -7,8 +7,8 @@ import { Box, CircularProgress } from '@mui/material'
 import { SelectingTable } from '@/components/DetailView/common/SelectingTable'
 
 export const LocalityTab = () => {
-  const { editData, mode } = useDetailContext<SpeciesDetails>()
-  const { data, isError } = useGetAllLocalitiesQuery()
+  const { data, editData, mode } = useDetailContext<SpeciesDetails>()
+  const { data: localitiesData, isError } = useGetAllLocalitiesQuery()
 
   if (isError) return 'Error loading Localities.'
   if (!data) return <CircularProgress />
@@ -52,7 +52,7 @@ export const LocalityTab = () => {
     <SelectingTable<Editable<Locality>, SpeciesDetails>
       buttonText="Add existing locality"
       columns={columns}
-      data={data}
+      data={localitiesData}
       fieldName="now_ls"
       idFieldName="lid"
     />
@@ -67,7 +67,10 @@ export const LocalityTab = () => {
       )}
       <EditableTable<Editable<Locality>, SpeciesDetails>
         columns={columns}
-        data={editData.now_ls.map(item => (!item.now_loc ? (item as unknown as Editable<Locality>) : item.now_loc))}
+        editTableData={editData.now_ls.map(item =>
+          !item.now_loc ? (item as unknown as Editable<Locality>) : item.now_loc
+        )}
+        tableData={data.now_ls.map(item => (!item.now_loc ? (item as unknown as Editable<Locality>) : item.now_loc))}
         editable
         field="now_ls"
       />

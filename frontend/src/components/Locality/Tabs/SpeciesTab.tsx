@@ -8,7 +8,7 @@ import { MRT_ColumnDef } from 'material-react-table'
 import { useForm } from 'react-hook-form'
 
 export const SpeciesTab = () => {
-  const { editData, mode } = useDetailContext<LocalityDetails>()
+  const { mode } = useDetailContext<LocalityDetails>()
   const {
     register,
     formState: { errors },
@@ -79,12 +79,7 @@ export const SpeciesTab = () => {
   return (
     <Grouped title="Species">
       {mode === 'edit' && editingModal}
-      <EditableTable<Editable<LocalitySpecies>, LocalityDetails>
-        columns={columns}
-        data={editData.now_ls}
-        editable
-        field="now_ls"
-      />
+      <EditableTable<Editable<LocalitySpecies>, LocalityDetails> columns={columns} editable field="now_ls" />
     </Grouped>
   )
 }

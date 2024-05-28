@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import { LocalityDetails } from '../backendTypes'
 
 export const validateLocality = (editData: LocalityDetails, fieldName: keyof LocalityDetails) => {

@@ -91,7 +91,6 @@ export const DetailView = <T extends object>({
   )
 
   const bigTextField = (field: keyof T) => <EditableTextField<T> field={field} type="text" big />
-
   const initialState = {
     data,
     mode,

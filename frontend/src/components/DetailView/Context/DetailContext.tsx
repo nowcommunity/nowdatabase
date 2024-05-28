@@ -1,5 +1,6 @@
-import { ReactNode, createContext, useState, JSX } from 'react'
+import { ReactNode, createContext, useState, JSX, useEffect } from 'react'
 import { DropdownOption } from '../common/editingComponents'
+import { cloneDeep } from 'lodash-es'
 
 export type ModeType = 'read' | 'new' | 'edit'
 
@@ -24,7 +25,9 @@ export const DetailContextProvider = <T extends object>({
   children: ReactNode | ReactNode[]
   contextState: Omit<DetailContextType<T>, 'setEditData'>
 }) => {
-  const [editData, setEditData] = useState<T>(contextState.editData)
+  const [editData, setEditData] = useState<T>(cloneDeep(contextState.data))
+
+  useEffect(() => setEditData(cloneDeep(contextState.data)), [contextState.data])
 
   return (
     <DetailContext.Provider

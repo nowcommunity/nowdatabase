@@ -9,7 +9,7 @@ import { Box, CircularProgress } from '@mui/material'
 import { MRT_ColumnDef } from 'material-react-table'
 
 export const MuseumTab = () => {
-  const { editData, mode } = useDetailContext<LocalityDetails>()
+  const { mode } = useDetailContext<LocalityDetails>()
   const { data: museumData, isError } = useGetAllMuseumsQuery()
 
   if (isError) return 'Error loading museums.'
@@ -62,12 +62,7 @@ export const MuseumTab = () => {
           />
         </Box>
       )}
-      <EditableTable<Editable<Museum>, LocalityDetails>
-        columns={columns}
-        data={editData.museums}
-        editable
-        field="museums"
-      />
+      <EditableTable<Editable<Museum>, LocalityDetails> columns={columns} editable field="museums" />
     </Grouped>
   )
 }
