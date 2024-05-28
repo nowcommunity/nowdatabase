@@ -16,6 +16,8 @@ export const NavBar = () => {
     { title: 'Species', url: '/species' },
     { title: 'Reference', url: '/reference' },
     { title: 'Time unit', url: '/time-unit' },
+    { title: 'Region', url: '/region' },
+    { title: 'Admin', url: '/admin' },
   ]
 
   if (user.username === null) pages.push({ title: 'Login', url: '/login' })

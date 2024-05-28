@@ -21,3 +21,8 @@ export const createTestUser = async () => {
     }
   }
 }
+
+export const getAllUsers = async () => {
+  const result = await prisma.com_users.findMany({})
+  return result
+}

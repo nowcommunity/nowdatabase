@@ -4,6 +4,8 @@ import { NavBar } from './components/NavBar'
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import { LocalityTable } from './components/Locality/LocalityTable'
 import { ReferenceTable } from './components/Reference/ReferenceTable'
+import { RegionTable } from './components/Region/RegionTable'
+import { RegionDetails } from './components/Region/RegionDetails'
 import { SpeciesTable } from './components/Species/SpeciesTable'
 import { TimeUnitTable } from './components/TimeUnit/TimeUnitTable'
 import { Login } from './components/Login'
@@ -25,6 +27,8 @@ const App = () => {
               <Route element={<LocalityDetails />} path="/locality/:id" />
               <Route element={<LocalityTable />} path="/locality/" />
               <Route element={<ReferenceTable />} path="/reference/" />
+              <Route element={<RegionTable />} path="/region/" />
+              <Route element={<RegionDetails />} path="/region/:id" />
               <Route element={<SpeciesDetails />} path="/species/:id" />
               <Route element={<SpeciesTable />} path="/species/" />
               <Route element={<TimeUnitTable />} path="/time-unit/" />

@@ -14,6 +14,9 @@ export type LocalityUpdate = Prisma.now_lau & { now_lr: Prisma.now_lr }
 export type SpeciesUpdate = Prisma.now_sau & { now_lr: Prisma.now_sr }
 export type Museum = Prisma.com_mlist
 export type Project = Prisma.now_proj
+export type Region = Prisma.now_reg_coord
+export type RegionCoordinator = Prisma.now_reg_coord_people
+export type RegionCountry = Prisma.now_reg_coord_country
 export type SedimentaryStructure = Prisma.now_ss
 export type LocalitySynonym = Prisma.now_syn_loc
 export type SpeciesSynonym = Prisma.com_taxa_synonym
@@ -70,6 +73,7 @@ export type Reference = {
 }
 
 export type ReferenceDetails = Prisma.ref_ref
+export type RegionDetails = Prisma.now_reg_coord & { now_reg_coord_people: Array<Editable<RegionCoordinator>> }
 
 export type TimeUnit = {
   low_bound: number
