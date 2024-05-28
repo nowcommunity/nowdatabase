@@ -1,14 +1,11 @@
 ### Contributing and CI / CD
 
 **Contributing**
-+ Commits can be freely made to `development` branch, but it is safer to use another branch and then make a pull request to merge in development.
++ Make commits in some new branches - for example a specific feature. If you make more general changes you can use `development`. Merge/rebase, or make a pull request to main once ready and tests pass.
 
 **Tests**
-+ Pre-commit hook lints and tests typescript compilation before every commit. 
-  + This can be bypassed by adding "--no-verify" as argument to the commit command.
-
-Dynamic tests to be built later.
++ Linting and tsc is ran in GitHub actions on push and pull request to any branch.
++ Run locally by doing `npm run lint` and `npx tsc --noEmit` in both `frontend` and `backend` folders.s
 
 **Deployment**
-+ Code can be merged to `main`-branch once it is tested in development.
-+ Code is deployed from `main`. Currently requires building both images in OpenShift.
++ Code is deployed from `main`. Currently requires building both images in OpenShift manually.
