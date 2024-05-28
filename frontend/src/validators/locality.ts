@@ -1,32 +1,23 @@
 import { LocalityDetails } from '../backendTypes'
+import { Validators, validator } from './validator'
 
 export const validateLocality = (editData: LocalityDetails, fieldName: keyof LocalityDetails) => {
-  const getValidator: {
-    [K in keyof LocalityDetails]?: (val: unknown) => string | null
-  } = {
-    bfa_max_abs: (value: unknown) => {
-      if (typeof value !== 'number') return 'Must be a number'
-      if (value < parseInt(editData.bfa_min_abs ?? '0')) return 'Value cannot be smaller than basis for age (min)'
-      return null
+  const validators: Validators<Partial<LocalityDetails>> = {
+    bfa_max_abs: {
+      name: 'Basis for age (absolute)',
+      asNumber: (num: number) => {
+        if (num < parseInt(editData.bfa_min_abs ?? '0')) return 'Max value cannot be lower than min'
+      },
     },
-    bfa_min_abs: (value: unknown) => {
-      if (typeof value !== 'number') return 'Must be a number'
-      if (value > parseInt(editData.bfa_min_abs ?? '99999999'))
-        return 'Value cannot be greater than basis for age (max)'
-      return null
-    },
-    min_age: (value: unknown) => {
-      if (typeof value !== 'number') return 'Must be a number'
-      if (value > editData.max_age) return 'Must be smaller than max age'
-      return null
-    },
-    max_age: (value: unknown) => {
-      if (typeof value !== 'number') return 'Must be a number'
-      if (value < editData.min_age) return 'Must be greater than min_age'
-      return null
+    bfa_min_abs: {
+      name: 'Basis for age (minimum)',
+      asNumber: (num: number) => {
+        const bfa_max_abs = editData.bfa_max_abs
+        if (!bfa_max_abs) return
+        if (parseInt(bfa_max_abs) > num) return 'Min value cannot be higher than max'
+      },
     },
   }
-  const validator = getValidator[fieldName]
-  if (validator === undefined) return null
-  return validator(editData[fieldName])
+
+  return validator(validators, editData, fieldName)
 }
