@@ -1,4 +1,4 @@
-import { Editable, LocalityDetails, LocalitySynonym } from '@/backendTypes'
+import { Editable, LocalityDetailsType, LocalitySynonym } from '@/backendTypes'
 import { useDetailContext } from '@/components/DetailView/Context/DetailContext'
 import { Grouped, ArrayFrame, HalfFrames } from '@/components/DetailView/common/tabLayoutHelpers'
 import { Box, TextField } from '@mui/material'
@@ -8,7 +8,7 @@ import { EditableTable } from '@/components/DetailView/common/EditableTable'
 import { EditingModal } from '@/components/DetailView/common/EditingModal'
 
 export const LocalityTab = () => {
-  const { data, textField, radioSelection, dropdown, mode, bigTextField } = useDetailContext<LocalityDetails>()
+  const { data, textField, radioSelection, dropdown, mode, bigTextField } = useDetailContext<LocalityDetailsType>()
 
   const approximateCoordinatesOptions = ['', { display: 'No', value: '0' }, { display: 'Yes', value: '1' }]
   const generalLocalityOptions = ['', { display: 'No', value: 'n' }, { display: 'Yes', value: 'y' }]
@@ -94,7 +94,7 @@ export const LocalityTab = () => {
 
       <Grouped title="Synonyms">
         {!mode.read && editingModal}
-        <EditableTable<Editable<LocalitySynonym>, LocalityDetails> columns={columns} editable field="now_syn_loc" />
+        <EditableTable<Editable<LocalitySynonym>, LocalityDetailsType> columns={columns} editable field="now_syn_loc" />
       </Grouped>
     </>
   )

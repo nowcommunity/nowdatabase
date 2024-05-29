@@ -1,4 +1,4 @@
-import { Editable, LocalityDetails, Museum } from '@/backendTypes'
+import { Editable, LocalityDetailsType, Museum } from '@/backendTypes'
 import { EditableTable } from '@/components/DetailView/common/EditableTable'
 import { EditingForm } from '@/components/DetailView/common/EditingForm'
 import { Grouped } from '@/components/DetailView/common/tabLayoutHelpers'
@@ -9,7 +9,7 @@ import { Box, CircularProgress } from '@mui/material'
 import { MRT_ColumnDef } from 'material-react-table'
 
 export const MuseumTab = () => {
-  const { mode } = useDetailContext<LocalityDetails>()
+  const { mode } = useDetailContext<LocalityDetailsType>()
   const { data: museumData, isError } = useGetAllMuseumsQuery()
 
   if (isError) return 'Error loading museums.'
@@ -48,12 +48,12 @@ export const MuseumTab = () => {
     <Grouped title="Museums">
       {!mode.read && (
         <Box display="flex" gap={1}>
-          <EditingForm<Museum, LocalityDetails>
+          <EditingForm<Museum, LocalityDetailsType>
             buttonText="Add new museum"
             formFields={formFields}
             arrayFieldName="museums"
           />
-          <SelectingTable<Museum, LocalityDetails>
+          <SelectingTable<Museum, LocalityDetailsType>
             buttonText="Add existing museum"
             data={museumData}
             columns={columns}
@@ -62,7 +62,7 @@ export const MuseumTab = () => {
           />
         </Box>
       )}
-      <EditableTable<Editable<Museum>, LocalityDetails> columns={columns} editable field="museums" />
+      <EditableTable<Editable<Museum>, LocalityDetailsType> columns={columns} editable field="museums" />
     </Grouped>
   )
 }

@@ -1,4 +1,4 @@
-import { Editable, Locality, SpeciesDetails } from '@/backendTypes'
+import { Editable, Locality, SpeciesDetailsType } from '@/backendTypes'
 import { Grouped } from '@/components/DetailView/common/tabLayoutHelpers'
 import { EditableTable } from '@/components/DetailView/common/EditableTable'
 import { useDetailContext } from '@/components/DetailView/Context/DetailContext'
@@ -7,7 +7,7 @@ import { Box, CircularProgress } from '@mui/material'
 import { SelectingTable } from '@/components/DetailView/common/SelectingTable'
 
 export const LocalityTab = () => {
-  const { data, editData, mode } = useDetailContext<SpeciesDetails>()
+  const { data, editData, mode } = useDetailContext<SpeciesDetailsType>()
   const { data: localitiesData, isError } = useGetAllLocalitiesQuery()
 
   if (isError) return 'Error loading Localities.'
@@ -49,7 +49,7 @@ export const LocalityTab = () => {
   // const editingModal = <EditingForm buttonText="Add new locality" formFields={formFields} arrayFieldName="now_ls" />
 
   const selectingTable = (
-    <SelectingTable<Editable<Locality>, SpeciesDetails>
+    <SelectingTable<Editable<Locality>, SpeciesDetailsType>
       buttonText="Add existing locality"
       columns={columns}
       data={localitiesData}
@@ -65,7 +65,7 @@ export const LocalityTab = () => {
           {selectingTable}
         </Box>
       )}
-      <EditableTable<Editable<Locality>, SpeciesDetails>
+      <EditableTable<Editable<Locality>, SpeciesDetailsType>
         columns={columns}
         editTableData={editData.now_ls.map(item =>
           !item.now_loc ? (item as unknown as Editable<Locality>) : item.now_loc

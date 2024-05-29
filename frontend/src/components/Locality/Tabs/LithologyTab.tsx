@@ -1,4 +1,4 @@
-import { Editable, LocalityDetails, SedimentaryStructure, SedimentaryStructureValues } from '@/backendTypes'
+import { Editable, LocalityDetailsType, SedimentaryStructure, SedimentaryStructureValues } from '@/backendTypes'
 import { EditableTable } from '@/components/DetailView/common/EditableTable'
 import { SelectingTable } from '@/components/DetailView/common/SelectingTable'
 import { ArrayFrame, HalfFrames, Grouped } from '@/components/DetailView/common/tabLayoutHelpers'
@@ -7,7 +7,7 @@ import { useGetAllSedimentaryStructuresQuery } from '@/redux/sedimentaryStructur
 import { MRT_ColumnDef } from 'material-react-table'
 
 export const LithologyTab = () => {
-  const { textField, dropdown, setEditData, bigTextField } = useDetailContext<LocalityDetails>()
+  const { textField, dropdown, setEditData, bigTextField } = useDetailContext<LocalityDetailsType>()
   const { data: sedimentaryStructuresData } = useGetAllSedimentaryStructuresQuery()
 
   const rockTypeOptions = [
@@ -159,7 +159,7 @@ export const LithologyTab = () => {
     ['Comments', bigTextField('depo_comm')],
   ]
 
-  const { editData, mode } = useDetailContext<LocalityDetails>()
+  const { editData, mode } = useDetailContext<LocalityDetailsType>()
 
   const columns: MRT_ColumnDef<SedimentaryStructure>[] = [
     {
@@ -185,7 +185,7 @@ export const LithologyTab = () => {
         <Grouped title="Sedimentary Structure & Taphonomic Detail">
           {!mode.read && (
             <>
-              <SelectingTable<SedimentaryStructureValues, LocalityDetails>
+              <SelectingTable<SedimentaryStructureValues, LocalityDetailsType>
                 buttonText="Add existing sedimentary structure"
                 columns={selectingTableColumns}
                 data={sedimentaryStructuresData}
@@ -201,7 +201,11 @@ export const LithologyTab = () => {
               />
             </>
           )}
-          <EditableTable<Editable<SedimentaryStructure>, LocalityDetails> columns={columns} editable field="now_ss" />
+          <EditableTable<Editable<SedimentaryStructure>, LocalityDetailsType>
+            columns={columns}
+            editable
+            field="now_ss"
+          />
         </Grouped>
         <ArrayFrame half array={depositionalContext} title="Depositional Context" />
       </HalfFrames>

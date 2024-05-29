@@ -1,4 +1,4 @@
-import { Editable, LocalityDetails, LocalityUpdate } from '@/backendTypes'
+import { Editable, LocalityDetailsType, LocalityUpdate } from '@/backendTypes'
 import { EditableTable } from '@/components/DetailView/common/EditableTable'
 import { Grouped } from '@/components/DetailView/common/tabLayoutHelpers'
 import { Box } from '@mui/material'
@@ -33,7 +33,7 @@ export const UpdateTab = () => {
 
   return (
     <Grouped title="Updates">
-      <EditableTable<Editable<LocalityUpdate>, LocalityDetails> columns={columns} editable field="now_lau" />
+      <EditableTable<Editable<LocalityUpdate>, LocalityDetailsType> columns={columns} editable field="now_lau" />
     </Grouped>
   )
 }

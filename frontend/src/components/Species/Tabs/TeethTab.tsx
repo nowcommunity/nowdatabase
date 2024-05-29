@@ -1,9 +1,9 @@
-import { SpeciesDetails } from '@/backendTypes'
+import { SpeciesDetailsType } from '@/backendTypes'
 import { ArrayFrame, HalfFrames } from '@/components/DetailView/common/tabLayoutHelpers'
 import { useDetailContext } from '@/components/DetailView/Context/DetailContext'
 
 export const TeethTab = () => {
-  const { dropdown, textField } = useDetailContext<SpeciesDetails>()
+  const { dropdown, textField } = useDetailContext<SpeciesDetailsType>()
 
   const toothShapeMulticuspidOptions = [
     { value: '', display: 'None' },

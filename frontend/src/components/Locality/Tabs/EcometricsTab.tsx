@@ -1,9 +1,9 @@
-import { LocalityDetails } from '@/backendTypes'
+import { LocalityDetailsType } from '@/backendTypes'
 import { ArrayFrame } from '../../DetailView/common/tabLayoutHelpers'
 import { useDetailContext } from '@/components/DetailView/Context/DetailContext'
 
 export const EcometricsTab = () => {
-  const { textField } = useDetailContext<LocalityDetails>()
+  const { textField } = useDetailContext<LocalityDetailsType>()
 
   const ecometrics = [
     ['Estimate of annual precipitation (mm)', textField('estimate_precip')],

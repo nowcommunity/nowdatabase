@@ -1,9 +1,9 @@
-import { LocalityDetails } from '@/backendTypes'
+import { LocalityDetailsType } from '@/backendTypes'
 import { ArrayFrame, HalfFrames } from '@/components/DetailView/common/tabLayoutHelpers'
 import { useDetailContext } from '@/components/DetailView/Context/DetailContext'
 
 export const ClimateTab = () => {
-  const { textField, dropdown, bigTextField } = useDetailContext<LocalityDetails>()
+  const { textField, dropdown, bigTextField } = useDetailContext<LocalityDetailsType>()
 
   const climateTypeOptions = [
     '',

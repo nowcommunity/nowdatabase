@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import {
   type MRT_ColumnFiltersState,
   type MRT_ColumnDef,
@@ -12,7 +12,7 @@ import { CircularProgress } from '@mui/material'
 import { useLocation } from 'react-router-dom'
 import { renderCustomToolbar, renderCustomToolbarModalVersion } from './helpers'
 import { ActionComponent } from './ActionComponent'
-import { PageContext } from '../Page'
+import { usePageContext } from '../Page'
 
 type TableStateInUrl = 'sorting' | 'columnfilters' | 'pagination'
 
@@ -45,7 +45,7 @@ export const TableView = <T extends MRT_RowData>({
   const [columnFilters, setColumnFilters] = useState<MRT_ColumnFiltersState>([])
   const [sorting, setSorting] = useState<MRT_SortingState>([])
   const [pagination, setPagination] = useState<MRT_PaginationState>(defaultPagination)
-  const { setIdList, setTableUrl } = useContext(PageContext)
+  const { setIdList, setTableUrl } = usePageContext<T>()
   const loadStateFromUrl = (state: TableStateInUrl, defaultState: [] | MRT_PaginationState) => {
     const searchParams = new URLSearchParams(location.search)
     const stateFromUrl = searchParams.get(state)

@@ -1,4 +1,4 @@
-import { Editable, SpeciesDetails, SpeciesSynonym } from '@/backendTypes'
+import { Editable, SpeciesDetailsType, SpeciesSynonym } from '@/backendTypes'
 import { useDetailContext } from '@/components/DetailView/Context/DetailContext'
 import { Grouped } from '@/components/DetailView/common/tabLayoutHelpers'
 import { Box, TextField } from '@mui/material'
@@ -8,7 +8,7 @@ import { EditableTable } from '@/components/DetailView/common/EditableTable'
 import { EditingModal } from '@/components/DetailView/common/EditingModal'
 
 export const SynonymTab = () => {
-  const { mode } = useDetailContext<SpeciesDetails>()
+  const { mode } = useDetailContext<SpeciesDetailsType>()
   const {
     register,
     formState: { errors },
@@ -49,7 +49,11 @@ export const SynonymTab = () => {
     <>
       <Grouped title="Synonyms">
         {!mode.read && editingModal}
-        <EditableTable<Editable<SpeciesSynonym>, SpeciesDetails> columns={columns} editable field="com_taxa_synonym" />
+        <EditableTable<Editable<SpeciesSynonym>, SpeciesDetailsType>
+          columns={columns}
+          editable
+          field="com_taxa_synonym"
+        />
       </Grouped>
     </>
   )

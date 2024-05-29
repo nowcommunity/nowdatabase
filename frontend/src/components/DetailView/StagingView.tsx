@@ -1,9 +1,9 @@
-import { LocalityDetails } from '@/backendTypes'
+import { LocalityDetailsType } from '@/backendTypes'
 import { ArrayFrame } from './common/tabLayoutHelpers'
 import { useDetailContext } from './Context/DetailContext'
 
 export const StagingView = () => {
-  const { bigTextField } = useDetailContext<LocalityDetails>()
+  const { bigTextField } = useDetailContext<LocalityDetailsType>()
 
   const array = [
     ['Date', new Date().toLocaleDateString('en-CA')],

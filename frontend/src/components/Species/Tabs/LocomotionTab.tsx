@@ -1,9 +1,9 @@
-import { SpeciesDetails } from '@/backendTypes'
+import { SpeciesDetailsType } from '@/backendTypes'
 import { ArrayFrame, HalfFrames } from '@/components/DetailView/common/tabLayoutHelpers'
 import { useDetailContext } from '@/components/DetailView/Context/DetailContext'
 
 export const LocomotionTab = () => {
-  const { dropdown } = useDetailContext<SpeciesDetails>()
+  const { dropdown } = useDetailContext<SpeciesDetailsType>()
 
   const feedingHabitat1Options = ['', 'ae', 'aq', 'sa', 'te']
 

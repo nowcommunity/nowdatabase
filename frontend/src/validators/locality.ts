@@ -1,8 +1,8 @@
-import { LocalityDetails } from '../backendTypes'
+import { LocalityDetailsType } from '../backendTypes'
 import { Validators, validator } from './validator'
 
-export const validateLocality = (editData: LocalityDetails, fieldName: keyof LocalityDetails) => {
-  const validators: Validators<Partial<LocalityDetails>> = {
+export const validateLocality = (editData: LocalityDetailsType, fieldName: keyof LocalityDetailsType) => {
+  const validators: Validators<Partial<LocalityDetailsType>> = {
     bfa_max_abs: {
       name: 'Basis for age (absolute)',
       asNumber: (num: number) => {

@@ -1,4 +1,4 @@
-import { Editable, LocalityDetails, CollectingMethod } from '@/backendTypes'
+import { Editable, LocalityDetailsType, CollectingMethod } from '@/backendTypes'
 import { useDetailContext } from '@/components/DetailView/Context/DetailContext'
 import { Grouped, ArrayFrame, HalfFrames } from '@/components/DetailView/common/tabLayoutHelpers'
 import { Box, TextField } from '@mui/material'
@@ -8,8 +8,8 @@ import { EditableTable } from '@/components/DetailView/common/EditableTable'
 import { EditingModal } from '@/components/DetailView/common/EditingModal'
 
 export const TaphonomyTab = () => {
-  const { textField, dropdown } = useDetailContext<LocalityDetails>()
-  const { mode } = useDetailContext<LocalityDetails>()
+  const { textField, dropdown } = useDetailContext<LocalityDetailsType>()
+  const { mode } = useDetailContext<LocalityDetailsType>()
 
   const assemblageFormationOptions = [
     '',
@@ -158,7 +158,7 @@ export const TaphonomyTab = () => {
       <HalfFrames>
         <Grouped title="Collecting Methods">
           {!mode.read && editingModal}
-          <EditableTable<Editable<CollectingMethod>, LocalityDetails>
+          <EditableTable<Editable<CollectingMethod>, LocalityDetailsType>
             columns={columns}
             editable
             field="now_coll_meth"

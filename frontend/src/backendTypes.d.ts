@@ -17,7 +17,7 @@ export type Project = Prisma.now_proj
 export type SedimentaryStructure = Prisma.now_ss
 export type LocalitySynonym = Prisma.now_syn_loc
 export type SpeciesSynonym = Prisma.com_taxa_synonym
-export type LocalityDetails = Omit<Prisma.now_loc, 'now_mus'> & { museums: Array<Editable<Museum>> } & {
+export type LocalityDetailsType = Omit<Prisma.now_loc, 'now_mus'> & { museums: Array<Editable<Museum>> } & {
   now_ls: Array<Editable<LocalitySpecies>>
 } & { now_plr: Array<Editable<LocalityProject>> } & { now_syn_loc: Array<Editable<LocalitySynonym>> } & {
   now_ss: Editable<SedimentaryStructure>[]
@@ -34,7 +34,7 @@ export type Locality = {
   loc_status: boolean | null
 }
 
-export type SpeciesDetails = Prisma.com_species & { now_ls: Array<Editable<SpeciesLocality>> } & {
+export type SpeciesDetailsType = Prisma.com_species & { now_ls: Array<Editable<SpeciesLocality>> } & {
   com_taxa_synonym: Array<Editable<SpeciesSynonym>>
 } & { now_sau: Array<Editable<SpeciesUpdate>> }
 
@@ -69,7 +69,7 @@ export type Reference = {
   title_secondary: string
 }
 
-export type ReferenceDetails = Prisma.ref_ref
+export type ReferenceDetailsType = Prisma.ref_ref
 
 export type TimeUnit = {
   low_bound: number
@@ -89,4 +89,4 @@ export type TimeUnit = {
   rank: string
 }
 
-export type TimeUnitDetails = Prisma.now_time_unit
+export type TimeUnitDetailsType = Prisma.now_time_unit

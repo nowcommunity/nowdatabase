@@ -1,4 +1,4 @@
-import { Editable, LocalityDetails, LocalityProject } from '@/backendTypes'
+import { Editable, LocalityDetailsType, LocalityProject } from '@/backendTypes'
 import { EditableTable } from '@/components/DetailView/common/EditableTable'
 import { Grouped } from '@/components/DetailView/common/tabLayoutHelpers'
 import { EditingModal } from '@/components/DetailView/common/EditingModal'
@@ -8,7 +8,7 @@ import { MRT_ColumnDef } from 'material-react-table'
 import { useForm } from 'react-hook-form'
 
 export const ProjectTab = () => {
-  const { mode } = useDetailContext<LocalityDetails>()
+  const { mode } = useDetailContext<LocalityDetailsType>()
   const {
     register,
     formState: { errors },
@@ -58,7 +58,7 @@ export const ProjectTab = () => {
   return (
     <Grouped title="Projects">
       {!mode.read && editingModal}
-      <EditableTable<Editable<LocalityProject>, LocalityDetails> columns={columns} editable field="now_plr" />
+      <EditableTable<Editable<LocalityProject>, LocalityDetailsType> columns={columns} editable field="now_plr" />
     </Grouped>
   )
 }

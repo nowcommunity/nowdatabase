@@ -1,9 +1,9 @@
-import { LocalityDetails } from '@/backendTypes'
+import { LocalityDetailsType } from '@/backendTypes'
 import { ArrayFrame, HalfFrames } from '@/components/DetailView/common/tabLayoutHelpers'
 import { useDetailContext } from '@/components/DetailView/Context/DetailContext'
 
 export const AgeTab = () => {
-  const { textField, radioSelection, dropdown, bigTextField } = useDetailContext<LocalityDetails>()
+  const { textField, radioSelection, dropdown, bigTextField } = useDetailContext<LocalityDetailsType>()
 
   const fracOptions = [
     { value: '', display: 'None' },

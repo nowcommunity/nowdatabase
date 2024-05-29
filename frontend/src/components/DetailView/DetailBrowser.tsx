@@ -3,17 +3,22 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack'
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward'
 import { useDetailContext } from './Context/DetailContext'
 import { useNavigate } from 'react-router-dom'
-import { useContext } from 'react'
-import { PageContext } from '../Page'
+import { usePageContext } from '../Page'
 
-export const DetailBrowser = <T,>() => {
-  const { data } = useDetailContext<T>()
+export const DetailBrowser = <T extends object>() => {
+  const { data, mode } = useDetailContext<T>()
   const navigate = useNavigate()
-  const { idList, idFieldName, viewName } = useContext(PageContext)
+  const { idList, idFieldName, viewName, createTitle } = usePageContext<T>()
   const idListExists = idList?.length > 0
-  const currentIndex = idList.indexOf((data as { [key: string]: string })[idFieldName as string])
+  const currentIndex = idList.indexOf((data as { [key: string]: string })[idFieldName])
   const nextIndex = currentIndex + 1
   const previousIndex = currentIndex - 1
+
+  const getText = () => {
+    if (mode.read) {
+      return `Viewing ${viewName}: ${createTitle(data)}`
+    }
+  }
 
   return (
     <Box
@@ -27,7 +32,7 @@ export const DetailBrowser = <T,>() => {
         gap: '1em',
       }}
     >
-      <div> Viewing details of a {viewName}</div>
+      <div>{getText()}</div>
       {idListExists && (
         <div>
           {previousIndex >= 0 && (

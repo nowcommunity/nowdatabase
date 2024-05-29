@@ -1,4 +1,4 @@
-import { Editable, SpeciesDetails, SpeciesLocality } from '@/backendTypes'
+import { Editable, SpeciesDetailsType, SpeciesLocality } from '@/backendTypes'
 import { EditableTable } from '@/components/DetailView/common/EditableTable'
 import { EditingModal } from '@/components/DetailView/common/EditingModal'
 import { Grouped } from '@/components/DetailView/common/tabLayoutHelpers'
@@ -8,7 +8,7 @@ import { MRT_ColumnDef } from 'material-react-table'
 import { useForm } from 'react-hook-form'
 
 export const LocalitySpeciesTab = () => {
-  const { mode } = useDetailContext<SpeciesDetails>()
+  const { mode } = useDetailContext<SpeciesDetailsType>()
   const {
     register,
     formState: { errors },
@@ -153,7 +153,7 @@ export const LocalitySpeciesTab = () => {
   return (
     <Grouped title="Locality-Species Information">
       {!mode.read && editingModal}
-      <EditableTable<Editable<SpeciesLocality>, SpeciesDetails> columns={columns} editable field="now_ls" />
+      <EditableTable<Editable<SpeciesLocality>, SpeciesDetailsType> columns={columns} editable field="now_ls" />
     </Grouped>
   )
 }

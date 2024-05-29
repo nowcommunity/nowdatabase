@@ -1,5 +1,5 @@
 import { api } from './api'
-import { TimeUnit, TimeUnitDetails } from '@/backendTypes'
+import { TimeUnit, TimeUnitDetailsType } from '@/backendTypes'
 
 const timeunitsApi = api.injectEndpoints({
   endpoints: builder => ({
@@ -8,7 +8,7 @@ const timeunitsApi = api.injectEndpoints({
         url: `/time-unit/all`,
       }),
     }),
-    getTimeUnitDetails: builder.query<TimeUnitDetails, string>({
+    getTimeUnitDetails: builder.query<TimeUnitDetailsType, string>({
       query: id => ({
         url: `/time-unit/${id}`,
       }),

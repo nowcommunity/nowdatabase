@@ -1,4 +1,4 @@
-import { Editable, SpeciesDetails, SpeciesUpdate } from '@/backendTypes'
+import { Editable, SpeciesDetailsType, SpeciesUpdate } from '@/backendTypes'
 import { EditableTable } from '@/components/DetailView/common/EditableTable'
 import { Grouped } from '@/components/DetailView/common/tabLayoutHelpers'
 import { Box } from '@mui/material'
@@ -33,7 +33,7 @@ export const UpdateTab = () => {
 
   return (
     <Grouped title="Updates">
-      <EditableTable<Editable<SpeciesUpdate>, SpeciesDetails> columns={columns} editable field="now_sau" />
+      <EditableTable<Editable<SpeciesUpdate>, SpeciesDetailsType> columns={columns} editable field="now_sau" />
     </Grouped>
   )
 }

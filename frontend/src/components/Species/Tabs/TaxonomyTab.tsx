@@ -1,9 +1,9 @@
-import { SpeciesDetails } from '@/backendTypes'
+import { SpeciesDetailsType } from '@/backendTypes'
 import { ArrayFrame, HalfFrames } from '@/components/DetailView/common/tabLayoutHelpers'
 import { useDetailContext } from '@/components/DetailView/Context/DetailContext'
 
 export const TaxonomyTab = () => {
-  const { textField, dropdown, bigTextField } = useDetailContext<SpeciesDetails>()
+  const { textField, dropdown, bigTextField } = useDetailContext<SpeciesDetailsType>()
 
   const taxonStatusOptions = [
     '',

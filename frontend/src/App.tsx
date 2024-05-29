@@ -10,6 +10,7 @@ import { SpeciesDetails } from './components/Species/SpeciesDetails'
 import { Page } from './components/Page'
 import { LocalityTable } from './components/Locality/LocalityTable'
 import { LocalityDetails } from './components/Locality/LocalityDetails'
+import { LocalityDetailsType, ReferenceDetailsType, SpeciesDetailsType, TimeUnitDetailsType } from './backendTypes'
 
 const App = () => {
   return (
@@ -30,6 +31,7 @@ const App = () => {
                     detailView={<LocalityDetails />}
                     viewName="locality"
                     idFieldName="lid"
+                    createTitle={(loc: LocalityDetailsType) => `${loc.loc_name}`}
                   />
                 }
                 path="/locality/:id?"
@@ -41,18 +43,33 @@ const App = () => {
                     detailView={<SpeciesDetails />}
                     viewName="species"
                     idFieldName="species_id"
+                    createTitle={(species: SpeciesDetailsType) => `${species.species_name}`}
                   />
                 }
                 path="/species/:id?"
               />
               <Route
                 element={
-                  <Page tableView={<ReferenceTable />} detailView={null} viewName="reference" idFieldName="lid" />
+                  <Page
+                    tableView={<ReferenceTable />}
+                    detailView={null}
+                    viewName="reference"
+                    idFieldName="rid"
+                    createTitle={(ref: ReferenceDetailsType) => `${ref.issue}: ${ref.title_primary}`}
+                  />
                 }
                 path="/reference/:id?"
               />
               <Route
-                element={<Page tableView={<TimeUnitTable />} detailView={null} viewName="time-unit" idFieldName="" />}
+                element={
+                  <Page
+                    tableView={<TimeUnitTable />}
+                    detailView={null}
+                    viewName="time-unit"
+                    idFieldName="tu_name"
+                    createTitle={(tu: TimeUnitDetailsType) => `${tu.tu_display_name}`}
+                  />
+                }
                 path="/time-unit/:id?"
               />
               <Route element={<FrontPage />} path="/" />

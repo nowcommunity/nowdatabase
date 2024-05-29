@@ -84,7 +84,7 @@ export const DetailView = <T extends object>({
     elevation: 5,
   }
 
-  const refSelectionView = (
+  const stagingView = (
     <Paper {...paperProps}>
       <Box sx={{ display: 'flex', flexDirection: 'column', rowGap: '1em' }}>
         <StagingView />
@@ -132,7 +132,7 @@ export const DetailView = <T extends object>({
             </Box>
           )}
         </Box>
-        {mode.staging ? refSelectionView : tabView}
+        {mode.staging ? stagingView : tabView}
       </DetailContextProvider>
     </Stack>
   )

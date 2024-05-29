@@ -1,5 +1,5 @@
 import { api } from './api'
-import { Species, SpeciesDetails } from '@/backendTypes'
+import { Species, SpeciesDetailsType } from '@/backendTypes'
 
 const speciesApi = api.injectEndpoints({
   endpoints: builder => ({
@@ -8,7 +8,7 @@ const speciesApi = api.injectEndpoints({
         url: `/species/all`,
       }),
     }),
-    getSpeciesDetails: builder.query<SpeciesDetails, string>({
+    getSpeciesDetails: builder.query<SpeciesDetailsType, string>({
       query: id => ({
         url: `/species/${id}`,
       }),

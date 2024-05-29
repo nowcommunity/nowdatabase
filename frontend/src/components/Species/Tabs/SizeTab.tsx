@@ -1,9 +1,9 @@
-import { SpeciesDetails } from '@/backendTypes'
+import { SpeciesDetailsType } from '@/backendTypes'
 import { ArrayFrame, HalfFrames } from '@/components/DetailView/common/tabLayoutHelpers'
 import { useDetailContext } from '@components/DetailView/Context/DetailContext'
 
 export const SizeTab = () => {
-  const { dropdown, textField } = useDetailContext<SpeciesDetails>()
+  const { dropdown, textField } = useDetailContext<SpeciesDetailsType>()
 
   const snoutVentLengthOptions = ['', '<10cm', '10cm-1m', '1m-2m', '2m-5m', '>5m']
 

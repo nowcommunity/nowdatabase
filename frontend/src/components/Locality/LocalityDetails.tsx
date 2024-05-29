@@ -12,7 +12,7 @@ import { ProjectTab } from './Tabs/ProjectTab'
 import { SpeciesTab } from './Tabs/SpeciesTab'
 import { TaphonomyTab } from './Tabs/TaphonomyTab'
 import { UpdateTab } from './Tabs/UpdateTab'
-import { LocalityDetails as LocalityDetailsType } from '@/backendTypes'
+import { LocalityDetailsType } from '@/backendTypes'
 import { validateLocality } from '@/validators/locality'
 
 export const LocalityDetails = () => {
