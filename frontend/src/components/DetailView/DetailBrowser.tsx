@@ -17,7 +17,10 @@ export const DetailBrowser = <T extends object>() => {
   const getText = () => {
     if (mode.read) {
       return `Viewing ${viewName}: ${createTitle(data)}`
+    } else if (mode.new) {
+      return `Creating ${viewName}`
     }
+    return `Editing ${viewName}: ${createTitle(data)}`
   }
 
   return (
@@ -33,7 +36,7 @@ export const DetailBrowser = <T extends object>() => {
       }}
     >
       <div>{getText()}</div>
-      {idListExists && (
+      {idListExists && mode.read && (
         <div>
           {previousIndex >= 0 && (
             <Button onClick={() => navigate(`/${viewName}/${idList[previousIndex]}`)}>

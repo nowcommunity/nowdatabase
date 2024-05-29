@@ -126,11 +126,9 @@ export const DetailView = <T extends object>({
               <WriteButton onWrite={onWrite} text={mode.staging ? 'Complete and save' : 'Finalize entry'} />
             )}
           </Box>
-          {!mode.staging && (
-            <Box sx={{ marginRight: '3em' }}>
-              <DetailBrowser<T> />
-            </Box>
-          )}
+          <Box sx={{ marginRight: '3em' }}>
+            <DetailBrowser<T> />
+          </Box>
         </Box>
         {mode.staging ? stagingView : tabView}
       </DetailContextProvider>
