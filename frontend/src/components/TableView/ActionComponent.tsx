@@ -1,7 +1,6 @@
 import { Box, Button, Tooltip } from '@mui/material'
 import { MRT_RowData, MRT_Row } from 'material-react-table'
 import { useNavigate } from 'react-router-dom'
-
 import ManageSearchIcon from '@mui/icons-material/ManageSearch'
 import PolicyIcon from '@mui/icons-material/Policy'
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline'

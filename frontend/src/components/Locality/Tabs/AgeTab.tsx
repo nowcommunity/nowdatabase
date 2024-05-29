@@ -35,14 +35,24 @@ export const AgeTab = () => {
       'Minimum age',
       textField('min_age', 'number'),
       <FieldWithTableSelection<TimeUnitDetailsType, LocalityDetailsType>
-        key="tu_name"
+        key="bfa_min"
         sourceField="tu_name"
         targetField="bfa_min"
         selectorTable={<TimeUnitTable />}
       />,
       dropdown('frac_min', fracOptions, 'Minimum fraction'),
     ],
-    ['Maximum age', textField('max_age'), textField('bfa_max'), dropdown('frac_max', fracOptions, 'Maximum fraction')],
+    [
+      'Maximum age',
+      textField('max_age'),
+      <FieldWithTableSelection<TimeUnitDetailsType, LocalityDetailsType>
+        key="bfa_max"
+        sourceField="tu_name"
+        targetField="bfa_max"
+        selectorTable={<TimeUnitTable />}
+      />,
+      dropdown('frac_max', fracOptions, 'Maximum fraction'),
+    ],
     [''],
     ['Chronostrathigraphic age', textField('chron')],
     ['Age Comment', bigTextField('age_comm')],
