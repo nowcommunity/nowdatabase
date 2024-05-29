@@ -8,11 +8,15 @@ import {
   RadioGroup,
   FormControlLabel,
   Radio,
+  Box,
+  Modal,
+  Button,
 } from '@mui/material'
-import { ChangeEvent, ReactNode } from 'react'
+import { cloneElement, ChangeEvent, ReactNode, useState, ReactElement } from 'react'
 import { RegisterOptions, FieldValues, UseFormRegisterReturn, FieldErrors } from 'react-hook-form'
 import { useDetailContext } from '../Context/DetailContext'
 import { DataValue } from './tabLayoutHelpers'
+import { modalStyle } from './misc'
 
 const fieldWidth = '16em'
 
@@ -159,4 +163,44 @@ export const EditableTextField = <T extends object>({
   )
 
   return <DataValue<T> field={field} EditElement={editingComponent} />
+}
+
+export const FieldWithTableSelection = <T extends object, ParentType extends object>({
+  targetField,
+  sourceField,
+  selectorTable,
+}: {
+  targetField: keyof ParentType
+  sourceField: keyof T
+  selectorTable: ReactElement
+}) => {
+  const { editData, setEditData } = useDetailContext<ParentType>()
+  const [open, setOpen] = useState(false)
+  const selectorFn = (selected: T) => {
+    setEditData({ ...editData, [targetField]: selected[sourceField] })
+    setOpen(false)
+  }
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const selectorTableWithFn = cloneElement(selectorTable, { selectorFn })
+  if (open)
+    return (
+      <Box>
+        <Modal
+          open={open}
+          aria-labelledby={`modal-${targetField as string}`}
+          aria-describedby={`modal-${targetField as string}`}
+        >
+          <Box sx={{ ...modalStyle }}>
+            <Box marginBottom="2em" marginTop="1em">
+              {selectorTableWithFn}
+            </Box>
+            <Button onClick={() => setOpen(false)}>Cancel</Button>
+          </Box>
+        </Modal>
+      </Box>
+    )
+  const editingComponent = (
+    <TextField variant="outlined" size="small" value={editData[targetField]} onClick={() => setOpen(true)} />
+  )
+  return <DataValue<ParentType> field={targetField} EditElement={editingComponent} />
 }

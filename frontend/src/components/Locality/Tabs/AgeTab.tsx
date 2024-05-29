@@ -1,10 +1,11 @@
-import { LocalityDetailsType } from '@/backendTypes'
+import { LocalityDetailsType, TimeUnitDetailsType } from '@/backendTypes'
+import { FieldWithTableSelection } from '@/components/DetailView/common/editingComponents'
 import { ArrayFrame, HalfFrames } from '@/components/DetailView/common/tabLayoutHelpers'
 import { useDetailContext } from '@/components/DetailView/Context/DetailContext'
+import { TimeUnitTable } from '@/components/TimeUnit/TimeUnitTable'
 
 export const AgeTab = () => {
   const { textField, radioSelection, dropdown, bigTextField } = useDetailContext<LocalityDetailsType>()
-
   const fracOptions = [
     { value: '', display: 'None' },
     'Early half 1:2',
@@ -33,7 +34,12 @@ export const AgeTab = () => {
     [
       'Minimum age',
       textField('min_age', 'number'),
-      textField('bfa_min'),
+      <FieldWithTableSelection<TimeUnitDetailsType, LocalityDetailsType>
+        key="tu_name"
+        sourceField="tu_name"
+        targetField="bfa_min"
+        selectorTable={<TimeUnitTable />}
+      />,
       dropdown('frac_min', fracOptions, 'Minimum fraction'),
     ],
     ['Maximum age', textField('max_age'), textField('bfa_max'), dropdown('frac_max', fracOptions, 'Maximum fraction')],
