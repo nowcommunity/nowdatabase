@@ -1,7 +1,7 @@
 import * as Prisma from '../../backend/node_modules/@prisma/client/default'
 
 export type RowState = 'new' | 'removed' | 'cancelled' | 'clean'
-
+export type UpdateComment = { update_comment: string }
 // Use this for fields that include array that has to be edited by EditableTable.
 // For example see LocalityDetails: museums field
 export type Editable<T> = T & { rowState?: RowState }
@@ -23,7 +23,7 @@ export type LocalityDetails = Omit<Prisma.now_loc, 'now_mus'> & { museums: Array
   now_ss: Editable<SedimentaryStructure>[]
 } & {
   now_coll_meth: Editable<CollectingMethod>[]
-} & { now_lau: Array<Editable<LocalityUpdate>> }
+} & { now_lau: Array<Editable<LocalityUpdate>> } & UpdateComment
 
 export type Locality = {
   lid: number

@@ -6,7 +6,7 @@ import { DetailContextProvider, ModeType } from './Context/DetailContext'
 import { cloneDeep } from 'lodash-es'
 import { DropdownOption, DropdownSelector, EditableTextField, RadioSelector } from './common/editingComponents'
 import { DetailBrowser } from './DetailBrowser'
-import { ReferenceSelection } from './ReferenceSelection'
+import { StagingView } from './StagingView'
 import { ReturnButton, WriteButton } from './components'
 
 export type TabType = {
@@ -84,7 +84,7 @@ export const DetailView = <T extends object>({
   const refSelectionView = (
     <Paper {...paperProps}>
       <Box sx={{ display: 'flex', flexDirection: 'column', rowGap: '1em' }}>
-        <ReferenceSelection />
+        <StagingView />
       </Box>
     </Paper>
   )
@@ -120,7 +120,7 @@ export const DetailView = <T extends object>({
               </Button>
             )}
             {mode !== 'read' && onWrite && (
-              <WriteButton onWrite={onWrite} text={refMode ? 'Complete and save' : 'Select reference'} />
+              <WriteButton onWrite={onWrite} text={refMode ? 'Complete and save' : 'Finalize entry'} />
             )}
           </Box>
           {!refMode && (
