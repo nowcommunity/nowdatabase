@@ -106,6 +106,9 @@ export const TableView = <T extends MRT_RowData>({
   }, [columnFilters, sorting, pagination, location.pathname, selectorFn, setIdList, table, idFieldName, setTableUrl])
 
   useEffect(() => {
+    if (selectorFn) {
+      return
+    }
     setIdList(table.getPrePaginationRowModel().rows.map(row => row.original[idFieldName] as string))
 
     // Don't put setIdList in the dependency array: it will cause re-render loop.
