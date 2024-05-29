@@ -33,7 +33,7 @@ export const UpdateTab = () => {
 
   return (
     <Grouped title="Updates">
-      <EditableTable<Editable<SpeciesUpdate>, SpeciesDetailsType> columns={columns} editable field="now_sau" />
+      <EditableTable<Editable<SpeciesUpdate>, SpeciesDetailsType> columns={columns} field="now_sau" />
     </Grouped>
   )
 }
