@@ -2,11 +2,13 @@ import { ReactNode, createContext, useState, JSX, useEffect } from 'react'
 import { DropdownOption } from '../common/editingComponents'
 import { cloneDeep } from 'lodash-es'
 
-export type ModeType = 'read' | 'new' | 'edit'
+// -ref modes mean that user is selecting reference for either adding or editing item
+export type ModeType = 'read' | 'new' | 'edit' | 'new-ref' | 'edit-ref'
 
 export type DetailContextType<T> = {
   data: T
   mode: ModeType
+  setMode: (newMode: ModeType) => void
   editData: T
   setEditData: (editData: T) => void
   textField: (field: keyof T, type?: React.HTMLInputTypeAttribute) => JSX.Element

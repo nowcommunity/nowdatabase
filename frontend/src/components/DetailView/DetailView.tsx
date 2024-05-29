@@ -1,51 +1,17 @@
-import { useNavigate, useSearchParams } from 'react-router-dom'
+import { useSearchParams } from 'react-router-dom'
 import { Box, Button, Paper, Stack, Tab, Tabs } from '@mui/material'
-import ArrowBackIcon from '@mui/icons-material/ArrowBack'
 import EditIcon from '@mui/icons-material/Edit'
-import SaveIcon from '@mui/icons-material/Save'
-import { useEffect, useState, JSX, useContext } from 'react'
+import { useEffect, useState, JSX } from 'react'
 import { DetailContextProvider, ModeType } from './Context/DetailContext'
 import { cloneDeep } from 'lodash-es'
-import { useDetailContext } from './hooks'
 import { DropdownOption, DropdownSelector, EditableTextField, RadioSelector } from './common/editingComponents'
-import { TopBar } from './TopBar'
-import { PageContext } from '../Page'
+import { DetailBrowser } from './DetailBrowser'
+import { ReferenceSelection } from './ReferenceSelection'
+import { ReturnButton, WriteButton } from './components'
 
 export type TabType = {
   title: string
   content: JSX.Element
-}
-
-const WriteButton = <T,>({
-  onWrite,
-  setMode,
-}: {
-  onWrite: (editData: T) => void
-  setMode: (newMode: ModeType) => void
-}) => {
-  const { editData } = useDetailContext<T>()
-  return (
-    <Button
-      onClick={() => {
-        onWrite(editData)
-        setMode('read')
-      }}
-      variant="contained"
-    >
-      <SaveIcon />
-    </Button>
-  )
-}
-
-const ReturnButton = () => {
-  const navigate = useNavigate()
-  const { tableUrl } = useContext(PageContext)
-  return (
-    <Button onClick={() => navigate(tableUrl, { relative: 'path' })}>
-      <ArrowBackIcon color="primary" style={{ marginRight: '0.35em' }} />
-      Return to table
-    </Button>
-  )
 }
 
 export const DetailView = <T extends object>({
@@ -91,9 +57,11 @@ export const DetailView = <T extends object>({
   )
 
   const bigTextField = (field: keyof T) => <EditableTextField<T> field={field} type="text" big />
+
   const initialState = {
     data,
     mode,
+    setMode,
     editData: cloneDeep(data),
     textField,
     dropdown,
@@ -102,42 +70,66 @@ export const DetailView = <T extends object>({
     validator,
   }
 
+  const paperProps = {
+    style: {
+      minHeight: '10em',
+      backgroundColor: 'lightgray',
+      padding: '1em',
+    },
+    elevation: 5,
+  }
+
+  const refMode = ['new-ref', 'edit-ref'].includes(mode)
+
+  const refSelectionView = (
+    <Paper {...paperProps}>
+      <Box sx={{ display: 'flex', flexDirection: 'column', rowGap: '1em' }}>
+        <ReferenceSelection />
+      </Box>
+    </Paper>
+  )
+
+  const tabView = (
+    <>
+      <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+        <Tabs value={tab} onChange={(_event, newValue) => setTab(newValue as number)}>
+          {tabs.map(tab => (
+            <Tab key={tab.title} label={tab.title} />
+          ))}
+        </Tabs>
+      </Box>
+      <Paper {...paperProps}>
+        <Box sx={{ display: 'flex', flexDirection: 'column', rowGap: '1em' }}>{tabs[tab].content}</Box>
+      </Paper>
+    </>
+  )
+
   return (
     <Stack rowGap={2}>
       <DetailContextProvider contextState={initialState}>
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignContent: 'center', marginTop: 'auto' }}>
           <Box sx={{ display: 'flex' }} gap={10}>
             <ReturnButton />
-            <Button
-              onClick={() => setMode(mode === 'edit' ? 'read' : 'edit')}
-              variant={mode === 'edit' ? 'contained' : 'outlined'}
-              style={{ width: '12em' }}
-            >
-              <EditIcon /> {mode === 'read' ? 'Edit' : 'Stop editing'}
-            </Button>
-            {mode === 'edit' && onWrite && <WriteButton onWrite={onWrite} setMode={setMode} />}
+            {!refMode && (
+              <Button
+                onClick={() => setMode(mode === 'edit' ? 'read' : 'edit')}
+                variant={mode === 'edit' ? 'contained' : 'outlined'}
+                style={{ width: '12em' }}
+              >
+                <EditIcon style={{ marginRight: '0.5em' }} /> {mode === 'read' ? 'Edit' : 'Stop editing'}
+              </Button>
+            )}
+            {mode !== 'read' && onWrite && (
+              <WriteButton onWrite={onWrite} text={refMode ? 'Complete and save' : 'Select reference'} />
+            )}
           </Box>
-          <Box sx={{ marginRight: '3em' }}>
-            <TopBar<T> />
-          </Box>
+          {!refMode && (
+            <Box sx={{ marginRight: '3em' }}>
+              <DetailBrowser<T> />
+            </Box>
+          )}
         </Box>
-        <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-          <Tabs value={tab} onChange={(_event, newValue) => setTab(newValue as number)}>
-            {tabs.map(tab => (
-              <Tab key={tab.title} label={tab.title} />
-            ))}
-          </Tabs>
-        </Box>
-        <Paper
-          style={{
-            minHeight: '10em',
-            backgroundColor: 'lightgray',
-            padding: '1em',
-          }}
-          elevation={5}
-        >
-          <Box sx={{ display: 'flex', flexDirection: 'column', rowGap: '1em' }}>{tabs[tab].content}</Box>
-        </Paper>
+        {refMode ? refSelectionView : tabView}
       </DetailContextProvider>
     </Stack>
   )

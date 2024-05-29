@@ -6,7 +6,7 @@ import { useNavigate } from 'react-router-dom'
 import { useContext } from 'react'
 import { PageContext } from '../Page'
 
-export const TopBar = <T,>() => {
+export const DetailBrowser = <T,>() => {
   const { data } = useDetailContext<T>()
   const navigate = useNavigate()
   const { idList, idFieldName, viewName } = useContext(PageContext)
