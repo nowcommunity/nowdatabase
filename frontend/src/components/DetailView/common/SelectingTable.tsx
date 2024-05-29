@@ -40,7 +40,7 @@ export const SelectingTable = <T extends MRT_RowData, ParentType>({
     return new Set(selectedItems.map(item => item[idFieldName] as T))
   }, [selectedItems, idFieldName])
 
-  const filteredMuseums = useMemo(() => {
+  const filteredData = useMemo(() => {
     if (!data) return []
     return data.filter(row => {
       if (selectedValues) return !selectedValues.includes(row[idFieldName])
@@ -52,7 +52,7 @@ export const SelectingTable = <T extends MRT_RowData, ParentType>({
     <EditingModal buttonText={buttonText}>
       {data ? (
         <TableView<T>
-          data={filteredMuseums}
+          data={filteredData}
           columns={columns}
           selectorFn={editingAction ?? defaultEditingAction}
           idFieldName={idFieldName}
