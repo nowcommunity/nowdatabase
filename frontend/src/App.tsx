@@ -3,6 +3,8 @@ import { FrontPage } from './components/FrontPage'
 import { NavBar } from './components/NavBar'
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import { LocalityTable } from './components/Locality/LocalityTable'
+import { ProjectTable } from './components/Project/ProjectTable'
+import { ProjectDetails } from './components/Project/ProjectDetails'
 import { ReferenceTable } from './components/Reference/ReferenceTable'
 import { RegionTable } from './components/Region/RegionTable'
 import { RegionDetails } from './components/Region/RegionDetails'
@@ -26,6 +28,8 @@ const App = () => {
             <Routes>
               <Route element={<LocalityDetails />} path="/locality/:id" />
               <Route element={<LocalityTable />} path="/locality/" />
+              <Route element={<ProjectTable />} path="/project/" />
+              <Route element={<ProjectDetails />} path="/project/:id" />
               <Route element={<ReferenceTable />} path="/reference/" />
               <Route element={<RegionTable />} path="/region/" />
               <Route element={<RegionDetails />} path="/region/:id" />
