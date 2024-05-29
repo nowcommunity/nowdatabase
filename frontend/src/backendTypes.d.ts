@@ -53,7 +53,7 @@ export type Species = {
   genus_name: string
   species_name: string
   unique_identifier: string
-  sp_status: boolean | null
+  taxonomic_status: string
 }
 
 export type Reference = {

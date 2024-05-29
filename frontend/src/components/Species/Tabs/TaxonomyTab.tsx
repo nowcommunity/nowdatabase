@@ -22,7 +22,7 @@ export const TaxonomyTab = () => {
     ['Family', textField('family_name'), 'Subfamily or Tribe', textField('subfamily_name')],
     ['Genus', textField('genus_name'), ''],
     ['Species', textField('species_name'), 'Unique Identifier', textField('unique_identifier')],
-    ['Taxon Status', dropdown('sp_status', taxonStatusOptions, 'Taxon Status')],
+    ['Taxonomic Status', dropdown('taxonomic_status', taxonStatusOptions, 'Taxonomic Status')],
   ]
 
   const comment = [['Comment', textField('sp_comment')]]

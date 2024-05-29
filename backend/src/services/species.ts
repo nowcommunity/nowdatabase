@@ -16,7 +16,7 @@ export const getAllSpecies = async (onlyPublic: boolean) => {
       genus_name: true,
       species_name: true,
       unique_identifier: true,
-      sp_status: true,
+      taxonomic_status: true,
     },
     where,
   })
