@@ -1,6 +1,6 @@
 import { SpeciesDetails } from '@/backendTypes'
 import { ArrayFrame } from '@/components/DetailView/common/tabLayoutHelpers'
-import { useDetailContext } from '@/components/DetailView/hooks'
+import { useDetailContext } from '@/components/DetailView/Context/DetailContext'
 
 export const DietTab = () => {
   const { dropdown } = useDetailContext<SpeciesDetails>()

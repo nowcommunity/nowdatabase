@@ -1,5 +1,5 @@
 import { Editable, LocalityDetails, LocalitySynonym } from '@/backendTypes'
-import { useDetailContext } from '@/components/DetailView/hooks'
+import { useDetailContext } from '@/components/DetailView/Context/DetailContext'
 import { Grouped, ArrayFrame, HalfFrames } from '@/components/DetailView/common/tabLayoutHelpers'
 import { Box, TextField } from '@mui/material'
 import { MRT_ColumnDef } from 'material-react-table'
@@ -28,7 +28,7 @@ export const LocalityTab = () => {
     ['Name', textField('loc_name')],
     [
       'Visibility status',
-      mode === 'edit'
+      !mode.read
         ? radioSelection(
             'loc_status',
             [
@@ -93,7 +93,7 @@ export const LocalityTab = () => {
       <ArrayFrame array={latlong} title="Latitude & Longitude" />
 
       <Grouped title="Synonyms">
-        {mode === 'edit' && editingModal}
+        {!mode.read && editingModal}
         <EditableTable<Editable<LocalitySynonym>, LocalityDetails> columns={columns} editable field="now_syn_loc" />
       </Grouped>
     </>

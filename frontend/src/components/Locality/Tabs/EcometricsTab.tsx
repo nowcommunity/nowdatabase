@@ -1,6 +1,6 @@
 import { LocalityDetails } from '@/backendTypes'
 import { ArrayFrame } from '../../DetailView/common/tabLayoutHelpers'
-import { useDetailContext } from '@/components/DetailView/hooks'
+import { useDetailContext } from '@/components/DetailView/Context/DetailContext'
 
 export const EcometricsTab = () => {
   const { textField } = useDetailContext<LocalityDetails>()

@@ -1,6 +1,6 @@
 import { SpeciesDetails } from '@/backendTypes'
 import { ArrayFrame, HalfFrames } from '@/components/DetailView/common/tabLayoutHelpers'
-import { useDetailContext } from '@/components/DetailView/hooks'
+import { useDetailContext } from '@/components/DetailView/Context/DetailContext'
 
 export const TaxonomyTab = () => {
   const { textField, dropdown, bigTextField } = useDetailContext<SpeciesDetails>()

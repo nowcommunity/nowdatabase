@@ -1,7 +1,7 @@
 import { Editable, Locality, SpeciesDetails } from '@/backendTypes'
 import { Grouped } from '@/components/DetailView/common/tabLayoutHelpers'
 import { EditableTable } from '@/components/DetailView/common/EditableTable'
-import { useDetailContext } from '@/components/DetailView/hooks'
+import { useDetailContext } from '@/components/DetailView/Context/DetailContext'
 import { useGetAllLocalitiesQuery } from '@/redux/localityReducer'
 import { Box, CircularProgress } from '@mui/material'
 import { SelectingTable } from '@/components/DetailView/common/SelectingTable'
@@ -60,7 +60,7 @@ export const LocalityTab = () => {
 
   return (
     <Grouped title="Localities">
-      {mode === 'edit' && (
+      {!mode.read && (
         <Box display="flex" gap={1}>
           {selectingTable}
         </Box>

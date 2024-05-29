@@ -1,10 +1,10 @@
 import { useNavigate } from 'react-router-dom'
-import { useDetailContext } from './hooks'
 import { Button } from '@mui/material'
 import ArrowBackIcon from '@mui/icons-material/ArrowBack'
 import SaveIcon from '@mui/icons-material/Save'
 import { useContext } from 'react'
 import { PageContext } from '../Page'
+import { useDetailContext } from './Context/DetailContext'
 
 export const WriteButton = <T,>({ onWrite, text }: { onWrite: (editData: T) => void; text?: string }) => {
   const { editData, mode, setMode } = useDetailContext<T>()
@@ -12,12 +12,8 @@ export const WriteButton = <T,>({ onWrite, text }: { onWrite: (editData: T) => v
     <Button
       sx={{ width: '20em' }}
       onClick={() => {
-        if (mode === 'edit') {
-          setMode('edit-ref')
-          return
-        }
-        if (mode === 'new') {
-          setMode('new-ref')
+        if (!mode.staging) {
+          setMode(mode.new ? 'staging-edit' : 'staging-new')
           return
         }
         onWrite(editData)
@@ -35,7 +31,7 @@ export const ReturnButton = () => {
   const navigate = useNavigate()
   const { tableUrl } = useContext(PageContext)
   const { mode, setMode } = useDetailContext()
-  if (['new-ref', 'edit-ref'].includes(mode)) {
+  if (mode.staging) {
     return (
       <Button
         onClick={() => {

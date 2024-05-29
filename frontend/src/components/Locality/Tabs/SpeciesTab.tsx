@@ -2,7 +2,7 @@ import { Editable, LocalityDetails, LocalitySpecies } from '@/backendTypes'
 import { EditableTable } from '@/components/DetailView/common/EditableTable'
 import { EditingModal } from '@/components/DetailView/common/EditingModal'
 import { Grouped } from '@/components/DetailView/common/tabLayoutHelpers'
-import { useDetailContext } from '@/components/DetailView/hooks'
+import { useDetailContext } from '@/components/DetailView/Context/DetailContext'
 import { Box, TextField } from '@mui/material'
 import { MRT_ColumnDef } from 'material-react-table'
 import { useForm } from 'react-hook-form'
@@ -78,7 +78,7 @@ export const SpeciesTab = () => {
 
   return (
     <Grouped title="Species">
-      {mode === 'edit' && editingModal}
+      {!mode.read && editingModal}
       <EditableTable<Editable<LocalitySpecies>, LocalityDetails> columns={columns} editable field="now_ls" />
     </Grouped>
   )

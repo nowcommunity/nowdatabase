@@ -3,7 +3,7 @@ import { EditableTable } from '@/components/DetailView/common/EditableTable'
 import { EditingForm } from '@/components/DetailView/common/EditingForm'
 import { Grouped } from '@/components/DetailView/common/tabLayoutHelpers'
 import { SelectingTable } from '@/components/DetailView/common/SelectingTable'
-import { useDetailContext } from '@/components/DetailView/hooks'
+import { useDetailContext } from '@/components/DetailView/Context/DetailContext'
 import { useGetAllMuseumsQuery } from '@/redux/museumReducer'
 import { Box, CircularProgress } from '@mui/material'
 import { MRT_ColumnDef } from 'material-react-table'
@@ -46,7 +46,7 @@ export const MuseumTab = () => {
 
   return (
     <Grouped title="Museums">
-      {mode === 'edit' && (
+      {!mode.read && (
         <Box display="flex" gap={1}>
           <EditingForm<Museum, LocalityDetails>
             buttonText="Add new museum"

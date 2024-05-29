@@ -1,5 +1,5 @@
 import { Editable, LocalityDetails, CollectingMethod } from '@/backendTypes'
-import { useDetailContext } from '@/components/DetailView/hooks'
+import { useDetailContext } from '@/components/DetailView/Context/DetailContext'
 import { Grouped, ArrayFrame, HalfFrames } from '@/components/DetailView/common/tabLayoutHelpers'
 import { Box, TextField } from '@mui/material'
 import { MRT_ColumnDef } from 'material-react-table'
@@ -157,7 +157,7 @@ export const TaphonomyTab = () => {
 
       <HalfFrames>
         <Grouped title="Collecting Methods">
-          {mode === 'edit' && editingModal}
+          {!mode.read && editingModal}
           <EditableTable<Editable<CollectingMethod>, LocalityDetails>
             columns={columns}
             editable

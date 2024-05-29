@@ -2,7 +2,7 @@ import { Editable, LocalityDetails, SedimentaryStructure, SedimentaryStructureVa
 import { EditableTable } from '@/components/DetailView/common/EditableTable'
 import { SelectingTable } from '@/components/DetailView/common/SelectingTable'
 import { ArrayFrame, HalfFrames, Grouped } from '@/components/DetailView/common/tabLayoutHelpers'
-import { useDetailContext } from '@/components/DetailView/hooks'
+import { useDetailContext } from '@/components/DetailView/Context/DetailContext'
 import { useGetAllSedimentaryStructuresQuery } from '@/redux/sedimentaryStructureReducer'
 import { MRT_ColumnDef } from 'material-react-table'
 
@@ -183,7 +183,7 @@ export const LithologyTab = () => {
       </HalfFrames>
       <HalfFrames>
         <Grouped title="Sedimentary Structure & Taphonomic Detail">
-          {mode === 'edit' && (
+          {!mode.read && (
             <>
               <SelectingTable<SedimentaryStructureValues, LocalityDetails>
                 buttonText="Add existing sedimentary structure"

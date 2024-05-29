@@ -1,6 +1,6 @@
 import { Card, Typography, Box, Grid, Divider } from '@mui/material'
 import { ReactNode } from 'react'
-import { useDetailContext } from '../hooks'
+import { useDetailContext } from '../Context/DetailContext'
 
 export const ArrayToTable = ({ array, half }: { array: Array<Array<ReactNode>>; half?: boolean }) => {
   const maxRowLength = Math.max(...array.map(row => row.length))
@@ -99,7 +99,7 @@ export const DataValue = <T extends object>({
   displayValue?: ReactNode | null
 }) => {
   const { data, mode } = useDetailContext<T>()
-  if (mode === 'edit') {
+  if (!mode.read) {
     return EditElement
   }
   return displayValue ?? data[field]

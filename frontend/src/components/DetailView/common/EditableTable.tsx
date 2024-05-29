@@ -1,7 +1,7 @@
 import { Editable, RowState } from '@/backendTypes'
 import { CircularProgress, Box, Button } from '@mui/material'
 import { type MRT_ColumnDef, type MRT_RowData, MaterialReactTable, MRT_Row } from 'material-react-table'
-import { useDetailContext } from '../hooks'
+import { useDetailContext } from '../Context/DetailContext'
 import RemoveCircleOutlineIcon from '@mui/icons-material/RemoveCircleOutline'
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline'
 
@@ -56,17 +56,18 @@ export const EditableTable = <T extends Editable<MRT_RowData>, ParentType extend
     )
   }
 
-  const actionRowProps = editable && mode === 'edit' ? { enableRowActions: true, renderRowActions: actionRow } : {}
+  const actionRowProps =
+    editable && mode.option === 'edit' ? { enableRowActions: true, renderRowActions: actionRow } : {}
 
   const rowStateToColor = (state: RowState | undefined) => {
-    if (mode === 'read') return null
+    if (mode.read) return null
     if (state === 'new') return 'lightgreen'
     else if (state === 'removed' || state === 'cancelled') return '#FFCCCB'
     return null
   }
 
   const getData = () => {
-    if (editable && mode === 'edit') {
+    if (editable && !mode.read) {
       if (!editTableData) return editData[field] as T[]
       return editTableData
     }

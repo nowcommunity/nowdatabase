@@ -2,7 +2,7 @@ import { Editable, LocalityDetails, LocalityProject } from '@/backendTypes'
 import { EditableTable } from '@/components/DetailView/common/EditableTable'
 import { Grouped } from '@/components/DetailView/common/tabLayoutHelpers'
 import { EditingModal } from '@/components/DetailView/common/EditingModal'
-import { useDetailContext } from '@/components/DetailView/hooks'
+import { useDetailContext } from '@/components/DetailView/Context/DetailContext'
 import { Box, TextField } from '@mui/material'
 import { MRT_ColumnDef } from 'material-react-table'
 import { useForm } from 'react-hook-form'
@@ -57,7 +57,7 @@ export const ProjectTab = () => {
 
   return (
     <Grouped title="Projects">
-      {mode === 'edit' && editingModal}
+      {!mode.read && editingModal}
       <EditableTable<Editable<LocalityProject>, LocalityDetails> columns={columns} editable field="now_plr" />
     </Grouped>
   )

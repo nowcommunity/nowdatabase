@@ -11,7 +11,7 @@ import {
 } from '@mui/material'
 import { ChangeEvent, ReactNode } from 'react'
 import { RegisterOptions, FieldValues, UseFormRegisterReturn, FieldErrors } from 'react-hook-form'
-import { useDetailContext } from '../hooks'
+import { useDetailContext } from '../Context/DetailContext'
 import { DataValue } from './tabLayoutHelpers'
 
 const fieldWidth = '16em'

@@ -1,5 +1,5 @@
 import { Editable, SpeciesDetails, SpeciesSynonym } from '@/backendTypes'
-import { useDetailContext } from '@/components/DetailView/hooks'
+import { useDetailContext } from '@/components/DetailView/Context/DetailContext'
 import { Grouped } from '@/components/DetailView/common/tabLayoutHelpers'
 import { Box, TextField } from '@mui/material'
 import { MRT_ColumnDef } from 'material-react-table'
@@ -48,7 +48,7 @@ export const SynonymTab = () => {
   return (
     <>
       <Grouped title="Synonyms">
-        {mode === 'edit' && editingModal}
+        {!mode.read && editingModal}
         <EditableTable<Editable<SpeciesSynonym>, SpeciesDetails> columns={columns} editable field="com_taxa_synonym" />
       </Grouped>
     </>

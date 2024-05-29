@@ -1,7 +1,7 @@
 import { Box, Button } from '@mui/material'
 import ArrowBackIcon from '@mui/icons-material/ArrowBack'
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward'
-import { useDetailContext } from './hooks'
+import { useDetailContext } from './Context/DetailContext'
 import { useNavigate } from 'react-router-dom'
 import { useContext } from 'react'
 import { PageContext } from '../Page'

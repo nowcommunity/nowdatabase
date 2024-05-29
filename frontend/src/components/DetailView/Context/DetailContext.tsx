@@ -1,14 +1,54 @@
-import { ReactNode, createContext, useState, JSX, useEffect } from 'react'
+/* eslint-disable react-refresh/only-export-components */
+import { ReactNode, createContext, useState, JSX, useEffect, Context, useContext } from 'react'
 import { DropdownOption } from '../common/editingComponents'
 import { cloneDeep } from 'lodash-es'
 
-// -ref modes mean that user is selecting reference for either adding or editing item
-export type ModeType = 'read' | 'new' | 'edit' | 'new-ref' | 'edit-ref'
+export type ModeOptions = 'read' | 'new' | 'edit' | 'staging-edit' | 'staging-new'
+
+export type ModeType = {
+  read: boolean
+  staging: boolean
+  new: boolean
+  option: ModeOptions
+}
+
+export const modeOptionToMode: Record<ModeOptions, ModeType> = {
+  new: {
+    read: false,
+    staging: false,
+    new: true,
+    option: 'new',
+  },
+  read: {
+    read: true,
+    staging: false,
+    new: false,
+    option: 'read',
+  },
+  edit: {
+    read: false,
+    staging: false,
+    new: false,
+    option: 'edit',
+  },
+  'staging-edit': {
+    read: false,
+    staging: true,
+    new: false,
+    option: 'staging-edit',
+  },
+  'staging-new': {
+    read: false,
+    staging: true,
+    new: false,
+    option: 'staging-new',
+  },
+}
 
 export type DetailContextType<T> = {
   data: T
   mode: ModeType
-  setMode: (newMode: ModeType) => void
+  setMode: (newMode: ModeOptions) => void
   editData: T
   setEditData: (editData: T) => void
   textField: (field: keyof T, type?: React.HTMLInputTypeAttribute) => JSX.Element
@@ -43,4 +83,10 @@ export const DetailContextProvider = <T extends object>({
       {children}
     </DetailContext.Provider>
   )
+}
+
+export const useDetailContext = <T,>() => {
+  const detailContext = useContext<DetailContextType<T>>(DetailContext as unknown as Context<DetailContextType<T>>)
+  if (!detailContext) throw new Error('detailContext lacking provider')
+  return detailContext
 }
