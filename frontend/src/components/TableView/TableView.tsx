@@ -22,9 +22,7 @@ const defaultPagination: MRT_PaginationState = { pageIndex: 0, pageSize: 15 }
   TableView takes in the data and columns of a table, and handles
   rendering the actual table and saving & loading its state via url.
   
-  selectorFn and selectedList are optional props. They should only be 
-  defined when the table is used to select items from the list when
-  editing something, for example in detail view.
+  selectorFn should only be defined if using this as a selecting table
 */
 export const TableView = <T extends MRT_RowData>({
   data,
@@ -36,7 +34,7 @@ export const TableView = <T extends MRT_RowData>({
 }: {
   data: T[] | undefined
   columns: MRT_ColumnDef<T>[]
-  idFieldName: keyof T
+  idFieldName?: keyof T
   checkRowRestriction?: (row: T) => boolean
   selectorFn?: (id: T) => void
   url?: string
