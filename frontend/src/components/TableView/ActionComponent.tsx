@@ -14,13 +14,13 @@ export const ActionComponent = <T extends MRT_RowData>({
   selectorFn,
 }: {
   row: MRT_Row<T>
-  idFieldName: keyof T
+  idFieldName?: keyof T
   checkRowRestriction: ((row: T) => boolean) | undefined
   url: string | undefined
   selectorFn?: (id: T) => void
 }) => {
   const navigate = useNavigate()
-  const id = row.original[idFieldName]
+  const id = row.original[idFieldName!]
   const getIconToShow = () => {
     if (selectorFn) return <AddCircleOutlineIcon />
     return <ManageSearchIcon />
