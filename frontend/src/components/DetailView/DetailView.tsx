@@ -49,12 +49,12 @@ export const DetailView = <T extends object>({
     setModeState(modeOptionToMode[newMode])
   }
 
-  const textField = (field: keyof T, type?: React.HTMLInputTypeAttribute) => (
-    <EditableTextField<T> field={field} type={type} />
+  const textField = (field: keyof T, type?: React.HTMLInputTypeAttribute, disabled?: boolean) => (
+    <EditableTextField<T> field={field} type={type} disabled={disabled} />
   )
 
-  const dropdown = (field: keyof T, options: Array<DropdownOption | string>, name: string) => (
-    <DropdownSelector field={field} options={options} name={name} />
+  const dropdown = (field: keyof T, options: Array<DropdownOption | string>, name: string, disabled?: boolean) => (
+    <DropdownSelector field={field} options={options} name={name} disabled={disabled} />
   )
 
   const radioSelection = (field: keyof T, options: Array<DropdownOption | string>, name: string) => (

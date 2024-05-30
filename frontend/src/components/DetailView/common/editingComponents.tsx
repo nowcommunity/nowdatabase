@@ -18,7 +18,7 @@ import { useDetailContext } from '../Context/DetailContext'
 import { DataValue } from './tabLayoutHelpers'
 import { modalStyle } from './misc'
 
-const fieldWidth = '16em'
+const fieldWidth = '14em'
 
 export type DropdownOption = { value: string; display: string }
 
@@ -26,10 +26,12 @@ export const DropdownSelector = <T extends object>({
   options,
   name,
   field,
+  disabled,
 }: {
   options: Array<DropdownOption | string>
   name: string
   field: keyof T
+  disabled?: boolean
 }) => {
   const { setEditData, editData } = useDetailContext<T>()
   const editingComponent = (
@@ -43,6 +45,7 @@ export const DropdownSelector = <T extends object>({
         onChange={(event: SelectChangeEvent) => setEditData({ ...editData, [field]: event.target.value })}
         sx={{ width: fieldWidth }}
         size="small"
+        disabled={disabled}
       >
         {options.map(item => (
           <MenuItem key={getValue(item)} value={getValue(item)}>
@@ -139,10 +142,12 @@ export const EditableTextField = <T extends object>({
   field,
   type,
   big = false,
+  disabled = false,
 }: {
   field: keyof T
   type?: React.HTMLInputTypeAttribute
   big?: boolean
+  disabled?: boolean
 }) => {
   const { setEditData, editData, validator } = useDetailContext<T>()
   const error = validator(editData, field)
@@ -159,6 +164,7 @@ export const EditableTextField = <T extends object>({
       helperText={error ?? ''}
       type={type ?? 'text'}
       multiline={big}
+      disabled={disabled}
     />
   )
 
@@ -169,10 +175,12 @@ export const FieldWithTableSelection = <T extends object, ParentType extends obj
   targetField,
   sourceField,
   selectorTable,
+  disabled,
 }: {
   targetField: keyof ParentType
   sourceField: keyof T
   selectorTable: ReactElement
+  disabled?: boolean
 }) => {
   const { editData, setEditData } = useDetailContext<ParentType>()
   const [open, setOpen] = useState(false)
@@ -200,7 +208,13 @@ export const FieldWithTableSelection = <T extends object, ParentType extends obj
       </Box>
     )
   const editingComponent = (
-    <TextField variant="outlined" size="small" value={editData[targetField]} onClick={() => setOpen(true)} />
+    <TextField
+      variant="outlined"
+      size="small"
+      value={editData[targetField]}
+      onClick={() => setOpen(true)}
+      disabled={disabled}
+    />
   )
   return <DataValue<ParentType> field={targetField} EditElement={editingComponent} />
 }
