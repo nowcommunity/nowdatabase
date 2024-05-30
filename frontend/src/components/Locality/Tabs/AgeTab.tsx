@@ -15,6 +15,26 @@ export const AgeTab = () => {
     'Late third 3:3',
   ]
 
+  const bfa_abs_options = [
+    'AAR',
+    'Ar/Ar',
+    'C14',
+    'chemical',
+    'Delta_018',
+    'ESR',
+    'fission_track',
+    'K/Ar',
+    'obsidian_hyd',
+    'other_absolute',
+    'other_radiometric',
+    'Rb/Sr',
+    'Sr/Sr',
+    'TL',
+    'tree_ring',
+    'U-series',
+    'U/Th',
+  ]
+
   // TODO: The date_meth options should come from db: distinct(now_loc.date_meth)
   const age = [
     [
@@ -30,10 +50,11 @@ export const AgeTab = () => {
       ),
     ],
     [''],
-    ['Age (Ma)', 'Basis for age (Absolute)', 'Basis for age (Time Unit)', 'Basis for age (Fraction)'],
+    ['', 'Age (Ma)', 'Basis for age (Absolute)', 'Basis for age (Time Unit)', 'Basis for age (Fraction)'],
     [
       'Minimum age',
       textField('min_age', 'number'),
+      dropdown('bfa_min_abs', bfa_abs_options, 'Min Basis for age (absolute)'),
       <FieldWithTableSelection<TimeUnitDetailsType, LocalityDetailsType>
         key="bfa_min"
         sourceField="tu_name"
@@ -45,6 +66,7 @@ export const AgeTab = () => {
     [
       'Maximum age',
       textField('max_age'),
+      dropdown('bfa_max_abs', bfa_abs_options, 'Max Basis for age (absolute)'),
       <FieldWithTableSelection<TimeUnitDetailsType, LocalityDetailsType>
         key="bfa_max"
         sourceField="tu_name"
