@@ -188,7 +188,7 @@ export const FieldWithTableSelection = <T extends object, ParentType extends obj
     setEditData({ ...editData, [targetField]: selected[sourceField] })
     setOpen(false)
   }
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
   const selectorTableWithFn = cloneElement(selectorTable, { selectorFn })
   if (open)
     return (
