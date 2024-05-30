@@ -21,3 +21,11 @@ Example:
       },
     },
 ```
+
+### Note!
+
+The files in this folder, and also backendTypes.d.ts, cannot
++ Use path aliases in imports
++ Import files from elsewhere in frontend
+
+Because these files are used also by backend, and backend container only gets access to these files in frontend.
