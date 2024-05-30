@@ -4,8 +4,9 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack'
 import SaveIcon from '@mui/icons-material/Save'
 import { usePageContext } from '../Page'
 import { useDetailContext } from './Context/DetailContext'
+import { EditDataType } from '@/backendTypes'
 
-export const WriteButton = <T,>({ onWrite, text }: { onWrite: (editData: T) => void; text?: string }) => {
+export const WriteButton = <T,>({ onWrite, text }: { onWrite: (editData: EditDataType<T>) => void; text?: string }) => {
   const { editData, mode, setMode } = useDetailContext<T>()
   return (
     <Button

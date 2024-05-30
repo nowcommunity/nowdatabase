@@ -31,7 +31,7 @@ export const LocalityTab = () => {
       header: 'Min Age',
     },
   ]
-
+  // TODO fix
   // Here is code for adding new locality from Species > Localities tab.
   // Let's add it later, as it is quite complicated to handle.
 
@@ -67,8 +67,11 @@ export const LocalityTab = () => {
       )}
       <EditableTable<Editable<Locality>, SpeciesDetailsType>
         columns={columns}
-        editTableData={editData.now_ls.map(item =>
-          !item.now_loc ? (item as unknown as Editable<Locality>) : item.now_loc
+        editTableData={editData.now_ls.map(
+          item =>
+            !item.now_loc
+              ? (item as unknown as Editable<Locality>)
+              : ({ ...item.now_loc, lid: item.now_loc.lid! } as never) // TODO fix type
         )}
         tableData={data.now_ls.map(item => (!item.now_loc ? (item as unknown as Editable<Locality>) : item.now_loc))}
         editable

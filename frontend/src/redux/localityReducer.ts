@@ -1,5 +1,5 @@
 import { api } from './api'
-import { Locality, LocalityDetailsType } from '@/backendTypes'
+import { EditDataType, Locality, LocalityDetailsType } from '@/backendTypes'
 
 const localitiesApi = api.injectEndpoints({
   endpoints: builder => ({
@@ -14,7 +14,7 @@ const localitiesApi = api.injectEndpoints({
       }),
       providesTags: result => (result ? [{ type: 'locality', id: result.lid }] : []),
     }),
-    editLocality: builder.mutation<LocalityDetailsType, LocalityDetailsType>({
+    editLocality: builder.mutation<LocalityDetailsType, EditDataType<LocalityDetailsType>>({
       query: locality => ({
         url: `/locality/`,
         method: 'PUT',

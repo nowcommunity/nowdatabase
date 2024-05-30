@@ -43,7 +43,7 @@ export const DropdownSelector = <T extends object>({
         id={`${name}-multiselect`}
         value={(editData[field] || '') as string}
         onChange={(event: SelectChangeEvent) => setEditData({ ...editData, [field]: event.target.value })}
-        sx={{ width: fieldWidth }}
+        sx={{ width: fieldWidth, backgroundColor: disabled ? 'grey' : '' }}
         size="small"
         disabled={disabled}
       >
@@ -150,10 +150,10 @@ export const EditableTextField = <T extends object>({
   disabled?: boolean
 }) => {
   const { setEditData, editData, validator } = useDetailContext<T>()
-  const error = validator(editData, field)
+  const { error } = validator(editData, field)
   const editingComponent = (
     <TextField
-      sx={{ width: fieldWidth }}
+      sx={{ width: fieldWidth, backgroundColor: disabled ? 'grey' : '' }}
       onChange={(event: ChangeEvent<HTMLInputElement>) =>
         setEditData({ ...editData, [field]: event?.currentTarget?.value })
       }
@@ -214,6 +214,7 @@ export const FieldWithTableSelection = <T extends object, ParentType extends obj
       value={editData[targetField]}
       onClick={() => setOpen(true)}
       disabled={disabled}
+      sx={{ backgroundColor: disabled ? 'grey' : '' }}
     />
   )
   return <DataValue<ParentType> field={targetField} EditElement={editingComponent} />

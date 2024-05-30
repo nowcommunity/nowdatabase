@@ -1,5 +1,22 @@
 import * as Prisma from '../../backend/node_modules/@prisma/client/default'
 
+type PartialString<T> = {
+  [P in keyof T]: T[P] extends string | null ? T[P] | undefined : T[P]
+}
+
+// Makes all number fields strings, and then all string fields optional! Used for editData
+type EditFields<T> = PartialString<{
+  [P in keyof T]: T[P] extends number | bigint | null ? string : T[P]
+}>
+
+type EditDataType<T> = EditFields<{
+  [P in keyof T]: T[P] extends (infer U)[]
+    ? EditDataType<U>[]
+    : T[P] extends object
+      ? EditDataType<PartialString<EditFields<T[P]>>>
+      : T[P]
+}>
+
 export type RowState = 'new' | 'removed' | 'cancelled' | 'clean'
 export type UpdateComment = { update_comment: string }
 // Use this for fields that include array that has to be edited by EditableTable.

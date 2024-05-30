@@ -1,26 +1,28 @@
+import { EditDataType } from '../backendTypes'
+
 const isValidNumber = (value: string) => !Number.isNaN(parseInt(value))
 
-type ValidationReturn = string | null | undefined
-
+export type ValidationError = string | null | undefined
+export type ValidationObject = { name: string; error: ValidationError }
 type Validator = {
   name: string
   required?: boolean
   minLength?: number
   maxLength?: number
-  asNumber?: ((num: number) => ValidationReturn) | boolean
-  asString?: ((str: string) => ValidationReturn) | boolean
+  asNumber?: ((num: number) => ValidationError) | boolean
+  asString?: ((str: string) => ValidationError) | boolean
 }
 
 export type Validators<T> = { [field in keyof T]: Validator }
 
-const validate: (validator: Validator, value: unknown) => ValidationReturn = (validator: Validator, value: unknown) => {
+const validate: (validator: Validator, value: unknown) => ValidationError = (validator: Validator, value: unknown) => {
   const { required, minLength, maxLength, asNumber, asString } = validator
   if (value === null || value === undefined) return required ? 'This field is required' : null
   if (asNumber) {
-    if (typeof value !== 'string') return 'Error in type' // TODO: How to do this...
+    if (typeof value !== 'string') return 'Error in type' // Shouldn't happen due to editdata being all string
     if (!isValidNumber(value)) return 'Value must be a valid number'
     if (typeof asNumber === 'function') return asNumber(parseInt(value))
-    return isValidNumber(value) ? 'Value must be a valid number' : null
+    return null
   }
   if (asString) {
     if (typeof value !== 'string') return 'Value must be of type string'
@@ -32,10 +34,13 @@ const validate: (validator: Validator, value: unknown) => ValidationReturn = (va
   return null
 }
 
-export const validator = <T>(validators: Validators<T>, editData: T, fieldName: keyof T) => {
+export const validator = <T>(
+  validators: Validators<Partial<T>>,
+  editData: EditDataType<T>,
+  fieldName: keyof T
+): ValidationObject => {
   const validator = validators[fieldName]
-  if (validator === undefined) return null
+  if (validator === undefined) return { name: fieldName as string, error: null }
   const validationError = validate(validator, editData[fieldName])
-  if (!validationError) return null
-  return `Field validation failed for ${validator.name}: ${validationError}`
+  return { name: validator.name, error: validationError }
 }

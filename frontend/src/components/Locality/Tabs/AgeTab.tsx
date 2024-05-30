@@ -5,7 +5,7 @@ import { useDetailContext } from '@/components/DetailView/Context/DetailContext'
 import { TimeUnitTable } from '@/components/TimeUnit/TimeUnitTable'
 
 export const AgeTab = () => {
-  const { textField, radioSelection, dropdown, bigTextField } = useDetailContext<LocalityDetailsType>()
+  const { textField, radioSelection, dropdown, bigTextField, editData } = useDetailContext<LocalityDetailsType>()
   const fracOptions = [
     { value: '', display: 'None' },
     'Early half 1:2',
@@ -54,26 +54,28 @@ export const AgeTab = () => {
     [
       'Minimum age',
       textField('min_age', 'number'),
-      dropdown('bfa_min_abs', bfa_abs_options, 'Min Basis for age (absolute)'),
+      dropdown('bfa_min_abs', bfa_abs_options, 'Min Basis for age (absolute)', editData.date_meth === 'time_unit'),
       <FieldWithTableSelection<TimeUnitDetailsType, LocalityDetailsType>
         key="bfa_min"
         sourceField="tu_name"
         targetField="bfa_min"
         selectorTable={<TimeUnitTable />}
+        disabled={editData.date_meth === 'absolute'}
       />,
-      dropdown('frac_min', fracOptions, 'Minimum fraction'),
+      dropdown('frac_min', fracOptions, 'Minimum fraction', editData.date_meth === 'absolute'),
     ],
     [
       'Maximum age',
-      textField('max_age'),
-      dropdown('bfa_max_abs', bfa_abs_options, 'Max Basis for age (absolute)'),
+      textField('max_age', 'number'),
+      dropdown('bfa_max_abs', bfa_abs_options, 'Max Basis for age (absolute)', editData.date_meth === 'time_unit'),
       <FieldWithTableSelection<TimeUnitDetailsType, LocalityDetailsType>
         key="bfa_max"
         sourceField="tu_name"
         targetField="bfa_max"
         selectorTable={<TimeUnitTable />}
+        disabled={editData.date_meth === 'absolute'}
       />,
-      dropdown('frac_max', fracOptions, 'Maximum fraction'),
+      dropdown('frac_max', fracOptions, 'Maximum fraction', editData.date_meth === 'absolute'),
     ],
     [''],
     ['Chronostrathigraphic age', textField('chron')],

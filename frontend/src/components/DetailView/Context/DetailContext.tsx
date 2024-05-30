@@ -2,6 +2,8 @@
 import { ReactNode, createContext, useState, JSX, useEffect, Context, useContext } from 'react'
 import { DropdownOption } from '../common/editingComponents'
 import { cloneDeep } from 'lodash-es'
+import { ValidationObject } from '@/validators/validator'
+import { EditDataType } from '@/backendTypes'
 
 export type ModeOptions = 'read' | 'new' | 'edit' | 'staging-edit' | 'staging-new'
 
@@ -49,35 +51,54 @@ export type DetailContextType<T> = {
   data: T
   mode: ModeType
   setMode: (newMode: ModeOptions) => void
-  editData: T
-  setEditData: (editData: T) => void
+  editData: EditDataType<T>
+  setEditData: (editData: EditDataType<T>) => void
   textField: (field: keyof T, type?: React.HTMLInputTypeAttribute) => JSX.Element
   bigTextField: (field: keyof T) => JSX.Element
-  dropdown: (field: keyof T, options: Array<DropdownOption | string>, name: string) => JSX.Element
+  dropdown: (field: keyof T, options: Array<DropdownOption | string>, name: string, disabled?: boolean) => JSX.Element
   radioSelection: (field: keyof T, options: Array<DropdownOption | string>, name: string) => JSX.Element
-  validator: (editData: T, field: keyof T) => string | null
+  validator: (editData: EditDataType<T>, field: keyof T) => ValidationObject
 }
 
 export const DetailContext = createContext<DetailContextType<unknown>>(null!)
 
-export const DetailContextProvider = <T extends object>({
+/* This changes data so that all number or bigint fields become string */
+export const makeEditData = <T,>(data: T): EditDataType<T> => {
+  const editData: EditDataType<T> = {} as EditDataType<T>
+  for (const field in data) {
+    if (Array.isArray(data[field])) {
+      editData[field] = (data[field] as never[]).map(item => makeEditData(item)) as never
+    } else if (typeof data[field] === 'object' && data[field] !== null) {
+      editData[field] = makeEditData(data[field]) as never
+    } else if (typeof data[field] === 'number') {
+      editData[field] = ('' + (data[field] as number)) as never
+    } else if (typeof data[field] === 'bigint') {
+      editData[field] = ('' + (data[field] as bigint)) as never
+    } else {
+      editData[field] = cloneDeep(data[field]) as never
+    }
+  }
+  return editData
+}
+
+export const DetailContextProvider = <T extends EditDataType<object>>({
   children,
   contextState,
 }: {
   children: ReactNode | ReactNode[]
   contextState: Omit<DetailContextType<T>, 'setEditData'>
 }) => {
-  const [editData, setEditData] = useState<T>(cloneDeep(contextState.data))
+  const [editData, setEditData] = useState<EditDataType<T>>(makeEditData(contextState.data))
 
-  useEffect(() => setEditData(cloneDeep(contextState.data)), [contextState.data])
-
+  useEffect(() => setEditData(makeEditData(contextState.data)), [contextState.data])
   return (
     <DetailContext.Provider
       value={{
         ...contextState,
         editData,
-        setEditData: (data: unknown) => setEditData(data as T),
-        validator: (editData: unknown, fieldName: keyof T) => contextState.validator(editData as T, fieldName),
+        setEditData: (data: unknown) => setEditData(data as EditDataType<T>),
+        validator: (editData: unknown, fieldName: keyof T) =>
+          contextState.validator(editData as EditDataType<T>, fieldName),
       }}
     >
       {children}

@@ -9,7 +9,7 @@ import {
 } from '../services/locality'
 import { fixBigInt } from '../utils/common'
 import { detailedDiff } from 'deep-object-diff'
-import { LocalityDetailsType } from '../../../frontend/src/backendTypes'
+import { EditDataType, LocalityDetailsType } from '../../../frontend/src/backendTypes'
 
 const router = Router()
 
@@ -25,10 +25,10 @@ router.get('/:id', async (req, res) => {
   res.status(200).send(fixBigInt(locality))
 })
 
-router.put('/', async (req: Request<object, object, { locality: LocalityDetailsType }>, res) => {
+router.put('/', async (req: Request<object, object, { locality: EditDataType<LocalityDetailsType> }>, res) => {
   const editedLocality = req.body.locality
   const fixedEditedLocality = fixEditedLocality(editedLocality)
-  const oldLocality = await getLocalityDetails(fixedEditedLocality.lid)
+  const oldLocality = await getLocalityDetails(parseInt(fixedEditedLocality.lid!))
   const difference = detailedDiff(oldLocality!, fixedEditedLocality)
   const filteredLoc = filterLocality(difference.updated)
   const validationErrors = validateEntireLocality(filteredLoc)

@@ -20,7 +20,7 @@ export const EditableTable = <T extends Editable<MRT_RowData>, ParentType extend
   field,
 }: {
   tableData?: Array<T> | null
-  editTableData?: Array<T> | null
+  editTableData?: Array<Editable<T>> | null
   columns: MRT_ColumnDef<T>[]
   editable?: boolean
   field: keyof ParentType
@@ -34,7 +34,7 @@ export const EditableTable = <T extends Editable<MRT_RowData>, ParentType extend
     // TODO: Using static index - need to use some id, probably sorting breaks this
     const rowClicked = (index: number | undefined) => {
       if (index === undefined) return
-      const items = [...editData[field]]
+      const items = [...(editData[field] as Array<Editable<object>>)]
       if (items[index].rowState === 'new') {
         items.splice(index, 1)
         setEditData({ ...editData, [field]: items })

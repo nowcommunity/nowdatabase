@@ -12,7 +12,7 @@ import { ProjectTab } from './Tabs/ProjectTab'
 import { SpeciesTab } from './Tabs/SpeciesTab'
 import { TaphonomyTab } from './Tabs/TaphonomyTab'
 import { UpdateTab } from './Tabs/UpdateTab'
-import { LocalityDetailsType } from '@/backendTypes'
+import { EditDataType, LocalityDetailsType } from '@/backendTypes'
 import { validateLocality } from '@/validators/locality'
 
 export const LocalityDetails = () => {
@@ -22,7 +22,7 @@ export const LocalityDetails = () => {
   if (isError) return <div>Error loading data</div>
   if (isLoading || !data) return <CircularProgress />
 
-  const onWrite = (editData: LocalityDetailsType) => {
+  const onWrite = (editData: EditDataType<LocalityDetailsType>) => {
     void editLocalityRequest(editData)
   }
 

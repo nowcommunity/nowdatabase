@@ -2,12 +2,13 @@ import { useSearchParams } from 'react-router-dom'
 import { Box, Button, Paper, Stack, Tab, Tabs } from '@mui/material'
 import EditIcon from '@mui/icons-material/Edit'
 import { useEffect, useState, JSX } from 'react'
-import { DetailContextProvider, ModeOptions, ModeType, modeOptionToMode } from './Context/DetailContext'
-import { cloneDeep } from 'lodash-es'
+import { DetailContextProvider, ModeOptions, ModeType, makeEditData, modeOptionToMode } from './Context/DetailContext'
 import { DropdownOption, DropdownSelector, EditableTextField, RadioSelector } from './common/editingComponents'
 import { DetailBrowser } from './DetailBrowser'
 import { StagingView } from './StagingView'
 import { ReturnButton, WriteButton } from './components'
+import { ValidationObject } from '@/validators/validator'
+import { EditDataType } from '@/backendTypes'
 
 export type TabType = {
   title: string
@@ -22,8 +23,8 @@ export const DetailView = <T extends object>({
 }: {
   tabs: TabType[]
   data: T
-  onWrite: (editData: T) => void
-  validator: (editData: T, field: keyof T) => string | null
+  onWrite: (editData: EditDataType<T>) => void
+  validator: (editData: EditDataType<T>, field: keyof EditDataType<T>) => ValidationObject
 }) => {
   const [searchParams, setSearchParams] = useSearchParams()
   const getUrl = () => {
@@ -67,7 +68,7 @@ export const DetailView = <T extends object>({
     data,
     mode,
     setMode,
-    editData: cloneDeep(data),
+    editData: makeEditData(data),
     textField,
     dropdown,
     radioSelection,
