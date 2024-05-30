@@ -72,7 +72,7 @@ export const fixEditedLocality = (editedLocality: EditDataType<LocalityDetailsTy
       ...now_ls,
       com_species: {
         ...now_ls.com_species,
-        body_mass: now_ls.com_species.body_mass === null ? null : BigInt(now_ls.com_species.body_mass),
+        body_mass: now_ls.com_species.body_mass, // TODO FIX ? null : BigInt(now_ls.com_species.body_mass!),
       },
     }))
   }

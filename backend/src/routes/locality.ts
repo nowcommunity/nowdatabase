@@ -30,7 +30,7 @@ router.put('/', async (req: Request<object, object, { locality: EditDataType<Loc
   const fixedEditedLocality = fixEditedLocality(editedLocality)
   const oldLocality = await getLocalityDetails(parseInt(fixedEditedLocality.lid!))
   const difference = detailedDiff(oldLocality!, fixedEditedLocality)
-  const filteredLoc = filterLocality(difference.updated)
+  const filteredLoc = filterLocality(difference.updated as EditDataType<LocalityDetailsType>)
   const validationErrors = validateEntireLocality(filteredLoc)
   if (validationErrors.length > 0) {
     return res.status(400).send({ validationErrors })
