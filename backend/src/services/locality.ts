@@ -1,6 +1,6 @@
 import { logger } from '../utils/logger'
 import { prisma } from '../utils/db'
-import { LocalityDetails } from '../../../frontend/src/backendTypes'
+import { LocalityDetailsType } from '../../../frontend/src/backendTypes'
 import Prisma from '@prisma/client'
 import { validateLocality } from '../../../frontend/src/validators/locality'
 
@@ -60,7 +60,7 @@ export const getLocalityDetails = async (id: number) => {
   return { ...locality, museums: now_mus.map(museum => museum.com_mlist) }
 }
 
-export const fixEditedLocality = (editedLocality: LocalityDetails) => {
+export const fixEditedLocality = (editedLocality: LocalityDetailsType) => {
   if (editedLocality.now_lau) {
     editedLocality.now_lau = editedLocality.now_lau.map(lau => ({
       ...lau,
@@ -83,13 +83,13 @@ export const validateEntireLocality = (editedFields: Partial<Prisma.now_loc>) =>
   const keys = Object.keys(editedFields)
   const errors = []
   for (const key of keys) {
-    const error = validateLocality(editedFields as LocalityDetails, key as keyof LocalityDetails)
+    const error = validateLocality(editedFields as LocalityDetailsType, key as keyof LocalityDetailsType)
     if (error !== null) errors.push(error)
   }
   return errors
 }
 
-export const filterLocality = (editedFields: Partial<LocalityDetails>) => {
+export const filterLocality = (editedFields: Partial<LocalityDetailsType>) => {
   const fields = Object.keys(prisma.now_loc.fields)
   const filteredLoc = Object.entries(editedFields)
     .filter(([field]) => fields.includes(field))
