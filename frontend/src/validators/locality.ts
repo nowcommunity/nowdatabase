@@ -19,6 +19,12 @@ export const validateLocality = (editData: LocalityDetailsType, fieldName: keyof
         return
       },
     },
+    loc_name: {
+      name: 'Locality name',
+    },
+    date_meth: {
+      name: 'Dating method',
+    },
   }
 
   return validator(validators, editData, fieldName)
