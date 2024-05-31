@@ -33,6 +33,8 @@ export type LocalityDetails = Omit<Prisma.now_loc, 'now_mus'> & { museums: Array
 export type Locality = {
   lid: number
   loc_name: string
+  bfa_max: string | null
+  bfa_min: string | null
   max_age: number
   min_age: number
   country: string | null
@@ -95,4 +97,6 @@ export type TimeUnit = {
   rank: string
 }
 
-export type TimeUnitDetails = Prisma.now_time_unit
+// export type TimeUnitDetails = Prisma.now_time_unit
+export type TimeUnitDetails = Prisma.now_time_unit & { now_tu_sequence: Array<Editable<TimeUnitSequence>> }
+export type TimeUnitSequence = Prisma.now_tu_sequence
