@@ -30,7 +30,12 @@ export type SpeciesLocality = Prisma.now_ls & { now_loc: Prisma.now_loc }
 export type LocalityUpdate = Prisma.now_lau & { now_lr: Prisma.now_lr }
 export type SpeciesUpdate = Prisma.now_sau & { now_lr: Prisma.now_sr }
 export type Museum = Prisma.com_mlist
+export type ProjectPeople = Prisma.now_proj_people
+export type ProjectDetails = Prisma.now_proj & { now_proj_people: Array<Editable<ProjectPeople>> }
 export type Project = Prisma.now_proj
+export type Region = Prisma.now_reg_coord
+export type RegionCoordinator = Prisma.now_reg_coord_people
+export type RegionCountry = Prisma.now_reg_coord_country
 export type SedimentaryStructure = Prisma.now_ss
 export type LocalitySynonym = Prisma.now_syn_loc
 export type SpeciesSynonym = Prisma.com_taxa_synonym
@@ -45,6 +50,8 @@ export type LocalityDetailsType = Omit<Prisma.now_loc, 'now_mus'> & { museums: A
 export type Locality = {
   lid: number
   loc_name: string
+  bfa_max: string | null
+  bfa_min: string | null
   max_age: number
   min_age: number
   country: string | null
@@ -65,6 +72,7 @@ export type Species = {
   genus_name: string
   species_name: string
   unique_identifier: string
+  taxonomic_status: string
   sp_status: boolean | null
 }
 
@@ -87,6 +95,9 @@ export type Reference = {
 }
 
 export type ReferenceDetailsType = Prisma.ref_ref
+export type RegionDetails = Prisma.now_reg_coord & { now_reg_coord_people: Array<Editable<RegionCoordinator>> } & {
+  now_reg_coord_country: Array<Editable<RegionCountry>>
+}
 
 export type TimeUnit = {
   low_bound: number
@@ -106,4 +117,7 @@ export type TimeUnit = {
   rank: string
 }
 
-export type TimeUnitDetailsType = Prisma.now_time_unit
+export type TimeUnitDetailsType = EditDataType<
+  Prisma.now_time_unit & { now_tu_sequence: Array<Editable<TimeUnitSequence>> }
+>
+export type TimeUnitSequence = Prisma.now_tu_sequence

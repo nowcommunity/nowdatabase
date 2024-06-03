@@ -6,11 +6,12 @@ import { ReferenceTable } from './Reference/ReferenceTable'
 import { SpeciesDetails } from './Species/SpeciesDetails'
 import { SpeciesTable } from './Species/SpeciesTable'
 import { TimeUnitTable } from './TimeUnit/TimeUnitTable'
+import { TimeUnitDetails } from './TimeUnit/TimeUnitDetails'
 
 export const timeUnitPage = (
   <Page
     tableView={<TimeUnitTable />}
-    detailView={null}
+    detailView={<TimeUnitDetails />}
     viewName="time-unit"
     idFieldName="tu_name"
     createTitle={(tu: TimeUnitDetailsType) => `${tu.tu_display_name}`}

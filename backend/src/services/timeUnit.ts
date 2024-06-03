@@ -34,6 +34,21 @@ export const getAllTimeUnits = async () => {
 
 export const getTimeUnitDetails = async (id: string) => {
   // TODO: Check if user has access
-  const result = await prisma.now_time_unit.findUnique({ where: { tu_name: id } })
+  const result = await prisma.now_time_unit.findUnique({
+    where: { tu_name: id },
+    include: {
+      now_tu_sequence: {},
+      now_tu_bound_now_time_unit_low_bndTonow_tu_bound: {},
+      now_tu_bound_now_time_unit_up_bndTonow_tu_bound: {},
+    },
+  })
+  return result
+}
+
+export const getTimeUnitLocalities = async (id: string) => {
+  // TODO: Check if user has access
+  const result = await prisma.now_loc.findMany({
+    where: { OR: [{ bfa_max: id }, { bfa_min: id }] },
+  })
   return result
 }
