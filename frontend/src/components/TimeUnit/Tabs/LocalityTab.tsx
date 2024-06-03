@@ -1,13 +1,15 @@
-import { Locality } from '@/backendTypes'
+import { Locality, TimeUnitDetails } from '@/backendTypes'
 import { useGetTimeUnitLocalitiesQuery } from '@/redux/timeUnitReducer'
 import { CircularProgress } from '@mui/material'
 import { TableView } from '../../TableView/TableView'
+import { useDetailContext } from '@/components/DetailView/hooks'
 
 export const LocalityTab = () => {
-  const { data, isError } = useGetTimeUnitLocalitiesQuery('aragonian')
+  const { data } = useDetailContext<TimeUnitDetails>()
+  const { data: localitiesData, isError } = useGetTimeUnitLocalitiesQuery(data.tu_name)
 
   if (isError) return 'Error loading Localities.'
-  if (!data) return <CircularProgress />
+  if (!localitiesData) return <CircularProgress />
 
   const columns = [
     {
@@ -36,7 +38,7 @@ export const LocalityTab = () => {
       checkRowRestriction={checkRowRestriction}
       idFieldName="lid"
       columns={columns}
-      data={data}
+      data={localitiesData}
       url="locality"
     />
   )

@@ -48,7 +48,7 @@ export const getTimeUnitDetails = async (id: string) => {
 export const getTimeUnitLocalities = async (id: string) => {
   // TODO: Check if user has access
   const result = await prisma.now_loc.findMany({
-    where: { bfa_max: id },
+    where: { OR: [{ bfa_max: id }, { bfa_min: id }] },
   })
   return result
 }
