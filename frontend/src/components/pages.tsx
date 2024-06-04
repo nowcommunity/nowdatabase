@@ -1,12 +1,30 @@
-import { TimeUnitDetailsType, ReferenceDetailsType, SpeciesDetailsType, LocalityDetailsType } from '@/backendTypes'
+import {
+  TimeUnitDetailsType,
+  ReferenceDetailsType,
+  SpeciesDetailsType,
+  LocalityDetailsType,
+  TimeBoundDetailsType,
+} from '@/backendTypes'
 import { LocalityDetails } from './Locality/LocalityDetails'
 import { LocalityTable } from './Locality/LocalityTable'
 import { Page } from './Page'
 import { ReferenceTable } from './Reference/ReferenceTable'
 import { SpeciesDetails } from './Species/SpeciesDetails'
 import { SpeciesTable } from './Species/SpeciesTable'
+import { TimeBoundDetails } from './TimeBound/TimeBoundDetails'
+import { TimeBoundTable } from './TimeBound/TimeBoundTable'
 import { TimeUnitTable } from './TimeUnit/TimeUnitTable'
 import { TimeUnitDetails } from './TimeUnit/TimeUnitDetails'
+
+export const timeBoundPage = (
+  <Page
+    tableView={<TimeBoundTable />}
+    detailView={<TimeBoundDetails />}
+    viewName="time-bound"
+    idFieldName="bid"
+    createTitle={(tb: TimeBoundDetailsType) => `${tb.b_name}`}
+  />
+)
 
 export const timeUnitPage = (
   <Page

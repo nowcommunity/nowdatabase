@@ -99,6 +99,15 @@ export type RegionDetails = Prisma.now_reg_coord & { now_reg_coord_people: Array
   now_reg_coord_country: Array<Editable<RegionCountry>>
 }
 
+export type TimeBound = {
+  bid: number
+  b_name: string
+  age: number
+  b_comment: string
+}
+
+export type TimeBoundDetailsType = Prisma.now_tu_bound
+
 export type TimeUnit = {
   low_bound: number
   up_bound: number
@@ -116,6 +125,8 @@ export type TimeUnit = {
   tu_display_name: string
   rank: string
 }
+
+export type TimeBoundUpdate = Prisma.now_bau & { now_br: Prisma.now_br }
 
 export type TimeUnitDetailsType = EditDataType<
   Prisma.now_time_unit & { now_tu_sequence: Array<Editable<TimeUnitSequence>> }

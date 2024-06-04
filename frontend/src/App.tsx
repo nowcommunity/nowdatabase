@@ -7,7 +7,7 @@ import { ProjectDetails } from './components/Project/ProjectDetails'
 import { RegionTable } from './components/Region/RegionTable'
 import { RegionDetails } from './components/Region/RegionDetails'
 import { Login } from './components/Login'
-import { localityPage, referencePage, speciesPage, timeUnitPage } from './components/pages'
+import { localityPage, referencePage, speciesPage, timeBoundPage, timeUnitPage } from './components/pages'
 
 const App = () => {
   return (
@@ -25,6 +25,7 @@ const App = () => {
               <Route element={speciesPage} path="/species/:id?" />
               <Route element={referencePage} path="/reference/:id?" />
               <Route element={timeUnitPage} path="/time-unit/:id?" />
+              <Route element={timeBoundPage} path="/time-bound/:id?" />
               <Route element={<ProjectTable />} path="/project/" />
               <Route element={<ProjectDetails />} path="/project/:id" />
               <Route element={<RegionTable />} path="/region/" />
