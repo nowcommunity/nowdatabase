@@ -88,6 +88,15 @@ export type Reference = {
 
 export type ReferenceDetailsType = Prisma.ref_ref
 
+export type TimeBound = {
+  bid: number
+  b_name: string
+  age: number
+  b_comment: string
+}
+
+export type TimeBoundDetailsType = Prisma.now_tu_bound
+
 export type TimeUnit = {
   low_bound: number
   up_bound: number
@@ -105,5 +114,7 @@ export type TimeUnit = {
   tu_display_name: string
   rank: string
 }
+
+export type TimeBoundUpdate = Prisma.now_bau & { now_br: Prisma.now_br }
 
 export type TimeUnitDetailsType = Prisma.now_time_unit

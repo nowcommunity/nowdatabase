@@ -15,7 +15,8 @@ export const NavBar = () => {
     { title: 'Locality', url: '/locality' },
     { title: 'Species', url: '/species' },
     { title: 'Reference', url: '/reference' },
-    { title: 'Time unit', url: '/time-unit' },
+    { title: 'Time Unit', url: '/time-unit' },
+    { title: 'Time Bound', url: '/time-bound' },
   ]
 
   if (user.username === null) pages.push({ title: 'Login', url: '/login' })
