@@ -35,3 +35,8 @@ export const getReferenceDetails = async (id: number) => {
   const result = await prisma.ref_ref.findUnique({ where: { rid: id } })
   return result
 }
+
+export const getReferenceTypes = async () => {
+  const referenceTypes = await prisma.ref_ref_type.findMany({ include: { ref_field_name: true } })
+  return referenceTypes
+}
