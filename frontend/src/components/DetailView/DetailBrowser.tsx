@@ -13,14 +13,29 @@ export const DetailBrowser = <T extends object>() => {
   const currentIndex = idList.indexOf((data as { [key: string]: string })[idFieldName])
   const nextIndex = currentIndex + 1
   const previousIndex = currentIndex - 1
-
+  const style = {
+    width: '18em',
+    overflow: 'hidden',
+    whiteSpace: 'nowrap',
+    textOverflow: 'ellipsis',
+    position: 'relative',
+    textAlign: 'left',
+    '&::after': {
+      content: '""',
+      position: 'absolute',
+      right: 0,
+      width: '20%',
+      height: '100%',
+      background: 'linear-gradient(to right, transparent, white 50%)',
+    },
+  }
   const getText = () => {
     if (mode.read) {
-      return `Viewing ${viewName}: ${createTitle(data)}`
+      return `${createTitle(data)}`
     } else if (mode.new) {
-      return `Creating ${viewName}`
+      return `Creating new ${viewName}`
     }
-    return `Editing ${viewName}: ${createTitle(data)}`
+    return `${createTitle(data)}`
   }
 
   return (
@@ -30,12 +45,11 @@ export const DetailBrowser = <T extends object>() => {
         justifyContent: 'center',
         height: '100%',
         display: 'flex',
-        fontWeight: 'bold',
-        fontSize: '22px',
+        fontSize: '18px',
         gap: '1em',
       }}
     >
-      <div>{getText()}</div>
+      <Box sx={style}>{getText()}</Box>
       {idListExists && mode.read && (
         <div>
           {previousIndex >= 0 && (
