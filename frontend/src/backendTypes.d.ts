@@ -132,3 +132,7 @@ export type TimeUnitDetailsType = EditDataType<
   Prisma.now_time_unit & { now_tu_sequence: Array<Editable<TimeUnitSequence>> }
 >
 export type TimeUnitSequence = Prisma.now_tu_sequence
+
+export type ReferenceType = Prisma.ref_ref_type & { ref_field_name: Prisma.ref_field_name[] }
+
+export type ReferenceField = Prisma.ref_field_name

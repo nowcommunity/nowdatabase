@@ -1,5 +1,5 @@
 import { api } from './api'
-import { Reference, ReferenceDetailsType } from '@/backendTypes'
+import { Reference, ReferenceDetailsType, ReferenceType } from '@/backendTypes'
 
 const referencesApi = api.injectEndpoints({
   endpoints: builder => ({
@@ -13,7 +13,12 @@ const referencesApi = api.injectEndpoints({
         url: `/reference/${id}`,
       }),
     }),
+    getReferenceTypes: builder.query<ReferenceType[], void>({
+      query: () => ({
+        url: 'reference/types',
+      }),
+    }),
   }),
 })
 
-export const { useGetAllReferencesQuery, useGetReferenceDetailsQuery } = referencesApi
+export const { useGetAllReferencesQuery, useGetReferenceDetailsQuery, useGetReferenceTypesQuery } = referencesApi
