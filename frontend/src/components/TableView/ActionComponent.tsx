@@ -14,7 +14,7 @@ export const ActionComponent = <T extends MRT_RowData>({
 }: {
   row: MRT_Row<T>
   idFieldName?: keyof T
-  checkRowRestriction: ((row: T) => boolean) | undefined
+  checkRowRestriction?: ((row: T) => boolean) | undefined
   url: string | undefined
   selectorFn?: (id: T) => void
 }) => {
