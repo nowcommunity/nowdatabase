@@ -74,7 +74,6 @@ export const LocalityTab = () => {
               : ({ ...item.now_loc, lid: item.now_loc.lid! } as never) // TODO fix type
         )}
         tableData={data.now_ls.map(item => (!item.now_loc ? (item as unknown as Editable<Locality>) : item.now_loc))}
-        editable
         field="now_ls"
       />
     </Grouped>

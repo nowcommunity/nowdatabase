@@ -1,8 +1,8 @@
-import { Locality, TimeUnitDetailsType } from '@/backendTypes'
+import { TimeUnitDetailsType } from '@/backendTypes'
 import { useGetTimeUnitLocalitiesQuery } from '@/redux/timeUnitReducer'
 import { CircularProgress } from '@mui/material'
-import { TableView } from '../../TableView/TableView'
 import { useDetailContext } from '@/components/DetailView/Context/DetailContext'
+import { SimpleTable } from '@/components/DetailView/common/SimpleTable'
 
 export const LocalityTab = () => {
   const { data } = useDetailContext<TimeUnitDetailsType>()
@@ -29,17 +29,6 @@ export const LocalityTab = () => {
       header: 'Min Age',
     },
   ]
-  const checkRowRestriction = (row: Locality) => {
-    return !!row.loc_status
-  }
 
-  return (
-    <TableView<Locality>
-      checkRowRestriction={checkRowRestriction}
-      idFieldName="lid"
-      columns={columns}
-      data={localitiesData}
-      url="locality"
-    />
-  )
+  return <SimpleTable columns={columns} data={localitiesData} />
 }

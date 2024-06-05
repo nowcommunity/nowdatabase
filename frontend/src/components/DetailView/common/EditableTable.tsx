@@ -5,7 +5,7 @@ import { useDetailContext } from '../Context/DetailContext'
 import RemoveCircleOutlineIcon from '@mui/icons-material/RemoveCircleOutline'
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline'
 
-const getNewState = (state: RowState) => {
+const getNewState = (state: RowState): RowState => {
   if (!state || state === 'clean') return 'removed'
   if (state === 'new') return 'cancelled'
   if (state === 'cancelled') return 'new'
@@ -16,13 +16,11 @@ export const EditableTable = <T extends Editable<MRT_RowData>, ParentType extend
   tableData,
   editTableData,
   columns,
-  editable,
   field,
 }: {
   tableData?: Array<T> | null
   editTableData?: Array<Editable<T>> | null
   columns: MRT_ColumnDef<T>[]
-  editable?: boolean
   field: keyof ParentType
 }) => {
   const { editData, setEditData, mode, data } = useDetailContext<ParentType>()
@@ -31,7 +29,7 @@ export const EditableTable = <T extends Editable<MRT_RowData>, ParentType extend
   const actionRow = ({ row, staticRowIndex }: { row: MRT_Row<T>; staticRowIndex?: number | undefined }) => {
     const state = row.original.rowState ?? 'clean'
 
-    // TODO: Using static index - need to use some id, probably sorting breaks this
+    // TODO: Using static index - need to use some id, sorting breaks this
     const rowClicked = (index: number | undefined) => {
       if (index === undefined) return
       const items = [...(editData[field] as Array<Editable<object>>)]
@@ -56,8 +54,7 @@ export const EditableTable = <T extends Editable<MRT_RowData>, ParentType extend
     )
   }
 
-  const actionRowProps =
-    editable && mode.option === 'edit' ? { enableRowActions: true, renderRowActions: actionRow } : {}
+  const actionRowProps = mode.read ? {} : { enableRowActions: true, renderRowActions: actionRow }
 
   const rowStateToColor = (state: RowState | undefined) => {
     if (mode.read) return null
@@ -67,7 +64,7 @@ export const EditableTable = <T extends Editable<MRT_RowData>, ParentType extend
   }
 
   const getData = () => {
-    if (editable && !mode.read) {
+    if (!mode.read) {
       if (!editTableData) return editData[field] as T[]
       return editTableData
     }

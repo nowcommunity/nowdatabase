@@ -49,11 +49,7 @@ export const SynonymTab = () => {
     <>
       <Grouped title="Synonyms">
         {!mode.read && editingModal}
-        <EditableTable<Editable<SpeciesSynonym>, SpeciesDetailsType>
-          columns={columns}
-          editable
-          field="com_taxa_synonym"
-        />
+        <EditableTable<Editable<SpeciesSynonym>, SpeciesDetailsType> columns={columns} field="com_taxa_synonym" />
       </Grouped>
     </>
   )

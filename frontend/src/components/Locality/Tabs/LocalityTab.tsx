@@ -94,7 +94,7 @@ export const LocalityTab = () => {
 
       <Grouped title="Synonyms">
         {!mode.read && editingModal}
-        <EditableTable<Editable<LocalitySynonym>, LocalityDetailsType> columns={columns} editable field="now_syn_loc" />
+        <EditableTable<Editable<LocalitySynonym>, LocalityDetailsType> columns={columns} field="now_syn_loc" />
       </Grouped>
     </>
   )

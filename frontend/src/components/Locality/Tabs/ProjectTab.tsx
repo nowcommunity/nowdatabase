@@ -58,7 +58,7 @@ export const ProjectTab = () => {
   return (
     <Grouped title="Projects">
       {!mode.read && editingModal}
-      <EditableTable<Editable<LocalityProject>, LocalityDetailsType> columns={columns} editable field="now_plr" />
+      <EditableTable<Editable<LocalityProject>, LocalityDetailsType> columns={columns} field="now_plr" />
     </Grouped>
   )
 }

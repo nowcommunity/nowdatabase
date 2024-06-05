@@ -35,7 +35,6 @@ export const CoordinatorTab = () => {
         <EditableTable<EditDataType<Editable<RegionCoordinator>>, RegionDetails>
           columns={coordinator}
           editTableData={editData.now_reg_coord_people}
-          editable
           field="now_reg_coord_people"
         />
       </Grouped>
@@ -43,7 +42,6 @@ export const CoordinatorTab = () => {
         <EditableTable<EditDataType<Editable<RegionCountry>>, RegionDetails>
           columns={country}
           editTableData={editData.now_reg_coord_country}
-          editable
           field="now_reg_coord_country"
         />
       </Grouped>

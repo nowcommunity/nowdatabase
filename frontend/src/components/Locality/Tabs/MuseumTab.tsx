@@ -62,7 +62,7 @@ export const MuseumTab = () => {
           />
         </Box>
       )}
-      <EditableTable<Editable<Museum>, LocalityDetailsType> columns={columns} editable field="museums" />
+      <EditableTable<Editable<Museum>, LocalityDetailsType> columns={columns} field="museums" />
     </Grouped>
   )
 }

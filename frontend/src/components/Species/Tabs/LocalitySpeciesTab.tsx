@@ -153,7 +153,7 @@ export const LocalitySpeciesTab = () => {
   return (
     <Grouped title="Locality-Species Information">
       {!mode.read && editingModal}
-      <EditableTable<Editable<SpeciesLocality>, SpeciesDetailsType> columns={columns} editable field="now_ls" />
+      <EditableTable<Editable<SpeciesLocality>, SpeciesDetailsType> columns={columns} field="now_ls" />
     </Grouped>
   )
 }

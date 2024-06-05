@@ -64,7 +64,6 @@ export const CoordinatorTab = () => {
         <EditableTable<EditDataType<Editable<ProjectPeople>>, ProjectDetails>
           columns={people}
           editTableData={editData.now_proj_people}
-          editable
           field="now_proj_people"
         />
       </Grouped>

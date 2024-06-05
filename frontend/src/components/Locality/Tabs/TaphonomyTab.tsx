@@ -158,11 +158,7 @@ export const TaphonomyTab = () => {
       <HalfFrames>
         <Grouped title="Collecting Methods">
           {!mode.read && editingModal}
-          <EditableTable<Editable<CollectingMethod>, LocalityDetailsType>
-            columns={columns}
-            editable
-            field="now_coll_meth"
-          />
+          <EditableTable<Editable<CollectingMethod>, LocalityDetailsType> columns={columns} field="now_coll_meth" />
         </Grouped>
         <></>
       </HalfFrames>

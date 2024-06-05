@@ -201,11 +201,7 @@ export const LithologyTab = () => {
               />
             </>
           )}
-          <EditableTable<Editable<SedimentaryStructure>, LocalityDetailsType>
-            columns={columns}
-            editable
-            field="now_ss"
-          />
+          <EditableTable<Editable<SedimentaryStructure>, LocalityDetailsType> columns={columns} field="now_ss" />
         </Grouped>
         <ArrayFrame half array={depositionalContext} title="Depositional Context" />
       </HalfFrames>
