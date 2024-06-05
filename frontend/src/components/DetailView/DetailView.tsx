@@ -50,19 +50,22 @@ export const DetailView = <T extends object>({
     setModeState(modeOptionToMode[newMode])
   }
 
-  const textField = (field: keyof T, type?: React.HTMLInputTypeAttribute, disabled?: boolean) => (
+  const textField = (field: keyof EditDataType<T>, type?: React.HTMLInputTypeAttribute, disabled?: boolean) => (
     <EditableTextField<T> field={field} type={type} disabled={disabled} />
   )
 
-  const dropdown = (field: keyof T, options: Array<DropdownOption | string>, name: string, disabled?: boolean) => (
-    <DropdownSelector field={field} options={options} name={name} disabled={disabled} />
-  )
+  const dropdown = (
+    field: keyof EditDataType<T>,
+    options: Array<DropdownOption | string>,
+    name: string,
+    disabled?: boolean
+  ) => <DropdownSelector field={field} options={options} name={name} disabled={disabled} />
 
-  const radioSelection = (field: keyof T, options: Array<DropdownOption | string>, name: string) => (
+  const radioSelection = (field: keyof EditDataType<T>, options: Array<DropdownOption | string>, name: string) => (
     <RadioSelector field={field} options={options} name={name} />
   )
 
-  const bigTextField = (field: keyof T) => <EditableTextField<T> field={field} type="text" big />
+  const bigTextField = (field: keyof EditDataType<T>) => <EditableTextField<T> field={field} type="text" big />
 
   const initialState = {
     data,

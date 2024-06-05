@@ -15,7 +15,7 @@ type EditDataType<T> = EditFields<{
     : T[P] extends object
       ? EditDataType<PartialString<EditFields<T[P]>>>
       : T[P]
-}>
+}> & { references: Reference[] }
 
 export type RowState = 'new' | 'removed' | 'cancelled' | 'clean'
 export type UpdateComment = { update_comment: string }

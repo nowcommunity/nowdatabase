@@ -53,11 +53,16 @@ export type DetailContextType<T> = {
   setMode: (newMode: ModeOptions) => void
   editData: EditDataType<T>
   setEditData: (editData: EditDataType<T>) => void
-  textField: (field: keyof T, type?: React.HTMLInputTypeAttribute) => JSX.Element
-  bigTextField: (field: keyof T) => JSX.Element
-  dropdown: (field: keyof T, options: Array<DropdownOption | string>, name: string, disabled?: boolean) => JSX.Element
-  radioSelection: (field: keyof T, options: Array<DropdownOption | string>, name: string) => JSX.Element
-  validator: (editData: EditDataType<T>, field: keyof T) => ValidationObject
+  textField: (field: keyof EditDataType<T>, type?: React.HTMLInputTypeAttribute) => JSX.Element
+  bigTextField: (field: keyof EditDataType<T>) => JSX.Element
+  dropdown: (
+    field: keyof EditDataType<T>,
+    options: Array<DropdownOption | string>,
+    name: string,
+    disabled?: boolean
+  ) => JSX.Element
+  radioSelection: (field: keyof EditDataType<T>, options: Array<DropdownOption | string>, name: string) => JSX.Element
+  validator: (editData: EditDataType<T>, field: keyof EditDataType<T>) => ValidationObject
 }
 
 export const DetailContext = createContext<DetailContextType<unknown>>(null!)
@@ -78,10 +83,10 @@ export const makeEditData = <T,>(data: T): EditDataType<T> => {
       editData[field] = cloneDeep(data[field]) as never
     }
   }
-  return editData
+  return { ...editData, references: [] }
 }
 
-export const DetailContextProvider = <T extends EditDataType<object>>({
+export const DetailContextProvider = <T extends object>({
   children,
   contextState,
 }: {
@@ -97,7 +102,7 @@ export const DetailContextProvider = <T extends EditDataType<object>>({
         ...contextState,
         editData,
         setEditData: (data: unknown) => setEditData(data as EditDataType<T>),
-        validator: (editData: unknown, fieldName: keyof T) =>
+        validator: (editData: unknown, fieldName: keyof EditDataType<T>) =>
           contextState.validator(editData as EditDataType<T>, fieldName),
       }}
     >

@@ -17,6 +17,7 @@ import { RegisterOptions, FieldValues, UseFormRegisterReturn, FieldErrors } from
 import { useDetailContext } from '../Context/DetailContext'
 import { DataValue } from './tabLayoutHelpers'
 import { modalStyle } from './misc'
+import { EditDataType } from '@/backendTypes'
 
 const fieldWidth = '14em'
 
@@ -30,7 +31,7 @@ export const DropdownSelector = <T extends object>({
 }: {
   options: Array<DropdownOption | string>
   name: string
-  field: keyof T
+  field: keyof EditDataType<T>
   disabled?: boolean
 }) => {
   const { setEditData, editData } = useDetailContext<T>()
@@ -94,7 +95,7 @@ export const RadioSelector = <T extends object>({
 }: {
   options: Array<DropdownOption | string>
   name: string
-  field: keyof T
+  field: keyof EditDataType<T>
 }) => {
   const { setEditData, editData } = useDetailContext<T>()
   const editingComponent = (
@@ -129,11 +130,11 @@ const MultiSelector = <T extends object>({
   editingComponent,
 }: {
   options: Array<DropdownOption | string>
-  field: keyof T
+  field: keyof EditDataType<T>
   editingComponent: ReactNode
 }) => {
   const { data } = useDetailContext<T>()
-  const option = options.find(option => getValue(option) == data[field]) // intentional use of ==
+  const option = options.find(option => getValue(option) == data[field as keyof T]) // intentional use of ==
   const displayValue = option ? getDisplay(option) : null
   return <DataValue<T> field={field} EditElement={editingComponent} displayValue={displayValue} />
 }
@@ -144,13 +145,13 @@ export const EditableTextField = <T extends object>({
   big = false,
   disabled = false,
 }: {
-  field: keyof T
+  field: keyof EditDataType<T>
   type?: React.HTMLInputTypeAttribute
   big?: boolean
   disabled?: boolean
 }) => {
   const { setEditData, editData, validator } = useDetailContext<T>()
-  const { error } = validator(editData, field)
+  const { error } = validator(editData, field as keyof T)
   const editingComponent = (
     <TextField
       sx={{ width: fieldWidth, backgroundColor: disabled ? 'grey' : '' }}

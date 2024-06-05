@@ -1,6 +1,7 @@
 import { Card, Typography, Box, Grid, Divider } from '@mui/material'
 import { ReactNode } from 'react'
 import { useDetailContext } from '../Context/DetailContext'
+import { EditDataType } from '@/backendTypes'
 
 export const ArrayToTable = ({ array, half }: { array: Array<Array<ReactNode>>; half?: boolean }) => {
   const maxRowLength = Math.max(...array.map(row => row.length))
@@ -94,7 +95,7 @@ export const DataValue = <T extends object>({
   EditElement,
   displayValue,
 }: {
-  field: keyof T
+  field: keyof EditDataType<T>
   EditElement: ReactNode
   displayValue?: ReactNode | null
 }) => {
@@ -102,5 +103,5 @@ export const DataValue = <T extends object>({
   if (!mode.read) {
     return EditElement
   }
-  return displayValue ?? data[field]
+  return displayValue ?? data[field as keyof T]
 }

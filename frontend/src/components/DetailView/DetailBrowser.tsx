@@ -15,6 +15,7 @@ export const DetailBrowser = <T extends object>() => {
   const previousIndex = currentIndex - 1
   const style = {
     width: '18em',
+    marginLeft: '2em',
     overflow: 'hidden',
     whiteSpace: 'nowrap',
     textOverflow: 'ellipsis',
