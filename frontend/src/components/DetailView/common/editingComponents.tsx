@@ -133,7 +133,7 @@ const MultiSelector = <T extends object>({
   editingComponent: ReactNode
 }) => {
   const { data } = useDetailContext<T>()
-  const option = options.find(option => getValue(option) === data[field])
+  const option = options.find(option => getValue(option) == data[field]) // intentional use of ==
   const displayValue = option ? getDisplay(option) : null
   return <DataValue<T> field={field} EditElement={editingComponent} displayValue={displayValue} />
 }
