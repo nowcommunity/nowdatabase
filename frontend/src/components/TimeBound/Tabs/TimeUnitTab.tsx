@@ -43,8 +43,8 @@ export const TimeUnitTab = () => {
       header: 'Comment',
     },
   ]
-  const checkRowRestriction = (row: TimeUnit) => {
-    return !!0
+  const checkRowRestriction = () => {
+    return false
   }
 
   return (

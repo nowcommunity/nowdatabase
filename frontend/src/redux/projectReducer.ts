@@ -1,5 +1,5 @@
 import { api } from './api'
-import { Project, ProjectDetails } from '@/backendTypes'
+import { Project, ProjectDetailsType } from '@/backendTypes'
 
 const projectsApi = api.injectEndpoints({
   endpoints: builder => ({
@@ -8,7 +8,7 @@ const projectsApi = api.injectEndpoints({
         url: `/project/all`,
       }),
     }),
-    getProjectDetails: builder.query<ProjectDetails, string>({
+    getProjectDetails: builder.query<ProjectDetailsType, string>({
       query: id => ({
         url: `/project/${id}`,
       }),

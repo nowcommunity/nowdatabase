@@ -1,11 +1,11 @@
-import { EditDataType, Editable, ProjectDetails, ProjectPeople } from '@/backendTypes'
+import { EditDataType, Editable, ProjectDetailsType, ProjectPeople } from '@/backendTypes'
 import { useDetailContext } from '@/components/DetailView/Context/DetailContext'
 import { ArrayFrame, Grouped } from '@/components/DetailView/common/tabLayoutHelpers'
 import { MRT_ColumnDef } from 'material-react-table'
 import { EditableTable } from '@/components/DetailView/common/EditableTable'
 
 export const CoordinatorTab = () => {
-  const { data, editData, mode, radioSelection, textField } = useDetailContext<ProjectDetails>()
+  const { data, editData, mode, radioSelection, textField } = useDetailContext<ProjectDetailsType>()
 
   const getStatusText = () => (data.proj_records ? <>Private</> : <>Public</>)
 
@@ -61,7 +61,7 @@ export const CoordinatorTab = () => {
     <>
       <ArrayFrame half array={projectInformation} title="Project Information" />
       <Grouped title="Project Members">
-        <EditableTable<EditDataType<Editable<ProjectPeople>>, ProjectDetails>
+        <EditableTable<EditDataType<Editable<ProjectPeople>>, ProjectDetailsType>
           columns={people}
           editTableData={editData.now_proj_people}
           field="now_proj_people"
