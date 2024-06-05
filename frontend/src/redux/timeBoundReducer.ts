@@ -8,12 +8,12 @@ const timeboundsApi = api.injectEndpoints({
         url: `/time-bound/all`,
       }),
     }),
-    getTimeBoundDetails: builder.query<TimeBoundDetailsType, string>({
+    getTimeBoundDetails: builder.query<TimeBoundDetailsType, string | number>({
       query: id => ({
         url: `/time-bound/${id}`,
       }),
     }),
-    getTimeBoundTimeUnits: builder.query<TimeUnit[], string>({
+    getTimeBoundTimeUnits: builder.query<TimeUnit[], string | number>({
       query: id => ({
         url: `/time-bound/time-units/${id}`,
       }),
