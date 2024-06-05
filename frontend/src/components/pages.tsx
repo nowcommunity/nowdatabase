@@ -15,6 +15,7 @@ import { TimeBoundDetails } from './TimeBound/TimeBoundDetails'
 import { TimeBoundTable } from './TimeBound/TimeBoundTable'
 import { TimeUnitTable } from './TimeUnit/TimeUnitTable'
 import { TimeUnitDetails } from './TimeUnit/TimeUnitDetails'
+import { ReferenceDetails } from './Reference/ReferenceDetails'
 
 export const timeBoundPage = (
   <Page
@@ -39,10 +40,10 @@ export const timeUnitPage = (
 export const referencePage = (
   <Page
     tableView={<ReferenceTable />}
-    detailView={null}
+    detailView={<ReferenceDetails />}
     viewName="reference"
     idFieldName="rid"
-    createTitle={(ref: ReferenceDetailsType) => `${ref.issue}: ${ref.title_primary}`}
+    createTitle={(ref: ReferenceDetailsType) => `${ref.title_primary}`}
   />
 )
 
