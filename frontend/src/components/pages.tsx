@@ -4,6 +4,8 @@ import {
   SpeciesDetailsType,
   LocalityDetailsType,
   TimeBoundDetailsType,
+  ProjectDetailsType,
+  RegionDetails as RegionDetailsType,
 } from '@/backendTypes'
 import { LocalityDetails } from './Locality/LocalityDetails'
 import { LocalityTable } from './Locality/LocalityTable'
@@ -16,6 +18,10 @@ import { TimeBoundTable } from './TimeBound/TimeBoundTable'
 import { TimeUnitTable } from './TimeUnit/TimeUnitTable'
 import { TimeUnitDetails } from './TimeUnit/TimeUnitDetails'
 import { ReferenceDetails } from './Reference/ReferenceDetails'
+import { ProjectTable } from './Project/ProjectTable'
+import { ProjectDetails } from './Project/ProjectDetails'
+import { RegionTable } from './Region/RegionTable'
+import { RegionDetails } from './Region/RegionDetails'
 
 export const timeBoundPage = (
   <Page
@@ -64,5 +70,25 @@ export const localityPage = (
     viewName="locality"
     idFieldName="lid"
     createTitle={(loc: LocalityDetailsType) => `${loc.loc_name}`}
+  />
+)
+
+export const projectPage = (
+  <Page
+    tableView={<ProjectTable />}
+    detailView={<ProjectDetails />}
+    viewName="project"
+    idFieldName="pid"
+    createTitle={(project: ProjectDetailsType) => `${project.proj_name}`}
+  />
+)
+
+export const regionPage = (
+  <Page<RegionDetailsType>
+    tableView={<RegionTable />}
+    detailView={<RegionDetails />}
+    viewName="region"
+    idFieldName="reg_coord_id"
+    createTitle={(region: RegionDetailsType) => `${region.region}`}
   />
 )
