@@ -141,7 +141,7 @@ const MultiSelector = <T extends object>({
 
 export const EditableTextField = <T extends object>({
   field,
-  type,
+  type = 'text',
   big = false,
   disabled = false,
 }: {
@@ -151,7 +151,7 @@ export const EditableTextField = <T extends object>({
   disabled?: boolean
 }) => {
   const { setEditData, editData, validator } = useDetailContext<T>()
-  const { error } = validator(editData, field as keyof T)
+  const { error } = validator(editData, field)
   const editingComponent = (
     <TextField
       sx={{ width: fieldWidth, backgroundColor: disabled ? 'grey' : '' }}
@@ -163,7 +163,7 @@ export const EditableTextField = <T extends object>({
       size="small"
       error={!!error}
       helperText={error ?? ''}
-      type={type ?? 'text'}
+      type={type}
       multiline={big}
       disabled={disabled}
     />
