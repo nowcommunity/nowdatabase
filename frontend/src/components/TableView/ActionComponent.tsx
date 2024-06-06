@@ -34,7 +34,7 @@ export const ActionComponent = <T extends MRT_RowData>({
   return (
     <Box display="flex" gap="0.2em" alignItems="center" width="3.6em">
       <Button variant="text" style={{ width: '2em' }} onClick={onClick}>
-        {getIconToShow()}
+        <div data-cy={`detailview-button`}>{getIconToShow()}</div>
       </Button>
       {checkRowRestriction && checkRowRestriction(row.original) && (
         <Tooltip placement="top" title="This item has restricted visibility">
