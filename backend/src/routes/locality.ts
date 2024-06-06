@@ -1,14 +1,6 @@
 import { Request, Router } from 'express'
-import {
-  editLocality,
-  filterLocality,
-  fixEditedLocality,
-  getAllLocalities,
-  getLocalityDetails,
-  validateEntireLocality,
-} from '../services/locality'
+import { getAllLocalities, getLocalityDetails, processLocalityForEdit } from '../services/locality'
 import { fixBigInt } from '../utils/common'
-import { detailedDiff } from 'deep-object-diff'
 import { EditDataType, LocalityDetailsType } from '../../../frontend/src/backendTypes'
 
 const router = Router()
@@ -27,16 +19,10 @@ router.get('/:id', async (req, res) => {
 
 router.put('/', async (req: Request<object, object, { locality: EditDataType<LocalityDetailsType> }>, res) => {
   const editedLocality = req.body.locality
-  const fixedEditedLocality = fixEditedLocality(editedLocality)
-  const oldLocality = await getLocalityDetails(parseInt(fixedEditedLocality.lid!))
-  const difference = detailedDiff(oldLocality!, fixedEditedLocality)
-  const filteredLoc = filterLocality(difference.updated as EditDataType<LocalityDetailsType>)
-  const validationErrors = validateEntireLocality(filteredLoc)
-  if (validationErrors.length > 0) {
+  const { validationErrors, result } = await processLocalityForEdit(editedLocality)
+  if (validationErrors) {
     return res.status(400).send({ validationErrors })
   }
-  const result = await editLocality(oldLocality!.lid, difference.updated)
-  if (!result) return res.status(400).send()
   return res.status(200).send(result)
 })
 
