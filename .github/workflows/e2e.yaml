@@ -15,6 +15,6 @@ jobs:
         with:
           node-version: 20      
       - name: 'Run app with anonymous data'
-        run: npm run start:anon
+        run: npm run start:anon -- -d
       - name: 'Run cypress'
         run: npm test
