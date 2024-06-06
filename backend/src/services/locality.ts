@@ -78,15 +78,16 @@ export const fixEditedLocality = (editedLocality: EditDataType<LocalityDetailsTy
       lau_date: new Date(lau.lau_date!),
     }))
   }
-  if (editedLocality.now_ls) {
-    editedLocality.now_ls = editedLocality.now_ls.map(now_ls => ({
-      ...now_ls,
-      com_species: {
-        ...now_ls.com_species,
-        body_mass: now_ls.com_species.body_mass, // TODO FIX ? null : BigInt(now_ls.com_species.body_mass!),
-      },
-    }))
-  }
+  // TODO: see if we have to turn these into bigint or if writing number to db is ok.
+  // if (editedLocality.now_ls) {
+  //   editedLocality.now_ls = editedLocality.now_ls.map(now_ls => ({
+  //     ...now_ls,
+  //     com_species: {
+  //       ...now_ls.com_species,
+  //       body_mass: now_ls.com_species.body_mass,
+  //     },
+  //   }))
+  // }
   return editedLocality
 }
 
