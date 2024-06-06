@@ -5,6 +5,7 @@ import Prisma from '@prisma/client'
 import { validateLocality } from '../../../frontend/src/validators/locality'
 import { detailedDiff } from 'deep-object-diff'
 import { filterFields } from './writeUtils'
+import { ValidationObject } from '../../../frontend/src/validators/validator'
 
 export const testDb = async () => {
   const result = await prisma.now_loc.findMany({ select: { loc_name: true }, where: { loc_name: 'Amba East' } })
@@ -93,10 +94,10 @@ export const fixEditedLocality = (editedLocality: EditDataType<LocalityDetailsTy
 
 export const validateEntireLocality = (editedFields: Partial<Prisma.now_loc>) => {
   const keys = Object.keys(editedFields)
-  const errors = []
+  const errors: ValidationObject[] = []
   for (const key of keys) {
     const error = validateLocality(editedFields as EditDataType<LocalityDetailsType>, key as keyof LocalityDetailsType)
-    if (error !== null) errors.push(error)
+    if (error.error) errors.push(error)
   }
   return errors
 }
@@ -107,7 +108,7 @@ export const processLocalityForEdit = async (editedLocality: EditDataType<Locali
   const difference = detailedDiff(oldLocality!, fixedEditedLocality)
   const filteredLoc = filterFields(difference.updated as EditDataType<LocalityDetailsType>, prisma.now_loc.fields)
   const validationErrors = validateEntireLocality(filteredLoc)
-  if (validationErrors) return { validationErrors }
+  if (validationErrors.length > 0) return { validationErrors }
   const result = await editLocality(oldLocality!.lid, difference.updated)
   return { result }
 }

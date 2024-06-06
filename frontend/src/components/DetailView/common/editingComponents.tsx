@@ -161,7 +161,7 @@ export const EditableTextField = <T extends object>({
       value={editData[field] ?? ''}
       variant="outlined"
       size="small"
-      error={error !== null}
+      error={!!error}
       helperText={error ?? ''}
       type={type ?? 'text'}
       multiline={big}
