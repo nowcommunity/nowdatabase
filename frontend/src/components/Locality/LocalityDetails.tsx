@@ -3,6 +3,7 @@ import { useEditLocalityMutation, useGetLocalityDetailsQuery } from '../../redux
 import { CircularProgress } from '@mui/material'
 import { DetailView, TabType } from '../DetailView/DetailView'
 import { AgeTab } from './Tabs/AgeTab'
+import { ArchaeologyTab } from './Tabs/ArchaeologyTab'
 import { ClimateTab } from './Tabs/ClimateTab'
 import { EcometricsTab } from './Tabs/EcometricsTab'
 import { LithologyTab } from './Tabs/LithologyTab'
@@ -50,6 +51,10 @@ export const LocalityDetails = () => {
     {
       title: 'Climate',
       content: <ClimateTab />,
+    },
+    {
+      title: 'Archaeology',
+      content: <ArchaeologyTab />,
     },
     {
       title: 'Ecometrics',
