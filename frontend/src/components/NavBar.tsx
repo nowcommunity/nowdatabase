@@ -16,10 +16,10 @@ export const NavBar = () => {
     { title: 'Species', url: '/species' },
     { title: 'Reference', url: '/reference' },
     { title: 'Time Unit', url: '/time-unit' },
+    { title: 'Time Bound', url: '/time-bound' },
+    { title: 'Admin', url: '/admin' },
     { title: 'Region', url: '/region' },
     { title: 'Project', url: '/project' },
-    { title: 'Admin', url: '/admin' },
-    { title: 'Time Bound', url: '/time-bound' },
   ]
 
   if (user.username === null) pages.push({ title: 'Login', url: '/login' })

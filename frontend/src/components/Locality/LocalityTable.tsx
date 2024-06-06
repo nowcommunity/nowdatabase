@@ -23,12 +23,12 @@ export const LocalityTable = ({ selectorFn }: { selectorFn?: (newObject: Localit
         header: 'Country',
       },
       {
-        accessorKey: 'min_age',
-        header: 'Min age',
-      },
-      {
         accessorKey: 'max_age',
         header: 'Max age',
+      },
+      {
+        accessorKey: 'min_age',
+        header: 'Min age',
       },
     ],
     []
