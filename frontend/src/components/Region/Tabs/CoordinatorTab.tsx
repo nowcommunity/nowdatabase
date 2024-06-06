@@ -1,4 +1,4 @@
-import { Editable, RegionDetails, RegionCoordinator, RegionCountry, EditDataType } from '@/backendTypes'
+import { RegionDetails, RegionCoordinator, RegionCountry } from '@/backendTypes'
 import { useDetailContext } from '@/components/DetailView/Context/DetailContext'
 import { Grouped } from '@/components/DetailView/common/tabLayoutHelpers'
 import { MRT_ColumnDef } from 'material-react-table'
@@ -6,7 +6,7 @@ import { EditableTable } from '@/components/DetailView/common/EditableTable'
 
 export const CoordinatorTab = () => {
   const { editData } = useDetailContext<RegionDetails>()
-  const coordinator: MRT_ColumnDef<EditDataType<Editable<RegionCoordinator>>>[] = [
+  const coordinator: MRT_ColumnDef<RegionCoordinator>[] = [
     {
       accessorKey: 'com_people.surname',
       header: 'Surname',
@@ -21,7 +21,7 @@ export const CoordinatorTab = () => {
     },
   ]
 
-  const country: MRT_ColumnDef<EditDataType<Editable<RegionCountry>>>[] = [
+  const country: MRT_ColumnDef<RegionCountry>[] = [
     {
       accessorKey: 'country',
       header: 'Country',
@@ -32,14 +32,14 @@ export const CoordinatorTab = () => {
   return (
     <>
       <Grouped title="Regional Coordinators">
-        <EditableTable<EditDataType<Editable<RegionCoordinator>>, RegionDetails>
+        <EditableTable<RegionCoordinator, RegionDetails>
           columns={coordinator}
           editTableData={editData.now_reg_coord_people}
           field="now_reg_coord_people"
         />
       </Grouped>
       <Grouped title="Countries">
-        <EditableTable<EditDataType<Editable<RegionCountry>>, RegionDetails>
+        <EditableTable<RegionCountry, RegionDetails>
           columns={country}
           editTableData={editData.now_reg_coord_country}
           field="now_reg_coord_country"

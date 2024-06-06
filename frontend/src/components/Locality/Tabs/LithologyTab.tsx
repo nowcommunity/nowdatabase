@@ -194,13 +194,10 @@ export const LithologyTab = () => {
                 editingAction={(newSed: SedimentaryStructureValues) => {
                   setEditData({
                     ...editData,
-                    now_ss: [
-                      ...editData.now_ss,
-                      { lid: editData.lid!, sed_struct: newSed.ss_value, rowState: 'new', references: [] },
-                    ],
+                    now_ss: [...editData.now_ss, { lid: editData.lid!, sed_struct: newSed.ss_value, rowState: 'new' }],
                   })
                 }}
-                selectedValues={editData.now_ss.map(ss => ss.sed_struct!)}
+                selectedValues={editData.now_ss.map(ss => ss.sed_struct ?? '')} // TODO ss.sed_struct may be null. is empty string ok default?
               />
             </>
           )}

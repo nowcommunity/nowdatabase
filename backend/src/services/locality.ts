@@ -104,7 +104,7 @@ export const validateEntireLocality = (editedFields: Partial<Prisma.now_loc>) =>
 
 export const processLocalityForEdit = async (editedLocality: EditDataType<LocalityDetailsType>) => {
   const fixedEditedLocality = fixEditedLocality(editedLocality)
-  const oldLocality = await getLocalityDetails(parseInt(fixedEditedLocality.lid!))
+  const oldLocality = await getLocalityDetails(fixedEditedLocality.lid!)
   const difference = detailedDiff(oldLocality!, fixedEditedLocality)
   const filteredLoc = filterFields(difference.updated as EditDataType<LocalityDetailsType>, prisma.now_loc.fields)
   const validationErrors = validateEntireLocality(filteredLoc)

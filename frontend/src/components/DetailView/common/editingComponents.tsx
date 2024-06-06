@@ -157,8 +157,11 @@ export const EditableTextField = <T extends object>({
       sx={{ width: fieldWidth, backgroundColor: disabled ? 'grey' : '' }}
       onChange={(event: ChangeEvent<HTMLInputElement>) => {
         const value = event?.currentTarget?.value
-        if (!value || Number.isNaN(parseInt(value))) return
-        setEditData({ ...editData, [field]: parseInt(value) })
+        if (type === 'text' || value === '') {
+          setEditData({ ...editData, [field]: value })
+          return
+        }
+        setEditData({ ...editData, [field]: parseFloat(value) })
       }}
       value={editData[field] ?? ''}
       variant="outlined"

@@ -1,4 +1,4 @@
-import { Editable, RowState } from '@/backendTypes'
+import { Editable, PartialExceptArrays, RowState } from '@/backendTypes'
 import { CircularProgress, Box, Button } from '@mui/material'
 import { type MRT_ColumnDef, type MRT_RowData, MaterialReactTable, MRT_Row } from 'material-react-table'
 import { useDetailContext } from '../Context/DetailContext'
@@ -12,14 +12,14 @@ const getNewState = (state: RowState): RowState => {
   return 'clean'
 }
 
-export const EditableTable = <T extends Editable<MRT_RowData>, ParentType extends MRT_RowData>({
+export const EditableTable = <T extends MRT_RowData & { rowState?: RowState }, ParentType extends MRT_RowData>({
   tableData,
   editTableData,
   columns,
   field,
 }: {
   tableData?: Array<T> | null
-  editTableData?: Array<Editable<T>> | null
+  editTableData?: Array<PartialExceptArrays<T>> | null
   columns: MRT_ColumnDef<T>[]
   field: keyof ParentType
 }) => {
@@ -27,7 +27,7 @@ export const EditableTable = <T extends Editable<MRT_RowData>, ParentType extend
   if (tableData === null || editTableData === null) return <CircularProgress />
 
   const actionRow = ({ row, staticRowIndex }: { row: MRT_Row<T>; staticRowIndex?: number | undefined }) => {
-    const state = row.original.rowState ?? 'clean'
+    const state = (row.original as Editable<T>).rowState ?? 'clean'
 
     // TODO: Using static index - need to use some id, sorting breaks this
     const rowClicked = (index: number | undefined) => {
@@ -66,7 +66,7 @@ export const EditableTable = <T extends Editable<MRT_RowData>, ParentType extend
   const getData = () => {
     if (!mode.read) {
       if (!editTableData) return editData[field] as T[]
-      return editTableData
+      return editTableData as T[]
     }
     if (!tableData) return data[field] as T[]
     return tableData
@@ -82,7 +82,7 @@ export const EditableTable = <T extends Editable<MRT_RowData>, ParentType extend
       enablePagination={false}
       state={{ density: 'compact' }}
       muiTableBodyRowProps={({ row }: { row: MRT_Row<T> }) => ({
-        sx: { backgroundColor: rowStateToColor(row.original.rowState as RowState) },
+        sx: { backgroundColor: rowStateToColor(row.original.rowState) },
       })}
     />
   )

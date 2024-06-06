@@ -1,4 +1,4 @@
-import { EditDataType, Editable, ProjectDetailsType, ProjectPeople } from '@/backendTypes'
+import { ProjectDetailsType, ProjectPeople } from '@/backendTypes'
 import { useDetailContext } from '@/components/DetailView/Context/DetailContext'
 import { ArrayFrame, Grouped } from '@/components/DetailView/common/tabLayoutHelpers'
 import { MRT_ColumnDef } from 'material-react-table'
@@ -41,7 +41,7 @@ export const CoordinatorTab = () => {
     ],
   ]
 
-  const people: MRT_ColumnDef<EditDataType<Editable<ProjectPeople>>>[] = [
+  const people: MRT_ColumnDef<ProjectPeople>[] = [
     {
       accessorKey: 'com_people.surname',
       header: 'Surname',
@@ -61,7 +61,7 @@ export const CoordinatorTab = () => {
     <>
       <ArrayFrame half array={projectInformation} title="Project Information" />
       <Grouped title="Project Members">
-        <EditableTable<EditDataType<Editable<ProjectPeople>>, ProjectDetailsType>
+        <EditableTable<ProjectPeople, ProjectDetailsType>
           columns={people}
           editTableData={editData.now_proj_people}
           field="now_proj_people"

@@ -22,7 +22,7 @@ export const ReferenceTab = () => {
     if (mode.read) {
       return data.ref_type_id === refType.ref_type_id
     }
-    return parseInt(editData.ref_type_id!) === refType.ref_type_id
+    return editData.ref_type_id === refType.ref_type_id
   })
   const fields = selectedRefType?.ref_field_name.filter(field => field.display)
 

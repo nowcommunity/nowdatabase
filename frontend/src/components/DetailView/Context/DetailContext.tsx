@@ -67,24 +67,10 @@ export type DetailContextType<T> = {
 
 export const DetailContext = createContext<DetailContextType<unknown>>(null!)
 
-/* This changes data so that all number or bigint fields become string */
-export const makeEditData = <T,>(data: T): EditDataType<T> => {
-  const editData: EditDataType<T> = {} as EditDataType<T>
-  for (const field in data) {
-    if (Array.isArray(data[field])) {
-      editData[field] = (data[field] as never[]).map(item => makeEditData(item)) as never
-    } else if (typeof data[field] === 'object' && data[field] !== null) {
-      editData[field] = makeEditData(data[field]) as never
-    } else if (typeof data[field] === 'number') {
-      editData[field] = ('' + (data[field] as number)) as never
-    } else if (typeof data[field] === 'bigint') {
-      editData[field] = ('' + (data[field] as bigint)) as never
-    } else {
-      editData[field] = cloneDeep(data[field]) as never
-    }
-  }
-  return { ...editData, references: [] }
-}
+export const makeEditData = <T,>(data: T): EditDataType<T> => ({
+  ...(cloneDeep(data) as EditDataType<T>),
+  references: [],
+})
 
 export const DetailContextProvider = <T extends object>({
   children,
