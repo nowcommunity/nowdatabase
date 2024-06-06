@@ -109,7 +109,7 @@ export const processLocalityForEdit = async (editedLocality: EditDataType<Locali
   const filteredLoc = filterFields(difference.updated as EditDataType<LocalityDetailsType>, prisma.now_loc.fields)
   const validationErrors = validateEntireLocality(filteredLoc)
   if (validationErrors.length > 0) return { validationErrors }
-  const result = await editLocality(oldLocality!.lid, difference.updated)
+  const result = await editLocality(oldLocality!.lid, filteredLoc)
   return { result }
 }
 
