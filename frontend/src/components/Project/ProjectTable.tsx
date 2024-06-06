@@ -10,7 +10,7 @@ export const ProjectTable = ({ selectorFn }: { selectorFn?: (id: Project) => voi
     () => [
       {
         id: 'id',
-        accessorKey: 'pid',
+        accessorKey: 'id',
         header: 'Project Id',
       },
       {
