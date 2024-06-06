@@ -1,0 +1,20 @@
+name: 'End-to-end tests'
+
+on:
+  pull_request:
+    types: [opened, reopened]
+  push:
+
+jobs:
+  e2e_tests:
+    name: 'End-to-end tests'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20      
+      - name: 'Run app with anonymous data'
+        run: npm run start:anon
+      - name: 'Run cypress'
+        run: npm test
