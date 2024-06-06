@@ -1,5 +1,3 @@
-const isValidNumber = (value: string) => !Number.isNaN(parseInt(value))
-
 export type ValidationError = string | null | undefined
 export type ValidationObject = { name: string; error: ValidationError }
 type Validator = {
@@ -17,9 +15,8 @@ const validate: (validator: Validator, value: unknown) => ValidationError = (val
   const { required, minLength, maxLength, asNumber, asString } = validator
   if (value === null || value === undefined) return required ? 'This field is required' : null
   if (asNumber) {
-    if (typeof value !== 'string') return 'Error in type' // Shouldn't happen due to editdata being all string
-    if (!isValidNumber(value)) return 'Value must be a valid number'
-    if (typeof asNumber === 'function') return asNumber(parseInt(value))
+    if (typeof value !== 'number') return 'Value must be a valid number' // If this happens, code is broken somewhere
+    if (typeof asNumber === 'function') return asNumber(value)
     return null
   }
   if (asString) {
