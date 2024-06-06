@@ -216,6 +216,7 @@ export const FieldWithTableSelection = <T extends object, ParentType extends obj
       onClick={() => setOpen(true)}
       disabled={disabled}
       sx={{ backgroundColor: disabled ? 'grey' : '' }}
+      inputProps={{ readOnly: true }}
     />
   )
   return <DataValue<ParentType> field={targetField} EditElement={editingComponent} />
