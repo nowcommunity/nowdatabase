@@ -6,10 +6,10 @@
   "scripts": {
     "start": "docker compose -f docker-compose.yml up",
     "start:anon": "docker compose -f docker-compose.anon.yml up",
-    "cypress": "cypress open",
-    "test": "cypress run --browser chrome",
-    "check": "echo \"Running frontend tsc ...\" && cd frontend && npx tsc --noEmit && echo \"Running frontend eslint ...\" && npm run lint && cd ../backend && echo \"Running backend tsc ...\" && npx tsc --noEmit && echo \"Running backend eslint ...\"&& npm run lint && echo \"All good! :)\"",
     "dev": "docker compose -f docker-compose.dev.yml up",
+    "check": "echo \"Running frontend tsc ...\" && cd frontend && npx tsc --noEmit && echo \"Running frontend eslint ...\" && npm run lint && cd ../backend && echo \"Running backend tsc ...\" && npx tsc --noEmit && echo \"Running backend eslint ...\"&& npm run lint && echo \"All good! :)\"",
+    "test": "cypress run --browser chrome",
+    "cypress": "cypress open",
     "prepare": "husky"
   },
   "author": "",
