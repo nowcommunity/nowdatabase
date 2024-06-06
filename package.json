@@ -6,6 +6,7 @@
   "scripts": {
     "start": "docker compose -f docker-compose.yml up",
     "start:anon": "docker compose -f docker-compose.anon.yml up",
+    "cypress": "cypress open",
     "test": "echo \"Error: no test specified\" && exit 1",
     "check": "echo \"Running tsc and lint for both services (stops on first error) ...\" && cd frontend && npx tsc --noEmit && npm run lint && cd ../backend && npx tsc --noEmit && npm run lint && echo \"All good! :)\"",
     "dev": "docker compose -f docker-compose.dev.yml up",
@@ -13,6 +14,7 @@
   },
   "author": "",
   "devDependencies": {
+    "cypress": "^13.11.0",
     "husky": "^9.0.11"
   }
 }
