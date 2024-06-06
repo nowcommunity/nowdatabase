@@ -11,6 +11,7 @@ export const validateLocality = (
       asNumber: (num: number) => {
         const min_age = editData.min_age
         if (min_age && num < parseInt(min_age)) return 'Max value cannot be lower than min'
+        return
       },
     },
     min_age: {
@@ -18,6 +19,7 @@ export const validateLocality = (
       asNumber: (num: number) => {
         const max_age = editData.max_age
         if (max_age && num > parseInt(max_age)) return 'Min value cannot be higher than max'
+        return
       },
     },
     loc_name: {
