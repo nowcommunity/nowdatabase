@@ -1,5 +1,3 @@
-import { EditDataType } from '../backendTypes'
-
 const isValidNumber = (value: string) => !Number.isNaN(parseInt(value))
 
 export type ValidationError = string | null | undefined
@@ -34,11 +32,7 @@ const validate: (validator: Validator, value: unknown) => ValidationError = (val
   return null
 }
 
-export const validator = <T>(
-  validators: Validators<Partial<T>>,
-  editData: EditDataType<T>,
-  fieldName: keyof T
-): ValidationObject => {
+export const validator = <T>(validators: Validators<Partial<T>>, editData: T, fieldName: keyof T): ValidationObject => {
   const validator = validators[fieldName]
   if (validator === undefined) return { name: fieldName as string, error: null }
   const validationError = validate(validator, editData[fieldName])

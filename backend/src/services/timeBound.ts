@@ -1,8 +1,4 @@
-import { logger } from '../utils/logger'
 import { prisma } from '../utils/db'
-import { EditDataType, TimeBoundDetailsType } from '../../../frontend/src/backendTypes'
-import Prisma from '@prisma/client'
-import { validateTimeBound } from '../../../frontend/src/validators/timeBound'
 
 export const getAllTimeBounds = async () => {
   const result = await prisma.now_tu_bound.findMany({

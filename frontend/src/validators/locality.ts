@@ -1,7 +1,10 @@
 import { EditDataType, LocalityDetailsType } from '../backendTypes'
 import { Validators, validator } from './validator'
 
-export const validateLocality = (editData: EditDataType<LocalityDetailsType>, fieldName: keyof LocalityDetailsType) => {
+export const validateLocality = (
+  editData: EditDataType<LocalityDetailsType>,
+  fieldName: keyof EditDataType<LocalityDetailsType>
+) => {
   const validators: Validators<Partial<EditDataType<LocalityDetailsType>>> = {
     max_age: {
       name: 'Age (max)',
@@ -29,6 +32,6 @@ export const validateLocality = (editData: EditDataType<LocalityDetailsType>, fi
     },
   }
 
-  const returnval = validator<LocalityDetailsType>(validators, editData, fieldName)
+  const returnval = validator<EditDataType<LocalityDetailsType>>(validators, editData, fieldName)
   return returnval
 }
