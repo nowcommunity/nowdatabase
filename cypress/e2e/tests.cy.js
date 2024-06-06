@@ -36,6 +36,7 @@ describe('Open each page, table view and detail view, and check at least some co
     cy.contains('chlma')
   })
   it('Region works', () => {
+    cy.contains('Admin').click()
     cy.contains('Region').click()
     cy.contains('region 4452477e')
     cy.get('[data-cy="detailview-button"]').first().click()
@@ -43,6 +44,7 @@ describe('Open each page, table view and detail view, and check at least some co
     cy.contains('prs')
   })
   it('Project works', () => {
+    cy.contains('Admin').click()
     cy.contains('Project').click()
     cy.contains('Workgroup on Insectivores')
     cy.get('[data-cy="detailview-button"]').first().click()
