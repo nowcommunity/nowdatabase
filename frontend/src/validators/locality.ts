@@ -32,6 +32,5 @@ export const validateLocality = (
     },
   }
 
-  const returnval = validator<EditDataType<LocalityDetailsType>>(validators, editData, fieldName)
-  return returnval
+  return validator<EditDataType<LocalityDetailsType>>(validators, editData, fieldName)
 }
