@@ -40,6 +40,11 @@ export const getTimeUnitDetails = async (id: string) => {
       now_tu_sequence: {},
       now_tu_bound_now_time_unit_low_bndTonow_tu_bound: {},
       now_tu_bound_now_time_unit_up_bndTonow_tu_bound: {},
+      now_tau: {
+        include: {
+          now_tr: true,
+        },
+      },
     },
   })
   return result

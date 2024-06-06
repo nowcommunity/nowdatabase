@@ -58,6 +58,9 @@ export type Locality = {
   loc_status: boolean | null
 }
 
+export type Sequence = Prisma.now_tu_sequence
+export type SequenceDetailsType = Prisma.now_tu_sequence
+
 export type SpeciesDetailsType = Prisma.com_species & { now_ls: Array<Editable<SpeciesLocality>> } & {
   com_taxa_synonym: Array<Editable<SpeciesSynonym>>
 } & { now_sau: Array<Editable<SpeciesUpdate>> }
@@ -129,9 +132,10 @@ export type TimeUnit = {
 export type TimeBoundUpdate = Prisma.now_bau & { now_br: Prisma.now_br }
 
 export type TimeUnitDetailsType = EditDataType<
-  Prisma.now_time_unit & { now_tu_sequence: Array<Editable<TimeUnitSequence>> }
+  Prisma.now_time_unit & { now_tu_sequence: Array<Editable<SequenceDetailsType>> }
 >
-export type TimeUnitSequence = Prisma.now_tu_sequence
+
+export type TimeUnitUpdate = Prisma.now_time_update & { now_br: Prisma.now_tr }
 
 export type ReferenceType = Prisma.ref_ref_type & { ref_field_name: Prisma.ref_field_name[] }
 
