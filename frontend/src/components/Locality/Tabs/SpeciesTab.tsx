@@ -6,7 +6,6 @@ import { SelectingTable } from '@/components/DetailView/common/SelectingTable'
 import { useDetailContext } from '@/components/DetailView/Context/DetailContext'
 import { Box, TextField } from '@mui/material'
 import { MRT_ColumnDef } from 'material-react-table'
-import { useForm } from 'react-hook-form'
 
 export const SpeciesTab = () => {
   const { mode } = useDetailContext<LocalityDetailsType>()
@@ -78,10 +77,6 @@ export const SpeciesTab = () => {
   )
 
   return (
-    /*    <Grouped title="Species">
-      {!mode.read && editingModal}
-      <EditableTable<Editable<LocalitySpecies>, LocalityDetailsType> columns={columns} field="now_ls" />
-    </Grouped>*/
     <Grouped title="Species">
       {!mode.read && (
         <Box display="flex" gap={1}>
