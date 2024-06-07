@@ -54,7 +54,7 @@ export const MuseumTab = () => {
             arrayFieldName="museums"
           />
           <SelectingTable<Museum, LocalityDetailsType>
-            buttonText="Add existing museum"
+            buttonText="Select Museum"
             data={museumData}
             columns={columns}
             fieldName="museums"

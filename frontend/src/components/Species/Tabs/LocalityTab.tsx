@@ -50,7 +50,7 @@ export const LocalityTab = () => {
 
   const selectingTable = (
     <SelectingTable<Editable<Locality>, SpeciesDetailsType>
-      buttonText="Add existing locality"
+      buttonText="Select Locality"
       columns={columns}
       data={localitiesData}
       fieldName="now_ls"

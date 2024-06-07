@@ -2,6 +2,7 @@ import { Editable, LocalityDetailsType, LocalitySpecies } from '@/backendTypes'
 import { EditableTable } from '@/components/DetailView/common/EditableTable'
 import { EditingModal } from '@/components/DetailView/common/EditingModal'
 import { Grouped } from '@/components/DetailView/common/tabLayoutHelpers'
+import { SelectingTable } from '@/components/DetailView/common/SelectingTable'
 import { useDetailContext } from '@/components/DetailView/Context/DetailContext'
 import { Box, TextField } from '@mui/material'
 import { MRT_ColumnDef } from 'material-react-table'
@@ -77,9 +78,23 @@ export const SpeciesTab = () => {
   )
 
   return (
-    <Grouped title="Species">
+    /*    <Grouped title="Species">
       {!mode.read && editingModal}
       <EditableTable<Editable<LocalitySpecies>, LocalityDetailsType> columns={columns} field="now_ls" />
+    </Grouped>*/
+    <Grouped title="Species">
+      {!mode.read && (
+        <Box display="flex" gap={1}>
+          <SelectingTable<LocalitySpecies, LocalityDetailsType>
+            buttonText="Select Museum"
+            data={museumData}
+            columns={columns}
+            fieldName="museums"
+            idFieldName="museum"
+          />
+        </Box>
+      )}
+      <EditableTable<Editable<Museum>, LocalityDetailsType> columns={columns} field="museums" />
     </Grouped>
   )
 }

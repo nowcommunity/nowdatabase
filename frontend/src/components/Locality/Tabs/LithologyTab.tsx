@@ -186,7 +186,7 @@ export const LithologyTab = () => {
           {!mode.read && (
             <>
               <SelectingTable<SedimentaryStructureValues, LocalityDetailsType>
-                buttonText="Add existing sedimentary structure"
+                buttonText="Select Sedimentary structure"
                 columns={selectingTableColumns}
                 data={sedimentaryStructuresData}
                 fieldName="now_ss"
