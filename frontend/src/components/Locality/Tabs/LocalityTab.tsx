@@ -8,9 +8,12 @@ import { EditableTable } from '@/components/DetailView/common/EditableTable'
 import { EditingModal } from '@/components/DetailView/common/EditingModal'
 
 export const LocalityTab = () => {
-  const { data, textField, radioSelection, dropdown, mode, bigTextField } = useDetailContext<LocalityDetailsType>()
+  const { textField, radioSelection, dropdown, mode, bigTextField } = useDetailContext<LocalityDetailsType>()
 
-  const approximateCoordinatesOptions = ['', { display: 'No', value: '0' }, { display: 'Yes', value: '1' }]
+  const approximateCoordinatesOptions = [
+    { display: 'No', value: 'false' },
+    { display: 'Yes', value: 'true' },
+  ]
   const generalLocalityOptions = ['', { display: 'No', value: 'n' }, { display: 'Yes', value: 'y' }]
 
   const siteAreaOptions = [
@@ -22,22 +25,18 @@ export const LocalityTab = () => {
     { display: '>1000 m2', value: '>1000m2' },
   ]
 
-  const getStatusText = () => (data.loc_status ? <>Draft</> : <>Public</>)
-
   const info = [
     ['Name', textField('loc_name')],
     [
       'Visibility status',
-      !mode.read
-        ? radioSelection(
-            'loc_status',
-            [
-              { value: 'false', display: 'Public' },
-              { value: 'true', display: 'Draft' },
-            ],
-            'Status'
-          )
-        : getStatusText(),
+      radioSelection(
+        'loc_status',
+        [
+          { value: 'false', display: 'Public' },
+          { value: 'true', display: 'Draft' },
+        ],
+        'Status'
+      ),
     ],
   ]
   const country = [

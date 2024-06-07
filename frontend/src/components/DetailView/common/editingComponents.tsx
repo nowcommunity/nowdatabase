@@ -24,6 +24,20 @@ const fieldWidth = '14em'
 export type DropdownOptionValue = string | number
 export type DropdownOption = { value: DropdownOptionValue; display: string }
 
+const setDropdownOptionValue = (
+  setValue: (val: string | number | boolean) => void,
+  value: string | undefined,
+  asNumber: boolean
+) => {
+  if (value && asNumber) {
+    setValue(parseInt(value))
+  } else if (value === 'true' || value === 'false') {
+    setValue(value === 'true')
+  } else {
+    setValue(value ?? '')
+  }
+}
+
 export const DropdownSelector = <T extends object>({
   options,
   name,
@@ -43,8 +57,12 @@ export const DropdownSelector = <T extends object>({
         labelId={`${name}-multiselect-label`}
         label={name}
         id={`${name}-multiselect`}
-        value={(editData[field] || '') as string}
-        onChange={(event: SelectChangeEvent) => setEditData({ ...editData, [field]: event.target.value })}
+        value={editData[field] as string}
+        onChange={(event: SelectChangeEvent) => {
+          const setValue = (value: number | string | boolean) => setEditData({ ...editData, [field]: value })
+          const asNumber = typeof options[0] === 'number'
+          setDropdownOptionValue(setValue, event?.target?.value, asNumber)
+        }}
         sx={{ width: fieldWidth, backgroundColor: disabled ? 'grey' : '' }}
         size="small"
         disabled={disabled}
@@ -95,6 +113,7 @@ const getDisplay = (item: DropdownOption | DropdownOptionValue) => (typeof item 
   This also means that the options cannot be 'true' or 'false' if you want
   to actually write those as strings to database. If that is required, this
   needs to be changed.
+  ALSO: All options have to be of same type! This isn't enforced with types.
 */
 export const RadioSelector = <T extends object>({
   options,
@@ -112,15 +131,9 @@ export const RadioSelector = <T extends object>({
         aria-labelledby={`${name}-radio-selection`}
         name={name}
         onChange={(event: ChangeEvent<HTMLInputElement>) => {
-          const value = event?.currentTarget?.value
-          const setValue = (val: string | number | boolean) => setEditData({ ...editData, [field]: val })
-          if (value && typeof getValue(options[0]) === 'number') {
-            setValue(parseInt(value))
-          } else if (value === 'true' || value === 'false') {
-            setValue(value === 'true')
-          } else {
-            setEditData({ ...editData, [field]: value })
-          }
+          const setValue = (value: number | string | boolean) => setEditData({ ...editData, [field]: value })
+          const asNumber = typeof options[0] === 'number'
+          setDropdownOptionValue(setValue, event?.currentTarget?.value, asNumber)
         }}
         value={editData[field]}
         sx={{ display: 'flex', flexDirection: 'row' }}
@@ -150,7 +163,8 @@ const MultiSelector = <T extends object>({
   editingComponent: ReactNode
 }) => {
   const { data } = useDetailContext<T>()
-  const option = options.find(option => getValue(option) == data[field as keyof T]) // TODO intentional use of == but is it necessary anymore
+  const valueInField = data[field as keyof T]
+  const option = options.find(option => getValue(option) === valueInField || getValue(option) === valueInField + '')
   const displayValue = option ? getDisplay(option) : null
   return <DataValue<T> field={field} EditElement={editingComponent} displayValue={displayValue} />
 }

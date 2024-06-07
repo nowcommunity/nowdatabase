@@ -5,9 +5,7 @@ import { MRT_ColumnDef } from 'material-react-table'
 import { EditableTable } from '@/components/DetailView/common/EditableTable'
 
 export const CoordinatorTab = () => {
-  const { data, editData, mode, radioSelection, textField } = useDetailContext<ProjectDetailsType>()
-
-  const getStatusText = () => (data.proj_records ? <>Private</> : <>Public</>)
+  const { editData, radioSelection, textField } = useDetailContext<ProjectDetailsType>()
 
   const projectInformation = [
     ['Project Id', textField('pid')],
@@ -28,16 +26,14 @@ export const CoordinatorTab = () => {
     ],
     [
       'Record Status',
-      !mode.read
-        ? radioSelection(
-            'proj_records',
-            [
-              { value: 'false', display: 'Public' },
-              { value: 'true', display: 'Private' },
-            ],
-            'Record Status'
-          )
-        : getStatusText(),
+      radioSelection(
+        'proj_records',
+        [
+          { value: 'false', display: 'Public' },
+          { value: 'true', display: 'Private' },
+        ],
+        'Record Status'
+      ),
     ],
   ]
 
