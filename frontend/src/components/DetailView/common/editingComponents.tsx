@@ -68,7 +68,7 @@ export const DropdownSelector = <T extends object>({
         disabled={disabled}
       >
         {options.map(item => (
-          <MenuItem key={getValue(item)} value={getValue(item)}>
+          <MenuItem key={getValue(item)} value={getValue(item)} style={{ height: '2em' }}>
             {getDisplay(item)}
           </MenuItem>
         ))}
