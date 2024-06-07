@@ -65,8 +65,13 @@ export const getLocalityDetails = async (id: number) => {
   })
 
   if (!result) return null
-  const { now_mus, ...locality } = result
-  return { ...locality, museums: now_mus.map(museum => museum.com_mlist) }
+  const { now_ls, now_mus, now_plr, ...locality } = result
+  return {
+    ...locality,
+    museums: now_mus.map(museum => museum.com_mlist),
+    projects: now_plr.map(project => project.now_proj),
+    species: now_ls.map(species => species.com_species),
+  }
 }
 
 export const fixEditedLocality = (editedLocality: EditDataType<LocalityDetailsType>) => {

@@ -1,95 +1,86 @@
-import { Editable, LocalityDetailsType, LocalitySpecies } from '@/backendTypes'
+//import { Editable, LocalityDetailsType, Museum } from '@/backendTypes'
+import { Editable, LocalityDetailsType, Species } from '@/backendTypes'
 import { EditableTable } from '@/components/DetailView/common/EditableTable'
-import { EditingModal } from '@/components/DetailView/common/EditingModal'
+import { EditingForm } from '@/components/DetailView/common/EditingForm'
 import { Grouped } from '@/components/DetailView/common/tabLayoutHelpers'
 import { SelectingTable } from '@/components/DetailView/common/SelectingTable'
 import { useDetailContext } from '@/components/DetailView/Context/DetailContext'
-import { Box, TextField } from '@mui/material'
+import { useGetAllSpeciesQuery } from '@/redux/speciesReducer'
+import { Box, CircularProgress } from '@mui/material'
 import { MRT_ColumnDef } from 'material-react-table'
 
 export const SpeciesTab = () => {
   const { mode } = useDetailContext<LocalityDetailsType>()
-  const {
-    register,
-    formState: { errors },
-  } = useForm()
+  const { data: speciesData, isError } = useGetAllSpeciesQuery()
 
-  const columns: MRT_ColumnDef<LocalitySpecies>[] = [
+  if (isError) return 'Error loading Species.'
+  if (!speciesData) return <CircularProgress />
+
+  const columns: MRT_ColumnDef<Species>[] = [
     {
-      accessorKey: 'com_species.order_name',
+      accessorKey: 'order_name',
       header: 'Order',
     },
     {
-      accessorKey: 'com_species.family_name',
+      accessorKey: 'family_name',
       header: 'Family',
     },
     {
-      accessorKey: 'com_species.genus_name',
+      accessorKey: 'genus_name',
       header: 'Genus',
     },
     {
-      accessorKey: 'com_species.species_name',
+      accessorKey: 'species_name',
       header: 'Species',
     },
     {
-      accessorKey: 'com_species.subclass_or_superorder_name',
+      accessorKey: 'subclass_or_superorder_name',
       header: 'Subclass or Superorder',
     },
     {
-      accessorKey: 'com_species.suborder_or_superfamily_name',
+      accessorKey: 'suborder_or_superfamily_name',
       header: 'Suborder or Superfamily',
     },
     {
-      accessorKey: 'com_species.unique_identifier',
+      accessorKey: 'unique_identifier',
       header: 'Unique Identifier',
     },
     {
-      accessorKey: 'com_species.taxonomic_status',
+      accessorKey: 'taxonomic_status',
       header: 'Taxon status',
     },
   ]
 
-  // eslint-disable-next-line @typescript-eslint/require-await
-  const onSave = async () => {
-    // TODO: Saving logic here (add Species to editData)
-    return Object.keys(errors).length === 0
-  }
-
-  const editingModal = (
-    <EditingModal buttonText="Add new Species" onSave={onSave}>
-      <Box sx={{ display: 'flex', flexDirection: 'column', gap: '1em' }}>
-        <TextField {...register('com_species.order_name', { required: true })} label="Order" />
-        <TextField {...register('com_species.family_name', { required: true })} label="Family" />
-        <TextField {...register('com_species.genus_name', { required: true })} label="Genus" />
-        <TextField {...register('com_species.species_name', { required: true })} label="Species" />
-        <TextField
-          {...register('com_species.subclass_or_superorder_name', { required: true })}
-          label="Subclass or Superorder"
-        />
-        <TextField
-          {...register('com_species.suborder_or_superfamily_name', { required: true })}
-          label="Suborder or Superfamily"
-        />
-        <TextField {...register('com_species.unique_identifier', { required: true })} label="Unique Identifier" />
-        <TextField {...register('com_species.taxonomic_status')} label="Taxon status" />
-      </Box>
-    </EditingModal>
-  )
+  const formFields: { name: string; label: string; required?: boolean }[] = [
+    { name: 'order_name', label: 'Order', required: true },
+    { name: 'family_name', label: 'Family', required: true },
+    { name: 'genus_name', label: 'Genus', required: true },
+    { name: 'species_name', label: 'Species', required: true },
+    { name: 'subclass_or_superorder_name', label: 'Subclass or Superorder' },
+    { name: 'suborder_or_superfamily_name', label: 'Suborder or Superfamily' },
+    { name: 'unique_identifier', label: 'Unique Identifier', required: true },
+    { name: 'taxonomic_status', label: 'Taxon status' },
+  ]
 
   return (
     <Grouped title="Species">
       {!mode.read && (
         <Box display="flex" gap={1}>
-          <SelectingTable<LocalitySpecies, LocalityDetailsType>
-            buttonText="Select Museum"
-            data={museumData}
+          <EditingForm<Species, LocalityDetailsType>
+            buttonText="Add new Species"
+            formFields={formFields}
+            arrayFieldName="species"
+          />
+          <SelectingTable<Species, LocalityDetailsType>
+            buttonText="Select Species"
+            data={speciesData}
             columns={columns}
-            fieldName="museums"
-            idFieldName="museum"
+            fieldName="species"
+            idFieldName="species_id"
           />
         </Box>
       )}
-      <EditableTable<Editable<Museum>, LocalityDetailsType> columns={columns} field="museums" />
+      <EditableTable<Editable<Species>, LocalityDetailsType> columns={columns} field="species" />
     </Grouped>
   )
 }

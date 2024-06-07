@@ -39,9 +39,15 @@ export type RegionCountry = Prisma.now_reg_coord_country
 export type SedimentaryStructure = Prisma.now_ss
 export type LocalitySynonym = Prisma.now_syn_loc
 export type SpeciesSynonym = Prisma.com_taxa_synonym
-export type LocalityDetailsType = Omit<Prisma.now_loc, 'now_mus'> & { museums: Array<Editable<Museum>> } & {
+export type LocalityDetailsType = Omit<Prisma.now_loc, 'now_ls' | 'now_mus' | 'now_proj'> & {
+  museums: Array<Editable<Museum>>
+} & {
+  projects: Array<Editable<Project>>
+} & {
+  taxa: Array<Editable<Species>>
+} /*& {
   now_ls: Array<Editable<LocalitySpecies>>
-} & { now_plr: Array<Editable<LocalityProject>> } & { now_syn_loc: Array<Editable<LocalitySynonym>> } & {
+} */ & { now_plr: Array<Editable<LocalityProject>> } & { now_syn_loc: Array<Editable<LocalitySynonym>> } & {
   now_ss: Editable<SedimentaryStructure>[]
 } & {
   now_coll_meth: Editable<CollectingMethod>[]
