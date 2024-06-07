@@ -5,7 +5,7 @@ import { useGetReferenceTypesQuery } from '@/redux/referenceReducer'
 import { CircularProgress } from '@mui/material'
 
 export const ReferenceTab = () => {
-  const { dropdown, data, editData, mode, textField } = useDetailContext<ReferenceDetailsType>()
+  const { dropdown, data, editData, mode, textField, bigTextField } = useDetailContext<ReferenceDetailsType>()
   const { data: referenceTypes } = useGetReferenceTypesQuery()
 
   if (!referenceTypes) return <CircularProgress />
@@ -28,9 +28,14 @@ export const ReferenceTab = () => {
 
   const fields = selectedRefType?.ref_field_name.filter(field => field.display)
 
+  // Write here the fields that should have a bigger, resizable text field
+  const bigFields = ['title_primary', 'authors_primary', 'ref_abstract', 'gen_notes']
+
   const fieldsArray = fields?.map(field => [
     field.ref_field_name,
-    textField(field.field_name! as keyof ReferenceDetailsType),
+    bigFields.includes(field.field_name!)
+      ? bigTextField(field.field_name! as keyof ReferenceDetailsType)
+      : textField(field.field_name! as keyof ReferenceDetailsType),
   ]) ?? [['Encountered error. Field type could not be found. Please contact project administrators.']]
 
   return (
