@@ -21,7 +21,7 @@ import { EditDataType } from '@/backendTypes'
 
 const fieldWidth = '14em'
 
-export type DropdownOption = { value: string; display: string }
+export type DropdownOption = { value: string | number; display: string }
 
 export const DropdownSelector = <T extends object>({
   options,
