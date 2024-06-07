@@ -22,7 +22,7 @@ export const LocalityTab = () => {
     { display: '>1000 m2', value: '>1000m2' },
   ]
 
-  const getStatusText = () => (data.loc_status ? <>Private</> : <>Public</>)
+  const getStatusText = () => (data.loc_status ? <>Draft</> : <>Public</>)
 
   const info = [
     ['Name', textField('loc_name')],
@@ -33,7 +33,7 @@ export const LocalityTab = () => {
             'loc_status',
             [
               { value: 'false', display: 'Public' },
-              { value: 'true', display: 'Private' },
+              { value: 'true', display: 'Draft' },
             ],
             'Status'
           )

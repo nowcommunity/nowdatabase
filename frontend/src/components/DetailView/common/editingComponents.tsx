@@ -21,7 +21,8 @@ import { EditDataType } from '@/backendTypes'
 
 const fieldWidth = '14em'
 
-export type DropdownOption = { value: string | number; display: string }
+export type DropdownOptionValue = string | number
+export type DropdownOption = { value: DropdownOptionValue; display: string }
 
 export const DropdownSelector = <T extends object>({
   options,
@@ -85,15 +86,22 @@ export const FormTextField = <T extends string>({
   return <TextField {...props} />
 }
 
-const getValue = (item: DropdownOption | string) => (typeof item === 'string' ? item : item.value)
-const getDisplay = (item: DropdownOption | string) => (typeof item === 'string' ? item : item.display)
+const getValue = (item: DropdownOption | DropdownOptionValue) => (typeof item !== 'object' ? item : item.value)
+const getDisplay = (item: DropdownOption | DropdownOptionValue) => (typeof item !== 'object' ? item : item.display)
 
+/*
+  Supports string and number values, and booleans as strings. This means that
+  strings 'true' or 'false' will be handled by the app (and server) as boolean-type.
+  This also means that the options cannot be 'true' or 'false' if you want
+  to actually write those as strings to database. If that is required, this
+  needs to be changed.
+*/
 export const RadioSelector = <T extends object>({
   options,
   name,
   field,
 }: {
-  options: Array<DropdownOption | string>
+  options: Array<DropdownOption | DropdownOptionValue>
   name: string
   field: keyof EditDataType<T>
 }) => {
@@ -103,9 +111,17 @@ export const RadioSelector = <T extends object>({
       <RadioGroup
         aria-labelledby={`${name}-radio-selection`}
         name={name}
-        onChange={(event: ChangeEvent<HTMLInputElement>) =>
-          setEditData({ ...editData, [field]: event?.currentTarget?.value })
-        }
+        onChange={(event: ChangeEvent<HTMLInputElement>) => {
+          const value = event?.currentTarget?.value
+          const setValue = (val: string | number | boolean) => setEditData({ ...editData, [field]: val })
+          if (value && typeof getValue(options[0]) === 'number') {
+            setValue(parseInt(value))
+          } else if (value === 'true' || value === 'false') {
+            setValue(value === 'true')
+          } else {
+            setEditData({ ...editData, [field]: value })
+          }
+        }}
         value={editData[field]}
         sx={{ display: 'flex', flexDirection: 'row' }}
       >
@@ -129,12 +145,12 @@ const MultiSelector = <T extends object>({
   field,
   editingComponent,
 }: {
-  options: Array<DropdownOption | string>
+  options: Array<DropdownOption | DropdownOptionValue>
   field: keyof EditDataType<T>
   editingComponent: ReactNode
 }) => {
   const { data } = useDetailContext<T>()
-  const option = options.find(option => getValue(option) == data[field as keyof T]) // intentional use of ==
+  const option = options.find(option => getValue(option) == data[field as keyof T]) // TODO intentional use of == but is it necessary anymore
   const displayValue = option ? getDisplay(option) : null
   return <DataValue<T> field={field} EditElement={editingComponent} displayValue={displayValue} />
 }
