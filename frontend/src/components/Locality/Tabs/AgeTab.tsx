@@ -78,7 +78,7 @@ export const AgeTab = () => {
       dropdown('frac_max', fracOptions, 'Maximum fraction', editData.date_meth === 'absolute'),
     ],
     [''],
-    ['Chronostrathigraphic age', textField('chron')],
+    ['Chronostratigraphic Age', textField('chron')],
     ['Age Comment', bigTextField('age_comm')],
   ]
 
