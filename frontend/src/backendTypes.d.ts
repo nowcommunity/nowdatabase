@@ -44,10 +44,8 @@ export type LocalityDetailsType = Omit<Prisma.now_loc, 'now_ls' | 'now_mus' | 'n
 } & {
   projects: Array<Editable<Project>>
 } & {
-  taxa: Array<Editable<Species>>
-} /*& {
   now_ls: Array<Editable<LocalitySpecies>>
-} */ & { now_plr: Array<Editable<LocalityProject>> } & { now_syn_loc: Array<Editable<LocalitySynonym>> } & {
+} & { now_plr: Array<Editable<LocalityProject>> } & { now_syn_loc: Array<Editable<LocalitySynonym>> } & {
   now_ss: Editable<SedimentaryStructure>[]
 } & {
   now_coll_meth: Editable<CollectingMethod>[]
