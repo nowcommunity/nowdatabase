@@ -1,11 +1,9 @@
-import { PrismaClient } from '@prisma/client'
-
-const prisma = new PrismaClient()
+import { dbClient } from '../utils/db'
 
 export const getAllSpecies = async (onlyPublic: boolean) => {
   const where = onlyPublic ? { sp_status: false } : {}
 
-  const result = await prisma.com_species.findMany({
+  const result = await dbClient.com_species.findMany({
     select: {
       species_id: true,
       subclass_or_superorder_name: true,
@@ -27,14 +25,14 @@ export const getAllSpecies = async (onlyPublic: boolean) => {
 
 export const getSpeciesDetailsx = async (id: number) => {
   // TODO: Check if user has access
-  const result = await prisma.com_species.findUnique({ where: { species_id: id } })
+  const result = await dbClient.com_species.findUnique({ where: { species_id: id } })
   return result
 }
 
 export const getSpeciesDetails = async (id: number) => {
   // TODO: Check if user has access
 
-  const result = await prisma.com_species.findUnique({
+  const result = await dbClient.com_species.findUnique({
     where: { species_id: id },
     include: {
       now_ls: {

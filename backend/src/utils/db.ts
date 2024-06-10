@@ -1,9 +1,11 @@
 import { testDb } from '../services/locality'
 import { sleep } from './common'
 import { logger } from './logger'
-import { PrismaClient } from '@prisma/client'
+import { PrismaClient as DbClient } from '../../prisma/generated/now_test_client'
+import { PrismaClient as LogDbClient } from '../../prisma/generated/now_log_test_client'
 
-export const prisma = new PrismaClient()
+export const logDbClient = new LogDbClient()
+export const dbClient = new DbClient()
 
 export const testDbConnection = async () => {
   logger.info(`Attempting to connect to database...`)

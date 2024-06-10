@@ -18,6 +18,7 @@ import { PORT, BACKEND_MODE } from './utils/config'
 import { tokenExtractor, userExtractor, requireLogin } from './middlewares/authenticator'
 import { errorHandler } from './middlewares/errorHandler'
 import { createTestUser } from './services/user'
+import { testDbConnection } from './utils/db'
 
 const app = express()
 
@@ -42,9 +43,10 @@ app.use('/time-unit', timeUnitRouter)
 app.use('/museum', museumRouter)
 app.use('/sedimentary-structure', sedimentaryStructureRouter)
 app.use(errorHandler)
-app.listen(PORT, () => {
+app.listen(PORT, async () => {
   logger.info(`Server running on port ${PORT} in "${BACKEND_MODE}"-mode`)
   if (BACKEND_MODE === 'dev') {
+    await testDbConnection()
     logger.info('Creating test-user')
     void createTestUser()
   }

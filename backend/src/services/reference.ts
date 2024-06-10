@@ -1,7 +1,7 @@
-import { prisma } from '../utils/db'
+import { dbClient } from '../utils/db'
 
 export const getAllReferences = async () => {
-  const result = await prisma.ref_ref.findMany({
+  const result = await dbClient.ref_ref.findMany({
     select: {
       rid: true,
       date_primary: true,
@@ -32,11 +32,11 @@ export const getAllReferences = async () => {
 
 export const getReferenceDetails = async (id: number) => {
   // TODO: Check if user has access
-  const result = await prisma.ref_ref.findUnique({ where: { rid: id } })
+  const result = await dbClient.ref_ref.findUnique({ where: { rid: id } })
   return result
 }
 
 export const getReferenceTypes = async () => {
-  const referenceTypes = await prisma.ref_ref_type.findMany({ include: { ref_field_name: true } })
+  const referenceTypes = await dbClient.ref_ref_type.findMany({ include: { ref_field_name: true } })
   return referenceTypes
 }

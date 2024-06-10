@@ -1,4 +1,4 @@
-import * as Prisma from '../../backend/node_modules/@prisma/client/default'
+import * as Prisma from '../../backend/prisma/generated/now_test_client/default'
 
 // TODO does it really work for items of array too
 type PartialExceptArrays<T> = {

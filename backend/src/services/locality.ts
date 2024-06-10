@@ -1,25 +1,22 @@
 import { logger } from '../utils/logger'
-import { prisma } from '../utils/db'
+import { dbClient, logDbClient } from '../utils/db'
 import { EditDataType, LocalityDetailsType } from '../../../frontend/src/backendTypes'
-import Prisma from '@prisma/client'
+import Prisma from '../../prisma/generated/now_test_client'
 import { validateLocality } from '../../../frontend/src/validators/locality'
 import { detailedDiff } from 'deep-object-diff'
 import { filterFields } from './writeUtils'
 import { ValidationObject } from '../../../frontend/src/validators/validator'
 
 export const testDb = async () => {
-  const result = await prisma.now_loc.findMany({ select: { loc_name: true }, where: { loc_name: 'Amba East' } })
-  if (result[0].loc_name === 'Amba East') {
-    logger.info('Database connection tested, data can be fetched')
-  } else {
-    logger.error('Database connection does not work')
-  }
+  logger.info('Testing db...')
+  const logResult = await logDbClient.log.findMany({})
+  console.log(JSON.stringify(logResult.slice(0, 5), null, 2))
 }
 
 export const getAllLocalities = async (onlyPublic: boolean) => {
   const where = onlyPublic ? { loc_status: false } : {}
 
-  const result = await prisma.now_loc.findMany({
+  const result = await dbClient.now_loc.findMany({
     select: {
       lid: true,
       loc_name: true,
@@ -38,7 +35,7 @@ export const getAllLocalities = async (onlyPublic: boolean) => {
 export const getLocalityDetails = async (id: number) => {
   // TODO: Check if user has access
 
-  const result = await prisma.now_loc.findUnique({
+  const result = await dbClient.now_loc.findUnique({
     where: { lid: id },
     include: {
       now_mus: {
@@ -76,7 +73,7 @@ export const fixEditedLocality = (editedLocality: EditDataType<LocalityDetailsTy
   if (editedLocality.now_lau) {
     editedLocality.now_lau = editedLocality.now_lau.map(lau => ({
       ...lau,
-      lau_date: new Date(lau.lau_date!),
+      lau_date: new Date(lau.lau_date),
     }))
   }
   // TODO: see if we have to turn these into bigint or if writing number to db is ok.
@@ -104,9 +101,9 @@ export const validateEntireLocality = (editedFields: Partial<Prisma.now_loc>) =>
 
 export const processLocalityForEdit = async (editedLocality: EditDataType<LocalityDetailsType>) => {
   const fixedEditedLocality = fixEditedLocality(editedLocality)
-  const oldLocality = await getLocalityDetails(fixedEditedLocality.lid!)
-  const difference = detailedDiff(oldLocality!, fixedEditedLocality)
-  const filteredLoc = filterFields(difference.updated as EditDataType<LocalityDetailsType>, prisma.now_loc.fields)
+  const oldLocality = await getLocalityDetails(fixedEditedLocality.lid)
+  const difference = detailedDiff(oldLocality, fixedEditedLocality)
+  const filteredLoc = filterFields(difference.updated as EditDataType<LocalityDetailsType>, dbClient.now_loc.fields)
   const validationErrors = validateEntireLocality(filteredLoc)
   if (validationErrors.length > 0) return { validationErrors }
   const result = await editLocality(oldLocality!.lid, filteredLoc)
@@ -114,7 +111,7 @@ export const processLocalityForEdit = async (editedLocality: EditDataType<Locali
 }
 
 export const editLocality = async (lid: number, filteredLoc: Partial<Prisma.now_loc>) => {
-  const result = await prisma.now_loc.update({
+  const result = await dbClient.now_loc.update({
     where: {
       lid,
     },

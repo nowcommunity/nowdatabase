@@ -1,6 +1,6 @@
-import { prisma } from '../utils/db'
+import { dbClient } from '../utils/db'
 
 export const getAllMuseums = async () => {
-  const result = await prisma.com_mlist.findMany({})
+  const result = await dbClient.com_mlist.findMany({})
   return result
 }

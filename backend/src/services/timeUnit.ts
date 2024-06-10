@@ -1,7 +1,7 @@
-import { prisma } from '../utils/db'
+import { dbClient } from '../utils/db'
 
 export const getAllTimeUnits = async () => {
-  const result = await prisma.now_time_unit.findMany({
+  const result = await dbClient.now_time_unit.findMany({
     select: {
       tu_name: true,
       tu_display_name: true,
@@ -34,7 +34,7 @@ export const getAllTimeUnits = async () => {
 
 export const getTimeUnitDetails = async (id: string) => {
   // TODO: Check if user has access
-  const result = await prisma.now_time_unit.findUnique({
+  const result = await dbClient.now_time_unit.findUnique({
     where: { tu_name: id },
     include: {
       now_tu_sequence: {},
@@ -47,7 +47,7 @@ export const getTimeUnitDetails = async (id: string) => {
 
 export const getTimeUnitLocalities = async (id: string) => {
   // TODO: Check if user has access
-  const result = await prisma.now_loc.findMany({
+  const result = await dbClient.now_loc.findMany({
     where: { OR: [{ bfa_max: id }, { bfa_min: id }] },
   })
   return result
