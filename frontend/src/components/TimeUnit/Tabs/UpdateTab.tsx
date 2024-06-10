@@ -1,10 +1,12 @@
-import { Editable, TimeUnitDetailsType, TimeUnitUpdate } from '@/backendTypes'
-import { EditableTable } from '@/components/DetailView/common/EditableTable'
+import { TimeUnitDetailsType, TimeUnitUpdate } from '@/backendTypes'
+import { useDetailContext } from '@/components/DetailView/Context/DetailContext'
+import { SimpleTable } from '@/components/DetailView/common/SimpleTable'
 import { Grouped } from '@/components/DetailView/common/tabLayoutHelpers'
 import { Box } from '@mui/material'
 import { MRT_ColumnDef } from 'material-react-table'
 
 export const UpdateTab = () => {
+  const { data } = useDetailContext<TimeUnitDetailsType>()
   const formatDate = (date: Date | null) => {
     if (!date) return 'No date'
     return new Date(date).toISOString().split('T')[0]
@@ -33,7 +35,7 @@ export const UpdateTab = () => {
 
   return (
     <Grouped title="Updates">
-      <EditableTable<Editable<TimeUnitUpdate>, TimeUnitDetailsType> columns={columns} field="now_tau" />
+      <SimpleTable columns={columns} data={data.now_tau} />
     </Grouped>
   )
 }

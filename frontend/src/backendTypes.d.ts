@@ -13,7 +13,7 @@ type PartialExceptArrays<T> = {
 // This is used for editData, which is all the same stuff as data, but for writing actions,
 // so must include references and have fields as partial.
 type EditDataType<T> = PartialExceptArrays<T> & { references: Reference[] }
-
+export type SpeciesType = Prisma.com_species
 export type RowState = 'new' | 'removed' | 'cancelled' | 'clean'
 export type UpdateComment = { update_comment: string }
 // Use this for fields that include array that has to be edited by EditableTable.
@@ -22,7 +22,7 @@ export type Editable<T> = T & { rowState?: RowState }
 export type SedimentaryStructureValues = Prisma.now_ss_values
 export type CollectingMethod = Prisma.now_coll_meth
 export type LocalityProject = Prisma.now_plr & { now_proj: Prisma.now_proj }
-export type LocalitySpecies = Prisma.now_ls & { com_species: Prisma.com_species }
+export type LocalitySpecies = Omit<Prisma.now_ls, 'com_species'> & { com_species: SpeciesType }
 export type SpeciesLocality = Prisma.now_ls & { now_loc: Prisma.now_loc }
 export type LocalityUpdate = Prisma.now_lau & { now_lr: Prisma.now_lr }
 export type SpeciesUpdate = Prisma.now_sau & { now_lr: Prisma.now_sr }
@@ -98,7 +98,7 @@ export type Reference = {
   title_secondary: string
 }
 
-export type ReferenceDetailsType = Prisma.ref_ref
+export type ReferenceDetailsType = EditDataType<Prisma.ref_ref>
 export type RegionDetails = Prisma.now_reg_coord & { now_reg_coord_people: Array<RegionCoordinator> } & {
   now_reg_coord_country: Array<RegionCountry>
 }
@@ -133,9 +133,11 @@ export type TimeUnit = {
 export type TimeBoundUpdate = Prisma.now_bau & { now_br: Prisma.now_br }
 
 export type TimeUnitSequence = Prisma.now_tu_sequence
-export type TimeUnitDetailsType = EditDataType<Prisma.now_time_unit & { now_tu_sequence: Array<SequenceDetailsType> }>
 
-export type TimeUnitUpdate = Prisma.now_time_update & { now_br: Prisma.now_tr }
+export type TimeUnitUpdate = Prisma.now_time_update & { now_tr: Prisma.now_tr }
+export type TimeUnitDetailsType = EditDataType<
+  Prisma.now_time_unit & { now_tu_sequence: Array<SequenceDetailsType> }
+> & { now_tau: Array<TimeUnitUpdate> }
 
 export type ReferenceType = Prisma.ref_ref_type & { ref_field_name: Prisma.ref_field_name[] }
 

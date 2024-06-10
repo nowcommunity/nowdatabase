@@ -1,9 +1,7 @@
-//import { Editable, LocalityDetailsType, Museum } from '@/backendTypes'
-import { Editable, LocalityDetailsType, Species } from '@/backendTypes'
+import { LocalityDetailsType, Species } from '@/backendTypes'
 import { EditableTable } from '@/components/DetailView/common/EditableTable'
 import { EditingForm } from '@/components/DetailView/common/EditingForm'
 import { Grouped } from '@/components/DetailView/common/tabLayoutHelpers'
-import { SelectingTable } from '@/components/DetailView/common/SelectingTable'
 import { useDetailContext } from '@/components/DetailView/Context/DetailContext'
 import { useGetAllSpeciesQuery } from '@/redux/speciesReducer'
 import { Box, CircularProgress } from '@mui/material'
@@ -69,18 +67,24 @@ export const SpeciesTab = () => {
           <EditingForm<Species, LocalityDetailsType>
             buttonText="Add new Species"
             formFields={formFields}
-            arrayFieldName="species"
+            arrayFieldName="now_ls"
           />
-          <SelectingTable<Species, LocalityDetailsType>
+
+          {/* 
+          TODO fix this. EditDataType still doesn't work correctly: requires now_ls all fields
+          <SelectingTable<EditDataType<SpeciesType>, EditDataType<LocalityDetailsType>>
             buttonText="Select Species"
             data={speciesData}
             columns={columns}
-            fieldName="species"
+            fieldName="now_ls"
             idFieldName="species_id"
-          />
+            editingAction={(newSpecies: SpeciesType) => {
+              setEditData({ ...editData, now_ls: [...editData.now_ls, { com_species: newSpecies }] })
+            }} 
+          />*/}
         </Box>
       )}
-      <EditableTable<Editable<Species>, LocalityDetailsType> columns={columns} field="species" />
+      <EditableTable<Species, LocalityDetailsType> columns={columns} field="now_ls" />
     </Grouped>
   )
 }
