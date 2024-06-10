@@ -36,7 +36,11 @@ export type RegionCountry = Prisma.now_reg_coord_country
 export type SedimentaryStructure = Prisma.now_ss
 export type LocalitySynonym = Prisma.now_syn_loc
 export type SpeciesSynonym = Prisma.com_taxa_synonym
-export type LocalityDetailsType = Omit<Prisma.now_loc, 'now_mus'> & { museums: Array<Museum> } & {
+export type LocalityDetailsType = Omit<Prisma.now_loc, 'now_ls' | 'now_mus' | 'now_proj'> & {
+  museums: Array<Museum>
+} & {
+  projects: Array<Project>
+} & {
   now_ls: Array<LocalitySpecies>
 } & { now_plr: Array<LocalityProject> } & { now_syn_loc: Array<LocalitySynonym> } & {
   now_ss: SedimentaryStructure[]
@@ -54,6 +58,9 @@ export type Locality = {
   country: string | null
   loc_status: boolean | null
 }
+
+export type Sequence = Prisma.now_tu_sequence
+export type SequenceDetailsType = Prisma.now_tu_sequence
 
 export type SpeciesDetailsType = Prisma.com_species & { now_ls: Array<SpeciesLocality> } & {
   com_taxa_synonym: Array<SpeciesSynonym>
@@ -125,8 +132,10 @@ export type TimeUnit = {
 
 export type TimeBoundUpdate = Prisma.now_bau & { now_br: Prisma.now_br }
 
-export type TimeUnitDetailsType = EditDataType<Prisma.now_time_unit & { now_tu_sequence: Array<TimeUnitSequence> }>
 export type TimeUnitSequence = Prisma.now_tu_sequence
+export type TimeUnitDetailsType = EditDataType<Prisma.now_time_unit & { now_tu_sequence: Array<SequenceDetailsType> }>
+
+export type TimeUnitUpdate = Prisma.now_time_update & { now_br: Prisma.now_tr }
 
 export type ReferenceType = Prisma.ref_ref_type & { ref_field_name: Prisma.ref_field_name[] }
 
