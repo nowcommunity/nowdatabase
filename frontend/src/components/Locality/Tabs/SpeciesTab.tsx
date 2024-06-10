@@ -67,7 +67,7 @@ export const SpeciesTab = () => {
           <EditingForm<Species, LocalityDetailsType>
             buttonText="Add new Species"
             formFields={formFields}
-            arrayFieldName="now_ls"
+            arrayFieldName="species"
           />
 
           {/* 
@@ -84,7 +84,7 @@ export const SpeciesTab = () => {
           />*/}
         </Box>
       )}
-      <EditableTable<Species, LocalityDetailsType> columns={columns} field="now_ls" />
+      <EditableTable<Species, LocalityDetailsType> columns={columns} field="species" />
     </Grouped>
   )
 }
