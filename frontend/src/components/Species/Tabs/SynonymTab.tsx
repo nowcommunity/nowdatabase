@@ -40,7 +40,7 @@ export const SynonymTab = () => {
       <Box sx={{ display: 'flex', flexDirection: 'column', gap: '1em' }}>
         <TextField {...register('syn_genus_name', { required: true })} label="Genus" required />
         <TextField {...register('syn_species_name', { required: true })} label="Species" required />
-        <TextField {...register('syn_comment', { required: true })} label="Comment" required />
+        <TextField {...register('syn_comment')} label="Comment" />
       </Box>
     </EditingModal>
   )
