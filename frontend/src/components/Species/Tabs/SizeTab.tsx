@@ -5,17 +5,24 @@ import { useDetailContext } from '@components/DetailView/Context/DetailContext'
 export const SizeTab = () => {
   const { dropdown, textField } = useDetailContext<SpeciesDetailsType>()
 
-  const snoutVentLengthOptions = ['', '<10cm', '10cm-1m', '1m-2m', '2m-5m', '>5m']
+  const snoutVentLengthOptions = [
+    '',
+    { display: '< 10cm', value: '<10cm' },
+    { display: '10cm - 1m', value: '10cm-1m' },
+    { display: '1m - 2m', value: '1m-2m' },
+    { display: '2m - 5m', value: '2m-5m' },
+    { display: '> 5m', value: '>5m' },
+  ]
 
-  const sexualDimorphismSizeOptions = ['', 'y', 'n']
+  const sexualDimorphismSizeOptions = ['', { display: 'Yes', value: 'y' }, { display: 'No', value: 'n' }]
 
-  const sexualDimorphismDisplayOptions = ['', 'y', 'n']
+  const sexualDimorphismDisplayOptions = ['', { display: 'Yes', value: 'y' }, { display: 'No', value: 'n' }]
 
-  const populationStructureOptions = ['', 'soc', 'sol']
+  const populationStructureOptions = ['', { display: 'Social', value: 'soc' }, { display: 'Solitary ', value: 'sol' }]
 
   const size = [
-    ['Body Mass (g)', textField('body_mass')],
-    ['Brain Mass (g)', textField('brain_mass')],
+    ['Body Mass (g)', textField('body_mass', 'number')],
+    ['Brain Mass (g)', textField('brain_mass', 'number')],
     ['Snout-Vent Length', dropdown('sv_length', snoutVentLengthOptions, 'Snout-Vent Length')],
   ]
 
