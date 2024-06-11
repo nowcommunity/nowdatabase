@@ -18,5 +18,7 @@ jobs:
         run: npm run start:anon -- -d
       - name: 'Install root dependencies'
         run: npm ci
+      - name: 'Generate prisma clients'
+        run: npm run prisma
       - name: 'Run cypress'
         run: npm test
