@@ -23,7 +23,7 @@ router.put('/', async (req: Request<object, object, { locality: EditDataType<Loc
   if (validationErrors) {
     return res.status(400).send({ validationErrors })
   }
-  return res.status(200).send(result)
+  return res.status(200).send(result ? { result: fixBigInt(result) } : { error: 'no result' })
 })
 
 export default router
