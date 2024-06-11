@@ -1,7 +1,7 @@
-import { prisma } from '../utils/db'
+import { nowDb } from '../utils/db'
 
 export const getAllTimeBounds = async () => {
-  const result = await prisma.now_tu_bound.findMany({
+  const result = await nowDb.now_tu_bound.findMany({
     select: {
       bid: true,
       b_name: true,
@@ -15,7 +15,7 @@ export const getAllTimeBounds = async () => {
 export const getTimeBoundDetails = async (id: number) => {
   // TODO: Check if user has access
 
-  const result = await prisma.now_tu_bound.findUnique({
+  const result = await nowDb.now_tu_bound.findUnique({
     where: { bid: id },
     include: {
       now_bau: {
@@ -30,7 +30,7 @@ export const getTimeBoundDetails = async (id: number) => {
 
 export const getTimeBoundTimeUnits = async (id: number) => {
   // TODO: Check if user has access
-  const result = await prisma.now_time_unit.findMany({
+  const result = await nowDb.now_time_unit.findMany({
     where: { OR: [{ up_bnd: id }, { low_bnd: id }] },
   })
   return result

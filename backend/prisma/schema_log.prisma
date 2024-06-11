@@ -1,0 +1,27 @@
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "linux-musl"]
+  output   = "./generated/now_log_test_client"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("LOG_DATABASE_URL")
+}
+
+model log {
+  log_id      Int       @id @default(autoincrement())
+  event_time  DateTime? @db.DateTime(0)
+  user_name   String?   @db.VarChar(100)
+  server_name String?   @db.VarChar(50)
+  table_name  String?   @db.VarChar(50)
+  pk_data     String?   @db.VarChar(200)
+  column_name String?   @db.VarChar(50)
+  log_action  Int?
+  old_data    String?   @db.VarChar(255)
+  new_data    String?   @db.VarChar(255)
+  luid        Int?
+  suid        Int?
+  tuid        Int?
+  buid        Int?
+}

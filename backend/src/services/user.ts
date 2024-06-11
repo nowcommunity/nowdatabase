@@ -1,4 +1,4 @@
-import { prisma } from '../utils/db'
+import { nowDb } from '../utils/db'
 import * as bcrypt from 'bcrypt'
 import { logger } from '../utils/logger'
 import { sleep } from '../utils/common'
@@ -7,7 +7,7 @@ export const createTestUser = async () => {
   for (let i = 0; i < 10; i++) {
     try {
       const passwordHash = await bcrypt.hash('test', 10)
-      await prisma.com_users.create({
+      await nowDb.com_users.create({
         data: {
           user_name: 'test',
           password: passwordHash,
@@ -23,6 +23,6 @@ export const createTestUser = async () => {
 }
 
 export const getAllUsers = async () => {
-  const result = await prisma.com_users.findMany({})
+  const result = await nowDb.com_users.findMany({})
   return result
 }
