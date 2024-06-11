@@ -16,11 +16,11 @@ jobs:
           node-version: 20
       - name: 'Install root dependencies'
         run: npm ci
-      - name: 'Generate prisma clients'
-        run: npm run prisma
       - name: 'Install backend dependencies'
         working-directory: 'backend'
         run: npm ci
+      - name: 'Generate prisma clients' # has to be after root ci, but before checking code.
+        run: npm run prisma
       - name: 'Run backend linter'
         working-directory: 'backend'
         run: npm run lint
