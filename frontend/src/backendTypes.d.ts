@@ -1,19 +1,16 @@
 import * as Prisma from '../../backend/node_modules/@prisma/client/default'
 
-// TODO does it really work for items of array too
-type PartialExceptArrays<T> = {
-  [P in keyof T]: T[P] extends Array<infer U>
-    ? Array<Editable<PartialExceptArrays<U>>>
-    : T[P] extends object
-      ? PartialExceptArrays<T[P]>
-      : T[P] | undefined
-}
+type EditDataType<T> = T extends object
+  ? T extends readonly unknown[]
+    ? { [I in keyof T]: Editable<EditDataType<T[I]>> }
+    : { [K in keyof T as T[K] extends readonly unknown[] ? K : never]: EditDataType<T[K]> } & {
+          [K in keyof T as T[K] extends readonly unknown[] ? never : K]?: EditDataType<T[K]>
+        } extends infer U
+      ? { [K in keyof U]: U[K] }
+      : never
+  : T
 
-// Makes all fields optional, including nested fields. Also, add references-field.
-// This is used for editData, which is all the same stuff as data, but for writing actions,
-// so must include references and have fields as partial.
-type EditDataType<T> = PartialExceptArrays<T> & { references: Reference[] }
-
+export type SpeciesType = Prisma.com_species
 export type RowState = 'new' | 'removed' | 'cancelled' | 'clean'
 export type UpdateComment = { update_comment: string }
 // Use this for fields that include array that has to be edited by EditableTable.
@@ -22,7 +19,7 @@ export type Editable<T> = T & { rowState?: RowState }
 export type SedimentaryStructureValues = Prisma.now_ss_values
 export type CollectingMethod = Prisma.now_coll_meth
 export type LocalityProject = Prisma.now_plr & { now_proj: Prisma.now_proj }
-export type LocalitySpecies = Prisma.now_ls & { com_species: Prisma.com_species }
+export type LocalitySpecies = Omit<Prisma.now_ls, 'com_species'> & { com_species: SpeciesType }
 export type SpeciesLocality = Prisma.now_ls & { now_loc: Prisma.now_loc }
 export type LocalityUpdate = Prisma.now_lau & { now_lr: Prisma.now_lr }
 export type SpeciesUpdate = Prisma.now_sau & { now_lr: Prisma.now_sr }
@@ -36,8 +33,12 @@ export type RegionCountry = Prisma.now_reg_coord_country
 export type SedimentaryStructure = Prisma.now_ss
 export type LocalitySynonym = Prisma.now_syn_loc
 export type SpeciesSynonym = Prisma.com_taxa_synonym
-export type LocalityDetailsType = Omit<Prisma.now_loc, 'now_mus'> & { museums: Array<Museum> } & {
-  now_ls: Array<LocalitySpecies>
+export type LocalityDetailsType = Omit<Prisma.now_loc, 'now_ls' | 'now_mus' | 'now_proj'> & {
+  museums: Array<Museum>
+} & {
+  projects: Array<Project>
+} & {
+  species: Array<LocalitySpecies>
 } & { now_plr: Array<LocalityProject> } & { now_syn_loc: Array<LocalitySynonym> } & {
   now_ss: SedimentaryStructure[]
 } & {
@@ -54,6 +55,9 @@ export type Locality = {
   country: string | null
   loc_status: boolean | null
 }
+
+export type Sequence = Prisma.now_tu_sequence
+export type SequenceDetailsType = Prisma.now_tu_sequence
 
 export type SpeciesDetailsType = Prisma.com_species & { now_ls: Array<SpeciesLocality> } & {
   com_taxa_synonym: Array<SpeciesSynonym>
@@ -91,7 +95,7 @@ export type Reference = {
   title_secondary: string
 }
 
-export type ReferenceDetailsType = Prisma.ref_ref
+export type ReferenceDetailsType = EditDataType<Prisma.ref_ref>
 export type RegionDetails = Prisma.now_reg_coord & { now_reg_coord_people: Array<RegionCoordinator> } & {
   now_reg_coord_country: Array<RegionCountry>
 }
@@ -125,8 +129,12 @@ export type TimeUnit = {
 
 export type TimeBoundUpdate = Prisma.now_bau & { now_br: Prisma.now_br }
 
-export type TimeUnitDetailsType = EditDataType<Prisma.now_time_unit & { now_tu_sequence: Array<TimeUnitSequence> }>
 export type TimeUnitSequence = Prisma.now_tu_sequence
+
+export type TimeUnitUpdate = Prisma.now_time_update & { now_tr: Prisma.now_tr }
+export type TimeUnitDetailsType = EditDataType<
+  Prisma.now_time_unit & { now_tu_sequence: Array<SequenceDetailsType> }
+> & { now_tau: Array<TimeUnitUpdate> }
 
 export type ReferenceType = Prisma.ref_ref_type & { ref_field_name: Prisma.ref_field_name[] }
 

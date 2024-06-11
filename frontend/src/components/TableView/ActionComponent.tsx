@@ -13,17 +13,20 @@ export const ActionComponent = <T extends MRT_RowData>({
   selectorFn,
 }: {
   row: MRT_Row<T>
-  idFieldName?: keyof T
+  idFieldName: keyof T
   checkRowRestriction?: ((row: T) => boolean) | undefined
   url: string | undefined
   selectorFn?: (id: T) => void
 }) => {
   const navigate = useNavigate()
-  const id = row.original[idFieldName!]
+
+  const id = row.original[idFieldName]
+
   const getIconToShow = () => {
     if (selectorFn) return <AddCircleOutlineIcon />
     return <ManageSearchIcon />
   }
+
   const onClick = () => {
     if (selectorFn) {
       selectorFn(row.original)
@@ -31,10 +34,11 @@ export const ActionComponent = <T extends MRT_RowData>({
       navigate(`/${url}/${id}`)
     }
   }
+
   return (
     <Box display="flex" gap="0.2em" alignItems="center" width="3.6em">
-      <Button variant="text" style={{ width: '2em' }} onClick={onClick}>
-        <div data-cy={`detailview-button`}>{getIconToShow()}</div>
+      <Button data-cy={`detailview-button-${id}`} variant="text" style={{ width: '2em' }} onClick={onClick}>
+        {getIconToShow()}
       </Button>
       {checkRowRestriction && checkRowRestriction(row.original) && (
         <Tooltip placement="top" title="This item has restricted visibility">

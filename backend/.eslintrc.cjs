@@ -7,7 +7,7 @@ module.exports = {
     'plugin:import/recommended',
     'plugin:@typescript-eslint/recommended-type-checked',
   ],
-  ignorePatterns: ['build', '.eslintrc.cjs', 'babel.config.js', '*/node_modules/*'],
+  ignorePatterns: ['build', '.eslintrc.cjs', 'babel.config.js', '*/node_modules/*', 'prisma'],
   parser: '@typescript-eslint/parser',
   plugins: ['@typescript-eslint'],
   rules: {

@@ -1,7 +1,7 @@
 import { Box, TextField } from '@mui/material'
 import { EditingModal } from './EditingModal'
 import { useForm } from 'react-hook-form'
-import { Editable } from '@/backendTypes'
+import { EditDataType, Editable } from '@/backendTypes'
 import { useDetailContext } from '../Context/DetailContext'
 
 export type EditingFormField = { name: string; label: string; required?: boolean }
@@ -12,7 +12,7 @@ to add a new entry to a list, or edit existing one.
 If using for adding new, provide arrayFieldName.
 For editing existing row, use existingObject and editAction.
 */
-export const EditingForm = <T extends object, PT extends object>({
+export const EditingForm = <T extends object, ParentType extends object>({
   buttonText,
   formFields,
   editAction,
@@ -21,7 +21,7 @@ export const EditingForm = <T extends object, PT extends object>({
 }: {
   buttonText: string
   formFields: EditingFormField[]
-  arrayFieldName?: keyof PT
+  arrayFieldName?: keyof ParentType
   editAction?: (newObject: T) => void
   existingObject?: T | undefined
 }) => {
@@ -31,7 +31,7 @@ export const EditingForm = <T extends object, PT extends object>({
   }
   const { register, trigger, formState, getValues } = useForm({ defaultValues: getDefaultValues() })
   const { errors } = formState
-  const { editData, setEditData } = useDetailContext<PT>()
+  const { editData, setEditData } = useDetailContext<ParentType>()
 
   const onSave = async () => {
     const result = await trigger()
@@ -39,7 +39,10 @@ export const EditingForm = <T extends object, PT extends object>({
     const values = getValues()
     const newObject: Editable<T> = { ...(values as T), rowState: 'new' }
     if (arrayFieldName)
-      setEditData({ ...editData, [arrayFieldName]: [...(editData[arrayFieldName] as Array<T>), newObject] })
+      setEditData({
+        ...editData,
+        [arrayFieldName]: [...(editData[arrayFieldName as keyof EditDataType<ParentType>] as Array<T>), newObject],
+      })
     if (editAction) editAction(newObject)
     return true
   }
