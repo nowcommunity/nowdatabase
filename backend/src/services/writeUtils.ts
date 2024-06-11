@@ -4,16 +4,17 @@
 import { EditDataType } from '../../../frontend/src/backendTypes'
 
 /*
-  Returns object where only the "original" fields remain. For example:
-  if editedFields = full edited locality type, and modelObject = prisma.now_loc.fields, returns editedFields-object with
+  Returns object where only the "original" fields remain.
 */
-export const filterFields = <T extends object>(editedObject: EditDataType<T>, wantedFields: object) => {
+export const filterFields = <T extends object>(
+  editedObject: EditDataType<T>,
+  wantedFields: Record<string, unknown>
+) => {
   const fields = Object.keys(wantedFields)
-  const filteredFields = Object.entries(editedObject)
-    .filter(([field]) => fields.includes(field))
-    .reduce<Record<string, unknown>>((obj, cur) => {
-      obj[cur[0]] = cur[1]
-      return obj
-    }, {}) as Partial<T>
-  return filteredFields
+  const filteredFields = Object.entries(editedObject).filter(([field]) => fields.includes(field))
+  const filteredObject = filteredFields.reduce<Record<string, unknown>>((obj, cur) => {
+    obj[cur[0]] = cur[1]
+    return obj
+  }, {}) as Partial<T>
+  return { filteredFields, filteredObject }
 }

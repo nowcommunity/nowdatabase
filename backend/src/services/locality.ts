@@ -106,14 +106,21 @@ export const processLocalityForEdit = async (editedLocality: EditDataType<Locali
   const fixedEditedLocality = fixEditedLocality(editedLocality)
   const oldLocality = await getLocalityDetails(fixedEditedLocality.lid!)
   const difference = detailedDiff(oldLocality!, fixedEditedLocality)
-  const filteredLoc = filterFields(difference.updated as EditDataType<LocalityDetailsType>, nowDb.now_loc.fields)
-  const validationErrors = validateEntireLocality(filteredLoc)
+  const { filteredFields, filteredObject } = filterFields(
+    difference.updated as EditDataType<LocalityDetailsType>,
+    nowDb.now_loc.fields as unknown as Record<string, unknown>
+  )
+  const validationErrors = validateEntireLocality(filteredObject)
   if (validationErrors.length > 0) return { validationErrors }
-  const result = await editLocality(oldLocality!.lid, filteredLoc)
+  const result = await editLocality(oldLocality!.lid, filteredFields, filteredObject)
   return { result }
 }
 
-export const editLocality = async (lid: number, filteredLoc: EditDataType<Prisma.now_loc>) => {
+export const editLocality = async (
+  lid: number,
+  filteredFields: Array<[string, unknown]>,
+  filteredLoc: EditDataType<Prisma.now_loc>
+) => {
   const result = await nowDb.now_loc.update({
     where: {
       lid,
@@ -122,5 +129,20 @@ export const editLocality = async (lid: number, filteredLoc: EditDataType<Prisma
       ...(filteredLoc as Prisma.now_loc),
     },
   })
+
+  // log_action: 1=delete, 2=create, 3=update
+  const data = filteredFields.map(([field, value]) => ({
+    event_time: new Date(),
+    user_name: 'testuser',
+    server_name: 'sysbiol',
+    table_name: 'now_loc',
+    pk_data: `${(lid + '').length}.${lid};`,
+    column_name: field,
+    new_data: value as never,
+    luid: lid,
+  }))
+
+  await logDb.log.createMany({ data })
+
   return result
 }

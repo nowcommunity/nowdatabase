@@ -8,7 +8,7 @@ export const errorHandler = (
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   _next: express.NextFunction
 ) => {
-  logger.info('error handler')
+  logger.info('** Error handler **')
   if ('status' in error) {
     return res.status(error.status as number).json({ message: error.message })
   }
