@@ -38,7 +38,7 @@ export type LocalityDetailsType = Omit<Prisma.now_loc, 'now_ls' | 'now_mus' | 'n
 } & {
   projects: Array<Project>
 } & {
-  now_ls: Array<LocalitySpecies>
+  species: Array<LocalitySpecies>
 } & { now_plr: Array<LocalityProject> } & { now_syn_loc: Array<LocalitySynonym> } & {
   now_ss: SedimentaryStructure[]
 } & {

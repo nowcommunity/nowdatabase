@@ -1,6 +1,7 @@
 import { LocalityDetailsType, Species } from '@/backendTypes'
 import { EditableTable } from '@/components/DetailView/common/EditableTable'
 import { EditingForm } from '@/components/DetailView/common/EditingForm'
+import { SelectingTable } from '@/components/DetailView/common/SelectingTable'
 import { Grouped } from '@/components/DetailView/common/tabLayoutHelpers'
 import { useDetailContext } from '@/components/DetailView/Context/DetailContext'
 import { useGetAllSpeciesQuery } from '@/redux/speciesReducer'
@@ -8,7 +9,7 @@ import { Box, CircularProgress } from '@mui/material'
 import { MRT_ColumnDef } from 'material-react-table'
 
 export const SpeciesTab = () => {
-  const { mode } = useDetailContext<LocalityDetailsType>()
+  const { mode, editData, setEditData } = useDetailContext<LocalityDetailsType>()
   const { data: speciesData, isError } = useGetAllSpeciesQuery()
 
   if (isError) return 'Error loading Species.'
@@ -67,24 +68,21 @@ export const SpeciesTab = () => {
           <EditingForm<Species, LocalityDetailsType>
             buttonText="Add new Species"
             formFields={formFields}
-            arrayFieldName="now_ls"
+            arrayFieldName="species"
           />
-
-          {/* 
-          TODO fix this. EditDataType still doesn't work correctly: requires now_ls all fields
-          <SelectingTable<EditDataType<SpeciesType>, EditDataType<LocalityDetailsType>>
+          <SelectingTable<Species, LocalityDetailsType>
             buttonText="Select Species"
             data={speciesData}
             columns={columns}
-            fieldName="now_ls"
+            fieldName="species"
             idFieldName="species_id"
-            editingAction={(newSpecies: SpeciesType) => {
-              setEditData({ ...editData, now_ls: [...editData.now_ls, { com_species: newSpecies }] })
-            }} 
-          />*/}
+            editingAction={(newSpecies: Species) => {
+              setEditData({ ...editData, species: [...editData.species, { ...newSpecies, rowState: 'new' }] })
+            }}
+          />
         </Box>
       )}
-      <EditableTable<Species, LocalityDetailsType> columns={columns} field="now_ls" />
+      <EditableTable<Species, LocalityDetailsType> columns={columns} field="species" />
     </Grouped>
   )
 }
