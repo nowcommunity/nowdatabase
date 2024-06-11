@@ -52,6 +52,10 @@ export const LocalitySpeciesTab = () => {
       header: 'MNI',
     },
     {
+      accessorKey: 'qua',
+      header: 'QUA',
+    },
+    {
       accessorKey: 'body_mass',
       header: 'Body Mass (g)',
     },
@@ -78,6 +82,18 @@ export const LocalitySpeciesTab = () => {
     {
       accessorKey: 'mw_cs_blunt',
       header: 'MW Blunt',
+    },
+    {
+      accessorKey: 'mw_scale_min',
+      header: 'MW Scale Min',
+    },
+    {
+      accessorKey: 'mw_scale_max',
+      header: 'MW Scale Max',
+    },
+    {
+      accessorKey: 'mw_value',
+      header: 'MW Value',
     },
     {
       header: 'MW Score',
