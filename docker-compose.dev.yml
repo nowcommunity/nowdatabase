@@ -18,7 +18,7 @@ services:
     ports:
       - 127.0.0.1:4000:4000
     command: >
-        sh -c "cd /usr/src/app/backend && npm ci && npm run dev"
+        sh -c "cd /usr/src/app/backend && npm ci && npm run prisma && npm run dev"
     env_file: .dev.env
   db:
     container_name: nowdb-db-dev

@@ -4,6 +4,8 @@
   "description": "NOW - New and Old Worlds - Database of fossil mammals",
   "main": "index.js",
   "scripts": {
+    "setup": "npm run install:all && npm run prisma",
+    "install:all": "npm i && cd backend && npm i && cd ../frontend && npm i && cd ..",
     "start": "docker compose -f docker-compose.yml up",
     "start:anon": "docker compose -f docker-compose.anon.yml up",
     "dev": "docker compose -f docker-compose.dev.yml up",
