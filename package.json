@@ -10,7 +10,8 @@
     "check": "echo \"Running frontend tsc ...\" && cd frontend && npx tsc --noEmit && echo \"Running frontend eslint ...\" && npm run lint && cd ../backend && echo \"Running backend tsc ...\" && npx tsc --noEmit && echo \"Running backend eslint ...\"&& npm run lint && echo \"All good! :)\"",
     "test": "cypress run --browser chrome",
     "cypress": "cypress open",
-    "prepare": "husky"
+    "prepare": "husky",
+    "prisma": "cd backend && npx prisma generate --schema prisma/schema.prisma && npx prisma generate --schema prisma/schema_log.prisma"
   },
   "author": "",
   "devDependencies": {

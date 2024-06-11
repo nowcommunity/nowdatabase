@@ -77,10 +77,7 @@ export const getLocalityDetails = async (id: number) => {
 
 export const fixEditedLocality = (editedLocality: EditDataType<LocalityDetailsType>) => {
   if (editedLocality.now_lau) {
-    editedLocality.now_lau = editedLocality.now_lau.map(lau => ({
-      ...lau,
-      lau_date: new Date(lau.lau_date as Date),
-    }))
+    editedLocality.now_lau = editedLocality.now_lau.map(lau => ({ ...lau, lau_date: new Date(lau.lau_date as Date) }))
   }
   // TODO: see if we have to turn these into bigint or if writing number to db is ok.
   // if (editedLocality.now_ls) {
@@ -107,8 +104,8 @@ export const validateEntireLocality = (editedFields: EditDataType<Prisma.now_loc
 
 export const processLocalityForEdit = async (editedLocality: EditDataType<LocalityDetailsType>) => {
   const fixedEditedLocality = fixEditedLocality(editedLocality)
-  const oldLocality = await getLocalityDetails(fixedEditedLocality.lid)
-  const difference = detailedDiff(oldLocality, fixedEditedLocality)
+  const oldLocality = await getLocalityDetails(fixedEditedLocality.lid!)
+  const difference = detailedDiff(oldLocality!, fixedEditedLocality)
   const filteredLoc = filterFields(difference.updated as EditDataType<LocalityDetailsType>, nowDb.now_loc.fields)
   const validationErrors = validateEntireLocality(filteredLoc)
   if (validationErrors.length > 0) return { validationErrors }
@@ -117,7 +114,7 @@ export const processLocalityForEdit = async (editedLocality: EditDataType<Locali
 }
 
 export const editLocality = async (lid: number, filteredLoc: EditDataType<Prisma.now_loc>) => {
-  const result = await prisma.now_loc.update({
+  const result = await nowDb.now_loc.update({
     where: {
       lid,
     },

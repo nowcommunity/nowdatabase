@@ -1,4 +1,4 @@
-import * as Prisma from '../../backend/node_modules/@prisma/client/default'
+import * as Prisma from '../../backend/prisma/generated/now_test_client/default'
 
 type EditDataType<T> = T extends object
   ? T extends readonly unknown[]

@@ -3,13 +3,13 @@ import { Router } from 'express'
 import * as jwt from 'jsonwebtoken'
 import { SECRET, LOGIN_VALID_MS, USER_CREATION_SECRET } from '../utils/config'
 import * as bcrypt from 'bcrypt'
-import { prisma } from '../utils/db'
+import { nowDb } from '../utils/db'
 
 const router = Router()
 
 router.post('/login', async (req, res) => {
   const { username, password } = req.body
-  const result = await prisma.com_users.findFirst({
+  const result = await nowDb.com_users.findFirst({
     where: {
       user_name: username,
     },
@@ -34,7 +34,7 @@ router.post('/create', async (req, res) => {
   const saltRounds = 10
   const passwordHash = await bcrypt.hash(password as string, saltRounds)
 
-  await prisma.com_users.create({
+  await nowDb.com_users.create({
     data: {
       user_name: username as string,
       password: passwordHash,
