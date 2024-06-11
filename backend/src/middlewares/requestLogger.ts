@@ -2,6 +2,7 @@ import { logger } from '../utils/logger'
 import { Middleware } from '../types'
 import express from 'express'
 
+// This can be used to log requests as well; currently not in use
 export const requestLogger: Middleware = (req, _res, next) => {
   logger.info(`${req.method} ${req.url}`)
   next()

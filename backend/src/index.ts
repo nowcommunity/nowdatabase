@@ -11,7 +11,7 @@ import speciesRouter from './routes/species'
 import timeBoundRouter from './routes/timeBound'
 import timeUnitRouter from './routes/timeUnit'
 import userRouter from './routes/user'
-import { requestLogger, responseLogger } from './middlewares/requestLogger'
+import { responseLogger } from './middlewares/requestLogger'
 import compression from 'compression'
 import { logger } from './utils/logger'
 import { PORT, BACKEND_MODE } from './utils/config'
@@ -25,7 +25,6 @@ const app = express()
 app.use(express.json({ limit: '50mb' }))
 app.use(cors())
 app.use(compression())
-app.use(requestLogger)
 app.use(tokenExtractor)
 app.use(userExtractor)
 app.use(responseLogger)
@@ -47,7 +46,7 @@ app.listen(PORT, async () => {
   logger.info(`Server running on port ${PORT} in "${BACKEND_MODE}"-mode`)
   if (BACKEND_MODE === 'dev') {
     await testDbConnection()
-    logger.info('Creating test-user')
+    logger.info('Creating test-user...')
     void createTestUser()
   }
 })
