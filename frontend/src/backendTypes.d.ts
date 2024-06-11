@@ -1,18 +1,15 @@
 import * as Prisma from '../../backend/node_modules/@prisma/client/default'
 
-// TODO does it really work for items of array too
-type PartialExceptArrays<T> = {
-  [P in keyof T]: T[P] extends Array<infer U>
-    ? Array<Editable<PartialExceptArrays<U>>>
-    : T[P] extends object
-      ? PartialExceptArrays<T[P]>
-      : T[P] | undefined
-}
+type EditDataType<T> = T extends object
+  ? T extends readonly unknown[]
+    ? { [I in keyof T]: Editable<EditDataType<T[I]>> }
+    : { [K in keyof T as T[K] extends readonly unknown[] ? K : never]: EditDataType<T[K]> } & {
+          [K in keyof T as T[K] extends readonly unknown[] ? never : K]?: EditDataType<T[K]>
+        } extends infer U
+      ? { [K in keyof U]: U[K] }
+      : never
+  : T
 
-// Makes all fields optional, including nested fields. Also, add references-field.
-// This is used for editData, which is all the same stuff as data, but for writing actions,
-// so must include references and have fields as partial.
-type EditDataType<T> = PartialExceptArrays<T> & { references: Reference[] }
 export type SpeciesType = Prisma.com_species
 export type RowState = 'new' | 'removed' | 'cancelled' | 'clean'
 export type UpdateComment = { update_comment: string }

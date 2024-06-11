@@ -1,4 +1,4 @@
-import { Editable, PartialExceptArrays, RowState } from '@/backendTypes'
+import { EditDataType, RowState } from '@/backendTypes'
 import { CircularProgress, Box, Button } from '@mui/material'
 import { type MRT_ColumnDef, type MRT_RowData, MaterialReactTable, MRT_Row } from 'material-react-table'
 import { useDetailContext } from '../Context/DetailContext'
@@ -19,20 +19,20 @@ export const EditableTable = <T extends MRT_RowData & { rowState?: RowState }, P
   field,
 }: {
   tableData?: Array<T> | null
-  editTableData?: Array<PartialExceptArrays<T>> | null
+  editTableData?: Array<EditDataType<T>> | null
   columns: MRT_ColumnDef<T>[]
-  field: keyof ParentType
+  field: keyof EditDataType<ParentType>
 }) => {
   const { editData, setEditData, mode, data } = useDetailContext<ParentType>()
   if (tableData === null || editTableData === null) return <CircularProgress />
 
   const actionRow = ({ row, staticRowIndex }: { row: MRT_Row<T>; staticRowIndex?: number | undefined }) => {
-    const state = (row.original as Editable<T>).rowState ?? 'clean'
+    const state = row.original.rowState ?? 'clean'
 
     // TODO: Using static index - need to use some id, sorting breaks this
     const rowClicked = (index: number | undefined) => {
       if (index === undefined) return
-      const items = [...(editData[field] as Array<Editable<object>>)]
+      const items = [...editData[field]]
       if (items[index].rowState === 'new') {
         items.splice(index, 1)
         setEditData({ ...editData, [field]: items })
@@ -68,7 +68,7 @@ export const EditableTable = <T extends MRT_RowData & { rowState?: RowState }, P
       if (!editTableData) return editData[field] as T[]
       return editTableData as T[]
     }
-    if (!tableData) return data[field] as T[]
+    if (!tableData) return data[field as keyof ParentType] as T[]
     return tableData
   }
 

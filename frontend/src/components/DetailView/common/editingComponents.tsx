@@ -247,12 +247,12 @@ export const FieldWithTableSelection = <T extends object, ParentType extends obj
     <TextField
       variant="outlined"
       size="small"
-      value={editData[targetField]}
+      value={editData[targetField as keyof EditDataType<ParentType>]}
       onClick={() => setOpen(true)}
       disabled={disabled}
       sx={{ backgroundColor: disabled ? 'grey' : '' }}
       inputProps={{ readOnly: true }}
     />
   )
-  return <DataValue<ParentType> field={targetField} EditElement={editingComponent} />
+  return <DataValue<ParentType> field={targetField as keyof EditDataType<ParentType>} EditElement={editingComponent} />
 }

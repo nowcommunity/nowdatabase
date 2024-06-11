@@ -4,13 +4,14 @@ import { TableView } from '@/components/TableView/TableView'
 import { useDetailContext } from '../Context/DetailContext'
 import { useMemo } from 'react'
 import { CircularProgress } from '@mui/material'
+import { EditDataType } from '@/backendTypes'
 
 /*
 If editabletable has different type than selectingtable rows,
 give an array in prop "selectedValues" that contains the string values
 that already exist in editdata
 */
-export const SelectingTable = <T extends MRT_RowData, ParentType>({
+export const SelectingTable = <T extends MRT_RowData, ParentType extends object>({
   buttonText,
   data,
   columns,
@@ -29,7 +30,7 @@ export const SelectingTable = <T extends MRT_RowData, ParentType>({
 }) => {
   const { editData, setEditData } = useDetailContext<ParentType>()
 
-  const selectedItems = editData[fieldName] as T[]
+  const selectedItems = editData[fieldName as keyof EditDataType<ParentType>] as T[]
 
   const defaultEditingAction = (newObject: T) => {
     if (selectedItems.find(item => item[idFieldName] === newObject[idFieldName])) return
