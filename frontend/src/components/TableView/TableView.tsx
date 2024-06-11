@@ -34,7 +34,7 @@ export const TableView = <T extends MRT_RowData>({
 }: {
   data: T[] | undefined
   columns: MRT_ColumnDef<T>[]
-  idFieldName?: keyof T
+  idFieldName: keyof T
   checkRowRestriction?: (row: T) => boolean
   selectorFn?: (id: T) => void
   url?: string
@@ -107,7 +107,7 @@ export const TableView = <T extends MRT_RowData>({
     if (selectorFn) {
       return
     }
-    setIdList(table.getPrePaginationRowModel().rows.map(row => row.original[idFieldName!] as string))
+    setIdList(table.getPrePaginationRowModel().rows.map(row => row.original[idFieldName] as string))
 
     // Don't put setIdList in the dependency array: it will cause re-render loop.
     // eslint-disable-next-line react-hooks/exhaustive-deps
