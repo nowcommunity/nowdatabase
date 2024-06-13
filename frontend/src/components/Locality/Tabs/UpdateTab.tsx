@@ -85,7 +85,7 @@ const DetailsModal = ({ updates, references }: { updates: UpdateLog[]; reference
     },
     {
       header: 'Action',
-      accessorFn: ({ log_action }) => (log_action === 1 ? 'Delete' : log_action === 2 ? 'Update' : 'Add'),
+      accessorFn: ({ log_action }) => (log_action === 1 ? 'Delete' : log_action === 3 ? 'Update' : 'Add'),
     },
     {
       header: 'Old data',

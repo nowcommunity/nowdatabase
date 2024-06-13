@@ -157,7 +157,7 @@ export const writeLocality = async (lid: number, filteredFields: Array<[string, 
       log_action: 3, // 1 = delete, 2 = create, 3 = update
       old_data: oldLocality[field as keyof Prisma.now_loc],
       new_data: value as never,
-      luid: lid,
+      luid: lid, //TODO WRONG: this should be the id for the luid (Locality update) that we created for this update
     }))
 
     logger.info(`Writing ${updateRows.length} rows into log-table...`)
