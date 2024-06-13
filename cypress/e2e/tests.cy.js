@@ -10,9 +10,9 @@ describe('Open each page, table view and detail view, and check at least some co
   it('Locality works', () => {
     cy.contains('Locality').click()
     cy.contains('Dmanisi')
-    cy.get('[data-cy="detailview-button-20920"]').click()
+    cy.get('[data-cy="detailview-button-21050"]').click()
     cy.contains('Dating method')
-    cy.contains('bahean')
+    cy.contains('olduvai')
   })
   it('Species works', () => {
     cy.contains('Species').click()
@@ -31,9 +31,9 @@ describe('Open each page, table view and detail view, and check at least some co
   it('Time Unit works', () => {
     cy.contains('Time Unit').click()
     cy.contains('Langhian')
-    cy.get('[data-cy="detailview-button-bahean"]').first().click()
+    cy.get('[data-cy="detailview-button-langhian"]').first().click()
     cy.contains('Sequence')
-    cy.contains('chlma')
+    cy.contains('gcss')
   })
   it('Region works', () => {
     cy.contains('Admin').click()
