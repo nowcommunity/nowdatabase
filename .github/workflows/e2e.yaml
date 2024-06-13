@@ -10,18 +10,26 @@ jobs:
     name: 'End-to-end tests'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup node
+        uses: actions/setup-node@v4
         with:
           node-version: 20
+
       - name: 'Install root dependencies'
         run: npm ci
+
       - name: 'Install backend dependencies'
         working-directory: 'backend'
         run: npm ci
+
       - name: 'Generate prisma clients' # has to be after root ci, but before checking code.
         run: npm run prisma
-      - name: 'Run app with anonymous data'
-        run: npm run start:anon -- -d
-      - name: 'Run cypress'
-        run: npm test
+
+      - name: Cypress
+        uses: cypress-io/github-action@v6
+        with:
+          start: npm run dev
