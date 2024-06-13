@@ -12,6 +12,7 @@ services:
   backend:
     container_name: nowdb-backend-dev
     image: node:20-alpine3.16
+    env_file: .anon.env
     volumes:
       - ./backend/:/usr/src/app/backend/
       - ./frontend/src/validators:/usr/src/app/frontend/src/validators
@@ -19,7 +20,6 @@ services:
       - 127.0.0.1:4000:4000
     command: >
         sh -c "cd /usr/src/app/backend && npm ci && npm run dev"
-    env_file: .anon.env
   db-anon:
     container_name: nowdb-db-anon
     image: mariadb
