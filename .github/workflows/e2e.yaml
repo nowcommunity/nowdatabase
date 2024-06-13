@@ -31,6 +31,9 @@ jobs:
       - name: 'Generate prisma clients' # has to be after root ci, but before checking code.
         run: npm run prisma
 
+      - name: 'Build containers'
+        run: docker compose -f docker-compose.anon.yml build
+
       - name: Cypress
         uses: cypress-io/github-action@v6
         with:
