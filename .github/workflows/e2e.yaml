@@ -36,9 +36,6 @@ jobs:
         with:
           start: npm run start:anon
           build: docker compose -f docker-compose.anon.yml build
-      - name: Output container logs
-        if: always()
-        run: |
-          docker logs "${{ job.services.nowdb-backend-dev.id }}"
-          docker logs "${{ job.services.nowdb-frontend-dev.id }}" 
-          docker logs "${{ job.services.nowdb-db.id }}"
+      - name: Dump docker logs on failure
+        if: failure()
+        uses: jwalton/gh-docker-logs@v2
