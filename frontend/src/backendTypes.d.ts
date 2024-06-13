@@ -1,4 +1,5 @@
 import * as Prisma from '../../backend/prisma/generated/now_test_client/default'
+import * as LogPrisma from '../../backend/prisma/generated/now_log_test_client/default'
 
 type EditDataType<T> = T extends object
   ? T extends readonly unknown[]
@@ -21,7 +22,7 @@ export type CollectingMethod = Prisma.now_coll_meth
 export type LocalityProject = Prisma.now_plr & { now_proj: Prisma.now_proj }
 export type LocalitySpecies = Omit<Prisma.now_ls, 'com_species'> & { com_species: SpeciesType }
 export type SpeciesLocality = Prisma.now_ls & { now_loc: Prisma.now_loc }
-export type LocalityUpdate = Prisma.now_lau & { now_lr: Prisma.now_lr }
+export type LocalityUpdate = Prisma.now_lau & { now_lr: Prisma.now_lr } & { updates: UpdateLog[] }
 export type SpeciesUpdate = Prisma.now_sau & { now_lr: Prisma.now_sr }
 export type Museum = Prisma.com_mlist
 export type ProjectPeople = Prisma.now_proj_people
@@ -44,7 +45,7 @@ export type LocalityDetailsType = Omit<Prisma.now_loc, 'now_ls' | 'now_mus' | 'n
 } & {
   now_coll_meth: CollectingMethod[]
 } & { now_lau: Array<LocalityUpdate> } & UpdateComment
-
+export type UpdateLog = LogPrisma.log
 export type Locality = {
   lid: number
   loc_name: string

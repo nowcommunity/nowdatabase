@@ -1,4 +1,4 @@
-import { nowDb, pool } from '../utils/db'
+import { logDb, nowDb, pool } from '../utils/db'
 import { EditDataType, LocalityDetailsType } from '../../../frontend/src/backendTypes'
 import Prisma from '../../prisma/generated/now_test_client'
 import { validateLocality } from '../../../frontend/src/validators/locality'
@@ -58,6 +58,16 @@ export const getLocalityDetails = async (id: number) => {
     },
   })
 
+  if (!result) return null
+
+  const luids = result.now_lau.map(lau => lau.luid)
+
+  const logResult = await logDb.log.findMany({ where: { luid: { in: luids } } })
+
+  result.now_lau = result.now_lau.map(lau => ({
+    ...lau,
+    updates: logResult.filter(logRow => logRow.luid === lau.luid),
+  }))
   if (!result) return null
   const { now_ls, now_mus, now_plr, ...locality } = result
   return {
