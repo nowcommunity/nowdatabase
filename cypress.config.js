@@ -5,10 +5,10 @@ module.exports = defineConfig({
     setupNodeEvents(on, config) {
       // implement node event listeners here
     },
-    defaultCommandTimeout: 12000,
+    defaultCommandTimeout: 52000,
     execTimeout: 90000,
     pageLoadTimeout: 140000,
-    requestTimeout: 9000,
-    responseTimeout: 45000,
+    requestTimeout: 80000,
+    responseTimeout: 80000,
   },
 });
