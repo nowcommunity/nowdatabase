@@ -28,7 +28,7 @@ export const testDb = async () => {
   logger.info('Testing Prisma-connection...')
   await nowDb.now_loc.findFirst({})
   await logDb.log.findFirst({})
-  logger.info('Connections to both databases via direct Prisma work.')
+  logger.info('Connections to both databases via Prisma work.')
 }
 
 export const testDbConnection = async () => {
