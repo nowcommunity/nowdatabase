@@ -9,5 +9,6 @@ SOURCE /docker-entrypoint-initdb.d/sqlfiles/now_log_test.sql
 USE now_test
 SOURCE /docker-entrypoint-initdb.d/sqlfiles/now_view.sql
 
+CREATE USER 'now_test'@'localhost' IDENTIFIED BY 'mariadb_password';
 GRANT SELECT, INSERT, UPDATE ON `now_log_test`.* TO 'now_test'@'%';
 GRANT SELECT, INSERT, UPDATE, DELETE ON `now_test`.* TO 'now_test'@'%';
