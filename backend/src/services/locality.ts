@@ -52,7 +52,16 @@ export const getLocalityDetails = async (id: number) => {
       },
       now_lau: {
         include: {
-          now_lr: true,
+          now_lr: {
+            include: {
+              ref_ref: {
+                include: {
+                  ref_authors: true,
+                  ref_journal: true,
+                },
+              },
+            },
+          },
         },
       },
     },

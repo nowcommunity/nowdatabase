@@ -1,10 +1,33 @@
-import { LocalityDetailsType, LocalityUpdate, UpdateLog } from '@/backendTypes'
+import { LocalityDetailsType, LocalityReference, LocalityUpdate, ReferenceDetailsType, UpdateLog } from '@/backendTypes'
 import { useDetailContext } from '@/components/DetailView/Context/DetailContext'
 import { EditingModal } from '@/components/DetailView/common/EditingModal'
 import { SimpleTable } from '@/components/DetailView/common/SimpleTable'
 import { Grouped } from '@/components/DetailView/common/tabLayoutHelpers'
-import { Box } from '@mui/material'
+import { Card, Stack } from '@mui/material'
 import { MRT_ColumnDef, MRT_Row } from 'material-react-table'
+import { Link } from 'react-router-dom'
+
+const ReferenceList = ({ references, big }: { references: ReferenceDetailsType[]; big: boolean }) => {
+  const getReferenceText = (ref: ReferenceDetailsType) => {
+    // TODO create different reference texts for different types.
+    // php version: html/include/database.php -> referenceCitation()
+    return `${ref.title_primary} ${ref.ref_journal?.journal_title ?? ''} ${ref.date_primary}`
+  }
+  return (
+    <Stack>
+      {references.map(ref => (
+        <Card key={ref.rid} sx={{ padding: '0.4em', margin: '0.5em', maxWidth: big ? '50em' : '30em' }}>
+          <div style={{ wordWrap: 'break-word', whiteSpace: 'normal' }}>{getReferenceText(ref)}</div>
+          {big && (
+            <div>
+              <Link to={`/reference/${ref.rid}`}>View</Link>
+            </div>
+          )}
+        </Card>
+      ))}
+    </Stack>
+  )
+}
 
 export const UpdateTab = () => {
   const { data } = useDetailContext<LocalityDetailsType>()
@@ -31,11 +54,15 @@ export const UpdateTab = () => {
     {
       accessorKey: 'now_lr',
       header: 'Reference',
-      Cell: () => <Box>not implemented</Box>,
+      Cell: ({ row }: { row: MRT_Row<LocalityUpdate> }) => (
+        <ReferenceList references={row.original.now_lr.map(lr => lr.ref_ref)} big={false} />
+      ),
     },
     {
       header: 'Details',
-      Cell: ({ row }: { row: MRT_Row<LocalityUpdate> }) => <DetailsModal updates={row.original.updates} />,
+      Cell: ({ row }: { row: MRT_Row<LocalityUpdate> }) => (
+        <DetailsModal updates={row.original.updates} references={row.original.now_lr} />
+      ),
     },
   ]
 
@@ -46,7 +73,7 @@ export const UpdateTab = () => {
   )
 }
 
-const DetailsModal = ({ updates }: { updates: UpdateLog[] }) => {
+const DetailsModal = ({ updates, references }: { updates: UpdateLog[]; references: LocalityReference[] }) => {
   const columns: MRT_ColumnDef<UpdateLog>[] = [
     {
       header: 'Table',
@@ -72,6 +99,7 @@ const DetailsModal = ({ updates }: { updates: UpdateLog[] }) => {
 
   return (
     <EditingModal buttonText="Details">
+      <ReferenceList references={references.map(ref => ref.ref_ref)} big />
       <SimpleTable columns={columns} data={updates} />
     </EditingModal>
   )
