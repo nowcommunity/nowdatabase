@@ -31,10 +31,9 @@ jobs:
       - name: 'Generate prisma clients' # has to be after root ci, but before checking code.
         run: npm run prisma
       - name: 'Start containers'
-        run: npm run start:anon
+        run: npm run start:anon -- -d && sleep 60
       - name: Cypress
         uses: cypress-io/github-action@v6
       - name: Dump docker logs on failure
         if: failure()
         uses: jwalton/gh-docker-logs@v2
-        
