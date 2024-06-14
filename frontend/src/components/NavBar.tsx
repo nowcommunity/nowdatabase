@@ -34,6 +34,7 @@ export const NavBar = () => {
       children: [
         { title: 'Region', url: '/region' },
         { title: 'Project', url: '/project' },
+        { title: 'Person', url: '/person' },
       ],
     },
   ]

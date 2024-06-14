@@ -1,6 +1,7 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { api } from '@/redux/api'
 import { UserFields } from '@shared/types'
+import { User, UserDetailsType } from '@/backendTypes'
 
 type LoginData = { username: string; password: string }
 
@@ -14,6 +15,16 @@ const userApi = api.injectEndpoints({
           password,
         },
         method: 'POST',
+      }),
+    }),
+    getAllUsers: builder.query<User[], void>({
+      query: () => ({
+        url: `/user/all`,
+      }),
+    }),
+    getUserDetails: builder.query<UserDetailsType, string>({
+      query: id => ({
+        url: `/user/${id}`,
       }),
     }),
   }),
@@ -46,4 +57,4 @@ const userSlice = createSlice({
 
 export const { setUser, clearUser } = userSlice.actions
 export const userReducer = userSlice.reducer
-export const { useTryLoginMutation } = userApi
+export const { useTryLoginMutation, useGetAllUsersQuery, useGetUserDetailsQuery } = userApi
