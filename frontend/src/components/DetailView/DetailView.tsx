@@ -27,6 +27,7 @@ export const DetailView = <T extends object>({
   validator: (editData: EditDataType<T>, field: keyof EditDataType<T>) => ValidationObject
 }) => {
   const [searchParams, setSearchParams] = useSearchParams()
+
   const getUrl = () => {
     const tabFromUrl = searchParams.get('tab')
     if (typeof tabFromUrl !== 'string' || isNaN(parseInt(tabFromUrl))) return 0

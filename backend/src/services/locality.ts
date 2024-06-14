@@ -2,10 +2,11 @@ import { logDb, nowDb, pool } from '../utils/db'
 import { EditDataType, LocalityDetailsType } from '../../../frontend/src/backendTypes'
 import Prisma from '../../prisma/generated/now_test_client'
 import { validateLocality } from '../../../frontend/src/validators/locality'
-import { detailedDiff } from 'deep-object-diff'
+import { diff } from 'deep-object-diff'
 import { filterFields } from './writeUtils'
 import { ValidationObject } from '../../../frontend/src/validators/validator'
 import { logger } from '../utils/logger'
+import { fixBigInt } from '../utils/common'
 
 export const getAllLocalities = async (onlyPublic: boolean) => {
   const where = onlyPublic ? { loc_status: false } : {}
@@ -79,17 +80,18 @@ export const getLocalityDetails = async (id: number) => {
   }))
   if (!result) return null
   const { now_ls, now_mus, now_plr, ...locality } = result
-  return {
+  const localityDetails = {
     ...locality,
     museums: now_mus.map(museum => museum.com_mlist),
     projects: now_plr.map(project => project.now_proj),
     species: now_ls.map(species => species.com_species),
   }
+  return JSON.parse(fixBigInt(localityDetails)!) as LocalityDetailsType
 }
 
 export const fixEditedLocality = (editedLocality: EditDataType<LocalityDetailsType>) => {
   if (editedLocality.now_lau) {
-    editedLocality.now_lau = editedLocality.now_lau.map(lau => ({ ...lau, lau_date: new Date(lau.lau_date as Date) }))
+    //editedLocality.now_lau = editedLocality.now_lau.map(lau => ({ ...lau, lau_date: new Date(lau.lau_date as Date) }))
   }
   return editedLocality
 }
@@ -107,9 +109,10 @@ export const validateEntireLocality = (editedFields: EditDataType<Prisma.now_loc
 export const processLocalityForEdit = async (editedLocality: EditDataType<LocalityDetailsType>) => {
   const fixedEditedLocality = fixEditedLocality(editedLocality)
   const oldLocality = await getLocalityDetails(fixedEditedLocality.lid!)
-  const difference = detailedDiff(oldLocality!, fixedEditedLocality)
+  const difference = diff(oldLocality!, fixedEditedLocality)
+
   const { filteredFields, filteredObject } = filterFields(
-    difference.updated as EditDataType<LocalityDetailsType>,
+    difference as EditDataType<LocalityDetailsType>,
     nowDb.now_loc.fields as unknown as Record<string, unknown>
   )
   const validationErrors = validateEntireLocality(filteredObject)
@@ -132,7 +135,7 @@ export const writeLocality = async (lid: number, filteredFields: Array<[string, 
 
     const columns = filteredFields.map(([field]) => `${field} = ?`).join(', ')
     const values = filteredFields.map(([, value]) => value)
-
+    if (values.length === 0) throw new Error('No changes found')
     const oldLocalityResults = await conn.query<Prisma.now_loc[]>(
       `SELECT * FROM ${dbName}.${tableName} WHERE lid = ?`,
       [lid]
@@ -146,6 +149,14 @@ export const writeLocality = async (lid: number, filteredFields: Array<[string, 
       ...values,
       lid,
     ])
+    // eslint-disable-next-line no-constant-condition
+    if (1 + 1 === 2) throw Error('DB-writing disabled for now')
+    const lauResult = await conn.query<Prisma.now_lau>(
+      `INSERT INTO ${dbName}.now_lau (lau_coordinator, lau_authorizer, lid) VALUES (?, ?, ?) RETURNING now_lau.luid`,
+      ['AK', 'AB', 10010]
+    )
+
+    const luid = lauResult.luid
 
     const updateRows = filteredFields.map(([field, value]) => ({
       event_time: new Date(),
@@ -157,7 +168,7 @@ export const writeLocality = async (lid: number, filteredFields: Array<[string, 
       log_action: 3, // 1 = delete, 2 = create, 3 = update
       old_data: oldLocality[field as keyof Prisma.now_loc],
       new_data: value as never,
-      luid: lid, //TODO WRONG: this should be the id for the luid (Locality update) that we created for this update
+      luid,
     }))
 
     logger.info(`Writing ${updateRows.length} rows into log-table...`)
