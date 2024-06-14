@@ -6,10 +6,11 @@ export const EcometricsTab = () => {
   const { textField } = useDetailContext<LocalityDetailsType>()
 
   const ecometrics = [
-    ['Estimate of annual precipitation (mm)', textField('estimate_precip')],
-    ['Estimate of mean annual temperature (°C)', textField('estimate_temp')],
-    ['Estimate of net primary productivity (g/m2/yr)', textField('estimate_npp')],
-    ['Woody cover percentage', textField('pers_woody_cover')],
+    ['Mean hypsodonty', 'Not yet implemented'],
+    ['Estimate of annual precipitation (mm)', textField('estimate_precip', 'number')],
+    ['Estimate of mean annual temperature (°C)', textField('estimate_temp', 'number')],
+    ['Estimate of net primary productivity (g/m2/yr)', textField('estimate_npp', 'number')],
+    ['Woody cover percentage', textField('pers_woody_cover', 'number')],
   ]
 
   return (

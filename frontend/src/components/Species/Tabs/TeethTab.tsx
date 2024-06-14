@@ -7,35 +7,48 @@ export const TeethTab = () => {
 
   const toothShapeMulticuspidOptions = [
     { value: '', display: 'None' },
-    'bil',
-    'bll',
-    'blm',
-    'bun',
-    'bus',
-    'col',
-    'csc',
-    'cso',
-    'csp',
-    'cyl',
-    'dil',
-    'ect',
-    'edt',
-    'lam',
-    'lss',
-    'md1',
-    'mdp',
-    'plo',
-    'qtb',
-    'sel',
-    'tri',
-    'zal',
+    { value: 'bil', display: 'Bilophodont' },
+    { value: 'bll', display: 'Bucco-Lingual Single Row Of Cusps' },
+    { value: 'blm', display: 'Buno-Lamellar' },
+    { value: 'bun', display: 'Bunodont' },
+    { value: 'bus', display: 'Bunoselenodont' },
+    { value: 'col', display: 'Columnar' },
+    { value: 'csc', display: 'Carnassial Shear + Crushing Postcanines' },
+    { value: 'cso', display: 'Carnassial Shear W/ Other Postcanine Functions' },
+    { value: 'csp', display: 'Carnassial Shear Primary' },
+    { value: 'cyl', display: 'Cylindrical' },
+    { value: 'dil', display: 'Dilambdodont' },
+    { value: 'ect', display: 'Ectolophodont (Ectoloph Dominant Edge)' },
+    { value: 'edt', display: 'Edentulous' },
+    { value: 'lam', display: 'Lamellar' },
+    { value: 'lss', display: 'Leaf-Shaped, Serrated' },
+    { value: 'md1', display: 'Mesio-Distal Single Row Of Cusps' },
+    { value: 'mdp', display: 'Mesio-Distal Multiple Rows Of Cusps' },
+    { value: 'plo', display: 'Plagiolophodont (Flat Trilophodonts)' },
+    { value: 'qtb', display: 'Quadritubercular' },
+    { value: 'sel', display: 'Selenodont (General)' },
+    { value: 'tri', display: 'Simple Tritubercular' },
+    { value: 'zal', display: 'Zalambdodont' },
   ]
 
-  const hypsodontyOptions = ['', 'bra', 'mes', 'hyp', 'hys', 'trp', 'tpl']
+  const hypsodontyOptions = [
+    '',
+    { display: 'Brachydont', value: 'bra' },
+    { display: 'Mesodont', value: 'mes' },
+    { display: 'Hypsodont', value: 'hyp' },
+    { display: 'Hypselodont', value: 'hys' },
+    { display: 'Tooth replacement', value: 'trp' },
+    { display: 'Tooth plates', value: 'tpl' },
+  ]
 
-  const horizodontyOptions = ['', 'bra', 'mes', 'hyp']
+  const horizodontyOptions = [
+    '',
+    { display: 'Brachyhorizodont', value: 'bra' },
+    { display: 'Mesohorizodont', value: 'mes' },
+    { display: 'Hypsohorizodont', value: 'hyp' },
+  ]
 
-  const symphysealMobilityOptions = ['', 'y', 'n']
+  const symphysealMobilityOptions = ['', { display: 'No', value: 'n' }, { display: 'Yes', value: 'y' }]
 
   const cuspShapeOptions = ['', 'R', 'S', 'L']
 
@@ -57,19 +70,31 @@ export const TeethTab = () => {
 
   const coronalCementumOptions = ['', '0', '1']
 
-  const mesowearOptions = ['', 'bil', 'mix', 'att', 'unw']
+  const mesowearOptions = [
+    '',
+    { display: 'Abrasion-dominated', value: 'bil' },
+    { display: 'Mixed-dominated', value: 'mix' },
+    { display: 'Attrition-dominated', value: 'att' },
+    { display: 'Unworn', value: 'unw' },
+  ]
 
-  const microwearOptions = ['', 'pit_dom', 'pit_str', 'str_dom']
+  const microwearOptions = [
+    '',
+    { display: 'Pits predominant', value: 'pit_dom' },
+    { display: 'Pits and striae appear equally dominant', value: 'pit_str' },
+    { display: 'Striations predominant', value: 'str_dom' },
+  ]
 
   const multicuspid = [
     ['Tooth Shape - Multicuspid', dropdown('tshm', toothShapeMulticuspidOptions, 'Tooth Shape - Multicuspid')],
     ['Hypsodonty', dropdown('crowntype', hypsodontyOptions, 'Hypsodonty')],
     ['Horizodonty', dropdown('horizodonty', horizodontyOptions, 'Horizodonty')],
     ['Symphyseal Mobility', dropdown('symph_mob', symphysealMobilityOptions, 'Symphyseal Mobility')],
-    ['Relative Blade Length of Lower Carnassial', textField('relative_blade_length')],
+    ['Relative Blade Length of Lower Carnassial', textField('relative_blade_length', 'number')],
   ]
 
   const developmental = [
+    ['Developmental Crown Type', 'Not implemented'],
     ['Cusp shape', dropdown('cusp_shape', cuspShapeOptions, 'Cusp shape')],
     ['Buccal cusp count', dropdown('cusp_count_buccal', buccalCuspCountOptions, 'Buccal cusp count')],
     ['Lingual cusp count', dropdown('cusp_count_lingual', lingualCuspCountOptions, 'Lingual cusp count')],
@@ -78,6 +103,7 @@ export const TeethTab = () => {
   ]
 
   const functional = [
+    ['Functional Crown Type', 'Not implemented'],
     ['Presence of acute lophs (AL)', dropdown('fct_al', acuteLophsOptions, 'Presence of acute lophs (AL)')],
     [
       'Presence of obtuse or basin-like lophs (OL)',
@@ -94,15 +120,15 @@ export const TeethTab = () => {
   const mesowear = [
     ['Mesowear'],
     ['Type', dropdown('mesowear', mesowearOptions, 'Type')],
-    ['Cusp Relief Low (OR%)', textField('mw_or_low')],
-    ['Cusp Relief High (OR%)', textField('mw_or_high')],
-    ['Cusp Shape Sharp (CS%)', textField('mw_cs_sharp')],
-    ['Cusp Shape Rounded (CS%)', textField('mw_cs_round')],
-    ['Cusp Shape Blunt (CS%)', textField('mw_cs_blunt')],
-    ['Scale Minimum', textField('mw_scale_min')],
-    ['Scale Maximum', textField('mw_scale_max')],
-    ['Reported Value', textField('mw_value')],
-    ['Normalized score'],
+    ['Cusp Relief Low (OR%)', textField('mw_or_low', 'number')],
+    ['Cusp Relief High (OR%)', textField('mw_or_high', 'number')],
+    ['Cusp Shape Sharp (CS%)', textField('mw_cs_sharp', 'number')],
+    ['Cusp Shape Rounded (CS%)', textField('mw_cs_round', 'number')],
+    ['Cusp Shape Blunt (CS%)', textField('mw_cs_blunt', 'number')],
+    ['Scale Minimum', textField('mw_scale_min', 'number')],
+    ['Scale Maximum', textField('mw_scale_max', 'number')],
+    ['Reported Value', textField('mw_value', 'number')],
+    ['Normalized score', 'Not implemented'],
     ['Microwear'],
     ['Type', dropdown('microwear', microwearOptions, 'Type')],
   ]

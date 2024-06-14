@@ -30,6 +30,7 @@ export type SpeciesLocality = Prisma.now_ls & { now_loc: Prisma.now_loc }
 export type LocalityUpdate = Prisma.now_lau & { now_lr: LocalityReference[] } & { updates: UpdateLog[] }
 export type SpeciesUpdate = Prisma.now_sau & { now_sr: Prisma.now_sr }
 export type Museum = Prisma.com_mlist
+export type PersonDetailsType = Prisma.com_people
 export type ProjectPeople = Prisma.now_proj_people
 export type ProjectDetailsType = Prisma.now_proj & { now_proj_people: Array<ProjectPeople> }
 export type Project = Prisma.now_proj
@@ -142,10 +143,12 @@ export type TimeBoundUpdate = Prisma.now_bau & { now_br: Prisma.now_br }
 export type TimeUnitSequence = Prisma.now_tu_sequence
 
 export type TimeUnitUpdate = Prisma.now_time_update & { now_tr: Prisma.now_tr }
-export type TimeUnitDetailsType = EditDataType<
-  Prisma.now_time_unit & { now_tu_sequence: Array<SequenceDetailsType> }
-> & { now_tau: Array<TimeUnitUpdate> }
+export type TimeUnitDetailsType = Prisma.now_time_unit & { now_tu_sequence: Array<SequenceDetailsType> } & {
+  now_tau: Array<TimeUnitUpdate>
+}
 
 export type ReferenceType = Prisma.ref_ref_type & { ref_field_name: Prisma.ref_field_name[] }
 
 export type ReferenceField = Prisma.ref_field_name
+export type User = Prisma.com_users
+export type UserDetailsType = Prisma.com_users

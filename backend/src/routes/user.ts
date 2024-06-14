@@ -4,6 +4,7 @@ import * as jwt from 'jsonwebtoken'
 import { SECRET, LOGIN_VALID_MS, USER_CREATION_SECRET } from '../utils/config'
 import * as bcrypt from 'bcrypt'
 import { nowDb } from '../utils/db'
+import { getAllUsers, getUserDetails } from '../services/user'
 
 const router = Router()
 
@@ -25,6 +26,17 @@ router.post('/login', async (req, res) => {
   })
 
   return res.status(200).send({ token, username: result.user_name })
+})
+
+router.get('/all', async (_req, res) => {
+  const users = await getAllUsers()
+  return res.status(200).send(users)
+})
+
+router.get('/:id', async (req, res) => {
+  const id = parseInt(req.params.id)
+  const user = await getUserDetails(id)
+  res.status(200).send(user)
 })
 
 router.post('/create', async (req, res) => {

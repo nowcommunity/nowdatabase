@@ -6,6 +6,7 @@ import museumRouter from './routes/museum'
 import referenceRouter from './routes/reference'
 import sedimentaryStructureRouter from './routes/sedimentaryStructure'
 import regionRouter from './routes/region'
+import personRouter from './routes/person'
 import projectRouter from './routes/project'
 import speciesRouter from './routes/species'
 import timeBoundRouter from './routes/timeBound'
@@ -35,6 +36,7 @@ if (BACKEND_MODE !== 'dev') app.use(requireLogin)
 app.use('/locality', localityRouter)
 app.use('/reference', referenceRouter)
 app.use('/region', regionRouter)
+app.use('/person', personRouter)
 app.use('/project', projectRouter)
 app.use('/species', speciesRouter)
 app.use('/time-bound', timeBoundRouter)

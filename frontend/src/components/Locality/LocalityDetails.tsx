@@ -53,12 +53,12 @@ export const LocalityDetails = () => {
       content: <ClimateTab />,
     },
     {
-      title: 'Archaeology',
-      content: <ArchaeologyTab />,
-    },
-    {
       title: 'Ecometrics',
       content: <EcometricsTab />,
+    },
+    {
+      title: 'Archaeology',
+      content: <ArchaeologyTab />,
     },
     {
       title: 'Museum',
