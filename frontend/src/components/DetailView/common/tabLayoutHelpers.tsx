@@ -94,14 +94,22 @@ export const DataValue = <T extends object>({
   field,
   EditElement,
   displayValue,
+  round,
 }: {
   field: keyof EditDataType<T>
   EditElement: ReactNode
   displayValue?: ReactNode | null
+  round?: number
 }) => {
   const { data, mode } = useDetailContext<T>()
   if (!mode.read) {
     return EditElement
   }
-  return displayValue ?? data[field as keyof T]
+  const getValue = (value: ReactNode) => {
+    if (round === undefined || typeof value !== 'number') {
+      return value
+    }
+    return parseFloat((Math.floor(value * 100) / 100).toFixed(round))
+  }
+  return getValue(displayValue ?? (data[field as keyof T] as ReactNode))
 }
