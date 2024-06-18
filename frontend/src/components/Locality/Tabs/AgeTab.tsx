@@ -1,5 +1,6 @@
 import { LocalityDetailsType, TimeUnitDetailsType } from '@/backendTypes'
 import { FieldWithTableSelection } from '@/components/DetailView/common/editingComponents'
+import { emptyOption } from '@/components/DetailView/common/misc'
 import { ArrayFrame, HalfFrames } from '@/components/DetailView/common/tabLayoutHelpers'
 import { useDetailContext } from '@/components/DetailView/Context/DetailContext'
 import { TimeUnitTable } from '@/components/TimeUnit/TimeUnitTable'
@@ -7,7 +8,7 @@ import { TimeUnitTable } from '@/components/TimeUnit/TimeUnitTable'
 export const AgeTab = () => {
   const { textField, radioSelection, dropdown, bigTextField, editData } = useDetailContext<LocalityDetailsType>()
   const fracOptions = [
-    { value: '', display: 'None' },
+    emptyOption,
     'Early half 1:2',
     'Late half 2:2',
     'Early third 1:3',

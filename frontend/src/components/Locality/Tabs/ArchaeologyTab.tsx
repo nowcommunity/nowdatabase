@@ -1,4 +1,5 @@
 import { LocalityDetailsType } from '@/backendTypes'
+import { emptyOption } from '@/components/DetailView/common/misc'
 import { ArrayFrame } from '@/components/DetailView/common/tabLayoutHelpers'
 import { useDetailContext } from '@/components/DetailView/Context/DetailContext'
 
@@ -6,7 +7,7 @@ export const ArchaeologyTab = () => {
   const { dropdown, radioSelection } = useDetailContext<LocalityDetailsType>()
 
   const technologicalModeOptions = [
-    '',
+    emptyOption,
     { display: '1', value: '1' },
     { display: '2', value: '2' },
     { display: '3', value: '3' },
@@ -15,7 +16,7 @@ export const ArchaeologyTab = () => {
   ]
 
   const culturalStageOptions = [
-    '',
+    emptyOption,
     { display: 'Early Stone Age', value: 'early_stone_age' },
     { display: 'Middle Stone Age', value: 'middle_stone_age' },
     { display: 'Late Stone Age', value: 'late_stone_age' },
@@ -26,7 +27,7 @@ export const ArchaeologyTab = () => {
   ]
 
   const regionalCultureOptions = [
-    '',
+    emptyOption,
     { display: 'Acheulean', value: 'acheulean' },
     { display: 'Aterian', value: 'aterian' },
     { display: 'Aurignac', value: 'aurignac' },

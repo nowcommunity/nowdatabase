@@ -1,4 +1,5 @@
 import { SpeciesDetailsType } from '@/backendTypes'
+import { emptyOption } from '@/components/DetailView/common/misc'
 import { ArrayFrame, HalfFrames } from '@/components/DetailView/common/tabLayoutHelpers'
 import { useDetailContext } from '@/components/DetailView/Context/DetailContext'
 
@@ -48,30 +49,30 @@ export const TeethTab = () => {
     { display: 'Hypsohorizodont', value: 'hyp' },
   ]
 
-  const symphysealMobilityOptions = ['', { display: 'No', value: 'n' }, { display: 'Yes', value: 'y' }]
+  const symphysealMobilityOptions = [emptyOption, { display: 'No', value: 'n' }, { display: 'Yes', value: 'y' }]
 
-  const cuspShapeOptions = ['', 'R', 'S', 'L']
+  const cuspShapeOptions = [emptyOption, 'R', 'S', 'L']
 
-  const buccalCuspCountOptions = ['', '0', '1', '2', '3', 'M']
+  const buccalCuspCountOptions = [emptyOption, '0', '1', '2', '3', 'M']
 
-  const lingualCuspCountOptions = ['', '0', '1', '2', '3', 'M']
+  const lingualCuspCountOptions = [emptyOption, '0', '1', '2', '3', 'M']
 
-  const longitudinalLophCountOptions = ['', '0', '1', '2', '3', 'M']
+  const longitudinalLophCountOptions = [emptyOption, '0', '1', '2', '3', 'M']
 
-  const transverseLophCountOptions = ['', '0', '1', '2', '3', 'M']
+  const transverseLophCountOptions = [emptyOption, '0', '1', '2', '3', 'M']
 
-  const acuteLophsOptions = ['', '0', '1']
+  const acuteLophsOptions = [emptyOption, '0', '1']
 
-  const obtuseLophsOptions = ['', '0', '1']
+  const obtuseLophsOptions = [emptyOption, '0', '1']
 
-  const structuralFortificationOptions = ['', '0', '1']
+  const structuralFortificationOptions = [emptyOption, '0', '1']
 
-  const occlusalTopographyOptions = ['', '0', '1']
+  const occlusalTopographyOptions = [emptyOption, '0', '1']
 
-  const coronalCementumOptions = ['', '0', '1']
+  const coronalCementumOptions = [emptyOption, '0', '1']
 
   const mesowearOptions = [
-    '',
+    emptyOption,
     { display: 'Abrasion-dominated', value: 'bil' },
     { display: 'Mixed-dominated', value: 'mix' },
     { display: 'Attrition-dominated', value: 'att' },
@@ -79,7 +80,7 @@ export const TeethTab = () => {
   ]
 
   const microwearOptions = [
-    '',
+    emptyOption,
     { display: 'Pits predominant', value: 'pit_dom' },
     { display: 'Pits and striae appear equally dominant', value: 'pit_str' },
     { display: 'Striations predominant', value: 'str_dom' },

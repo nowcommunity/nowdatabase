@@ -6,6 +6,7 @@ import { MRT_ColumnDef } from 'material-react-table'
 import { useForm } from 'react-hook-form'
 import { EditableTable } from '@/components/DetailView/common/EditableTable'
 import { EditingModal } from '@/components/DetailView/common/EditingModal'
+import { emptyOption } from '@/components/DetailView/common/misc'
 
 export const LocalityTab = () => {
   const { textField, radioSelection, dropdown, mode, bigTextField } = useDetailContext<LocalityDetailsType>()
@@ -14,7 +15,7 @@ export const LocalityTab = () => {
     { display: 'No', value: 'false' },
     { display: 'Yes', value: 'true' },
   ]
-  const generalLocalityOptions = ['', { display: 'No', value: 'n' }, { display: 'Yes', value: 'y' }]
+  const generalLocalityOptions = [emptyOption, { display: 'No', value: 'n' }, { display: 'Yes', value: 'y' }]
 
   const siteAreaOptions = [
     '',

@@ -1,4 +1,5 @@
 import { LocalityDetailsType } from '@/backendTypes'
+import { emptyOption } from '@/components/DetailView/common/misc'
 import { ArrayFrame, HalfFrames } from '@/components/DetailView/common/tabLayoutHelpers'
 import { useDetailContext } from '@/components/DetailView/Context/DetailContext'
 
@@ -6,7 +7,7 @@ export const ClimateTab = () => {
   const { textField, dropdown, bigTextField } = useDetailContext<LocalityDetailsType>()
 
   const climateTypeOptions = [
-    '',
+    emptyOption,
     { display: 'Cold temperate', value: 'cold_temperate' },
     { display: 'Paratropical', value: 'paratropical' },
     { display: 'Subtropical', value: 'subtropical' },
@@ -15,21 +16,21 @@ export const ClimateTab = () => {
   ]
 
   const temperatureOptions = [
-    '',
+    emptyOption,
     { display: 'Cold', value: 'cold' },
     { display: 'Hot', value: 'hot' },
     { display: 'Moderate', value: 'mod' },
   ]
 
   const moistureOptions = [
-    '',
+    emptyOption,
     { display: 'Dry', value: 'dry' },
     { display: 'Intermediate', value: 'int' },
     { display: 'Wet', value: 'wet' },
   ]
 
   const agentOfDisturbanceOptions = [
-    '',
+    emptyOption,
     { display: 'Fire', value: 'fire' },
     { display: 'Fire-Wind', value: 'fire-wind' },
     { display: 'Water', value: 'water' },
@@ -40,7 +41,7 @@ export const ClimateTab = () => {
   ]
 
   const seasonalityOptions = [
-    '',
+    emptyOption,
     { display: 'Light', value: 'light' },
     { display: 'Light-Temperature', value: 'light-temp' },
     { display: 'None', value: 'none' },
@@ -51,7 +52,7 @@ export const ClimateTab = () => {
   ]
 
   const biomeOptions = [
-    '',
+    emptyOption,
     { display: 'Broad-leaved evergreen forest', value: 'bl_evergreen_f' },
     { display: '"Mediterranean" sclerophyll vegetation', value: 'chaparral' },
     { display: 'Coniferous forest - including boreal and subalpine', value: 'coniferous_f' },
@@ -65,30 +66,34 @@ export const ClimateTab = () => {
   ]
 
   const vegetationHeightOptions = [
-    '',
+    emptyOption,
     { display: 'Less than 2 m', value: '<2m' },
     { display: '2-5 m', value: '2-5m' },
     { display: 'Greater 5m', value: '>5m' },
   ]
 
   const vegetationStructureOptions = [
-    '',
+    emptyOption,
     { display: 'Closed', value: 'closed' },
     { display: 'Open', value: 'open' },
     { display: 'Semi-open', value: 'semi-open' },
   ]
 
   const primaryProductivityLevelOptions = [
-    '',
+    emptyOption,
     { display: 'High', value: 'high' },
     { display: 'Low', value: 'low' },
     { display: 'Medium', value: 'med' },
   ]
 
-  const nutrientAvailabilityOptions = ['', { display: 'Low', value: 'low' }, { display: 'Not low', value: 'not_low' }]
+  const nutrientAvailabilityOptions = [
+    emptyOption,
+    { display: 'Low', value: 'low' },
+    { display: 'Not low', value: 'not_low' },
+  ]
 
   const waterAvailabilityOptions = [
-    '',
+    emptyOption,
     { display: 'Mesic', value: 'mesic' },
     { display: 'Seasonal', value: 'seasonal' },
     { display: 'Wet', value: 'wet' },

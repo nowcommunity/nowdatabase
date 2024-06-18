@@ -22,7 +22,7 @@ import { EditDataType } from '@/backendTypes'
 const fieldWidth = '14em'
 
 export type DropdownOptionValue = string | number
-export type DropdownOption = { value: DropdownOptionValue; display: string }
+export type DropdownOption = { value: DropdownOptionValue; display: string; optionDisplay?: string }
 
 const setDropdownOptionValue = (
   setValue: (val: string | number | boolean) => void,
@@ -69,7 +69,7 @@ export const DropdownSelector = <T extends object>({
       >
         {options.map(item => (
           <MenuItem key={getValue(item)} value={getValue(item)} style={{ height: '2em' }}>
-            {getDisplay(item)}
+            {getDisplay(item, true)}
           </MenuItem>
         ))}
       </Select>
@@ -105,7 +105,11 @@ export const FormTextField = <T extends string>({
 }
 
 const getValue = (item: DropdownOption | DropdownOptionValue) => (typeof item !== 'object' ? item : item.value)
-const getDisplay = (item: DropdownOption | DropdownOptionValue) => (typeof item !== 'object' ? item : item.display)
+const getDisplay = (item: DropdownOption | DropdownOptionValue, inMenu?: boolean) => {
+  if (typeof item === 'string' || typeof item === 'number') return item
+  if (inMenu && item.optionDisplay) return item.optionDisplay
+  return item.display
+}
 
 /*
   Supports string and number values, and booleans as strings. This means that
@@ -143,7 +147,7 @@ export const RadioSelector = <T extends object>({
             key={getValue(option)}
             value={getValue(option)}
             control={<Radio />}
-            label={getDisplay(option)}
+            label={getDisplay(option, true)}
           />
         ))}
       </RadioGroup>

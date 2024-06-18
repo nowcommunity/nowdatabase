@@ -11,3 +11,9 @@ export const modalStyle = {
   boxShadow: 24,
   p: 4,
 }
+
+export const emptyOption = {
+  optionDisplay: 'No value',
+  display: '',
+  value: '',
+}

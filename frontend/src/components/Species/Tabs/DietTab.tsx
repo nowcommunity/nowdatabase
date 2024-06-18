@@ -1,4 +1,5 @@
 import { SpeciesDetailsType } from '@/backendTypes'
+import { emptyOption } from '@/components/DetailView/common/misc'
 import { ArrayFrame } from '@/components/DetailView/common/tabLayoutHelpers'
 import { useDetailContext } from '@/components/DetailView/Context/DetailContext'
 
@@ -6,14 +7,14 @@ export const DietTab = () => {
   const { dropdown } = useDetailContext<SpeciesDetailsType>()
 
   const diet1Options = [
-    '',
+    emptyOption,
     { display: 'Animal', value: 'a' },
     { display: 'Plant', value: 'p' },
     { display: 'Omnivore', value: 'o' },
   ]
 
   const diet2Options = [
-    '',
+    emptyOption,
     { display: 'Carnivore', value: 'carnivore' },
     { display: 'Herbivore', value: 'herbivore' },
     { display: 'Invertivore', value: 'invert' },
@@ -22,7 +23,7 @@ export const DietTab = () => {
   ]
 
   const diet3Options = [
-    '',
+    emptyOption,
     { display: 'Fresh-grass grazers', value: 'fr_grass' },
     { display: 'Grazer (>90% grass)', value: 'graze' },
     { display: 'Mixed browser/grazer', value: 'br_gr' },
@@ -52,27 +53,27 @@ export const DietTab = () => {
   ]
 
   const relativeFibreContentOptions = [
-    '',
+    emptyOption,
     { display: 'High level of fibre', value: 'h' },
     { display: 'Medium level of fibre', value: 'm' },
     { display: 'Low level of fibre', value: 'l' },
   ]
 
   const selectivityOptions = [
-    '',
+    emptyOption,
     { display: 'Feeds selectively', value: 's' },
     { display: 'Feeds unselectively', value: 'u' },
   ]
 
   const digestionOptions = [
-    '',
+    emptyOption,
     { display: 'Hindgut fermenter', value: 'hg' },
     { display: 'Foregut fermenter', value: 'fg' },
     { display: 'True ruminant', value: 'ru' },
   ]
 
   const huntForageOptions = [
-    '',
+    emptyOption,
     { display: 'Ambush', value: 'ambush' },
     { display: 'Dig', value: 'dig' },
     { display: 'Pounce/Pursuit', value: 'pounce/p' },

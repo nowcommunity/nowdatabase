@@ -1,5 +1,6 @@
 import { Editable, LocalityDetailsType, SedimentaryStructure, SedimentaryStructureValues } from '@/backendTypes'
 import { EditableTable } from '@/components/DetailView/common/EditableTable'
+import { emptyOption } from '@/components/DetailView/common/misc'
 import { SelectingTable } from '@/components/DetailView/common/SelectingTable'
 import { ArrayFrame, HalfFrames, Grouped } from '@/components/DetailView/common/tabLayoutHelpers'
 import { useDetailContext } from '@/components/DetailView/Context/DetailContext'
@@ -11,7 +12,7 @@ export const LithologyTab = () => {
   const { data: sedimentaryStructuresData } = useGetAllSedimentaryStructuresQuery()
 
   const rockTypeOptions = [
-    '',
+    emptyOption,
     'chert',
     'claystone',
     'coal',
@@ -27,7 +28,7 @@ export const LithologyTab = () => {
   ]
 
   const generalOptions = [
-    '',
+    emptyOption,
     'coastal',
     'deltaic',
     'eolian',
@@ -45,7 +46,7 @@ export const LithologyTab = () => {
   ]
 
   const specificOptions = [
-    '',
+    emptyOption,
     'ab_chan_fill',
     'alluvial_fan',
     'beach',
@@ -78,7 +79,7 @@ export const LithologyTab = () => {
   ]
 
   const circumstanceOptions = [
-    '',
+    emptyOption,
     'airfall',
     'amber',
     'burrow',
@@ -94,7 +95,7 @@ export const LithologyTab = () => {
   ]
 
   const depoContext1Options = [
-    '',
+    emptyOption,
     { display: 'FC: Floodplain Channel', value: 'FC' },
     { display: 'FP: Floodplain', value: 'FP' },
     { display: 'FL: Float', value: 'FL' },
@@ -105,7 +106,7 @@ export const LithologyTab = () => {
   ]
 
   const depoContext2Options = [
-    '',
+    emptyOption,
     { display: 'FC-C: Complex Fill', value: 'FC-C' },
     { display: 'FC-S: Simple Fill', value: 'FC-S' },
     { display: 'FP-C: Continuous', value: 'FP-C' },
@@ -117,7 +118,7 @@ export const LithologyTab = () => {
   ]
 
   const depoContext3Options = [
-    '',
+    emptyOption,
     { display: 'FC-C1: Basal Lag and Bar', value: 'FC-C1' },
     { display: 'FC-C2: Cross-cutting Lenses', value: 'FC-C2' },
     { display: 'FC-S1: Basal Lag and Bar', value: 'FC-S1' },
@@ -130,7 +131,7 @@ export const LithologyTab = () => {
   ]
 
   const depoContext4Options = [
-    '',
+    emptyOption,
     { display: 'MC-U2a: Coarse-grained', value: 'MC-U2a' },
     { display: 'MC-U2b: Fine-grained', value: 'MC-U2b' },
     { display: 'MC-U3a: Coarse-grained', value: 'MC-U3a' },
