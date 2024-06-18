@@ -33,7 +33,7 @@ export const ProjectTab = () => {
       header: 'Status',
     },
     {
-      accessorKey: 'proj_records',
+      accessorFn: ({ proj_records }) => (proj_records ? 'Public' : 'Private'),
       header: 'Records',
     },
   ]
