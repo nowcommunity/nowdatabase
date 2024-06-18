@@ -12,9 +12,9 @@ import { MuseumTab } from './Tabs/MuseumTab'
 import { ProjectTab } from './Tabs/ProjectTab'
 import { SpeciesTab } from './Tabs/SpeciesTab'
 import { TaphonomyTab } from './Tabs/TaphonomyTab'
-import { UpdateTab } from './Tabs/UpdateTab'
 import { EditDataType, LocalityDetailsType } from '@/backendTypes'
 import { validateLocality } from '@/validators/locality'
+import { UpdateTab } from '../DetailView/common/UpdateTab'
 
 export const LocalityDetails = () => {
   const { id } = useParams()
@@ -70,7 +70,7 @@ export const LocalityDetails = () => {
     },
     {
       title: 'Updates',
-      content: <UpdateTab />,
+      content: <UpdateTab refFieldName="now_lr" updatesFieldName="now_lau" prefix="lau" />,
     },
   ]
 

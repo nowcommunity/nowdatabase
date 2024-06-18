@@ -1,4 +1,4 @@
-import { nowDb } from '../utils/db'
+import { logDb, nowDb } from '../utils/db'
 
 export const getAllSpecies = async (onlyPublic: boolean) => {
   const where = onlyPublic ? { sp_status: false } : {}
@@ -43,12 +43,31 @@ export const getSpeciesDetails = async (id: number) => {
       com_taxa_synonym: {},
       now_sau: {
         include: {
-          now_sr: true,
+          now_sr: {
+            include: {
+              ref_ref: {
+                include: {
+                  ref_authors: true,
+                  ref_journal: true,
+                },
+              },
+            },
+          },
         },
       },
     },
   })
 
   if (!result) return null
+
+  const suids = result.now_sau.map(sau => sau.suid)
+
+  const logResult = await logDb.log.findMany({ where: { suid: { in: suids } } })
+
+  result.now_sau = result.now_sau.map(sau => ({
+    ...sau,
+    updates: logResult.filter(logRow => logRow.suid === sau.suid),
+  }))
+
   return result
 }

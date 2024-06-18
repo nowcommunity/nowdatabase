@@ -1,4 +1,4 @@
-import { nowDb } from '../utils/db'
+import { logDb, nowDb } from '../utils/db'
 
 export const getAllTimeUnits = async () => {
   const result = await nowDb.now_time_unit.findMany({
@@ -42,11 +42,32 @@ export const getTimeUnitDetails = async (id: string) => {
       now_tu_bound_now_time_unit_up_bndTonow_tu_bound: {},
       now_tau: {
         include: {
-          now_tr: true,
+          now_tr: {
+            include: {
+              ref_ref: {
+                include: {
+                  ref_authors: true,
+                  ref_journal: true,
+                },
+              },
+            },
+          },
         },
       },
     },
   })
+
+  if (!result) return null
+
+  const tuids = result.now_tau.map(tau => tau.tuid)
+
+  const logResult = await logDb.log.findMany({ where: { suid: { in: tuids } } })
+
+  result.now_tau = result.now_tau.map(tau => ({
+    ...tau,
+    updates: logResult.filter(logRow => logRow.tuid === tau.tuid),
+  }))
+
   return result
 }
 

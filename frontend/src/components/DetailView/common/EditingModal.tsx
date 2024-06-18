@@ -13,10 +13,12 @@ export const EditingModal = ({
   buttonText,
   children,
   onSave,
+  dataCy,
 }: {
   buttonText: string
   children: ReactNode | ReactNode[]
   onSave?: () => Promise<boolean>
+  dataCy?: string
 }) => {
   const [open, setOpen] = useState(false)
   const closeWithSave = async () => {
@@ -28,7 +30,7 @@ export const EditingModal = ({
 
   return (
     <Box>
-      <Button onClick={() => setOpen(true)} variant="contained" sx={{ marginBottom: '1em' }}>
+      <Button data-cy={dataCy} onClick={() => setOpen(true)} variant="contained" sx={{ marginBottom: '1em' }}>
         {buttonText}
       </Button>
       <Modal open={open} aria-labelledby={`modal-${buttonText}`} aria-describedby={`modal-${buttonText}`}>

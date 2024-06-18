@@ -10,7 +10,7 @@ import { SizeTab } from './Tabs/SizeTab'
 import { SynonymTab } from './Tabs/SynonymTab'
 import { TaxonomyTab } from './Tabs/TaxonomyTab'
 import { TeethTab } from './Tabs/TeethTab'
-import { UpdateTab } from './Tabs/UpdateTab'
+import { UpdateTab } from '../DetailView/common/UpdateTab'
 
 export const SpeciesDetails = () => {
   const { id } = useParams()
@@ -54,7 +54,7 @@ export const SpeciesDetails = () => {
     },
     {
       title: 'Updates',
-      content: <UpdateTab />,
+      content: <UpdateTab refFieldName="now_sr" updatesFieldName="now_sau" prefix="sau" />,
     },
   ]
 

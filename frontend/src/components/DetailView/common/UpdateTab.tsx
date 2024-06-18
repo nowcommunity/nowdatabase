@@ -1,10 +1,10 @@
-import { LocalityDetailsType, LocalityReference, LocalityUpdate, ReferenceDetailsType, UpdateLog } from '@/backendTypes'
+import { ReferenceDetailsType, UpdateLog } from '@/backendTypes'
 import { useDetailContext } from '@/components/DetailView/Context/DetailContext'
 import { EditingModal } from '@/components/DetailView/common/EditingModal'
 import { SimpleTable } from '@/components/DetailView/common/SimpleTable'
 import { Grouped } from '@/components/DetailView/common/tabLayoutHelpers'
 import { Card, Stack } from '@mui/material'
-import { MRT_ColumnDef, MRT_Row } from 'material-react-table'
+import { MRT_ColumnDef, MRT_Row, MRT_RowData } from 'material-react-table'
 import { Link } from 'react-router-dom'
 
 const ReferenceList = ({ references, big }: { references: ReferenceDetailsType[]; big: boolean }) => {
@@ -29,51 +29,71 @@ const ReferenceList = ({ references, big }: { references: ReferenceDetailsType[]
   )
 }
 
-export const UpdateTab = () => {
-  const { data } = useDetailContext<LocalityDetailsType>()
+export const UpdateTab = <T, UpdateType extends MRT_RowData & { updates: UpdateLog[] }>({
+  prefix,
+  refFieldName,
+  updatesFieldName,
+}: {
+  prefix: string
+  refFieldName: keyof UpdateType
+  updatesFieldName: keyof T
+}) => {
+  const { data } = useDetailContext<T>()
 
   const formatDate = (date: Date | null) => {
     if (!date) return 'No date'
     return new Date(date).toISOString().split('T')[0]
   }
 
-  const columns: MRT_ColumnDef<LocalityUpdate>[] = [
+  const columns: MRT_ColumnDef<UpdateType>[] = [
     {
-      accessorKey: 'lau_date',
+      accessorKey: `${prefix}_date`,
       header: 'Date',
       Cell: ({ cell }) => formatDate(cell.getValue() as Date | null),
     },
     {
-      accessorKey: 'lau_authorizer',
+      accessorKey: `${prefix}_authorizer`,
       header: 'Editor',
     },
     {
-      accessorKey: 'lau_coordinator',
+      accessorKey: `${prefix}_coordinator`,
       header: 'Coordinator',
     },
     {
-      accessorKey: 'now_lr',
+      accessorKey: refFieldName as string,
       header: 'Reference',
-      Cell: ({ row }: { row: MRT_Row<LocalityUpdate> }) => (
-        <ReferenceList references={row.original.now_lr.map(lr => lr.ref_ref)} big={false} />
+      Cell: ({ row }: { row: MRT_Row<UpdateType> }) => (
+        <ReferenceList
+          references={(row.original[refFieldName] as { ref_ref: ReferenceDetailsType }[]).map(item => item.ref_ref)}
+          big={false}
+        />
       ),
     },
     {
       header: 'Details',
-      Cell: ({ row }: { row: MRT_Row<LocalityUpdate> }) => (
-        <DetailsModal updates={row.original.updates} references={row.original.now_lr} />
+      Cell: ({ row }: { row: MRT_Row<UpdateType> }) => (
+        <DetailsModal
+          updates={row.original.updates}
+          references={row.original[refFieldName] as { ref_ref: ReferenceDetailsType }[]}
+        />
       ),
     },
   ]
 
   return (
     <Grouped title="Updates">
-      <SimpleTable columns={columns} data={data.now_lau} />
+      <SimpleTable columns={columns} data={data[updatesFieldName] as UpdateType[]} />
     </Grouped>
   )
 }
 
-const DetailsModal = ({ updates, references }: { updates: UpdateLog[]; references: LocalityReference[] }) => {
+const DetailsModal = <RefType extends { ref_ref: ReferenceDetailsType }>({
+  updates,
+  references,
+}: {
+  updates: UpdateLog[]
+  references: RefType[]
+}) => {
   const columns: MRT_ColumnDef<UpdateLog>[] = [
     {
       header: 'Table',
@@ -98,7 +118,7 @@ const DetailsModal = ({ updates, references }: { updates: UpdateLog[]; reference
   ]
 
   return (
-    <EditingModal buttonText="Details">
+    <EditingModal buttonText="Details" dataCy="update-details-button">
       <ReferenceList references={references.map(ref => ref.ref_ref)} big />
       <SimpleTable columns={columns} data={updates} />
     </EditingModal>

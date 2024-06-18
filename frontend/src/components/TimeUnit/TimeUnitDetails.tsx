@@ -4,7 +4,7 @@ import { CircularProgress } from '@mui/material'
 import { DetailView, TabType } from '../DetailView/DetailView'
 import { LocalityTab } from './Tabs/LocalityTab'
 import { TimeUnitTab } from './Tabs/TimeUnitTab'
-import { UpdateTab } from './Tabs/UpdateTab'
+import { UpdateTab } from '../DetailView/common/UpdateTab'
 
 export const TimeUnitDetails = () => {
   const { id } = useParams()
@@ -24,7 +24,7 @@ export const TimeUnitDetails = () => {
     },
     {
       title: 'Updates',
-      content: <UpdateTab />,
+      content: <UpdateTab refFieldName="now_tr" updatesFieldName="now_tau" prefix="tau" />,
     },
   ]
 
