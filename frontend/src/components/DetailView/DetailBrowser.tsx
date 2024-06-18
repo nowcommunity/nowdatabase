@@ -54,13 +54,13 @@ export const DetailBrowser = <T extends object>() => {
       {idListExists && mode.read && (
         <div>
           {previousIndex >= 0 && (
-            <Button onClick={() => navigate(`/${viewName}/${idList[previousIndex]}`)}>
+            <Button onClick={() => navigate(`/${viewName}/${encodeURIComponent(idList[previousIndex])}`)}>
               <ArrowBackIcon />
             </Button>
           )}
           {`${currentIndex + 1} of ${idList.length}`}
           {nextIndex < idList.length && (
-            <Button onClick={() => navigate(`/${viewName}/${idList[nextIndex]}`)}>
+            <Button onClick={() => navigate(`/${viewName}/${encodeURIComponent(idList[nextIndex])}`)}>
               <ArrowForwardIcon />
             </Button>
           )}

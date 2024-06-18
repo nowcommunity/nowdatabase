@@ -8,7 +8,7 @@ import { UpdateTab } from '../DetailView/common/UpdateTab'
 
 export const TimeUnitDetails = () => {
   const { id } = useParams()
-  const { isLoading, isError, data } = useGetTimeUnitDetailsQuery(id!)
+  const { isLoading, isError, data } = useGetTimeUnitDetailsQuery(encodeURIComponent(id!))
 
   if (isError) return <div>Error loading data</div>
   if (isLoading || !data) return <CircularProgress />

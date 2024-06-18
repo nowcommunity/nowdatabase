@@ -8,7 +8,7 @@ import { UpdateTab } from '../DetailView/common/UpdateTab.tsx'
 
 export const TimeBoundDetails = () => {
   const { id } = useParams()
-  const { isLoading, isError, data } = useGetTimeBoundDetailsQuery(id!)
+  const { isLoading, isError, data } = useGetTimeBoundDetailsQuery(decodeURIComponent(id!))
 
   if (isError) return <div>Error loading data</div>
   if (isLoading || !data) return <CircularProgress />

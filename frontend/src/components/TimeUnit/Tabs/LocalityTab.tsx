@@ -6,7 +6,7 @@ import { SimpleTable } from '@/components/DetailView/common/SimpleTable'
 
 export const LocalityTab = () => {
   const { data } = useDetailContext<TimeUnitDetailsType>()
-  const { data: localitiesData, isError } = useGetTimeUnitLocalitiesQuery(data.tu_name)
+  const { data: localitiesData, isError } = useGetTimeUnitLocalitiesQuery(encodeURIComponent(data.tu_name))
 
   if (isError) return 'Error loading Localities.'
   if (!localitiesData) return <CircularProgress />
