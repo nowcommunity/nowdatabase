@@ -6,7 +6,7 @@ import { useDetailContext } from '@/components/DetailView/Context/DetailContext'
 
 export const TimeUnitTab = () => {
   const { data } = useDetailContext<TimeBoundDetailsType>()
-  const { data: timeUnitsData, isError } = useGetTimeBoundTimeUnitsQuery(data.bid!)
+  const { data: timeUnitsData, isError } = useGetTimeBoundTimeUnitsQuery(data.bid)
 
   if (isError) return 'Error loading Time Units.'
   if (!timeUnitsData) return <CircularProgress />
