@@ -90,7 +90,7 @@ export const TeethTab = () => {
     ['Hypsodonty', dropdown('crowntype', hypsodontyOptions, 'Hypsodonty')],
     ['Horizodonty', dropdown('horizodonty', horizodontyOptions, 'Horizodonty')],
     ['Symphyseal Mobility', dropdown('symph_mob', symphysealMobilityOptions, 'Symphyseal Mobility')],
-    ['Relative Blade Length of Lower Carnassial', textField('relative_blade_length', 'number')],
+    ['Relative Blade Length of Lower Carnassial', textField('relative_blade_length', { type: 'number' })],
   ]
 
   const developmental = [
@@ -120,14 +120,14 @@ export const TeethTab = () => {
   const mesowear = [
     ['Mesowear'],
     ['Type', dropdown('mesowear', mesowearOptions, 'Type')],
-    ['Cusp Relief Low (OR%)', textField('mw_or_low', 'number')],
-    ['Cusp Relief High (OR%)', textField('mw_or_high', 'number')],
-    ['Cusp Shape Sharp (CS%)', textField('mw_cs_sharp', 'number')],
-    ['Cusp Shape Rounded (CS%)', textField('mw_cs_round', 'number')],
-    ['Cusp Shape Blunt (CS%)', textField('mw_cs_blunt', 'number')],
-    ['Scale Minimum', textField('mw_scale_min', 'number')],
-    ['Scale Maximum', textField('mw_scale_max', 'number')],
-    ['Reported Value', textField('mw_value', 'number')],
+    ['Cusp Relief Low (OR%)', textField('mw_or_low', { type: 'number' })],
+    ['Cusp Relief High (OR%)', textField('mw_or_high', { type: 'number' })],
+    ['Cusp Shape Sharp (CS%)', textField('mw_cs_sharp', { type: 'number' })],
+    ['Cusp Shape Rounded (CS%)', textField('mw_cs_round', { type: 'number' })],
+    ['Cusp Shape Blunt (CS%)', textField('mw_cs_blunt', { type: 'number' })],
+    ['Scale Minimum', textField('mw_scale_min', { type: 'number' })],
+    ['Scale Maximum', textField('mw_scale_max', { type: 'number' })],
+    ['Reported Value', textField('mw_value', { type: 'number' })],
     ['Normalized score', 'Not implemented'],
     ['Microwear'],
     ['Type', dropdown('microwear', microwearOptions, 'Type')],

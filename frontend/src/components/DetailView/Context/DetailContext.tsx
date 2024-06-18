@@ -4,6 +4,7 @@ import { DropdownOption } from '../common/editingComponents'
 import { cloneDeep } from 'lodash-es'
 import { ValidationObject } from '@/validators/validator'
 import { EditDataType } from '@/backendTypes'
+import { TextFieldOptions } from '../DetailView'
 
 export type ModeOptions = 'read' | 'new' | 'edit' | 'staging-edit' | 'staging-new'
 
@@ -53,7 +54,7 @@ export type DetailContextType<T> = {
   setMode: (newMode: ModeOptions) => void
   editData: EditDataType<T>
   setEditData: (editData: EditDataType<T>) => void
-  textField: (field: keyof EditDataType<T>, type?: React.HTMLInputTypeAttribute) => JSX.Element
+  textField: (field: keyof EditDataType<T>, options?: TextFieldOptions) => JSX.Element
   bigTextField: (field: keyof EditDataType<T>) => JSX.Element
   dropdown: (
     field: keyof EditDataType<T>,

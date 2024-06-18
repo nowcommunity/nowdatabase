@@ -172,11 +172,13 @@ const MultiSelector = <T extends object>({
 export const EditableTextField = <T extends object>({
   field,
   type = 'text',
+  round,
   big = false,
   disabled = false,
 }: {
   field: keyof EditDataType<T>
   type?: React.HTMLInputTypeAttribute
+  round?: number
   big?: boolean
   disabled?: boolean
 }) => {
@@ -204,7 +206,7 @@ export const EditableTextField = <T extends object>({
     />
   )
 
-  return <DataValue<T> field={field} EditElement={editingComponent} />
+  return <DataValue<T> field={field} EditElement={editingComponent} round={round} />
 }
 
 export const FieldWithTableSelection = <T extends object, ParentType extends object>({

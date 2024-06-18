@@ -21,8 +21,8 @@ export const SizeTab = () => {
   const populationStructureOptions = ['', { display: 'Social', value: 'soc' }, { display: 'Solitary ', value: 'sol' }]
 
   const size = [
-    ['Body Mass (g)', textField('body_mass', 'number')],
-    ['Brain Mass (g)', textField('brain_mass', 'number')],
+    ['Body Mass (g)', textField('body_mass', { type: 'number' })],
+    ['Brain Mass (g)', textField('brain_mass', { type: 'number' })],
     ['Snout-Vent Length', dropdown('sv_length', snoutVentLengthOptions, 'Snout-Vent Length')],
   ]
 

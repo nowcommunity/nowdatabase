@@ -15,6 +15,19 @@ export type TabType = {
   content: JSX.Element
 }
 
+export type TextFieldOptions = (
+  | {
+      type: 'text'
+    }
+  | {
+      type: 'number'
+      round?: number
+    }
+) & {
+  disabled?: boolean
+  big?: boolean
+}
+
 export const DetailView = <T extends object>({
   tabs,
   data,
@@ -51,8 +64,8 @@ export const DetailView = <T extends object>({
     setModeState(modeOptionToMode[newMode])
   }
 
-  const textField = (field: keyof EditDataType<T>, type?: React.HTMLInputTypeAttribute, disabled?: boolean) => (
-    <EditableTextField<T> field={field} type={type} disabled={disabled} />
+  const textField = (field: keyof EditDataType<T>, options?: TextFieldOptions) => (
+    <EditableTextField<T> field={field} {...{ options }} />
   )
 
   const dropdown = (

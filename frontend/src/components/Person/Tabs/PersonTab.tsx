@@ -6,7 +6,7 @@ export const PersonTab = () => {
   const { textField } = useDetailContext<PersonDetailsType>()
 
   const person = [
-    ['User ID', textField('user_id', 'number')],
+    ['User ID', textField('user_id', { type: 'number' })],
     ['Initials', textField('initials')],
     ['First Name', textField('first_name')],
     ['Surname', textField('surname')],
