@@ -118,7 +118,7 @@ export type TimeBound = {
   b_comment: string
 }
 
-export type TimeBoundDetailsType = EditDataType<Prisma.now_tu_bound & { now_bau: Prisma.now_bau }>
+export type TimeBoundDetailsType = Prisma.now_tu_bound & { now_bau: Prisma.now_bau }
 
 export type TimeUnit = {
   low_bound: number
