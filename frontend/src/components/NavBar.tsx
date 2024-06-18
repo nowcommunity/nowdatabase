@@ -81,7 +81,13 @@ export const NavBar = () => {
             }}
           >
             {link.children.map(childLink => (
-              <MenuItem key={`${childLink.url}-menu-link`} component={Link} to={childLink.url} onClick={handleClose}>
+              <MenuItem
+                key={`${childLink.url}-menu-link`}
+                id={`${childLink.url}-menu-link`}
+                component={Link}
+                to={childLink.url}
+                onClick={handleClose}
+              >
                 {childLink.title}
               </MenuItem>
             ))}

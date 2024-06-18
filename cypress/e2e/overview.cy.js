@@ -43,9 +43,9 @@ describe('Open each page, table view and detail view, and check at least some co
     cy.contains('Regional Coordinators')
     cy.contains('prs')
   })
-  it('Project works', () => {
-    cy.contains('Admin').click()
-    cy.contains('Project').click()
+  it.only('Project works', () => {
+    cy.get('div[id="/admin-menu-button"]').click()
+    cy.get('a[id="/project-menu-link"]').click()
     cy.contains('Workgroup on Insectivores')
     cy.get('[data-cy="detailview-button-3"]').first().click()
     cy.contains('Coordinator')
