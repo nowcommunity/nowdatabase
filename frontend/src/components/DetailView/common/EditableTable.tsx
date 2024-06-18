@@ -79,7 +79,7 @@ export const EditableTable = <T extends MRT_RowData & { rowState?: RowState }, P
       data={getData()}
       enableTopToolbar={false}
       enableColumnActions={false}
-      enablePagination={false}
+      enablePagination={getData().length > 15}
       state={{ density: 'compact' }}
       muiTableBodyRowProps={({ row }: { row: MRT_Row<T> }) => ({
         sx: { backgroundColor: rowStateToColor(row.original.rowState) },
