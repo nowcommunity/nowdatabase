@@ -1,12 +1,12 @@
 import { useMemo } from 'react'
 import { type MRT_ColumnDef } from 'material-react-table'
 import { useGetAllPersonsQuery } from '../../redux/personReducer'
-import { Person } from '@/backendTypes'
+import { PersonDetailsType } from '@/backendTypes'
 import { TableView } from '../TableView/TableView'
 
-export const PersonTable = ({ selectorFn }: { selectorFn?: (id: Person) => void }) => {
+export const PersonTable = ({ selectorFn }: { selectorFn?: (id: PersonDetailsType) => void }) => {
   const personQuery = useGetAllPersonsQuery()
-  const columns = useMemo<MRT_ColumnDef<Person>[]>(
+  const columns = useMemo<MRT_ColumnDef<PersonDetailsType>[]>(
     () => [
       {
         id: 'id',
@@ -41,7 +41,7 @@ export const PersonTable = ({ selectorFn }: { selectorFn?: (id: Person) => void 
   }
 
   return (
-    <TableView<Person>
+    <TableView<PersonDetailsType>
       selectorFn={selectorFn}
       checkRowRestriction={checkRowRestriction}
       idFieldName="initials"

@@ -114,7 +114,7 @@ export const userPage = (
     tableView={<UserTable />}
     detailView={<UserDetails />}
     viewName="user"
-    idFieldName="id"
+    idFieldName="user_id"
     createTitle={(user: UserDetailsType) => `${user.user_name}`}
   />
 )
