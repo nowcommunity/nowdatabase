@@ -7,10 +7,11 @@ import { filterFields } from './writeUtils'
 import { ValidationObject } from '../../../frontend/src/validators/validator'
 import { logger } from '../utils/logger'
 import { fixBigInt } from '../utils/common'
+import { testWrite } from './write'
 
 export const getAllLocalities = async (onlyPublic: boolean) => {
   const where = onlyPublic ? { loc_status: false } : {}
-
+  await testWrite()
   const result = await nowDb.now_loc.findMany({
     select: {
       lid: true,
