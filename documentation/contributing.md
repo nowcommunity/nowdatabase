@@ -9,3 +9,8 @@
 
 **Deployment**
 + Code is deployed from `main`. Currently requires building both images in OpenShift manually.
+
+**Naming conventions**
++ Types, React-components: `PascalCase`
++ Field names that come directly from database columns or tables: `snake_case`
++ Everything else - variables, functions etc: `camelCase`
