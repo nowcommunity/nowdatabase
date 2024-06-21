@@ -2,16 +2,14 @@ import { logDb, nowDb, pool } from '../utils/db'
 import { EditDataType, LocalityDetailsType } from '../../../frontend/src/backendTypes'
 import Prisma from '../../prisma/generated/now_test_client'
 import { validateLocality } from '../../../frontend/src/validators/locality'
-import { diff } from 'deep-object-diff'
-import { filterFields } from './writeUtils'
 import { ValidationObject } from '../../../frontend/src/validators/validator'
 import { logger } from '../utils/logger'
 import { fixBigInt } from '../utils/common'
-import { testWrite } from './write'
+import { write } from './write/write'
 
 export const getAllLocalities = async (onlyPublic: boolean) => {
   const where = onlyPublic ? { loc_status: false } : {}
-  await testWrite()
+  console.log('moi')
   const result = await nowDb.now_loc.findMany({
     select: {
       lid: true,
@@ -30,7 +28,6 @@ export const getAllLocalities = async (onlyPublic: boolean) => {
 
 export const getLocalityDetails = async (id: number) => {
   // TODO: Check if user has access
-
   const result = await nowDb.now_loc.findUnique({
     where: { lid: id },
     include: {
@@ -80,14 +77,7 @@ export const getLocalityDetails = async (id: number) => {
     updates: logResult.filter(logRow => logRow.luid === lau.luid),
   }))
   if (!result) return null
-  const { now_ls, now_mus, now_plr, ...locality } = result
-  const localityDetails = {
-    ...locality,
-    museums: now_mus.map(museum => museum.com_mlist),
-    projects: now_plr.map(project => project.now_proj),
-    species: now_ls.map(species => species.com_species),
-  }
-  return JSON.parse(fixBigInt(localityDetails)!) as LocalityDetailsType
+  return JSON.parse(fixBigInt(result)!) as LocalityDetailsType
 }
 
 export const fixEditedLocality = (editedLocality: EditDataType<LocalityDetailsType>) => {
@@ -110,15 +100,9 @@ export const validateEntireLocality = (editedFields: EditDataType<Prisma.now_loc
 export const processLocalityForEdit = async (editedLocality: EditDataType<LocalityDetailsType>) => {
   const fixedEditedLocality = fixEditedLocality(editedLocality)
   const oldLocality = await getLocalityDetails(fixedEditedLocality.lid!)
-  const difference = diff(oldLocality!, fixedEditedLocality)
-
-  const { filteredFields, filteredObject } = filterFields(
-    difference as EditDataType<LocalityDetailsType>,
-    nowDb.now_loc.fields as unknown as Record<string, unknown>
-  )
-  const validationErrors = validateEntireLocality(filteredObject)
-  if (validationErrors.length > 0) return { validationErrors }
-  const result = await writeLocality(oldLocality!.lid, filteredFields)
+  // const validationErrors = validateEntireLocality(editedLocality)
+  // if (validationErrors.length > 0) return { validationErrors }
+  const result = write(editedLocality, 'now_loc', oldLocality!)
   return { result }
 }
 
