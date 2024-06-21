@@ -1,7 +1,7 @@
 /*
   common utility functions for processing saving actions
 */
-import { EditDataType } from '../../../frontend/src/backendTypes'
+import { EditDataType } from '../../../../frontend/src/backendTypes'
 
 /*
   Returns object where only the "original" fields remain.
