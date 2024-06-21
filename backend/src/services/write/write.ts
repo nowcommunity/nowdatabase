@@ -27,11 +27,12 @@ type Item = { column: string; value: any }
 type WriteItem = { table: string; type: 'add' | 'update' | 'delete'; items: Item[] }
 
 const getFindFunction = (tableName: string, newItem: any) => (item: any) => {
-  if (tableName === 'now_ls') {
-    // todo this should be com species when it is fixed
-    if (item.species_id === newItem.species_id) return true
+  const matchFields = (fields: string[]) => {
+    return !fields.find(f => newItem[f] !== item[f])
   }
-  return false // TODO add all types
+  const matches = { now_ls: ['species_id', 'lid'], now_proj: ['pid'], now_plr: ['lid', 'pid'], now_syn_loc: ['syn_id'] }
+  if (!matches[tableName]) console.log('Alert matcher missing for ', tableName)
+  return matchFields(matches[tableName])
 }
 
 // TODO change ignored fields to allowed fields. form those by taking prisma.model.fields, and adding the accepted relation fields.
@@ -83,7 +84,7 @@ export const write: WriteFunction = (data, tableName, oldObject) => {
           .map(item => ({ column: relationField, value: item[idFieldName] }))
         rowsToDelete.push(...toBeDeleted)
         for (const item of value.filter(({ rowState }) => rowState !== 'removed')) {
-          const itemWithId = { ...item } // TODO add id here when join tables added
+          const itemWithId = { ...item, [ids[tableName]]: id }
           // console.log('item', item, JSON.stringify(item))
           writeTable(itemWithId, relationField, oldObj[relationField].find(getFindFunction(relationField, itemWithId)))
         }
