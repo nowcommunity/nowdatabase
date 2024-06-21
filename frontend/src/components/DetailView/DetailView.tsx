@@ -65,7 +65,7 @@ export const DetailView = <T extends object>({
   }
 
   const textField = (field: keyof EditDataType<T>, options?: TextFieldOptions) => (
-    <EditableTextField<T> field={field} {...{ options }} />
+    <EditableTextField<T> field={field} {...options} />
   )
 
   const dropdown = (

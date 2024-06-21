@@ -188,6 +188,7 @@ export const EditableTextField = <T extends object>({
 }) => {
   const { setEditData, editData, validator } = useDetailContext<T>()
   const { error } = validator(editData, field)
+
   const editingComponent = (
     <TextField
       sx={{ width: fieldWidth, backgroundColor: disabled ? 'grey' : '' }}
