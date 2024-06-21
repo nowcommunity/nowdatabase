@@ -41,16 +41,13 @@ export const write: WriteFunction = (data, tableName, oldObject) => {
   console.log('Write')
   const writeList: WriteItem[] = []
   const writeTable = (obj: object, tableName: string, oldObj: object | null) => {
-    console.log(
-      `writeTable called tableName: ${tableName}\n'} ${oldObj ? ' oldobj defined ' : ' no old object found '}`
-    )
     const allFields = Object.keys(obj).filter(f => !ignoredFields.includes(f))
     const fields = allFields.filter(f => typeof obj[f as keyof object] !== 'object' || obj[f as keyof object] === null)
     const relationFields = allFields.filter(
       f => typeof obj[f as keyof object] === 'object' && obj[f as keyof object] !== null
     )
-    console.log('fields: ', JSON.stringify(fields))
-    console.log('relations: ', JSON.stringify(relationFields))
+    // console.log('fields: ', JSON.stringify(fields))
+    // console.log('relations: ', JSON.stringify(relationFields))
     const fieldsToWrite: Item[] = []
     const rowsToDelete: Item[] = []
     for (const field of fields) {
@@ -98,14 +95,14 @@ export const write: WriteFunction = (data, tableName, oldObject) => {
     //console.log(JSON.stringify(fieldsToWrite, null, 2))
   }
 
-  console.log('Old object', JSON.stringify(oldObject, null, 2))
-  console.log('New object', JSON.stringify(data, null, 2))
+  // console.log('Old object', JSON.stringify(oldObject, null, 2))
+  // console.log('New object', JSON.stringify(data, null, 2))
   writeTable(revertFieldNames(data), tableName, revertFieldNames(oldObject))
   // console.log(JSON.stringify(writeList, null, 2))
   return 'ok'
 }
 
 const query = (queryString: string, values: any[]) => {
-  console.log(`${queryString} | values: ${values.join(', ')}`)
+  console.log(`${queryString} \t| values: ${values.join(', ')}`)
   return 'some_id'
 }
