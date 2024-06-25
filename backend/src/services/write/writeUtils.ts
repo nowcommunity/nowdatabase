@@ -2,6 +2,7 @@
   common utility functions for processing saving actions
 */
 import { EditDataType } from '../../../../frontend/src/backendTypes'
+import { fixBigInt } from '../../utils/common'
 
 /*
   Returns object where only the "original" fields remain.
@@ -39,11 +40,13 @@ export const revertFieldNames = (obj: object) => {
 
 export const isNumeric = (value: string) => /^-?\d+$/.test(value)
 
-// JSON.stringify doesn't preserve "key: undefined" entries, this prints those as a string instead
+// JSON.stringify doesn't preserve "key: undefined" entries, this prints those as a string instead.
+// Also turns bigint to number because bigint cant be serialized
 export const printJSON = (obj: object) =>
   JSON.stringify(
     obj,
     (k: string | number, v: unknown) => {
+      if (typeof v === 'bigint') return Number(v)
       return v === undefined ? 'undefined' : v
     },
     2
