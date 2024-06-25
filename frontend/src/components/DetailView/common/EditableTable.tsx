@@ -1,9 +1,18 @@
 import { EditDataType, RowState } from '@/backendTypes'
 import { CircularProgress, Box, Button } from '@mui/material'
-import { type MRT_ColumnDef, type MRT_RowData, MaterialReactTable, MRT_Row } from 'material-react-table'
+import {
+  type MRT_ColumnDef,
+  type MRT_RowData,
+  MaterialReactTable,
+  MRT_Row,
+  MRT_PaginationState,
+} from 'material-react-table'
 import { useDetailContext } from '../Context/DetailContext'
 import RemoveCircleOutlineIcon from '@mui/icons-material/RemoveCircleOutline'
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline'
+import { useState } from 'react'
+
+const defaultPagination: MRT_PaginationState = { pageIndex: 0, pageSize: 15 }
 
 const getNewState = (state: RowState): RowState => {
   if (!state || state === 'clean') return 'removed'
@@ -23,6 +32,7 @@ export const EditableTable = <T extends MRT_RowData & { rowState?: RowState }, P
   columns: MRT_ColumnDef<T>[]
   field: keyof EditDataType<ParentType>
 }) => {
+  const [pagination, setPagination] = useState<MRT_PaginationState>(defaultPagination)
   const { editData, setEditData, mode, data } = useDetailContext<ParentType>()
   if (tableData === null || editTableData === null) return <CircularProgress />
 
@@ -80,7 +90,10 @@ export const EditableTable = <T extends MRT_RowData & { rowState?: RowState }, P
       enableTopToolbar={false}
       enableColumnActions={false}
       enablePagination={getData().length > 15}
-      state={{ density: 'compact' }}
+      onPaginationChange={setPagination}
+      positionPagination="both"
+      paginationDisplayMode="pages"
+      state={{ density: 'compact', pagination }}
       muiTableBodyRowProps={({ row }: { row: MRT_Row<T> }) => ({
         sx: { backgroundColor: rowStateToColor(row.original.rowState) },
       })}
