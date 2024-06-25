@@ -7,6 +7,7 @@ const localitiesApi = api.injectEndpoints({
       query: () => ({
         url: `/locality/all`,
       }),
+      providesTags: result => (result ? [{ type: 'localities' }] : []),
     }),
     getLocalityDetails: builder.query<LocalityDetailsType, string>({
       query: id => ({
@@ -20,7 +21,7 @@ const localitiesApi = api.injectEndpoints({
         method: 'PUT',
         body: { locality },
       }),
-      invalidatesTags: (result, _error, { lid }) => (result ? [{ type: 'locality', id: lid }] : []),
+      invalidatesTags: (result, _error, { lid }) => (result ? [{ type: 'locality', id: lid }, 'localities'] : []),
     }),
   }),
 })
