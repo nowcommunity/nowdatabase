@@ -102,8 +102,7 @@ export const processLocalityForEdit = async (editedLocality: EditDataType<Locali
   const oldLocality = await getLocalityDetails(fixedEditedLocality.lid!)
   const validationErrors = validateEntireLocality(editedLocality)
   if (validationErrors.length > 0) return { validationErrors }
-  // const testLoc = await getLocalityDetails(fixedEditedLocality.lid!)
-  const result = write(editedLocality, 'now_loc', oldLocality!)
+  const result = await write(editedLocality, 'now_loc', oldLocality!)
   return { result }
 }
 

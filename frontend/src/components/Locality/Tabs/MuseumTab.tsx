@@ -9,7 +9,7 @@ import { Box, CircularProgress } from '@mui/material'
 import { MRT_ColumnDef } from 'material-react-table'
 
 export const MuseumTab = () => {
-  const { mode } = useDetailContext<LocalityDetailsType>()
+  const { mode, editData, setEditData } = useDetailContext<LocalityDetailsType>()
   const { data: museumData, isError } = useGetAllMuseumsQuery()
 
   if (isError) return 'Error loading museums.'
@@ -51,18 +51,38 @@ export const MuseumTab = () => {
           <EditingForm<Museum, LocalityDetailsType>
             buttonText="Add new museum"
             formFields={formFields}
-            arrayFieldName="museums"
+            editAction={(newMuseum: Museum) => {
+              setEditData({
+                ...editData,
+                now_mus: [
+                  ...editData.now_mus,
+                  { lid: editData.lid, museum: newMuseum.museum, com_mlist: newMuseum, rowState: 'new' },
+                ],
+              })
+            }}
           />
           <SelectingTable<Museum, LocalityDetailsType>
             buttonText="Select Museum"
             data={museumData}
             columns={columns}
-            fieldName="museums"
+            fieldName="now_mus"
             idFieldName="museum"
+            editingAction={(newMuseum: Museum) => {
+              setEditData({
+                ...editData,
+                now_mus: [
+                  ...editData.now_mus,
+                  { lid: editData.lid, museum: newMuseum.museum, com_mlist: newMuseum, rowState: 'new' },
+                ],
+              })
+            }}
           />
         </Box>
       )}
-      <EditableTable<Editable<Museum>, LocalityDetailsType> columns={columns} field="museums" />
+      <EditableTable<Editable<Museum>, LocalityDetailsType>
+        columns={columns.map(col => ({ ...col, accessorKey: `com_mlist.${col.accessorKey}` }))}
+        field="now_mus"
+      />
     </Grouped>
   )
 }

@@ -1,4 +1,4 @@
-import { LocalityDetailsType, Species } from '@/backendTypes'
+import { LocalityDetailsType, LocalitySpecies, Species } from '@/backendTypes'
 import { EditableTable } from '@/components/DetailView/common/EditableTable'
 import { EditingForm } from '@/components/DetailView/common/EditingForm'
 import { SelectingTable } from '@/components/DetailView/common/SelectingTable'
@@ -49,7 +49,40 @@ export const SpeciesTab = () => {
       header: 'Taxon status',
     },
   ]
-
+  const columns2: MRT_ColumnDef<LocalitySpecies>[] = [
+    {
+      accessorKey: 'com_species.order_name',
+      header: 'Order',
+    },
+    {
+      accessorKey: 'com_species.family_name',
+      header: 'Family',
+    },
+    {
+      accessorKey: 'com_species.genus_name',
+      header: 'Genus',
+    },
+    {
+      accessorKey: 'com_species.species_name',
+      header: 'Species',
+    },
+    {
+      accessorKey: 'com_species.subclass_or_superorder_name',
+      header: 'Subclass or Superorder',
+    },
+    {
+      accessorKey: 'com_species.suborder_or_superfamily_name',
+      header: 'Suborder or Superfamily',
+    },
+    {
+      accessorKey: 'com_species.unique_identifier',
+      header: 'Unique Identifier',
+    },
+    {
+      accessorKey: 'com_species.taxonomic_status',
+      header: 'Taxon status',
+    },
+  ]
   const formFields: { name: string; label: string; required?: boolean }[] = [
     { name: 'order_name', label: 'Order', required: true },
     { name: 'family_name', label: 'Family', required: true },
@@ -68,21 +101,45 @@ export const SpeciesTab = () => {
           <EditingForm<Species, LocalityDetailsType>
             buttonText="Add new Species"
             formFields={formFields}
-            arrayFieldName="species"
+            editAction={(newSpecies: Species) => {
+              setEditData({
+                ...editData,
+                now_ls: [
+                  ...editData.now_ls,
+                  {
+                    lid: editData.lid,
+                    species_id: newSpecies.species_id,
+                    com_species: { ...newSpecies },
+                    rowState: 'new',
+                  },
+                ],
+              })
+            }}
           />
           <SelectingTable<Species, LocalityDetailsType>
             buttonText="Select Species"
             data={speciesData}
             columns={columns}
-            fieldName="species"
+            fieldName="now_ls"
             idFieldName="species_id"
             editingAction={(newSpecies: Species) => {
-              setEditData({ ...editData, species: [...editData.species, { ...newSpecies, rowState: 'new' }] })
+              setEditData({
+                ...editData,
+                now_ls: [
+                  ...editData.now_ls,
+                  {
+                    lid: editData.lid,
+                    species_id: newSpecies.species_id,
+                    com_species: { ...newSpecies },
+                    rowState: 'new',
+                  },
+                ],
+              })
             }}
           />
         </Box>
       )}
-      <EditableTable<Species, LocalityDetailsType> columns={columns} field="species" />
+      <EditableTable<LocalitySpecies, LocalityDetailsType> columns={columns2} field="now_ls" />
     </Grouped>
   )
 }

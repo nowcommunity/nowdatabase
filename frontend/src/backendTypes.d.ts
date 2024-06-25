@@ -25,7 +25,7 @@ export type Editable<T> = T & { rowState?: RowState }
 export type SedimentaryStructureValues = Prisma.now_ss_values
 export type CollectingMethod = Prisma.now_coll_meth
 export type LocalityProject = Prisma.now_plr & { now_proj: Prisma.now_proj }
-export type LocalitySpecies = Omit<Prisma.now_ls, 'com_species'> & { com_species: SpeciesType }
+export type LocalitySpecies = Prisma.now_ls & { com_species: SpeciesType }
 export type SpeciesLocality = Prisma.now_ls & { now_loc: Prisma.now_loc }
 export type LocalityUpdate = Prisma.now_lau & { now_lr: LocalityReference[] } & { updates: UpdateLog[] }
 export type SpeciesUpdate = Prisma.now_sau & { now_sr: Prisma.now_sr }
@@ -40,12 +40,13 @@ export type RegionCountry = Prisma.now_reg_coord_country
 export type SedimentaryStructure = Prisma.now_ss
 export type LocalitySynonym = Prisma.now_syn_loc
 export type SpeciesSynonym = Prisma.com_taxa_synonym
-export type LocalityDetailsType = Omit<Prisma.now_loc, 'now_ls' | 'now_mus' | 'now_proj'> & {
-  museums: Array<Museum>
+export type LocalityMuseum = Prisma.now_mus & { com_mlist: Museum }
+export type LocalityDetailsType = Prisma.now_loc & {
+  now_mus: Array<LocalityMuseum>
 } & {
   projects: Array<Project>
 } & {
-  species: Array<LocalitySpecies>
+  now_ls: Array<LocalitySpecies>
 } & { now_plr: Array<LocalityProject> } & { now_syn_loc: Array<LocalitySynonym> } & {
   now_ss: SedimentaryStructure[]
 } & {

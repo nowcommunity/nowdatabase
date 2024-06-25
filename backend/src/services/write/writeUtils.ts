@@ -48,3 +48,9 @@ export const printJSON = (obj: object) =>
     },
     2
   )
+
+export const isEmptyValue = (value: string | number | null | undefined) => {
+  if (value === null || value === undefined) return true
+  if (typeof value === 'string' && value === '') return true
+  return false
+}
