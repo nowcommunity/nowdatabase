@@ -15,7 +15,7 @@ import {
 } from '../../../../frontend/src/backendTypes'
 import { nowDb, pool } from '../../utils/db'
 import { logger } from '../../utils/logger'
-import { isEmptyValue } from './writeUtils'
+import { isEmptyValue, printJSON } from './writeUtils'
 
 const DEBUG_MODE = true
 
@@ -88,7 +88,7 @@ export const write: WriteFunction = async (data, tableName, oldObject) => {
 
   const query = async (queryString: string, values: any[]) => {
     const result = await conn.query(queryString, values)
-    logger.info(`${queryString} \t\t| values: ${values.join(', ')} \t| Result: ${JSON.stringify(result)}`)
+    logger.info(`${queryString} \t\t| values: ${values.join(', ')} \t| Result: ${printJSON(result)}`)
     return result
   }
 
@@ -100,7 +100,7 @@ export const write: WriteFunction = async (data, tableName, oldObject) => {
     }, {})
     let whereObject = { [ids[tableName].join('_')]: where }
     if (ids[tableName].length === 1) whereObject = { [ids[tableName][0]]: obj[ids[tableName][0]] }
-    debugLog(ids[tableName], JSON.stringify(where))
+    debugLog(ids[tableName], printJSON(where))
     const oldObj =
       ids[tableName] && Object.keys(where).length === ids[tableName].length
         ? await nowDb[tableName].findUnique({
@@ -162,32 +162,36 @@ export const write: WriteFunction = async (data, tableName, oldObject) => {
       // The ones with rowState 'removed' will be deleted
       const toBeDeleted: Item[] = items
         .filter(({ rowState }) => rowState === 'removed')
-        .map(item => ({ column: arrayField, value: item[idFieldName] }))
+        .map(item => ({
+          tableName: arrayField,
+          idColumns: ids[arrayField],
+          idValues: ids[arrayField].map(id => item[id]),
+        }))
       rowsToDelete.push(...toBeDeleted)
 
       // Ones without that rowstate will be recursed into
       for (const item of items.filter(({ rowState }) => rowState !== 'removed')) {
         const itemWithId = { ...item, [ids[tableName]]: id }
         await writeTable(itemWithId, arrayField)
-        debugLog(`Processed array item ${JSON.stringify(item)}`)
+        debugLog(`Processed array item ${printJSON(item)}`)
       }
     }
     for (const rowToDelete of rowsToDelete) {
       const deleteResult = await query(
-        `DELETE FROM ${dbName}.${rowToDelete.column} WHERE ${ids[rowToDelete.column]} = ?`,
-        [rowToDelete.value]
+        `DELETE FROM ${dbName}.${rowToDelete.tableName} WHERE ${rowToDelete.idColumns.map(column => `${column} = ?`).join(' AND ')}`,
+        rowToDelete.idValues
       ) // NOTE column here is actually table name
-      debugLog(`deleteResult: ${JSON.stringify(deleteResult)}`)
+      debugLog(`deleteResult: ${printJSON(deleteResult)}`)
     }
-    //debugLog(JSON.stringify(fieldsToWrite, null, 2))
-    debugLog(`Returning id: ${JSON.stringify(id)}`)
+    //debugLog(printJSON(fieldsToWrite, null, 2))
+    debugLog(`Returning id: ${printJSON(id)}`)
     return id
   }
 
-  // debugLog('Old object', JSON.stringify(oldObject, null, 2))
-  // debugLog('New object', JSON.stringify(data, null, 2))
+  // debugLog('Old object', printJSON(oldObject, null, 2))
+  // debugLog('New object', printJSON(data, null, 2))
   const result = await writeTable(data, tableName)
 
-  debugLog(`Final result: ${JSON.stringify(result)}`)
+  debugLog(`Final result: ${printJSON(result)}`)
   return result
 }
