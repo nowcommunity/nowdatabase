@@ -1,17 +1,22 @@
 import { useParams } from 'react-router-dom'
-import { useGetTimeUnitDetailsQuery } from '../../redux/timeUnitReducer'
+import { useEditTimeUnitMutation, useGetTimeUnitDetailsQuery } from '../../redux/timeUnitReducer'
 import { CircularProgress } from '@mui/material'
 import { DetailView, TabType } from '../DetailView/DetailView'
 import { LocalityTab } from './Tabs/LocalityTab'
 import { TimeUnitTab } from './Tabs/TimeUnitTab'
 import { UpdateTab } from '../DetailView/common/UpdateTab'
+import { EditDataType, TimeUnitDetailsType } from '@/backendTypes'
 
 export const TimeUnitDetails = () => {
   const { id } = useParams()
   const { isLoading, isError, data } = useGetTimeUnitDetailsQuery(encodeURIComponent(id!))
-
+  const [editTimeUnitRequest, status] = useEditTimeUnitMutation()
   if (isError) return <div>Error loading data</div>
   if (isLoading || !data) return <CircularProgress />
+
+  const onWrite = async (editData: EditDataType<TimeUnitDetailsType>) => {
+    await editTimeUnitRequest(editData)
+  }
 
   const tabs: TabType[] = [
     {
@@ -28,5 +33,13 @@ export const TimeUnitDetails = () => {
     },
   ]
 
-  return <DetailView tabs={tabs} data={data} onWrite={() => {}} validator={() => ({ name: '', error: null })} />
+  return (
+    <DetailView
+      tabs={tabs}
+      data={data}
+      onWrite={onWrite}
+      loading={status.isLoading}
+      validator={() => ({ name: '', error: null })}
+    />
+  )
 }
