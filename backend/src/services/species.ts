@@ -23,12 +23,6 @@ export const getAllSpecies = async (onlyPublic: boolean) => {
   return result
 }
 
-export const getSpeciesDetailsx = async (id: number) => {
-  // TODO: Check if user has access
-  const result = await nowDb.com_species.findUnique({ where: { species_id: id } })
-  return result
-}
-
 export const getSpeciesDetails = async (id: number) => {
   // TODO: Check if user has access
 

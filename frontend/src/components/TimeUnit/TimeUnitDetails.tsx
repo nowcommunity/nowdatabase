@@ -9,10 +9,10 @@ import { EditDataType, TimeUnitDetailsType } from '@/backendTypes'
 
 export const TimeUnitDetails = () => {
   const { id } = useParams()
-  const { isLoading, isError, data } = useGetTimeUnitDetailsQuery(encodeURIComponent(id!))
-  const [editTimeUnitRequest, status] = useEditTimeUnitMutation()
+  const { isLoading, isError, isFetching, data } = useGetTimeUnitDetailsQuery(encodeURIComponent(id!))
+  const [editTimeUnitRequest] = useEditTimeUnitMutation()
   if (isError) return <div>Error loading data</div>
-  if (isLoading || !data) return <CircularProgress />
+  if (isLoading || isFetching || !data) return <CircularProgress />
 
   const onWrite = async (editData: EditDataType<TimeUnitDetailsType>) => {
     await editTimeUnitRequest(editData)
@@ -33,13 +33,5 @@ export const TimeUnitDetails = () => {
     },
   ]
 
-  return (
-    <DetailView
-      tabs={tabs}
-      data={data}
-      onWrite={onWrite}
-      loading={status.isLoading}
-      validator={() => ({ name: '', error: null })}
-    />
-  )
+  return <DetailView tabs={tabs} data={data} onWrite={onWrite} validator={() => ({ name: '', error: null })} />
 }

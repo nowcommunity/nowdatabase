@@ -33,13 +33,11 @@ export const DetailView = <T extends object>({
   data,
   onWrite,
   validator,
-  loading,
 }: {
   tabs: TabType[]
   data: T
   onWrite: (editData: EditDataType<T>) => Promise<void>
   validator: (editData: EditDataType<T>, field: keyof EditDataType<T>) => ValidationObject
-  loading: boolean
 }) => {
   const [searchParams, setSearchParams] = useSearchParams()
 
@@ -142,7 +140,7 @@ export const DetailView = <T extends object>({
                 <EditIcon style={{ marginRight: '0.5em' }} /> {mode.read ? 'Edit' : 'Cancel edit'}
               </Button>
             )}
-            {!mode.read && onWrite && <WriteButton onWrite={onWrite} loading={loading} />}
+            {!mode.read && onWrite && <WriteButton onWrite={onWrite} />}
           </Box>
           <Box sx={{ marginRight: '3em' }}>
             <DetailBrowser<T> />
