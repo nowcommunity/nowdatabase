@@ -85,7 +85,7 @@ export const write: WriteFunction = async (data, tableName, oldObject) => {
   debugLog('Write')
   const writeList: WriteItem[] = []
   const conn = await pool.getConnection()
-
+  await conn.beginTransaction()
   const query = async (queryString: string, values: any[]) => {
     const result = await conn.query(queryString, values)
     logger.info(`${queryString} \t\t| values: ${values.join(', ')} \t| Result: ${printJSON(result)}`)
@@ -145,8 +145,8 @@ export const write: WriteFunction = async (data, tableName, oldObject) => {
     if (values.length > 0) {
       if (id && !!oldObj) {
         await query(
-          `UPDATE ${dbName}.${tableName} SET ${columns.map(c => `${c} = ?`).join(', ')} RETURNING ${idFieldName}`,
-          values
+          `UPDATE ${dbName}.${tableName} SET ${columns.map(c => `${c} = ?`).join(', ')} WHERE ${idFieldName} = ?`,
+          [...values, id]
         )
       } else {
         const result = await query(
@@ -188,10 +188,17 @@ export const write: WriteFunction = async (data, tableName, oldObject) => {
     return id
   }
 
-  // debugLog('Old object', printJSON(oldObject, null, 2))
-  // debugLog('New object', printJSON(data, null, 2))
-  const result = await writeTable(data, tableName)
-
-  debugLog(`Final result: ${printJSON(result)}`)
+  let result = null
+  try {
+    // debugLog('Old object', printJSON(oldObject, null, 2))
+    // debugLog('New object', printJSON(data, null, 2))
+    result = await writeTable(data, tableName)
+    debugLog(`Final result: ${printJSON(result)}`)
+    await conn.commit()
+  } catch (e) {
+    logger.error(printJSON(e))
+  } finally {
+    await conn.end()
+  }
   return result
 }
