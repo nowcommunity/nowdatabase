@@ -9,7 +9,7 @@ import { write } from './write/write'
 
 export const getAllLocalities = async (onlyPublic: boolean) => {
   const where = onlyPublic ? { loc_status: false } : {}
-  console.log('moi')
+
   const result = await nowDb.now_loc.findMany({
     select: {
       lid: true,

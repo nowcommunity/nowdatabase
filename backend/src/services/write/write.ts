@@ -88,7 +88,7 @@ allowedFields['now_bau'] = false
 
 const dbName = 'now_test'
 
-export const write: WriteFunction = async (data, tableName, oldObject) => {
+export const write: WriteFunction = async (data, tableName) => {
   debugLog('Write')
   const writeList: WriteItem[] = []
   const conn = await pool.getConnection()
@@ -129,7 +129,6 @@ export const write: WriteFunction = async (data, tableName, oldObject) => {
       const newId = await writeTable(obj[objectField], objectField)
       relationIds[ids[objectField][1]] = newId
       debugLog(`Processed objectField ${objectField} and assigned id ${newId} to ${ids[objectField][1]}`)
-      debugLog(`}`)
     }
     basicFields.push(...Object.keys(relationIds))
     debugLog(`basicFields: ${printJSON(basicFields)}`)
@@ -215,4 +214,24 @@ export const write: WriteFunction = async (data, tableName, oldObject) => {
     await conn.end()
   }
   return result
+}
+
+const test = async () => {
+  console.log('testing')
+  await sleep(4000)
+  await write(
+    {
+      loc_name: 'newnewnew',
+      date_meth: 'absolute',
+      max_age: 123,
+      min_age: 123,
+      dec_lat: 1,
+      dec_long: 1,
+      hominin_skeletal_remains: true,
+      bipedal_footprints: true,
+      stone_tool_technology: true,
+      stone_tool_cut_marks_on_bones: true,
+    },
+    'now_loc'
+  )
 }
