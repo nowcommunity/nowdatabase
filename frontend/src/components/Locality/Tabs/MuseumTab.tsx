@@ -18,11 +18,11 @@ export const MuseumTab = () => {
   const columns: MRT_ColumnDef<Museum>[] = [
     {
       accessorKey: 'museum',
-      header: 'Code',
+      header: 'Museum code',
     },
     {
       accessorKey: 'institution',
-      header: 'Museum',
+      header: 'Institution',
     },
     {
       accessorKey: 'city',
@@ -35,8 +35,8 @@ export const MuseumTab = () => {
   ]
 
   const formFields: { name: string; label: string; required?: boolean }[] = [
-    { name: 'code', label: 'Code', required: true },
     { name: 'museum', label: 'Museum', required: true },
+    { name: 'institution', label: 'Institution' },
     { name: 'alternativeName', label: 'Alternative name' },
     { name: 'city', label: 'City', required: true },
     { name: 'state', label: 'State' },

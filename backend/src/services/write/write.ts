@@ -13,7 +13,7 @@ import {
   TimeBoundDetailsType,
   TimeUnitDetailsType,
 } from '../../../../frontend/src/backendTypes'
-import { nowDb } from '../../utils/db'
+import { nowDb, pool } from '../../utils/db'
 import { logger } from '../../utils/logger'
 import { isEmptyValue } from './writeUtils'
 
@@ -79,9 +79,19 @@ allowedFields['now_sau'] = false
 allowedFields['now_tau'] = false
 allowedFields['now_bau'] = false
 
+const dbName = 'now_test'
+
 export const write: WriteFunction = async (data, tableName, oldObject) => {
   debugLog('Write')
   const writeList: WriteItem[] = []
+  const conn = await pool.getConnection()
+
+  const query = async (queryString: string, values: any[]) => {
+    const result = await conn.query(queryString, values)
+    logger.info(`${queryString} \t\t| values: ${values.join(', ')} \t| Result: ${JSON.stringify(result)}`)
+    return result
+  }
+
   const writeTable = async (obj: object, tableName: string) => {
     debugLog(`writeTable ${tableName} ${Object.keys(obj)}`)
     const where = ids[tableName].reduce((acc, cur) => {
@@ -108,34 +118,42 @@ export const write: WriteFunction = async (data, tableName, oldObject) => {
     const rowsToDelete: Item[] = []
     const relationIds = {}
     for (const objectField of objectFields) {
-      const newId = await writeTable(obj[objectField], objectField, oldObj?.[objectField])
-      relationIds[ids[objectField][0]] = newId
-      debugLog(`Processed objectField ${objectField} and assigned id ${newId} to ${ids[objectField][0]}`)
+      const newId = await writeTable(obj[objectField], objectField)
+      relationIds[ids[objectField][1]] = newId
+      debugLog(`Processed objectField ${objectField} and assigned id ${newId} to ${ids[objectField][1]}`)
+      debugLog(`}`)
     }
     basicFields.push(Object.keys(relationIds))
     for (const field of basicFields) {
+      const isRelationField = !!relationIds[field]
       const newValue = relationIds[field] ?? (obj[field as keyof object] as any)
       const oldValue = oldObj?.[field as keyof object]
-      debugLog(
+      /* debugLog(
         `Field: ${field} Old value: ${oldValue} - ${typeof oldValue} New value: ${newValue} - ${typeof newValue}`
-      )
+      ) */
       if (newValue === oldValue) continue
       if (isEmptyValue(newValue) && isEmptyValue(oldValue)) continue
       if (typeof oldValue === 'bigint' && typeof newValue === 'number' && BigInt(newValue) === oldValue) continue
-      fieldsToWrite.push({ column: field, value: newValue })
+      if (!isRelationField) fieldsToWrite.push({ column: field, value: newValue })
     }
 
     const columns = fieldsToWrite.map(({ column }) => column)
     const values = fieldsToWrite.map(({ value }) => value)
     const idFieldName = ids[tableName as keyof object] as string
+    debugLog(`Writing to ${tableName} to columns ${columns.join(', ')} values ${values.join(', ')}`)
     let id = obj[idFieldName as keyof object] as string
     if (values.length > 0) {
       if (id && !!oldObj) {
-        query(`UPDATE ${tableName} SET ${columns.map(c => `${c} = ?`).join(', ')} RETURNING ${idFieldName}`, [
-          ...values,
-        ])
+        await query(
+          `UPDATE ${dbName}.${tableName} SET ${columns.map(c => `${c} = ?`).join(', ')} RETURNING ${idFieldName}`,
+          values
+        )
       } else {
-        id = query(`INSERT INTO ${tableName} (${columns.join(', ')}) VALUES (?) RETURNING ${idFieldName}`, values)
+        const result = await query(
+          `INSERT INTO ${dbName}.${tableName} (${columns.join(', ')}) VALUES (${values.map(_ => '?').join(', ')}) RETURNING ${idFieldName}`,
+          values
+        )
+        id = result[idFieldName]
       }
     }
     for (const arrayField of arrayFields) {
@@ -150,24 +168,26 @@ export const write: WriteFunction = async (data, tableName, oldObject) => {
       // Ones without that rowstate will be recursed into
       for (const item of items.filter(({ rowState }) => rowState !== 'removed')) {
         const itemWithId = { ...item, [ids[tableName]]: id }
-        await writeTable(itemWithId, arrayField, oldObj?.[arrayField]?.find(getFindFunction(arrayField, itemWithId)))
+        await writeTable(itemWithId, arrayField)
         debugLog(`Processed array item ${JSON.stringify(item)}`)
       }
     }
-    rowsToDelete.map(item => query(`DELETE FROM ${tableName} WHERE ? = ?`, [ids[item.column], item.value])) // NOTE column here is actually table name
+    for (const rowToDelete of rowsToDelete) {
+      const deleteResult = await query(
+        `DELETE FROM ${dbName}.${rowToDelete.column} WHERE ${ids[rowToDelete.column]} = ?`,
+        [rowToDelete.value]
+      ) // NOTE column here is actually table name
+      debugLog(`deleteResult: ${JSON.stringify(deleteResult)}`)
+    }
     //debugLog(JSON.stringify(fieldsToWrite, null, 2))
-    debugLog(`Returning id: ${id}`)
+    debugLog(`Returning id: ${JSON.stringify(id)}`)
     return id
   }
 
   // debugLog('Old object', JSON.stringify(oldObject, null, 2))
   // debugLog('New object', JSON.stringify(data, null, 2))
-  await writeTable(data, tableName)
-  // debugLog(JSON.stringify(writeList, null, 2))
-  return 'ok'
-}
+  const result = await writeTable(data, tableName)
 
-const query = (queryString: string, values: any[]) => {
-  logger.info(`${queryString} \t| values: ${values.join(', ')}`)
-  return 'some_id'
+  debugLog(`Final result: ${JSON.stringify(result)}`)
+  return result
 }
