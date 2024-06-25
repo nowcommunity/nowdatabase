@@ -19,12 +19,12 @@ import { UpdateTab } from '../DetailView/common/UpdateTab'
 export const LocalityDetails = () => {
   const { id } = useParams()
   const { isLoading, isError, data } = useGetLocalityDetailsQuery(id!)
-  const [editLocalityRequest] = useEditLocalityMutation()
+  const [editLocalityRequest, status] = useEditLocalityMutation()
   if (isError) return <div>Error loading data</div>
   if (isLoading || !data) return <CircularProgress />
 
-  const onWrite = (editData: EditDataType<LocalityDetailsType>) => {
-    void editLocalityRequest(editData)
+  const onWrite = async (editData: EditDataType<LocalityDetailsType>) => {
+    await editLocalityRequest(editData)
   }
 
   const tabs: TabType[] = [
@@ -74,5 +74,7 @@ export const LocalityDetails = () => {
     },
   ]
 
-  return <DetailView tabs={tabs} data={data} onWrite={onWrite} validator={validateLocality} />
+  return (
+    <DetailView tabs={tabs} data={data} onWrite={onWrite} loading={status.isLoading} validator={validateLocality} />
+  )
 }

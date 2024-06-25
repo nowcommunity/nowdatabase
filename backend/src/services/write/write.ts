@@ -13,6 +13,7 @@ import {
   TimeBoundDetailsType,
   TimeUnitDetailsType,
 } from '../../../../frontend/src/backendTypes'
+import { sleep } from '../../utils/common'
 import { nowDb, pool } from '../../utils/db'
 import { logger } from '../../utils/logger'
 import { isEmptyValue, printJSON } from './writeUtils'
@@ -40,6 +41,7 @@ const ids = {
   com_mlist: ['museum'],
   com_species: ['species_id'],
   now_ss: ['lid', 'sed_struct'],
+  now_tu: ['tu_name'],
 }
 
 type Item = { column: string; value: any }
@@ -100,7 +102,7 @@ export const write: WriteFunction = async (data, tableName, oldObject) => {
     }, {})
     let whereObject = { [ids[tableName].join('_')]: where }
     if (ids[tableName].length === 1) whereObject = { [ids[tableName][0]]: obj[ids[tableName][0]] }
-    debugLog(ids[tableName], printJSON(where))
+    debugLog(`ids: ${ids[tableName]}, where: ${printJSON(where)}`)
     const oldObj =
       ids[tableName] && Object.keys(where).length === ids[tableName].length
         ? await nowDb[tableName].findUnique({
@@ -189,15 +191,20 @@ export const write: WriteFunction = async (data, tableName, oldObject) => {
   }
 
   let result = null
+
   try {
     // debugLog('Old object', printJSON(oldObject, null, 2))
     // debugLog('New object', printJSON(data, null, 2))
     result = await writeTable(data, tableName)
     debugLog(`Final result: ${printJSON(result)}`)
     await conn.commit()
-  } catch (e) {
-    logger.error(printJSON(e))
+  } catch (e: unknown) {
+    await conn.rollback()
+    await conn.end()
+    logger.error('Error in write')
+    throw e
   } finally {
+    console.log('Closing connection')
     await conn.end()
   }
   return result

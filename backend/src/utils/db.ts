@@ -3,7 +3,7 @@ import { logger } from './logger'
 import { PrismaClient as NowClient } from '../../prisma/generated/now_test_client'
 import { PrismaClient as LogClient } from '../../prisma/generated/now_log_test_client'
 import mariadb from 'mariadb'
-import { MARIADB_HOST, MARIADB_PASSWORD } from './config'
+import { MARIADB_HOST, MARIADB_PASSWORD, DB_CONNECTION_LIMIT } from './config'
 
 export const logDb = new LogClient()
 export const nowDb = new NowClient()
@@ -12,7 +12,7 @@ export const pool = mariadb.createPool({
   host: MARIADB_HOST,
   password: MARIADB_PASSWORD,
   user: 'now_test',
-  connectionLimit: 5,
+  connectionLimit: parseInt(DB_CONNECTION_LIMIT),
 })
 
 export const testMariaDb = async () => {
@@ -21,6 +21,9 @@ export const testMariaDb = async () => {
   await conn.query('SELECT * FROM now_test.now_loc LIMIT 5')
   await conn.query('SELECT * FROM now_log_test.log LIMIT 5')
   logger.info('Connections to both databases via direct mariadb-connector work.')
+  if (DB_CONNECTION_LIMIT === '5') {
+    logger.info('Warning: DB connection limit is only 5! Set environment variable to raise it.')
+  }
   if (conn) return conn.end()
 }
 
@@ -28,7 +31,7 @@ export const testDb = async () => {
   logger.info('Testing Prisma-connection...')
   await nowDb.now_loc.findFirst({})
   await logDb.log.findFirst({})
-  logger.info('Connections to both databases via Prisma work.')
+  logger.info('Connection to now database via Prisma works.')
 }
 
 export const testDbConnection = async () => {

@@ -1,13 +1,19 @@
 import { useNavigate } from 'react-router-dom'
-import { Button } from '@mui/material'
+import { Button, CircularProgress } from '@mui/material'
 import ArrowBackIcon from '@mui/icons-material/ArrowBack'
 import SaveIcon from '@mui/icons-material/Save'
 import { usePageContext } from '../Page'
 import { useDetailContext } from './Context/DetailContext'
 import { EditDataType } from '@/backendTypes'
+import { useState } from 'react'
 
-export const WriteButton = <T,>({ onWrite, text }: { onWrite: (editData: EditDataType<T>) => void; text?: string }) => {
+export const WriteButton = <T,>({ onWrite }: { onWrite: (editData: EditDataType<T>) => Promise<void> }) => {
   const { editData, mode, setMode } = useDetailContext<T>()
+  const [loading, setLoading] = useState(false)
+  const getButtonText = () => {
+    if (mode.staging) return 'Finalize entry'
+    return 'Complete and save'
+  }
   return (
     <Button
       sx={{ width: '20em' }}
@@ -16,13 +22,20 @@ export const WriteButton = <T,>({ onWrite, text }: { onWrite: (editData: EditDat
           setMode(mode.new ? 'staging-edit' : 'staging-new')
           return
         }
-        onWrite(editData)
-        setMode('read')
+        setLoading(true)
+        void onWrite(editData).then(() => {
+          setLoading(false)
+          setMode('read')
+        })
       }}
       variant="contained"
     >
-      <SaveIcon style={{ marginRight: '0.5em' }} />
-      {text}
+      {loading ? (
+        <CircularProgress size="1.2em" sx={{ color: 'white', marginRight: '1em' }} />
+      ) : (
+        <SaveIcon style={{ marginRight: '0.5em' }} />
+      )}
+      {getButtonText()}
     </Button>
   )
 }
