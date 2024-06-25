@@ -1,5 +1,5 @@
 import { useParams } from 'react-router-dom'
-import { useGetSpeciesDetailsQuery } from '../../redux/speciesReducer'
+import { useEditSpeciesMutation, useGetSpeciesDetailsQuery } from '../../redux/speciesReducer'
 import { CircularProgress } from '@mui/material'
 import { DetailView, TabType } from '../DetailView/DetailView'
 import { DietTab } from './Tabs/DietTab'
@@ -11,13 +11,18 @@ import { SynonymTab } from './Tabs/SynonymTab'
 import { TaxonomyTab } from './Tabs/TaxonomyTab'
 import { TeethTab } from './Tabs/TeethTab'
 import { UpdateTab } from '../DetailView/common/UpdateTab'
+import { EditDataType, SpeciesDetailsType } from '@/backendTypes'
 
 export const SpeciesDetails = () => {
   const { id } = useParams()
-  const { isLoading, isError, data } = useGetSpeciesDetailsQuery(id!)
-
+  const { isLoading, isError, isFetching, data } = useGetSpeciesDetailsQuery(id!)
+  const [editSpeciesRequest, status] = useEditSpeciesMutation()
   if (isError) return <div>Error loading data</div>
-  if (isLoading || !data) return <CircularProgress />
+  if (isLoading || isFetching || !data) return <CircularProgress />
+
+  const onWrite = async (editData: EditDataType<SpeciesDetailsType>) => {
+    await editSpeciesRequest(editData)
+  }
 
   const tabs: TabType[] = [
     {
@@ -62,7 +67,8 @@ export const SpeciesDetails = () => {
     <DetailView
       tabs={tabs}
       data={data}
-      onWrite={() => {}}
+      loading={status.isLoading}
+      onWrite={onWrite}
       validator={() => ({
         name: 'unknown',
         error: null,

@@ -7,7 +7,7 @@ import { Box, CircularProgress } from '@mui/material'
 import { SelectingTable } from '@/components/DetailView/common/SelectingTable'
 
 export const LocalityTab = () => {
-  const { data, editData, mode } = useDetailContext<SpeciesDetailsType>()
+  const { data, editData, setEditData, mode } = useDetailContext<SpeciesDetailsType>()
   const { data: localitiesData, isError } = useGetAllLocalitiesQuery()
 
   if (isError) return 'Error loading Localities.'
@@ -55,6 +55,20 @@ export const LocalityTab = () => {
       data={localitiesData}
       fieldName="now_ls"
       idFieldName="lid"
+      editingAction={(locality: Locality) => {
+        setEditData({
+          ...editData,
+          now_ls: [
+            ...editData.now_ls,
+            {
+              species_id: editData.species_id,
+              lid: locality.lid,
+              now_loc: locality,
+              rowState: 'new',
+            },
+          ],
+        })
+      }}
     />
   )
 
@@ -66,14 +80,7 @@ export const LocalityTab = () => {
         </Box>
       )}
       <EditableTable<Editable<Locality>, SpeciesDetailsType>
-        columns={columns}
-        editTableData={editData.now_ls.map(
-          item =>
-            !item.now_loc
-              ? (item as unknown as Editable<Locality>)
-              : ({ ...item.now_loc, lid: item.now_loc.lid! } as never) // TODO fix type
-        )}
-        tableData={data.now_ls.map(item => (!item.now_loc ? (item as unknown as Editable<Locality>) : item.now_loc))}
+        columns={columns.map(c => ({ ...c, accessorKey: `now_loc.${c.accessorKey}` }))}
         field="now_ls"
       />
     </Grouped>
