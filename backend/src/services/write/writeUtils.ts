@@ -42,9 +42,9 @@ export const isNumeric = (value: string) => /^-?\d+$/.test(value)
 
 // JSON.stringify doesn't preserve "key: undefined" entries, this prints those as a string instead.
 // Also turns bigint to number because bigint cant be serialized
-export const printJSON = (obj: object) =>
+export const printJSON = (item: object | string | number) =>
   JSON.stringify(
-    obj,
+    item,
     (k: string | number, v: unknown) => {
       if (typeof v === 'bigint') return Number(v)
       return v === undefined ? 'undefined' : v
