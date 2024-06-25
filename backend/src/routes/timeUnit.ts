@@ -28,7 +28,7 @@ router.put('/', async (req: Request<object, object, { timeUnit: EditDataType<Tim
   const editedObject = req.body.timeUnit
   const oldObject = await getTimeUnitDetails(editedObject.tu_name!)
   console.log(printJSON(editedObject))
-  const result = await write(editedObject, 'now_tu', oldObject as TimeUnitDetailsType)
+  const result = await write(editedObject, 'now_time_unit', oldObject as TimeUnitDetailsType)
   return res.status(200).send(result ? { result: result } : { error: 'error' })
 })
 

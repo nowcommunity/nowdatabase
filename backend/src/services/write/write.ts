@@ -41,7 +41,7 @@ const ids = {
   com_mlist: ['museum'],
   com_species: ['species_id'],
   now_ss: ['lid', 'sed_struct'],
-  now_tu: ['tu_name'],
+  now_time_unit: ['tu_name'],
 }
 
 type Item = { column: string; value: any }
@@ -71,7 +71,12 @@ const supportedTables = [
   'com_mlist',
   'com_species',
   'now_ss',
+  'now_time_unit',
 ]
+
+if (supportedTables.find(table => !ids[table]) || Object.keys(ids).find(id => !supportedTables.includes(id)))
+  throw Error('In write.js, all tables with ids must be supported and all supported tables must have ids')
+
 // Adding tables and fields to allowed field values
 addFieldsToAllowed(supportedTables)
 supportedTables.forEach(table => addFieldsToAllowed(Object.keys(nowDb[table].fields)))
@@ -111,6 +116,7 @@ export const write: WriteFunction = async (data, tableName, oldObject) => {
         : null
     debugLog(`old obj: ${!!oldObj} ${Object.keys(whereObject).length} ${ids[tableName].length}`)
     const allFields = Object.keys(obj).filter(f => allowedFields[f])
+    debugLog(`All fields: ${allFields}`)
     const basicFields = allFields.filter(
       f => typeof obj[f as keyof object] !== 'object' || obj[f as keyof object] === null
     )
@@ -125,14 +131,15 @@ export const write: WriteFunction = async (data, tableName, oldObject) => {
       debugLog(`Processed objectField ${objectField} and assigned id ${newId} to ${ids[objectField][1]}`)
       debugLog(`}`)
     }
-    basicFields.push(Object.keys(relationIds))
+    basicFields.push(...Object.keys(relationIds))
+    debugLog(`basicFields: ${printJSON(basicFields)}`)
     for (const field of basicFields) {
       const isRelationField = !!relationIds[field]
       const newValue = relationIds[field] ?? (obj[field as keyof object] as any)
       const oldValue = oldObj?.[field as keyof object]
-      /* debugLog(
+      debugLog(
         `Field: ${field} Old value: ${oldValue} - ${typeof oldValue} New value: ${newValue} - ${typeof newValue}`
-      ) */
+      )
       if (newValue === oldValue) continue
       if (isEmptyValue(newValue) && isEmptyValue(oldValue)) continue
       if (typeof oldValue === 'bigint' && typeof newValue === 'number' && BigInt(newValue) === oldValue) continue
