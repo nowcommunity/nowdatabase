@@ -2,14 +2,19 @@ import { useParams } from 'react-router-dom'
 import { CircularProgress } from '@mui/material'
 import { DetailView, TabType } from '../DetailView/DetailView'
 import { ReferenceTab } from './Tabs/ReferenceTab'
-import { useGetReferenceDetailsQuery } from '@/redux/referenceReducer'
+import { useEditReferenceMutation, useGetReferenceDetailsQuery } from '@/redux/referenceReducer'
+import { EditDataType, ReferenceDetailsType } from '@/backendTypes'
 
 export const ReferenceDetails = () => {
   const { id } = useParams()
-  const { isLoading, isError, data } = useGetReferenceDetailsQuery(id!)
-
+  const { isLoading, isFetching, isError, data } = useGetReferenceDetailsQuery(id!)
+  const [editReferenceMutation] = useEditReferenceMutation()
   if (isError) return <div>Error loading data</div>
-  if (isLoading || !data) return <CircularProgress />
+  if (isLoading || isFetching || !data) return <CircularProgress />
+
+  const onWrite = async (editedReference: EditDataType<ReferenceDetailsType>) => {
+    await editReferenceMutation(editedReference)
+  }
 
   const tabs: TabType[] = [
     {
@@ -18,5 +23,5 @@ export const ReferenceDetails = () => {
     },
   ]
 
-  return <DetailView tabs={tabs} data={data} onWrite={() => {}} validator={() => ({ name: '', error: null })} />
+  return <DetailView tabs={tabs} data={data} onWrite={onWrite} validator={() => ({ name: '', error: null })} />
 }

@@ -16,7 +16,7 @@ import { EditDataType, SpeciesDetailsType } from '@/backendTypes'
 export const SpeciesDetails = () => {
   const { id } = useParams()
   const { isLoading, isError, isFetching, data } = useGetSpeciesDetailsQuery(id!)
-  const [editSpeciesRequest, status] = useEditSpeciesMutation()
+  const [editSpeciesRequest] = useEditSpeciesMutation()
   if (isError) return <div>Error loading data</div>
   if (isLoading || isFetching || !data) return <CircularProgress />
 
@@ -67,7 +67,6 @@ export const SpeciesDetails = () => {
     <DetailView
       tabs={tabs}
       data={data}
-      loading={status.isLoading}
       onWrite={onWrite}
       validator={() => ({
         name: 'unknown',

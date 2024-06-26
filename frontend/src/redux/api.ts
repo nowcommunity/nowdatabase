@@ -4,7 +4,19 @@ import { RootState } from './store'
 
 export const api = createApi({
   reducerPath: 'api',
-  tagTypes: ['user', 'localities', 'species', 'specieslist', 'references', 'timeunits', 'timeunit', 'locality'],
+  tagTypes: [
+    'user',
+    'locality',
+    'localities',
+    'species',
+    'specieslist',
+    'reference',
+    'references',
+    'timeunits',
+    'timeunit',
+    'timebound',
+    'timebounds',
+  ],
   baseQuery: fetchBaseQuery({
     baseUrl: BACKEND_URL,
     prepareHeaders: (headers, { getState }) => {
