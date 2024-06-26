@@ -43,7 +43,7 @@ export const modeOptionToMode: Record<ModeOptions, ModeType> = {
   'staging-new': {
     read: false,
     staging: true,
-    new: false,
+    new: true,
     option: 'staging-new',
   },
 }

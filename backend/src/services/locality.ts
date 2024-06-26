@@ -98,11 +98,9 @@ export const validateEntireLocality = (editedFields: EditDataType<Prisma.now_loc
 }
 
 export const processLocalityForEdit = async (editedLocality: EditDataType<LocalityDetailsType>) => {
-  const fixedEditedLocality = fixEditedLocality(editedLocality)
-  const oldLocality = await getLocalityDetails(fixedEditedLocality.lid!)
   const validationErrors = validateEntireLocality(editedLocality)
   if (validationErrors.length > 0) return { validationErrors }
-  const result = await write(editedLocality, 'now_loc', oldLocality!)
+  const result = await write(editedLocality, 'now_loc')
   return { result }
 }
 

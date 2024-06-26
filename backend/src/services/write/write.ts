@@ -53,8 +53,6 @@ const getFindFunction = (tableName: string, newItem: any) => (item: any) => {
   return !ids[tableName].find(f => newItem[f] !== item[f])
 }
 
-// TODO change ignored fields to allowed fields. form those by taking prisma.model.fields, and adding the accepted relation fields.
-const ignoredFields = ['now_lau']
 const allowedFields = {}
 const addFieldsToAllowed = fields =>
   fields.forEach(f => {
@@ -112,7 +110,7 @@ export const write: WriteFunction = async (data, tableName) => {
     if (ids[tableName].length === 1) whereObject = { [ids[tableName][0]]: obj[ids[tableName][0]] }
     debugLog(`ids: ${ids[tableName]}, where: ${printJSON(where)}`)
     const oldObj =
-      ids[tableName] && Object.keys(where).length === ids[tableName].length
+      ids[tableName] && obj[ids[tableName][0]] && Object.keys(where).length === ids[tableName].length
         ? await nowDb[tableName].findUnique({
             where: whereObject,
           })
@@ -130,10 +128,13 @@ export const write: WriteFunction = async (data, tableName) => {
     const relationIds = {}
     for (const objectField of objectFields) {
       const newId = await writeTable(obj[objectField], objectField)
-      relationIds[ids[objectField][1]] = newId
-      debugLog(`Processed objectField ${objectField} and assigned id ${newId} to ${ids[objectField][1]}`)
+      const lastItem = ids[objectField].length - 1
+      relationIds[ids[objectField][lastItem]] = newId
+      debugLog(`Processed objectField ${objectField} and assigned id ${newId} to ${ids[objectField][lastItem]}`)
     }
-    basicFields.push(...Object.keys(relationIds))
+    Object.keys(relationIds).forEach(rId => {
+      if (!basicFields.includes(rId) && rId !== undefined) basicFields.push(rId)
+    })
     debugLog(`basicFields: ${printJSON(basicFields)}`)
     for (const field of basicFields) {
       const isRelationField = !!relationIds[field]
