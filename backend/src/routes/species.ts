@@ -23,7 +23,7 @@ router.put('/', async (req: Request<object, object, { species: EditDataType<Spec
   const editedObject = req.body.species
   const oldObject = await getSpeciesDetails(editedObject.species_id!)
   console.log(printJSON(editedObject))
-  const result = await write(editedObject, 'com_species', oldObject as unknown as SpeciesDetailsType)
+  const result = await write(editedObject, 'com_species')
   return res.status(200).send(result ? { result: result } : { error: 'error' })
 })
 

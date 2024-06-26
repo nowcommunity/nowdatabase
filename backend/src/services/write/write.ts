@@ -26,8 +26,7 @@ const debugLog = (msg: string) => {
 
 type WriteFunction = (
   data: EditDataType<LocalityDetailsType | SpeciesDetailsType | TimeUnitDetailsType | TimeBoundDetailsType>,
-  tableName: string,
-  oldObject: EditDataType<LocalityDetailsType | SpeciesDetailsType | TimeUnitDetailsType | TimeBoundDetailsType>
+  tableName: string
 ) => Promise<string>
 
 const ids = {
@@ -42,6 +41,8 @@ const ids = {
   com_species: ['species_id'],
   now_ss: ['lid', 'sed_struct'],
   now_time_unit: ['tu_name'],
+  now_tu_bound: ['bid'],
+  ref_ref: ['rid'],
 }
 
 type Item = { column: string; value: any }
@@ -72,6 +73,8 @@ const supportedTables = [
   'com_species',
   'now_ss',
   'now_time_unit',
+  'now_tu_bound',
+  'ref_ref',
 ]
 
 if (supportedTables.find(table => !ids[table]) || Object.keys(ids).find(id => !supportedTables.includes(id)))

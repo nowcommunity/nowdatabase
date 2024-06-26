@@ -1,6 +1,8 @@
-import { Router } from 'express'
+import { Request, Router } from 'express'
 import { getAllTimeBounds, getTimeBoundDetails, getTimeBoundTimeUnits } from '../services/timeBound'
 import { fixBigInt } from '../utils/common'
+import { EditDataType, TimeBoundDetailsType } from '../../../frontend/src/backendTypes'
+import { write } from '../services/write/write'
 
 const router = Router()
 
@@ -19,6 +21,12 @@ router.get('/time-units/:id', async (req, res) => {
   const id = parseInt(req.params.id)
   const timeUnits = await getTimeBoundTimeUnits(id)
   return res.status(200).send(fixBigInt(timeUnits))
+})
+
+router.put('/', async (req: Request<object, object, { timeBound: EditDataType<TimeBoundDetailsType> }>, res) => {
+  const editedLocality = req.body.timeBound
+  const result = await write(editedLocality, 'now_tu_bound')
+  return res.status(200).send(result ? { result: result } : { error: 'error' })
 })
 
 export default router
