@@ -33,11 +33,13 @@ export const DetailView = <T extends object>({
   data,
   onWrite,
   validator,
+  isNew,
 }: {
   tabs: TabType[]
-  data: T
+  data: T | object
   onWrite: (editData: EditDataType<T>) => Promise<void>
   validator: (editData: EditDataType<T>, field: keyof EditDataType<T>) => ValidationObject
+  isNew: boolean
 }) => {
   const [searchParams, setSearchParams] = useSearchParams()
 
@@ -47,7 +49,7 @@ export const DetailView = <T extends object>({
     return parseInt(tabFromUrl)
   }
 
-  const [mode, setModeState] = useState<ModeType>(modeOptionToMode['read'])
+  const [mode, setModeState] = useState<ModeType>(isNew ? modeOptionToMode['new'] : modeOptionToMode['read'])
   const [tab, setTab] = useState(getUrl())
 
   useEffect(() => {
@@ -131,7 +133,7 @@ export const DetailView = <T extends object>({
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignContent: 'center', marginTop: 'auto' }}>
           <Box sx={{ display: 'flex' }} gap={10}>
             <ReturnButton />
-            {!mode.staging && (
+            {!mode.staging && !initialState.mode.new && (
               <Button
                 onClick={() => setMode(!mode.read ? 'read' : 'edit')}
                 variant={mode.read ? 'contained' : 'outlined'}
@@ -140,7 +142,7 @@ export const DetailView = <T extends object>({
                 <EditIcon style={{ marginRight: '0.5em' }} /> {mode.read ? 'Edit' : 'Cancel edit'}
               </Button>
             )}
-            {!mode.read && onWrite && <WriteButton onWrite={onWrite} />}
+            {(!mode.read || initialState.mode.new) && onWrite && <WriteButton onWrite={onWrite} />}
           </Box>
           <Box sx={{ marginRight: '3em' }}>
             <DetailBrowser<T> />

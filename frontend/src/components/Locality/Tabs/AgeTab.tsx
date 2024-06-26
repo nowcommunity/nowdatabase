@@ -7,6 +7,7 @@ import { TimeUnitTable } from '@/components/TimeUnit/TimeUnitTable'
 
 export const AgeTab = () => {
   const { textField, radioSelection, dropdown, bigTextField, editData } = useDetailContext<LocalityDetailsType>()
+
   const fracOptions = [
     emptyOption,
     'Early half 1:2',

@@ -10,6 +10,7 @@ import { useState } from 'react'
 export const WriteButton = <T,>({ onWrite }: { onWrite: (editData: EditDataType<T>) => Promise<void> }) => {
   const { editData, mode, setMode } = useDetailContext<T>()
   const [loading, setLoading] = useState(false)
+
   const getButtonText = () => {
     if (mode.staging) return 'Finalize entry'
     return 'Complete and save'
@@ -19,7 +20,7 @@ export const WriteButton = <T,>({ onWrite }: { onWrite: (editData: EditDataType<
       sx={{ width: '20em' }}
       onClick={() => {
         if (!mode.staging) {
-          setMode(mode.new ? 'staging-edit' : 'staging-new')
+          setMode(mode.new ? 'staging-new' : 'staging-edit')
           return
         }
         setLoading(true)
@@ -44,11 +45,13 @@ export const ReturnButton = () => {
   const navigate = useNavigate()
   const { tableUrl } = usePageContext()
   const { mode, setMode } = useDetailContext()
+
   if (mode.staging) {
     return (
       <Button
         onClick={() => {
-          setMode('edit')
+          if (mode.new) setMode('new')
+          else setMode('edit')
         }}
       >
         <ArrowBackIcon color="primary" style={{ marginRight: '0.2em' }} />
