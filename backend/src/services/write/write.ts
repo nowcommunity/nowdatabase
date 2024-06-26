@@ -132,26 +132,31 @@ export const write: WriteFunction = async (data, tableName) => {
       relationIds[ids[objectField][lastItem]] = newId
       debugLog(`Processed objectField ${objectField} and assigned id ${newId} to ${ids[objectField][lastItem]}`)
     }
+    ids[tableName].forEach(id => {
+      relationIds[id] = obj[id]
+    })
     Object.keys(relationIds).forEach(rId => {
       if (!basicFields.includes(rId) && rId !== undefined) basicFields.push(rId)
     })
+
     debugLog(`basicFields: ${printJSON(basicFields)}`)
     for (const field of basicFields) {
       const isRelationField = !!relationIds[field]
       const newValue = relationIds[field] ?? (obj[field as keyof object] as any)
       const oldValue = oldObj?.[field as keyof object]
       debugLog(
-        `Field: ${field} Old value: ${oldValue} - ${typeof oldValue} New value: ${newValue} - ${typeof newValue}`
+        `Field: ${field} Old value: ${oldValue} (${typeof oldValue}) New value: ${newValue} (${typeof newValue}) - isRelationField: ${isRelationField}`
       )
       if (newValue === oldValue) continue
       if (isEmptyValue(newValue) && isEmptyValue(oldValue)) continue
       if (typeof oldValue === 'bigint' && typeof newValue === 'number' && BigInt(newValue) === oldValue) continue
-      if (!isRelationField) fieldsToWrite.push({ column: field, value: newValue })
+      if (!isRelationField || newValue !== undefined) fieldsToWrite.push({ column: field, value: newValue })
     }
 
     const columns = fieldsToWrite.map(({ column }) => column)
     const values = fieldsToWrite.map(({ value }) => value)
-    const idFieldName = ids[tableName as keyof object] as string
+    const idFieldName = ids[tableName][0]
+    debugLog(`idFieldName ${printJSON(idFieldName)}`)
     debugLog(`Writing to ${tableName} to columns ${columns.join(', ')} values ${values.join(', ')}`)
     let id = obj[idFieldName as keyof object] as string
     if (values.length > 0) {
@@ -165,7 +170,8 @@ export const write: WriteFunction = async (data, tableName) => {
           `INSERT INTO ${dbName}.${tableName} (${columns.join(', ')}) VALUES (${values.map(_ => '?').join(', ')}) RETURNING ${idFieldName}`,
           values
         )
-        id = result[idFieldName]
+        debugLog(`Insert result: ${printJSON(result)}`)
+        id = result[0][idFieldName]
       }
     }
     for (const arrayField of arrayFields) {
