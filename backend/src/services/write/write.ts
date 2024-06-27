@@ -21,6 +21,8 @@ import { isEmptyValue, printJSON } from './writeUtils'
 
 const DEBUG_MODE = true
 
+const logDbName = 'now_log_test'
+
 const debugLog = (msg: string) => {
   if (DEBUG_MODE) logger.info(msg)
 }
@@ -29,7 +31,8 @@ type WriteFunction = (
   data: EditDataType<LocalityDetailsType | SpeciesDetailsType | TimeUnitDetailsType | TimeBoundDetailsType>,
   tableName: string,
   authorizer: string,
-  coordinator: string
+  coordinator: string,
+  userName: string
 ) => Promise<string>
 
 const ids = {
@@ -48,7 +51,7 @@ const ids = {
   ref_ref: ['rid'],
 }
 
-type Item = { column: string; value: any }
+type Item = { column: string; value: any; oldValue?: any }
 type WriteItem = { table: string; type: 'add' | 'update' | 'delete'; items: Item[] }
 
 const getFindFunction = (tableName: string, newItem: any) => (item: any) => {
@@ -92,7 +95,7 @@ allowedFields['now_bau'] = false
 
 const dbName = 'now_test'
 
-export const write: WriteFunction = async (data, tableName, coordinator, authorizer) => {
+export const write: WriteFunction = async (data, tableName, coordinator, authorizer, userName) => {
   debugLog('Write')
   const writeList: WriteItem[] = []
   const conn = await pool.getConnection()
@@ -153,7 +156,7 @@ export const write: WriteFunction = async (data, tableName, coordinator, authori
       if (newValue === oldValue) continue
       if (isEmptyValue(newValue) && isEmptyValue(oldValue)) continue
       if (typeof oldValue === 'bigint' && typeof newValue === 'number' && BigInt(newValue) === oldValue) continue
-      if (!isRelationField || newValue !== undefined) fieldsToWrite.push({ column: field, value: newValue })
+      if (!isRelationField || newValue !== undefined) fieldsToWrite.push({ column: field, value: newValue, oldValue })
     }
 
     const columns = fieldsToWrite.map(({ column }) => column)
@@ -233,9 +236,11 @@ export const write: WriteFunction = async (data, tableName, coordinator, authori
       tableNameToUpdateTable[tableName],
       coordinator,
       authorizer,
+      data[tableNameToUpdateTable[tableName]].comment,
       result
     )
     debugLog(`updateEntry: ${printJSON(updateEntry)}`)
+    const logResult = await writeToLog(conn, writeList, tableName, updateEntry, userName)
     await conn.commit()
   } catch (e: unknown) {
     await conn.rollback()
@@ -249,22 +254,59 @@ export const write: WriteFunction = async (data, tableName, coordinator, authori
   return result
 }
 
+const tableToId = { now_lau: 'lid', now_sau: 'species_id', now_tau: 'tu_name', now_bau: 'bid' }
+const getUpdateIdField = (tableName: string) => `${tableName[4]}uid`
+
+const writeToLog = async (
+  conn: PoolConnection,
+  writeList: WriteItem[],
+  tableName: string,
+  updateEntryId: number,
+  userName: string
+) => {
+  const updateRows = writeList.flatMap(item =>
+    item.items.map(row => ({
+      event_time: new Date(),
+      user_name: userName,
+      server_name: 'sysbiol',
+      table_name: tableName,
+      pk_data: `${(ids[tableName][0] + '').length}.${ids[tableName].join('.')};`,
+      column_name: row.column,
+      // TODO add deletions
+      log_action: row.oldValue ? 3 : 2, // 1 = delete, 2 = create, 3 = update
+      old_data: row.oldValue,
+      new_data: row.value,
+      [getUpdateIdField(tableName)]: updateEntryId,
+    }))
+  )
+  debugLog(`updateRows: ${printJSON(updateRows)}`)
+  for (const row of updateRows) {
+    const columnsAndValues = Object.entries(row)
+    const columns = columnsAndValues.map(([column]) => column)
+    const values = columnsAndValues.map(([, values]) => values)
+    await conn.query(
+      `INSERT INTO ${logDbName}.log (${columns.join(', ')}) VALUES (${columns.map(() => '?').join(', ')})`,
+      values
+    )
+    debugLog(`Writing into log-db: ${printJSON(row)}`)
+  }
+}
+
 const createUpdateEntry = async (
   conn: PoolConnection,
   table: 'now_lau' | 'now_sau' | 'now_tau' | 'now_bau',
   coordinator: string,
   authorizer: string,
+  comment: string,
   id: number
 ) => {
-  const tableToId = { now_lau: 'lid', now_sau: 'species_id', now_tau: 'tu_name', now_bau: 'bid' }
-  const updateIdField = `${table[4]}uid`
   // TODO id must be made into correct form (5.12312; or something)
   const result = await conn.query(
-    `INSERT INTO ${dbName}.${table} (lau_coordinator, lau_authorizer, ${tableToId[table]}) VALUES (?, ?, ?) RETURNING ${table}.${updateIdField}`,
+    `INSERT INTO ${dbName}.${table} (lau_coordinator, lau_authorizer, ${tableToId[table]}) VALUES (?, ?, ?) RETURNING ${table}.${getUpdateIdField(table)}`,
     [coordinator, authorizer, id]
   )
   debugLog(`createUpdateEntry result before returning: ${printJSON(result)}`)
-  return result?.[0]?.[updateIdField]
+  return result?.[0]?.[getUpdateIdField(table)]
 }
 
 const test = async () => {
