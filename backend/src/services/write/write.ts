@@ -6,6 +6,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
+import { PoolConnection } from 'mariadb'
 import {
   EditDataType,
   LocalityDetailsType,
@@ -26,7 +27,9 @@ const debugLog = (msg: string) => {
 
 type WriteFunction = (
   data: EditDataType<LocalityDetailsType | SpeciesDetailsType | TimeUnitDetailsType | TimeBoundDetailsType>,
-  tableName: string
+  tableName: string,
+  authorizer: string,
+  coordinator: string
 ) => Promise<string>
 
 const ids = {
@@ -89,7 +92,7 @@ allowedFields['now_bau'] = false
 
 const dbName = 'now_test'
 
-export const write: WriteFunction = async (data, tableName) => {
+export const write: WriteFunction = async (data, tableName, coordinator, authorizer) => {
   debugLog('Write')
   const writeList: WriteItem[] = []
   const conn = await pool.getConnection()
@@ -160,11 +163,13 @@ export const write: WriteFunction = async (data, tableName) => {
     debugLog(`Writing to ${tableName} to columns ${columns.join(', ')} values ${values.join(', ')}`)
     let id = obj[idFieldName as keyof object] as string
     if (values.length > 0) {
+      let type: 'add' | 'update' | 'delete'
       if (id && !!oldObj) {
         await query(
           `UPDATE ${dbName}.${tableName} SET ${columns.map(c => `${c} = ?`).join(', ')} WHERE ${idFieldName} = ?`,
           [...values, id]
         )
+        type = 'update'
       } else {
         const result = await query(
           `INSERT INTO ${dbName}.${tableName} (${columns.join(', ')}) VALUES (${values.map(_ => '?').join(', ')}) RETURNING ${idFieldName}`,
@@ -172,7 +177,9 @@ export const write: WriteFunction = async (data, tableName) => {
         )
         debugLog(`Insert result: ${printJSON(result)}`)
         id = result[0][idFieldName]
+        type = 'add'
       }
+      writeList.push({ items: fieldsToWrite, type, table: tableName })
     }
     for (const arrayField of arrayFields) {
       const items = obj[arrayField]
@@ -199,6 +206,7 @@ export const write: WriteFunction = async (data, tableName) => {
         `DELETE FROM ${dbName}.${rowToDelete.tableName} WHERE ${rowToDelete.idColumns.map(column => `${column} = ?`).join(' AND ')}`,
         rowToDelete.idValues
       ) // NOTE column here is actually table name
+      writeList.push({ table: rowToDelete.tableName, type: 'delete', items: rowToDelete.idValues })
       debugLog(`deleteResult: ${printJSON(deleteResult)}`)
     }
     //debugLog(printJSON(fieldsToWrite, null, 2))
@@ -213,6 +221,21 @@ export const write: WriteFunction = async (data, tableName) => {
     // debugLog('New object', printJSON(data, null, 2))
     result = await writeTable(data, tableName)
     debugLog(`Final result: ${printJSON(result)}`)
+    debugLog(`WriteList: ${printJSON(writeList)}`)
+    const tableNameToUpdateTable = {
+      now_loc: 'now_lau',
+      com_species: 'now_sau',
+      now_time_unit: 'now_tau',
+      now_tu_bound: 'now_bau',
+    }
+    const updateEntry = await createUpdateEntry(
+      conn,
+      tableNameToUpdateTable[tableName],
+      coordinator,
+      authorizer,
+      result
+    )
+    debugLog(`updateEntry: ${printJSON(updateEntry)}`)
     await conn.commit()
   } catch (e: unknown) {
     await conn.rollback()
@@ -224,6 +247,24 @@ export const write: WriteFunction = async (data, tableName) => {
     await conn.end()
   }
   return result
+}
+
+const createUpdateEntry = async (
+  conn: PoolConnection,
+  table: 'now_lau' | 'now_sau' | 'now_tau' | 'now_bau',
+  coordinator: string,
+  authorizer: string,
+  id: number
+) => {
+  const tableToId = { now_lau: 'lid', now_sau: 'species_id', now_tau: 'tu_name', now_bau: 'bid' }
+  const updateIdField = `${table[4]}uid`
+  // TODO id must be made into correct form (5.12312; or something)
+  const result = await conn.query(
+    `INSERT INTO ${dbName}.${table} (lau_coordinator, lau_authorizer, ${tableToId[table]}) VALUES (?, ?, ?) RETURNING ${table}.${updateIdField}`,
+    [coordinator, authorizer, id]
+  )
+  debugLog(`createUpdateEntry result before returning: ${printJSON(result)}`)
+  return result?.[0]?.[updateIdField]
 }
 
 const test = async () => {
