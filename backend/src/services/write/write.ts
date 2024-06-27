@@ -10,6 +10,7 @@ import { PoolConnection } from 'mariadb'
 import {
   EditDataType,
   LocalityDetailsType,
+  ReferenceDetailsType,
   SpeciesDetailsType,
   TimeBoundDetailsType,
   TimeUnitDetailsType,
@@ -33,7 +34,7 @@ type WriteFunction = (
   authorizer: string,
   coordinator: string,
   userName: string
-) => Promise<string>
+) => Promise<string> | ((data: EditDataType<ReferenceDetailsType>, tableName: 'ref_ref') => Promise<string>)
 
 const ids = {
   now_loc: ['lid'],
@@ -301,10 +302,9 @@ const createUpdateEntry = async (
   id: number
 ) => {
   const idField = getUpdateIdField(table)
-  const dateField = `${table[4]}au_date`
-  const commentField = `${table[4]}au_comment`
+  const prefix = `${table[4]}au`
   const result = await conn.query(
-    `INSERT INTO ${dbName}.${table} (lau_coordinator, lau_authorizer, ${tableToId[table]}, ${dateField}, ${commentField}) VALUES (?, ?, ?, ?, ?) RETURNING ${table}.${idField}`,
+    `INSERT INTO ${dbName}.${table} (${prefix}_coordinator, ${prefix}_authorizer, ${tableToId[table]}, ${prefix}_date, ${prefix}_comment) VALUES (?, ?, ?, ?, ?) RETURNING ${table}.${idField}`,
     [coordinator, authorizer, id, new Date(), comment]
   )
   debugLog(`createUpdateEntry result before returning: ${printJSON(result)}`)

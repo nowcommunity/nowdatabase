@@ -3,7 +3,6 @@ import { getAllTimeUnits, getTimeUnitDetails, getTimeUnitLocalities } from '../s
 import { fixBigInt } from '../utils/common'
 import { EditDataType, TimeUnitDetailsType } from '../../../frontend/src/backendTypes'
 import { write } from '../services/write/write'
-import { printJSON } from '../services/write/writeUtils'
 
 const router = Router()
 
@@ -26,9 +25,7 @@ router.get('/localities/:id', async (req, res) => {
 
 router.put('/', async (req: Request<object, object, { timeUnit: EditDataType<TimeUnitDetailsType> }>, res) => {
   const editedObject = req.body.timeUnit
-  const oldObject = await getTimeUnitDetails(editedObject.tu_name!)
-  console.log(printJSON(editedObject))
-  const result = await write(editedObject, 'now_time_unit', oldObject as TimeUnitDetailsType)
+  const result = await write(editedObject, 'now_time_unit', 'ArK', 'ArK', 'testuser')
   return res.status(200).send(result ? { result: result } : { error: 'error' })
 })
 

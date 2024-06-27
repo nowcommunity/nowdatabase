@@ -6,13 +6,17 @@ import { BoundTab } from './Tabs/BoundTab'
 import { TimeUnitTab } from './Tabs/TimeUnitTab.tsx'
 import { UpdateTab } from '../DetailView/common/UpdateTab.tsx'
 import { EditDataType, TimeBoundDetailsType } from '@/backendTypes.js'
+import { emptyTimeBound } from '../DetailView/common/defaultValues.ts'
 
 export const TimeBoundDetails = () => {
   const { id } = useParams()
-  const { isLoading, isFetching, isError, data } = useGetTimeBoundDetailsQuery(decodeURIComponent(id!))
+  const isNew = id === 'new'
+  const { isLoading, isFetching, isError, data } = useGetTimeBoundDetailsQuery(decodeURIComponent(id!), {
+    skip: isNew,
+  })
   const [editTimeBoundRequest] = useEditTimeBoundMutation()
   if (isError) return <div>Error loading data</div>
-  if (isLoading || isFetching || !data) return <CircularProgress />
+  if (isLoading || isFetching || (!data && !isNew)) return <CircularProgress />
 
   const onWrite = async (editedTimeBound: EditDataType<TimeBoundDetailsType>) => {
     await editTimeBoundRequest(editedTimeBound)
@@ -36,7 +40,8 @@ export const TimeBoundDetails = () => {
   return (
     <DetailView
       tabs={tabs}
-      data={data}
+      data={isNew ? emptyTimeBound : data!}
+      isNew={isNew}
       onWrite={onWrite}
       validator={() => ({
         name: 'unknown',

@@ -6,13 +6,15 @@ import { LocalityTab } from './Tabs/LocalityTab'
 import { TimeUnitTab } from './Tabs/TimeUnitTab'
 import { UpdateTab } from '../DetailView/common/UpdateTab'
 import { EditDataType, TimeUnitDetailsType } from '@/backendTypes'
+import { emptyTimeUnit } from '../DetailView/common/defaultValues'
 
 export const TimeUnitDetails = () => {
   const { id } = useParams()
+  const isNew = id === 'new'
   const { isLoading, isError, isFetching, data } = useGetTimeUnitDetailsQuery(encodeURIComponent(id!))
   const [editTimeUnitRequest] = useEditTimeUnitMutation()
   if (isError) return <div>Error loading data</div>
-  if (isLoading || isFetching || !data) return <CircularProgress />
+  if (isLoading || isFetching || (!data && !isNew)) return <CircularProgress />
 
   const onWrite = async (editData: EditDataType<TimeUnitDetailsType>) => {
     await editTimeUnitRequest(editData)
@@ -33,5 +35,13 @@ export const TimeUnitDetails = () => {
     },
   ]
 
-  return <DetailView tabs={tabs} data={data} onWrite={onWrite} validator={() => ({ name: '', error: null })} />
+  return (
+    <DetailView
+      tabs={tabs}
+      isNew={isNew}
+      data={isNew ? emptyTimeUnit : data!}
+      onWrite={onWrite}
+      validator={() => ({ name: '', error: null })}
+    />
+  )
 }
