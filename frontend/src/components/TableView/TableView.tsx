@@ -8,8 +8,8 @@ import {
   useMaterialReactTable,
   MaterialReactTable,
 } from 'material-react-table'
-import { CircularProgress } from '@mui/material'
-import { useLocation } from 'react-router-dom'
+import { Box, Button, CircularProgress } from '@mui/material'
+import { Link, useLocation } from 'react-router-dom'
 import { renderCustomToolbar, renderCustomToolbarModalVersion } from './helpers'
 import { ActionComponent } from './ActionComponent'
 import { usePageContext } from '../Page'
@@ -115,5 +115,13 @@ export const TableView = <T extends MRT_RowData>({
 
   if (!data) return <CircularProgress />
 
-  return <MaterialReactTable table={table} />
+  return (
+    <Box>
+      <Button component={Link} to="new">
+        New
+      </Button>
+      <Button>Delete</Button>
+      <MaterialReactTable table={table} />
+    </Box>
+  )
 }
