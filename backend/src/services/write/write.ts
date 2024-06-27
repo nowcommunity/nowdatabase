@@ -300,31 +300,13 @@ const createUpdateEntry = async (
   comment: string,
   id: number
 ) => {
-  // TODO id must be made into correct form (5.12312; or something)
+  const idField = getUpdateIdField(table)
+  const dateField = `${table[4]}au_date`
+  const commentField = `${table[4]}au_comment`
   const result = await conn.query(
-    `INSERT INTO ${dbName}.${table} (lau_coordinator, lau_authorizer, ${tableToId[table]}) VALUES (?, ?, ?) RETURNING ${table}.${getUpdateIdField(table)}`,
-    [coordinator, authorizer, id]
+    `INSERT INTO ${dbName}.${table} (lau_coordinator, lau_authorizer, ${tableToId[table]}, ${dateField}, ${commentField}) VALUES (?, ?, ?, ?, ?) RETURNING ${table}.${idField}`,
+    [coordinator, authorizer, id, new Date(), comment]
   )
   debugLog(`createUpdateEntry result before returning: ${printJSON(result)}`)
-  return result?.[0]?.[getUpdateIdField(table)]
-}
-
-const test = async () => {
-  console.log('testing')
-  await sleep(4000)
-  await write(
-    {
-      loc_name: 'newnewnew',
-      date_meth: 'absolute',
-      max_age: 123,
-      min_age: 123,
-      dec_lat: 1,
-      dec_long: 1,
-      hominin_skeletal_remains: true,
-      bipedal_footprints: true,
-      stone_tool_technology: true,
-      stone_tool_cut_marks_on_bones: true,
-    },
-    'now_loc'
-  )
+  return result?.[0]?.[idField]
 }
