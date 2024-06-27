@@ -10,3 +10,6 @@ export const MARIADB_PORT = parseInt(process.env.MARIADB_PORT as string)
 export const USER_CREATION_SECRET = process.env.USER_CREATION_SECRET as string
 export const BACKEND_MODE = process.env.BACKEND_MODE as 'dev' | 'prod' | 'test'
 export const DB_CONNECTION_LIMIT = (process.env.DB_CONNECTION_LIMIT as string) ?? '10'
+export const NOW_DB_NAME = process.env.NOW_DB_NAME as string
+export const LOG_DB_NAME = process.env.LOG_DB_NAME as string
+export const IS_LOCAL = (process.env.IS_LOCAL as string) === 'true'
