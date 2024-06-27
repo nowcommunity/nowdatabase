@@ -36,7 +36,7 @@ export const DetailView = <T extends object>({
   isNew,
 }: {
   tabs: TabType[]
-  data: T | object
+  data: T
   onWrite: (editData: EditDataType<T>) => Promise<void>
   validator: (editData: EditDataType<T>, field: keyof EditDataType<T>) => ValidationObject
   isNew: boolean
