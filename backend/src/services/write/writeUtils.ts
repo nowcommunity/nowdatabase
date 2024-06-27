@@ -2,7 +2,6 @@
   common utility functions for processing saving actions
 */
 import { EditDataType } from '../../../../frontend/src/backendTypes'
-import { fixBigInt } from '../../utils/common'
 
 /*
   Returns object where only the "original" fields remain.
@@ -26,7 +25,7 @@ export const replaceKey =
     Array.isArray(o)
       ? o.map(replaceKey(f))
       : Object(o) === o
-        ? Object.fromEntries(Object.entries(o).map(([k, v]) => [f(k), replaceKey(f)(v)]))
+        ? Object.fromEntries(Object.entries(o).map(([k, v]: [string, object]) => [f(k), replaceKey(f)(v)]))
         : o
 
 export const revertFieldNames = (obj: object) => {

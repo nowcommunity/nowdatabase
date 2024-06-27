@@ -15,7 +15,6 @@ import {
   TimeBoundDetailsType,
   TimeUnitDetailsType,
 } from '../../../../frontend/src/backendTypes'
-import { sleep } from '../../utils/common'
 import { nowDb, pool } from '../../utils/db'
 import { logger } from '../../utils/logger'
 import { isEmptyValue, printJSON } from './writeUtils'
@@ -50,7 +49,7 @@ const ids = {
   now_time_unit: ['tu_name'],
   now_tu_bound: ['bid'],
   ref_ref: ['rid'],
-}
+} as Record<string, string[]>
 
 type Item = { column: string; value: any; oldValue?: any }
 type WriteItem = { table: string; type: 'add' | 'update' | 'delete'; items: Item[] }
@@ -140,13 +139,13 @@ export const write: WriteFunction = async (data, tableName, coordinator, authori
       debugLog(`Processed objectField ${objectField} and assigned id ${newId} to ${ids[objectField][lastItem]}`)
     }
     ids[tableName].forEach(id => {
-      relationIds[id] = obj[id]
+      if (relationIds[id] === undefined) relationIds[id] = obj[id]
     })
     Object.keys(relationIds).forEach(rId => {
       if (!basicFields.includes(rId) && rId !== undefined) basicFields.push(rId)
     })
 
-    debugLog(`basicFields: ${printJSON(basicFields)}`)
+    debugLog(`basicFields: ${printJSON(basicFields)}, relationIds object: ${printJSON(relationIds)}`)
     for (const field of basicFields) {
       const isRelationField = !!relationIds[field]
       const newValue = relationIds[field] ?? (obj[field as keyof object] as any)
@@ -270,7 +269,7 @@ const writeToLog = async (
       event_time: new Date(),
       user_name: userName,
       server_name: 'sysbiol',
-      table_name: tableName,
+      table_name: item.table,
       pk_data: `${(ids[tableName][0] + '').length}.${ids[tableName].join('.')};`,
       column_name: row.column,
       // TODO add deletions
