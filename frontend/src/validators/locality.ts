@@ -3,12 +3,15 @@ import { Validators, validator } from './validator'
 
 export const validateLocality = (
   editData: EditDataType<LocalityDetailsType>,
-  fieldName: keyof EditDataType<LocalityDetailsType>
+  fieldName: keyof EditDataType<LocalityDetailsType>,
+  isNew: boolean
 ) => {
   const validators: Validators<Partial<EditDataType<LocalityDetailsType>>> = {
     max_age: {
       name: 'Age (max)',
       asNumber: (num: number) => {
+        // eslint-disable-next-line no-console
+        if (isNew) console.log('Is new') // TODO remove
         if (editData.min_age && num < editData.min_age) return 'Max value cannot be lower than min'
         return
       },

@@ -63,7 +63,7 @@ export type DetailContextType<T> = {
     disabled?: boolean
   ) => JSX.Element
   radioSelection: (field: keyof EditDataType<T>, options: Array<DropdownOption | string>, name: string) => JSX.Element
-  validator: (editData: EditDataType<T>, field: keyof EditDataType<T>) => ValidationObject
+  validator: (editData: EditDataType<T>, field: keyof EditDataType<T>, isNew: boolean) => ValidationObject
 }
 
 export const DetailContext = createContext<DetailContextType<unknown>>(null!)
@@ -90,7 +90,7 @@ export const DetailContextProvider = <T extends object>({
         editData,
         setEditData: (data: unknown) => setEditData(data as EditDataType<T>),
         validator: (editData: unknown, fieldName: keyof EditDataType<T>) =>
-          contextState.validator(editData as EditDataType<T>, fieldName),
+          contextState.validator(editData as EditDataType<T>, fieldName, !contextState.mode.new),
       }}
     >
       {children}
