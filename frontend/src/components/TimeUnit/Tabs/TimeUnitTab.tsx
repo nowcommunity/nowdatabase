@@ -26,7 +26,7 @@ export const TimeUnitTab = () => {
       'Upper Time Unit Bound',
       <FieldWithTableSelection<TimeBoundDetailsType, TimeUnitDetailsType>
         key="up_bnd"
-        sourceField="b_name"
+        sourceField="bid"
         targetField="up_bnd"
         selectorTable={<TimeBoundTable />}
       />,
@@ -35,7 +35,7 @@ export const TimeUnitTab = () => {
       'Lower Time Unit Bound',
       <FieldWithTableSelection<TimeBoundDetailsType, TimeUnitDetailsType>
         key="low_bnd"
-        sourceField="b_name"
+        sourceField="bid"
         targetField="low_bnd"
         selectorTable={<TimeBoundTable />}
       />,

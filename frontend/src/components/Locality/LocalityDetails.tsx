@@ -15,14 +15,15 @@ import { TaphonomyTab } from './Tabs/TaphonomyTab'
 import { EditDataType, LocalityDetailsType } from '@/backendTypes'
 import { validateLocality } from '@/validators/locality'
 import { UpdateTab } from '../DetailView/common/UpdateTab'
-import { emptyLocality } from '../DetailView/defaultValues/locality'
+import { emptyLocality } from '../DetailView/common/defaultValues'
 
 export const LocalityDetails = () => {
   const { id } = useParams()
-  const { isLoading, isFetching, isError, data } = useGetLocalityDetailsQuery(id!, { skip: id === 'new' })
+  const isNew = id === 'new'
+  const { isLoading, isFetching, isError, data } = useGetLocalityDetailsQuery(id!, { skip: isNew })
   const [editLocalityRequest] = useEditLocalityMutation()
   if (isError) return <div>Error loading data</div>
-  if (isLoading || isFetching || (!data && id !== 'new')) return <CircularProgress />
+  if (isLoading || isFetching || (!data && !isNew)) return <CircularProgress />
 
   const onWrite = async (editData: EditDataType<LocalityDetailsType>) => {
     await editLocalityRequest(editData)
@@ -78,8 +79,8 @@ export const LocalityDetails = () => {
   return (
     <DetailView<LocalityDetailsType>
       tabs={tabs}
-      data={id === 'new' ? emptyLocality : data!}
-      isNew={id === 'new'}
+      data={isNew ? emptyLocality : data!}
+      isNew={isNew}
       onWrite={onWrite}
       validator={validateLocality}
     />

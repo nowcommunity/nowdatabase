@@ -12,13 +12,15 @@ import { TaxonomyTab } from './Tabs/TaxonomyTab'
 import { TeethTab } from './Tabs/TeethTab'
 import { UpdateTab } from '../DetailView/common/UpdateTab'
 import { EditDataType, SpeciesDetailsType } from '@/backendTypes'
+import { emptySpecies } from '../DetailView/common/defaultValues'
 
 export const SpeciesDetails = () => {
   const { id } = useParams()
-  const { isLoading, isError, isFetching, data } = useGetSpeciesDetailsQuery(id!)
+  const isNew = id === 'new'
+  const { isLoading, isError, isFetching, data } = useGetSpeciesDetailsQuery(id!, { skip: isNew })
   const [editSpeciesRequest] = useEditSpeciesMutation()
   if (isError) return <div>Error loading data</div>
-  if (isLoading || isFetching || !data) return <CircularProgress />
+  if (isLoading || isFetching || (!data && !isNew)) return <CircularProgress />
 
   const onWrite = async (editData: EditDataType<SpeciesDetailsType>) => {
     await editSpeciesRequest(editData)
@@ -66,8 +68,9 @@ export const SpeciesDetails = () => {
   return (
     <DetailView
       tabs={tabs}
-      data={data}
+      data={isNew ? emptySpecies : data!}
       onWrite={onWrite}
+      isNew={isNew}
       validator={() => ({
         name: 'unknown',
         error: null,

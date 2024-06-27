@@ -24,8 +24,8 @@ router.get('/time-units/:id', async (req, res) => {
 })
 
 router.put('/', async (req: Request<object, object, { timeBound: EditDataType<TimeBoundDetailsType> }>, res) => {
-  const editedLocality = req.body.timeBound
-  const result = await write(editedLocality, 'now_tu_bound')
+  const editedObject = req.body.timeBound
+  const result = await write(editedObject, 'now_time_unit', 'ArK', 'ArK', 'testuser')
   return res.status(200).send(result ? { result: result } : { error: 'error' })
 })
 

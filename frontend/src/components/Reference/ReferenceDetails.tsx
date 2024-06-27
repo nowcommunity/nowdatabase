@@ -4,13 +4,15 @@ import { DetailView, TabType } from '../DetailView/DetailView'
 import { ReferenceTab } from './Tabs/ReferenceTab'
 import { useEditReferenceMutation, useGetReferenceDetailsQuery } from '@/redux/referenceReducer'
 import { EditDataType, ReferenceDetailsType } from '@/backendTypes'
+import { emptyReference } from '../DetailView/common/defaultValues'
 
 export const ReferenceDetails = () => {
   const { id } = useParams()
-  const { isLoading, isFetching, isError, data } = useGetReferenceDetailsQuery(id!)
+  const isNew = id === 'new'
+  const { isLoading, isFetching, isError, data } = useGetReferenceDetailsQuery(id!, { skip: isNew })
   const [editReferenceMutation] = useEditReferenceMutation()
   if (isError) return <div>Error loading data</div>
-  if (isLoading || isFetching || !data) return <CircularProgress />
+  if (isLoading || isFetching || (!data && !isNew)) return <CircularProgress />
 
   const onWrite = async (editedReference: EditDataType<ReferenceDetailsType>) => {
     await editReferenceMutation(editedReference)
@@ -23,5 +25,13 @@ export const ReferenceDetails = () => {
     },
   ]
 
-  return <DetailView tabs={tabs} data={data} onWrite={onWrite} validator={() => ({ name: '', error: null })} />
+  return (
+    <DetailView
+      tabs={tabs}
+      isNew={isNew}
+      data={isNew ? emptyReference : data!}
+      onWrite={onWrite}
+      validator={() => ({ name: '', error: null })}
+    />
+  )
 }
