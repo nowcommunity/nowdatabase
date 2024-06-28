@@ -18,9 +18,13 @@ router.get('/:id', async (req, res) => {
   res.status(200).send(fixBigInt(species))
 })
 
-router.put('/', async (req: Request<object, object, { species: EditDataType<SpeciesDetailsType> }>, res) => {
+router.put('/', async (req: Request<object, object, { species: SpeciesDetailsType }>, res) => {
   const editedObject = req.body.species
-  const result = await write(editedObject, 'com_species', 'ArK', 'ArK', 'testuser')
+  const result = await write(editedObject, 'com_species', {
+    authorizer: 'ArK',
+    coordinator: 'ArK',
+    userName: 'testuser',
+  })
   return res.status(200).send(result ? { result: result } : { error: 'error' })
 })
 

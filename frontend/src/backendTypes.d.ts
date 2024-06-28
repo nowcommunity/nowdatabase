@@ -11,6 +11,8 @@ type EditDataType<T> = T extends object
       : never
   : T
 
+type FixBigInt = object // TODO
+
 export type LocalityReference = Prisma.now_lr & { ref_ref: ReferenceDetailsType } & {
   ref_authors: Prisma.ref_authors
   ref_journal: Prisma.ref_journal
