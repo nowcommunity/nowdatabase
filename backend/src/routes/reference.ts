@@ -1,6 +1,6 @@
 import { Request, Router } from 'express'
 import { getAllReferences, getReferenceDetails, getReferenceTypes } from '../services/reference'
-import { EditDataType, TimeBoundDetailsType } from '../../../frontend/src/backendTypes'
+import { ReferenceDetailsType } from '../../../frontend/src/backendTypes'
 import { write } from '../services/write/write'
 
 const router = Router()
@@ -21,9 +21,9 @@ router.get('/:id', async (req, res) => {
   res.status(200).send(reference)
 })
 
-router.put('/', async (req: Request<object, object, { reference: EditDataType<TimeBoundDetailsType> }>, res) => {
-  const editedLocality = req.body.reference
-  const result = await write(editedLocality, 'ref_ref')
+router.put('/', async (req: Request<object, object, { reference: ReferenceDetailsType }>, res) => {
+  const editedObject = req.body.reference
+  const result = await write(editedObject, 'ref_ref')
   return res.status(200).send(result ? { result: result } : { error: 'error' })
 })
 

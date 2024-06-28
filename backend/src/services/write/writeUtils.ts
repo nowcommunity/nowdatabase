@@ -69,14 +69,16 @@ export const debugLog = (msg: string, onlyVerbose?: boolean) => {
   logger.info(msg)
 }
 
-export type CustomObject = Record<string, string | number | object | CustomObject[]>
+export type CustomObject = Record<string, string | number | object | CustomObject[] | null | boolean>
 
 export type WriteFunction = <T extends CustomObject>(
-  data: EditDataType<T>,
+  data: T,
   tableName: AllowedTables,
-  authorizer: string,
-  coordinator: string,
-  userName: string
+  updateOptions?: {
+    authorizer: string
+    coordinator: string
+    userName: string
+  }
 ) =>
   | Promise<string | number>
   | ((data: EditDataType<ReferenceDetailsType>, tableName: 'ref_ref') => Promise<string | number>)

@@ -16,8 +16,8 @@ import {
 import { NOW_DB_NAME } from '../../utils/config'
 import { createUpdateEntry, writeToLog } from './updateAndLog'
 
-export const write: WriteFunction = async (data, tableName, coordinator, authorizer, userName) => {
-  debugLog(`Started write. Table: ${tableName}, username: ${userName}`)
+export const write: WriteFunction = async (data, tableName, updateOptions) => {
+  debugLog(`Started write. Table: ${tableName} ${updateOptions?.userName ? `User: ${updateOptions.userName}` : ''}`)
   const writeList: WriteItem[] = []
   const conn = await pool.getConnection()
   await conn.beginTransaction()
@@ -152,23 +152,26 @@ export const write: WriteFunction = async (data, tableName, coordinator, authori
     result = await writeTable(data, tableName)
     debugLog(`Final result: ${printJSON(result)}`)
     debugLog(`WriteList: ${printJSON(writeList)}`)
-    const tableNameToPrefix = {
-      now_loc: 'l',
-      com_species: 's',
-      now_time_unit: 't',
-      now_tu_bound: 'b',
-    } as Record<AllowedTables, 's' | 't' | 'l' | 'b'>
-    const prefix = tableNameToPrefix[tableName]
-    const updateEntry = await createUpdateEntry(
-      conn,
-      prefix,
-      coordinator,
-      authorizer,
-      (data[`now_${prefix}au`] as { comment: string }).comment,
-      result
-    )
-    debugLog(`updateEntry: ${printJSON(updateEntry)}`, true)
-    await writeToLog(conn, writeList, tableName, updateEntry, userName)
+    if (updateOptions) {
+      const { coordinator, authorizer, userName } = updateOptions
+      const tableNameToPrefix = {
+        now_loc: 'l',
+        com_species: 's',
+        now_time_unit: 't',
+        now_tu_bound: 'b',
+      } as Record<AllowedTables, 's' | 't' | 'l' | 'b'>
+      const prefix = tableNameToPrefix[tableName]
+      const updateEntry = await createUpdateEntry(
+        conn,
+        prefix,
+        coordinator,
+        authorizer,
+        (data[`now_${prefix}au`] as { comment: string }).comment,
+        result
+      )
+      debugLog(`updateEntry: ${printJSON(updateEntry)}`, true)
+      await writeToLog(conn, writeList, tableName, updateEntry, userName)
+    }
     await conn.commit()
   } catch (e: unknown) {
     await conn.rollback()
