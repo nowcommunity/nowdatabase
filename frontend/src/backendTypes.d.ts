@@ -11,14 +11,22 @@ type EditDataType<T> = T extends object
       : never
   : T
 
-type FixBigInt = object // TODO
+type FixBigInt<T> = {
+  [K in keyof T]: T[K] extends bigint
+    ? number
+    : T[K] extends (infer U)[]
+      ? FixBigInt<U>[]
+      : T[K] extends object
+        ? FixBigInt<T[K]>
+        : T[K]
+}
 
 export type LocalityReference = Prisma.now_lr & { ref_ref: ReferenceDetailsType } & {
   ref_authors: Prisma.ref_authors
   ref_journal: Prisma.ref_journal
 }
 
-export type SpeciesType = Prisma.com_species
+export type SpeciesType = FixBigInt<Prisma.com_species>
 export type RowState = 'new' | 'removed' | 'cancelled' | 'clean'
 export type UpdateComment = { update_comment: string }
 // Use this for fields that include array that has to be edited by EditableTable.
@@ -27,8 +35,8 @@ export type Editable<T> = T & { rowState?: RowState }
 export type SedimentaryStructureValues = Prisma.now_ss_values
 export type CollectingMethod = Prisma.now_coll_meth
 export type LocalityProject = Prisma.now_plr & { now_proj: Prisma.now_proj }
-export type LocalitySpecies = Prisma.now_ls & { com_species: SpeciesType }
-export type SpeciesLocality = Prisma.now_ls & { now_loc: Prisma.now_loc }
+export type LocalitySpecies = FixBigInt<Prisma.now_ls> & { com_species: SpeciesType }
+export type SpeciesLocality = FixBigInt<Prisma.now_ls> & { now_loc: Prisma.now_loc }
 export type LocalityUpdate = Prisma.now_lau & { now_lr: LocalityReference[] } & { updates: UpdateLog[] }
 export type SpeciesUpdate = Prisma.now_sau & { now_sr: Prisma.now_sr }
 export type Museum = Prisma.com_mlist
@@ -69,7 +77,7 @@ export type Locality = {
 export type Sequence = Prisma.now_tu_sequence
 export type SequenceDetailsType = Prisma.now_tu_sequence
 
-export type SpeciesDetailsType = Prisma.com_species & { now_ls: Array<SpeciesLocality> } & {
+export type SpeciesDetailsType = SpeciesType & { now_ls: Array<SpeciesLocality> } & {
   com_taxa_synonym: Array<SpeciesSynonym>
 } & { now_sau: Array<SpeciesUpdate> }
 
