@@ -21,9 +21,6 @@ export const testMariaDb = async () => {
   await conn.query('SELECT * FROM now_test.now_loc LIMIT 5')
   await conn.query('SELECT * FROM now_log_test.log LIMIT 5')
   logger.info('Connections to both databases via direct mariadb-connector work.')
-  if (DB_CONNECTION_LIMIT === '5') {
-    logger.info('Warning: DB connection limit is only 5! Set environment variable to raise it.')
-  }
   if (conn) return conn.end()
 }
 
