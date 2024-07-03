@@ -1,6 +1,4 @@
 export const MARIADB_HOST = process.env.MARIADB_HOST as string
-export const MARIADB_LOG_DATABASE = process.env.MARIADB_LOG_DATABASE as string
-export const MARIADB_USER = process.env.MARIADB_USER as string
 export const MARIADB_PASSWORD = process.env.MARIADB_PASSWORD as string
 export const SECRET = process.env.SECRET as string
 export const PORT = process.env.NOWDB_BACKEND_PORT as unknown as number
@@ -16,8 +14,6 @@ export const COORDINATOR = process.env.COORDINATOR as string
 
 const requiredEnvs = {
   MARIADB_HOST,
-  MARIADB_LOG_DATABASE,
-  MARIADB_USER,
   MARIADB_PASSWORD,
   SECRET,
   PORT,
