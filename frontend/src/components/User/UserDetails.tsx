@@ -18,5 +18,5 @@ export const UserDetails = () => {
     },
   ]
 
-  return <DetailView tabs={tabs} data={data} onWrite={() => {}} validator={() => ({ name: '', error: null })} />
+  return <DetailView tabs={tabs} data={data} validator={() => ({ name: '', error: null })} />
 }

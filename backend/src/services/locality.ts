@@ -82,11 +82,7 @@ export const validateEntireLocality = (editedFields: EditDataType<Prisma.now_loc
   const keys = Object.keys(editedFields)
   const errors: ValidationObject[] = []
   for (const key of keys) {
-    const error = validateLocality(
-      editedFields as EditDataType<LocalityDetailsType>,
-      key as keyof LocalityDetailsType,
-      editedFields.lid === undefined
-    )
+    const error = validateLocality(editedFields as EditDataType<LocalityDetailsType>, key as keyof LocalityDetailsType)
     if (error.error) errors.push(error)
   }
   return errors

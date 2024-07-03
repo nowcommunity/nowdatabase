@@ -33,13 +33,13 @@ export const DetailView = <T extends object>({
   data,
   onWrite,
   validator,
-  isNew,
+  isNew = false,
 }: {
   tabs: TabType[]
   data: T
-  onWrite: (editData: EditDataType<T>) => Promise<void>
+  onWrite?: (editData: EditDataType<T>) => Promise<void>
   validator: (editData: EditDataType<T>, field: keyof EditDataType<T>) => ValidationObject
-  isNew: boolean
+  isNew?: boolean
 }) => {
   const [searchParams, setSearchParams] = useSearchParams()
 
