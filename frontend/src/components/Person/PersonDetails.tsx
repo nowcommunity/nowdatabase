@@ -3,6 +3,7 @@ import { useGetPersonDetailsQuery } from '../../redux/personReducer'
 import { CircularProgress } from '@mui/material'
 import { DetailView, TabType } from '../DetailView/DetailView'
 import { PersonTab } from './Tabs/PersonTab'
+import { UserTab } from './Tabs/UserTab'
 
 export const PersonDetails = () => {
   const { id } = useParams()
@@ -17,6 +18,8 @@ export const PersonDetails = () => {
       content: <PersonTab />,
     },
   ]
+
+  if (data.user) tabs.push({ title: 'User', content: <UserTab /> })
 
   return <DetailView tabs={tabs} data={data} validator={() => ({ name: '', error: null })} />
 }

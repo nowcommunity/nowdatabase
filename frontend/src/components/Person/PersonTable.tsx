@@ -33,6 +33,20 @@ export const PersonTable = ({ selectorFn }: { selectorFn?: (id: PersonDetailsTyp
         accessorKey: 'country',
         header: 'Country',
       },
+      {
+        id: 'user_id',
+        accessorKey: 'user.user_id',
+        header: 'User Id',
+        size: 20,
+      },
+      {
+        accessorKey: 'user.user_name',
+        header: 'User name',
+      },
+      {
+        accessorKey: 'user.last_login',
+        header: 'Last login',
+      },
     ],
     []
   )

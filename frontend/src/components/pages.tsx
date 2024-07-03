@@ -7,7 +7,6 @@ import {
   PersonDetailsType,
   ProjectDetailsType,
   RegionDetails as RegionDetailsType,
-  UserDetailsType,
 } from '@/backendTypes'
 import { LocalityDetails } from './Locality/LocalityDetails'
 import { LocalityTable } from './Locality/LocalityTable'
@@ -26,8 +25,6 @@ import { ProjectTable } from './Project/ProjectTable'
 import { ProjectDetails } from './Project/ProjectDetails'
 import { RegionTable } from './Region/RegionTable'
 import { RegionDetails } from './Region/RegionDetails'
-import { UserTable } from './User/UserTable'
-import { UserDetails } from './User/UserDetails'
 
 export const timeBoundPage = (
   <Page
@@ -106,15 +103,5 @@ export const regionPage = (
     viewName="region"
     idFieldName="reg_coord_id"
     createTitle={(region: RegionDetailsType) => `${region.region}`}
-  />
-)
-
-export const userPage = (
-  <Page
-    tableView={<UserTable />}
-    detailView={<UserDetails />}
-    viewName="user"
-    idFieldName="user_id"
-    createTitle={(user: UserDetailsType) => `${user.user_name}`}
   />
 )

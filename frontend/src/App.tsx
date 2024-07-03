@@ -12,7 +12,6 @@ import {
   speciesPage,
   timeBoundPage,
   timeUnitPage,
-  userPage,
 } from './components/pages'
 
 const App = () => {
@@ -35,7 +34,6 @@ const App = () => {
               <Route element={regionPage} path="/region/:id?" />
               <Route element={personPage} path="/person/:id?" />
               <Route element={projectPage} path="/project/:id?" />
-              <Route element={userPage} path="/user/:id?" />
               <Route element={<FrontPage />} path="/" />
               <Route element={<Login />} path="/login" />
               <Route element={<div>Page not found.</div>} path="*" />

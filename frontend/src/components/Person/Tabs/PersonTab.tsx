@@ -3,10 +3,9 @@ import { ArrayFrame } from '../../DetailView/common/tabLayoutHelpers'
 import { useDetailContext } from '@/components/DetailView/Context/DetailContext'
 
 export const PersonTab = () => {
-  const { textField } = useDetailContext<PersonDetailsType>()
+  const { textField, data } = useDetailContext<PersonDetailsType>()
 
   const person = [
-    ['User ID', textField('user_id', { type: 'number' })],
     ['Initials', textField('initials')],
     ['First Name', textField('first_name')],
     ['Surname', textField('surname')],
@@ -15,9 +14,18 @@ export const PersonTab = () => {
     ['Country', textField('country')],
   ]
 
+  const user = data.user
+    ? [
+        ['User Name', data.user?.user_name ?? ''],
+        ['Last log in', data.user?.last_login?.toString()],
+        ['User Group', data.user?.now_user_group ?? ''],
+      ]
+    : [['Not a user']]
+
   return (
     <>
       <ArrayFrame array={person} title="Person" />
+      <ArrayFrame array={user} title="User" />
     </>
   )
 }
