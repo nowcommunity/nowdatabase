@@ -25,7 +25,7 @@ router.get('/localities/:id', async (req, res) => {
 
 router.put('/', async (req: Request<object, object, { timeUnit: EditDataType<TimeUnitDetailsType> }>, res) => {
   const editedObject = req.body.timeUnit
-  const result = await write(editedObject, 'now_time_unit', 'ArK', 'ArK', 'testuser')
+  const result = await write(editedObject, 'now_time_unit', { userName: 'testuser', authorizer: 'ArK' })
   return res.status(200).send(result ? { result: result } : { error: 'error' })
 })
 

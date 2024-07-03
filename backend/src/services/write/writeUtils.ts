@@ -76,7 +76,6 @@ export type WriteFunction = <T extends CustomObject>(
   tableName: AllowedTables,
   updateOptions?: {
     authorizer: string
-    coordinator: string
     userName: string
   }
 ) =>
