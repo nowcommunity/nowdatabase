@@ -1,11 +1,9 @@
-import { logDb, nowDb, pool } from '../utils/db'
+import { logDb, nowDb } from '../utils/db'
 import { EditDataType, LocalityDetailsType } from '../../../frontend/src/backendTypes'
 import Prisma from '../../prisma/generated/now_test_client'
 import { validateLocality } from '../../../frontend/src/validators/locality'
 import { ValidationObject } from '../../../frontend/src/validators/validator'
-import { logger } from '../utils/logger'
 import { fixBigInt } from '../utils/common'
-import { write } from './write/write'
 
 export const getAllLocalities = async (onlyPublic: boolean) => {
   const where = onlyPublic ? { loc_status: false } : {}
@@ -80,95 +78,16 @@ export const getLocalityDetails = async (id: number) => {
   return JSON.parse(fixBigInt(result)!) as LocalityDetailsType
 }
 
-export const fixEditedLocality = (editedLocality: EditDataType<LocalityDetailsType>) => {
-  if (editedLocality.now_lau) {
-    //editedLocality.now_lau = editedLocality.now_lau.map(lau => ({ ...lau, lau_date: new Date(lau.lau_date as Date) }))
-  }
-  return editedLocality
-}
-
 export const validateEntireLocality = (editedFields: EditDataType<Prisma.now_loc>) => {
   const keys = Object.keys(editedFields)
   const errors: ValidationObject[] = []
   for (const key of keys) {
-    const error = validateLocality(editedFields as EditDataType<LocalityDetailsType>, key as keyof LocalityDetailsType)
+    const error = validateLocality(
+      editedFields as EditDataType<LocalityDetailsType>,
+      key as keyof LocalityDetailsType,
+      editedFields.lid === undefined
+    )
     if (error.error) errors.push(error)
   }
   return errors
-}
-
-export const processLocalityForEdit = async (editedLocality: EditDataType<LocalityDetailsType>) => {
-  const validationErrors = validateEntireLocality(editedLocality)
-  if (validationErrors.length > 0) return { validationErrors }
-  const result = await write(editedLocality, 'now_loc', 'ArK', 'ArK', 'testuser')
-  return { result }
-}
-
-export const writeLocality = async (lid: number, filteredFields: Array<[string, unknown]>) => {
-  let conn
-  logger.info('starting to write')
-  let result = null
-  try {
-    conn = await pool.getConnection()
-    await conn.beginTransaction()
-
-    const dbName = 'now_test'
-    const logDbName = 'now_log_test'
-    const tableName = 'now_loc'
-
-    const columns = filteredFields.map(([field]) => `${field} = ?`).join(', ')
-    const values = filteredFields.map(([, value]) => value)
-    if (values.length === 0) throw new Error('No changes found')
-    const oldLocalityResults = await conn.query<Prisma.now_loc[]>(
-      `SELECT * FROM ${dbName}.${tableName} WHERE lid = ?`,
-      [lid]
-    )
-
-    const oldLocality = oldLocalityResults[0]
-
-    logger.info(`Updating ${columns.length} values in table ${tableName}...`)
-
-    result = await conn.query<Prisma.now_loc>(`UPDATE ${dbName}.${tableName} SET ${columns} WHERE lid = ?`, [
-      ...values,
-      lid,
-    ])
-    // eslint-disable-next-line no-constant-condition
-    if (1 + 1 === 2) throw Error('DB-writing disabled for now')
-    const lauResult = await conn.query<Prisma.now_lau>(
-      `INSERT INTO ${dbName}.now_lau (lau_coordinator, lau_authorizer, lid) VALUES (?, ?, ?) RETURNING now_lau.luid`,
-      ['AK', 'AB', 10010]
-    )
-
-    const luid = lauResult.luid
-
-    const updateRows = filteredFields.map(([field, value]) => ({
-      event_time: new Date(),
-      user_name: 'testuser', // TODO fix
-      server_name: 'sysbiol',
-      table_name: tableName,
-      pk_data: `${(lid + '').length}.${lid};`,
-      column_name: field,
-      log_action: 3, // 1 = delete, 2 = create, 3 = update
-      old_data: oldLocality[field as keyof Prisma.now_loc],
-      new_data: value as never,
-      luid,
-    }))
-
-    logger.info(`Writing ${updateRows.length} rows into log-table...`)
-
-    for (const row of updateRows) {
-      const columnsAndValues = Object.entries(row)
-      const columns = columnsAndValues.map(([column]) => column)
-      const values = columnsAndValues.map(([, values]) => values)
-      await conn.query<Prisma.now_loc>(
-        `INSERT INTO ${logDbName}.log (${columns.join(', ')}) VALUES (${columns.map(() => '?').join(', ')})`,
-        values
-      )
-    }
-    await conn.commit()
-    logger.info('Wrote successfully!')
-  } finally {
-    if (conn) await conn.release()
-  }
-  return result
 }
