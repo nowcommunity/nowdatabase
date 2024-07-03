@@ -11,8 +11,8 @@ type EditDataType<T> = T extends object
       : never
   : T
 
-type FixBigInt<T> = {
-  [K in keyof T]: T[K] extends bigint
+export type FixBigInt<T> = {
+  [K in keyof T]: T[K] extends bigint | null
     ? number
     : T[K] extends (infer U)[]
       ? FixBigInt<U>[]

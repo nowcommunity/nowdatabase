@@ -13,7 +13,7 @@ import {
   isEmptyValue,
   printJSON,
 } from './writeUtils'
-import { NOW_DB_NAME } from '../../utils/config'
+import { COORDINATOR, NOW_DB_NAME } from '../../utils/config'
 import { createUpdateEntry, writeToLog } from './updateAndLog'
 
 export const write: WriteFunction = async (data, tableName, updateOptions) => {
@@ -97,7 +97,7 @@ export const write: WriteFunction = async (data, tableName, updateOptions) => {
       if (id && !!oldObj) {
         await query(
           `UPDATE ${NOW_DB_NAME}.${tableName} SET ${columns.map(c => `${c} = ?`).join(', ')} WHERE ${idFieldName} = ?`,
-          [...values, id]
+          [...values, id] as never
         )
         type = 'update'
       } else {
@@ -153,7 +153,7 @@ export const write: WriteFunction = async (data, tableName, updateOptions) => {
     debugLog(`Final result: ${printJSON(result)}`)
     debugLog(`WriteList: ${printJSON(writeList)}`)
     if (updateOptions) {
-      const { coordinator, authorizer, userName } = updateOptions
+      const { authorizer, userName } = updateOptions
       const tableNameToPrefix = {
         now_loc: 'l',
         com_species: 's',
@@ -164,7 +164,7 @@ export const write: WriteFunction = async (data, tableName, updateOptions) => {
       const updateEntry = await createUpdateEntry(
         conn,
         prefix,
-        coordinator,
+        COORDINATOR,
         authorizer,
         (data[`now_${prefix}au`] as { comment: string }).comment,
         result

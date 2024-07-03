@@ -1,7 +1,8 @@
 import { Request, Router } from 'express'
-import { getAllLocalities, getLocalityDetails, processLocalityForEdit } from '../services/locality'
+import { getAllLocalities, getLocalityDetails, validateEntireLocality } from '../services/locality'
 import { fixBigInt } from '../utils/common'
 import { EditDataType, LocalityDetailsType } from '../../../frontend/src/backendTypes'
+import { write } from '../services/write/write'
 
 const router = Router()
 
@@ -19,10 +20,11 @@ router.get('/:id', async (req, res) => {
 
 router.put('/', async (req: Request<object, object, { locality: EditDataType<LocalityDetailsType> }>, res) => {
   const editedLocality = req.body.locality
-  const { validationErrors, result } = await processLocalityForEdit(editedLocality)
+  const validationErrors = validateEntireLocality(editedLocality)
   if (validationErrors) {
     return res.status(400).send({ validationErrors })
   }
+  const result = await write(editedLocality, 'now_loc', { authorizer: 'NA', userName: 'testuser' })
   return res.status(200).send(result ? { result: result } : { error: 'error' })
 })
 
