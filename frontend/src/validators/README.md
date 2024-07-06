@@ -22,6 +22,8 @@ Example:
     },
 ```
 
+To know if user is creating a new entry or editing existing one, check if the id exists. For example put `const isNew = editData.lid === undefined` at the beginning of the entire validator so it can be used in all of the fields' validators.
+
 ### Note!
 
 The files in this folder, and also backendTypes.d.ts, cannot
