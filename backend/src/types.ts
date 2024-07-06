@@ -8,3 +8,9 @@ export type User = {
   username: string
   role: Role
 }
+
+// Administrator su
+// Edit unrestricted eu
+// Edit restricted er
+// NOW office no
+// Project worker pl
