@@ -18,8 +18,10 @@ import { logger } from './utils/logger'
 import { PORT, BACKEND_MODE } from './utils/config'
 import { tokenExtractor, userExtractor, requireLogin } from './middlewares/authenticator'
 import { errorHandler } from './middlewares/errorHandler'
-import { createTestUser } from './services/user'
+import { createTestUsers } from './services/user'
 import { testDbConnection } from './utils/db'
+import { requireOneOf } from './middlewares/authorizer'
+import { Role } from './types'
 
 const app = express()
 
@@ -34,21 +36,21 @@ app.use('/user', userRouter)
 if (BACKEND_MODE !== 'dev') app.use(requireLogin)
 
 app.use('/locality', localityRouter)
-app.use('/reference', referenceRouter)
-app.use('/region', regionRouter)
-app.use('/person', personRouter)
-app.use('/project', projectRouter)
 app.use('/species', speciesRouter)
-app.use('/time-bound', timeBoundRouter)
+app.use('/reference', referenceRouter)
 app.use('/time-unit', timeUnitRouter)
-app.use('/museum', museumRouter)
+app.use('/time-bound', requireOneOf([Role.Admin]), timeBoundRouter)
+app.use('/region', requireOneOf([Role.Admin]), regionRouter)
+app.use('/person', requireOneOf([Role.Admin]), personRouter)
+app.use('/project', requireOneOf([Role.Admin]), projectRouter)
+app.use('/museum', requireOneOf([Role.Admin]), museumRouter)
 app.use('/sedimentary-structure', sedimentaryStructureRouter)
 app.use(errorHandler)
 app.listen(PORT, async () => {
   logger.info(`Server running on port ${PORT} in "${BACKEND_MODE}"-mode`)
   if (BACKEND_MODE === 'dev') {
     await testDbConnection()
-    logger.info('Creating test-user...')
-    void createTestUser()
+    logger.info('Creating test-users...')
+    void createTestUsers()
   }
 })

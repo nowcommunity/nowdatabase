@@ -4,9 +4,16 @@ import Prisma from '../../prisma/generated/now_test_client'
 import { validateLocality } from '../../../frontend/src/validators/locality'
 import { ValidationObject } from '../../../frontend/src/validators/validator'
 import { fixBigInt } from '../utils/common'
+import { User } from '../types'
 
-export const getAllLocalities = async (onlyPublic: boolean) => {
-  const where = onlyPublic ? { loc_status: false } : {}
+export const getAllLocalities = async (showAll: boolean, user?: User) => {
+  const where = showAll ? {} : { loc_status: false }
+
+  const removeProjects: (item: { now_plr: unknown }) => unknown = item => {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { now_plr, ...rest } = item
+    return rest
+  }
 
   const result = await nowDb.now_loc.findMany({
     select: {
@@ -18,10 +25,33 @@ export const getAllLocalities = async (onlyPublic: boolean) => {
       min_age: true,
       country: true,
       loc_status: true,
+      now_plr: {
+        select: { pid: true },
+      },
     },
     where,
   })
-  return result
+
+  if (showAll) return result.map(removeProjects)
+
+  if (!user) return result.filter(loc => loc.loc_status === false).map(removeProjects)
+
+  const usersProjects = await nowDb.now_proj_people.findMany({
+    where: { initials: user.initials },
+    select: { pid: true },
+  })
+
+  const ids = usersProjects
+    .map(({ pid }) => pid)
+    .reduce(
+      (obj: Record<number, boolean>, cur: number) => {
+        obj[cur] = true
+        return obj
+      },
+      {} as Record<number, boolean>
+    )
+
+  return result.filter(loc => !loc.loc_status || loc.now_plr.find(now_plr => ids[now_plr.pid])).map(removeProjects)
 }
 
 export const getLocalityDetails = async (id: number) => {

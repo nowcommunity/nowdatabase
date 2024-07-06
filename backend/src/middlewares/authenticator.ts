@@ -1,4 +1,4 @@
-import { Middleware, User } from '../types'
+import { Middleware, Role, User } from '../types'
 import { SECRET } from '../utils/config'
 import jwt, { Secret, TokenExpiredError } from 'jsonwebtoken'
 import { nowDb } from '../utils/db'
@@ -28,6 +28,20 @@ const verify = async (token: string, secret: Secret) => {
   })
 }
 
+const getRole = (userGroup: string) => {
+  const userGroupToRole = {
+    su: Role.Admin,
+    eu: Role.EditUnrestricted,
+    er: Role.EditRestricted,
+    pl: Role.Project,
+    plp: Role.ProjectPrivate,
+    no: Role.NowOffice,
+    ro: Role.ReadOnly,
+  } as Record<string, Role | undefined>
+
+  return userGroupToRole[userGroup] ?? Role.ReadOnly
+}
+
 export const userExtractor: Middleware = async (req, res, next) => {
   if (req.token === undefined || req.token === null) {
     return next()
@@ -39,14 +53,26 @@ export const userExtractor: Middleware = async (req, res, next) => {
     if (!username) throw new Error('Invalid token')
 
     const foundUser = await nowDb.com_users.findFirst({
-      select: { user_name: true },
+      select: { user_name: true, now_user_group: true, user_id: true },
       where: { user_name: username },
     })
 
     if (!foundUser) {
       return res.status(401).json({ message: 'Invalid user' })
     }
-    req.user = { username: foundUser.user_name!, role: 'admin' }
+
+    const foundPerson = await nowDb.com_people.findFirst({
+      select: { initials: true },
+      where: { user_id: foundUser.user_id },
+    })
+    if (!foundPerson) throw new Error('Found user, but not persons initials. Unexpected error.')
+    req.user = {
+      username: foundUser.user_name!,
+      role: getRole(foundUser.now_user_group ?? ''),
+      userId: foundUser.user_id,
+      initials: foundPerson?.initials,
+    }
+
     return next()
   } catch (e: unknown) {
     if (e instanceof TokenExpiredError) {
