@@ -2,23 +2,23 @@
 services:
   frontend:
     container_name: nowdb-frontend-dev
-    image: node:20-alpine3.16
+    build:
+      context: ./frontend
+      dockerfile: ./dev.Dockerfile
     volumes:
       - ./frontend/:/usr/src/app
     ports:
       - 127.0.0.1:5173:5173
-    command: >
-        sh -c "cd /usr/src/app && npm ci && npm run dev -- --host"
   backend:
     container_name: nowdb-backend-dev
-    image: node:20-alpine3.16
+    build:
+      context: .
+      dockerfile: ./backend/dev.Dockerfile
     volumes:
       - ./backend/:/usr/src/app/backend/
       - ./frontend/src/validators:/usr/src/app/frontend/src/validators
     ports:
       - 127.0.0.1:4000:4000
-    command: >
-        sh -c "cd /usr/src/app/backend && npm ci && npm run prisma && npm run dev"
     env_file: .dev.env
   db:
     container_name: nowdb-db-dev
