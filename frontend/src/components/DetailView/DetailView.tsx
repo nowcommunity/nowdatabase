@@ -98,7 +98,7 @@ export const DetailView = <T extends object>({
   const paperProps = {
     style: {
       minHeight: '10em',
-      backgroundColor: 'lightgray',
+      backgroundColor: '#cfd8dc',
       padding: '1em',
     },
     elevation: 5,
