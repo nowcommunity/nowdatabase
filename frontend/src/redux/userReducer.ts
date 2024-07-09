@@ -1,8 +1,13 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { api } from '@/redux/api'
-import { FrontendUser } from '@shared/types'
 import { PersonDetailsType } from '@/backendTypes'
 import { Role } from '@/types'
+
+export type FrontendUser = {
+  token: string
+  username: string
+  role: Role
+}
 
 type LoginData = { username: string; password: string }
 

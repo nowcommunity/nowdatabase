@@ -4,6 +4,7 @@ import { useDispatch } from 'react-redux'
 import { Box, Button, CircularProgress, Container, Stack, TextField, Typography } from '@mui/material'
 import { useNavigate } from 'react-router-dom'
 import { api } from '../redux/api'
+import { Role } from '@/types'
 
 export const Login = () => {
   const [username, setUsername] = useState('')
@@ -32,7 +33,7 @@ export const Login = () => {
 
   useEffect(() => {
     if (data && data.token) {
-      dispatch(setUser({ username: data.username, token: data.token }))
+      dispatch(setUser({ username: data.username, token: data.token, role: data.role || Role.ReadOnly }))
       // Reset api cache, so that we won't show guest data to logged user
       dispatch(api.util.resetApiState())
       navigate('/')

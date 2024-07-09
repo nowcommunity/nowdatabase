@@ -5,6 +5,7 @@ import { SECRET, LOGIN_VALID_MS, USER_CREATION_SECRET } from '../utils/config'
 import * as bcrypt from 'bcrypt'
 import { nowDb } from '../utils/db'
 import { getAllUsers, getUserDetails } from '../services/user'
+import { getRole } from '../middlewares/authenticator'
 
 const router = Router()
 
@@ -14,7 +15,7 @@ router.post('/login', async (req, res) => {
     where: {
       user_name: username,
     },
-    select: { user_name: true, password: true, user_id: true },
+    select: { user_name: true, password: true, user_id: true, now_user_group: true },
   })
 
   const passwordMatches = result && (await bcrypt.compare(password as string, result.password as string))
@@ -25,7 +26,7 @@ router.post('/login', async (req, res) => {
     expiresIn: LOGIN_VALID_MS,
   })
 
-  return res.status(200).send({ token, username: result.user_name })
+  return res.status(200).send({ token, username: result.user_name, role: getRole(result.now_user_group ?? '') })
 })
 
 router.get('/all', async (_req, res) => {

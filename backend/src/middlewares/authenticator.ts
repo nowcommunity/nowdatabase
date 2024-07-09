@@ -30,7 +30,7 @@ const verify = async (token: string, secret: Secret) => {
   })
 }
 
-const getRole = (userGroup: string) => {
+export const getRole = (userGroup: string) => {
   const userGroupToRole = {
     su: Role.Admin,
     eu: Role.EditUnrestricted,

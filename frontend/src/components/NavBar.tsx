@@ -107,7 +107,7 @@ export const NavBar = () => {
       </MenuItem>
     )
   }
-
+  console.log({ user })
   return (
     <AppBar position="static">
       <Stack spacing={10} direction="row" marginLeft={2} justifyContent="space-between">

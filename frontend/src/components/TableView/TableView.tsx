@@ -117,7 +117,7 @@ export const TableView = <T extends MRT_RowData>({
   }, [table, columnFilters, sorting])
 
   if (!data) return <CircularProgress />
-  console.log({ user })
+
   return (
     <Box>
       {user &&
