@@ -327,6 +327,7 @@ CREATE TABLE `com_users` (
   `user_id` int(11) NOT NULL AUTO_INCREMENT,
   `user_name` varchar(100) DEFAULT NULL,
   `password` varchar(100) DEFAULT NULL,
+  `newpassword` varchar(100) DEFAULT NULL,
   `last_login` date DEFAULT NULL,
   `now_user_group` varchar(30) DEFAULT NULL,
   `mor_user_group` varchar(30) DEFAULT NULL,
@@ -341,7 +342,7 @@ CREATE TABLE `com_users` (
 
 LOCK TABLES `com_users` WRITE;
 /*!40000 ALTER TABLE `com_users` DISABLE KEYS */;
-INSERT INTO `com_users` VALUES (156,'admin','0cc175b9c0f1b6a831c399e269772661','2024-05-30','su',NULL,NULL),(157,'editu','0cc175b9c0f1b6a831c399e269772661','2024-05-23','eu',NULL,NULL),(158,'editr','0cc175b9c0f1b6a831c399e269772661','2024-05-27','er',NULL,NULL),(159,'office','0cc175b9c0f1b6a831c399e269772661','2024-05-23','no',NULL,NULL),(160,'project','0cc175b9c0f1b6a831c399e269772661','2024-05-27','pl',NULL,NULL),(161,'read','0cc175b9c0f1b6a831c399e269772661','2024-05-23','ro',NULL,NULL),(162,'coord','0cc175b9c0f1b6a831c399e269772661','2024-05-27','su',NULL,NULL);
+INSERT INTO `com_users` VALUES (156,'admin','0cc175b9c0f1b6a831c399e269772661',NULL,'2024-05-30','su',NULL,NULL),(157,'editu','0cc175b9c0f1b6a831c399e269772661',NULL,'2024-05-23','eu',NULL,NULL),(158,'editr','0cc175b9c0f1b6a831c399e269772661',NULL,'2024-05-27','er',NULL,NULL),(159,'office','0cc175b9c0f1b6a831c399e269772661',NULL,'2024-05-23','no',NULL,NULL),(160,'project','0cc175b9c0f1b6a831c399e269772661',NULL,'2024-05-27','pl',NULL,NULL),(161,'read','0cc175b9c0f1b6a831c399e269772661',NULL,'2024-05-23','ro',NULL,NULL),(162,'coord','0cc175b9c0f1b6a831c399e269772661',NULL,'2024-05-27','su',NULL,NULL);
 /*!40000 ALTER TABLE `com_users` ENABLE KEYS */;
 UNLOCK TABLES;
 
