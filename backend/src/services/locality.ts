@@ -1,10 +1,9 @@
 import { logDb, nowDb } from '../utils/db'
-import { EditDataType, LocalityDetailsType } from '../../../frontend/src/backendTypes'
+import { EditDataType, LocalityDetailsType, User } from '../../../frontend/src/backendTypes'
 import Prisma from '../../prisma/generated/now_test_client'
 import { validateLocality } from '../../../frontend/src/validators/locality'
 import { ValidationObject } from '../../../frontend/src/validators/validator'
 import { fixBigInt } from '../utils/common'
-import { User } from '../types'
 
 export const getAllLocalities = async (showAll: boolean, user?: User) => {
   const where = showAll ? {} : { loc_status: false }
