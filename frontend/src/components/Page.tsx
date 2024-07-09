@@ -71,7 +71,8 @@ export const Page = <T extends Record<string, unknown>>({
 }) => {
   const { id } = useParams()
   const user = useUser()
-  if (allowedRoles && allowedRoles.includes(user.role)) return <Box>Your user is not authorized to view this page.</Box>
+  if (allowedRoles && !allowedRoles.includes(user.role))
+    return <Box>Your user is not authorized to view this page.</Box>
   return (
     <PageContextProvider<T> idFieldName={idFieldName as string} viewName={viewName} createTitle={createTitle}>
       {id ? detailView : tableView}
