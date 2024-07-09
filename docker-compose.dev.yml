@@ -16,7 +16,7 @@ services:
       dockerfile: ./backend/dev.Dockerfile
     volumes:
       - ./backend/:/usr/src/app/backend/
-      - ./frontend/src/validators:/usr/src/app/frontend/src/validators
+      - ./frontend/src/:/usr/src/app/frontend/src/
     ports:
       - 127.0.0.1:4000:4000
     env_file: .dev.env

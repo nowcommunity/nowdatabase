@@ -25,9 +25,11 @@ import { ProjectTable } from './Project/ProjectTable'
 import { ProjectDetails } from './Project/ProjectDetails'
 import { RegionTable } from './Region/RegionTable'
 import { RegionDetails } from './Region/RegionDetails'
+import { Role } from '@/types'
 
 export const timeBoundPage = (
   <Page
+    allowedRoles={[Role.Admin, Role.EditUnrestricted]}
     tableView={<TimeBoundTable />}
     detailView={<TimeBoundDetails />}
     viewName="time-bound"
@@ -78,6 +80,7 @@ export const localityPage = (
 
 export const personPage = (
   <Page
+    allowedRoles={[Role.Admin]}
     tableView={<PersonTable />}
     detailView={<PersonDetails />}
     viewName="person"
@@ -88,6 +91,7 @@ export const personPage = (
 
 export const projectPage = (
   <Page
+    allowedRoles={[Role.Admin]}
     tableView={<ProjectTable />}
     detailView={<ProjectDetails />}
     viewName="project"
@@ -98,6 +102,7 @@ export const projectPage = (
 
 export const regionPage = (
   <Page<RegionDetailsType>
+    allowedRoles={[Role.Admin]}
     tableView={<RegionTable />}
     detailView={<RegionDetails />}
     viewName="region"

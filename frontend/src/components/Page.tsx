@@ -1,6 +1,9 @@
 /* eslint-disable react-refresh/only-export-components */
 import { useParams } from 'react-router-dom'
 import { ReactNode, createContext, useContext, useState, Context } from 'react'
+import { useUser } from '@/hooks/user'
+import { Box } from '@mui/material'
+import { Role } from '@/types'
 
 export type PageContextType<T> = {
   idList: string[]
@@ -57,14 +60,18 @@ export const Page = <T extends Record<string, unknown>>({
   idFieldName,
   viewName,
   createTitle,
+  allowedRoles,
 }: {
   tableView: ReactNode
   detailView: ReactNode
   idFieldName: keyof T
   viewName: string
   createTitle: (data: T) => string
+  allowedRoles?: Role[]
 }) => {
   const { id } = useParams()
+  const user = useUser()
+  if (allowedRoles && allowedRoles.includes(user.role)) return <Box>Your user is not authorized to view this page.</Box>
   return (
     <PageContextProvider<T> idFieldName={idFieldName as string} viewName={viewName} createTitle={createTitle}>
       {id ? detailView : tableView}

@@ -13,6 +13,8 @@ import { Link, useLocation } from 'react-router-dom'
 import { renderCustomToolbar, renderCustomToolbarModalVersion } from './helpers'
 import { ActionComponent } from './ActionComponent'
 import { usePageContext } from '../Page'
+import { useUser } from '@/hooks/user'
+import { Role } from '@/types'
 
 type TableStateInUrl = 'sorting' | 'columnfilters' | 'pagination'
 
@@ -43,6 +45,7 @@ export const TableView = <T extends MRT_RowData>({
   const [columnFilters, setColumnFilters] = useState<MRT_ColumnFiltersState>([])
   const [sorting, setSorting] = useState<MRT_SortingState>([])
   const [pagination, setPagination] = useState<MRT_PaginationState>(defaultPagination)
+  const user = useUser()
   const { setIdList, setTableUrl } = usePageContext<T>()
   const loadStateFromUrl = (state: TableStateInUrl, defaultState: [] | MRT_PaginationState) => {
     const searchParams = new URLSearchParams(location.search)
@@ -114,13 +117,16 @@ export const TableView = <T extends MRT_RowData>({
   }, [table, columnFilters, sorting])
 
   if (!data) return <CircularProgress />
-
+  console.log({ user })
   return (
     <Box>
-      <Button component={Link} to="new">
-        New
-      </Button>
-      <Button>Delete</Button>
+      {user &&
+        [Role.Admin, Role.EditRestricted, Role.EditUnrestricted, Role.Project, Role.NowOffice].includes(user.role) && (
+          <Button component={Link} to="new">
+            New
+          </Button>
+        )}
+      {user && [Role.Admin, Role.EditUnrestricted].includes(user.role) && <Button>Delete</Button>}
       <MaterialReactTable table={table} />
     </Box>
   )

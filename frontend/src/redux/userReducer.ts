@@ -1,13 +1,14 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { api } from '@/redux/api'
-import { UserFields } from '@shared/types'
+import { FrontendUser } from '@shared/types'
 import { PersonDetailsType } from '@/backendTypes'
+import { Role } from '@/types'
 
 type LoginData = { username: string; password: string }
 
 const userApi = api.injectEndpoints({
   endpoints: builder => ({
-    tryLogin: builder.mutation<UserFields, LoginData>({
+    tryLogin: builder.mutation<FrontendUser, LoginData>({
       query: ({ username, password }: LoginData) => ({
         url: `/user/login`,
         body: {
@@ -30,27 +31,30 @@ const userApi = api.injectEndpoints({
   }),
 })
 
-interface UserState {
+export interface UserState {
   token: string | null
   username: string | null
+  role: Role
 }
 
 const initialState: UserState = {
   token: null,
   username: null,
+  role: Role.ReadOnly,
 }
 
 const userSlice = createSlice({
   name: 'user',
   initialState,
   reducers: {
-    setUser(state, action: PayloadAction<{ token: string; username: string }>) {
-      state.token = action.payload.token
-      state.username = action.payload.username
+    setUser(state, action: PayloadAction<{ token: string; username: string; role: Role }>) {
+      const { token, username, role } = action.payload
+      state = { ...state, token, username, role }
     },
     clearUser(state) {
       state.token = null
       state.username = null
+      state.role = Role.ReadOnly
     },
   },
 })

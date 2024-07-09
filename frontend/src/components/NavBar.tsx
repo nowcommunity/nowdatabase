@@ -1,15 +1,16 @@
 import { AppBar, Box, Menu, MenuItem, MenuList, Stack, Typography } from '@mui/material'
 import { Link, useNavigate } from 'react-router-dom'
-import { useDispatch, useSelector } from 'react-redux'
-import { RootState } from '../redux/store'
+import { useDispatch } from 'react-redux'
 import { clearUser } from '../redux/userReducer'
 import { api } from '../redux/api'
 import { MouseEvent, useState } from 'react'
+import { Role } from '@/types'
+import { useUser } from '@/hooks/user'
 
-type LinkDefinition = { title: string; url: string; children?: LinkDefinition[] }
+type LinkDefinition = { title: string; url: string; children?: LinkDefinition[]; allowedRoles?: Role[] }
 
 export const NavBar = () => {
-  const user = useSelector((store: RootState) => store.user)
+  const user = useUser()
   const navigate = useNavigate()
   const dispatch = useDispatch()
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
@@ -27,10 +28,11 @@ export const NavBar = () => {
     { title: 'Species', url: '/species' },
     { title: 'Reference', url: '/reference' },
     { title: 'Time Unit', url: '/time-unit' },
-    { title: 'Time Bound', url: '/time-bound' },
+    { title: 'Time Bound', url: '/time-bound', allowedRoles: [Role.Admin, Role.EditUnrestricted] },
     {
       title: 'Admin',
       url: '/admin',
+      allowedRoles: [Role.Admin],
       children: [
         { title: 'Region', url: '/region' },
         { title: 'Project', url: '/project' },
@@ -80,17 +82,19 @@ export const NavBar = () => {
               'aria-labelledby': `${link.url}-menu-button`,
             }}
           >
-            {link.children.map(childLink => (
-              <MenuItem
-                key={`${childLink.url}-menu-link`}
-                id={`${childLink.url}-menu-link`}
-                component={Link}
-                to={childLink.url}
-                onClick={handleClose}
-              >
-                {childLink.title}
-              </MenuItem>
-            ))}
+            {link.children
+              .filter(childLink => !childLink.allowedRoles || childLink.allowedRoles.includes(user.role))
+              .map(childLink => (
+                <MenuItem
+                  key={`${childLink.url}-menu-link`}
+                  id={`${childLink.url}-menu-link`}
+                  component={Link}
+                  to={childLink.url}
+                  onClick={handleClose}
+                >
+                  {childLink.title}
+                </MenuItem>
+              ))}
           </Menu>
         </MenuItem>
       )
@@ -112,7 +116,11 @@ export const NavBar = () => {
             Now Database
           </Typography>
         </MenuItem>
-        <MenuList style={{ alignContent: 'center' }}>{pages.map(page => renderLink(page))}</MenuList>
+        <MenuList style={{ alignContent: 'center' }}>
+          {pages
+            .filter(childLink => !childLink.allowedRoles || childLink.allowedRoles.includes(user.role))
+            .map(page => renderLink(page))}
+        </MenuList>
         <Box
           alignContent="center"
           style={{ marginTop: 'auto', marginBottom: 'auto' }}

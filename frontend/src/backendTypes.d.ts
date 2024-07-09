@@ -1,5 +1,13 @@
 import * as Prisma from '../../backend/prisma/generated/now_test_client/default'
 import * as LogPrisma from '../../backend/prisma/generated/now_log_test_client/default'
+import { Role } from './types'
+
+export type User = {
+  username: string
+  role: Role
+  userId: number
+  initials: string
+}
 
 type EditDataType<T> = T extends object
   ? T extends readonly unknown[]

@@ -13,8 +13,9 @@ export const FrontPage = () => {
         <a href="https://github.com/nowcommunity/nowdatabase">https://github.com/nowcommunity/nowdatabase</a>
       </p>
       <p>
-        Have any questions or suggestions for improvement? Make an issue by logging into GitHub and clicking new issue
-        on this page: <a href="https://github.com/nowcommunity/nowdatabase">GitHub Issues</a>
+        Have any questions or suggestions for improvement? Make an issue by logging into GitHub and clicking the
+        &quot;New Issue&quot; -button on this page:{' '}
+        <a href="https://github.com/nowcommunity/nowdatabase/issue">GitHub Issues</a>
       </p>
     </Box>
   )

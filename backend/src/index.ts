@@ -21,7 +21,7 @@ import { errorHandler } from './middlewares/errorHandler'
 import { createTestUsers } from './services/user'
 import { testDbConnection } from './utils/db'
 import { requireOneOf } from './middlewares/authorizer'
-import { Role } from './types'
+import { Role } from './../../frontend/src/types'
 
 const app = express()
 
@@ -42,8 +42,8 @@ app.use('/time-unit', timeUnitRouter)
 app.use('/time-bound', requireOneOf([Role.Admin]), timeBoundRouter)
 app.use('/region', requireOneOf([Role.Admin]), regionRouter)
 app.use('/person', requireOneOf([Role.Admin]), personRouter)
-app.use('/project', requireOneOf([Role.Admin]), projectRouter)
-app.use('/museum', requireOneOf([Role.Admin]), museumRouter)
+app.use('/project', projectRouter)
+app.use('/museum', museumRouter)
 app.use('/sedimentary-structure', sedimentaryStructureRouter)
 app.use(errorHandler)
 app.listen(PORT, async () => {

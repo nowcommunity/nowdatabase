@@ -1,4 +1,5 @@
-import { Middleware, Role } from '../types'
+import { Role } from '../../../frontend/src/types'
+import { Middleware } from '../types'
 
 class AccessError extends Error {
   declare status: number
@@ -11,7 +12,7 @@ class AccessError extends Error {
 
 export const requireOneOf = (roles: Role[]) => {
   const f: Middleware = (req, _res, next) => {
-    if (!roles.includes(req.user.role)) throw new AccessError()
+    if (!req.user || !roles.includes(req.user.role)) throw new AccessError()
     next()
   }
   return f
