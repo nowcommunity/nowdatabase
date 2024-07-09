@@ -49,7 +49,7 @@ const userSlice = createSlice({
   reducers: {
     setUser(state, action: PayloadAction<{ token: string; username: string; role: Role }>) {
       const { token, username, role } = action.payload
-      state = { ...state, token, username, role }
+      return { ...state, token, username, role }
     },
     clearUser(state) {
       state.token = null
