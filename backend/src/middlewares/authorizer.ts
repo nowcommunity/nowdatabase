@@ -1,4 +1,5 @@
-import { Middleware, Role } from '../types'
+import { Role } from '../../../frontend/src/backendTypes'
+import { Middleware } from '../types'
 
 class AccessError extends Error {
   declare status: number

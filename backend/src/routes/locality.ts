@@ -4,7 +4,7 @@ import { fixBigInt } from '../utils/common'
 import { EditDataType, LocalityDetailsType } from '../../../frontend/src/backendTypes'
 import { write } from '../services/write/write'
 import { requireOneOf } from '../middlewares/authorizer'
-import { Role } from '../types'
+import { Role } from '../../../frontend/src/types'
 
 const router = Router()
 

@@ -21,7 +21,7 @@ import { errorHandler } from './middlewares/errorHandler'
 import { createTestUsers } from './services/user'
 import { testDbConnection } from './utils/db'
 import { requireOneOf } from './middlewares/authorizer'
-import { Role } from './types'
+import { Role } from './../../frontend/src/backendTypes'
 
 const app = express()
 
