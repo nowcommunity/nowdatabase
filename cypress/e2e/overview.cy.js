@@ -1,11 +1,18 @@
 const baseUrl = 'http://localhost:5173/'
 
 describe('Open each page, table view and detail view, and check at least some correct text appears', () => {
+  before('Login as admin, directs to front page', () => {
+    cy.session("logged-as-admin", () => {})
+    cy.visit(baseUrl)
+    cy.contains('construction')
+    cy.contains('Login').click()
+    cy.get('[data-cy="username-basic"]').type("testSu")
+    cy.get('[data-cy="password-basic"]').type("test")
+    cy.get('[data-cy="login-button"]').click()
+    cy.contains('construction')
+  })
   beforeEach(() => {
     cy.visit(baseUrl)
-  })
-  it('Front page works', () => {
-    cy.contains('construction')
   })
   it('Locality works', () => {
     cy.contains('Locality').click()
@@ -13,6 +20,7 @@ describe('Open each page, table view and detail view, and check at least some co
     cy.get('[data-cy="detailview-button-21050"]').click()
     cy.contains('Dating method')
     cy.contains('olduvai')
+
   })
   it('Species works', () => {
     cy.contains('Species').click()
@@ -20,6 +28,7 @@ describe('Open each page, table view and detail view, and check at least some co
     cy.get('[data-cy="detailview-button-21052"]').first().click()
     cy.contains('Class')
     cy.contains('Simplomys')
+
   })
   it('Reference works', () => {
     cy.contains('Reference').click()
@@ -27,6 +36,7 @@ describe('Open each page, table view and detail view, and check at least some co
     cy.get('[data-cy="detailview-button-10039"]').first().click()
     cy.contains('Reference type')
     cy.contains('A new geomagnetic polarity time scale for the Late Cretaceous and Cenozoic')
+
   })
   it('Time Unit works', () => {
     cy.contains('Time Unit').click()
@@ -34,6 +44,7 @@ describe('Open each page, table view and detail view, and check at least some co
     cy.get('[data-cy="detailview-button-langhian"]').first().click()
     cy.contains('Sequence')
     cy.contains('gcss')
+
   })
   it('Region works', () => {
     cy.contains('Admin').click()
@@ -43,7 +54,7 @@ describe('Open each page, table view and detail view, and check at least some co
     cy.contains('Regional Coordinators')
     cy.contains('prs')
   })
-  it.only('Project works', () => {
+  it('Project works', () => {
     cy.get('div[id="/admin-menu-button"]').click()
     cy.get('a[id="/project-menu-link"]').click()
     cy.contains('Workgroup on Insectivores')

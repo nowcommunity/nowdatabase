@@ -44,7 +44,7 @@ export const Login = () => {
     <Container style={{ alignContent: 'center' }} maxWidth="sm">
       <Stack rowGap="1em">
         <TextField
-          id="username-basic"
+          data-cy="username-basic"
           label="Username"
           variant="outlined"
           type="text"
@@ -55,7 +55,7 @@ export const Login = () => {
           fullWidth
         />
         <TextField
-          id="password-basic"
+          data-cy="password-basic"
           label="Password"
           variant="outlined"
           type="password"
@@ -65,7 +65,7 @@ export const Login = () => {
           helperText={passwordError}
           fullWidth
         />
-        <Button onClick={() => void login()} size="large" style={{ fontSize: '1.4em' }}>
+        <Button data-cy="login-button" onClick={() => void login()} size="large" style={{ fontSize: '1.4em' }}>
           Login
         </Button>
         <Box>
