@@ -1,4 +1,4 @@
-# For running in local development: hot reload etc
+# For running with anonymous data, for e2e tests in local or github actions
 services:
   frontend:
     container_name: nowdb-frontend-dev
