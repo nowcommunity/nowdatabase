@@ -2,24 +2,24 @@
 services:
   frontend:
     container_name: nowdb-frontend-dev
-    build:
-      context: ./frontend
-      dockerfile: ./dev.Dockerfile
+    image: node:20-alpine3.16
     volumes:
       - ./frontend/:/usr/src/app
     ports:
       - 127.0.0.1:5173:5173
+    command: >
+        sh -c "cd /usr/src/app && npm ci && npm run dev -- --host"
   backend:
     container_name: nowdb-backend-dev
-    build:
-      context: .
-      dockerfile: ./backend/dev.Dockerfile
+    image: node:20-alpine3.16
+    env_file: .anon.env
     volumes:
       - ./backend/:/usr/src/app/backend/
-      - ./frontend/src/:/usr/src/app/frontend/src/
+      - ./frontend/src/validators:/usr/src/app/frontend/src/validators
     ports:
       - 127.0.0.1:4000:4000
-    env_file: .anon.env  
+    command: >
+        sh -c "cd /usr/src/app/backend && npm ci && npm run dev"
   db-anon:
     container_name: nowdb-db-anon
     image: mariadb
