@@ -120,13 +120,18 @@ export const TableView = <T extends MRT_RowData>({
 
   return (
     <Box>
-      {user &&
-        [Role.Admin, Role.EditRestricted, Role.EditUnrestricted, Role.Project, Role.NowOffice].includes(user.role) && (
-          <Button component={Link} to="new">
-            New
-          </Button>
-        )}
-      {user && [Role.Admin, Role.EditUnrestricted].includes(user.role) && <Button>Delete</Button>}
+      {user && (
+        <Box sx={{ display: 'flex', flexGap: '2', marginBottom: '0.5rem' }}>
+          {[Role.Admin, Role.EditRestricted, Role.EditUnrestricted, Role.Project, Role.NowOffice].includes(
+            user.role
+          ) && (
+            <Button sx={{ marginRight: '5px' }} variant="contained" component={Link} to="new">
+              New
+            </Button>
+          )}
+          {[Role.Admin, Role.EditUnrestricted].includes(user.role) && <Button variant="contained">Delete</Button>}
+        </Box>
+      )}
       <MaterialReactTable table={table} />
     </Box>
   )

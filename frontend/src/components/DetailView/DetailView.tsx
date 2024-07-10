@@ -1,5 +1,5 @@
 import { useSearchParams } from 'react-router-dom'
-import { Box, Button, Paper, Stack, Tab, Tabs } from '@mui/material'
+import { Box, Button, Paper, Stack, Tab, Tabs, useTheme } from '@mui/material'
 import EditIcon from '@mui/icons-material/Edit'
 import { useEffect, useState, JSX } from 'react'
 import { DetailContextProvider, ModeOptions, ModeType, makeEditData, modeOptionToMode } from './Context/DetailContext'
@@ -42,7 +42,7 @@ export const DetailView = <T extends object>({
   isNew?: boolean
 }) => {
   const [searchParams, setSearchParams] = useSearchParams()
-
+  const theme = useTheme()
   const getUrl = () => {
     const tabFromUrl = searchParams.get('tab')
     if (typeof tabFromUrl !== 'string' || isNaN(parseInt(tabFromUrl))) return 0
@@ -98,8 +98,8 @@ export const DetailView = <T extends object>({
   const paperProps = {
     style: {
       minHeight: '10em',
-      backgroundColor: '#cfd8dc',
       padding: '1em',
+      backgroundColor: theme.palette.grey[300],
     },
     elevation: 5,
   }
