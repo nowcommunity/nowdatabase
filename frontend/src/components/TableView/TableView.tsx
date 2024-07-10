@@ -8,7 +8,7 @@ import {
   useMaterialReactTable,
   MaterialReactTable,
 } from 'material-react-table'
-import { Box, Button, CircularProgress } from '@mui/material'
+import { Box, Button, CircularProgress, Paper } from '@mui/material'
 import { Link, useLocation } from 'react-router-dom'
 import { renderCustomToolbar, renderCustomToolbarModalVersion } from './helpers'
 import { ActionComponent } from './ActionComponent'
@@ -76,6 +76,7 @@ export const TableView = <T extends MRT_RowData>({
     autoResetPageIndex: false,
     positionPagination: 'both',
     paginationDisplayMode: 'pages',
+    muiTablePaperProps: { elevation: 0 },
     enableDensityToggle: false,
     enableGlobalFilter: false,
     enableColumnActions: false,
@@ -119,7 +120,7 @@ export const TableView = <T extends MRT_RowData>({
   if (!data) return <CircularProgress />
 
   return (
-    <Box>
+    <Paper elevation={5}>
       {user && (
         <Box sx={{ display: 'flex', flexGap: '2', marginBottom: '0.5rem' }}>
           {[Role.Admin, Role.EditRestricted, Role.EditUnrestricted, Role.Project, Role.NowOffice].includes(
@@ -133,6 +134,6 @@ export const TableView = <T extends MRT_RowData>({
         </Box>
       )}
       <MaterialReactTable table={table} />
-    </Box>
+    </Paper>
   )
 }
