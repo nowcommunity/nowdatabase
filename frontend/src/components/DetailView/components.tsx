@@ -12,7 +12,7 @@ export const WriteButton = <T,>({ onWrite }: { onWrite: (editData: EditDataType<
   const [loading, setLoading] = useState(false)
 
   const getButtonText = () => {
-    if (mode.staging) return 'Finalize entry'
+    if (!mode.staging) return 'Finalize entry'
     return 'Complete and save'
   }
   return (
