@@ -6,11 +6,6 @@ module.exports = defineConfig({
       // implement node event listeners here
     },
     baseUrl: 'http://localhost:5173/',
-    defaultCommandTimeout: 52000,
-    execTimeout: 90000,
-    pageLoadTimeout: 140000,
-    requestTimeout: 80000,
-    responseTimeout: 80000,
     testIsolation: false,
   },
   viewportHeight: 900,

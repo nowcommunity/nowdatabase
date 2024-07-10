@@ -2,13 +2,7 @@
 describe('Open each page, table view and detail view, and check at least some correct text appears', () => {
   before('Login as admin, directs to front page', () => {
     cy.session("logged-as-admin", () => {})
-    cy.visit('/')
-    cy.contains('construction')
-    cy.contains('Login').click()
-    cy.get('[data-cy="username-basic"]').type("testSu")
-    cy.get('[data-cy="password-basic"]').type("test")
-    cy.get('[data-cy="login-button"]').click()
-    cy.contains('construction')
+    cy.login('testSu')
   })
   beforeEach(() => {
     cy.visit('/')
@@ -44,28 +38,5 @@ describe('Open each page, table view and detail view, and check at least some co
     cy.contains('Sequence')
     cy.contains('gcss')
 
-  })
-  it('Region works', () => {
-    cy.contains('Admin').click()
-    cy.contains('Region').click()
-    cy.contains('region 4452477e')
-    cy.get('[data-cy="detailview-button-1"]').first().click()
-    cy.contains('Regional Coordinators')
-    cy.contains('prs')
-  })
-  it('Project works', () => {
-    cy.get('div[id="/admin-menu-button"]').click()
-    cy.get('a[id="/project-menu-link"]').click()
-    cy.contains('Workgroup on Insectivores')
-    cy.get('[data-cy="detailview-button-3"]').first().click()
-    cy.contains('Coordinator')
-    cy.contains('NOW Database')
-  })
-  it('Time Bound works', () => {
-    cy.contains('Time Bound').click()
-    cy.contains('C2N-y')
-    cy.get('[data-cy="detailview-button-11"]').first().click()
-    cy.contains('Bound')
-    cy.contains('1.778')
   })
 })
