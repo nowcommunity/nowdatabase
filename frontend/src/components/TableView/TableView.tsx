@@ -77,7 +77,7 @@ export const TableView = <T extends MRT_RowData>({
     onSortingChange: setSorting,
     onPaginationChange: setPagination,
     autoResetPageIndex: false,
-    positionPagination: 'both',
+    positionPagination: selectorFn ? 'top' : 'both',
     paginationDisplayMode: 'pages',
     muiTablePaperProps: { elevation: 0 },
     enableDensityToggle: false,
