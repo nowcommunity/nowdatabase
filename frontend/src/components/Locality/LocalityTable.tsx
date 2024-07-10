@@ -39,6 +39,7 @@ export const LocalityTable = ({ selectorFn }: { selectorFn?: (newObject: Localit
 
   return (
     <TableView<Locality>
+      title="Localities"
       selectorFn={selectorFn}
       checkRowRestriction={checkRowRestriction}
       idFieldName="lid"

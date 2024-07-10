@@ -28,6 +28,7 @@ export const RegionTable = ({ selectorFn }: { selectorFn?: (id: Region) => void 
 
   return (
     <TableView<Region>
+      title="Regions"
       selectorFn={selectorFn}
       checkRowRestriction={checkRowRestriction}
       idFieldName="reg_coord_id"

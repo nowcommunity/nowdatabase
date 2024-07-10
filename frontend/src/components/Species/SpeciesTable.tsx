@@ -68,6 +68,7 @@ export const SpeciesTable = ({ selectorFn }: { selectorFn?: (id: Species) => voi
 
   return (
     <TableView<Species>
+      title="Species"
       selectorFn={selectorFn}
       checkRowRestriction={checkRowRestriction}
       idFieldName="species_id"

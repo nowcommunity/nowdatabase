@@ -35,6 +35,7 @@ export const TimeBoundTable = ({ selectorFn }: { selectorFn?: (newTimeBound: Tim
 
   return (
     <TableView<TimeBound>
+      title="Time bounds"
       selectorFn={selectorFn}
       checkRowRestriction={checkRowRestriction}
       idFieldName="bid"

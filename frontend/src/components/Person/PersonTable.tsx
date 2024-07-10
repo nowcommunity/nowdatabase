@@ -56,6 +56,7 @@ export const PersonTable = ({ selectorFn }: { selectorFn?: (id: PersonDetailsTyp
 
   return (
     <TableView<PersonDetailsType>
+      title="People"
       selectorFn={selectorFn}
       checkRowRestriction={checkRowRestriction}
       idFieldName="initials"

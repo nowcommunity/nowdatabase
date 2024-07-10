@@ -8,7 +8,7 @@ import {
   useMaterialReactTable,
   MaterialReactTable,
 } from 'material-react-table'
-import { Box, Button, CircularProgress, Paper } from '@mui/material'
+import { Box, Button, CircularProgress, Divider, Paper, Typography } from '@mui/material'
 import { Link, useLocation } from 'react-router-dom'
 import { renderCustomToolbar, renderCustomToolbarModalVersion } from './helpers'
 import { ActionComponent } from './ActionComponent'
@@ -34,7 +34,9 @@ export const TableView = <T extends MRT_RowData>({
   checkRowRestriction,
   selectorFn,
   url,
+  title,
 }: {
+  title?: string
   data: T[] | undefined
   columns: MRT_ColumnDef<T>[]
   idFieldName: keyof T
@@ -125,16 +127,22 @@ export const TableView = <T extends MRT_RowData>({
   return (
     <Paper elevation={5} style={{ paddingTop: '0.1rem' }}>
       {!selectorFn && user && (
-        <Box sx={{ display: 'flex', flexGap: '2', margin: '0.5rem' }}>
-          {[Role.Admin, Role.EditRestricted, Role.EditUnrestricted, Role.Project, Role.NowOffice].includes(
-            user.role
-          ) && (
-            <Button sx={{ marginRight: '5px' }} variant="contained" component={Link} to="new">
-              New
-            </Button>
-          )}
-          {[Role.Admin, Role.EditUnrestricted].includes(user.role) && <Button variant="contained">Delete</Button>}
-        </Box>
+        <>
+          <Box sx={{ display: 'flex', flexGap: '2', marginTop: '1rem', justifyContent: 'center', maxHeight: '3.2em' }}>
+            <Typography sx={{ margin: '0.4rem' }} variant="h4">
+              {title ?? ''}
+            </Typography>
+            {[Role.Admin, Role.EditRestricted, Role.EditUnrestricted, Role.Project, Role.NowOffice].includes(
+              user.role
+            ) && (
+              <Button sx={{ marginRight: '1rem', marginLeft: '1rem' }} variant="contained" component={Link} to="new">
+                New
+              </Button>
+            )}
+            {[Role.Admin, Role.EditUnrestricted].includes(user.role) && <Button variant="contained">Delete</Button>}
+          </Box>
+          <Divider sx={{ marginTop: '1rem' }} />
+        </>
       )}
       <MaterialReactTable table={table} />
     </Paper>

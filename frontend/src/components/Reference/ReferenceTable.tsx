@@ -12,6 +12,7 @@ export const ReferenceTable = ({ selectorFn }: { selectorFn?: (id: Reference) =>
 
   return (
     <TableView<Reference>
+      title="References"
       selectorFn={selectorFn}
       checkRowRestriction={checkRowRestriction}
       idFieldName="rid"
