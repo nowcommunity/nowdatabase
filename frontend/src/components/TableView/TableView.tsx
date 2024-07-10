@@ -120,9 +120,9 @@ export const TableView = <T extends MRT_RowData>({
   if (!data) return <CircularProgress />
 
   return (
-    <Paper elevation={5}>
+    <Paper elevation={5} style={{ paddingTop: '0.1rem' }}>
       {user && (
-        <Box sx={{ display: 'flex', flexGap: '2', marginBottom: '0.5rem' }}>
+        <Box sx={{ display: 'flex', flexGap: '2', margin: '0.5rem' }}>
           {[Role.Admin, Role.EditRestricted, Role.EditUnrestricted, Role.Project, Role.NowOffice].includes(
             user.role
           ) && (
