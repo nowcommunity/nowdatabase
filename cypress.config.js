@@ -5,6 +5,7 @@ module.exports = defineConfig({
     setupNodeEvents(on, config) {
       // implement node event listeners here
     },
+    baseUrl: 'http://localhost:5173/',
     defaultCommandTimeout: 52000,
     execTimeout: 90000,
     pageLoadTimeout: 140000,
