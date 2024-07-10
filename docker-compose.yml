@@ -10,6 +10,7 @@ services:
       - 5173:5173
     environment:
       - BACKEND_URL=http://localhost:4000
+    env_file: .env
   backend:
     container_name: nowdb-backend
     build:

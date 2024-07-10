@@ -6,6 +6,7 @@ import { api } from '../redux/api'
 import { MouseEvent, useState } from 'react'
 import { Role } from '@/types'
 import { useUser } from '@/hooks/user'
+import { ENV } from '@/util/config'
 
 type LinkDefinition = { title: string; url: string; children?: LinkDefinition[]; allowedRoles?: Role[] }
 
@@ -108,12 +109,17 @@ export const NavBar = () => {
     )
   }
 
+  const getModeText = () => {
+    if (ENV === 'staging') return '(test)'
+    if (ENV === 'dev') return '(dev)'
+    return ''
+  }
   return (
     <AppBar position="static">
       <Stack spacing={10} direction="row" marginLeft={2} justifyContent="space-between">
         <MenuItem component={Link} to="/">
           <Typography component="h1" fontSize={'2.2em'}>
-            Now Database
+            Now Database {getModeText()}
           </Typography>
         </MenuItem>
         <MenuList style={{ alignContent: 'center' }}>

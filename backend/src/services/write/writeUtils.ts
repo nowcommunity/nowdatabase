@@ -2,7 +2,6 @@
   Common utility functions for processing saving actions
 */
 import { EditDataType, ReferenceDetailsType } from '../../../../frontend/src/backendTypes'
-import { NOW_DB_NAME, IS_LOCAL } from '../../utils/config'
 import { nowDb } from '../../utils/db'
 import { logger } from '../../utils/logger'
 
@@ -60,8 +59,8 @@ export const isEmptyValue = (value: string | number | null | undefined) => {
   return false
 }
 
-// If we're using test db, we show debug prints. In local development, it will be more verbose.
-const debugLevel = NOW_DB_NAME === 'now_test' ? (IS_LOCAL ? 2 : 1) : 0
+// Set this to 1 or 2 for debugging write (higher = more logging)
+const debugLevel = 0
 
 export const debugLog = (msg: string, onlyVerbose?: boolean) => {
   if (debugLevel === 0) return

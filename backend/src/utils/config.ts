@@ -5,11 +5,19 @@ export const PORT = process.env.NOWDB_BACKEND_PORT as unknown as number
 export const LOGIN_VALID_MS = parseInt(process.env.LOGIN_VALID_MINUTES as string) * 60 * 1000
 export const MARIADB_PORT = parseInt(process.env.MARIADB_PORT as string)
 export const USER_CREATION_SECRET = process.env.USER_CREATION_SECRET as string
-export const BACKEND_MODE = process.env.BACKEND_MODE as 'dev' | 'prod' | 'test'
+
+/* Running environment: 
+    dev     = development or testing, locally or in GitHub actions
+    staging = semi-public test version, non-anonymized test-data
+    prod    = production with real data
+*/
+const allowedRunningEnvs = ['dev', 'staging', 'prod'] as const
+export const RUNNING_ENV = process.env.RUNNING_ENV as (typeof allowedRunningEnvs)[number]
+if (!allowedRunningEnvs.includes(RUNNING_ENV)) throw new Error('Invalid RUNNING_ENV')
+
 export const DB_CONNECTION_LIMIT = (process.env.DB_CONNECTION_LIMIT as string) ?? '10'
 export const NOW_DB_NAME = process.env.NOW_DB_NAME as string
 export const LOG_DB_NAME = process.env.LOG_DB_NAME as string
-export const IS_LOCAL = (process.env.IS_LOCAL as string) === 'true'
 export const COORDINATOR = process.env.COORDINATOR as string
 
 const requiredEnvs = {
@@ -20,11 +28,11 @@ const requiredEnvs = {
   LOGIN_VALID_MS,
   MARIADB_PORT,
   USER_CREATION_SECRET,
-  BACKEND_MODE,
+  BACKEND_MODE: RUNNING_ENV,
   NOW_DB_NAME,
   LOG_DB_NAME,
-  IS_LOCAL,
   COORDINATOR,
+  RUNNING_ENV,
 }
 
 const missingEnvs = Object.entries(requiredEnvs).filter(([, value]) => value === undefined)

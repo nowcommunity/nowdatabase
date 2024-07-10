@@ -9,6 +9,7 @@ services:
       - ./frontend/:/usr/src/app
     ports:
       - 127.0.0.1:5173:5173
+    env_file: .dev.env
   backend:
     container_name: nowdb-backend-dev
     build:

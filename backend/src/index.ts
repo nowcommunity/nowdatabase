@@ -15,8 +15,8 @@ import userRouter from './routes/user'
 import { responseLogger } from './middlewares/requestLogger'
 import compression from 'compression'
 import { logger } from './utils/logger'
-import { PORT, BACKEND_MODE } from './utils/config'
-import { tokenExtractor, userExtractor, requireLogin } from './middlewares/authenticator'
+import { PORT, RUNNING_ENV } from './utils/config'
+import { tokenExtractor, userExtractor } from './middlewares/authenticator'
 import { errorHandler } from './middlewares/errorHandler'
 import { createTestUsers } from './services/user'
 import { testDbConnection } from './utils/db'
@@ -33,8 +33,6 @@ app.use(userExtractor)
 app.use(responseLogger)
 
 app.use('/user', userRouter)
-if (BACKEND_MODE !== 'dev') app.use(requireLogin)
-
 app.use('/locality', localityRouter)
 app.use('/species', speciesRouter)
 app.use('/reference', referenceRouter)
@@ -47,8 +45,8 @@ app.use('/museum', museumRouter)
 app.use('/sedimentary-structure', sedimentaryStructureRouter)
 app.use(errorHandler)
 app.listen(PORT, async () => {
-  logger.info(`Server running on port ${PORT} in "${BACKEND_MODE}"-mode`)
-  if (BACKEND_MODE === 'dev') {
+  logger.info(`Server running on port ${PORT} in "${RUNNING_ENV}"-mode`)
+  if (RUNNING_ENV === 'dev') {
     await testDbConnection()
     logger.info('Creating test-users...')
     void createTestUsers()
