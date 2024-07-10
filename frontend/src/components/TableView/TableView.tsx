@@ -19,6 +19,7 @@ import { Role } from '@/types'
 type TableStateInUrl = 'sorting' | 'columnfilters' | 'pagination'
 
 const defaultPagination: MRT_PaginationState = { pageIndex: 0, pageSize: 15 }
+const defaultPaginationSmall: MRT_PaginationState = { pageIndex: 0, pageSize: 10 }
 
 /*
   TableView takes in the data and columns of a table, and handles
@@ -44,7 +45,9 @@ export const TableView = <T extends MRT_RowData>({
   const location = useLocation()
   const [columnFilters, setColumnFilters] = useState<MRT_ColumnFiltersState>([])
   const [sorting, setSorting] = useState<MRT_SortingState>([])
-  const [pagination, setPagination] = useState<MRT_PaginationState>(defaultPagination)
+  const [pagination, setPagination] = useState<MRT_PaginationState>(
+    selectorFn ? defaultPaginationSmall : defaultPagination
+  )
   const user = useUser()
   const { setIdList, setTableUrl } = usePageContext<T>()
   const loadStateFromUrl = (state: TableStateInUrl, defaultState: [] | MRT_PaginationState) => {
