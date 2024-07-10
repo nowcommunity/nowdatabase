@@ -39,8 +39,14 @@ export const EditingModal = ({
             {' '}
             {children}
           </Box>
-          {onSave && <Button onClick={() => void closeWithSave()}>Save</Button>}
-          <Button onClick={() => setOpen(false)}>{onSave ? 'Cancel' : 'Close'}</Button>
+          {onSave && (
+            <Button sx={{ marginRight: '0.5em' }} variant="contained" onClick={() => void closeWithSave()}>
+              Save
+            </Button>
+          )}
+          <Button variant="contained" onClick={() => setOpen(false)}>
+            {onSave ? 'Cancel' : 'Close'}
+          </Button>
         </Box>
       </Modal>
     </Box>
