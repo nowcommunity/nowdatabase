@@ -1,7 +1,7 @@
 # For running with anonymous data, for e2e tests in local or github actions
 services:
   frontend:
-    container_name: nowdb-frontend-dev
+    container_name: nowdb-frontend-anon
     image: node:20-alpine3.16
     volumes:
       - ./frontend/:/usr/src/app
@@ -11,7 +11,7 @@ services:
     command: >
         sh -c "cd /usr/src/app && npm ci && npm run dev -- --host"
   backend:
-    container_name: nowdb-backend-dev
+    container_name: nowdb-backend-anon
     image: node:20-alpine3.16
     env_file: .anon.env
     volumes:
