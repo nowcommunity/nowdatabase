@@ -2,7 +2,7 @@
 describe('Open each page, table view and detail view, and check at least some correct text appears', () => {
   before('Login as admin, directs to front page', () => {
     cy.session("logged-as-admin", () => {})
-    cy.visit('')
+    cy.visit('/')
     cy.contains('construction')
     cy.contains('Login').click()
     cy.get('[data-cy="username-basic"]').type("testSu")
@@ -11,7 +11,7 @@ describe('Open each page, table view and detail view, and check at least some co
     cy.contains('construction')
   })
   beforeEach(() => {
-    cy.visit('')
+    cy.visit('/')
   })
   it('Locality works', () => {
     cy.contains('Locality').click()
