@@ -10,4 +10,4 @@ COPY package-lock.json ./
 
 RUN npm ci
 
-CMD ["npm", "run", "dev", "--", "--host"]
+CMD ["npm", "run", "dev", "-- --host"]
