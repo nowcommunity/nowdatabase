@@ -2,6 +2,7 @@
   Common utility functions for processing saving actions
 */
 import { EditDataType, ReferenceDetailsType } from '../../../../frontend/src/backendTypes'
+import { RUNNING_ENV } from '../../utils/config'
 import { nowDb } from '../../utils/db'
 import { logger } from '../../utils/logger'
 
@@ -59,8 +60,8 @@ export const isEmptyValue = (value: string | number | null | undefined) => {
   return false
 }
 
-// Set this to 1 or 2 for debugging write (higher = more logging)
-const debugLevel = 0
+// If doing hard debugging of write in local dev, set this to 2
+const debugLevel = RUNNING_ENV === 'prod' ? 0 : 1
 
 export const debugLog = (msg: string, onlyVerbose?: boolean) => {
   if (debugLevel === 0) return
