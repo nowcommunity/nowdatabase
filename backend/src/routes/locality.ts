@@ -26,7 +26,7 @@ router.put(
   async (req: Request<object, object, { locality: EditDataType<LocalityDetailsType> }>, res) => {
     const editedLocality = req.body.locality
     const validationErrors = validateEntireLocality(editedLocality)
-    if (validationErrors) {
+    if (validationErrors.length > 0) {
       return res.status(400).send({ validationErrors })
     }
     const result = await write(editedLocality, 'now_loc', { authorizer: 'NA', userName: 'testuser' })
