@@ -155,18 +155,18 @@ export const write: WriteFunction = async (data, tableName, updateOptions) => {
     if (updateOptions) {
       const { authorizer, userName } = updateOptions
       const tableNameToPrefix = {
-        now_loc: 'l',
-        com_species: 's',
-        now_time_unit: 't',
-        now_tu_bound: 'b',
-      } as Record<AllowedTables, 's' | 't' | 'l' | 'b'>
+        now_loc: 'lau',
+        com_species: 'sau',
+        now_time_unit: 'tau',
+        now_tu_bound: 'bau',
+      } as Record<AllowedTables, 'sau' | 'tau' | 'lau' | 'bau'>
       const prefix = tableNameToPrefix[tableName]
       const updateEntry = await createUpdateEntry(
         conn,
         prefix,
         COORDINATOR,
         authorizer,
-        (data[`now_${prefix}au`] as { comment: string }).comment,
+        (data[`now_${prefix}`] as { comment: string }).comment,
         result
       )
       debugLog(`updateEntry: ${printJSON(updateEntry)}`, true)

@@ -7,13 +7,13 @@ const getUpdateIdField = (tableName: string) => `${tableName[4]}uid`
 
 export const createUpdateEntry = async (
   conn: PoolConnection,
-  prefix: 's' | 't' | 'l' | 'b',
+  prefix: 'sau' | 'tau' | 'lau' | 'bau',
   coordinator: string,
   authorizer: string,
   comment: string,
   id: string | number
 ) => {
-  const table = `now_${prefix}au`
+  const table = `now_${prefix}`
   const idField = getUpdateIdField(table)
   const result: object[] = await conn.query(
     `INSERT INTO ${NOW_DB_NAME}.${table} (${prefix}_coordinator, ${prefix}_authorizer, ${tableToId[table]}, ${prefix}_date, ${prefix}_comment) VALUES (?, ?, ?, ?, ?) RETURNING ${table}.${idField}`,
