@@ -70,19 +70,3 @@ export const createTestUsers = async () => {
     }
   }
 }
-
-export const getAllUsers = async () => {
-  const result = await nowDb.com_users.findMany({})
-  return result
-}
-
-export const getUserDetails = async (id: number) => {
-  // TODO: Check if user has access
-
-  const result = await nowDb.com_users.findUnique({
-    where: {
-      user_id: id,
-    },
-  })
-  return result
-}

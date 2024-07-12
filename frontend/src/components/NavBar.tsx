@@ -42,6 +42,8 @@ export const NavBar = () => {
     },
   ]
 
+  if (user.username) pages.push({ title: 'User', url: '/userpage' })
+
   const logout = () => {
     dispatch(clearUser())
     // Reset api, so that we won't show cached private data to guest user
@@ -52,9 +54,7 @@ export const NavBar = () => {
 
   const logoutButton = (
     <MenuItem onClick={logout} style={{ display: 'inline-block' }}>
-      <Typography component="h4" textAlign="center">
-        Logout
-      </Typography>
+      <Typography textAlign="center">Logout</Typography>
     </MenuItem>
   )
 
@@ -70,9 +70,7 @@ export const NavBar = () => {
             onClick={handleClick}
             sx={{ color: 'white', paddingTop: '6px', paddingBottom: '6px', paddingLeft: '16px', paddingRight: '16px' }}
           >
-            <Typography component="h4" textAlign="center">
-              {link.title}
-            </Typography>
+            <Typography textAlign="center">{link.title}</Typography>
           </Box>
           <Menu
             id={`${link.url}-menu`}
@@ -102,9 +100,7 @@ export const NavBar = () => {
     }
     return (
       <MenuItem key={`${link.url}-menuitem`} component={Link} to={link.url} style={{ display: 'inline-block' }}>
-        <Typography component="h4" textAlign="center">
-          {link.title}
-        </Typography>
+        <Typography textAlign="center">{link.title}</Typography>
       </MenuItem>
     )
   }
@@ -118,9 +114,7 @@ export const NavBar = () => {
     <AppBar position="static">
       <Stack spacing={10} direction="row" marginLeft={2} justifyContent="space-between">
         <MenuItem component={Link} to="/">
-          <Typography component="h1" fontSize={'2.2em'}>
-            Now Database {getModeText()}
-          </Typography>
+          <Typography fontSize={'2.2em'}>Now Database {getModeText()}</Typography>
         </MenuItem>
         <MenuList style={{ alignContent: 'center' }}>
           {pages

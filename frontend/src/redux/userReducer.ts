@@ -1,12 +1,12 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { api } from '@/redux/api'
-import { PersonDetailsType } from '@/backendTypes'
 import { Role } from '@/types'
 
 export type FrontendUser = {
   token: string
   username: string
   role: Role
+  initials: string
 }
 
 type LoginData = { username: string; password: string }
@@ -23,16 +23,6 @@ const userApi = api.injectEndpoints({
         method: 'POST',
       }),
     }),
-    getAllUsers: builder.query<PersonDetailsType[], void>({
-      query: () => ({
-        url: `/user/all`,
-      }),
-    }),
-    getUserDetails: builder.query<PersonDetailsType, string>({
-      query: id => ({
-        url: `/user/${id}`,
-      }),
-    }),
   }),
 })
 
@@ -40,30 +30,29 @@ export interface UserState {
   token: string | null
   username: string | null
   role: Role
+  initials: string | null
 }
 
 const initialState: UserState = {
   token: null,
   username: null,
   role: Role.ReadOnly,
+  initials: null,
 }
 
 const userSlice = createSlice({
   name: 'user',
   initialState,
   reducers: {
-    setUser(state, action: PayloadAction<{ token: string; username: string; role: Role }>) {
-      const { token, username, role } = action.payload
-      return { ...state, token, username, role }
+    setUser(_state, action: PayloadAction<UserState>) {
+      return { ...action.payload }
     },
-    clearUser(state) {
-      state.token = null
-      state.username = null
-      state.role = Role.ReadOnly
+    clearUser() {
+      return { ...initialState }
     },
   },
 })
 
 export const { setUser, clearUser } = userSlice.actions
 export const userReducer = userSlice.reducer
-export const { useTryLoginMutation, useGetAllUsersQuery, useGetUserDetailsQuery } = userApi
+export const { useTryLoginMutation } = userApi

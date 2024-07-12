@@ -34,7 +34,7 @@ export const Login = () => {
 
   useEffect(() => {
     if (data && data.token) {
-      dispatch(setUser({ username: data.username, token: data.token, role: data.role || Role.ReadOnly }))
+      dispatch(setUser(data))
       // Reset api cache, so that we won't show guest data to logged user
       dispatch(api.util.resetApiState())
       navigate('/')

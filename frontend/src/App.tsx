@@ -13,6 +13,7 @@ import {
   timeBoundPage,
   timeUnitPage,
 } from './components/pages'
+import { UserPage } from './components/UserPage'
 
 const App = () => {
   return (
@@ -34,8 +35,9 @@ const App = () => {
               <Route element={regionPage} path="/region/:id?" />
               <Route element={personPage} path="/person/:id?" />
               <Route element={projectPage} path="/project/:id?" />
-              <Route element={<FrontPage />} path="/" />
               <Route element={<Login />} path="/login" />
+              <Route element={<UserPage />} path="/userpage" />
+              <Route element={<FrontPage />} path="/" />
               <Route element={<div>Page not found.</div>} path="*" />
             </Routes>
           </Grid>

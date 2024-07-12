@@ -26,7 +26,16 @@ router.post('/login', async (req, res) => {
     expiresIn: LOGIN_VALID_MS,
   })
 
-  return res.status(200).send({ token, username: result.user_name, role: getRole(result.now_user_group ?? '') })
+  const personResult = await nowDb.com_people.findFirst({ where: { user_id: result.user_id } })
+
+  if (!personResult) throw new Error('User found but not person; this should not happen.')
+
+  return res.status(200).send({
+    token,
+    username: result.user_name,
+    role: getRole(result.now_user_group ?? ''),
+    initials: personResult.initials,
+  })
 })
 
 router.get('/all', async (_req, res) => {
