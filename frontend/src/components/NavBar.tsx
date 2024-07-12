@@ -42,7 +42,7 @@ export const NavBar = () => {
     },
   ]
 
-  if (user.username) pages.push({ title: 'User', url: '/userpage' })
+  if (user.username) pages.push({ title: 'User', url: '/person/user-page' })
 
   const logout = () => {
     dispatch(clearUser())

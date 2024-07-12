@@ -34,12 +34,14 @@ export const DetailView = <T extends object>({
   onWrite,
   validator,
   isNew = false,
+  isUserPage = false,
 }: {
   tabs: TabType[]
   data: T
   onWrite?: (editData: EditDataType<T>) => Promise<void>
   validator: (editData: EditDataType<T>, field: keyof EditDataType<T>) => ValidationObject
   isNew?: boolean
+  isUserPage?: boolean
 }) => {
   const [searchParams, setSearchParams] = useSearchParams()
   const theme = useTheme()
@@ -132,7 +134,7 @@ export const DetailView = <T extends object>({
       <DetailContextProvider contextState={initialState}>
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignContent: 'center', marginTop: 'auto' }}>
           <Box sx={{ display: 'flex' }} gap={10}>
-            <ReturnButton />
+            {!isUserPage && <ReturnButton />}
             {!mode.staging && !initialState.mode.new && (
               <Button
                 onClick={() => setMode(!mode.read ? 'read' : 'edit')}
@@ -144,9 +146,11 @@ export const DetailView = <T extends object>({
             )}
             {(!mode.read || initialState.mode.new) && onWrite && <WriteButton onWrite={onWrite} />}
           </Box>
-          <Box sx={{ marginRight: '3em' }}>
-            <DetailBrowser<T> />
-          </Box>
+          {!isUserPage && (
+            <Box sx={{ marginRight: '3em' }}>
+              <DetailBrowser<T> />
+            </Box>
+          )}
         </Box>
         {mode.staging ? stagingView : tabView}
       </DetailContextProvider>

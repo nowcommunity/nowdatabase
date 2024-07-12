@@ -18,7 +18,10 @@ export const getPersonDetails = async (id: string) => {
 
   if (!person.user_id) return { ...person, user: null }
 
-  const user = await nowDb.com_users.findUnique({ where: { user_id: person.user_id } })
+  const user = await nowDb.com_users.findUnique({
+    where: { user_id: person.user_id },
+    select: { user_id: true, user_name: true, last_login: true, now_user_group: true },
+  })
 
   return { ...person, user }
 }

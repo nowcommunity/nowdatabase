@@ -80,7 +80,6 @@ export const localityPage = (
 
 export const personPage = (
   <Page
-    allowedRoles={[Role.Admin]}
     tableView={<PersonTable />}
     detailView={<PersonDetails />}
     viewName="person"
