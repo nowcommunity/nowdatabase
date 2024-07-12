@@ -1,7 +1,7 @@
 generator client {
-  provider = "prisma-client-js"
+  provider      = "prisma-client-js"
+  output        = "./generated/now_test_client"
   binaryTargets = ["native", "linux-musl"]
-  output   = "./generated/now_test_client"
 }
 
 datasource db {
@@ -144,7 +144,6 @@ model com_species {
   now_ls                       now_ls[]
   now_psr                      now_psr[]
   now_sau                      now_sau[]
-  com_taxa_synonym             com_taxa_synonym[]
 }
 
 model com_subfamily_synonym {
@@ -159,7 +158,6 @@ model com_taxa_synonym {
   syn_species_name String? @db.VarChar(30)
   syn_comment      String? @db.VarChar(255)
 
-  com_species com_species @relation(fields: [species_id], references: [species_id], onDelete: Cascade, onUpdate: NoAction, map: "com_taxa_synonym_FKIndex1")
   @@index([species_id], map: "com_taxa_synonym_FKIndex1")
 }
 
@@ -167,6 +165,7 @@ model com_users {
   user_id        Int       @id @default(autoincrement())
   user_name      String?   @db.VarChar(100)
   password       String?   @db.VarChar(100)
+  newpassword    String?   @db.VarChar(100)
   last_login     DateTime? @db.Date
   now_user_group String?   @db.VarChar(30)
   mor_user_group String?   @db.VarChar(30)
