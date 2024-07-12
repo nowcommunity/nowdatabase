@@ -13,11 +13,12 @@ export const PersonTab = () => {
     ['Organization', textField('organization')],
     ['Country', textField('country')],
   ]
-
+  const lastLogin = data.user?.last_login
+  const dateFormat = new Intl.DateTimeFormat('en-GB', { year: 'numeric', month: 'long', day: 'numeric' })
   const user = data.user
     ? [
         ['User Name', data.user?.user_name ?? ''],
-        ['Last log in', data.user?.last_login?.toString()],
+        ['Last log in', lastLogin ? dateFormat.format(new Date(lastLogin)) : 'No data'],
         ['User Group', data.user?.now_user_group ?? ''],
       ]
     : [['Not a user']]
