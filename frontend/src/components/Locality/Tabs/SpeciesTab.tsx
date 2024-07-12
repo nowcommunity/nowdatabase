@@ -5,15 +5,13 @@ import { SelectingTable } from '@/components/DetailView/common/SelectingTable'
 import { Grouped } from '@/components/DetailView/common/tabLayoutHelpers'
 import { useDetailContext } from '@/components/DetailView/Context/DetailContext'
 import { useGetAllSpeciesQuery } from '@/redux/speciesReducer'
-import { Box, CircularProgress } from '@mui/material'
+import { Box } from '@mui/material'
+import { skipToken } from '@reduxjs/toolkit/query'
 import { MRT_ColumnDef } from 'material-react-table'
 
 export const SpeciesTab = () => {
   const { mode, editData, setEditData } = useDetailContext<LocalityDetailsType>()
-  const { data: speciesData, isError } = useGetAllSpeciesQuery()
-
-  if (isError) return 'Error loading Species.'
-  if (!speciesData) return <CircularProgress />
+  const { data: speciesData, isError } = useGetAllSpeciesQuery(mode.read ? skipToken : undefined)
 
   const columns: MRT_ColumnDef<Species>[] = [
     {
@@ -119,6 +117,7 @@ export const SpeciesTab = () => {
           <SelectingTable<Species, LocalityDetailsType>
             buttonText="Select Species"
             data={speciesData}
+            isError={isError}
             columns={columns}
             fieldName="now_ls"
             idFieldName="species_id"

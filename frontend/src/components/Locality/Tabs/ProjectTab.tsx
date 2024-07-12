@@ -1,19 +1,16 @@
 import { Editable, LocalityDetailsType, Project } from '@/backendTypes'
 import { EditableTable } from '@/components/DetailView/common/EditableTable'
-// import { EditingForm } from '@/components/DetailView/common/EditingForm'
 import { Grouped } from '@/components/DetailView/common/tabLayoutHelpers'
 import { SelectingTable } from '@/components/DetailView/common/SelectingTable'
 import { useDetailContext } from '@/components/DetailView/Context/DetailContext'
 import { useGetAllProjectsQuery } from '@/redux/projectReducer'
-import { Box, CircularProgress } from '@mui/material'
+import { Box } from '@mui/material'
 import { MRT_ColumnDef } from 'material-react-table'
+import { skipToken } from '@reduxjs/toolkit/query'
 
 export const ProjectTab = () => {
   const { mode, editData, setEditData } = useDetailContext<LocalityDetailsType>()
-  const { data: projectData, isError } = useGetAllProjectsQuery()
-
-  if (isError) return 'Error loading Projects.'
-  if (!projectData) return <CircularProgress />
+  const { data: projectData, isError } = useGetAllProjectsQuery(mode.read ? skipToken : undefined)
 
   const columns: MRT_ColumnDef<Project>[] = [
     {
@@ -32,6 +29,7 @@ export const ProjectTab = () => {
       accessorKey: 'proj_status',
       header: 'Status',
     },
+    // TODO
     /* {
       accessorFn: ({ proj_records }) => (proj_records ? 'Public' : 'Private'),
       header: 'Records',
@@ -46,6 +44,7 @@ export const ProjectTab = () => {
             buttonText="Select Project"
             data={projectData}
             columns={columns}
+            isError={isError}
             idFieldName="pid"
             fieldName="now_plr"
             editingAction={(newProject: Project) => {

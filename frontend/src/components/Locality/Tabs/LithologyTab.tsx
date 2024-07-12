@@ -5,11 +5,14 @@ import { SelectingTable } from '@/components/DetailView/common/SelectingTable'
 import { ArrayFrame, HalfFrames, Grouped } from '@/components/DetailView/common/tabLayoutHelpers'
 import { useDetailContext } from '@/components/DetailView/Context/DetailContext'
 import { useGetAllSedimentaryStructuresQuery } from '@/redux/sedimentaryStructureReducer'
+import { skipToken } from '@reduxjs/toolkit/query'
 import { MRT_ColumnDef } from 'material-react-table'
 
 export const LithologyTab = () => {
-  const { textField, dropdown, setEditData, bigTextField } = useDetailContext<LocalityDetailsType>()
-  const { data: sedimentaryStructuresData } = useGetAllSedimentaryStructuresQuery()
+  const { mode, textField, dropdown, editData, setEditData, bigTextField } = useDetailContext<LocalityDetailsType>()
+  const { data: sedimentaryStructuresData, isError } = useGetAllSedimentaryStructuresQuery(
+    mode.read ? skipToken : undefined
+  )
 
   const rockTypeOptions = [
     emptyOption,
@@ -160,8 +163,6 @@ export const LithologyTab = () => {
     ['Comments', bigTextField('depo_comm')],
   ]
 
-  const { editData, mode } = useDetailContext<LocalityDetailsType>()
-
   const columns: MRT_ColumnDef<SedimentaryStructure>[] = [
     {
       accessorKey: 'sed_struct',
@@ -188,6 +189,7 @@ export const LithologyTab = () => {
             <>
               <SelectingTable<SedimentaryStructureValues, LocalityDetailsType>
                 buttonText="Select Sedimentary structure"
+                isError={isError}
                 columns={selectingTableColumns}
                 data={sedimentaryStructuresData}
                 fieldName="now_ss"

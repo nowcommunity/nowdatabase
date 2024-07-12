@@ -3,7 +3,7 @@ import { EditingModal } from './EditingModal'
 import { TableView } from '@/components/TableView/TableView'
 import { useDetailContext } from '../Context/DetailContext'
 import { useMemo } from 'react'
-import { CircularProgress } from '@mui/material'
+import { Box, CircularProgress } from '@mui/material'
 import { EditDataType } from '@/backendTypes'
 
 /*
@@ -19,6 +19,7 @@ export const SelectingTable = <T extends MRT_RowData, ParentType extends object>
   fieldName,
   idFieldName,
   selectedValues,
+  isError,
 }: {
   buttonText: string
   data: T[] | undefined
@@ -27,9 +28,9 @@ export const SelectingTable = <T extends MRT_RowData, ParentType extends object>
   fieldName: keyof ParentType
   idFieldName: keyof T
   selectedValues?: string[]
+  isError: boolean
 }) => {
   const { editData, setEditData } = useDetailContext<ParentType>()
-
   const selectedItems = editData[fieldName as keyof EditDataType<ParentType>] as T[]
 
   const defaultEditingAction = (newObject: T) => {
@@ -49,6 +50,8 @@ export const SelectingTable = <T extends MRT_RowData, ParentType extends object>
     })
   }, [data, idSet, idFieldName, selectedValues])
 
+  if (isError) return <Box>Error fetching data for the selecting table.</Box>
+  if (!data) return <CircularProgress />
   return (
     <EditingModal buttonText={buttonText}>
       {data ? (

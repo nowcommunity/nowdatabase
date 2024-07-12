@@ -5,15 +5,13 @@ import { Grouped } from '@/components/DetailView/common/tabLayoutHelpers'
 import { SelectingTable } from '@/components/DetailView/common/SelectingTable'
 import { useDetailContext } from '@/components/DetailView/Context/DetailContext'
 import { useGetAllMuseumsQuery } from '@/redux/museumReducer'
-import { Box, CircularProgress } from '@mui/material'
+import { Box } from '@mui/material'
 import { MRT_ColumnDef } from 'material-react-table'
+import { skipToken } from '@reduxjs/toolkit/query'
 
 export const MuseumTab = () => {
   const { mode, editData, setEditData } = useDetailContext<LocalityDetailsType>()
-  const { data: museumData, isError } = useGetAllMuseumsQuery()
-
-  if (isError) return 'Error loading museums.'
-  if (!museumData) return <CircularProgress />
+  const { data: museumData, isError } = useGetAllMuseumsQuery(mode.read ? skipToken : undefined)
 
   const columns: MRT_ColumnDef<Museum>[] = [
     {
@@ -64,6 +62,7 @@ export const MuseumTab = () => {
           <SelectingTable<Museum, LocalityDetailsType>
             buttonText="Select Museum"
             data={museumData}
+            isError={isError}
             columns={columns}
             fieldName="now_mus"
             idFieldName="museum"

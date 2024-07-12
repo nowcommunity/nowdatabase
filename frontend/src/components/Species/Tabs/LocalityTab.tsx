@@ -3,15 +3,13 @@ import { Grouped } from '@/components/DetailView/common/tabLayoutHelpers'
 import { EditableTable } from '@/components/DetailView/common/EditableTable'
 import { useDetailContext } from '@/components/DetailView/Context/DetailContext'
 import { useGetAllLocalitiesQuery } from '@/redux/localityReducer'
-import { Box, CircularProgress } from '@mui/material'
+import { Box } from '@mui/material'
 import { SelectingTable } from '@/components/DetailView/common/SelectingTable'
+import { skipToken } from '@reduxjs/toolkit/query'
 
 export const LocalityTab = () => {
-  const { data, editData, setEditData, mode } = useDetailContext<SpeciesDetailsType>()
-  const { data: localitiesData, isError } = useGetAllLocalitiesQuery()
-
-  if (isError) return 'Error loading Localities.'
-  if (!data) return <CircularProgress />
+  const { editData, setEditData, mode } = useDetailContext<SpeciesDetailsType>()
+  const { data: localitiesData, isError } = useGetAllLocalitiesQuery(mode.read ? skipToken : undefined)
 
   const columns = [
     {
@@ -52,6 +50,7 @@ export const LocalityTab = () => {
     <SelectingTable<Editable<Locality>, SpeciesDetailsType>
       buttonText="Select Locality"
       columns={columns}
+      isError={isError}
       data={localitiesData}
       fieldName="now_ls"
       idFieldName="lid"
