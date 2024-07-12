@@ -7,11 +7,35 @@ import { Card, Stack } from '@mui/material'
 import { MRT_ColumnDef, MRT_Row, MRT_RowData } from 'material-react-table'
 import { Link } from 'react-router-dom'
 
+const makeNameList = (names: Array<string | null>) => {
+  if (names.length === 3) {
+    return `${names[0]}, ${names[1]} & ${names[2]}`
+  } else if (names.length >= 4) {
+    return `${names[0]} et al.`
+  } else if (names.length === 2) {
+    return `${names[0]} & ${names[1]}`
+  }
+  return names[0] ?? ''
+}
+
 const ReferenceList = ({ references, big }: { references: ReferenceDetailsType[]; big: boolean }) => {
   const getReferenceText = (ref: ReferenceDetailsType) => {
-    // TODO create different reference texts for different types.
     // php version: html/include/database.php -> referenceCitation()
-    return `${ref.title_primary} ${ref.ref_journal?.journal_title ?? ''} ${ref.date_primary}`
+    const authors = makeNameList(ref.ref_authors.map(author => author.author_surname))
+    const issue = ref.issue ? ` (${ref.issue}) ` : ''
+    if (ref.ref_type_id === 1) {
+      // Journal
+      return `${authors} (${ref.date_primary ?? ''}). ${ref.title_primary ?? ''}. ${ref.ref_journal?.journal_title ?? ''} ${ref.volume ?? ''}${issue}${ref.start_page ?? ref.end_page ? ': ' : ''}${ref.start_page ?? ''}${ref.start_page && ref.end_page ? '-' : ''}${ref.end_page ?? ''}${ref.start_page || ref.end_page ? '.' : ''}${ref.publisher || ref.pub_place ? `${ref.publisher || ''} ${ref.pub_place}.` : ''}`
+    } else if (ref.ref_type_id === 2) {
+      // Book
+      // It seems that if field_id of authors are 12, they are editors instead and should not be shown in book
+      return `${ref.ref_authors[0]?.field_id !== 12 ? authors : ''} (${ref.date_primary ?? ''}). ${ref.title_primary ?? ''}. ${ref.publisher || ref.pub_place ? ' ' : ''}${ref.publisher ?? ''}${ref.publisher && ref.pub_place ? ', ' : ''}${ref.pub_place ?? ''}${ref.publisher || ref.pub_place ? '.' : ''}`
+    } else if (ref.ref_type_id === 3) {
+      // Book chapter
+      return `${authors} ${ref.ref_authors.length > 1 ? '(eds)' : ref.ref_authors.length === 1 ? '(ed)' : ''} ${ref.title_primary ?? ''}. IN: ${authors} ${ref.title_secondary ?? ''}. ${ref.start_page || ref.end_page ? 'pp.' : ''}${ref.start_page ?? ''}${ref.start_page && ref.end_page ? '-' : ''}${ref.end_page ?? ''}. ${ref.publisher || ref.pub_place ? ' ' : ''}${ref.publisher ?? ''}${ref.publisher && ref.pub_place ? ', ' : ''}${ref.publisher || ref.pub_place ? '.' : ''}`
+    }
+    // All other types
+    return `${authors} ${ref.date_primary ? `(${ref.date_primary}). ` : ''} ${ref.title_primary?.concat('. ') ?? ''}${ref.title_secondary?.concat('. ') ?? ''}${ref.title_series?.concat('. ') ?? ''}${ref.gen_notes?.concat('.') ?? ''}`
   }
   return (
     <Stack>
