@@ -22,6 +22,8 @@ If the database schema is changed, prisma-schema must be also updated. The smart
 + I ran the dev version of the app `npm run dev`
 + I ran `docker exec -it nowdb-backend-dev npx prisma db pull`
 + The schema was updated and the changes can be committed to github.
++ After any schema update, to run the app, the **Prisma client must be generated again** (the client is located in "prisma/generated"). I did it by running `npm run prisma` in `backend/` directory (outside of docker). Running it inside the container would not re-generate it correctly, not sure why.
+
 
 Prisma documentation: https://www.prisma.io/docs/orm/reference/prisma-cli-reference#db-pull
 
