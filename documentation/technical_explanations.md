@@ -13,7 +13,17 @@ Enter the password defined in `.dev.env`.
 
 **Updating prisma-schema**
 
-If the database schema is changed, prisma-schema must be also updated. Doing `npx prisma db pull` may be enough but if not, refer to the documentation: https://www.prisma.io/docs/orm/reference/prisma-cli-reference#db-pull
+If the database schema is changed, prisma-schema must be also updated. The smart prisma-way would be to run migrations via prisma, but I did this:
+
++ The database was modified directly in SQL
++ Anon-db dump was updated to reflect the changes by hand (for both the table structure and the data inputted to it)
++ Also the test-db dump used locally was changed by hand, but this may be more complicated if theres a lot of data - in which case a new dump must be taken from the db after changes
+  + Notice that for the db-container to initialize data, you must remove the container and then the volume and rebuild
++ I ran the dev version of the app `npm run dev`
++ I ran `docker exec -it nowdb-backend-dev npx prisma db pull`
++ The schema was updated and the changes can be committed to github.
+
+Prisma documentation: https://www.prisma.io/docs/orm/reference/prisma-cli-reference#db-pull
 
 **Mariadb-connector and transactions**
 
