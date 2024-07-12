@@ -4,7 +4,6 @@ import * as jwt from 'jsonwebtoken'
 import { SECRET, LOGIN_VALID_MS, USER_CREATION_SECRET } from '../utils/config'
 import * as bcrypt from 'bcrypt'
 import { nowDb } from '../utils/db'
-import { getAllUsers, getUserDetails } from '../services/user'
 import { getRole } from '../middlewares/authenticator'
 
 const router = Router()
@@ -36,17 +35,6 @@ router.post('/login', async (req, res) => {
     role: getRole(result.now_user_group ?? ''),
     initials: personResult.initials,
   })
-})
-
-router.get('/all', async (_req, res) => {
-  const users = await getAllUsers()
-  return res.status(200).send(users)
-})
-
-router.get('/:id', async (req, res) => {
-  const id = parseInt(req.params.id)
-  const user = await getUserDetails(id)
-  res.status(200).send(user)
 })
 
 router.post('/create', async (req, res) => {
