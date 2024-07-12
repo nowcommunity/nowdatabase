@@ -14,7 +14,7 @@ describe('Broadly test what different user rights see', () => {
     })
     it('Region works', () => {
       cy.get('div[id="/admin-menu-button"]').click()
-      cy.contains('Region').click()
+      cy.contains('Regions').click()
       cy.contains('region 4452477e')
       cy.get('[data-cy="detailview-button-1"]').first().click()
       cy.contains('Regional Coordinators')
@@ -29,7 +29,7 @@ describe('Broadly test what different user rights see', () => {
       cy.contains('NOW Database')
     })
     it('Time Bound works', () => {
-      cy.contains('Time Bound').click()
+      cy.contains('Time Bounds').click()
       cy.contains('C2N-y')
       cy.get('[data-cy="detailview-button-11"]').first().click()
       cy.contains('Bound')

@@ -8,7 +8,7 @@ describe('Open each page, table view and detail view, and check at least some co
     cy.visit('/')
   })
   it('Locality works', () => {
-    cy.contains('Locality').click()
+    cy.contains('Localities').click()
     cy.contains('Dmanisi')
     cy.get('[data-cy="detailview-button-21050"]').click()
     cy.contains('Dating method')
@@ -24,7 +24,7 @@ describe('Open each page, table view and detail view, and check at least some co
 
   })
   it('Reference works', () => {
-    cy.contains('Reference').click()
+    cy.contains('References').click()
     cy.contains('A Concise Geologic Time')
     cy.get('[data-cy="detailview-button-10039"]').first().click()
     cy.contains('Reference type')
@@ -32,7 +32,7 @@ describe('Open each page, table view and detail view, and check at least some co
 
   })
   it('Time Unit works', () => {
-    cy.contains('Time Unit').click()
+    cy.contains('Time Units').click()
     cy.contains('Langhian')
     cy.get('[data-cy="detailview-button-langhian"]').first().click()
     cy.contains('Sequence')
