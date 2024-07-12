@@ -122,7 +122,7 @@ export const emptySpecies = {
   subfamily_name: '',
   genus_name: '',
   species_name: '',
-  unique_identifier: '',
+  unique_identifier: '-',
   taxonomic_status: null,
   common_name: '',
   sp_author: '',
