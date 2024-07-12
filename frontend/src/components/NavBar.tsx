@@ -25,19 +25,19 @@ export const NavBar = () => {
   }
 
   const pages: LinkDefinition[] = [
-    { title: 'Locality', url: '/locality' },
+    { title: 'Localities', url: '/locality' },
     { title: 'Species', url: '/species' },
-    { title: 'Reference', url: '/reference' },
-    { title: 'Time Unit', url: '/time-unit' },
-    { title: 'Time Bound', url: '/time-bound', allowedRoles: [Role.Admin, Role.EditUnrestricted] },
+    { title: 'References', url: '/reference' },
+    { title: 'Time Units', url: '/time-unit' },
+    { title: 'Time Bounds', url: '/time-bound', allowedRoles: [Role.Admin, Role.EditUnrestricted] },
     {
       title: 'Admin',
       url: '/admin',
       allowedRoles: [Role.Admin],
       children: [
-        { title: 'Region', url: '/region' },
-        { title: 'Project', url: '/project' },
-        { title: 'Person', url: '/person' },
+        { title: 'Regions', url: '/region' },
+        { title: 'Projects', url: '/project' },
+        { title: 'People', url: '/person' },
       ],
     },
   ]
