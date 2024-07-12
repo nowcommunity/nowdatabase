@@ -31,14 +31,14 @@ export const createTestUsers = async () => {
       const passwordHash = await bcrypt.hash('test', 10)
       for (const testUser of testUsers) {
         const existingUser = await nowDb.com_users.findFirst({
-          where: { ...testUser, password: passwordHash },
+          where: { ...testUser, newpassword: passwordHash },
         })
         let userId
         if (!existingUser) {
           const createdUser = await nowDb.com_users.create({
             data: {
               user_name: testUser.user_name,
-              password: passwordHash,
+              newpassword: passwordHash,
               now_user_group: testUser.now_user_group,
             },
           })

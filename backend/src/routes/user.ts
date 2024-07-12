@@ -14,10 +14,10 @@ router.post('/login', async (req, res) => {
     where: {
       user_name: username,
     },
-    select: { user_name: true, password: true, user_id: true, now_user_group: true },
+    select: { user_name: true, newpassword: true, user_id: true, now_user_group: true },
   })
-
-  const passwordMatches = foundUser && (await bcrypt.compare(password as string, foundUser.password as string))
+  console.log({ foundUser })
+  const passwordMatches = foundUser && (await bcrypt.compare(password as string, foundUser.newpassword as string))
 
   if (!passwordMatches) return res.status(403).send()
 
@@ -49,7 +49,7 @@ router.post('/create', async (req, res) => {
   await nowDb.com_users.create({
     data: {
       user_name: username as string,
-      password: passwordHash,
+      newpassword: passwordHash,
     },
   })
 
