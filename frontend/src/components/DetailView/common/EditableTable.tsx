@@ -89,6 +89,7 @@ export const EditableTable = <T extends MRT_RowData & { rowState?: RowState }, P
       data={getData()}
       enableTopToolbar={false}
       enableColumnActions={false}
+      enableSorting={false}
       enablePagination={getData().length > 15}
       onPaginationChange={setPagination}
       positionPagination="both"
