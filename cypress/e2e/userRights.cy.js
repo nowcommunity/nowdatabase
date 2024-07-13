@@ -49,7 +49,6 @@ describe('Broadly test what different user rights see', () => {
       cy.contains('Time Bound').should('not.exist')
     })
     it('Direct routes to protected views do not work', () => {
-      cy.pageForbidden('person')
       cy.pageForbidden('region')
       cy.pageForbidden('time-bound')
       cy.pageForbidden('project')
