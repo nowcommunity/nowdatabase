@@ -34,7 +34,6 @@ export const getSpeciesDetails = async (id: number) => {
           now_loc: true,
         },
       },
-      com_taxa_synonym: {},
       now_sau: {
         include: {
           now_sr: {
@@ -54,6 +53,8 @@ export const getSpeciesDetails = async (id: number) => {
 
   if (!result) return null
 
+  const synonyms = await nowDb.com_taxa_synonym.findMany({ where: { species_id: id } })
+
   const suids = result.now_sau.map(sau => sau.suid)
 
   const logResult = await logDb.log.findMany({ where: { suid: { in: suids } } })
@@ -63,5 +64,5 @@ export const getSpeciesDetails = async (id: number) => {
     updates: logResult.filter(logRow => logRow.suid === sau.suid),
   }))
 
-  return result
+  return { ...result, com_taxa_synonym: synonyms || [] }
 }
