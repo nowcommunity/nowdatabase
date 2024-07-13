@@ -4,10 +4,19 @@ import Prisma from '../../prisma/generated/now_test_client'
 import { validateLocality } from '../../../frontend/src/validators/locality'
 import { ValidationObject } from '../../../frontend/src/validators/validator'
 import { fixBigInt } from '../utils/common'
+import { Role } from '../../../frontend/src/types'
+import { AccessError } from '../middlewares/authorizer'
+
+const getIdsOfUsersProjects = async (user: User) => {
+  const usersProjects = await nowDb.now_proj_people.findMany({
+    where: { initials: user.initials },
+    select: { pid: true },
+  })
+
+  return new Set(usersProjects.map(({ pid }) => pid))
+}
 
 export const getAllLocalities = async (showAll: boolean, user?: User) => {
-  const where = showAll ? {} : { loc_status: false }
-
   const removeProjects: (item: { now_plr: unknown }) => unknown = item => {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { now_plr, ...rest } = item
@@ -28,33 +37,20 @@ export const getAllLocalities = async (showAll: boolean, user?: User) => {
         select: { pid: true },
       },
     },
-    where,
   })
 
   if (showAll) return result.map(removeProjects)
 
   if (!user) return result.filter(loc => loc.loc_status === false).map(removeProjects)
 
-  const usersProjects = await nowDb.now_proj_people.findMany({
-    where: { initials: user.initials },
-    select: { pid: true },
-  })
+  const usersProjects = await getIdsOfUsersProjects(user)
 
-  const ids = usersProjects
-    .map(({ pid }) => pid)
-    .reduce(
-      (obj: Record<number, boolean>, cur: number) => {
-        obj[cur] = true
-        return obj
-      },
-      {} as Record<number, boolean>
-    )
-
-  return result.filter(loc => !loc.loc_status || loc.now_plr.find(now_plr => ids[now_plr.pid])).map(removeProjects)
+  return result
+    .filter(loc => !loc.loc_status || loc.now_plr.find(now_plr => usersProjects.has(now_plr.pid)))
+    .map(removeProjects)
 }
 
-export const getLocalityDetails = async (id: number) => {
-  // TODO: Check if user has access
+export const getLocalityDetails = async (id: number, user: User | undefined) => {
   const result = await nowDb.now_loc.findUnique({
     where: { lid: id },
     include: {
@@ -103,7 +99,18 @@ export const getLocalityDetails = async (id: number) => {
     ...lau,
     updates: logResult.filter(logRow => logRow.luid === lau.luid),
   }))
-  if (!result) return null
+
+  if (result.loc_status) {
+    if (!user) throw new AccessError()
+    if (![Role.Admin, Role.EditUnrestricted].includes(user.role)) {
+      const usersProjects = await getIdsOfUsersProjects(user)
+      if (!result.now_plr.find(proj => usersProjects.has(proj.pid)))
+        throw new AccessError(
+          'The requested locality is in draft status and the user has no required rights or project association to it.'
+        )
+    }
+  }
+
   return JSON.parse(fixBigInt(result)!) as LocalityDetailsType
 }
 

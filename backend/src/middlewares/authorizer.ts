@@ -1,11 +1,11 @@
 import { Role } from '../../../frontend/src/types'
 import { Middleware } from '../types'
 
-class AccessError extends Error {
+export class AccessError extends Error {
   declare status: number
-  constructor() {
+  constructor(message?: string) {
     super()
-    this.message = 'User not authorized for the requested resource or action'
+    this.message = message ?? 'User not authorized for the requested resource or action'
     this.status = 403
   }
 }
