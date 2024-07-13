@@ -16,7 +16,7 @@ router.post('/login', async (req, res) => {
     },
     select: { user_name: true, newpassword: true, user_id: true, now_user_group: true },
   })
-  console.log({ foundUser })
+
   const passwordMatches = foundUser && (await bcrypt.compare(password as string, foundUser.newpassword as string))
 
   if (!passwordMatches) return res.status(403).send()
