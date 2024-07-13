@@ -41,6 +41,7 @@ export const TimeBoundDetails = () => {
     <DetailView
       tabs={tabs}
       data={isNew ? emptyTimeBound : data!}
+      hasStagingMode
       isNew={isNew}
       onWrite={onWrite}
       validator={() => ({

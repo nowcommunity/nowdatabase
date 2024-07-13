@@ -39,6 +39,7 @@ export const TimeUnitDetails = () => {
     <DetailView
       tabs={tabs}
       isNew={isNew}
+      hasStagingMode
       data={isNew ? emptyTimeUnit : data!}
       onWrite={onWrite}
       validator={() => ({ name: '', error: null })}

@@ -83,6 +83,7 @@ export const LocalityDetails = () => {
       isNew={isNew}
       onWrite={onWrite}
       validator={validateLocality}
+      hasStagingMode
     />
   )
 }

@@ -71,6 +71,7 @@ export const SpeciesDetails = () => {
       data={isNew ? emptySpecies : data!}
       onWrite={onWrite}
       isNew={isNew}
+      hasStagingMode
       validator={() => ({
         name: 'unknown',
         error: null,

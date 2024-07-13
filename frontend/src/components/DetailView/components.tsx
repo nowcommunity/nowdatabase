@@ -7,19 +7,25 @@ import { useDetailContext } from './Context/DetailContext'
 import { EditDataType } from '@/backendTypes'
 import { useState } from 'react'
 
-export const WriteButton = <T,>({ onWrite }: { onWrite: (editData: EditDataType<T>) => Promise<void> }) => {
+export const WriteButton = <T,>({
+  onWrite,
+  hasStagingMode = false,
+}: {
+  onWrite: (editData: EditDataType<T>) => Promise<void>
+  hasStagingMode?: boolean
+}) => {
   const { editData, mode, setMode } = useDetailContext<T>()
   const [loading, setLoading] = useState(false)
 
   const getButtonText = () => {
-    if (!mode.staging) return 'Finalize entry'
+    if (!mode.staging) return hasStagingMode ? 'Finalize entry' : 'Save changes'
     return 'Complete and save'
   }
   return (
     <Button
       sx={{ width: '20em' }}
       onClick={() => {
-        if (!mode.staging) {
+        if (!mode.staging && hasStagingMode) {
           setMode(mode.new ? 'staging-new' : 'staging-edit')
           return
         }

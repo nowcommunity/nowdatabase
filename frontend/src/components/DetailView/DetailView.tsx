@@ -35,6 +35,7 @@ export const DetailView = <T extends object>({
   validator,
   isNew = false,
   isUserPage = false,
+  hasStagingMode = false,
 }: {
   tabs: TabType[]
   data: T
@@ -42,6 +43,7 @@ export const DetailView = <T extends object>({
   validator: (editData: EditDataType<T>, field: keyof EditDataType<T>) => ValidationObject
   isNew?: boolean
   isUserPage?: boolean
+  hasStagingMode?: boolean
 }) => {
   const [searchParams, setSearchParams] = useSearchParams()
   const theme = useTheme()
@@ -144,7 +146,9 @@ export const DetailView = <T extends object>({
                 <EditIcon style={{ marginRight: '0.5em' }} /> {mode.read ? 'Edit' : 'Cancel edit'}
               </Button>
             )}
-            {(!mode.read || initialState.mode.new) && onWrite && <WriteButton onWrite={onWrite} />}
+            {(!mode.read || initialState.mode.new) && onWrite && (
+              <WriteButton onWrite={onWrite} hasStagingMode={hasStagingMode} />
+            )}
           </Box>
           {!isUserPage && (
             <Box sx={{ marginRight: '3em' }}>
