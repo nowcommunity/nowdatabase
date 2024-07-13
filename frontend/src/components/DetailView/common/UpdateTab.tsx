@@ -40,7 +40,10 @@ const ReferenceList = ({ references, big }: { references: ReferenceDetailsType[]
   return (
     <Stack>
       {references.map(ref => (
-        <Card key={ref.rid} sx={{ padding: '0.4em', margin: '0.5em', maxWidth: big ? '50em' : '30em' }}>
+        <Card
+          key={ref.rid}
+          sx={{ padding: '0.4em', margin: '0.5em', maxWidth: big ? '50em' : '30em', backgroundColor: 'lightblue' }}
+        >
           <div style={{ wordWrap: 'break-word', whiteSpace: 'normal' }}>{getReferenceText(ref)}</div>
           {big && (
             <div>
