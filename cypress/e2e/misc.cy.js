@@ -36,7 +36,7 @@ describe('Test individual features across the app', () => {
     cy.contains('Reference type')
   })
   describe('Staging mode works for the data types that require it', () => {
-    before('Login as admin', () => {
+    beforeEach('Login as admin', () => {
       cy.login('testSu')
     })
     it('Staging mode works on locality', () => {
@@ -59,7 +59,7 @@ describe('Test individual features across the app', () => {
   })
   // TODO remove the skips once onWrite's has been added to all
   describe('Staging mode does not appear for the data types that dont require it', () => {
-    before('Login as admin', () => {
+    beforeEach('Login as admin', () => {
       cy.login('testSu')
     })
     it('Staging mode does not appear on reference', () => {

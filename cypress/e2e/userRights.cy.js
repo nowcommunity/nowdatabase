@@ -1,7 +1,7 @@
 
 describe('Broadly test what different user rights see', () => {
   describe('Admin visibility', () => {
-    before('Login as admin', () => {
+    beforeEach('Login as admin', () => {
       cy.session('admin-session', () => {})
       cy.login('testSu')
     })
@@ -37,7 +37,7 @@ describe('Broadly test what different user rights see', () => {
     })
   })
   describe('Test unlogged visibility', () => {
-    before('Ensure logout', () => {
+    beforeEach('Ensure logout', () => {
       cy.clearAllLocalStorage()
       cy.visit('/')
       cy.contains('Guest user')
@@ -49,9 +49,9 @@ describe('Broadly test what different user rights see', () => {
       cy.contains('Time Bound').should('not.exist')
     })
     it('Direct routes to protected views do not work', () => {
-      cy.pageForbidden('region')
-      cy.pageForbidden('time-bound')
-      cy.pageForbidden('project')
+      cy.pageForbidden('/region')
+      cy.pageForbidden('/time-bound')
+      cy.pageForbidden('/project')
     })
   })
 })

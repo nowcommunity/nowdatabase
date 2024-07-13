@@ -1,11 +1,7 @@
 
 describe('Open each page, table view and detail view, and check at least some correct text appears', () => {
-  before('Login as admin, directs to front page', () => {
-    cy.session("logged-as-admin", () => {})
+  beforeEach('Login as admin', () => {
     cy.login('testSu')
-  })
-  beforeEach(() => {
-    cy.visit('/')
   })
   it('Locality works', () => {
     cy.contains('Localities').click()
