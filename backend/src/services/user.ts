@@ -3,6 +3,34 @@ import * as bcrypt from 'bcrypt'
 import { logger } from '../utils/logger'
 import { sleep } from '../utils/common'
 
+export const createDraftLocality = async () => {
+  const draftLocality = await nowDb.now_loc.findUnique({ where: { lid: 49999 } })
+  if (draftLocality) return
+  await nowDb.now_loc.create({
+    data: { lid: 49999, min_age: 2, max_age: 3, loc_status: true, loc_name: 'draftLocality' },
+  })
+  await nowDb.now_loc.create({
+    data: {
+      lid: 50001,
+      min_age: 2,
+      max_age: 3,
+      loc_status: true,
+      loc_name: 'draftLocalityWithProject',
+      now_plr: {
+        create: {
+          now_proj: {
+            create: {
+              contact: 'TEST-PL',
+              proj_name: 'Test Project',
+              now_proj_people: { create: { initials: 'TEST-PL' } },
+            },
+          },
+        },
+      },
+    },
+  })
+}
+
 export const createTestUsers = async () => {
   const testUsers = [
     {
@@ -31,7 +59,7 @@ export const createTestUsers = async () => {
       const passwordHash = await bcrypt.hash('test', 10)
       for (const testUser of testUsers) {
         const existingUser = await nowDb.com_users.findFirst({
-          where: { ...testUser, newpassword: passwordHash },
+          where: { ...testUser },
         })
         let userId
         if (!existingUser) {
@@ -62,6 +90,7 @@ export const createTestUsers = async () => {
         })
         logger.info(`User ${testUser.user_name} created`)
       }
+      await createDraftLocality()
       return
     } catch (e: unknown) {
       logger.error(`Test user creation failed, attempt ${i} / 10. Trying again in 6 seconds.`)
