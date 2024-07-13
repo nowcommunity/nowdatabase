@@ -6,3 +6,5 @@ data/sqlfiles/*
 dump/
 dump.zip
 local_dev
+cypress/videos
+cypress/screenshots
