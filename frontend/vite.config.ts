@@ -14,6 +14,8 @@ export default defineConfig({
     ],
   },
   server: {
+    // NOTE: Polling is only enabled due to some developers using windows where hot reload in WSL-docker didnt work
+    // and this was easier than moving the project in the filesystem - feel free to disable
     watch: {
       usePolling: true,
     },
