@@ -30,7 +30,7 @@ router.put(
     if (validationErrors.length > 0) {
       return res.status(400).send({ validationErrors })
     }
-    const result = await write(editedLocality, 'now_loc', { authorizer: 'IZ', userName: 'testuser' })
+    const result = await write(editedLocality, 'now_loc', { authorizer: 'TEST-SU', userName: 'testuser' })
     return res.status(200).send(result ? { result: result } : { error: 'error' })
   }
 )

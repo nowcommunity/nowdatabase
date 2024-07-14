@@ -15,6 +15,9 @@ const allowedRunningEnvs = ['dev', 'staging', 'prod'] as const
 export const RUNNING_ENV = process.env.RUNNING_ENV as (typeof allowedRunningEnvs)[number]
 if (!allowedRunningEnvs.includes(RUNNING_ENV)) throw new Error('Invalid RUNNING_ENV')
 
+// Enable write operations. If this is not set to 'true', all write (create, update, delete) operations except for allowed ones (like user/login) are disabled.
+export const ENABLE_WRITE = process.env.ENABLE_WRITE === 'true'
+
 export const DB_CONNECTION_LIMIT = (process.env.DB_CONNECTION_LIMIT as string) ?? '10'
 export const NOW_DB_NAME = process.env.NOW_DB_NAME as string
 export const LOG_DB_NAME = process.env.LOG_DB_NAME as string
