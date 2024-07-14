@@ -8,3 +8,4 @@ dump.zip
 local_dev
 cypress/videos
 cypress/screenshots
+cypress/downloads
