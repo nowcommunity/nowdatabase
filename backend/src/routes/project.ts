@@ -11,7 +11,8 @@ router.get('/all', async (_req, res) => {
 router.get('/:id', async (req, res) => {
   const id = parseInt(req.params.id)
   const project = await getProjectDetails(id)
-  res.status(200).send(project)
+  if (!project) return res.status(404).send()
+  return res.status(200).send(project)
 })
 
 export default router

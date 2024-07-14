@@ -15,7 +15,8 @@ router.get('/all', async (req, res) => {
 router.get('/:id', async (req, res) => {
   const id = parseInt(req.params.id)
   const species = await getSpeciesDetails(id)
-  res.status(200).send(fixBigInt(species))
+  if (!species) return res.status(404).send()
+  return res.status(200).send(fixBigInt(species))
 })
 
 router.put('/', async (req: Request<object, object, { species: SpeciesDetailsType }>, res) => {

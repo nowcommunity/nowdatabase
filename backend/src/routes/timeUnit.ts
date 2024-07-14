@@ -13,8 +13,9 @@ router.get('/all', async (_req, res) => {
 
 router.get('/:id', async (req, res) => {
   const id = req.params.id
-  const time_unit = await getTimeUnitDetails(id)
-  res.status(200).send(time_unit)
+  const timeUnit = await getTimeUnitDetails(id)
+  if (!timeUnit) return res.status(404).send()
+  return res.status(200).send(timeUnit)
 })
 
 router.get('/localities/:id', async (req, res) => {
