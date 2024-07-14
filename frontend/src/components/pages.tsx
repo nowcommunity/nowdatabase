@@ -27,34 +27,13 @@ import { RegionTable } from './Region/RegionTable'
 import { RegionDetails } from './Region/RegionDetails'
 import { Role } from '@/types'
 
-export const timeBoundPage = (
+export const localityPage = (
   <Page
-    allowedRoles={[Role.Admin, Role.EditUnrestricted]}
-    tableView={<TimeBoundTable />}
-    detailView={<TimeBoundDetails />}
-    viewName="time-bound"
-    idFieldName="bid"
-    createTitle={(tb: TimeBoundDetailsType) => `${tb.b_name}`}
-  />
-)
-
-export const timeUnitPage = (
-  <Page
-    tableView={<TimeUnitTable />}
-    detailView={<TimeUnitDetails />}
-    viewName="time-unit"
-    idFieldName="tu_name"
-    createTitle={(tu: TimeUnitDetailsType) => `${tu.tu_display_name}`}
-  />
-)
-
-export const referencePage = (
-  <Page
-    tableView={<ReferenceTable />}
-    detailView={<ReferenceDetails />}
-    viewName="reference"
-    idFieldName="rid"
-    createTitle={(ref: ReferenceDetailsType) => `${ref.title_primary}`}
+    tableView={<LocalityTable />}
+    detailView={<LocalityDetails />}
+    viewName="locality"
+    idFieldName="lid"
+    createTitle={(loc: LocalityDetailsType) => `${loc.loc_name}`}
   />
 )
 
@@ -68,17 +47,41 @@ export const speciesPage = (
   />
 )
 
-export const localityPage = (
+export const referencePage = (
   <Page
-    tableView={<LocalityTable />}
-    detailView={<LocalityDetails />}
-    viewName="locality"
-    idFieldName="lid"
-    createTitle={(loc: LocalityDetailsType) => `${loc.loc_name}`}
+    tableView={<ReferenceTable />}
+    detailView={<ReferenceDetails />}
+    viewName="reference"
+    idFieldName="rid"
+    createTitle={(ref: ReferenceDetailsType) => `${ref.title_primary}`}
+  />
+)
+
+export const timeUnitPage = (
+  <Page
+    tableView={<TimeUnitTable />}
+    detailView={<TimeUnitDetails />}
+    viewName="time-unit"
+    idFieldName="tu_name"
+    createTitle={(tu: TimeUnitDetailsType) => `${tu.tu_display_name}`}
+  />
+)
+
+export const timeBoundPage = (
+  <Page
+    allowedRoles={[Role.Admin, Role.EditUnrestricted]}
+    tableView={<TimeBoundTable />}
+    detailView={<TimeBoundDetails />}
+    viewName="time-bound"
+    idFieldName="bid"
+    createTitle={(tb: TimeBoundDetailsType) => `${tb.b_name}`}
   />
 )
 
 export const personPage = (
+  // Only admins are allowed to see this page, but the rights cannot be checked here through
+  // allowedRoles, as the component has to be rendered for the user's own user-page.
+  // This is ok because the requests should fail on backend anyways.
   <Page
     tableView={<PersonTable />}
     detailView={<PersonDetails />}
