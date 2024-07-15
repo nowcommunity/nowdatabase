@@ -119,11 +119,13 @@ export const DetailView = <T extends object>({
   const tabView = (
     <>
       <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-        <Tabs value={tab} onChange={(_event, newValue) => setTab(newValue as number)}>
-          {tabs.map(tab => (
-            <Tab key={tab.title} label={tab.title} />
-          ))}
-        </Tabs>
+        {tabs.length > 1 && (
+          <Tabs value={tab} onChange={(_event, newValue) => setTab(newValue as number)}>
+            {tabs.map(tab => (
+              <Tab key={tab.title} label={tab.title} />
+            ))}
+          </Tabs>
+        )}
       </Box>
       <Paper {...paperProps}>
         <Box sx={{ display: 'flex', flexDirection: 'column', rowGap: '1em' }}>{tabs[tab].content}</Box>
