@@ -25,9 +25,17 @@ router.post('/login', async (req, res) => {
     expiresIn: LOGIN_VALID_MS,
   })
 
-  const personResult = await nowDb.com_people.findFirst({ where: { user_id: foundUser.user_id } })
+  const personResult = await nowDb.com_people.findFirst({
+    where: { user_id: foundUser.user_id },
+    select: {
+      initials: true,
+      now_proj: { select: { now_plr: { select: { now_loc: { select: { lid: true } } } } } },
+    },
+  })
 
   if (!personResult) throw new Error('User found but not person; this should not happen.')
+
+  const associatedLocalityIds = personResult.now_proj.flatMap(proj => proj.now_plr.map(plr => plr.now_loc.lid))
 
   await nowDb.com_users.update({ where: { user_id: foundUser.user_id }, data: { last_login: new Date() } })
 
@@ -36,6 +44,7 @@ router.post('/login', async (req, res) => {
     username: foundUser.user_name,
     role: getRole(foundUser.now_user_group ?? ''),
     initials: personResult.initials,
+    localities: associatedLocalityIds,
   })
 })
 
