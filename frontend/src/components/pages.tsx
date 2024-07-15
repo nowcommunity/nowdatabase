@@ -10,7 +10,7 @@ import {
 } from '@/backendTypes'
 import { LocalityDetails } from './Locality/LocalityDetails'
 import { LocalityTable } from './Locality/LocalityTable'
-import { Page } from './Page'
+import { EditRights, Page } from './Page'
 import { ReferenceTable } from './Reference/ReferenceTable'
 import { SpeciesDetails } from './Species/SpeciesDetails'
 import { SpeciesTable } from './Species/SpeciesTable'
@@ -26,6 +26,11 @@ import { ProjectDetails } from './Project/ProjectDetails'
 import { RegionTable } from './Region/RegionTable'
 import { RegionDetails } from './Region/RegionDetails'
 import { Role } from '@/types'
+import { UserState } from '@/redux/userReducer'
+
+export const noRights: EditRights = {}
+const fullRights: EditRights = { new: true, edit: true, delete: true }
+const limitedRights: EditRights = { new: true, edit: true }
 
 export const localityPage = (
   <Page
@@ -34,6 +39,11 @@ export const localityPage = (
     viewName="locality"
     idFieldName="lid"
     createTitle={(loc: LocalityDetailsType) => `${loc.loc_name}`}
+    getEditRights={(user: UserState, id: string | number) => {
+      if ([Role.Admin, Role.EditUnrestricted].includes(user.role)) return fullRights
+      if (user.role === Role.EditRestricted && user.localities.includes(id as number)) return limitedRights
+      return noRights
+    }}
   />
 )
 
@@ -44,6 +54,11 @@ export const speciesPage = (
     viewName="species"
     idFieldName="species_id"
     createTitle={(species: SpeciesDetailsType) => `${species.species_name}`}
+    getEditRights={(user: UserState) => {
+      if ([Role.Admin, Role.EditUnrestricted].includes(user.role)) return fullRights
+      if (user.role === Role.EditRestricted) return limitedRights
+      return noRights
+    }}
   />
 )
 
@@ -54,6 +69,12 @@ export const referencePage = (
     viewName="reference"
     idFieldName="rid"
     createTitle={(ref: ReferenceDetailsType) => `${ref.title_primary}`}
+    getEditRights={(user: UserState) => {
+      // TODO check if these are right. Can all groups (except readonly) delete references?
+      if ([Role.Admin, Role.EditUnrestricted].includes(user.role)) return fullRights
+      if (user.role === Role.ReadOnly) return limitedRights
+      return noRights
+    }}
   />
 )
 
@@ -64,6 +85,10 @@ export const timeUnitPage = (
     viewName="time-unit"
     idFieldName="tu_name"
     createTitle={(tu: TimeUnitDetailsType) => `${tu.tu_display_name}`}
+    getEditRights={(user: UserState) => {
+      if ([Role.Admin, Role.EditUnrestricted].includes(user.role)) return fullRights
+      return noRights
+    }}
   />
 )
 
@@ -75,6 +100,10 @@ export const timeBoundPage = (
     viewName="time-bound"
     idFieldName="bid"
     createTitle={(tb: TimeBoundDetailsType) => `${tb.b_name}`}
+    getEditRights={(user: UserState) => {
+      if ([Role.Admin, Role.EditUnrestricted].includes(user.role)) return fullRights
+      return noRights
+    }}
   />
 )
 
@@ -88,6 +117,11 @@ export const personPage = (
     viewName="person"
     idFieldName="initials"
     createTitle={(person: PersonDetailsType) => `${person.surname}`}
+    getEditRights={(user: UserState, id: number | string) => {
+      if (user.role === Role.Admin) return fullRights
+      if (user.initials === id) return { edit: true }
+      return noRights
+    }}
   />
 )
 
@@ -99,6 +133,10 @@ export const projectPage = (
     viewName="project"
     idFieldName="pid"
     createTitle={(project: ProjectDetailsType) => `${project.proj_name}`}
+    getEditRights={(user: UserState) => {
+      if (user.role === Role.Admin) return fullRights
+      return noRights
+    }}
   />
 )
 
@@ -110,5 +148,9 @@ export const regionPage = (
     viewName="region"
     idFieldName="reg_coord_id"
     createTitle={(region: RegionDetailsType) => `${region.region}`}
+    getEditRights={(user: UserState) => {
+      if (user.role === Role.Admin) return fullRights
+      return noRights
+    }}
   />
 )

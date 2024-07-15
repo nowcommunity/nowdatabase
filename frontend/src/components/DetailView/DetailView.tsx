@@ -9,6 +9,7 @@ import { StagingView } from './StagingView'
 import { ReturnButton, WriteButton } from './components'
 import { ValidationObject } from '@/validators/validator'
 import { EditDataType } from '@/backendTypes'
+import { usePageContext } from '../Page'
 
 export type TabType = {
   title: string
@@ -52,7 +53,7 @@ export const DetailView = <T extends object>({
     if (typeof tabFromUrl !== 'string' || isNaN(parseInt(tabFromUrl))) return 0
     return parseInt(tabFromUrl)
   }
-
+  const { editRights } = usePageContext()
   const [mode, setModeState] = useState<ModeType>(isNew ? modeOptionToMode['new'] : modeOptionToMode['read'])
   const [tab, setTab] = useState(getUrl())
 
@@ -139,7 +140,7 @@ export const DetailView = <T extends object>({
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignContent: 'center', marginTop: 'auto' }}>
           <Box sx={{ display: 'flex' }} gap={10}>
             {!isUserPage && <ReturnButton />}
-            {!mode.staging && !initialState.mode.new && (
+            {editRights.edit && !mode.staging && !initialState.mode.new && (
               <Button
                 onClick={() => setMode(!mode.read ? 'read' : 'edit')}
                 variant={mode.read ? 'contained' : 'outlined'}

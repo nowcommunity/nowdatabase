@@ -14,7 +14,6 @@ import { renderCustomToolbar, renderCustomToolbarModalVersion } from './helpers'
 import { ActionComponent } from './ActionComponent'
 import { usePageContext } from '../Page'
 import { useUser } from '@/hooks/user'
-import { Role } from '@/types'
 
 type TableStateInUrl = 'sorting' | 'columnfilters' | 'pagination'
 
@@ -45,6 +44,7 @@ export const TableView = <T extends MRT_RowData>({
   url?: string
 }) => {
   const location = useLocation()
+  const { editRights } = usePageContext()
   const [columnFilters, setColumnFilters] = useState<MRT_ColumnFiltersState>([])
   const [sorting, setSorting] = useState<MRT_SortingState>([])
   const [pagination, setPagination] = useState<MRT_PaginationState>(
@@ -132,14 +132,12 @@ export const TableView = <T extends MRT_RowData>({
             <Typography sx={{ margin: '0.4rem' }} variant="h4">
               {title ?? ''}
             </Typography>
-            {[Role.Admin, Role.EditRestricted, Role.EditUnrestricted, Role.Project, Role.NowOffice].includes(
-              user.role
-            ) && (
+            {editRights.new && (
               <Button sx={{ marginRight: '1rem', marginLeft: '1rem' }} variant="contained" component={Link} to="new">
                 New
               </Button>
             )}
-            {[Role.Admin, Role.EditUnrestricted].includes(user.role) && <Button variant="contained">Delete</Button>}
+            {editRights.delete && <Button variant="contained">Delete</Button>}
           </Box>
           <Divider sx={{ marginTop: '1rem' }} />
         </>
