@@ -7,6 +7,7 @@ export type FrontendUser = {
   username: string
   role: Role
   initials: string
+  localities: Array<number>
 }
 
 type LoginData = { username: string; password: string }
@@ -31,6 +32,7 @@ export interface UserState {
   username: string | null
   role: Role
   initials: string | null
+  localities: number[]
 }
 
 const initialState: UserState = {
@@ -38,6 +40,7 @@ const initialState: UserState = {
   username: null,
   role: Role.ReadOnly,
   initials: null,
+  localities: [],
 }
 
 const userSlice = createSlice({
