@@ -70,9 +70,8 @@ export const referencePage = (
     idFieldName="rid"
     createTitle={(ref: ReferenceDetailsType) => `${ref.title_primary}`}
     getEditRights={(user: UserState) => {
-      // TODO check if these are right. Can all groups (except readonly) delete references?
       if ([Role.Admin, Role.EditUnrestricted].includes(user.role)) return fullRights
-      if (user.role === Role.ReadOnly) return limitedRights
+      if (user.role === Role.EditRestricted) return { new: true }
       return noRights
     }}
   />
