@@ -4,7 +4,20 @@ import { ArrayFrame, HalfFrames } from '@/components/DetailView/common/tabLayout
 import { useDetailContext } from '@/components/DetailView/Context/DetailContext'
 
 export const TeethTab = () => {
-  const { dropdown, textField } = useDetailContext<SpeciesDetailsType>()
+  const { dropdown, textField, data } = useDetailContext<SpeciesDetailsType>()
+
+  const getCtValue = (fct: null | string) => (fct === null || fct === '' ? '-' : fct)
+  const formCt = (arr: Array<null | string>) => arr.map(val => getCtValue(val)).join('')
+
+  const functionalCrownType = formCt([data.fct_al, data.fct_ol, data.fct_sf, data.fct_ot, data.fct_cm])
+
+  const developmentalCrownType = formCt([
+    data.cusp_shape,
+    data.cusp_count_buccal,
+    data.cusp_count_lingual,
+    data.loph_count_lon,
+    data.loph_count_trs,
+  ])
 
   const toothShapeMulticuspidOptions = [
     { value: '', display: 'None' },
@@ -95,7 +108,7 @@ export const TeethTab = () => {
   ]
 
   const developmental = [
-    ['Developmental Crown Type', 'Not implemented'],
+    ['Developmental Crown Type', developmentalCrownType],
     ['Cusp shape', dropdown('cusp_shape', cuspShapeOptions, 'Cusp shape')],
     ['Buccal cusp count', dropdown('cusp_count_buccal', buccalCuspCountOptions, 'Buccal cusp count')],
     ['Lingual cusp count', dropdown('cusp_count_lingual', lingualCuspCountOptions, 'Lingual cusp count')],
@@ -104,7 +117,7 @@ export const TeethTab = () => {
   ]
 
   const functional = [
-    ['Functional Crown Type', 'Not implemented'],
+    ['Functional Crown Type', functionalCrownType],
     ['Presence of acute lophs (AL)', dropdown('fct_al', acuteLophsOptions, 'Presence of acute lophs (AL)')],
     [
       'Presence of obtuse or basin-like lophs (OL)',
