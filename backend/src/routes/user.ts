@@ -72,11 +72,25 @@ router.post('/create', async (req, res) => {
 router.put('/password', async (req, res) => {
   if (!req.user) throw new AccessError()
   const { userId } = req.user
-  const { newPassword } = req.body
-  // TODO validate new password
-  const passwordHash = await createPasswordHash(newPassword as string)
+  const { newPassword, oldPassword } = req.body as { newPassword: string; oldPassword: string }
+
+  const foundUser = await nowDb.com_users.findFirst({
+    where: {
+      user_id: userId,
+    },
+    select: { newpassword: true },
+  })
+
+  // Confusing naming here, but newpassword in db refers to the password hash used by this application.
+  const passwordMatches = foundUser && (await bcrypt.compare(oldPassword, foundUser.newpassword as string))
+  if (!passwordMatches) return res.status(403).send()
+  if (newPassword.length < 8) return res.status(400).send('Password must be at least 8 characters long.')
+  if (!/^[0-9A-Za-z$%&~]+/.test(newPassword))
+    return res.status(400).send('Use only alphanumeric characters a-z, A-Z and 0-9 and symbols ^?$%&~ in the password')
+
+  const passwordHash = await createPasswordHash(newPassword)
   await nowDb.com_users.update({ where: { user_id: userId }, data: { newpassword: passwordHash } })
-  res.status(200).send()
+  return res.status(200).send()
 })
 
 export default router

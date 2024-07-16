@@ -24,11 +24,12 @@ const userApi = api.injectEndpoints({
         method: 'POST',
       }),
     }),
-    changePassword: builder.mutation<void, string>({
-      query: (password: string) => ({
+    changePassword: builder.mutation<void, { newPassword: string; oldPassword: string }>({
+      query: ({ newPassword, oldPassword }: { newPassword: string; oldPassword: string }) => ({
         url: 'user/password',
         body: {
-          newPassword: password,
+          newPassword,
+          oldPassword,
         },
         method: 'PUT',
       }),

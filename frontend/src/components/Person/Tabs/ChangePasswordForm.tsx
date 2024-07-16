@@ -14,7 +14,7 @@ export const ChangePasswordForm = () => {
       // TODO show notification on error
       return
     }
-    void changePasswordMutation(newPassword)
+    void changePasswordMutation({ newPassword, oldPassword })
     setOldPassword('')
     setNewPassword('')
     setVerifyPassword('')
