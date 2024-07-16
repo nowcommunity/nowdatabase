@@ -3,7 +3,6 @@ import { ArrayFrame, Grouped } from '../../DetailView/common/tabLayoutHelpers'
 import { useDetailContext } from '@/components/DetailView/Context/DetailContext'
 import { formatLastLoginDate } from '@/common'
 import { useUser } from '@/hooks/user'
-import { Box, TextField } from '@mui/material'
 import { PasswordForm } from './PasswordForm'
 
 export const PersonTab = () => {
