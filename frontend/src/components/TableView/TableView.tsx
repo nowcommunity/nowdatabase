@@ -110,22 +110,12 @@ export const TableView = <T extends MRT_RowData>({
     const columnFilterToUrl = `columnfilters=${JSON.stringify(columnFilters)}`
     const sortingToUrl = `sorting=${JSON.stringify(sorting)}`
     const paginationToUrl = `pagination=${JSON.stringify(pagination)}`
+    setTableUrl(`${location.pathname}?&${columnFilterToUrl}&${sortingToUrl}&${paginationToUrl}`)
     navigate(`${location.pathname}?&${columnFilterToUrl}&${sortingToUrl}&${paginationToUrl}`, {
       replace: true,
     })
-    setTableUrl(`${location.pathname}?&${columnFilterToUrl}&${sortingToUrl}&${paginationToUrl}`)
-  }, [
-    columnFilters,
-    sorting,
-    pagination,
-    location.pathname,
-    selectorFn,
-    setIdList,
-    table,
-    idFieldName,
-    setTableUrl,
-    navigate,
-  ])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [columnFilters, sorting, pagination, selectorFn, table, idFieldName, navigate])
 
   useEffect(() => {
     if (selectorFn) {
