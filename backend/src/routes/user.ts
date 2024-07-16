@@ -49,13 +49,16 @@ router.post('/login', async (req, res) => {
   })
 })
 
+const createPasswordHash = async (password: string) => {
+  const saltRounds = 10
+  return await bcrypt.hash(password, saltRounds)
+}
+
 router.post('/create', async (req, res) => {
   // TODO type guards
   const { username, password, secret } = req.body
   if (!secret || secret !== USER_CREATION_SECRET) throw Error('Wrong user creation secret')
-  const saltRounds = 10
-  const passwordHash = await bcrypt.hash(password as string, saltRounds)
-
+  const passwordHash = await createPasswordHash(password as string)
   await nowDb.com_users.create({
     data: {
       user_name: username as string,
@@ -71,7 +74,8 @@ router.put('/password', async (req, res) => {
   const { userId } = req.user
   const { newPassword } = req.body
   // TODO validate new password
-  await nowDb.com_users.update({ where: { user_id: userId }, data: { newpassword: newPassword } })
+  const passwordHash = await createPasswordHash(newPassword as string)
+  await nowDb.com_users.update({ where: { user_id: userId }, data: { newpassword: passwordHash } })
   res.status(200).send()
 })
 
