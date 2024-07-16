@@ -24,6 +24,15 @@ const userApi = api.injectEndpoints({
         method: 'POST',
       }),
     }),
+    changePassword: builder.mutation<void, string>({
+      query: (password: string) => ({
+        url: 'user/password',
+        body: {
+          newPassword: password,
+        },
+        method: 'PUT',
+      }),
+    }),
   }),
 })
 
@@ -58,4 +67,4 @@ const userSlice = createSlice({
 
 export const { setUser, clearUser } = userSlice.actions
 export const userReducer = userSlice.reducer
-export const { useTryLoginMutation } = userApi
+export const { useTryLoginMutation, useChangePasswordMutation } = userApi
