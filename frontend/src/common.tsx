@@ -2,6 +2,11 @@ import { MRT_ColumnDef } from 'material-react-table'
 import { Reference } from './backendTypes'
 import { Cell } from './components/commonComponents'
 
+export const formatLastLoginDate = (date: Date) => {
+  const dateFormat = new Intl.DateTimeFormat('en-GB', { year: 'numeric', month: 'long', day: 'numeric' })
+  return dateFormat.format(new Date(date))
+}
+
 export const referenceTableColumns: MRT_ColumnDef<Reference>[] = [
   {
     id: 'id',

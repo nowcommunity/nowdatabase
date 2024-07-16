@@ -3,6 +3,7 @@ import { type MRT_ColumnDef } from 'material-react-table'
 import { useGetAllPersonsQuery } from '../../redux/personReducer'
 import { PersonDetailsType } from '@/backendTypes'
 import { TableView } from '../TableView/TableView'
+import { formatLastLoginDate } from '@/common'
 
 export const PersonTable = ({ selectorFn }: { selectorFn?: (id: PersonDetailsType) => void }) => {
   const personQuery = useGetAllPersonsQuery()
@@ -44,7 +45,8 @@ export const PersonTable = ({ selectorFn }: { selectorFn?: (id: PersonDetailsTyp
         header: 'User name',
       },
       {
-        accessorKey: 'user.last_login',
+        accessorFn: (person: PersonDetailsType) =>
+          person.user?.last_login ? formatLastLoginDate(person.user?.last_login) : 'None',
         header: 'Last login',
       },
     ],
