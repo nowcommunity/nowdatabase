@@ -121,7 +121,7 @@ export const DetailView = <T extends object>({
     <>
       <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
         {tabs.length > 1 && (
-          <Tabs value={tab} onChange={(_event, newValue) => setTab(newValue as number)}>
+          <Tabs variant="scrollable" value={tab} onChange={(_event, newValue) => setTab(newValue as number)}>
             {tabs.map(tab => (
               <Tab key={tab.title} label={tab.title} />
             ))}
