@@ -11,7 +11,7 @@ import { emptyTimeUnit } from '../DetailView/common/defaultValues'
 export const TimeUnitDetails = () => {
   const { id } = useParams()
   const isNew = id === 'new'
-  const { isLoading, isError, isFetching, data } = useGetTimeUnitDetailsQuery(encodeURIComponent(id!))
+  const { isLoading, isError, isFetching, data } = useGetTimeUnitDetailsQuery(encodeURIComponent(id!), { skip: isNew })
   const [editTimeUnitRequest] = useEditTimeUnitMutation()
   if (isError) return <div>Error loading data</div>
   if (isLoading || isFetching || (!data && !isNew)) return <CircularProgress />
