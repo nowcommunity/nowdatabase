@@ -143,16 +143,7 @@ export type TimeUnit = {
   low_bound: number
   up_bound: number
   seq_name: string
-  now_tu_sequence: {
-    seq_name: string
-  }
   tu_name: string
-  now_tu_bound_now_time_unit_low_bndTonow_tu_bound: {
-    age: number
-  }
-  now_tu_bound_now_time_unit_up_bndTonow_tu_bound: {
-    age: number
-  }
   tu_display_name: string
   rank: string
 }
