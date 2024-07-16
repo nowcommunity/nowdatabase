@@ -1,6 +1,6 @@
+import 'express-async-errors'
 import express from 'express'
 import cors from 'cors'
-import 'express-async-errors'
 import localityRouter from './routes/locality'
 import museumRouter from './routes/museum'
 import referenceRouter from './routes/reference'
