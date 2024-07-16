@@ -5,6 +5,7 @@ import { SECRET, LOGIN_VALID_MS, USER_CREATION_SECRET } from '../utils/config'
 import * as bcrypt from 'bcrypt'
 import { nowDb } from '../utils/db'
 import { getRole } from '../middlewares/authenticator'
+import { AccessError } from '../middlewares/authorizer'
 
 const router = Router()
 
@@ -63,6 +64,15 @@ router.post('/create', async (req, res) => {
   })
 
   return res.status(200).send()
+})
+
+router.put('/password', async (req, res) => {
+  if (!req.user) throw new AccessError()
+  const { userId } = req.user
+  const { newPassword } = req.body
+  // TODO validate new password
+  await nowDb.com_users.update({ where: { user_id: userId }, data: { newpassword: newPassword } })
+  res.status(200).send()
 })
 
 export default router
