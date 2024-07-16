@@ -28,7 +28,7 @@ import { RegionDetails } from './Region/RegionDetails'
 import { Role } from '@/types'
 import { UserState } from '@/redux/userReducer'
 
-export const noRights: EditRights = {}
+const noRights: EditRights = {}
 const fullRights: EditRights = { new: true, edit: true, delete: true }
 const limitedRights: EditRights = { new: true, edit: true }
 

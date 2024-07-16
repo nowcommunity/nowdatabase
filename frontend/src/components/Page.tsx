@@ -5,7 +5,6 @@ import { useUser } from '@/hooks/user'
 import { Box } from '@mui/material'
 import { Role } from '@/types'
 import { UserState } from '@/redux/userReducer'
-import { noRights } from './pages'
 import { ENABLE_WRITE } from '@/util/config'
 
 export type PageContextType<T> = {
@@ -82,7 +81,7 @@ export const Page = <T extends Record<string, unknown>>({
 }) => {
   const { id } = useParams()
   const user = useUser()
-  const editRights = ENABLE_WRITE && user ? getEditRights(user, id!) : noRights
+  const editRights = ENABLE_WRITE && user ? getEditRights(user, id!) : {}
   if (allowedRoles && !allowedRoles.includes(user.role))
     return <Box>Your user is not authorized to view this page.</Box>
   return (
