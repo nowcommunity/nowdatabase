@@ -9,7 +9,7 @@ import {
   MaterialReactTable,
 } from 'material-react-table'
 import { Box, Button, CircularProgress, Divider, Paper, Typography } from '@mui/material'
-import { Link, useLocation } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { renderCustomToolbar, renderCustomToolbarModalVersion } from './helpers'
 import { ActionComponent } from './ActionComponent'
 import { usePageContext } from '../Page'
@@ -47,6 +47,7 @@ export const TableView = <T extends MRT_RowData>({
   const { editRights } = usePageContext()
   const [columnFilters, setColumnFilters] = useState<MRT_ColumnFiltersState>([])
   const [sorting, setSorting] = useState<MRT_SortingState>([])
+  const navigate = useNavigate()
   const [pagination, setPagination] = useState<MRT_PaginationState>(
     selectorFn ? defaultPaginationSmall : defaultPagination
   )
@@ -109,8 +110,22 @@ export const TableView = <T extends MRT_RowData>({
     const columnFilterToUrl = `columnfilters=${JSON.stringify(columnFilters)}`
     const sortingToUrl = `sorting=${JSON.stringify(sorting)}`
     const paginationToUrl = `pagination=${JSON.stringify(pagination)}`
+    navigate(`${location.pathname}?&${columnFilterToUrl}&${sortingToUrl}&${paginationToUrl}`, {
+      replace: true,
+    })
     setTableUrl(`${location.pathname}?&${columnFilterToUrl}&${sortingToUrl}&${paginationToUrl}`)
-  }, [columnFilters, sorting, pagination, location.pathname, selectorFn, setIdList, table, idFieldName, setTableUrl])
+  }, [
+    columnFilters,
+    sorting,
+    pagination,
+    location.pathname,
+    selectorFn,
+    setIdList,
+    table,
+    idFieldName,
+    setTableUrl,
+    navigate,
+  ])
 
   useEffect(() => {
     if (selectorFn) {
