@@ -109,8 +109,9 @@ export const DataValue = <T extends object>({
     if (round === undefined || typeof value !== 'number') {
       return value
     }
+    const multiplier = parseInt('1'.padEnd(round + 1, '0'))
     if (value.toString().split('.')[1]?.length > round)
-      return parseFloat((Math.floor(value * 100) / 100).toFixed(round))
+      return parseFloat((Math.floor(value * multiplier) / multiplier).toFixed(round))
     return value
   }
   return getValue(displayValue ?? (data[field as keyof T] as ReactNode))
