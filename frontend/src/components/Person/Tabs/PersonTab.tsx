@@ -3,7 +3,7 @@ import { ArrayFrame, Grouped } from '../../DetailView/common/tabLayoutHelpers'
 import { useDetailContext } from '@/components/DetailView/Context/DetailContext'
 import { formatLastLoginDate } from '@/common'
 import { useUser } from '@/hooks/user'
-import { PasswordForm } from './PasswordForm'
+import { ChangePasswordForm } from './ChangePasswordForm'
 
 export const PersonTab = () => {
   const { textField, data } = useDetailContext<PersonDetailsType>()
@@ -33,7 +33,7 @@ export const PersonTab = () => {
       <ArrayFrame array={user} title="User" />
       {currentUser.initials === data.initials && (
         <Grouped title="Change password">
-          <PasswordForm />
+          <ChangePasswordForm />
         </Grouped>
       )}
     </>
