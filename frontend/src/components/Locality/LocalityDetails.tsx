@@ -1,4 +1,4 @@
-import { useParams } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import { useEditLocalityMutation, useGetLocalityDetailsQuery } from '../../redux/localityReducer'
 import { CircularProgress } from '@mui/material'
 import { DetailView, TabType } from '../DetailView/DetailView'
@@ -19,9 +19,12 @@ import { emptyLocality } from '../DetailView/common/defaultValues'
 
 export const LocalityDetails = () => {
   const { id } = useParams()
+  const navigate = useNavigate()
   const isNew = id === 'new'
   const { isLoading, isFetching, isError, data } = useGetLocalityDetailsQuery(id!, { skip: isNew })
-  const [editLocalityRequest] = useEditLocalityMutation()
+  const [editLocalityRequest, { isSuccess, data: newData }] = useEditLocalityMutation()
+
+  if (isSuccess && newData) navigate(`/locality/${newData.id}`)
   if (isError) return <div>Error loading data</div>
   if (isLoading || isFetching || (!data && !isNew)) return <CircularProgress />
 

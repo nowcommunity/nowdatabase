@@ -15,7 +15,7 @@ const localitiesApi = api.injectEndpoints({
       }),
       providesTags: result => (result ? [{ type: 'locality', id: result.lid }] : []),
     }),
-    editLocality: builder.mutation<LocalityDetailsType, EditDataType<LocalityDetailsType>>({
+    editLocality: builder.mutation<{ id: number }, EditDataType<LocalityDetailsType>>({
       query: locality => ({
         url: `/locality/`,
         method: 'PUT',
