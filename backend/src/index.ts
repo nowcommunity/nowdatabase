@@ -9,6 +9,7 @@ import regionRouter from './routes/region'
 import personRouter from './routes/person'
 import projectRouter from './routes/project'
 import speciesRouter from './routes/species'
+import refreshTokenRouter from './routes/refresh'
 import timeBoundRouter from './routes/timeBound'
 import timeUnitRouter from './routes/timeUnit'
 import userRouter from './routes/user'
@@ -34,6 +35,9 @@ app.use(responseLogger)
 if (!ENABLE_WRITE && RUNNING_ENV !== 'dev') {
   app.use(blockWriteRequests)
 }
+
+app.use(refreshTokenRouter)
+
 app.use(tokenExtractor)
 app.use(userExtractor)
 

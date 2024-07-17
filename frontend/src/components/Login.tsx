@@ -2,7 +2,7 @@ import { useEffect, useState, ChangeEvent, FormEvent } from 'react'
 import { useTryLoginMutation, setUser } from '../redux/userReducer'
 import { useDispatch } from 'react-redux'
 import { Box, Button, CircularProgress, Container, Stack, TextField, Typography } from '@mui/material'
-import { useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import { api } from '../redux/api'
 
 export const Login = () => {
@@ -13,6 +13,9 @@ export const Login = () => {
   const [loginMutation, { data, isLoading, isError }] = useTryLoginMutation()
   const dispatch = useDispatch()
   const navigate = useNavigate()
+  const location = useLocation()
+  const search = new URLSearchParams(location.search)
+  const loginHadExpired = search.get('expired')
 
   const login = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
@@ -42,6 +45,13 @@ export const Login = () => {
 
   return (
     <Container style={{ alignContent: 'center' }} maxWidth="sm">
+      <Box>
+        {loginHadExpired && (
+          <p style={{ color: 'darkorange', fontWeight: 'bold', fontSize: 28 }}>
+            Your login expired. Please login again.
+          </p>
+        )}
+      </Box>
       <form onSubmit={event => void login(event)}>
         <Stack rowGap="1em">
           <TextField

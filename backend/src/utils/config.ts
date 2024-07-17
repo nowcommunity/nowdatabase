@@ -2,7 +2,10 @@ export const MARIADB_HOST = process.env.MARIADB_HOST as string
 export const MARIADB_PASSWORD = process.env.MARIADB_PASSWORD as string
 export const SECRET = process.env.SECRET as string
 export const PORT = process.env.NOWDB_BACKEND_PORT as unknown as number
-export const LOGIN_VALID_MS = parseInt(process.env.LOGIN_VALID_MINUTES as string) * 60 * 1000
+
+export const LOGIN_VALID_SECONDS = parseInt(process.env.LOGIN_VALID_MINUTES as string) * 60
+export const GRACE_PERIOD_SECONDS = parseInt(process.env.GRACE_PERIOD_MINUTES || '60') * 60
+
 export const MARIADB_PORT = parseInt(process.env.MARIADB_PORT as string)
 export const USER_CREATION_SECRET = process.env.USER_CREATION_SECRET as string
 
@@ -28,7 +31,8 @@ const requiredEnvs = {
   MARIADB_PASSWORD,
   SECRET,
   PORT,
-  LOGIN_VALID_MS,
+  LOGIN_VALID_SECONDS,
+  GRACE_PERIOD_SECONDS,
   MARIADB_PORT,
   USER_CREATION_SECRET,
   BACKEND_MODE: RUNNING_ENV,

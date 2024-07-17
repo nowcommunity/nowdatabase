@@ -60,12 +60,15 @@ const userSlice = createSlice({
     setUser(_state, action: PayloadAction<UserState>) {
       return { ...action.payload }
     },
+    setToken(state, action: PayloadAction<string>) {
+      return { ...state, token: action.payload }
+    },
     clearUser() {
       return { ...initialState }
     },
   },
 })
 
-export const { setUser, clearUser } = userSlice.actions
+export const { setUser, setToken, clearUser } = userSlice.actions
 export const userReducer = userSlice.reducer
 export const { useTryLoginMutation, useChangePasswordMutation } = userApi

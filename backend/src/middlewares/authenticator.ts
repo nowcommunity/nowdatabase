@@ -21,9 +21,9 @@ export const tokenExtractor: Middleware = (req, _res, next) => {
   next()
 }
 
-const verify = async (token: string, secret: Secret) => {
+export const verify = async (token: string, secret: Secret, ignoreExpiration?: boolean) => {
   return new Promise((resolve, reject) => {
-    jwt.verify(token, secret, (err, decoded) => {
+    jwt.verify(token, secret, { ignoreExpiration }, (err, decoded) => {
       if (err) reject(err)
       else resolve(decoded)
     })
@@ -78,7 +78,7 @@ export const userExtractor: Middleware = async (req, res, next) => {
     return next()
   } catch (e: unknown) {
     if (e instanceof TokenExpiredError) {
-      return res.status(400).json({ message: 'Token expired' })
+      return res.status(401).json({ message: 'Token expired' })
     }
     next(e)
   }

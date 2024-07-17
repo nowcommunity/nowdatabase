@@ -1,11 +1,12 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { Router } from 'express'
-import * as jwt from 'jsonwebtoken'
-import { SECRET, LOGIN_VALID_MS, USER_CREATION_SECRET } from '../utils/config'
+import { sign } from 'jsonwebtoken'
+import { SECRET, LOGIN_VALID_SECONDS, USER_CREATION_SECRET } from '../utils/config'
 import * as bcrypt from 'bcrypt'
 import { nowDb } from '../utils/db'
 import { getRole } from '../middlewares/authenticator'
-import { AccessError } from '../middlewares/authorizer'
+import { AccessError, requireOneOf } from '../middlewares/authorizer'
+import { Role } from '../../../frontend/src/types'
 
 const router = Router()
 
@@ -22,8 +23,8 @@ router.post('/login', async (req, res) => {
 
   if (!passwordMatches) return res.status(403).send()
 
-  const token = jwt.sign({ username: foundUser.user_name, id: foundUser.user_id }, SECRET, {
-    expiresIn: LOGIN_VALID_MS,
+  const token = sign({ username: foundUser.user_name, id: foundUser.user_id }, SECRET, {
+    expiresIn: LOGIN_VALID_SECONDS,
   })
 
   const personResult = await nowDb.com_people.findFirst({
@@ -54,11 +55,13 @@ const createPasswordHash = async (password: string) => {
   return await bcrypt.hash(password, saltRounds)
 }
 
-router.post('/create', async (req, res) => {
-  // TODO type guards
+router.post('/create', requireOneOf([Role.Admin]), async (req, res) => {
   const { username, password, secret } = req.body
+
   if (!secret || secret !== USER_CREATION_SECRET) throw Error('Wrong user creation secret')
+
   const passwordHash = await createPasswordHash(password as string)
+
   await nowDb.com_users.create({
     data: {
       user_name: username as string,
