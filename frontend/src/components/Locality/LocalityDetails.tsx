@@ -21,15 +21,16 @@ export const LocalityDetails = () => {
   const { id } = useParams()
   const navigate = useNavigate()
   const isNew = id === 'new'
-  const { isLoading, isFetching, isError, data } = useGetLocalityDetailsQuery(id!, { skip: isNew })
-  const [editLocalityRequest, { isSuccess, data: newData }] = useEditLocalityMutation()
-
-  if (isSuccess && newData) navigate(`/locality/${newData.id}`)
+  const [editLocalityRequest, { isLoading: mutationLoading }] = useEditLocalityMutation()
+  const { isFetching, isError, data } = useGetLocalityDetailsQuery(id!, {
+    skip: isNew,
+  })
   if (isError) return <div>Error loading data</div>
-  if (isLoading || isFetching || (!data && !isNew)) return <CircularProgress />
+  if (isFetching || (!data && !isNew) || mutationLoading) return <CircularProgress />
 
   const onWrite = async (editData: EditDataType<LocalityDetailsType>) => {
-    await editLocalityRequest(editData)
+    const { id } = await editLocalityRequest(editData).unwrap()
+    navigate(`/locality/${id}`)
   }
 
   const tabs: TabType[] = [
