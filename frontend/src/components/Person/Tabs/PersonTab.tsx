@@ -4,6 +4,7 @@ import { useDetailContext } from '@/components/DetailView/Context/DetailContext'
 import { formatLastLoginDate } from '@/common'
 import { useUser } from '@/hooks/user'
 import { ChangePasswordForm } from './ChangePasswordForm'
+import { Box } from '@mui/material'
 
 export const PersonTab = () => {
   const { textField, data } = useDetailContext<PersonDetailsType>()
@@ -33,6 +34,7 @@ export const PersonTab = () => {
       <ArrayFrame array={user} title="User" />
       {currentUser.initials === data.initials && (
         <Grouped title="Change password">
+          {currentUser.isFirstLogin && <Box>Please change your password!</Box>}
           <ChangePasswordForm />
         </Grouped>
       )}

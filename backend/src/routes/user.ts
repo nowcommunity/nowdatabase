@@ -7,21 +7,32 @@ import { nowDb } from '../utils/db'
 import { getRole } from '../middlewares/authenticator'
 import { AccessError, requireOneOf } from '../middlewares/authorizer'
 import { Role } from '../../../frontend/src/types'
+import md5 from 'md5'
 
 const router = Router()
 
 router.post('/login', async (req, res) => {
   const { username, password } = req.body
+  if (typeof username !== 'string' || typeof password !== 'string' || username === '' || password === '')
+    throw new AccessError()
   const foundUser = await nowDb.com_users.findFirst({
     where: {
       user_name: username,
     },
-    select: { user_name: true, newpassword: true, user_id: true, now_user_group: true },
+    select: { user_name: true, password: true, newpassword: true, user_id: true, now_user_group: true },
   })
 
-  const passwordMatches = foundUser && (await bcrypt.compare(password as string, foundUser.newpassword as string))
+  let isFirstLogin: true | undefined
 
-  if (!passwordMatches) return res.status(403).send()
+  // For first login, we'll allow logging in with the old password using md5, but prompt user to change their password.
+  if (foundUser?.newpassword === null) {
+    const oldHash = md5(password)
+    if (foundUser.password !== oldHash) throw new AccessError()
+    isFirstLogin = true
+  } else {
+    const passwordMatches = foundUser && (await bcrypt.compare(password, foundUser.newpassword))
+    if (!passwordMatches) throw new AccessError()
+  }
 
   const token = sign({ username: foundUser.user_name, id: foundUser.user_id }, SECRET, {
     expiresIn: LOGIN_VALID_SECONDS,
@@ -47,6 +58,7 @@ router.post('/login', async (req, res) => {
     role: getRole(foundUser.now_user_group ?? ''),
     initials: personResult.initials,
     localities: associatedLocalityIds,
+    isFirstLogin,
   })
 })
 

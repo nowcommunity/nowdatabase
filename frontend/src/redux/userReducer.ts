@@ -2,19 +2,20 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { api } from '@/redux/api'
 import { Role } from '@/types'
 
-export type FrontendUser = {
+export type LoginResponse = {
   token: string
   username: string
   role: Role
   initials: string
   localities: Array<number>
+  isFirstLogin: undefined | true
 }
 
 type LoginData = { username: string; password: string }
 
 const userApi = api.injectEndpoints({
   endpoints: builder => ({
-    tryLogin: builder.mutation<FrontendUser, LoginData>({
+    tryLogin: builder.mutation<LoginResponse, LoginData>({
       query: ({ username, password }: LoginData) => ({
         url: `/user/login`,
         body: {
@@ -43,6 +44,7 @@ export interface UserState {
   role: Role
   initials: string | null
   localities: number[]
+  isFirstLogin: undefined | true
 }
 
 const initialState: UserState = {
@@ -51,6 +53,7 @@ const initialState: UserState = {
   role: Role.ReadOnly,
   initials: null,
   localities: [],
+  isFirstLogin: undefined,
 }
 
 const userSlice = createSlice({

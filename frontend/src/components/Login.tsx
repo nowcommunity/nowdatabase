@@ -1,4 +1,4 @@
-import { useEffect, useState, ChangeEvent, FormEvent } from 'react'
+import { useState, ChangeEvent, FormEvent } from 'react'
 import { useTryLoginMutation, setUser } from '../redux/userReducer'
 import { useDispatch } from 'react-redux'
 import { Box, Button, CircularProgress, Container, Stack, TextField, Typography } from '@mui/material'
@@ -31,25 +31,41 @@ export const Login = () => {
     if (error) return
     setUsernameError('')
     setPasswordError('')
-    await loginMutation({ username, password })
-  }
+    const result = await loginMutation({ username, password }).unwrap()
 
-  useEffect(() => {
-    if (data && data.token) {
-      dispatch(setUser(data))
-      // Reset api cache, so that we won't show guest data to logged user
-      dispatch(api.util.resetApiState())
+    if (!result) return
+
+    dispatch(setUser(result))
+
+    // Reset api cache, so that we won't show guest data (which would have omitted items) to a logged user
+    dispatch(api.util.resetApiState())
+
+    if (result.isFirstLogin) {
+      navigate(`user/${result.initials}`)
+    } else {
       navigate('/')
     }
-  }, [data, dispatch, navigate])
+  }
 
   return (
     <Container style={{ alignContent: 'center' }} maxWidth="sm">
       <Box>
-        {loginHadExpired && (
+        {loginHadExpired ? (
           <p style={{ color: 'darkorange', fontWeight: 'bold', fontSize: 28 }}>
             Your login expired. Please login again.
           </p>
+        ) : (
+          <>
+            <p>
+              <b>Welcome!</b> The users from the old Now Database application work here. If you are logging in this new
+              version for the first time, you can use your password of the old application.
+            </p>
+            <p>
+              However, upon first login, <b>please change your password</b> in this application. After changing it, the
+              new password will be used for this new version, but the{' '}
+              <b>old version will still work with your old password</b>.
+            </p>
+          </>
         )}
       </Box>
       <form onSubmit={event => void login(event)}>
