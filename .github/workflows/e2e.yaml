@@ -4,6 +4,8 @@ on:
   pull_request:
     types: [opened, reopened]
   push:
+    paths-ignore:
+      - '*.md'
 
 jobs:
   e2e_tests:

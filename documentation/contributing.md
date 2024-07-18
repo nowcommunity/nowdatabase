@@ -13,4 +13,5 @@
 **Naming conventions**
 + Types, React-components: `PascalCase`
 + Field names that come directly from database columns or tables: `snake_case`
++ Environment variables: `SCREAMING_SNAKE_CASE`
 + Everything else - variables, functions etc: `camelCase`
