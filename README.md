@@ -12,9 +12,14 @@ _____
 
 **Basic commands** :computer:
 
++ `npm run setup`
+  + Installs all node modules, and generates prisma client
 + `npm run dev` 
   + Uses `docker-compose.dev.yml`
   + Run in development mode: with hot reload
+
+Testing:
+
 + `npm run check`
   + Runs `tsc` and `eslint` for frontend and backend: Use this to check for errors before committing, if you feel like it.
 + `npm run start:anon`
@@ -24,6 +29,9 @@ _____
   + Runs cypress-tests in headless mode, same as in GitHub Actions. Requires the above command to be ran first.
 + `npm run cypress`
   + Opens cypress. You can run tests and see what they do.
+
+Run with the same image that is used in production:
+
 + `npm start`
   + Uses `docker-compose.yml`
   + This builds the code and runs it. Mostly you'll want to use this after major technical changes to check the code works also in production mode, before deploying. And then you'll likely want to do: `npm start -- --build` to force rebuild of containers.
@@ -41,5 +49,3 @@ _____
 :mag_right: [Validators](frontend/src/validators/) The readme explains how validators are written
 
 :mag_right: [Class diagram](documentation/class_diagram.md) See the relations of relevant tables. Notice that it omits some unimportant tables and does not show most columns.
-
-:key: [User rights](documentation/user_rights.md) User rights of different API-endpoints
