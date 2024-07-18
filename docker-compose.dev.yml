@@ -1,6 +1,6 @@
 # For running in local development: hot reload etc
 services:
-  frontend:
+  frontend-dev:
     container_name: nowdb-frontend-dev
     build:
       context: ./frontend
@@ -10,7 +10,7 @@ services:
     ports:
       - 127.0.0.1:5173:5173
     env_file: .dev.env
-  backend:
+  backend-dev:
     container_name: nowdb-backend-dev
     build:
       context: .
