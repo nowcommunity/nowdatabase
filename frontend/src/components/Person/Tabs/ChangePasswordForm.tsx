@@ -1,6 +1,7 @@
-import { useChangePasswordMutation } from '@/redux/userReducer'
+import { removeFirstLogin, useChangePasswordMutation } from '@/redux/userReducer'
 import { Button, Grid, TextField } from '@mui/material'
 import { useState } from 'react'
+import { useDispatch } from 'react-redux'
 
 export const ChangePasswordForm = () => {
   const [oldPassword, setOldPassword] = useState('')
@@ -8,16 +9,21 @@ export const ChangePasswordForm = () => {
   const [verifyPassword, setVerifyPassword] = useState('')
   const [changePasswordMutation] = useChangePasswordMutation()
   const sx = { display: 'flex', alignItems: 'center', width: '10em', fontWeight: 'bold' }
-
-  const changePassword = () => {
+  const dispatch = useDispatch()
+  const changePassword = async () => {
     if (newPassword !== verifyPassword) {
       // TODO show notification on error
       return
     }
-    void changePasswordMutation({ newPassword, oldPassword })
-    setOldPassword('')
-    setNewPassword('')
-    setVerifyPassword('')
+    try {
+      await changePasswordMutation({ newPassword, oldPassword }).unwrap()
+      dispatch(removeFirstLogin())
+      setOldPassword('')
+      setNewPassword('')
+      setVerifyPassword('')
+    } catch (e) {
+      console.log(e)
+    }
     // TODO show success notification
   }
 

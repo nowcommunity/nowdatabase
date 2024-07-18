@@ -67,8 +67,16 @@ export const HalfFrames = ({ children }: { children: [ReactNode, ReactNode] }) =
   )
 }
 
-export const Grouped = ({ title, children }: { title?: string; children: ReactNode }) => {
-  const styles = {
+export const Grouped = ({
+  title,
+  children,
+  style,
+}: {
+  title?: string
+  children: ReactNode
+  style?: React.CSSProperties
+}) => {
+  const styles = style ?? {
     padding: '10px',
     paddingBottom: '15px',
     backgroundColor: 'white',

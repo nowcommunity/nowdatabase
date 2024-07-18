@@ -39,9 +39,8 @@ export const Login = () => {
 
     // Reset api cache, so that we won't show guest data (which would have omitted items) to a logged user
     dispatch(api.util.resetApiState())
-
     if (result.isFirstLogin) {
-      navigate(`user/${result.initials}`)
+      navigate(`/person/user-page`)
     } else {
       navigate('/')
     }

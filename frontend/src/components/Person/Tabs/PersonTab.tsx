@@ -5,10 +5,16 @@ import { formatLastLoginDate } from '@/common'
 import { useUser } from '@/hooks/user'
 import { ChangePasswordForm } from './ChangePasswordForm'
 import { Box } from '@mui/material'
+import { useEffect } from 'react'
 
 export const PersonTab = () => {
   const { textField, data } = useDetailContext<PersonDetailsType>()
   const currentUser = useUser()
+
+  useEffect(() => {
+    if (!currentUser) return
+    window.scrollTo(0, document.body.scrollHeight)
+  }, [currentUser])
 
   const person = [
     ['Initials', textField('initials')],
@@ -33,8 +39,16 @@ export const PersonTab = () => {
       <ArrayFrame array={person} title="Person" />
       <ArrayFrame array={user} title="User" />
       {currentUser.initials === data.initials && (
-        <Grouped title="Change password">
-          {currentUser.isFirstLogin && <Box>Please change your password!</Box>}
+        <Grouped title="Change password" style={{ padding: '1em' }}>
+          {currentUser.isFirstLogin && (
+            <Box sx={{ margin: '0.2em', width: '40em' }}>
+              <p style={{ color: 'red', fontWeight: 'bold', fontSize: 26 }}>Please change your password!</p>
+              <p style={{ fontSize: 22 }}>
+                Changing your password here will only set the password for this new version. The old application will
+                still work with your old password.
+              </p>
+            </Box>
+          )}
           <ChangePasswordForm />
         </Grouped>
       )}
