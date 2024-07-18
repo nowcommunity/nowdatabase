@@ -56,11 +56,11 @@ export const Login = () => {
           </p>
         ) : (
           <>
-            <p>
+            <p style={{ fontSize: 20 }}>
               <b>Welcome!</b> The users from the old Now Database application work here. If you are logging in this new
               version for the first time, you can use your password of the old application.
             </p>
-            <p>
+            <p style={{ fontSize: 20 }}>
               However, upon first login, <b>please change your password</b> in this application. After changing it, the
               new password will be used for this new version, but the{' '}
               <b>old version will still work with your old password</b>.
@@ -92,7 +92,7 @@ export const Login = () => {
             helperText={passwordError}
             fullWidth
           />
-          <Button type="submit" data-cy="login-button" size="large" style={{ fontSize: '1.4em' }}>
+          <Button variant="contained" type="submit" data-cy="login-button" size="large" style={{ fontSize: '1.4em' }}>
             Login
           </Button>
           <Box>
