@@ -7,6 +7,7 @@ import { MouseEvent, useState } from 'react'
 import { Role } from '@/types'
 import { useUser } from '@/hooks/user'
 import { ENV } from '@/util/config'
+import { useNotify } from '@/hooks/notification'
 
 type LinkDefinition = { title: string; url: string; children?: LinkDefinition[]; allowedRoles?: Role[] }
 
@@ -14,6 +15,7 @@ export const NavBar = () => {
   const user = useUser()
   const navigate = useNavigate()
   const dispatch = useDispatch()
+  const notify = useNotify()
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
   const open = Boolean(anchorEl)
   const handleClick = (event: MouseEvent<HTMLElement>) => {
@@ -49,6 +51,7 @@ export const NavBar = () => {
     // Reset api, so that we won't show cached private data to guest user
     dispatch(api.util.resetApiState())
     localStorage.clear()
+    notify('Logged out!')
     navigate('/')
   }
 

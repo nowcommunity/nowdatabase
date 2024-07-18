@@ -1,9 +1,10 @@
-import { useState, ChangeEvent, FormEvent } from 'react'
+import { useState, ChangeEvent, FormEvent, useEffect } from 'react'
 import { useTryLoginMutation, setUser } from '../redux/userReducer'
 import { useDispatch } from 'react-redux'
 import { Box, Button, CircularProgress, Container, Stack, TextField, Typography } from '@mui/material'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { api } from '../redux/api'
+import { useNotify } from '@/hooks/notification'
 
 export const Login = () => {
   const [username, setUsername] = useState('')
@@ -16,6 +17,11 @@ export const Login = () => {
   const location = useLocation()
   const search = new URLSearchParams(location.search)
   const loginHadExpired = search.get('expired')
+  const notify = useNotify()
+
+  useEffect(() => {
+    if (loginHadExpired) notify('Your login expired. Please log in again.')
+  }, [loginHadExpired, notify])
 
   const login = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
@@ -28,13 +34,18 @@ export const Login = () => {
       setPasswordError('Input password')
       error = true
     }
-    if (error) return
+    if (error) {
+      return
+    }
     setUsernameError('')
     setPasswordError('')
     const result = await loginMutation({ username, password }).unwrap()
 
-    if (!result) return
-
+    if (!result) {
+      notify('Login unsuccessful', 'error')
+      return
+    }
+    notify('Logged in!')
     dispatch(setUser(result))
 
     // Reset api cache, so that we won't show guest data (which would have omitted items) to a logged user
