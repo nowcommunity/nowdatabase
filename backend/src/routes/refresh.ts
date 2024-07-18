@@ -17,7 +17,7 @@ router.post('/refreshToken', async (req: Request<object, { token: string }, { to
   } = (await verify(oldToken, SECRET as Secret, true)) as { username: string; exp: number; id: number }
 
   const now = new Date().getTime()
-  console.log({ now, exp, grace: GRACE_PERIOD_SECONDS })
+
   if (now > exp * 1000 + GRACE_PERIOD_SECONDS * 1000) throw new AccessError('Token expired. You must login again.')
 
   const foundUser = await nowDb.com_users.findFirst({

@@ -1,7 +1,6 @@
 import { Container, Grid } from '@mui/material'
 import { FrontPage } from './components/FrontPage'
 import { NavBar } from './components/NavBar'
-import { useState } from 'react'
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import { Login } from './components/Login'
 import {
@@ -14,23 +13,13 @@ import {
   timeBoundPage,
   timeUnitPage,
 } from './components/pages'
-import { Notification, NotificationContext, Severity } from './components/Notification'
+import { Notification, NotificationContextProvider } from './components/Notification'
 
 const App = () => {
-  const [open, setOpen] = useState(false)
-  const [message, setMessage] = useState('')
-  const [severity, setSeverity] = useState<Severity | undefined>('success')
-
-  const notify = (message: string, newSeverity?: Severity) => {
-    setMessage(message)
-    setOpen(true)
-    setSeverity(newSeverity)
-  }
-
   return (
     <BrowserRouter>
-      <Notification open={open} severity={severity} message={message} setOpen={setOpen} />
-      <NotificationContext.Provider value={{ notify }}>
+      <NotificationContextProvider>
+        <Notification />
         <Grid container>
           <Grid item xs={12}>
             <Container maxWidth="xl">
@@ -55,7 +44,7 @@ const App = () => {
             </Grid>
           </Container>
         </Grid>
-      </NotificationContext.Provider>
+      </NotificationContextProvider>
     </BrowserRouter>
   )
 }

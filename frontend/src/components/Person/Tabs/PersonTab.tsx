@@ -12,6 +12,7 @@ export const PersonTab = () => {
   const { textField, data } = useDetailContext<PersonDetailsType>()
   const currentUser = useUser()
   const notify = useNotify()
+
   useEffect(() => {
     if (!currentUser?.isFirstLogin) return
     window.scrollTo(0, document.body.scrollHeight)
