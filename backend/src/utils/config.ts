@@ -8,7 +8,6 @@ export const GRACE_PERIOD_SECONDS = parseInt(process.env.GRACE_PERIOD_MINUTES ||
 
 export const MARIADB_USER = process.env.MARIADB_USER as string
 export const MARIADB_PORT = parseInt(process.env.MARIADB_PORT as string)
-export const USER_CREATION_SECRET = process.env.USER_CREATION_SECRET as string
 
 /* Running environment: 
     dev     = development or testing, locally or in GitHub actions
@@ -35,7 +34,6 @@ const requiredEnvs = {
   LOGIN_VALID_SECONDS,
   GRACE_PERIOD_SECONDS,
   MARIADB_PORT,
-  USER_CREATION_SECRET,
   BACKEND_MODE: RUNNING_ENV,
   NOW_DB_NAME,
   LOG_DB_NAME,
