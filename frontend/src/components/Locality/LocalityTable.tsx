@@ -3,11 +3,12 @@ import { type MRT_ColumnDef } from 'material-react-table'
 import { useGetAllLocalitiesQuery, useGetLocalitySpeciesListMutation } from '../../redux/localityReducer'
 import { Locality } from '@/backendTypes'
 import { TableView } from '../TableView/TableView'
+import { useNotify } from '@/hooks/notification'
 
 export const LocalityTable = ({ selectorFn }: { selectorFn?: (newObject: Locality) => void }) => {
   const localitiesQuery = useGetAllLocalitiesQuery()
-  const [getLocalitySpeciesList] = useGetLocalitySpeciesListMutation()
-
+  const [getLocalitySpeciesList, { isLoading }] = useGetLocalitySpeciesListMutation()
+  const notify = useNotify()
   const columns = useMemo<MRT_ColumnDef<Locality>[]>(
     () => [
       {
@@ -37,6 +38,15 @@ export const LocalityTable = ({ selectorFn }: { selectorFn?: (newObject: Localit
   )
 
   const combinedExport = async (lids: number[]) => {
+    if (isLoading) {
+      notify('Please wait for the last request to complete.', 'warning')
+      return
+    }
+    const limit = 2000
+    if (lids.length > limit) {
+      notify(`Please filter the table more. Current rows: ${lids.length}. Limit: ${limit}`, 'error')
+      return
+    }
     const result = await getLocalitySpeciesList(lids).unwrap()
     const dataString = result.map(row => (row as unknown[]).join(',')).join('\n')
     const blob = new Blob([dataString], { type: 'text/csv' })
