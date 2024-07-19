@@ -6,9 +6,9 @@ WORKDIR /usr/src/app
 
 RUN mkdir -p /usr/src/app/frontend/src/validators
 
-COPY frontend/src/backendTypes.d.ts /usr/src/app/frontend/src/
-COPY frontend/src/validators /usr/src/app/frontend/src/validators
+COPY frontend/src/backendTypes.d.ts /usr/src/app/frontend/src/backendTypes.d.ts
 COPY frontend/src/types.ts /usr/src/app/frontend/src/types.ts
+COPY frontend/src/validators /usr/src/app/frontend/src/validators
 COPY backend/package.json backend/
 COPY backend/package-lock.json backend/
 COPY backend/prisma backend
@@ -30,7 +30,8 @@ FROM node:20-alpine3.16 AS node-run
 RUN mkdir -p /usr/src/app/backend/backend/prisma
 WORKDIR /usr/src/app/backend
 
-COPY --from=backend-build /usr/src/app/frontend/src/ ../frontend/src
+COPY --from=backend-build /usr/src/app/frontend/src/backendTypes.d.ts ../frontend/src/backendTypes.d.ts
+COPY --from=backend-build /usr/src/app/frontend/src/types.ts ../frontend/src/types.ts
 COPY --from=backend-build /usr/src/app/backend/build .
 COPY --from=backend-build /usr/src/app/backend/node_modules ./node_modules
 COPY --from=backend-build /usr/src/app/backend/prisma ./backend/prisma
@@ -38,5 +39,4 @@ COPY --from=backend-build /usr/src/app/backend/prisma ./backend/prisma
 EXPOSE 4000
 ENV NODE_ENV=production
 
-#CMD ["sleep", "infinite"]
 CMD ["node", "backend/src/index.js"]
