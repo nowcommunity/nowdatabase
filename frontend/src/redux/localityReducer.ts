@@ -17,7 +17,7 @@ const localitiesApi = api.injectEndpoints({
     }),
     getLocalitySpeciesList: builder.mutation<unknown[], number[]>({
       query: (lids: number[]) => ({
-        url: `/locality/localitySpecies/`,
+        url: `/locality-species/`,
         body: { lids },
         method: 'POST',
       }),

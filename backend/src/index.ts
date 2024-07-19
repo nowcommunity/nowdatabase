@@ -9,6 +9,7 @@ import regionRouter from './routes/region'
 import personRouter from './routes/person'
 import projectRouter from './routes/project'
 import speciesRouter from './routes/species'
+import localitySpeciesRouter from './routes/localitySpecies'
 import refreshTokenRouter from './routes/refresh'
 import timeBoundRouter from './routes/timeBound'
 import timeUnitRouter from './routes/timeUnit'
@@ -43,6 +44,7 @@ app.use(userExtractor)
 
 app.use('/user', userRouter)
 app.use('/locality', localityRouter)
+app.use('/locality-species', localitySpeciesRouter)
 app.use('/species', speciesRouter)
 app.use('/reference', referenceRouter)
 app.use('/time-unit', timeUnitRouter)

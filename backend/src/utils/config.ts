@@ -6,6 +6,7 @@ export const PORT = process.env.NOWDB_BACKEND_PORT as unknown as number
 export const LOGIN_VALID_SECONDS = parseInt(process.env.LOGIN_VALID_MINUTES as string) * 60
 export const GRACE_PERIOD_SECONDS = parseInt(process.env.GRACE_PERIOD_MINUTES || '60') * 60
 
+export const MARIADB_USER = process.env.MARIADB_USER as string
 export const MARIADB_PORT = parseInt(process.env.MARIADB_PORT as string)
 export const USER_CREATION_SECRET = process.env.USER_CREATION_SECRET as string
 
@@ -40,6 +41,7 @@ const requiredEnvs = {
   LOG_DB_NAME,
   COORDINATOR,
   RUNNING_ENV,
+  MARIADB_USER,
 }
 
 const missingEnvs = Object.entries(requiredEnvs).filter(([, value]) => value === undefined)

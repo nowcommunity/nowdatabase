@@ -1,10 +1,5 @@
 import { Request, Router } from 'express'
-import {
-  getAllLocalities,
-  getLocalityDetails,
-  getLocalitySpeciesList,
-  validateEntireLocality,
-} from '../services/locality'
+import { getAllLocalities, getLocalityDetails, validateEntireLocality } from '../services/locality'
 import { fixBigInt } from '../utils/common'
 import { EditDataType, LocalityDetailsType } from '../../../frontend/src/backendTypes'
 import { write } from '../services/write/write'
@@ -16,14 +11,6 @@ const router = Router()
 router.get('/all', async (req, res) => {
   const localities = await getAllLocalities(req.user)
   return res.status(200).send(fixBigInt(localities))
-})
-
-router.post('/localitySpecies', async (req: Request<object, object, { lids: number[] }>, res) => {
-  const user = req.user
-  const lids = req.body.lids
-  if (!lids) return res.status(400).send({ message: 'Missing lids' })
-  const localitySpeciesList = await getLocalitySpeciesList(lids, user)
-  return res.status(200).json(localitySpeciesList)
 })
 
 router.get('/:id', async (req, res) => {

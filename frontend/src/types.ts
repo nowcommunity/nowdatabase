@@ -8,7 +8,7 @@ export enum Role {
   ReadOnly = 7,
 }
 
-import { LocalityDetailsType } from '@/backendTypes'
+import { LocalityDetailsType } from '../src/backendTypes'
 
 export const calculateMeanHypsodonty = (locality: LocalityDetailsType) => {
   // Mean hypsodonty calculation has been made based on html/include/database.php line 2567 onwards

@@ -3,7 +3,7 @@ import { logger } from './logger'
 import { PrismaClient as NowClient } from '../../prisma/generated/now_test_client'
 import { PrismaClient as LogClient } from '../../prisma/generated/now_log_test_client'
 import mariadb from 'mariadb'
-import { MARIADB_HOST, MARIADB_PASSWORD, DB_CONNECTION_LIMIT } from './config'
+import { MARIADB_HOST, MARIADB_PASSWORD, DB_CONNECTION_LIMIT, MARIADB_USER } from './config'
 
 export const logDb = new LogClient()
 export const nowDb = new NowClient()
@@ -11,7 +11,7 @@ export const nowDb = new NowClient()
 export const pool = mariadb.createPool({
   host: MARIADB_HOST,
   password: MARIADB_PASSWORD,
-  user: 'now_test',
+  user: MARIADB_USER,
   connectionLimit: parseInt(DB_CONNECTION_LIMIT),
 })
 

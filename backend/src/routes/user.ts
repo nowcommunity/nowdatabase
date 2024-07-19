@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { Router } from 'express'
 import { sign } from 'jsonwebtoken'
-import { SECRET, LOGIN_VALID_SECONDS, USER_CREATION_SECRET } from '../utils/config'
+import { SECRET, LOGIN_VALID_SECONDS } from '../utils/config'
 import * as bcrypt from 'bcrypt'
 import { nowDb } from '../utils/db'
 import { getRole } from '../middlewares/authenticator'
@@ -68,9 +68,7 @@ const createPasswordHash = async (password: string) => {
 }
 
 router.post('/create', requireOneOf([Role.Admin]), async (req, res) => {
-  const { username, password, secret } = req.body
-
-  if (!secret || secret !== USER_CREATION_SECRET) throw Error('Wrong user creation secret')
+  const { username, password } = req.body
 
   const passwordHash = await createPasswordHash(password as string)
 
