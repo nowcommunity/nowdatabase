@@ -34,6 +34,7 @@ export const TableView = <T extends MRT_RowData>({
   selectorFn,
   url,
   title,
+  combinedExport,
 }: {
   title?: string
   data: T[] | undefined
@@ -42,6 +43,7 @@ export const TableView = <T extends MRT_RowData>({
   checkRowRestriction?: (row: T) => boolean
   selectorFn?: (id: T) => void
   url?: string
+  combinedExport?: (lids: number[]) => Promise<void>
 }) => {
   const location = useLocation()
   const { editRights } = usePageContext()
@@ -146,6 +148,22 @@ export const TableView = <T extends MRT_RowData>({
           </Box>
           <Divider sx={{ marginTop: '1rem' }} />
         </>
+      )}
+      {combinedExport && (
+        <Box sx={{ margin: '1em', maxWidth: '20em' }}>
+          <p>
+            Click here to export a list of the localities shown in the table combined with each species found in those
+            localities as a comma separated csv-file. Notice, that the export may take a while. It is recommended to
+            filter the table first. You can also export only the table data by clicking the download icon in the
+            right-top corner of the table.
+          </p>
+          <Button
+            variant="contained"
+            onClick={() => void combinedExport(table.getFilteredRowModel().rows.map(d => d.original.lid as number))}
+          >
+            Locality & Species export
+          </Button>
+        </Box>
       )}
       <MaterialReactTable table={table} />
     </Paper>

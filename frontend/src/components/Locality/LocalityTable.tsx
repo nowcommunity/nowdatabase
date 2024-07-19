@@ -1,11 +1,13 @@
 import { useMemo } from 'react'
 import { type MRT_ColumnDef } from 'material-react-table'
-import { useGetAllLocalitiesQuery } from '../../redux/localityReducer'
+import { useGetAllLocalitiesQuery, useGetLocalitySpeciesListMutation } from '../../redux/localityReducer'
 import { Locality } from '@/backendTypes'
 import { TableView } from '../TableView/TableView'
 
 export const LocalityTable = ({ selectorFn }: { selectorFn?: (newObject: Locality) => void }) => {
   const localitiesQuery = useGetAllLocalitiesQuery()
+  const [getLocalitySpeciesList] = useGetLocalitySpeciesListMutation()
+
   const columns = useMemo<MRT_ColumnDef<Locality>[]>(
     () => [
       {
@@ -33,6 +35,18 @@ export const LocalityTable = ({ selectorFn }: { selectorFn?: (newObject: Localit
     ],
     []
   )
+
+  const combinedExport = async (lids: number[]) => {
+    const result = await getLocalitySpeciesList(lids).unwrap()
+    const dataString = result.map(row => (row as unknown[]).join(',')).join('\n')
+    const blob = new Blob([dataString], { type: 'text/csv' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = 'localitiesWithSpecies.csv'
+    a.click()
+  }
+
   const checkRowRestriction = (row: Locality) => {
     return !!row.loc_status
   }
@@ -46,6 +60,7 @@ export const LocalityTable = ({ selectorFn }: { selectorFn?: (newObject: Localit
       columns={columns}
       data={localitiesQuery.data}
       url="locality"
+      combinedExport={combinedExport}
     />
   )
 }

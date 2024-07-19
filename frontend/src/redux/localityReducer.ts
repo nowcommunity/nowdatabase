@@ -15,6 +15,13 @@ const localitiesApi = api.injectEndpoints({
       }),
       providesTags: result => (result ? [{ type: 'locality', id: result.lid }] : []),
     }),
+    getLocalitySpeciesList: builder.mutation<unknown[], number[]>({
+      query: (lids: number[]) => ({
+        url: `/locality/localitySpecies/`,
+        body: { lids },
+        method: 'POST',
+      }),
+    }),
     editLocality: builder.mutation<{ id: number }, EditDataType<LocalityDetailsType>>({
       query: locality => ({
         url: `/locality/`,
@@ -26,4 +33,9 @@ const localitiesApi = api.injectEndpoints({
   }),
 })
 
-export const { useGetAllLocalitiesQuery, useGetLocalityDetailsQuery, useEditLocalityMutation } = localitiesApi
+export const {
+  useGetAllLocalitiesQuery,
+  useGetLocalityDetailsQuery,
+  useEditLocalityMutation,
+  useGetLocalitySpeciesListMutation,
+} = localitiesApi

@@ -4,8 +4,136 @@ import Prisma from '../../prisma/generated/now_test_client'
 import { validateLocality } from '../../../frontend/src/validators/locality'
 import { ValidationObject } from '../../../frontend/src/validators/validator'
 import { fixBigInt } from '../utils/common'
-import { Role } from '../../../frontend/src/types'
+import { Role, calculateMeanHypsodonty } from '../../../frontend/src/types'
 import { AccessError } from '../middlewares/authorizer'
+
+export const getLocalitySpeciesList = async (lids: number[], user: User) => {
+  // Get localities separately with getAllLocalities to know which localities user has access to.
+  // Unoptimal, if it's slow try a different way.
+  const localityList = await getAllLocalities(user)
+
+  const lidsSet = new Set(lids)
+  const premittedLids = localityList.filter(loc => lidsSet.has(loc.lid)).map(loc => loc.lid)
+
+  const localitySpecies = await nowDb.now_loc.findMany({
+    select: {
+      lid: true,
+      loc_name: true,
+      dms_lat: true,
+      dms_long: true,
+      dec_lat: true,
+      dec_long: true,
+      altitude: true,
+      max_age: true,
+      bfa_max: true,
+      bfa_max_abs: true,
+      frac_max: true,
+      min_age: true,
+      bfa_min: true,
+      bfa_min_abs: true,
+      frac_min: true,
+      chron: true,
+      age_comm: true,
+      basin: true,
+      subbasin: true,
+      country: true,
+      state: true,
+      county: true,
+      appr_num_spm: true,
+      gen_loc: true,
+      now_syn_loc: true,
+      estimate_precip: true,
+      estimate_npp: true,
+      pers_woody_cover: true,
+      pers_pollen_nap: true,
+      pers_pollen_other: true,
+      now_ls: {
+        include: { com_species: true },
+      },
+    },
+    where: {
+      lid: {
+        in: premittedLids,
+      },
+    },
+  })
+
+  // TODO calc mean hypsodonty & add title
+
+  const localityTitles = [
+    'lid',
+    'loc_name',
+    'dms_lat',
+    'dms_long',
+    'dec_lat',
+    'dec_long',
+    'altitude',
+    'max_age',
+    'bfa_max',
+    'bfa_max_abs',
+    'frac_max',
+    'min_age',
+    'bfa_min',
+    'bfa_min_abs',
+    'frac_min',
+    'chron',
+    'age_comm',
+    'basin',
+    'subbasin',
+    'country',
+    'state',
+    'county',
+    'appr_num_spm',
+    'gen_loc',
+    'now_syn_loc',
+    'estimate_precip',
+    'estimate_npp',
+    'pers_woody_cover',
+    'pers_pollen_nap',
+    'pers_pollen_other',
+    'mean hypsodonty',
+  ]
+
+  const formatValue = (value: string | number | boolean | null | object | bigint) => {
+    if (Array.isArray(value)) return `"${value.map((value: { synonym: string }) => value.synonym).join(', ')}"`
+    if (typeof value === 'object' && value !== null)
+      throw new Error('Internal error: Unexpected non-array object in export data')
+    if (typeof value === 'bigint') return Number(BigInt)
+    return `"${value}"`
+  }
+
+  const speciesTitles = Object.keys(nowDb.com_species.fields)
+  const lsTitles = Object.keys(nowDb.now_ls.fields)
+
+  const titleRow = [...localityTitles, ...speciesTitles, ...lsTitles]
+
+  const data = localitySpecies.flatMap(localityWithSpecies => {
+    const { now_ls, ...locality } = localityWithSpecies
+    const meanHypsodonty = calculateMeanHypsodonty(localityWithSpecies as unknown as LocalityDetailsType)
+    const speciesList =
+      now_ls.length > 0
+        ? now_ls.map(ls => {
+            const { com_species, ...nowLs } = ls
+            return [
+              ...Object.values(locality).map(value => formatValue(value)),
+              meanHypsodonty,
+              ...Object.values(com_species).map(value => formatValue(value)),
+              ...Object.values(nowLs).map(value => formatValue(value)),
+            ]
+          })
+        : [
+            [
+              ...Object.values(locality).map(value => formatValue(value)),
+              meanHypsodonty,
+              ...speciesTitles.map(() => ''),
+              ...lsTitles.map(() => ''),
+            ],
+          ]
+    return speciesList
+  })
+
+  return [titleRow, ...data]
+}
 
 const getIdsOfUsersProjects = async (user: User) => {
   const usersProjects = await nowDb.now_proj_people.findMany({
@@ -16,10 +144,25 @@ const getIdsOfUsersProjects = async (user: User) => {
   return new Set(usersProjects.map(({ pid }) => pid))
 }
 
-export const getAllLocalities = async (showAll: boolean, user?: User) => {
-  const removeProjects: (item: { now_plr: unknown }) => unknown = item => {
+type LocalityListType = {
+  lid: number
+  bfa_max: string | null
+  bfa_min: string | null
+  loc_name: string
+  max_age: number
+  min_age: number
+  country: string | null
+  loc_status: boolean | null
+  now_plr: {
+    pid: number
+  }[]
+}
+
+export const getAllLocalities = async (user?: User) => {
+  const showAll = user && [Role.Admin, Role.EditUnrestricted].includes(user.role)
+  const removeProjects: (loc: LocalityListType) => Omit<LocalityListType, 'now_plr'> = loc => {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { now_plr, ...rest } = item
+    const { now_plr, ...rest } = loc
     return rest
   }
 

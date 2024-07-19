@@ -25,7 +25,7 @@ export const NavBar = () => {
   const handleClose = () => {
     setAnchorEl(null)
   }
-
+  const linkFontSize = 18
   const pages: LinkDefinition[] = [
     { title: 'Localities', url: '/locality' },
     { title: 'Species', url: '/species' },
@@ -73,7 +73,9 @@ export const NavBar = () => {
             onClick={handleClick}
             sx={{ color: 'white', paddingTop: '6px', paddingBottom: '6px', paddingLeft: '16px', paddingRight: '16px' }}
           >
-            <Typography textAlign="center">{link.title}</Typography>
+            <Typography textAlign="center" fontSize={linkFontSize}>
+              {link.title}
+            </Typography>
           </Box>
           <Menu
             id={`${link.url}-menu`}
@@ -103,7 +105,9 @@ export const NavBar = () => {
     }
     return (
       <MenuItem key={`${link.url}-menuitem`} component={Link} to={link.url} style={{ display: 'inline-block' }}>
-        <Typography textAlign="center">{link.title}</Typography>
+        <Typography textAlign="center" fontSize={linkFontSize}>
+          {link.title}
+        </Typography>
       </MenuItem>
     )
   }
