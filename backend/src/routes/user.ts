@@ -68,16 +68,24 @@ const createPasswordHash = async (password: string) => {
 }
 
 router.post('/create', async (req, res) => {
-  const { username, password, secret } = req.body
+  const { username, password, initials, role, secret } = req.body
 
   if ((!req.user || req.user?.role !== Role.Admin) && secret !== SECRET) throw new AccessError()
 
   const passwordHash = await createPasswordHash(password as string)
 
-  await nowDb.com_users.create({
+  const createdUser = await nowDb.com_users.create({
     data: {
       user_name: username as string,
       newpassword: passwordHash,
+      now_user_group: role,
+    },
+  })
+
+  await nowDb.com_people.create({
+    data: {
+      initials,
+      user_id: createdUser.user_id,
     },
   })
 
