@@ -67,8 +67,10 @@ const createPasswordHash = async (password: string) => {
   return await bcrypt.hash(password, saltRounds)
 }
 
-router.post('/create', requireOneOf([Role.Admin]), async (req, res) => {
-  const { username, password } = req.body
+router.post('/create', async (req, res) => {
+  const { username, password, secret } = req.body
+
+  if ((!req.user || req.user?.role !== Role.Admin) && secret !== SECRET) throw new AccessError()
 
   const passwordHash = await createPasswordHash(password as string)
 
@@ -117,5 +119,7 @@ router.put('/password', async (req, res) => {
   await nowDb.com_users.update({ where: { user_id: userId }, data: { newpassword: passwordHash } })
   return res.status(200).send()
 })
+
+router.post('/create')
 
 export default router
