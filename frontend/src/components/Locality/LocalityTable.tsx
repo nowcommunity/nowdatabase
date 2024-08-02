@@ -72,6 +72,7 @@ export const LocalityTable = ({ selectorFn }: { selectorFn?: (newObject: Localit
       data={localitiesQuery.data}
       url="locality"
       combinedExport={combinedExport}
+      exportIsLoading={isLoading}
     />
   )
 }

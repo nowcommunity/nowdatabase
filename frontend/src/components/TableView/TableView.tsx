@@ -35,6 +35,7 @@ export const TableView = <T extends MRT_RowData>({
   url,
   title,
   combinedExport,
+  exportIsLoading,
 }: {
   title?: string
   data: T[] | undefined
@@ -44,6 +45,7 @@ export const TableView = <T extends MRT_RowData>({
   selectorFn?: (id: T) => void
   url?: string
   combinedExport?: (lids: number[]) => Promise<void>
+  exportIsLoading?: boolean
 }) => {
   const location = useLocation()
   const { editRights } = usePageContext()
@@ -157,12 +159,16 @@ export const TableView = <T extends MRT_RowData>({
             filter the table first. You can also export only the table data by clicking the download icon in the
             right-top corner of the table.
           </p>
-          <Button
-            variant="contained"
-            onClick={() => void combinedExport(table.getFilteredRowModel().rows.map(d => d.original.lid as number))}
-          >
-            Locality & Species export
-          </Button>
+          <Box sx={{ display: 'flex', gap: '0.4em' }}>
+            <Button
+              variant="contained"
+              disabled={exportIsLoading}
+              onClick={() => void combinedExport(table.getFilteredRowModel().rows.map(d => d.original.lid as number))}
+            >
+              Locality & Species export
+            </Button>
+            {exportIsLoading && <CircularProgress />}
+          </Box>
         </Box>
       )}
       <MaterialReactTable table={table} />
