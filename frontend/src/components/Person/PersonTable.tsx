@@ -49,6 +49,15 @@ export const PersonTable = ({ selectorFn }: { selectorFn?: (id: PersonDetailsTyp
           person.user?.last_login ? formatLastLoginDate(person.user?.last_login) : 'None',
         header: 'Last login',
       },
+      {
+        accessorKey: 'initials',
+        header: 'Initials',
+      },
+
+      {
+        accessorKey: 'user.now_user_group',
+        header: 'User role',
+      },
     ],
     []
   )
