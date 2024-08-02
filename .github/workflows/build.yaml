@@ -5,7 +5,6 @@ env:
   BACKEND_IMAGE_NAME: nowdb-backend
   FRONTEND_IMAGE_NAME: nowdb-frontend
 
-
 jobs:
   push_backend:
     runs-on: ubuntu-latest
@@ -46,12 +45,9 @@ jobs:
       contents: read
     steps:
       - uses: actions/checkout@v4
-      
+
       - name: Build image
-        env: 
-          VITE_BACKEND_URL: https://nowdatabase-backend-nowdatabase.ext.ocp-prod-0.k8s.it.helsinki.fi/
-          VITE_RUNNING_ENV: prod
-        run: docker build frontend --tag $FRONTEND_IMAGE_NAME --label "runnumber=${GITHUB_RUN_ID}"
+        run: docker build frontend --tag $FRONTEND_IMAGE_NAME --label "runnumber=${GITHUB_RUN_ID} --build-arg BACKEND_URL=${{ vars.BACKEND_URL }} --build-arg RUNNING_ENV=prod"
 
       - name: Log in to registry
         run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
