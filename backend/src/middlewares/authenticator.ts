@@ -11,7 +11,7 @@ import { Role } from '../../../frontend/src/types'
 declare module 'express-serve-static-core' {
   interface Request {
     token?: string | null
-    user: User
+    user?: User
   }
 }
 

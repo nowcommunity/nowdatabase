@@ -7,7 +7,7 @@ import { fixBigInt } from '../utils/common'
 import { Role, calculateMeanHypsodonty } from '../../../frontend/src/types'
 import { AccessError } from '../middlewares/authorizer'
 
-export const getLocalitySpeciesList = async (lids: number[], user: User) => {
+export const getLocalitySpeciesList = async (lids: number[], user: User | undefined) => {
   // Get localities separately with getAllLocalities to know which localities user has access to.
   // Unoptimal, if it's slow try a different way.
   const localityList = await getAllLocalities(user)
@@ -248,10 +248,7 @@ export const getLocalityDetails = async (id: number, user: User | undefined) => 
     if (!user) throw new AccessError()
     if (![Role.Admin, Role.EditUnrestricted].includes(user.role)) {
       const usersProjects = await getIdsOfUsersProjects(user)
-      if (!result.now_plr.find(proj => usersProjects.has(proj.pid)))
-        throw new AccessError(
-          'The requested locality is in draft status and the user has no required rights or project association to it.'
-        )
+      if (!result.now_plr.find(proj => usersProjects.has(proj.pid))) throw new AccessError()
     }
   }
 
