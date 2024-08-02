@@ -49,8 +49,8 @@ jobs:
       
       - name: Build image
         env: 
-          VITE_BACKEND_URL: ${{ secrets.BACKEND_URL }}
-
+          VITE_BACKEND_URL: https://nowdatabase-backend-nowdatabase.ext.ocp-prod-0.k8s.it.helsinki.fi/
+          VITE_RUNNING_ENV: prod
         run: docker build frontend --tag $FRONTEND_IMAGE_NAME --label "runnumber=${GITHUB_RUN_ID}"
 
       - name: Log in to registry
