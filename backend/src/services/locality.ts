@@ -99,6 +99,7 @@ export const getLocalitySpeciesList = async (lids: number[], user: User) => {
     if (typeof value === 'object' && value !== null)
       throw new Error('Internal error: Unexpected non-array object in export data')
     if (typeof value === 'bigint') return Number(BigInt)
+    if (value === null) return `""`
     return `"${value}"`
   }
 
