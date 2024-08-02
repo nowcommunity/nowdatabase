@@ -55,6 +55,7 @@ app.use('/project', projectRouter)
 app.use('/museum', museumRouter)
 app.use('/sedimentary-structure', sedimentaryStructureRouter)
 app.use(errorHandler)
+
 app.listen(PORT, async () => {
   logger.info(`Server running on port ${PORT} in "${RUNNING_ENV}"-mode`)
   if (RUNNING_ENV === 'dev') {
