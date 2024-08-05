@@ -33,7 +33,7 @@ app.use(cors())
 app.use(compression())
 app.use(responseLogger)
 
-if (!ENABLE_WRITE || RUNNING_ENV === 'dev') {
+if (!ENABLE_WRITE && RUNNING_ENV !== 'dev') {
   app.use(blockWriteRequests)
 }
 
