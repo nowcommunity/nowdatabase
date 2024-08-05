@@ -54,7 +54,7 @@ export const ArchaeologyTab = () => {
   const archaeology = [
     [
       'Hominin skeletal remains',
-      data.now_ls.find(({ com_species }) => hominins.includes(com_species.genus_name)) ? 'Yes' : 'No',
+      data.now_ls.find(({ com_species }) => hominins.includes(com_species.genus_name.toLowerCase())) ? 'Yes' : 'No',
     ],
     [
       'Stone tool cut marks on bones',
