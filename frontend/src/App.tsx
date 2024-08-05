@@ -14,11 +14,8 @@ import {
   timeUnitPage,
 } from './components/pages'
 import { Notification, NotificationContextProvider } from './components/Notification'
-import { ENV } from './util/config'
 
 const App = () => {
-  // eslint-disable-next-line no-console
-  console.log('Env: ', ENV)
   return (
     <BrowserRouter>
       <NotificationContextProvider>

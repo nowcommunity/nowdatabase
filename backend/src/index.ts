@@ -57,7 +57,7 @@ app.use('/sedimentary-structure', sedimentaryStructureRouter)
 app.use(errorHandler)
 
 app.listen(PORT, async () => {
-  logger.info(`Server running on port ${PORT} in "${RUNNING_ENV}"-mode`)
+  logger.info(`Server running on port ${PORT} in "${RUNNING_ENV}"-mode.`)
   if (RUNNING_ENV === 'dev') {
     await testDbConnection()
     logger.info('Creating test-users...')
