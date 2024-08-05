@@ -4,7 +4,7 @@ import { ArrayFrame } from '@/components/DetailView/common/tabLayoutHelpers'
 import { useDetailContext } from '@/components/DetailView/Context/DetailContext'
 
 export const ArchaeologyTab = () => {
-  const { dropdown, radioSelection } = useDetailContext<LocalityDetailsType>()
+  const { dropdown, radioSelection, data } = useDetailContext<LocalityDetailsType>()
 
   const technologicalModeOptions = [
     emptyOption,
@@ -41,8 +41,21 @@ export const ArchaeologyTab = () => {
     { display: 'Tabun B', value: 'tabun_b' },
   ]
 
+  const hominins = [
+    'sahelanthropus',
+    'orrorin',
+    'ardipithecus',
+    'kenyanthropus',
+    'australopithecus',
+    'paranthropus',
+    'homo',
+  ]
+
   const archaeology = [
-    ['Hominin skeletal remains', 'Not implemented yet'],
+    [
+      'Hominin skeletal remains',
+      data.now_ls.find(({ com_species }) => hominins.includes(com_species.genus_name)) ? 'Yes' : 'No',
+    ],
     [
       'Stone tool cut marks on bones',
       radioSelection(
