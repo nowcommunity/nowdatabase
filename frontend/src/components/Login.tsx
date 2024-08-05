@@ -1,7 +1,7 @@
 import { useState, ChangeEvent, FormEvent, useEffect } from 'react'
 import { useTryLoginMutation, setUser } from '../redux/userReducer'
 import { useDispatch } from 'react-redux'
-import { Box, Button, CircularProgress, Container, Stack, TextField, Typography } from '@mui/material'
+import { Box, Button, CircularProgress, Container, Stack, TextField } from '@mui/material'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { api } from '../redux/api'
 import { useNotify } from '@/hooks/notification'
@@ -11,7 +11,7 @@ export const Login = () => {
   const [password, setPassword] = useState('')
   const [usernameError, setUsernameError] = useState('')
   const [passwordError, setPasswordError] = useState('')
-  const [loginMutation, { data, isLoading, isError }] = useTryLoginMutation()
+  const [loginMutation, { data, isLoading }] = useTryLoginMutation()
   const dispatch = useDispatch()
   const navigate = useNavigate()
   const location = useLocation()
@@ -39,44 +39,38 @@ export const Login = () => {
     }
     setUsernameError('')
     setPasswordError('')
-    const result = await loginMutation({ username, password }).unwrap()
+    try {
+      const result = await loginMutation({ username, password }).unwrap()
+      notify('Logged in!')
+      dispatch(setUser(result))
 
-    if (!result) {
-      notify('Login unsuccessful', 'error')
-      return
-    }
-    notify('Logged in!')
-    dispatch(setUser(result))
-
-    // Reset api cache, so that we won't show guest data (which would have omitted items) to a logged user
-    dispatch(api.util.resetApiState())
-    if (result.isFirstLogin) {
-      navigate(`/person/user-page`)
-    } else {
-      navigate('/')
+      // Reset api cache, so that we won't show guest data (which could have omitted items) to a logged user
+      dispatch(api.util.resetApiState())
+      if (result.isFirstLogin) {
+        navigate(`/person/user-page`)
+      } else {
+        navigate('/')
+      }
+    } catch (e: unknown) {
+      if (e && typeof e === 'object' && 'status' in e && e.status === 403) {
+        notify('Login unsuccessful. Please check credentials.', 'error')
+        return
+      }
+      notify('Login unsuccessful for unknown reason', 'error')
     }
   }
 
   return (
     <Container style={{ alignContent: 'center' }} maxWidth="sm">
       <Box>
-        {loginHadExpired ? (
-          <p style={{ color: 'darkorange', fontWeight: 'bold', fontSize: 28 }}>
-            Your login expired. Please login again.
-          </p>
-        ) : (
-          <>
-            <p style={{ fontSize: 20 }}>
-              <b>Welcome!</b> The users from the old Now Database application work here. If you are logging in this new
-              version for the first time, you can use your password of the old application.
-            </p>
-            <p style={{ fontSize: 20 }}>
-              However, upon first login, <b>please change your password</b> in this application. After changing it, the
-              new password will be used for this new version, but the{' '}
-              <b>old version will still work with your old password</b>.
-            </p>
-          </>
-        )}
+        <p style={{ fontSize: 20 }}>
+          <b>Welcome!</b> The users from the old Now Database application work here. If you are logging in this new
+          version for the first time, you can use your password of the old application.
+        </p>
+        <p style={{ fontSize: 20 }}>
+          However, upon first login, <b>please change your password</b> in this application. After changing it, the new
+          password will be used for this new version, but the <b>old version will still work with your old password</b>.
+        </p>
       </Box>
       <form onSubmit={event => void login(event)}>
         <Stack rowGap="1em">
@@ -105,11 +99,6 @@ export const Login = () => {
           <Button variant="contained" type="submit" data-cy="login-button" size="large" style={{ fontSize: '1.4em' }}>
             Login
           </Button>
-          <Box>
-            <Typography color="red" align="center">
-              {isError && 'Login failed. Please check username and password.'}
-            </Typography>
-          </Box>
         </Stack>
       </form>
       {(isLoading || data) && <CircularProgress style={{ marginLeft: '1em' }} />}

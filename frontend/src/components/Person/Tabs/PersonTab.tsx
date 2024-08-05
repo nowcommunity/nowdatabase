@@ -45,7 +45,6 @@ export const PersonTab = () => {
         <Grouped title="Change password" style={{ padding: '1em' }}>
           {currentUser.isFirstLogin && (
             <Box sx={{ margin: '0.2em', width: '40em' }}>
-              <p style={{ color: 'darkorange', fontWeight: 'bold', fontSize: 26 }}>Please change your password!</p>
               <p style={{ fontSize: 22 }}>
                 Changing your password here will only set the password for this new version. The old application will
                 still work with your old password.
