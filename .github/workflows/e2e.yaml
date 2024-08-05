@@ -6,6 +6,7 @@ on:
   push:
     paths-ignore:
       - '**/*.md'
+      - '.github/workflows/build.yaml'
 
 jobs:
   e2e_tests:
