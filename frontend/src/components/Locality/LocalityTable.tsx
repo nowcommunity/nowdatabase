@@ -28,10 +28,12 @@ export const LocalityTable = ({ selectorFn }: { selectorFn?: (newObject: Localit
       {
         accessorKey: 'max_age',
         header: 'Max age',
+        filterVariant: 'range',
       },
       {
         accessorKey: 'min_age',
         header: 'Min age',
+        filterVariant: 'range',
       },
     ],
     []

@@ -21,6 +21,7 @@ export const TimeBoundTable = ({ selectorFn }: { selectorFn?: (newTimeBound: Tim
       {
         accessorKey: 'age',
         header: 'Age',
+        filterVariant: 'range',
       },
       {
         accessorKey: 'b_comment',

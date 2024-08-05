@@ -21,10 +21,12 @@ export const TimeUnitTable = ({ selectorFn }: { selectorFn?: (newTimeUnit: TimeU
       {
         accessorKey: 'low_bound',
         header: 'Lower Bound',
+        filterVariant: 'range',
       },
       {
         accessorKey: 'up_bound',
         header: 'Upper Bound',
+        filterVariant: 'range',
       },
       {
         accessorKey: 'seq_name',
