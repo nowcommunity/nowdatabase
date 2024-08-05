@@ -16,7 +16,7 @@ export const FrontPage = () => {
       </p>
       <p>
         Have any questions or suggestions for improvement? Make an in GitHub by clicking &quot;New Issue&quot; (requires
-        a GitHub user): <a href="https://github.com/nowcommunity/nowdatabase/issue">GitHub Issues</a>
+        a GitHub user): <a href="https://github.com/nowcommunity/nowdatabase/issues">GitHub Issues</a>
       </p>
       <p>
         The old application: <a href="https://nowdatabase.luomus.fi/">https://nowdatabase.luomus.fi/</a>
