@@ -35,6 +35,11 @@ describe('Broadly test what different user rights see', () => {
       cy.contains('Bound')
       cy.contains('1.778')
     })
+    it('Email page opens', () => {
+      cy.get('div[id="/admin-menu-button"]').click()
+      cy.contains('Email').click()
+      cy.contains('Send email')
+    })
   })
   describe('Test unlogged visibility', () => {
     beforeEach('Ensure logout', () => {
@@ -52,6 +57,9 @@ describe('Broadly test what different user rights see', () => {
       cy.pageForbidden('/region')
       cy.pageForbidden('/time-bound')
       cy.pageForbidden('/project')
+    })
+    it('Does not see email page', () => {
+      cy.pageForbidden('/email')
     })
   })
 })

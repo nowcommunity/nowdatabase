@@ -33,6 +33,5 @@ describe('Open each page, table view and detail view, and check at least some co
     cy.get('[data-cy="detailview-button-langhian"]').first().click()
     cy.contains('Sequence')
     cy.contains('gcss')
-
   })
 })

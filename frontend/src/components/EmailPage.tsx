@@ -10,7 +10,7 @@ export const EmailPage = () => {
   const [message, setMessage] = useState('')
   const [recipients, setRecipients] = useState<string>('')
   const [sendEmailMutation, { isSuccess, isLoading, isError }] = useEmailMutation()
-  if (user.role !== Role.Admin) return <Box>This page is visible only to admins</Box>
+  if (user.role !== Role.Admin) return <Box>Your user is not authorized to view this page.</Box>
 
   const parseRecipients = () => {
     return recipients.replace(' ', '').replace('\n', ',').replace(',', '\n').split(';')
