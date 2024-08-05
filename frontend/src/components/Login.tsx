@@ -21,7 +21,9 @@ export const Login = () => {
 
   useEffect(() => {
     if (loginHadExpired) notify('Your login expired. Please log in again.')
-  }, [loginHadExpired, notify])
+    // Putting notify into this causes the notification to not disappear, so don't do it.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [location.pathname])
 
   const login = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
