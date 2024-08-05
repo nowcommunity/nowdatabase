@@ -26,6 +26,12 @@ export const NOW_DB_NAME = process.env.NOW_DB_NAME as string
 export const LOG_DB_NAME = process.env.LOG_DB_NAME as string
 export const COORDINATOR = process.env.COORDINATOR as string
 
+// Email things: These will be undefined in dev mode.
+export const CONTACT_SMTP_HOST = process.env.CONTACT_SMTP_HOST
+export const CONTACT_FROM_NAME = process.env.CONTACT_FROM_NAME
+export const CONTACT_FROM_EMAIL = process.env.CONTACT_FROM_EMAIL
+export const CONTACT_SMTP_PORT = process.env.CONTACT_SMTP_PORT
+
 const requiredEnvs = {
   MARIADB_HOST,
   MARIADB_PASSWORD,

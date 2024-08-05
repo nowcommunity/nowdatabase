@@ -14,6 +14,7 @@ import refreshTokenRouter from './routes/refresh'
 import timeBoundRouter from './routes/timeBound'
 import timeUnitRouter from './routes/timeUnit'
 import userRouter from './routes/user'
+import emailRouter from './routes/email'
 import { responseLogger } from './middlewares/requestLogger'
 import compression from 'compression'
 import { logger } from './utils/logger'
@@ -54,6 +55,7 @@ app.use('/person', personRouter)
 app.use('/project', projectRouter)
 app.use('/museum', museumRouter)
 app.use('/sedimentary-structure', sedimentaryStructureRouter)
+app.use('/email', requireOneOf([Role.Admin]), emailRouter)
 app.use(errorHandler)
 
 app.listen(PORT, async () => {

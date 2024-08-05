@@ -14,6 +14,7 @@ import {
   timeUnitPage,
 } from './components/pages'
 import { Notification, NotificationContextProvider } from './components/Notification'
+import { EmailPage } from './components/EmailPage'
 
 const App = () => {
   return (
@@ -37,6 +38,7 @@ const App = () => {
                 <Route element={regionPage} path="/region/:id?" />
                 <Route element={personPage} path="/person/:id?" />
                 <Route element={projectPage} path="/project/:id?" />
+                <Route element={<EmailPage />} path="/email/" />
                 <Route element={<Login />} path="/login" />
                 <Route element={<FrontPage />} path="/" />
                 <Route element={<div>Page not found.</div>} path="*" />

@@ -40,6 +40,7 @@ export const NavBar = () => {
         { title: 'Regions', url: '/region' },
         { title: 'Projects', url: '/project' },
         { title: 'People', url: '/person' },
+        { title: 'Email', url: '/email' },
       ],
     },
   ]
