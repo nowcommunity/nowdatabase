@@ -12,9 +12,9 @@ COPY backend/prisma backend
 
 WORKDIR /usr/src/app/backend
 
-RUN npm ci
-
 COPY backend .
+
+RUN npm ci
 
 RUN npm run prisma
 
