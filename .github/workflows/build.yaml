@@ -15,7 +15,7 @@ env:
 
 jobs:
   push_backend:
-    if: github.event.label.name == 'push' && !contains(github.event.head_commit.message, '#no-deploy')
+    if: ${{ github.event_name == 'release' || (github.event_name == 'push' && contains(github.event.head_commit.message, '#no-deploy')) }}
     runs-on: ubuntu-latest
     permissions:
       packages: write
@@ -48,7 +48,7 @@ jobs:
           docker tag $BACKEND_IMAGE_NAME $IMAGE_ID:$VERSION
           docker push $IMAGE_ID:$VERSION
   push_frontend:
-    if: github.event.label.name == 'push' && !contains(github.event.head_commit.message, '#no-deploy')
+    if: ${{ github.event_name == 'release' || (github.event_name == 'push' && contains(github.event.head_commit.message, '#no-deploy')) }}
     runs-on: ubuntu-latest
     permissions:
       packages: write
