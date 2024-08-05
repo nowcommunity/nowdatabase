@@ -36,15 +36,11 @@ export const ProjectTable = ({ selectorFn }: { selectorFn?: (id: Project) => voi
     ],
     []
   )
-  const checkRowRestriction = () => {
-    return false
-  }
 
   return (
     <TableView<Project>
       title="Projects"
       selectorFn={selectorFn}
-      checkRowRestriction={checkRowRestriction}
       idFieldName="pid"
       columns={columns}
       data={projectQuery.data}

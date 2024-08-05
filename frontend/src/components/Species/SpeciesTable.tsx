@@ -62,15 +62,11 @@ export const SpeciesTable = ({ selectorFn }: { selectorFn?: (id: Species) => voi
     ],
     []
   )
-  const checkRowRestriction = (row: Species) => {
-    return !!row.sp_status
-  }
 
   return (
     <TableView<Species>
       title="Species"
       selectorFn={selectorFn}
-      checkRowRestriction={checkRowRestriction}
       idFieldName="species_id"
       columns={columns}
       data={speciesQuery.data}

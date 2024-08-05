@@ -30,15 +30,10 @@ export const TimeBoundTable = ({ selectorFn }: { selectorFn?: (newTimeBound: Tim
     ],
     []
   )
-  const checkRowRestriction = () => {
-    return false
-  }
-
   return (
     <TableView<TimeBound>
       title="Time bounds"
       selectorFn={selectorFn}
-      checkRowRestriction={checkRowRestriction}
       idFieldName="bid"
       columns={columns}
       data={time_boundQuery.data}

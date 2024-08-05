@@ -39,15 +39,11 @@ export const TimeUnitTable = ({ selectorFn }: { selectorFn?: (newTimeUnit: TimeU
     ],
     []
   )
-  const checkRowRestriction = () => {
-    return false
-  }
 
   return (
     <TableView<TimeUnit>
       title="Time units"
       selectorFn={selectorFn}
-      checkRowRestriction={checkRowRestriction}
       idFieldName="tu_name"
       columns={columns}
       data={time_unitQuery.data}

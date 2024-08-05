@@ -22,14 +22,10 @@ export const SequenceTable = ({ selectorFn }: { selectorFn?: (id: Sequence) => v
     ],
     []
   )
-  const checkRowRestriction = () => {
-    return false
-  }
 
   return (
     <TableView<Sequence>
       selectorFn={selectorFn}
-      checkRowRestriction={checkRowRestriction}
       idFieldName="sequence"
       columns={columns}
       data={sequenceQuery.data}

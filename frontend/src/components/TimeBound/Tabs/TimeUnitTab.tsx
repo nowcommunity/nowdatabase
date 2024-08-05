@@ -43,17 +43,6 @@ export const TimeUnitTab = () => {
       header: 'Comment',
     },
   ]
-  const checkRowRestriction = () => {
-    return false
-  }
 
-  return (
-    <TableView<TimeUnit>
-      checkRowRestriction={checkRowRestriction}
-      idFieldName="tu_name"
-      columns={columns}
-      data={timeUnitsData}
-      url="time-unit"
-    />
-  )
+  return <TableView<TimeUnit> idFieldName="tu_name" columns={columns} data={timeUnitsData} url="time-unit" />
 }
