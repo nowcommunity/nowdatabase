@@ -39,10 +39,13 @@ router.post(
       return res.status(400).json({ message: 'Emails already sent in last minute.' })
     }
     emailSent = new Date()
+    if (!CONTACT_FROM_NAME || !CONTACT_FROM_EMAIL || !CONTACT_SMTP_HOST || !CONTACT_SMTP_PORT) {
+      return res.status(500).json({ message: 'Server is missing configurations for sending emails.' })
+    }
     logger.info(`Sending ${recipients.length} emails...`)
     for (const recipient of recipients) {
       await transport.sendMail({
-        from: `"${CONTACT_FROM_NAME}" <${CONTACT_FROM_EMAIL}>`,
+        from: { name: CONTACT_FROM_NAME, address: CONTACT_FROM_EMAIL },
         to: recipient,
         subject: title,
         text: message,
