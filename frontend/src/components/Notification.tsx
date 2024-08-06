@@ -18,9 +18,14 @@ export const NotificationContextProvider = ({ children }: { children: ReactNode 
   const [message, setMessage] = useState('')
   const [severity, setSeverity] = useState<Severity | undefined>(undefined)
   const notify = (message: string, severity?: Severity) => {
-    setOpen(true)
-    setMessage(message)
-    setSeverity(severity)
+    setOpen(false)
+    /* If we don't first close the old one, the autoHideDuration timer will not reset
+    causing the new notification to show too short time. */
+    setTimeout(() => {
+      setOpen(true)
+      setMessage(message)
+      setSeverity(severity)
+    }, 200)
   }
   return (
     <NotificationContext.Provider value={{ open, setOpen, message, severity, notify }}>
