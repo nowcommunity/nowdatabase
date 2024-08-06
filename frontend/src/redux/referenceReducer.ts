@@ -22,7 +22,7 @@ const referencesApi = api.injectEndpoints({
     }),
     editReference: builder.mutation<ReferenceDetailsType, EditDataType<ReferenceDetailsType>>({
       query: reference => ({
-        url: `/reference/`,
+        url: `/reference`,
         method: 'PUT',
         body: { reference },
       }),

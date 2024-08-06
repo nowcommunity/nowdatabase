@@ -17,14 +17,14 @@ const localitiesApi = api.injectEndpoints({
     }),
     getLocalitySpeciesList: builder.mutation<unknown[], number[]>({
       query: (lids: number[]) => ({
-        url: `/locality-species/`,
+        url: `/locality-species`,
         body: { lids },
         method: 'POST',
       }),
     }),
     editLocality: builder.mutation<{ id: number }, EditDataType<LocalityDetailsType>>({
       query: locality => ({
-        url: `/locality/`,
+        url: `/locality`,
         method: 'PUT',
         body: { locality },
       }),

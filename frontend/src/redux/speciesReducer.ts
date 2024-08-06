@@ -17,7 +17,7 @@ const speciesApi = api.injectEndpoints({
     }),
     editSpecies: builder.mutation<SpeciesDetailsType, EditDataType<SpeciesDetailsType>>({
       query: species => ({
-        url: `/species/`,
+        url: `/species`,
         method: 'PUT',
         body: { species },
       }),

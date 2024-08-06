@@ -22,7 +22,7 @@ const timeunitsApi = api.injectEndpoints({
     }),
     editTimeUnit: builder.mutation<TimeUnitDetailsType, EditDataType<TimeUnitDetailsType>>({
       query: timeUnit => ({
-        url: `/time-unit/`,
+        url: `/time-unit`,
         method: 'PUT',
         body: { timeUnit },
       }),

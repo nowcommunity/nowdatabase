@@ -4,7 +4,7 @@ import { Middleware } from '../types'
 export const blockWriteRequests: Middleware = (req, res, next) => {
   const allowedRoutes = [
     '/user/login',
-    '/locality-species/',
+    '/locality-species',
     '/refreshToken',
     '/user/password',
     '/user/create',

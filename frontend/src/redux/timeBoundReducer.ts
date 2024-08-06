@@ -22,7 +22,7 @@ const timeboundsApi = api.injectEndpoints({
     }),
     editTimeBound: builder.mutation<TimeBoundDetailsType, EditDataType<TimeBoundDetailsType>>({
       query: timeBound => ({
-        url: `/time-bound/`,
+        url: `/time-bound`,
         method: 'PUT',
         body: { timeBound },
       }),
