@@ -32,6 +32,7 @@ const app = express()
 app.use(express.json({ limit: '50mb' }))
 app.use(cors())
 app.use(compression())
+
 app.use(responseLogger)
 
 if (!ENABLE_WRITE && RUNNING_ENV !== 'dev') {
