@@ -31,7 +31,7 @@ router.post(
     }
     if (!transport) {
       logger.info(
-        `Would have sent email with following data: ${JSON.stringify({ recipients, title, message }, null, 2)}`
+        `Would have sent email with following data: \n${JSON.stringify({ recipients, title, message }, null, 2)}`
       )
       return res.status(200).json()
     }

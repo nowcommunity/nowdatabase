@@ -23,6 +23,7 @@ router.get('/:id', async (req, res) => {
 router.put(
   '/',
   requireOneOf([Role.Admin, Role.EditRestricted, Role.EditUnrestricted]),
+  // TODO: Check if edit restricted has rights to the locality.
   async (req: Request<object, object, { locality: EditDataType<LocalityDetailsType> }>, res) => {
     const editedLocality = req.body.locality
     const validationErrors = validateEntireLocality(editedLocality)
