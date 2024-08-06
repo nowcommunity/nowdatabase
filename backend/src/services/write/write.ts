@@ -173,13 +173,12 @@ export const write: WriteFunction = async (data, tableName, updateOptions) => {
       await writeToLog(conn, writeList, tableName, updateEntry, userName)
     }
     await conn.commit()
+    await conn.end()
   } catch (e: unknown) {
     await conn.rollback()
     await conn.end()
     logger.error('Error in write')
     throw e
-  } finally {
-    await conn.end()
   }
   return result
 }
