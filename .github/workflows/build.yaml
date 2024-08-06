@@ -78,20 +78,20 @@ jobs:
           echo VERSION=$VERSION
           docker tag $FRONTEND_IMAGE_NAME $IMAGE_ID:$VERSION
           docker push $IMAGE_ID:$VERSION
-  delete_old_prod:
-    runs-on: ubuntu-latest
-    if: ${{ github.event_name == 'release' }}
-    steps:
-      - uses: actions/delete-package-versions@v5
-        with:
-          package-name: 'nowdb-frontend'
-          min-versions-to-keep: 5
-          package-type: 'container'
-      - uses: actions/delete-package-versions@v5
-        with:
-          package-name: 'nowdb-backend'
-          min-versions-to-keep: 5
-          package-type: 'container'
+  # delete_old_prod:
+  #   runs-on: ubuntu-latest
+  #   if: ${{ github.event_name == 'release' }}
+  #   steps:
+  #     - uses: actions/delete-package-versions@v5
+  #       with:
+  #         package-name: 'nowdb-frontend'
+  #         min-versions-to-keep: 5
+  #         package-type: 'container'
+  #     - uses: actions/delete-package-versions@v5
+  #       with:
+  #         package-name: 'nowdb-backend'
+  #         min-versions-to-keep: 5
+  #         package-type: 'container'
   delete_old_staging:
     runs-on: ubuntu-latest
     if: ${{ github.event_name == 'push' }}
