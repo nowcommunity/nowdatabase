@@ -35,7 +35,7 @@ router.post(
       )
       return res.status(200).json()
     }
-    if (emailSent && new Date().getTime() - emailSent.getTime() > 60000) {
+    if (emailSent && new Date().getTime() - emailSent.getTime() < 60000) {
       return res.status(400).json({ message: 'Emails already sent in last minute.' })
     }
     emailSent = new Date()
