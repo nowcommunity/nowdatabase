@@ -25,6 +25,13 @@ export const FrontPage = () => {
         Information about the database and NOW community:{' '}
         <a href="https://nowdatabase.org/">https://nowdatabase.org/</a>
       </p>
+      <h1>Feedback</h1>
+      <p>
+        <b>
+          <a href="https://forms.gle/Aj392QWov5QXBJfo7">Click here to provide feedback!</a>
+        </b>
+      </p>
+      <p>If you want a response, remember to write your email into the open text field.</p>
     </Box>
   )
 }
