@@ -13,6 +13,7 @@ export const pool = mariadb.createPool({
   password: MARIADB_PASSWORD,
   user: MARIADB_USER,
   connectionLimit: parseInt(DB_CONNECTION_LIMIT),
+  checkDuplicate: false,
 })
 
 export const testMariaDb = async () => {

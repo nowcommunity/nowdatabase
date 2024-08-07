@@ -1,11 +1,148 @@
-import { logDb, nowDb } from '../utils/db'
-import { EditDataType, LocalityDetailsType, User } from '../../../frontend/src/backendTypes'
+import { logDb, nowDb, pool } from '../utils/db'
+import { EditDataType, Locality, LocalityDetailsType, User } from '../../../frontend/src/backendTypes'
 import Prisma from '../../prisma/generated/now_test_client'
 import { validateLocality } from '../../../frontend/src/validators/locality'
 import { ValidationObject } from '../../../frontend/src/validators/validator'
 import { fixBigInt } from '../utils/common'
-import { Role, calculateMeanHypsodonty } from '../../../frontend/src/types'
+import { Role } from '../../../frontend/src/types'
 import { AccessError } from '../middlewares/authorizer'
+import { NOW_DB_NAME } from '../utils/config'
+
+const localityColumns = [
+  'lid',
+  'loc_name',
+  'dms_lat',
+  'dms_long',
+  'dec_lat',
+  'dec_long',
+  'altitude',
+  'max_age',
+  'bfa_max',
+  'bfa_max_abs',
+  'frac_max',
+  'min_age',
+  'bfa_min',
+  'bfa_min_abs',
+  'frac_min',
+  'chron',
+  'age_comm',
+  'basin',
+  'subbasin',
+  'country',
+  'state',
+  'county',
+  'appr_num_spm',
+  'gen_loc',
+  'estimate_precip',
+  'estimate_npp',
+  'pers_woody_cover',
+  'pers_pollen_nap',
+  'pers_pollen_other',
+]
+
+const now_lsColumns = [
+  'nis',
+  'pct',
+  'quad',
+  'mni',
+  'qua',
+  'id_status',
+  'orig_entry',
+  'source_name',
+  'body_mass',
+  'mesowear',
+  'mw_or_high',
+  'mw_or_low',
+  'mw_cs_sharp',
+  'mw_cs_round',
+  'mw_cs_blunt',
+  'mw_scale_min',
+  'mw_scale_max',
+  'mw_value',
+  'microwear',
+  'dc13_mean',
+  'dc13_n',
+  'dc13_max',
+  'dc13_min',
+  'dc13_stdev',
+  'do18_mean',
+  'do18_n',
+  'do18_max',
+  'do18_min',
+  'do18_stdev',
+]
+
+const speciesColumns = [
+  'species_id',
+  'class_name',
+  'order_name',
+  'family_name',
+  'subclass_or_superorder_name',
+  'suborder_or_superfamily_name',
+  'subfamily_name',
+  'genus_name',
+  'species_name',
+  'unique_identifier',
+  'taxonomic_status',
+  'common_name',
+  'sp_author',
+  'strain',
+  'gene',
+  'taxon_status',
+  'diet1',
+  'diet2',
+  'diet3',
+  'diet_description',
+  'rel_fib',
+  'selectivity',
+  'digestion',
+  'feedinghab1',
+  'feedinghab2',
+  'shelterhab1',
+  'shelterhab2',
+  'locomo1',
+  'locomo2',
+  'locomo3',
+  'hunt_forage',
+  'body_mass',
+  'brain_mass',
+  'sv_length',
+  'activity',
+  'sd_size',
+  'sd_display',
+  'tshm',
+  'symph_mob',
+  'relative_blade_length',
+  'tht',
+  'crowntype',
+  'microwear',
+  'horizodonty',
+  'cusp_shape',
+  'cusp_count_buccal',
+  'cusp_count_lingual',
+  'loph_count_lon',
+  'loph_count_trs',
+  'fct_al',
+  'fct_ol',
+  'fct_sf',
+  'fct_ot',
+  'fct_cm',
+  'mesowear',
+  'mw_or_high',
+  'mw_or_low',
+  'mw_cs_sharp',
+  'mw_cs_round',
+  'mw_cs_blunt',
+  'mw_scale_min',
+  'mw_scale_max',
+  'mw_value',
+  'pop_struc',
+  'sp_status',
+  'used_morph',
+  'used_now',
+  'used_gene',
+  'sp_comment',
+]
 
 export const getLocalitySpeciesList = async (lids: number[], user: User | undefined) => {
   // Get localities separately with getAllLocalities to know which localities user has access to.
@@ -13,86 +150,25 @@ export const getLocalitySpeciesList = async (lids: number[], user: User | undefi
   const localityList = await getAllLocalities(user)
 
   const lidsSet = new Set(lids)
-  const premittedLids = localityList.filter(loc => lidsSet.has(loc.lid)).map(loc => loc.lid)
+  const permittedLids = localityList.filter(loc => lidsSet.has(loc.lid)).map(loc => loc.lid)
 
-  const localitySpecies = await nowDb.now_loc.findMany({
-    select: {
-      lid: true,
-      loc_name: true,
-      dms_lat: true,
-      dms_long: true,
-      dec_lat: true,
-      dec_long: true,
-      altitude: true,
-      max_age: true,
-      bfa_max: true,
-      bfa_max_abs: true,
-      frac_max: true,
-      min_age: true,
-      bfa_min: true,
-      bfa_min_abs: true,
-      frac_min: true,
-      chron: true,
-      age_comm: true,
-      basin: true,
-      subbasin: true,
-      country: true,
-      state: true,
-      county: true,
-      appr_num_spm: true,
-      gen_loc: true,
-      now_syn_loc: true,
-      estimate_precip: true,
-      estimate_npp: true,
-      pers_woody_cover: true,
-      pers_pollen_nap: true,
-      pers_pollen_other: true,
-      now_ls: {
-        include: { com_species: true },
-      },
-    },
-    where: {
-      lid: {
-        in: premittedLids,
-      },
-    },
-  })
+  const conn = await pool.getConnection()
+  const columns = [
+    ...localityColumns.map(col => `${NOW_DB_NAME}.now_loc.${col} as ${col}`),
+    ...now_lsColumns.map(col => `${NOW_DB_NAME}.now_ls.${col} as ${col}`),
+    ...speciesColumns.map(col => `${NOW_DB_NAME}.com_species.${col} as ${col}`),
+  ].join(', ')
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+  const localitySpecies: Locality[] = await conn.query(
+    `
+    SELECT ${columns} FROM ${NOW_DB_NAME}.now_loc JOIN ${NOW_DB_NAME}.now_ls ON ${NOW_DB_NAME}.now_loc.lid = ${NOW_DB_NAME}.now_ls.lid JOIN ${NOW_DB_NAME}.com_species ON ${NOW_DB_NAME}.now_ls.species_id = ${NOW_DB_NAME}.com_species.species_id WHERE ${NOW_DB_NAME}.now_loc.lid IN (?)
+    `,
+    [permittedLids]
+  )
 
-  // TODO calc mean hypsodonty & add title
+  await conn.end()
 
-  const localityTitles = [
-    'lid',
-    'loc_name',
-    'dms_lat',
-    'dms_long',
-    'dec_lat',
-    'dec_long',
-    'altitude',
-    'max_age',
-    'bfa_max',
-    'bfa_max_abs',
-    'frac_max',
-    'min_age',
-    'bfa_min',
-    'bfa_min_abs',
-    'frac_min',
-    'chron',
-    'age_comm',
-    'basin',
-    'subbasin',
-    'country',
-    'state',
-    'county',
-    'appr_num_spm',
-    'gen_loc',
-    'now_syn_loc',
-    'estimate_precip',
-    'estimate_npp',
-    'pers_woody_cover',
-    'pers_pollen_nap',
-    'pers_pollen_other',
-    'mean hypsodonty',
-  ]
+  const localityTitles = [...localityColumns, ...now_lsColumns, ...speciesColumns]
 
   const formatValue = (value: string | number | boolean | null | object | bigint) => {
     if (Array.isArray(value)) return `"${value.map((value: { synonym: string }) => value.synonym).join(', ')}"`
@@ -105,35 +181,10 @@ export const getLocalitySpeciesList = async (lids: number[], user: User | undefi
 
   const speciesTitles = Object.keys(nowDb.com_species.fields)
   const lsTitles = Object.keys(nowDb.now_ls.fields)
+  const dataRows = localitySpecies.map(obj => Object.values(obj).map(value => formatValue(value as string))) as unknown
 
   const titleRow = [...localityTitles, ...speciesTitles, ...lsTitles]
-
-  const data = localitySpecies.flatMap(localityWithSpecies => {
-    const { now_ls, ...locality } = localityWithSpecies
-    const meanHypsodonty = calculateMeanHypsodonty(localityWithSpecies as unknown as LocalityDetailsType)
-    const speciesList =
-      now_ls.length > 0
-        ? now_ls.map(ls => {
-            const { com_species, ...nowLs } = ls
-            return [
-              ...Object.values(locality).map(value => formatValue(value)),
-              meanHypsodonty,
-              ...Object.values(com_species).map(value => formatValue(value)),
-              ...Object.values(nowLs).map(value => formatValue(value)),
-            ]
-          })
-        : [
-            [
-              ...Object.values(locality).map(value => formatValue(value)),
-              meanHypsodonty,
-              ...speciesTitles.map(() => ''),
-              ...lsTitles.map(() => ''),
-            ],
-          ]
-    return speciesList
-  })
-
-  return [titleRow, ...data]
+  return [titleRow, ...(dataRows as string[])]
 }
 
 const getIdsOfUsersProjects = async (user: User) => {
