@@ -155,15 +155,19 @@ export const TableView = <T extends MRT_RowData>({
         <Box sx={{ margin: '1em', maxWidth: '20em' }}>
           <p>
             Click here to export a list of the localities shown in the table combined with each species found in those
-            localities as a comma separated csv-file. Notice, that the export may take a while. It is recommended to
-            filter the table first. You can also export only the table data by clicking the download icon in the
-            right-top corner of the table.
+            localities as a comma separated csv-file. Notice, that the export may take a while. The combined
+            locality-species export is currently always sorted by the id&apos;s, but it only contains the localities
+            filtered in the table.{' '}
+          </p>
+          <p>
+            You can also export only the localities of the table by clicking the download icon in the right-top corner
+            of the table.
           </p>
           <Box sx={{ display: 'flex', gap: '0.4em' }}>
             <Button
               variant="contained"
               disabled={exportIsLoading}
-              onClick={() => void combinedExport(table.getFilteredRowModel().rows.map(d => d.original.lid as number))}
+              onClick={() => void combinedExport(table.getSortedRowModel().rows.map(d => d.original.lid as number))}
             >
               Locality & Species export
             </Button>
