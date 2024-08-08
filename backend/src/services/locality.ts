@@ -24,7 +24,6 @@ export const getLocalitySpeciesList = async (lids: number[], user: User | undefi
     ...speciesColumns.map(col => `${NOW_DB_NAME}.com_species.${col} as ${col}`),
   ].join(', ')
 
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   const localitySpecies: { [index: string]: string | number | null | bigint | boolean }[] = await conn.query(
     `
     SELECT ${columns} FROM ${NOW_DB_NAME}.now_loc JOIN ${NOW_DB_NAME}.now_ls ON ${NOW_DB_NAME}.now_loc.lid = ${NOW_DB_NAME}.now_ls.lid JOIN ${NOW_DB_NAME}.com_species ON ${NOW_DB_NAME}.now_ls.species_id = ${NOW_DB_NAME}.com_species.species_id WHERE ${NOW_DB_NAME}.now_loc.lid IN (?)
