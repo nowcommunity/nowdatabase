@@ -45,7 +45,7 @@ export const LocalityTable = ({ selectorFn }: { selectorFn?: (newObject: Localit
       return
     }
 
-    const limit = 999999
+    const limit = 4000
     if (lids.length > limit) {
       notify(`Please filter the table more. Current rows: ${lids.length}. Limit: ${limit}`, 'error')
       return
