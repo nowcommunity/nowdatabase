@@ -45,13 +45,13 @@ export const LocalityTable = ({ selectorFn }: { selectorFn?: (newObject: Localit
       return
     }
 
-    const limit = 4000
+    const limit = 99999999
     if (lids.length > limit) {
       notify(`Please filter the table more. Current rows: ${lids.length}. Limit: ${limit}`, 'error')
       return
     }
     const result = await getLocalitySpeciesList(lids).unwrap()
-    const dataString = result.map(row => (row as Array<unknown>).join(',')).join('\n')
+    const dataString = result.map(row => row.join(',')).join('\n')
     const blob = new Blob([dataString], { type: 'text/csv' })
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')

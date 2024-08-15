@@ -7,49 +7,61 @@ import { fixBigInt } from '../utils/common'
 import { Role } from '../../../frontend/src/types'
 import { AccessError } from '../middlewares/authorizer'
 import { NOW_DB_NAME } from '../utils/config'
-import { localityColumns, now_lsColumns, speciesColumns } from './combinedExportColumns'
+import { PoolConnection } from 'mariadb'
+
+const CHUNK_SIZE = 20000
+
+const getChunk = async (
+  conn: PoolConnection,
+  limit: number,
+  offset: number,
+  lids: number[],
+  includeDrafts: boolean
+) => {
+  const excludeDraftsString = includeDrafts
+    ? ''
+    : `AND (loc_status = 0 AND lid NOT IN (SELECT DISTINCT ${NOW_DB_NAME}.now_plr.lid FROM ${NOW_DB_NAME}.now_plr JOIN ${NOW_DB_NAME}.now_proj ON ${NOW_DB_NAME}.now_plr.pid = ${NOW_DB_NAME}.now_proj.pid WHERE ${NOW_DB_NAME}.now_proj.proj_records = 1))`
+  const result: { [index: string]: string | number | null | bigint | boolean }[] = await conn.query(
+    `
+    SELECT * FROM ${NOW_DB_NAME}.now_v_export_locsp WHERE lid IN (${lids.map(() => '?').join(', ')}) ${excludeDraftsString} ORDER BY loc_name LIMIT ${limit} OFFSET ${offset}
+    `,
+    [...lids]
+  )
+  return result
+}
+
+const formatValue = (val: unknown) => {
+  if (typeof val === 'bigint') return `"${Number(val)}"`
+  if (val === null) return `""`
+  return `"${val as string}"`
+}
+
+const getExportList = async (conn: PoolConnection, lids: number[], includeDrafts: boolean) => {
+  const chunks = []
+
+  let columnHeaders: null | string[] = null
+
+  for (let i = 0; ; i += 1) {
+    const chunk = await getChunk(conn, CHUNK_SIZE, i * CHUNK_SIZE, lids, includeDrafts)
+    if (chunk.length === 0) break
+
+    // Get column headers
+    if (!columnHeaders) columnHeaders = Object.keys(chunk[0])
+
+    chunks.push(...chunk.map(c => Object.values(c).map(val => formatValue(val))))
+  }
+  return [columnHeaders, ...chunks]
+}
 
 export const getLocalitySpeciesList = async (lids: number[], user: User | undefined) => {
-  // Get localities separately with getAllLocalities to know which localities user has access to.
-  // Unoptimal, if it's slow try a different way.
-  const localityList = await getAllLocalities(user)
-
-  const lidsSet = new Set(lids)
-  const permittedLids = localityList.filter(loc => lidsSet.has(loc.lid)).map(loc => loc.lid)
-
   const conn = await pool.getConnection()
-  const columns = [
-    ...localityColumns.map(col => `${NOW_DB_NAME}.now_loc.${col} as ${col}`),
-    ...now_lsColumns.map(col => `${NOW_DB_NAME}.now_ls.${col} as ${col}`),
-    ...speciesColumns.map(col => `${NOW_DB_NAME}.com_species.${col} as ${col}`),
-  ].join(', ')
-
-  const localitySpecies: { [index: string]: string | number | null | bigint | boolean }[] = await conn.query(
-    `
-    SELECT ${columns} FROM ${NOW_DB_NAME}.now_loc JOIN ${NOW_DB_NAME}.now_ls ON ${NOW_DB_NAME}.now_loc.lid = ${NOW_DB_NAME}.now_ls.lid JOIN ${NOW_DB_NAME}.com_species ON ${NOW_DB_NAME}.now_ls.species_id = ${NOW_DB_NAME}.com_species.species_id WHERE ${NOW_DB_NAME}.now_loc.lid IN (?)
-    `,
-    [permittedLids]
+  const exportList = await getExportList(
+    conn,
+    lids,
+    (user && [Role.Admin, Role.EditUnrestricted].includes(user.role)) || false
   )
-
   await conn.end()
-
-  const localityTitles = [...localityColumns, ...now_lsColumns, ...speciesColumns]
-
-  const formatValue = (value: string | number | boolean | null | object | bigint) => {
-    if (Array.isArray(value)) return `"${value.map((value: { synonym: string }) => value.synonym).join(', ')}"`
-    if (typeof value === 'object' && value !== null)
-      throw new Error('Internal error: Unexpected non-array object in export data')
-    if (typeof value === 'bigint') return Number(BigInt)
-    if (value === null) return `""`
-    return `"${value}"`
-  }
-
-  const speciesTitles = Object.keys(nowDb.com_species.fields)
-  const lsTitles = Object.keys(nowDb.now_ls.fields)
-  const dataRows = localitySpecies.map(obj => Object.values(obj).map(value => formatValue(value as string))) as unknown
-
-  const titleRow = [...localityTitles, ...speciesTitles, ...lsTitles]
-  return [titleRow, ...(dataRows as string[])]
+  return exportList
 }
 
 const getIdsOfUsersProjects = async (user: User) => {
