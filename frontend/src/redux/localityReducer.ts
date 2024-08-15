@@ -15,7 +15,7 @@ const localitiesApi = api.injectEndpoints({
       }),
       providesTags: result => (result ? [{ type: 'locality', id: result.lid }] : []),
     }),
-    getLocalitySpeciesList: builder.mutation<unknown[], number[]>({
+    getLocalitySpeciesList: builder.mutation<string[][], number[]>({
       query: (lids: number[]) => ({
         url: `/locality-species`,
         body: { lids },
