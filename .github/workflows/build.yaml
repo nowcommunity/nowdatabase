@@ -2,6 +2,7 @@ name: Build and deploy containers
 # Pushes to main will build containers with staging env's and push them as staging images, whereas release goes to production.
 on:
   release:
+    types: [published]
   push:
     branches:
       - main
