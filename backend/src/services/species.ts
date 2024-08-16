@@ -1,8 +1,6 @@
 import { logDb, nowDb } from '../utils/db'
 
-export const getAllSpecies = async (onlyPublic: boolean) => {
-  const where = onlyPublic ? { sp_status: false } : {}
-
+export const getAllSpecies = async () => {
   const result = await nowDb.com_species.findMany({
     select: {
       species_id: true,
@@ -17,7 +15,6 @@ export const getAllSpecies = async (onlyPublic: boolean) => {
       taxonomic_status: true,
       sp_status: true,
     },
-    where,
   })
 
   return result

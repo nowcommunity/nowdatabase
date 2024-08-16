@@ -6,9 +6,8 @@ import { write } from '../services/write/write'
 
 const router = Router()
 
-router.get('/all', async (req, res) => {
-  const onlyPublic = !req.user
-  const species = await getAllSpecies(onlyPublic)
+router.get('/all', async (_req, res) => {
+  const species = await getAllSpecies()
   return res.status(200).send(fixBigInt(species))
 })
 
