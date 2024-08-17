@@ -61,7 +61,21 @@ export const TableView = <T extends MRT_RowData>({
     const searchParams = new URLSearchParams(location.search)
     const stateFromUrl = searchParams.get(state)
     if (!stateFromUrl) return defaultState
-    return JSON.parse(stateFromUrl) as object
+    const res = JSON.parse(stateFromUrl) as object
+    if (state === 'columnfilters') {
+      // The range filters are written as "null" if they are empty because undefined is not valid JSON.
+      // This changes those to empty strings when loading the url to state.
+      return (res as MRT_ColumnFiltersState).map(columnFilter => {
+        if (Array.isArray(columnFilter.value)) {
+          return {
+            ...columnFilter,
+            value: columnFilter.value.map(val => (val === null ? '' : val) as unknown),
+          }
+        }
+        return columnFilter
+      })
+    }
+    return res
   }
 
   const table = useMaterialReactTable({
