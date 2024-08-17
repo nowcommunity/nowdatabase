@@ -4,7 +4,7 @@ on:
   pull_request:
     types: [opened, reopened]
   push:
-    tags-ignore:
+    branches:
       - '**'
     paths-ignore:
       - '**/*.md'
