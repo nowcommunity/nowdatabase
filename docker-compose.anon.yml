@@ -23,7 +23,7 @@ services:
         sh -c "cd /usr/src/app/backend && npm ci && npm run dev"
   db-anon:
     container_name: nowdb-db-anon
-    image: mariadb
+    image: mariadb:11.4.3
     env_file: .anon.env
     volumes:
       - ./test_data/:/docker-entrypoint-initdb.d
