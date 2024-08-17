@@ -1,4 +1,4 @@
-import { Box, IconButton } from '@mui/material'
+import { Box, Button } from '@mui/material'
 import {
   MRT_RowData,
   MRT_ShowHideColumnsButton,
@@ -6,7 +6,6 @@ import {
   MRT_ToggleFullScreenButton,
 } from 'material-react-table'
 import { mkConfig, generateCsv, download } from 'export-to-csv'
-import FileDownloadIcon from '@mui/icons-material/FileDownload'
 import { AcceptedData } from 'node_modules/export-to-csv/output/lib/types'
 
 export type ExportFn<T> = (data: T) => { [k: string]: AcceptedData }
@@ -41,8 +40,8 @@ export const renderCustomToolbar = <T extends MRT_RowData>({ table }: { table: M
   <Box>
     <MRT_ShowHideColumnsButton table={table} />
     <MRT_ToggleFullScreenButton table={table} />
-    <IconButton onClick={() => exportRows(table)}>
-      <FileDownloadIcon htmlColor="grey" />
-    </IconButton>
+    <Button onClick={() => exportRows(table)} variant="contained">
+      Export table
+    </Button>
   </Box>
 )
