@@ -1,10 +1,206 @@
 /*
   Common utility functions for processing saving actions
 */
+import { PoolConnection } from 'mariadb'
 import { EditDataType, ReferenceDetailsType } from '../../../../frontend/src/backendTypes'
-import { RUNNING_ENV } from '../../utils/config'
+import { COORDINATOR, RUNNING_ENV } from '../../utils/config'
 import { nowDb } from '../../utils/db'
 import { logger } from '../../utils/logger'
+import { createUpdateEntry, writeLogRows } from './updateAndLog'
+import { WriteContext } from './write'
+
+const tableNameToPrefix = {
+  now_loc: 'lau',
+  com_species: 'sau',
+  now_time_unit: 'tau',
+  now_tu_bound: 'bau',
+} as Record<AllowedTables, 'sau' | 'tau' | 'lau' | 'bau'>
+
+/* Updates to certain tables have to be logged in a different table
+   than the one the user edited. Sometimes several tables. For example,
+   user editing locality and changing now_ls will require update entry
+   to both now_loc and com_species. If this table doesn't have entry for a
+   table, assume it goes to the "main" update entry e.g. if user edited locality, now_loc. */
+const tableToUpdateTargets = {
+  now_ls: ['now_loc', 'com_species'],
+} as Record<AllowedTables, PrimaryTables[] | undefined>
+
+type PrimaryTables = 'now_loc' | 'com_species' | 'now_time_unit' | 'now_tu_bound'
+
+export type ActionType = 'delete' | 'update' | 'add'
+
+export type LogRow = Item & {
+  pkData: string
+  suid?: number
+  luid?: number
+  buid?: number
+  tuid?: number
+  type: ActionType
+}
+
+type UpdateEntry = {
+  table: PrimaryTables
+  logRows: LogRow[]
+  type: ActionType
+  id: string | number // Id of the item that was changed
+  entryId?: number // Id of the created update entry
+}
+
+export const logAllUpdates = async (
+  writeContext: WriteContext,
+  tableName: PrimaryTables,
+  userInitials: string,
+  comment: string,
+  id: string | number
+) => {
+  const updateEntries: UpdateEntry[] = []
+  const { writeList } = writeContext
+
+  const getIdColumn = (targetTable: AllowedTables) => {
+    if (targetTable === 'com_species') return 'species_id'
+    if (targetTable === 'now_mus') return 'museum'
+    if (targetTable === 'now_ls') return tableName === 'now_loc' ? 'species_id' : 'lid'
+    if (targetTable === 'now_loc') return 'lid'
+    throw new Error(`No id column found for ${targetTable}`)
+  }
+
+  const getSecondaryPkData = (table: AllowedTables, items: Item[]) => {
+    if (table === tableName) return ''
+    const secondaryId = items.find(item => item.column === getIdColumn(table))?.value
+    if (!secondaryId) throw new Error(`No id value found for ${table}`)
+    return `${secondaryId.toString().length}.${secondaryId};`
+  }
+
+  const rootUpdateEntry: UpdateEntry = {
+    type: 'add', // TODO fix: this should probably be received as an argument?
+    table: tableName,
+    id,
+    logRows: writeList.flatMap(writeItem =>
+      writeItem.items.map(item => ({
+        ...item,
+        type: writeItem.type,
+        pkData: `${id.toString().length}.${id};${getSecondaryPkData(writeItem.table, writeItem.items)}`,
+      }))
+    ),
+  }
+
+  updateEntries.push(rootUpdateEntry)
+
+  // Create "secondary" update-entries. This map holds by the primary table and id, e.g. secondaryUpdateEntries['species_id'][10001]
+  const secondaryUpdateEntries = {} as Record<PrimaryTables, Record<string | number, UpdateEntry>>
+
+  for (const writeListItem of writeList) {
+    const targetTables = tableToUpdateTargets[writeListItem.table] ?? [tableName]
+    for (const targetTable of targetTables) {
+      if (targetTable === tableName) continue
+      // find id of current entry. it will be the other id than the one of this table, e.g.
+      // if we are editing now_loc and this entry is triggered by now_ls (entry for com_species),
+      // the id will be "species_id", not "lid".
+      const idColumn = getIdColumn(targetTable)
+      const secondaryId = writeListItem.items.find(item => item.column === idColumn)?.value
+      if (!secondaryId)
+        throw new Error(`Error when creating update entries: id not found for targetTable: ${targetTable}`)
+      if (!secondaryUpdateEntries[targetTable]) secondaryUpdateEntries[targetTable] = {}
+      const pkData = `${id.toString().length}.${id};${secondaryId.toString().length}.${secondaryId};`
+      secondaryUpdateEntries[targetTable][secondaryId] = {
+        id: secondaryId,
+        table: targetTable,
+        type: writeListItem.type,
+        logRows: writeListItem.items.map(item => ({ ...item, pkData, type: writeListItem.type })),
+      }
+    }
+  }
+  for (const tableUpdates of Object.values(secondaryUpdateEntries)) {
+    for (const singleUpdateOfTable of Object.values(tableUpdates)) {
+      updateEntries.push(singleUpdateOfTable)
+    }
+  }
+  await writeUpdateEntries(updateEntries, writeContext.connection, userInitials, comment)
+  const logRows = mergeLogRows(updateEntries)
+  await writeLogRows(writeContext.connection, logRows, userInitials)
+}
+
+const getUpdateIdField = (tableName: PrimaryTables) => `${tableName[4]}uid` as 'buid' | 'luid' | 'suid' | 'tuid'
+
+const mergeLogRows = (updateEntries: UpdateEntry[]) => {
+  const getLogRowKey = (logRow: LogRow) => {
+    return `${logRow.column}-${logRow.value}-${logRow.oldValue}-${logRow.table}-${logRow.pkData}`
+  }
+
+  const logRowMap: Record<string, LogRow> = {}
+
+  // Iterate through updateEntries. Collect logrows into map. LogRows with identical data may be in multiple
+  // updateEntries, such as now_ls rows in locality and species. These should be merged so that only one is left,
+  // but with both id's (luid and suid) found in the updateEntries.
+  for (const updateEntry of updateEntries) {
+    const idFieldName = getUpdateIdField(updateEntry.table)
+    for (const logRow of updateEntry.logRows) {
+      const key = getLogRowKey(logRow)
+      logRowMap[key] = { ...(logRowMap[key] ? logRowMap[key] : logRow), [idFieldName]: updateEntry.entryId }
+    }
+  }
+  return Object.values(logRowMap)
+}
+
+const writeUpdateEntries = async (
+  updateEntries: UpdateEntry[],
+  connection: PoolConnection,
+  authorizer: string,
+  comment: string
+) => {
+  for (const updateEntry of updateEntries) {
+    const prefix = tableNameToPrefix[updateEntry.table]
+    const createdId = await createUpdateEntry(connection, prefix, COORDINATOR, authorizer, comment, updateEntry.id)
+    updateEntry.entryId = createdId
+  }
+  return updateEntries
+}
+
+// Some tables are not logged at all.
+// TODO dont even use write() for these, make their own services.
+export const tablesToNotLog = ['com_mlist']
+
+export const getFieldTypes = <T extends CustomObject>(obj: T, allFields: string[]) => {
+  const basicFields = allFields.filter(
+    f => typeof obj[f as keyof object] !== 'object' || obj[f as keyof object] === null
+  )
+  const arrayFields = allFields.filter(f => Array.isArray(obj[f as keyof object])) as AllowedTables[]
+  const objectFields: AllowedTables[] = allFields.filter(
+    f => typeof obj[f] === 'object' && obj[f] !== null && !Array.isArray(obj[f])
+  ) as AllowedTables[]
+  return { basicFields, arrayFields, objectFields }
+}
+export const getOldData = async <T extends CustomObject>(obj: T, tableName: AllowedTables) => {
+  // Create where-object with relevant ids to find
+  const where = ids[tableName].reduce<object>((acc: object, cur: keyof T) => {
+    if (obj[cur] !== undefined) return { ...acc, [cur]: obj[cur] as unknown }
+    return acc
+  }, {} as object) as unknown as object
+
+  // This creates the whereObject for tables whose primary id is composed of multiple ids
+  let whereObject: unknown = { [ids[tableName].join('_')]: where }
+
+  // Or if there is just one, then simply use that one
+  if (ids[tableName].length === 1) whereObject = { [ids[tableName][0]]: obj[ids[tableName][0]] }
+
+  debugLog(`Ids: ${ids[tableName].join(', ')}, where: ${printJSON(where)}`, true)
+
+  // Fetch the actual object
+  const oldObj: object | null =
+    ids[tableName] && obj[ids[tableName][0]] && Object.keys(where).length === ids[tableName].length
+      ? // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-explicit-any
+        ((await (nowDb[tableName] as any).findUnique({
+          where: whereObject,
+        })) as object)
+      : null
+
+  debugLog(
+    `Old object: ${!!oldObj} ${Object.keys(whereObject as Record<string, string>).length} ${ids[tableName].length}`,
+    true
+  )
+
+  return oldObj
+}
 
 /*
   Returns object where only the "original" fields remain.
@@ -73,11 +269,9 @@ export type CustomObject = Record<string, string | number | object | CustomObjec
 
 export type WriteFunction = <T extends CustomObject>(
   data: T,
-  tableName: AllowedTables,
-  updateOptions?: {
-    authorizer: string
-    userName: string
-  }
+  tableName: PrimaryTables,
+  username: string,
+  comment: string
 ) =>
   | Promise<string | number>
   | ((data: EditDataType<ReferenceDetailsType>, tableName: 'ref_ref') => Promise<string | number>)
@@ -117,11 +311,11 @@ export const ids = {
 } satisfies Record<AllowedTables, string[]>
 
 export const supportedTables = Object.keys(ids)
-export type Item = { column: string; value: string | number; oldValue?: string | number; items?: (string | number)[] }
+export type Item = { table: AllowedTables; column: string; value: string | number; oldValue?: string | number }
 export type DeleteItem = { tableName: AllowedTables; idValues: Array<string | number>; idColumns: string[] }
 export type WriteItem = {
   table: AllowedTables
-  type: 'add' | 'update' | 'delete'
+  type: ActionType
   items: Item[]
 }
 

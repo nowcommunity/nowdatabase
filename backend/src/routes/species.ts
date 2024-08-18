@@ -19,12 +19,9 @@ router.get('/:id', async (req, res) => {
   return res.status(200).send(fixBigInt(species))
 })
 
-router.put('/', async (req: Request<object, object, { species: SpeciesDetailsType }>, res) => {
+router.put('/', async (req: Request<object, object, { species: SpeciesDetailsType; comment: string }>, res) => {
   const editedSpecies = req.body.species
-  const result = await write(editedSpecies, 'com_species', {
-    authorizer: 'ArK',
-    userName: 'testuser',
-  })
+  const result = await write(editedSpecies, 'com_species', req.user!.initials, req.body.comment)
   return res.status(200).send(result ? { result: result } : { error: 'error' })
 })
 
