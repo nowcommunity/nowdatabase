@@ -15,7 +15,7 @@ export const StagingView = <T extends MRT_RowData>() => {
     ['Date', new Date().toLocaleDateString('en-CA')],
     ['Editor', 'Users Name'],
     ['Coordinator', 'Indre Zliobaite'],
-    ['Comment', bigTextField('update_comment')],
+    ['Comment', bigTextField('comment')],
   ]
 
   return (

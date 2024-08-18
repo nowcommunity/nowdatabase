@@ -121,10 +121,7 @@ export type Reference = {
   title_secondary: string
 }
 
-export type ReferenceDetailsType = Prisma.ref_ref & {
-  ref_authors: Prisma.ref_authors[]
-  ref_journal?: Prisma.ref_journal
-}
+export type ReferenceDetailsType = Prisma.ref_ref
 
 export type RegionDetails = Prisma.now_reg_coord & { now_reg_coord_people: Array<RegionCoordinator> } & {
   now_reg_coord_country: Array<RegionCountry>
@@ -159,6 +156,14 @@ export type TimeUnitDetailsType = Prisma.now_time_unit & { now_tu_sequence: Sequ
   now_tau: Array<TimeUnitUpdate>
 }
 
-export type ReferenceType = Prisma.ref_ref_type & { ref_field_name: Prisma.ref_field_name[] }
+export type ReferenceType = Prisma.ref_ref & {
+  ref_field_name: Prisma.ref_field_name
+  ref_ref_type: Prisma.ref_ref_type
+  ref_authors: Prisma.ref_authors[]
+} & { ref_journal: Pick<Prisma.ref_journal, 'journal_title'> }
+
+export type ReferenceTypeType = Prisma.ref_ref_type & { ref_field_name: Prisma.ref_field_name[] }
 
 export type ReferenceField = Prisma.ref_field_name
+
+export type EditMetaData = { comment?: string; references?: ReferenceType[] }

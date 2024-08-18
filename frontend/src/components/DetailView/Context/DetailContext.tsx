@@ -71,6 +71,7 @@ export const DetailContext = createContext<DetailContextType<unknown>>(null!)
 export const makeEditData = <T,>(data: T): EditDataType<T> => ({
   ...(cloneDeep(data) as EditDataType<T>),
   references: [],
+  comment: '',
 })
 
 export const DetailContextProvider = <T extends object>({

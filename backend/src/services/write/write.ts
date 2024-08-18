@@ -22,7 +22,7 @@ import { PoolConnection } from 'mariadb'
 
 const query = async (queryString: string, values: Array<string | number>, conn: PoolConnection) => {
   const result: object = await conn.query(queryString, values)
-  debugLog(`${queryString} \t\t| values: ${values.join(', ')} \t| Result: ${printJSON(result)}`)
+  debugLog(`Executed query: ${queryString} \t\t| values: ${values.join(', ')} \t| Result: ${printJSON(result)}`)
   return result
 }
 
@@ -33,12 +33,9 @@ export type WriteContext = {
 }
 
 const writeTable = async <T extends CustomObject>(obj: T, tableName: AllowedTables, writeContext: WriteContext) => {
-  debugLog(`writeTable ${tableName} ${Object.keys(obj).join(', ')}`)
-
   const oldObj = await getOldData(obj, tableName)
 
   const allFields = Object.keys(obj).filter(f => allowedFields[f])
-  debugLog(`All fields: ${allFields.join(', ')}`, true)
 
   /* 
     We divide the fields (the objects properties) into different types. Basic fields are the normal fields,
@@ -62,7 +59,6 @@ const writeTable = async <T extends CustomObject>(obj: T, tableName: AllowedTabl
     // get the relevant id name from ids: the order is so that last item is the relevant id. e.g. now_ls
     const idFieldName = ids[objectField][lastItem]
     relationIds[idFieldName] = newId
-    debugLog(`Processed objectField ${objectField} and assigned id ${newId} to ${idFieldName}`, true)
   }
 
   // Add to relationIds-map also those ids that we did not just edit or create
@@ -70,16 +66,11 @@ const writeTable = async <T extends CustomObject>(obj: T, tableName: AllowedTabl
     if (relationIds[id] === undefined) relationIds[id] = obj[id] as string
   })
 
-  debugLog(`basicFields: ${printJSON(basicFields)}, relationIds object: ${printJSON(relationIds)}`)
-
   /* Write the "basicFields", meaning simply all the columns that actually exist in the current table */
   for (const field of basicFields) {
     const isRelationField = !!relationIds[field]
     const newValue = relationIds[field] ?? (obj[field as keyof object] as CustomObject)
     const oldValue = oldObj?.[field as keyof object]
-    debugLog(
-      `Field: ${field} Old value: ${oldValue} (${typeof oldValue}) New value: ${newValue} (${typeof newValue}) - isRelationField: ${isRelationField}`
-    )
 
     // Skipping the values that aren't changed: including differences in empty values (etc. null and "") or bigint/number different type
     if (newValue === oldValue) continue
@@ -97,9 +88,6 @@ const writeTable = async <T extends CustomObject>(obj: T, tableName: AllowedTabl
 
   // Field name of the primary key for the current table
   const idFieldName = ids[tableName][0]
-
-  debugLog(`idFieldName ${printJSON(idFieldName)}`, true)
-  debugLog(`Writing to ${tableName} to columns ${columns.join(', ')} values ${values.join(', ')}`, true)
 
   let id = obj[idFieldName as keyof object] as string | number
 
@@ -122,7 +110,6 @@ const writeTable = async <T extends CustomObject>(obj: T, tableName: AllowedTabl
         values,
         writeContext.connection
       )) as Record<string, string | number>[]
-      debugLog(`Insert result: ${printJSON(result)}`)
       id = result[0][idFieldName]
       type = 'add'
     }
@@ -158,9 +145,7 @@ const writeTable = async <T extends CustomObject>(obj: T, tableName: AllowedTabl
     // Ones without that rowstate will be recursed into
     for (const item of items.filter(({ rowState }) => rowState !== 'removed')) {
       const itemWithId = { ...item, [ids[tableName][0]]: id }
-      debugLog(`itemWithId: ${printJSON(itemWithId)}`)
       await writeTable(itemWithId, arrayField, writeContext)
-      debugLog(`Processed array item ${printJSON(item)}`)
     }
   }
 
@@ -168,22 +153,16 @@ const writeTable = async <T extends CustomObject>(obj: T, tableName: AllowedTabl
     Delete rows from current table.
   */
   for (const rowToDelete of rowsToDelete) {
-    const deleteResult = await query(
+    await query(
       `DELETE FROM ${NOW_DB_NAME}.${rowToDelete.tableName} WHERE ${rowToDelete.idColumns.map(column => `${column} = ?`).join(' AND ')}`,
       rowToDelete.idValues,
       writeContext.connection
     )
-
-    // writeList.push({ table: rowToDelete.tableName, type: 'delete', items: rowToDelete.idValues })
-    debugLog(`deleteResult: ${printJSON(deleteResult)}`)
   }
-  debugLog(`Returning id: ${printJSON(id)}`)
   return id
 }
 
 export const write: WriteFunction = async (data, tableName, userInitials, comment) => {
-  debugLog(`Started write. Table: ${tableName}`)
-
   const connection = await pool.getConnection()
   await connection.beginTransaction()
 
@@ -195,7 +174,6 @@ export const write: WriteFunction = async (data, tableName, userInitials, commen
 
   try {
     const id = await writeTable(data, tableName, writeContext)
-    debugLog(`Final returned id: ${printJSON(id)}`)
 
     writeContext.writeList = writeContext.writeList.filter(item => !tablesToNotLog.includes(item.table))
     debugLog(`WriteList: ${printJSON(writeContext.writeList)}`)

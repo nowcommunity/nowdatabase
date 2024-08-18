@@ -1,4 +1,4 @@
-import { ReferenceDetailsType, UpdateLog } from '@/backendTypes'
+import { ReferenceType, UpdateLog } from '@/backendTypes'
 import { useDetailContext } from '@/components/DetailView/Context/DetailContext'
 import { EditingModal } from '@/components/DetailView/common/EditingModal'
 import { SimpleTable } from '@/components/DetailView/common/SimpleTable'
@@ -18,8 +18,8 @@ const makeNameList = (names: Array<string | null>) => {
   return names[0] ?? ''
 }
 
-const ReferenceList = ({ references, big }: { references: ReferenceDetailsType[]; big: boolean }) => {
-  const getReferenceText = (ref: ReferenceDetailsType) => {
+const ReferenceList = ({ references, big }: { references: ReferenceType[]; big: boolean }) => {
+  const getReferenceText = (ref: ReferenceType) => {
     // php version: html/include/database.php -> referenceCitation()
     const authors = makeNameList(ref.ref_authors.map(author => author.author_surname))
     const issue = ref.issue ? ` (${ref.issue}) ` : ''
@@ -91,7 +91,7 @@ export const UpdateTab = <T, UpdateType extends MRT_RowData & { updates: UpdateL
       header: 'Reference',
       Cell: ({ row }: { row: MRT_Row<UpdateType> }) => (
         <ReferenceList
-          references={(row.original[refFieldName] as { ref_ref: ReferenceDetailsType }[]).map(item => item.ref_ref)}
+          references={(row.original[refFieldName] as { ref_ref: ReferenceType }[]).map(item => item.ref_ref)}
           big={false}
         />
       ),
@@ -101,7 +101,7 @@ export const UpdateTab = <T, UpdateType extends MRT_RowData & { updates: UpdateL
       Cell: ({ row }: { row: MRT_Row<UpdateType> }) => (
         <DetailsModal
           updates={row.original.updates}
-          references={row.original[refFieldName] as { ref_ref: ReferenceDetailsType }[]}
+          references={row.original[refFieldName] as { ref_ref: ReferenceType }[]}
         />
       ),
     },
@@ -114,7 +114,7 @@ export const UpdateTab = <T, UpdateType extends MRT_RowData & { updates: UpdateL
   )
 }
 
-const DetailsModal = <RefType extends { ref_ref: ReferenceDetailsType }>({
+const DetailsModal = <RefType extends { ref_ref: ReferenceType }>({
   updates,
   references,
 }: {
