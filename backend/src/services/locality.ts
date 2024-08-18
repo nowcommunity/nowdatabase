@@ -192,3 +192,8 @@ export const validateEntireLocality = (editedFields: EditDataType<Prisma.now_loc
   }
   return errors
 }
+
+const writeLocality = (newLocality: LocalityDetailsType) => {
+  // write "relation"
+  // write ""
+}
