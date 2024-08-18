@@ -3,6 +3,7 @@ import { logger } from '../../utils/logger'
 import {
   AllowedTables,
   CustomObject,
+  DbValue,
   DeleteItem,
   Item,
   WriteFunction,
@@ -20,7 +21,7 @@ import {
 import { NOW_DB_NAME } from '../../utils/config'
 import { PoolConnection } from 'mariadb'
 
-const query = async (queryString: string, values: Array<string | number>, conn: PoolConnection) => {
+const query = async (queryString: string, values: Array<DbValue>, conn: PoolConnection) => {
   const result: object = await conn.query(queryString, values)
   debugLog(`Executed query: ${queryString} \t\t| values: ${values.join(', ')} \t| Result: ${printJSON(result)}`)
   return result

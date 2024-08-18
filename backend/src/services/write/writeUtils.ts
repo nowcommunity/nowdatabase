@@ -115,8 +115,17 @@ export const logAllUpdates = async (
       updateEntries.push(singleUpdateOfTable)
     }
   }
+  // Write the update-entries: This inserts the id's that are created into the objects.
   await writeUpdateEntries(updateEntries, writeContext.connection, userInitials, comment)
-  const logRows = mergeLogRows(updateEntries)
+
+  // The write has value and oldValue swapped for 'delete' type logRows due to reasons.
+  // It is simpler to fix it here than changing how write works, because values are used to find id's above.
+  const fixDeleteRows = (logRow: LogRow) => {
+    if (logRow.type !== 'delete') return logRow
+    return { ...logRow, oldValue: logRow.value, value: null }
+  }
+  const logRows = mergeLogRows(updateEntries).map(logRow => fixDeleteRows(logRow))
+
   await writeLogRows(writeContext.connection, logRows, userInitials)
 }
 
@@ -311,13 +320,16 @@ export const ids = {
 } satisfies Record<AllowedTables, string[]>
 
 export const supportedTables = Object.keys(ids)
-export type Item = { table: AllowedTables; column: string; value: string | number; oldValue?: string | number }
+export type Item = { table: AllowedTables; column: string; value: DbValue; oldValue?: DbValue }
 export type DeleteItem = { tableName: AllowedTables; idValues: Array<string | number>; idColumns: string[] }
 export type WriteItem = {
   table: AllowedTables
   type: ActionType
   items: Item[]
 }
+
+// Possible types of values that are read from db or written in there. BigInt is handled as number.
+export type DbValue = string | number | null
 
 export const allowedFields: Record<string, boolean | undefined> = {}
 const addFieldsToAllowed = (fields: string[]) =>
