@@ -3,7 +3,7 @@ import { useDetailContext } from '@/components/DetailView/Context/DetailContext'
 import { EditingModal } from '@/components/DetailView/common/EditingModal'
 import { SimpleTable } from '@/components/DetailView/common/SimpleTable'
 import { Grouped } from '@/components/DetailView/common/tabLayoutHelpers'
-import { Card, Stack } from '@mui/material'
+import { Box, Card, Stack } from '@mui/material'
 import { MRT_ColumnDef, MRT_Row, MRT_RowData } from 'material-react-table'
 import { Link } from 'react-router-dom'
 
@@ -101,6 +101,7 @@ export const UpdateTab = <T, UpdateType extends MRT_RowData & { updates: UpdateL
       Cell: ({ row }: { row: MRT_Row<UpdateType> }) => (
         <DetailsModal
           updates={row.original.updates}
+          comment={row.original[`${prefix}_comment` as keyof UpdateType] as string}
           references={row.original[refFieldName] as { ref_ref: ReferenceType }[]}
         />
       ),
@@ -117,9 +118,11 @@ export const UpdateTab = <T, UpdateType extends MRT_RowData & { updates: UpdateL
 const DetailsModal = <RefType extends { ref_ref: ReferenceType }>({
   updates,
   references,
+  comment,
 }: {
   updates: UpdateLog[]
   references: RefType[]
+  comment: string
 }) => {
   const columns: MRT_ColumnDef<UpdateLog>[] = [
     {
@@ -146,6 +149,7 @@ const DetailsModal = <RefType extends { ref_ref: ReferenceType }>({
 
   return (
     <EditingModal buttonText="Details" dataCy="update-details-button">
+      <Box>Comment: {comment}</Box>
       <ReferenceList references={references.map(ref => ref.ref_ref)} big />
       <SimpleTable columns={columns} data={updates} />
     </EditingModal>
