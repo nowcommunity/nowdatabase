@@ -24,10 +24,16 @@ router.get('/time-units/:id', async (req, res) => {
   return res.status(200).send(fixBigInt(timeUnits))
 })
 
-router.put('/', async (req: Request<object, object, { timeBound: EditDataType<TimeBoundDetailsType> }>, res) => {
-  const editedObject = req.body.timeBound
-  const result = await write(editedObject, 'now_time_unit', { userName: 'testuser', authorizer: 'ArK' })
-  return res.status(200).send(result ? { result: result } : { error: 'error' })
-})
+router.put(
+  '/',
+  async (
+    req: Request<object, object, { timeBound: EditDataType<TimeBoundDetailsType>; update_comment: string }>,
+    res
+  ) => {
+    const editedObject = req.body.timeBound
+    const result = await write(editedObject, 'now_time_unit', req.user!.initials, req.body.update_comment ?? '')
+    return res.status(200).send(result ? { result: result } : { error: 'error' })
+  }
+)
 
 export default router
