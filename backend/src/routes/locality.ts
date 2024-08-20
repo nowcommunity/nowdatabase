@@ -35,7 +35,13 @@ router.put(
       return res.status(400).send({ validationErrors })
     }
 
-    const result = await write(editedLocality, 'now_loc', req.user!.initials, comment ?? '')
+    const result = await write(
+      editedLocality,
+      'now_loc',
+      req.user!.initials,
+      comment ?? '',
+      editedLocality.lid ? 'update' : 'add'
+    )
     return res.status(200).send(result ? { id: result } : { error: 'error' })
   }
 )

@@ -1,6 +1,7 @@
 import { pool } from '../../utils/db'
 import { logger } from '../../utils/logger'
 import {
+  ActionType,
   AllowedTables,
   CustomObject,
   DbValue,
@@ -31,6 +32,7 @@ export type WriteContext = {
   connection: PoolConnection
   writeList: WriteItem[]
   username: string
+  type: ActionType
 }
 
 const writeTable = async <T extends CustomObject>(obj: T, tableName: AllowedTables, writeContext: WriteContext) => {
@@ -163,7 +165,7 @@ const writeTable = async <T extends CustomObject>(obj: T, tableName: AllowedTabl
   return id
 }
 
-export const write: WriteFunction = async (data, tableName, userInitials, comment) => {
+export const write: WriteFunction = async (data, tableName, userInitials, comment, type) => {
   const connection = await pool.getConnection()
   await connection.beginTransaction()
 
@@ -171,6 +173,7 @@ export const write: WriteFunction = async (data, tableName, userInitials, commen
     connection,
     writeList: [],
     username: userInitials,
+    type,
   }
 
   try {

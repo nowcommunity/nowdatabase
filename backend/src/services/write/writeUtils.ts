@@ -72,7 +72,7 @@ export const logAllUpdates = async (
   }
 
   const rootUpdateEntry: UpdateEntry = {
-    type: 'add', // TODO fix: this should probably be received as an argument?
+    type: writeContext.type,
     table: tableName,
     id,
     logRows: writeList.flatMap(writeItem =>
@@ -280,7 +280,8 @@ export type WriteFunction = <T extends CustomObject>(
   data: T,
   tableName: PrimaryTables,
   username: string,
-  comment: string
+  comment: string,
+  type: ActionType
 ) =>
   | Promise<string | number>
   | ((data: EditDataType<ReferenceDetailsType>, tableName: 'ref_ref') => Promise<string | number>)
