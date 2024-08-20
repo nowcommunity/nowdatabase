@@ -304,7 +304,7 @@ export type AllowedTables =
 /*
   Only tables listed here are supported for write operations
 */
-export const ids = {
+export const ids: Record<AllowedTables, string[]> = {
   now_loc: ['lid'],
   now_ls: ['lid', 'species_id'],
   now_proj: ['pid'],
@@ -318,7 +318,7 @@ export const ids = {
   now_time_unit: ['tu_name'],
   now_tu_bound: ['bid'],
   ref_ref: ['rid'],
-} satisfies Record<AllowedTables, string[]>
+}
 
 export const supportedTables = Object.keys(ids)
 export type Item = { table: AllowedTables; column: string; value: DbValue; oldValue?: DbValue }
