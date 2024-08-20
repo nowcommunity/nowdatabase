@@ -8,7 +8,7 @@ import {
   useMaterialReactTable,
   MaterialReactTable,
 } from 'material-react-table'
-import { Box, Button, CircularProgress, Divider, Paper, Typography } from '@mui/material'
+import { Box, Button, CircularProgress, Divider, Paper, Tooltip, Typography } from '@mui/material'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { renderCustomToolbar, renderCustomToolbarModalVersion } from './helpers'
 import { ActionComponent } from './ActionComponent'
@@ -166,15 +166,17 @@ export const TableView = <T extends MRT_RowData>({
         </>
       )}
       {combinedExport && (
-        <Box sx={{ margin: '1em', maxWidth: '20em' }}>
+        <Box sx={{ margin: '1em', maxWidth: '25em' }}>
           <Box sx={{ display: 'flex', gap: '0.4em' }}>
-            <Button
-              variant="contained"
-              disabled={exportIsLoading}
-              onClick={() => void combinedExport(table.getSortedRowModel().rows.map(d => d.original.lid as number))}
-            >
-              Export localities with their species
-            </Button>
+            <Tooltip title="Export's all localities filtered in the table below with all their species. The export is sorted by name. This takes a long time, to export only localities use the 'export' button in the top-right corner of the table.">
+              <Button
+                variant="contained"
+                disabled={exportIsLoading}
+                onClick={() => void combinedExport(table.getSortedRowModel().rows.map(d => d.original.lid as number))}
+              >
+                Export localities with their species
+              </Button>
+            </Tooltip>{' '}
             {exportIsLoading && <CircularProgress />}
           </Box>
         </Box>
