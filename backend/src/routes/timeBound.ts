@@ -31,7 +31,13 @@ router.put(
     res
   ) => {
     const editedObject = req.body.timeBound
-    const result = await write(editedObject, 'now_time_unit', req.user!.initials, req.body.update_comment ?? '')
+    const result = await write(
+      editedObject,
+      'now_time_unit',
+      req.user!.initials,
+      req.body.update_comment ?? '',
+      editedObject.bid ? 'update' : 'add'
+    )
     return res.status(200).send(result ? { result: result } : { error: 'error' })
   }
 )

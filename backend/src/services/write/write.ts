@@ -178,12 +178,9 @@ export const write: WriteFunction = async (data, tableName, userInitials, commen
 
   try {
     const id = await writeTable(data, tableName, writeContext)
-
     writeContext.writeList = writeContext.writeList.filter(item => !tablesToNotLog.includes(item.table))
     debugLog(`WriteList: ${printJSON(writeContext.writeList)}`)
-
     await logAllUpdates(writeContext, tableName, userInitials, comment, id)
-
     await connection.commit()
     await connection.end()
     return id

@@ -20,7 +20,13 @@ router.get('/:id', async (req, res) => {
 
 router.put('/', async (req: Request<object, object, { species: SpeciesDetailsType; comment: string }>, res) => {
   const editedSpecies = req.body.species
-  const result = await write(editedSpecies, 'com_species', req.user!.initials, req.body.comment)
+  const result = await write(
+    editedSpecies,
+    'com_species',
+    req.user!.initials,
+    req.body.comment,
+    editedSpecies.species_id ? 'update' : 'add'
+  )
   return res.status(200).send(result ? { result: result } : { error: 'error' })
 })
 
