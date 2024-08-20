@@ -160,7 +160,6 @@ export const TableView = <T extends MRT_RowData>({
                 New
               </Button>
             )}
-            {editRights.delete && <Button variant="contained">Delete</Button>}
           </Box>
           <Divider sx={{ marginTop: '1rem' }} />
         </>

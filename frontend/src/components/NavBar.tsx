@@ -27,6 +27,7 @@ export const NavBar = () => {
   }
   const linkFontSize = 18
   const pages: LinkDefinition[] = [
+    { title: 'Front Page', url: '/' },
     { title: 'Localities', url: '/locality' },
     { title: 'Species', url: '/species' },
     { title: 'References', url: '/reference' },
@@ -122,7 +123,7 @@ export const NavBar = () => {
     <AppBar position="static">
       <Stack spacing={10} direction="row" marginLeft={2} justifyContent="space-between">
         <MenuItem component={Link} to="/">
-          <Typography fontSize={'2.2em'}>Now Database {getModeText()}</Typography>
+          <Typography fontSize={'2.2em'}>NOW Database {getModeText()}</Typography>
         </MenuItem>
         <MenuList style={{ alignContent: 'center' }}>
           {pages
