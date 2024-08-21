@@ -154,6 +154,9 @@ export type TimeUnitUpdate = Prisma.now_time_update & {
 }
 export type TimeUnitDetailsType = Prisma.now_time_unit & { now_tu_sequence: SequenceDetailsType } & {
   now_tau: Array<TimeUnitUpdate>
+} & {
+  low_bound: Prisma.now_tu_bound
+  up_bound: Prisma.now_tu_bound
 }
 
 export type ReferenceType = Prisma.ref_ref & {

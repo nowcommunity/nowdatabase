@@ -6,7 +6,7 @@ import { SequenceTable } from '@/components/Sequence/SequenceTable'
 import { TimeBoundTable } from '@/components/TimeBound/TimeBoundTable'
 
 export const TimeUnitTab = () => {
-  const { textField } = useDetailContext<TimeUnitDetailsType>()
+  const { textField, data } = useDetailContext<TimeUnitDetailsType>()
 
   const timeUnit = [
     ['Name', textField('tu_display_name')],
@@ -42,9 +42,25 @@ export const TimeUnitTab = () => {
     ],
   ]
 
+  const low_bound = [
+    ['Id', data.low_bound.bid],
+    ['Name', data.low_bound.b_name],
+    ['Age', data.low_bound.age],
+    ['Comment', data.low_bound.b_comment],
+  ]
+
+  const up_bound = [
+    ['Id', data.up_bound.bid],
+    ['Name', data.up_bound.b_name],
+    ['Age', data.up_bound.age],
+    ['Comment', data.up_bound.b_comment],
+  ]
+
   return (
     <>
       <ArrayFrame array={timeUnit} title="Time Unit" />
+      <ArrayFrame array={low_bound} title="Lower bound" />
+      <ArrayFrame array={up_bound} title="Upper bound" />
     </>
   )
 }

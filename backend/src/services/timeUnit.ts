@@ -70,7 +70,12 @@ export const getTimeUnitDetails = async (id: string) => {
     updates: logResult.filter(logRow => logRow.tuid === tau.tuid),
   }))
 
-  return result
+  const {
+    now_tu_bound_now_time_unit_low_bndTonow_tu_bound: low_bound,
+    now_tu_bound_now_time_unit_up_bndTonow_tu_bound: up_bound,
+    ...rest
+  } = result
+  return { ...rest, low_bound, up_bound }
 }
 
 export const getTimeUnitLocalities = async (id: string) => {
