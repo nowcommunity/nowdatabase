@@ -21,8 +21,6 @@ export const getAllSpecies = async () => {
 }
 
 export const getSpeciesDetails = async (id: number) => {
-  // TODO: Check if user has access
-
   const result = await nowDb.com_species.findUnique({
     where: { species_id: id },
     include: {
