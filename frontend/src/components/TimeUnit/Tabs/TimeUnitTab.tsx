@@ -26,13 +26,12 @@ export const TimeUnitTab = () => {
   const timeUnit = [
     ['Name', textField('tu_display_name')],
     ['Rank', dropdown('rank', rankOptions, 'Rank')],
-    //['Sequence', dropdown('s')],
     ['Comment', textField('tu_comment')],
     [
       'Sequence',
       <FieldWithTableSelection<SequenceDetailsType, TimeUnitDetailsType>
         key="sequence"
-        sourceField="seq_name"
+        sourceField="sequence"
         targetField="sequence"
         selectorTable={<SequenceTable />}
       />,

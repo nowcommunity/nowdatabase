@@ -1,11 +1,11 @@
 import { api } from './api'
-import { EditDataType, Locality, TimeUnit, TimeUnitDetailsType } from '@/backendTypes'
+import { EditDataType, Locality, Sequence, TimeUnit, TimeUnitDetailsType } from '@/backendTypes'
 
 const timeunitsApi = api.injectEndpoints({
   endpoints: builder => ({
     getAllTimeUnits: builder.query<TimeUnit[], void>({
       query: () => ({
-        url: `/time-unit/all`,
+        url: `/time-unit/all/`,
       }),
       providesTags: result => (result ? [{ type: 'timeunits' }] : []),
     }),
@@ -20,9 +20,14 @@ const timeunitsApi = api.injectEndpoints({
         url: `/time-unit/localities/${id}`,
       }),
     }),
+    getSequences: builder.query<Sequence[], void>({
+      query: () => ({
+        url: `/time-unit/sequences`,
+      }),
+    }),
     editTimeUnit: builder.mutation<TimeUnitDetailsType, EditDataType<TimeUnitDetailsType>>({
       query: timeUnit => ({
-        url: `/time-unit`,
+        url: `/time-unit/`,
         method: 'PUT',
         body: { timeUnit },
       }),
@@ -37,4 +42,5 @@ export const {
   useGetTimeUnitLocalitiesQuery,
   useGetTimeUnitDetailsQuery,
   useEditTimeUnitMutation,
+  useGetSequencesQuery,
 } = timeunitsApi

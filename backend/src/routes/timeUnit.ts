@@ -3,12 +3,18 @@ import { getAllTimeUnits, getTimeUnitDetails, getTimeUnitLocalities } from '../s
 import { fixBigInt } from '../utils/common'
 import { EditDataType, EditMetaData, TimeUnitDetailsType } from '../../../frontend/src/backendTypes'
 import { write } from '../services/write/write'
+import { getAllSequences } from '../services/sequence'
 
 const router = Router()
 
 router.get('/all', async (_req, res) => {
   const time_units = await getAllTimeUnits()
   return res.status(200).send(time_units)
+})
+
+router.get('/sequences', async (_req, res) => {
+  const sequences = await getAllSequences()
+  return res.status(200).send(sequences)
 })
 
 router.get('/:id', async (req, res) => {
