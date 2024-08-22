@@ -37,6 +37,7 @@ export const DetailView = <T extends object>({
   isNew = false,
   isUserPage = false,
   hasStagingMode = false,
+  deleteFunction,
 }: {
   tabs: TabType[]
   data: T
@@ -45,6 +46,7 @@ export const DetailView = <T extends object>({
   isNew?: boolean
   isUserPage?: boolean
   hasStagingMode?: boolean
+  deleteFunction?: () => Promise<void>
 }) => {
   const [searchParams, setSearchParams] = useSearchParams()
   const theme = useTheme()
@@ -81,6 +83,11 @@ export const DetailView = <T extends object>({
     name: string,
     disabled?: boolean
   ) => <DropdownSelector field={field} options={options} name={name} disabled={disabled} />
+
+  const onDelete = () => {
+    if (!window.confirm('Are you sure you want to delete this item? This operation cannot be undone.')) return
+    if (deleteFunction) void deleteFunction()
+  }
 
   const radioSelection = (field: keyof EditDataType<T>, options: Array<DropdownOption | string>, name: string) => (
     <RadioSelector field={field} options={options} name={name} />
@@ -140,6 +147,11 @@ export const DetailView = <T extends object>({
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignContent: 'center', marginTop: 'auto' }}>
           <Box sx={{ display: 'flex' }} gap={10}>
             {!isUserPage && <ReturnButton />}
+            {editRights.delete && (
+              <Button onClick={onDelete} variant="contained">
+                Delete
+              </Button>
+            )}
             {editRights.edit && !mode.staging && !initialState.mode.new && (
               <Button
                 onClick={() => setMode(!mode.read ? 'read' : 'edit')}
