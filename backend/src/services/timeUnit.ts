@@ -63,7 +63,7 @@ export const getTimeUnitDetails = async (id: string) => {
 
   const tuids = result.now_tau.map(tau => tau.tuid)
 
-  const logResult = await logDb.log.findMany({ where: { suid: { in: tuids } } })
+  const logResult = await logDb.log.findMany({ where: { tuid: { in: tuids } } })
 
   result.now_tau = result.now_tau.map(tau => ({
     ...tau,
