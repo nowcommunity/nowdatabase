@@ -59,6 +59,7 @@ export const logAllUpdates = async (
     if (targetTable === 'now_mus') return 'museum'
     if (targetTable === 'now_ls') return tableName === 'now_loc' ? 'species_id' : 'lid'
     if (targetTable === 'now_loc') return 'lid'
+    if (targetTable === 'now_ss') return 'sed_struct'
     throw new Error(`No id column found for ${targetTable}`)
   }
 
