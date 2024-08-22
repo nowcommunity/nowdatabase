@@ -10,6 +10,11 @@ export const blockWriteRequests: Middleware = (req, res, next) => {
     '/user/create',
     '/email',
   ]
+
+  // route may have trailing slash
+  const allowedRoutesCopy = [...allowedRoutes]
+  allowedRoutesCopy.forEach(route => allowedRoutes.push(`${route}/`))
+
   const writeMethods = ['POST', 'PUT', 'PATCH', 'DELETE']
 
   if (writeMethods.includes(req.method) && !allowedRoutes.includes(req.path)) {
