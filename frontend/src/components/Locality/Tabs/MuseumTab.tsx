@@ -1,6 +1,5 @@
 import { Editable, LocalityDetailsType, Museum } from '@/backendTypes'
 import { EditableTable } from '@/components/DetailView/common/EditableTable'
-import { EditingForm } from '@/components/DetailView/common/EditingForm'
 import { Grouped } from '@/components/DetailView/common/tabLayoutHelpers'
 import { SelectingTable } from '@/components/DetailView/common/SelectingTable'
 import { useDetailContext } from '@/components/DetailView/Context/DetailContext'
@@ -32,33 +31,10 @@ export const MuseumTab = () => {
     },
   ]
 
-  const formFields: { name: string; label: string; required?: boolean }[] = [
-    { name: 'museum', label: 'Museum', required: true },
-    { name: 'institution', label: 'Institution' },
-    { name: 'alternativeName', label: 'Alternative name' },
-    { name: 'city', label: 'City', required: true },
-    { name: 'state', label: 'State' },
-    { name: 'stateCode', label: 'State code' },
-    { name: 'country', label: 'Country', required: true },
-  ]
-
   return (
     <Grouped title="Museums">
       {!mode.read && (
         <Box display="flex" gap={1}>
-          <EditingForm<Museum, LocalityDetailsType>
-            buttonText="Add new museum"
-            formFields={formFields}
-            editAction={(newMuseum: Museum) => {
-              setEditData({
-                ...editData,
-                now_mus: [
-                  ...editData.now_mus,
-                  { lid: editData.lid, museum: newMuseum.museum, com_mlist: newMuseum, rowState: 'new' },
-                ],
-              })
-            }}
-          />
           <SelectingTable<Museum, LocalityDetailsType>
             buttonText="Select Museum"
             data={museumData}
