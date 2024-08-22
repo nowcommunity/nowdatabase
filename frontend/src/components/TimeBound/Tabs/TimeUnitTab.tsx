@@ -1,8 +1,9 @@
 import { TimeUnit, TimeBoundDetailsType } from '@/backendTypes'
 import { useGetTimeBoundTimeUnitsQuery } from '@/redux/timeBoundReducer'
 import { CircularProgress } from '@mui/material'
-import { TableView } from '../../TableView/TableView'
 import { useDetailContext } from '@/components/DetailView/Context/DetailContext'
+import { MRT_ColumnDef } from 'material-react-table'
+import { SimpleTable } from '@/components/DetailView/common/SimpleTable'
 
 export const TimeUnitTab = () => {
   const { data } = useDetailContext<TimeBoundDetailsType>()
@@ -11,7 +12,7 @@ export const TimeUnitTab = () => {
   if (isError) return 'Error loading Time Units.'
   if (!timeUnitsData) return <CircularProgress />
 
-  const columns = [
+  const columns: MRT_ColumnDef<TimeUnit>[] = [
     {
       accessorKey: 'tu_name',
       header: 'ID',
@@ -21,14 +22,8 @@ export const TimeUnitTab = () => {
       header: 'Name',
     },
     {
-      accessorKey: 'up_bnd',
-      // accessorFn: ({ up_bnd }) => up_bnd === data.bid,
-      header: 'Upper Bound',
-    },
-    {
-      accessorKey: 'low_bnd',
-      // accessorFn: ({ low_bnd }) => low_bnd === data.bid,
-      header: 'Lower Bound',
+      accessorFn: ({ up_bound }) => (up_bound === data.bid ? 'Upper' : 'Lower'),
+      header: 'Upper/Lower',
     },
     {
       accessorKey: 'rank',
@@ -44,5 +39,5 @@ export const TimeUnitTab = () => {
     },
   ]
 
-  return <TableView<TimeUnit> idFieldName="tu_name" columns={columns} data={timeUnitsData} url="time-unit" />
+  return <SimpleTable<TimeUnit> columns={columns} data={timeUnitsData} />
 }
