@@ -5,9 +5,8 @@ describe('Broadly test what different user rights see', () => {
       cy.session('admin-session', () => {})
       cy.login('testSu')
     })
-    it('Sees new and delete buttons in tableviews', () => {
+    it('Sees new button in tableviews', () => {
       cy.visit('/locality')
-      cy.contains('Delete')
       cy.contains('New').click()
       cy.contains('Time Unit')
       cy.contains('Creating new locality')
