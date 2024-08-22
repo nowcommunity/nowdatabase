@@ -30,6 +30,12 @@ const localitiesApi = api.injectEndpoints({
       }),
       invalidatesTags: (result, _error, { lid }) => (result ? [{ type: 'locality', id: lid }, 'localities'] : []),
     }),
+    deleteLocality: builder.mutation<void, number>({
+      query: id => ({
+        url: `/locality/${id}`,
+        method: 'DELETE',
+      }),
+    }),
   }),
 })
 
@@ -38,4 +44,5 @@ export const {
   useGetLocalityDetailsQuery,
   useEditLocalityMutation,
   useGetLocalitySpeciesListMutation,
+  useDeleteLocalityMutation,
 } = localitiesApi
