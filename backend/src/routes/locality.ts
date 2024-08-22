@@ -5,6 +5,7 @@ import { EditDataType, EditMetaData, LocalityDetailsType } from '../../../fronte
 import { write } from '../services/write/write'
 import { requireOneOf } from '../middlewares/authorizer'
 import { Role } from '../../../frontend/src/types'
+import { deleteLocality } from '../services/write/delete'
 
 const router = Router()
 
@@ -46,5 +47,11 @@ router.put(
     return res.status(200).send(result ? { id: result } : { error: 'error' })
   }
 )
+
+router.delete('/:id', requireOneOf([Role.Admin]), async (req, res) => {
+  const id = parseInt(req.params.id)
+  await deleteLocality(id)
+  return res.status(200).send()
+})
 
 export default router
