@@ -1,17 +1,32 @@
 import { SequenceDetailsType, TimeBoundDetailsType, TimeUnitDetailsType } from '@/backendTypes'
 import { FieldWithTableSelection } from '@/components/DetailView/common/editingComponents'
+import { emptyOption } from '@/components/DetailView/common/misc'
 import { ArrayFrame } from '@/components/DetailView/common/tabLayoutHelpers'
 import { useDetailContext } from '@/components/DetailView/Context/DetailContext'
 import { SequenceTable } from '@/components/Sequence/SequenceTable'
 import { TimeBoundTable } from '@/components/TimeBound/TimeBoundTable'
 
 export const TimeUnitTab = () => {
-  const { textField, data, mode } = useDetailContext<TimeUnitDetailsType>()
+  const { textField, dropdown, data, mode } = useDetailContext<TimeUnitDetailsType>()
+
+  const rankOptions = [
+    'Age',
+    'Chron',
+    'Culture',
+    'Epoc',
+    'Period',
+    'Stage',
+    'Subage',
+    'Subchron',
+    'Unit',
+    'Zone',
+    emptyOption,
+  ]
 
   const timeUnit = [
     ['Name', textField('tu_display_name')],
-    ['Rank', textField('rank')],
-    ['Sequence', textField('sequence')],
+    ['Rank', dropdown('rank', rankOptions, 'Rank')],
+    //['Sequence', dropdown('s')],
     ['Comment', textField('tu_comment')],
     [
       'Sequence',
