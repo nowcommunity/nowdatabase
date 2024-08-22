@@ -26,7 +26,7 @@ router.put(
   // TODO: Check if edit restricted has rights to edit the locality.
   async (req: Request<object, object, { locality: EditDataType<LocalityDetailsType> & EditMetaData }>, res) => {
     const editedLocality = req.body.locality
-    const { comment } = editedLocality
+    const { comment, references } = editedLocality
     delete editedLocality.comment
     delete editedLocality.references
     const validationErrors = validateEntireLocality(editedLocality)
@@ -40,7 +40,8 @@ router.put(
       'now_loc',
       req.user!.initials,
       comment ?? '',
-      editedLocality.lid ? 'update' : 'add'
+      editedLocality.lid ? 'update' : 'add',
+      references ?? []
     )
     return res.status(200).send(result ? { id: result } : { error: 'error' })
   }

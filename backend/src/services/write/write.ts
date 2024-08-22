@@ -165,7 +165,7 @@ const writeTable = async <T extends CustomObject>(obj: T, tableName: AllowedTabl
   return id
 }
 
-export const write: WriteFunction = async (data, tableName, userInitials, comment, type) => {
+export const write: WriteFunction = async (data, tableName, userInitials, comment, type, references) => {
   const connection = await pool.getConnection()
   await connection.beginTransaction()
 
@@ -180,7 +180,7 @@ export const write: WriteFunction = async (data, tableName, userInitials, commen
     const id = await writeTable(data, tableName, writeContext)
     writeContext.writeList = writeContext.writeList.filter(item => !tablesToNotLog.includes(item.table))
     debugLog(`WriteList: ${printJSON(writeContext.writeList)}`)
-    await logAllUpdates(writeContext, tableName, userInitials, comment, id)
+    await logAllUpdates(writeContext, tableName, userInitials, comment, id, references)
     await connection.commit()
     await connection.end()
     return id

@@ -169,4 +169,4 @@ export type ReferenceTypeType = Prisma.ref_ref_type & { ref_field_name: Prisma.r
 
 export type ReferenceField = Prisma.ref_field_name
 
-export type EditMetaData = { comment?: string; references?: ReferenceType[] }
+export type EditMetaData = { comment?: string; references?: Reference[] }

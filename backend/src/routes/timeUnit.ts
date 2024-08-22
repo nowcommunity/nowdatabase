@@ -1,7 +1,7 @@
 import { Request, Router } from 'express'
 import { getAllTimeUnits, getTimeUnitDetails, getTimeUnitLocalities } from '../services/timeUnit'
 import { fixBigInt } from '../utils/common'
-import { EditDataType, TimeUnitDetailsType } from '../../../frontend/src/backendTypes'
+import { EditDataType, EditMetaData, TimeUnitDetailsType } from '../../../frontend/src/backendTypes'
 import { write } from '../services/write/write'
 
 const router = Router()
@@ -26,14 +26,15 @@ router.get('/localities/:id', async (req, res) => {
 
 router.put(
   '/',
-  async (req: Request<object, object, { timeUnit: EditDataType<TimeUnitDetailsType>; comment: string }>, res) => {
+  async (req: Request<object, object, { timeUnit: EditDataType<TimeUnitDetailsType> & EditMetaData }>, res) => {
     const editedObject = req.body.timeUnit
     const result = await write(
       editedObject,
       'now_time_unit',
       req.user!.initials,
-      req.body.comment ?? '',
-      editedObject.tu_name ? 'update' : 'add'
+      editedObject.comment ?? '',
+      editedObject.tu_name ? 'update' : 'add',
+      editedObject.references ?? []
     )
     return res.status(200).send(result ? { result: result } : { error: 'error' })
   }

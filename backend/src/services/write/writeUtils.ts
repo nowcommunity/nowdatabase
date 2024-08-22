@@ -1,9 +1,6 @@
-/*
-  Common utility functions for processing saving actions
-*/
 import { PoolConnection } from 'mariadb'
-import { EditDataType, ReferenceDetailsType } from '../../../../frontend/src/backendTypes'
-import { COORDINATOR, RUNNING_ENV } from '../../utils/config'
+import { EditDataType, Reference, ReferenceDetailsType } from '../../../../frontend/src/backendTypes'
+import { COORDINATOR, NOW_DB_NAME, RUNNING_ENV } from '../../utils/config'
 import { nowDb } from '../../utils/db'
 import { logger } from '../../utils/logger'
 import { createUpdateEntry, writeLogRows } from './updateAndLog'
@@ -14,7 +11,7 @@ const tableNameToPrefix = {
   com_species: 'sau',
   now_time_unit: 'tau',
   now_tu_bound: 'bau',
-} as Record<AllowedTables, 'sau' | 'tau' | 'lau' | 'bau'>
+} as Record<PrimaryTables, 'sau' | 'tau' | 'lau' | 'bau'>
 
 /* Updates to certain tables have to be logged in a different table
    than the one the user edited. Sometimes several tables. For example,
@@ -51,7 +48,8 @@ export const logAllUpdates = async (
   tableName: PrimaryTables,
   userInitials: string,
   comment: string,
-  id: string | number
+  id: string | number,
+  references: Reference[]
 ) => {
   const updateEntries: UpdateEntry[] = []
   const { writeList } = writeContext
@@ -115,8 +113,11 @@ export const logAllUpdates = async (
       updateEntries.push(singleUpdateOfTable)
     }
   }
+
   // Write the update-entries: This inserts the id's that are created into the objects.
   await writeUpdateEntries(updateEntries, writeContext.connection, userInitials, comment)
+
+  await writeReferences(updateEntries, writeContext.connection, references)
 
   // The write has value and oldValue swapped for 'delete' type logRows due to reasons.
   // It is simpler to fix it here than changing how write works, because values are used to find id's above.
@@ -130,6 +131,21 @@ export const logAllUpdates = async (
 }
 
 const getUpdateIdField = (tableName: PrimaryTables) => `${tableName[4]}uid` as 'buid' | 'luid' | 'suid' | 'tuid'
+
+const writeReferences = async (updateEntries: UpdateEntry[], connection: PoolConnection, references: Reference[]) => {
+  const referenceIds = references.map(ref => ref.rid)
+  for (const updateEntry of updateEntries) {
+    const id = updateEntry.entryId
+    const idField = getUpdateIdField(updateEntry.table)
+    const referenceJoinTable = `now_${idField[0]}r`
+    for (const referenceId of referenceIds) {
+      await connection.query(`INSERT INTO ${NOW_DB_NAME}.${referenceJoinTable} (${idField}, rid) VALUES (?, ?)`, [
+        id,
+        referenceId,
+      ])
+    }
+  }
+}
 
 const mergeLogRows = (updateEntries: UpdateEntry[]) => {
   const getLogRowKey = (logRow: LogRow) => {
@@ -281,7 +297,8 @@ export type WriteFunction = <T extends CustomObject>(
   tableName: PrimaryTables,
   username: string,
   comment: string,
-  type: ActionType
+  type: ActionType,
+  references: Reference[]
 ) =>
   | Promise<string | number>
   | ((data: EditDataType<ReferenceDetailsType>, tableName: 'ref_ref') => Promise<string | number>)
@@ -321,6 +338,7 @@ export const ids: Record<AllowedTables, string[]> = {
 }
 
 export const supportedTables = Object.keys(ids)
+
 export type Item = { table: AllowedTables; column: string; value: DbValue; oldValue?: DbValue }
 export type DeleteItem = { tableName: AllowedTables; idValues: Array<string | number>; idColumns: string[] }
 export type WriteItem = {
