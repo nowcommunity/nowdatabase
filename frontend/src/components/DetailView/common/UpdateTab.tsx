@@ -56,6 +56,11 @@ const ReferenceList = ({ references, big }: { references: ReferenceType[]; big: 
   )
 }
 
+const formatDate = (date: Date | null) => {
+  if (!date) return 'No date'
+  return new Date(date).toISOString().split('T')[0]
+}
+
 export const UpdateTab = <T, UpdateType extends MRT_RowData & { updates: UpdateLog[] }>({
   prefix,
   refFieldName,
@@ -66,11 +71,6 @@ export const UpdateTab = <T, UpdateType extends MRT_RowData & { updates: UpdateL
   updatesFieldName: keyof T
 }) => {
   const { data } = useDetailContext<T>()
-
-  const formatDate = (date: Date | null) => {
-    if (!date) return 'No date'
-    return new Date(date).toISOString().split('T')[0]
-  }
 
   const columns: MRT_ColumnDef<UpdateType>[] = [
     {
@@ -100,6 +100,9 @@ export const UpdateTab = <T, UpdateType extends MRT_RowData & { updates: UpdateL
       header: 'Details',
       Cell: ({ row }: { row: MRT_Row<UpdateType> }) => (
         <DetailsModal
+          date={row.original[`${prefix}_date`] as Date}
+          authorizer={row.original[`${prefix}_authorizer`] as string}
+          coordinator={row.original[`${prefix}_coordinator`] as string}
           updates={row.original.updates}
           comment={row.original[`${prefix}_comment` as keyof UpdateType] as string}
           references={row.original[refFieldName] as { ref_ref: ReferenceType }[]}
@@ -119,10 +122,16 @@ const DetailsModal = <RefType extends { ref_ref: ReferenceType }>({
   updates,
   references,
   comment,
+  date,
+  authorizer,
+  coordinator,
 }: {
   updates: UpdateLog[]
   references: RefType[]
   comment: string
+  date: Date
+  authorizer: string
+  coordinator: string
 }) => {
   const columns: MRT_ColumnDef<UpdateLog>[] = [
     {
@@ -149,8 +158,26 @@ const DetailsModal = <RefType extends { ref_ref: ReferenceType }>({
 
   return (
     <EditingModal buttonText="Details" dataCy="update-details-button">
-      <Box>Comment: {comment}</Box>
+      <h3>Update log</h3>
+      <Card sx={{ padding: '0.4em', margin: '0.5em', maxWidth: '30em', backgroundColor: 'lightblue' }}>
+        <Box>
+          <p>
+            <b>Date:</b> {formatDate(date)}
+          </p>
+          <p>
+            <b>Authorizer:</b> {authorizer}
+          </p>
+          <p>
+            <b>Coordinator:</b> {coordinator}
+          </p>
+          <p>
+            <b>Comment:</b> {comment ?? ''}
+          </p>
+        </Box>
+      </Card>
+      <h3>References</h3>
       <ReferenceList references={references.map(ref => ref.ref_ref)} big />
+      <h3>Changed database values</h3>
       <SimpleTable columns={columns} data={updates} />
     </EditingModal>
   )
