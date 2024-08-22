@@ -13,7 +13,7 @@ export const SpeciesTab = () => {
   const { mode, editData, setEditData } = useDetailContext<LocalityDetailsType>()
   const { data: speciesData, isError } = useGetAllSpeciesQuery(mode.read ? skipToken : undefined)
 
-  const columns: MRT_ColumnDef<Species>[] = [
+  const speciesColumns: MRT_ColumnDef<Species>[] = [
     {
       accessorKey: 'order_name',
       header: 'Order',
@@ -47,7 +47,7 @@ export const SpeciesTab = () => {
       header: 'Taxon status',
     },
   ]
-  const columns2: MRT_ColumnDef<LocalitySpecies>[] = [
+  const localitySpeciesColumns: MRT_ColumnDef<LocalitySpecies>[] = [
     {
       accessorKey: 'com_species.order_name',
       header: 'Order',
@@ -118,7 +118,7 @@ export const SpeciesTab = () => {
             buttonText="Select Species"
             data={speciesData}
             isError={isError}
-            columns={columns}
+            columns={speciesColumns}
             fieldName="now_ls"
             idFieldName="species_id"
             editingAction={(newSpecies: Species) => {
@@ -138,7 +138,7 @@ export const SpeciesTab = () => {
           />
         </Box>
       )}
-      <EditableTable<LocalitySpecies, LocalityDetailsType> columns={columns2} field="now_ls" />
+      <EditableTable<LocalitySpecies, LocalityDetailsType> columns={localitySpeciesColumns} field="now_ls" />
     </Grouped>
   )
 }

@@ -3,11 +3,10 @@ import { ArrayFrame } from '@/components/DetailView/common/tabLayoutHelpers'
 import { useDetailContext } from '@/components/DetailView/Context/DetailContext'
 
 export const BoundTab = () => {
-  const { textField } = useDetailContext<TimeBoundDetailsType>()
+  const { data, textField } = useDetailContext<TimeBoundDetailsType>()
 
   const bound = [
-    // TODO Add static Class field
-    ['Bound Id', textField('bid')],
+    ['Bound Id', data.bid],
     ['Name', textField('b_name')],
     ['Age (Ma)', textField('age')],
     ['Comment', textField('b_comment')],
