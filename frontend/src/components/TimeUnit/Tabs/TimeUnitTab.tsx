@@ -6,7 +6,7 @@ import { SequenceTable } from '@/components/Sequence/SequenceTable'
 import { TimeBoundTable } from '@/components/TimeBound/TimeBoundTable'
 
 export const TimeUnitTab = () => {
-  const { textField, data } = useDetailContext<TimeUnitDetailsType>()
+  const { textField, data, mode } = useDetailContext<TimeUnitDetailsType>()
 
   const timeUnit = [
     ['Name', textField('tu_display_name')],
@@ -22,26 +22,7 @@ export const TimeUnitTab = () => {
         selectorTable={<SequenceTable />}
       />,
     ],
-    [
-      'Upper Time Unit Bound',
-      <FieldWithTableSelection<TimeBoundDetailsType, TimeUnitDetailsType>
-        key="up_bnd"
-        sourceField="bid"
-        targetField="up_bnd"
-        selectorTable={<TimeBoundTable />}
-      />,
-    ],
-    [
-      'Lower Time Unit Bound',
-      <FieldWithTableSelection<TimeBoundDetailsType, TimeUnitDetailsType>
-        key="low_bnd"
-        sourceField="bid"
-        targetField="low_bnd"
-        selectorTable={<TimeBoundTable />}
-      />,
-    ],
   ]
-
   const low_bound = [
     ['Id', data.low_bound.bid],
     ['Name', data.low_bound.b_name],
@@ -56,11 +37,33 @@ export const TimeUnitTab = () => {
     ['Comment', data.up_bound.b_comment],
   ]
 
+  const time_bound_edit = [
+    [
+      'New Upper Bound',
+      <FieldWithTableSelection<TimeBoundDetailsType, TimeUnitDetailsType>
+        key="up_bnd"
+        sourceField="bid"
+        targetField="up_bnd"
+        selectorTable={<TimeBoundTable />}
+      />,
+    ],
+    [
+      'New Lower Bound',
+      <FieldWithTableSelection<TimeBoundDetailsType, TimeUnitDetailsType>
+        key="low_bnd"
+        sourceField="bid"
+        targetField="low_bnd"
+        selectorTable={<TimeBoundTable />}
+      />,
+    ],
+  ]
+
   return (
     <>
       <ArrayFrame array={timeUnit} title="Time Unit" />
       <ArrayFrame array={low_bound} title="Lower bound" />
       <ArrayFrame array={up_bound} title="Upper bound" />
+      {!mode.read && <ArrayFrame array={time_bound_edit} title="Edit bounds" />}
     </>
   )
 }
