@@ -1,5 +1,5 @@
 import { api } from './api'
-import { EditDataType, Reference, ReferenceDetailsType, ReferenceTypeType } from '@/backendTypes'
+import { EditDataType, Reference, ReferenceDetailsType, ReferenceType } from '@/backendTypes'
 
 const referencesApi = api.injectEndpoints({
   endpoints: builder => ({
@@ -15,7 +15,7 @@ const referencesApi = api.injectEndpoints({
       }),
       providesTags: result => (result ? [{ type: 'reference', id: result.rid }] : []),
     }),
-    getReferenceTypes: builder.query<ReferenceTypeType[], void>({
+    getReferenceTypes: builder.query<ReferenceType[], void>({
       query: () => ({
         url: 'reference/types',
       }),
