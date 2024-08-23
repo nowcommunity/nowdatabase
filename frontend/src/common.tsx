@@ -26,10 +26,12 @@ export const referenceTableColumns: MRT_ColumnDef<Reference>[] = [
     maxSize: 60,
   },
   {
-    accessorKey: 'title_primary',
+    id: 'title_primary',
+    accessorFn: ({ title_primary }) => title_primary ?? '',
     Cell,
     header: 'Title',
     maxSize: 60,
+    filterFn: 'contains',
   },
   {
     accessorFn: ({ ref_journal }) => ref_journal?.journal_title || '',
