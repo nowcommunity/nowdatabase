@@ -115,6 +115,9 @@ const writeTable = async <T extends CustomObject>(obj: T, tableName: AllowedTabl
       )) as Record<string, string | number>[]
       id = result[0][idFieldName]
       type = 'add'
+
+      // Add the newly created id to list, so that it will be logged correctly
+      fieldsToWrite.push({ table: tableName, column: idFieldName, value: id })
     }
     writeContext.writeList.push({ items: fieldsToWrite, type, table: tableName })
   }
