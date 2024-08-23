@@ -3,7 +3,7 @@ import { useDetailContext } from '@/components/DetailView/Context/DetailContext'
 import { EditingModal } from '@/components/DetailView/common/EditingModal'
 import { SimpleTable } from '@/components/DetailView/common/SimpleTable'
 import { Grouped } from '@/components/DetailView/common/tabLayoutHelpers'
-import { Box, Card, Stack } from '@mui/material'
+import { Box, Card, Divider, Stack } from '@mui/material'
 import { MRT_ColumnDef, MRT_Row, MRT_RowData } from 'material-react-table'
 import { Link } from 'react-router-dom'
 
@@ -159,7 +159,9 @@ const DetailsModal = <RefType extends { ref_ref: ReferenceType }>({
   return (
     <EditingModal buttonText="Details" dataCy="update-details-button">
       <h3>Update log</h3>
-      <Card sx={{ padding: '0.4em', margin: '0.5em', maxWidth: '30em', backgroundColor: 'lightblue' }}>
+      <Card
+        sx={{ padding: '0.4em', margin: '0.5em', paddingLeft: '1em', maxWidth: '30em', backgroundColor: 'lightblue' }}
+      >
         <Box>
           <p>
             <b>Date:</b> {formatDate(date)}
@@ -175,8 +177,14 @@ const DetailsModal = <RefType extends { ref_ref: ReferenceType }>({
           </p>
         </Box>
       </Card>
+      <Divider />
       <h3>References</h3>
-      <ReferenceList references={references.map(ref => ref.ref_ref)} big />
+      {references.length === 0 ? (
+        <Box>Update has no references.</Box>
+      ) : (
+        <ReferenceList references={references.map(ref => ref.ref_ref)} big />
+      )}
+      <Divider />
       <h3>Changed database values</h3>
       <SimpleTable columns={columns} data={updates} />
     </EditingModal>
