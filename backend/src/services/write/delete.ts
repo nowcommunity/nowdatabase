@@ -1,27 +1,16 @@
-import { PoolConnection } from 'mariadb'
-import { AllowedTables } from './writeUtils'
-import { NOW_DB_NAME } from '../../utils/config'
 import { pool } from '../../utils/db'
-import { logger } from '../../utils/logger'
-
-const deleteFromTable = async (
-  table: AllowedTables,
-  idColumn: string,
-  id: string | number,
-  returnColumns: string[],
-  connection: PoolConnection
-) => {
-  return await connection.query<Array<{ [key: string]: string | number }>>(
-    `DELETE FROM ${NOW_DB_NAME}.${table} WHERE ${idColumn} = ? RETURNING ${returnColumns.join(', ')}`,
-    [id]
-  )
-}
+import { DatabaseHandler } from '../writeOperations/databaseHandler'
 
 export const deleteLocality = async (id: string | number) => {
-  const connection = await pool.getConnection()
-  const deletedLocalitySpecies = await deleteFromTable('now_ls', 'lid', id, ['lid', 'species_id'], connection)
-  logger.info(`Deleted following locality species: ${deletedLocalitySpecies.toString()}`)
-  await deleteFromTable('now_loc', 'lid', id, ['lid'], connection)
-  // TODO: Log, inside a transaction
-  await connection.end()
+  const dbHandler = new DatabaseHandler(await pool.getConnection())
+  await dbHandler.start()
+  const deletedLocalitySpecies = await dbHandler.delete('now_ls', [{ column: 'lid', value: id }], [])
+  const deletedLocality = await dbHandler.delete('now_loc', [{ column: 'lid', value: id }])
+
+  // eslint-disable-next-line no-console
+  console.log({ deletedLocalitySpecies, deletedLocality })
+
+  // TODO: Log deletion
+  // TODO: clarify: Do we need to log all relations, for example now_coll_meth if lid is removed?
+  await dbHandler.end()
 }

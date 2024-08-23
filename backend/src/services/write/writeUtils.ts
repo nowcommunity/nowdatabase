@@ -22,7 +22,7 @@ const tableToUpdateTargets = {
   now_ls: ['now_loc', 'com_species'],
 } as Record<AllowedTables, PrimaryTables[] | undefined>
 
-type PrimaryTables = 'now_loc' | 'com_species' | 'now_time_unit' | 'now_tu_bound'
+export type PrimaryTables = 'now_loc' | 'com_species' | 'now_time_unit' | 'now_tu_bound'
 
 export type ActionType = 'delete' | 'update' | 'add'
 
