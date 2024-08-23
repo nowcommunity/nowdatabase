@@ -53,13 +53,13 @@ export const logAllUpdates = async (
 ) => {
   const updateEntries: UpdateEntry[] = []
   const { writeList } = writeContext
-
   const getIdColumn = (targetTable: AllowedTables) => {
     if (targetTable === 'com_species') return 'species_id'
     if (targetTable === 'now_mus') return 'museum'
     if (targetTable === 'now_ls') return tableName === 'now_loc' ? 'species_id' : 'lid'
     if (targetTable === 'now_loc') return 'lid'
     if (targetTable === 'now_ss') return 'sed_struct'
+    if (targetTable === 'com_taxa_synonym') return 'synonym_id'
     throw new Error(`No id column found for ${targetTable}`)
   }
 
@@ -315,6 +315,7 @@ export type AllowedTables =
   | 'com_mlist'
   | 'com_species'
   | 'now_ss'
+  | 'com_taxa_synonym'
   | 'now_time_unit'
   | 'now_tu_bound'
   | 'ref_ref'
@@ -336,6 +337,7 @@ export const ids: Record<AllowedTables, string[]> = {
   now_time_unit: ['tu_name'],
   now_tu_bound: ['bid'],
   ref_ref: ['rid'],
+  com_taxa_synonym: ['synonym_id'],
 }
 
 export const supportedTables = Object.keys(ids)

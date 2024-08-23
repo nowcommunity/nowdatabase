@@ -1,18 +1,12 @@
-import { Editable, SpeciesDetailsType, SpeciesSynonym } from '@/backendTypes'
+import { Editable, EditDataType, Species, SpeciesDetailsType, SpeciesSynonym } from '@/backendTypes'
 import { useDetailContext } from '@/components/DetailView/Context/DetailContext'
 import { Grouped } from '@/components/DetailView/common/tabLayoutHelpers'
-import { Box, TextField } from '@mui/material'
 import { MRT_ColumnDef } from 'material-react-table'
-import { useForm } from 'react-hook-form'
 import { EditableTable } from '@/components/DetailView/common/EditableTable'
-import { EditingModal } from '@/components/DetailView/common/EditingModal'
+import { EditingForm, EditingFormField } from '@/components/DetailView/common/EditingForm'
 
 export const SynonymTab = () => {
-  const { mode } = useDetailContext<SpeciesDetailsType>()
-  const {
-    register,
-    formState: { errors },
-  } = useForm()
+  const { mode, setEditData, editData } = useDetailContext<SpeciesDetailsType>()
 
   const columns: MRT_ColumnDef<SpeciesSynonym>[] = [
     {
@@ -29,26 +23,35 @@ export const SynonymTab = () => {
     },
   ]
 
-  // eslint-disable-next-line @typescript-eslint/require-await
-  const onSave = async () => {
-    // TODO: Saving logic here (add Synonym to editData)
-    return Object.keys(errors).length === 0
-  }
+  const formFields: EditingFormField[] = [
+    { name: 'syn_genus_name', label: 'Genus', required: true },
+    { name: 'syn_species_name', label: 'Species', required: true },
+    { name: 'syn_comment', label: 'Comment' },
+  ]
 
-  const editingModal = (
-    <EditingModal buttonText="Add new Synonym" onSave={onSave}>
-      <Box sx={{ display: 'flex', flexDirection: 'column', gap: '1em' }}>
-        <TextField {...register('syn_genus_name', { required: true })} label="Genus" required />
-        <TextField {...register('syn_species_name', { required: true })} label="Species" required />
-        <TextField {...register('syn_comment')} label="Comment" />
-      </Box>
-    </EditingModal>
+  const editingForm = (
+    <EditingForm<Species, SpeciesDetailsType>
+      buttonText="Add new Species"
+      formFields={formFields}
+      editAction={(newSynonym: EditDataType<SpeciesSynonym>) => {
+        setEditData({
+          ...editData,
+          com_taxa_synonym: [
+            ...editData.com_taxa_synonym,
+            {
+              ...newSynonym,
+              rowState: 'new',
+            },
+          ],
+        })
+      }}
+    />
   )
 
   return (
     <>
       <Grouped title="Synonyms">
-        {!mode.read && editingModal}
+        {!mode.read && editingForm}
         <EditableTable<Editable<SpeciesSynonym>, SpeciesDetailsType> columns={columns} field="com_taxa_synonym" />
       </Grouped>
     </>
