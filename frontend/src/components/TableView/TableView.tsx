@@ -170,9 +170,9 @@ export const TableView = <T extends MRT_RowData>({
             <Tooltip
               title={
                 <span style={{ fontSize: 18 }}>
-                  Export&lsquo;s all localities filtered in the table below with all their species. The export is sorted by
-                  name. This may take up to a minute, so please wait without closing the browser or switching page. To
-                  export only localities use the &lsquo;export&lsquo; button in the top-right corner of the table.
+                  Export&lsquo;s all localities filtered in the table below with all their species. The export is sorted
+                  by name. This may take up to a minute, so please wait without closing the browser or switching page.
+                  To export only localities use the &lsquo;export&lsquo; button in the top-right corner of the table.
                 </span>
               }
             >
