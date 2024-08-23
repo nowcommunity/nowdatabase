@@ -1,11 +1,9 @@
 import { Editable, LocalityDetailsType, CollectingMethod } from '@/backendTypes'
 import { useDetailContext } from '@/components/DetailView/Context/DetailContext'
 import { Grouped, ArrayFrame, HalfFrames } from '@/components/DetailView/common/tabLayoutHelpers'
-import { Box, TextField } from '@mui/material'
 import { MRT_ColumnDef } from 'material-react-table'
-import { useForm } from 'react-hook-form'
 import { EditableTable } from '@/components/DetailView/common/EditableTable'
-import { EditingModal } from '@/components/DetailView/common/EditingModal'
+import { EditingForm } from '@/components/DetailView/common/EditingForm'
 
 export const TaphonomyTab = () => {
   const { textField, dropdown } = useDetailContext<LocalityDetailsType>()
@@ -122,11 +120,6 @@ export const TaphonomyTab = () => {
     ['Species List Complete', dropdown('complete', speciesListCompleteOptions, 'Species List Complete')],
   ]
 
-  const {
-    register,
-    formState: { errors },
-  } = useForm()
-
   const columns: MRT_ColumnDef<CollectingMethod>[] = [
     {
       accessorKey: 'coll_meth',
@@ -134,18 +127,12 @@ export const TaphonomyTab = () => {
     },
   ]
 
-  // eslint-disable-next-line @typescript-eslint/require-await
-  const onSave = async () => {
-    // TODO: Saving logic here (add Collecting Method to editData)
-    return Object.keys(errors).length === 0
-  }
-
-  const editingModal = (
-    <EditingModal buttonText="Add new Collecting Method" onSave={onSave}>
-      <Box sx={{ display: 'flex', flexDirection: 'column', gap: '1em' }}>
-        <TextField {...register('coll_meth', { required: true })} label="Collecting Method" required />
-      </Box>
-    </EditingModal>
+  const editingForm = (
+    <EditingForm
+      formFields={[{ name: 'coll_meth', label: 'Collection method', required: true }]}
+      buttonText="Add collecting method"
+      arrayFieldName="now_coll_meth"
+    />
   )
 
   return (
@@ -157,7 +144,7 @@ export const TaphonomyTab = () => {
 
       <HalfFrames>
         <Grouped title="Collecting Methods">
-          {!mode.read && editingModal}
+          {!mode.read && editingForm}
           <EditableTable<Editable<CollectingMethod>, LocalityDetailsType> columns={columns} field="now_coll_meth" />
         </Grouped>
         <></>

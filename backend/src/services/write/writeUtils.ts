@@ -60,6 +60,7 @@ export const logAllUpdates = async (
     if (targetTable === 'now_loc') return 'lid'
     if (targetTable === 'now_ss') return 'sed_struct'
     if (targetTable === 'com_taxa_synonym') return 'synonym_id'
+    if (targetTable === 'now_coll_meth') return 'coll_meth'
     throw new Error(`No id column found for ${targetTable}`)
   }
 
