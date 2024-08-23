@@ -30,7 +30,7 @@ router.put(
     const editedObject = req.body.timeBound
     const result = await write(
       editedObject,
-      'now_time_unit',
+      'now_tu_bound',
       req.user!.initials,
       editedObject.comment ?? '',
       editedObject.bid ? 'update' : 'add',
