@@ -39,6 +39,7 @@ export type SedimentaryStructureValues = Prisma.now_ss_values
 export type CollectingMethod = Prisma.now_coll_meth
 export type LocalityProject = Prisma.now_plr & { now_proj: Prisma.now_proj }
 export type LocalitySpecies = FixBigInt<Prisma.now_ls> & { com_species: SpeciesType }
+export type LocalitySpeciesDetailsType = FixBigInt<Prisma.now_ls> & { com_species: SpeciesDetailsType }
 export type SpeciesLocality = FixBigInt<Prisma.now_ls> & { now_loc: Prisma.now_loc }
 export type LocalityUpdate = Prisma.now_lau & { now_lr: LocalityReference[] } & { updates: UpdateLog[] }
 export type SpeciesUpdate = Prisma.now_sau & { now_sr: Prisma.now_sr }
@@ -59,7 +60,7 @@ export type LocalityDetailsType = Prisma.now_loc & {
 } & {
   projects: Array<Project>
 } & {
-  now_ls: Array<LocalitySpecies>
+  now_ls: Array<LocalitySpeciesDetailsType>
 } & { now_plr: Array<LocalityProject> } & { now_syn_loc: Array<LocalitySynonym> } & {
   now_ss: SedimentaryStructure[]
 } & {

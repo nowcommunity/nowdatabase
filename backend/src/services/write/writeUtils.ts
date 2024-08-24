@@ -97,7 +97,7 @@ export const logAllUpdates = async (
       // if we are editing now_loc and this entry is triggered by now_ls (entry for com_species),
       // the id will be "species_id", not "lid".
       const idColumn = getIdColumn(targetTable)
-      const secondaryId = writeListItem.items.find(item => item.column === idColumn)?.value
+      const secondaryId = writeListItem.items.find(item => item.column === idColumn)?.value as string | number
       if (!secondaryId)
         throw new Error(`Error when creating update entries: id not found for targetTable: ${targetTable}`)
       if (!secondaryUpdateEntries[targetTable]) secondaryUpdateEntries[targetTable] = {}
@@ -352,7 +352,7 @@ export type WriteItem = {
 }
 
 // Possible types of values that are read from db or written in there. BigInt is handled as number.
-export type DbValue = string | number | null
+export type DbValue = string | number | null | boolean
 
 export const allowedFields: Record<string, boolean | undefined> = {}
 const addFieldsToAllowed = (fields: string[]) =>

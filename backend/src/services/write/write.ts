@@ -14,13 +14,13 @@ import {
   getFieldTypes,
   getOldData,
   ids,
-  isEmptyValue,
   logAllUpdates,
   printJSON,
   tablesToNotLog,
 } from './writeUtils'
 import { NOW_DB_NAME } from '../../utils/config'
 import { PoolConnection } from 'mariadb'
+import { valueIsDifferent } from '../writeOperations/utils'
 
 const query = async (queryString: string, values: Array<DbValue>, conn: PoolConnection) => {
   const result: object = await conn.query(queryString, values)
@@ -35,7 +35,7 @@ export type WriteContext = {
   type: ActionType
 }
 
-const writeTable = async <T extends CustomObject>(obj: T, tableName: AllowedTables, writeContext: WriteContext) => {
+const writeTable = async <T extends CustomObject>(obj: T, tableName: AllowedTables, writeHandler: WriteHandler) => {
   const oldObj = await getOldData(obj, tableName)
 
   const allFields = Object.keys(obj).filter(f => allowedFields[f])
@@ -57,10 +57,10 @@ const writeTable = async <T extends CustomObject>(obj: T, tableName: AllowedTabl
     We will first recourse into that, as we cannot write the parent table itself if we don't have the id of the possibly newly-created relation.
     So we write all objectFields and take their id's to be written later */
   for (const objectField of objectFields) {
-    const newId = await writeTable(obj[objectField] as CustomObject, objectField, writeContext)
-    const lastItem = ids[objectField].length - 1
+    const newId = await writeTable(obj[objectField] as CustomObject, objectField, writeHandler)
+    const lastIdIndex = ids[objectField].length - 1
     // get the relevant id name from ids: the order is so that last item is the relevant id. e.g. now_ls
-    const idFieldName = ids[objectField][lastItem]
+    const idFieldName = ids[objectField][lastIdIndex]
     relationIds[idFieldName] = newId
   }
 
@@ -75,10 +75,7 @@ const writeTable = async <T extends CustomObject>(obj: T, tableName: AllowedTabl
     const newValue = relationIds[field] ?? (obj[field as keyof object] as CustomObject)
     const oldValue = oldObj?.[field as keyof object]
 
-    // Skipping the values that aren't changed: including differences in empty values (etc. null and "") or bigint/number different type
-    if (newValue === oldValue) continue
-    if (isEmptyValue(newValue) && isEmptyValue(oldValue)) continue
-    if (typeof oldValue === 'bigint' && typeof newValue === 'number' && BigInt(newValue) === oldValue) continue
+    if (!valueIsDifferent(newValue, oldValue)) continue
 
     // Add the fields to be written, we will actually write them at the end.
     if (!isRelationField || newValue !== undefined)

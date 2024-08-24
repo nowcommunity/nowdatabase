@@ -1,10 +1,14 @@
-import { EditDataType, LocalityDetailsType, LocalitySpecies } from '../../../../frontend/src/backendTypes'
+import {
+  EditDataType,
+  LocalityDetailsType,
+  LocalitySpeciesDetailsType,
+  SpeciesDetailsType,
+} from '../../../../frontend/src/backendTypes'
 import { NOW_DB_NAME } from '../../utils/config'
-import { getItemList } from '../writeOperations/utils'
 import { WriteHandler } from '../writeOperations/writeHandler'
+import { DbValue } from './writeUtils'
 
 export const writeLocality = async (locality: EditDataType<LocalityDetailsType>) => {
-  const isNew: boolean = !!locality.lid
   const writeHandler = new WriteHandler(NOW_DB_NAME, 'now_loc')
   await writeHandler.start()
   for (const ls of locality.now_ls) {
@@ -17,12 +21,21 @@ export const writeLocality = async (locality: EditDataType<LocalityDetailsType>)
 }
 
 /* Writes now_ls entries, and also any new species inside. */
-const writeLocalitySpecies = async (writeHandler: WriteHandler, localitySpecies: EditDataType<LocalitySpecies>) => {
+const writeLocalitySpecies = async (
+  writeHandler: WriteHandler,
+  localitySpecies: EditDataType<LocalitySpeciesDetailsType>
+) => {
+  let species_id: DbValue | undefined = localitySpecies.com_species!.species_id
   if (!localitySpecies.species_id) {
-    // const { species_id } = await writeHandler.writeTable('com_species', )
+    species_id = await writeSpecies(writeHandler, localitySpecies.com_species!)
   }
-  const items = getItemList(localitySpecies)
-  return await writeHandler.writeTable('now_ls', items, [], ['lid', 'species_id'])
+  if (species_id) localitySpecies.com_species!.species_id = species_id
+  return await writeHandler.createObject('now_ls', localitySpecies, ['lid', 'species_id'])
+}
+
+const writeSpecies = async (writeHandler: WriteHandler, species: EditDataType<SpeciesDetailsType>) => {
+  const { species_id } = await writeHandler.createObject('com_species', species, ['species_id'])
+  return species_id as number
 }
 
 const deleteLocalitySpecies = async (writeHandler: WriteHandler, lid: number, species_id: number) => {

@@ -28,11 +28,11 @@ export class DatabaseHandler {
     return { values: items.map(item => item.value), columns: items.map(item => item.column) }
   }
 
-  async insert(table: AllowedTables, items: DbWriteItem[], returnColumns?: string[]) {
+  async insert<T>(table: AllowedTables, items: DbWriteItem[], returnColumns?: string[]) {
     const returnString = returnColumns ? `RETURNING ${returnColumns.join(', ')}` : ''
     const { columns, values } = this.getValuesAndColumns(items)
 
-    return await this.executeQuery(`INSERT INTO ${this.dbName}.${table} (?) VALUES (?) ${returnString}`, [
+    return await this.executeQuery<T>(`INSERT INTO ${this.dbName}.${table} (?) VALUES (?) ${returnString}`, [
       columns,
       values,
     ])
@@ -43,7 +43,7 @@ export class DatabaseHandler {
     const columnsString = columns.join(', ')
 
     const { columns: idColumns, values: idValues } = this.getValuesAndColumns(ids)
-    const whereClause = `${idColumns.map(idColumn => `${idColumn} = ?`).join(' AND ')}`
+    const whereClause = createWhereClause(idColumns)
 
     await this.executeQuery(`UPDATE ${this.dbName}.${table} (${columnsString}) WHERE ${whereClause}`, [
       values,
