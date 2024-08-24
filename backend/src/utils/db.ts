@@ -44,16 +44,16 @@ export const testDbConnection = async () => {
       return false
     }
   }
-  const maxAttempts = 20
+  const maxAttempts = 25
   let attempts = 0
   while (attempts < maxAttempts) {
     const success = await tryDbConnection()
     if (success) {
       return
     }
-    logger.info(`Trying again in 6 seconds, attempt ${attempts} / ${maxAttempts}`)
+    logger.info(`Trying again in 4 seconds, attempt ${attempts} / ${maxAttempts}`)
     attempts++
-    await sleep(6000)
+    await sleep(4000)
   }
   logger.error(`Attempted ${maxAttempts} times, but database connection could not be established`)
 }
