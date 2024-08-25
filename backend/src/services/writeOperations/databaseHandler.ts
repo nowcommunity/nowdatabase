@@ -40,12 +40,12 @@ export class DatabaseHandler {
 
   async update(table: AllowedTables, items: DbWriteItem[], ids: DbWriteItem[]) {
     const { columns, values } = this.getValuesAndColumns(items)
-    const columnsString = columns.join(', ')
+    const columnsString = columns.map(col => `${col} = ?`).join(', ')
 
     const { columns: idColumns, values: idValues } = this.getValuesAndColumns(ids)
     const whereClause = createWhereClause(idColumns)
 
-    await this.executeQuery(`UPDATE ${this.dbName}.${table} (${columnsString}) WHERE ${whereClause}`, [
+    await this.executeQuery(`UPDATE ${this.dbName}.${table} SET ${columnsString} WHERE ${whereClause}`, [
       ...values,
       ...idValues,
     ])

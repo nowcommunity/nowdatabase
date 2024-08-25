@@ -10,11 +10,13 @@ export class WriteHandler extends DatabaseHandler {
   writeList: WriteItem[] = []
   idColumn: string
   idValue?: string | number
+  allowedColumns: string[]
 
-  constructor(dbName: string, table: PrimaryTables, idColumn: string) {
+  constructor(dbName: string, table: PrimaryTables, idColumn: string, allowedColumns: string[]) {
     super(dbName)
     this.table = table
     this.idColumn = idColumn
+    this.allowedColumns = allowedColumns
   }
 
   async createRow<T extends Record<string, DbValue>>(
@@ -42,7 +44,9 @@ export class WriteHandler extends DatabaseHandler {
 
       fieldsToWrite.push({ column, value })
     }
-
+    if (items.find(item => !this.allowedColumns.includes(item.column))) {
+      throw new Error('Unallowed column in SQL')
+    }
     this.writeList.push({ table, type: 'update', items: items.map(item => ({ ...item, table })) })
 
     return await super.update(table, fieldsToWrite, ids)
