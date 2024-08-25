@@ -1,15 +1,29 @@
-import { EditDataType, LocalityDetailsType } from '../../../../frontend/src/backendTypes'
+import { EditDataType, LocalityDetailsType, Reference } from '../../../../frontend/src/backendTypes'
 import { NOW_DB_NAME } from '../../utils/config'
 import { WriteHandler } from '../writeOperations/writeHandler'
 import { getFieldsOfTables } from '../../utils/db'
 
-export const writeLocality = async (locality: EditDataType<LocalityDetailsType>) => {
-  const writeHandler = new WriteHandler(
-    NOW_DB_NAME,
-    'now_loc',
-    'lid',
-    getFieldsOfTables(['now_loc', 'now_ls', 'com_species', 'now_mus', 'now_ss', 'now_coll_meth', 'now_syn_loc'])
-  )
+export const writeLocality = async (
+  locality: EditDataType<LocalityDetailsType>,
+  comment: string | undefined,
+  references: Reference[] | undefined,
+  authorizer: string
+) => {
+  const writeHandler = new WriteHandler({
+    dbName: NOW_DB_NAME,
+    table: 'now_loc',
+    idColumn: 'lid',
+    allowedColumns: getFieldsOfTables([
+      'now_loc',
+      'now_ls',
+      'com_species',
+      'now_mus',
+      'now_ss',
+      'now_coll_meth',
+      'now_syn_loc',
+    ]),
+    type: locality.lid ? 'update' : 'add',
+  })
   await writeHandler.start()
 
   if (!locality.lid) {
@@ -29,12 +43,12 @@ export const writeLocality = async (locality: EditDataType<LocalityDetailsType>)
     species.species_id = species_id as number
   }
 
-  await writeHandler.upsertList('now_ls', locality.now_ls, ['lid', 'species_id'])
-  await writeHandler.upsertList('now_mus', locality.now_mus, ['lid', 'museum'])
-  await writeHandler.upsertList('now_ss', locality.now_ss, ['lid', 'sed_struct'])
-  await writeHandler.upsertList('now_coll_meth', locality.now_coll_meth, ['lid', 'coll_meth'])
-  await writeHandler.upsertList('now_syn_loc', locality.now_syn_loc, ['lid', 'syn_id'])
-  await writeHandler.logUpdates()
+  await writeHandler.applyListChanges('now_ls', locality.now_ls, ['lid', 'species_id'])
+  await writeHandler.applyListChanges('now_mus', locality.now_mus, ['lid', 'museum'])
+  await writeHandler.applyListChanges('now_ss', locality.now_ss, ['lid', 'sed_struct'])
+  await writeHandler.applyListChanges('now_coll_meth', locality.now_coll_meth, ['lid', 'coll_meth'])
+  await writeHandler.applyListChanges('now_syn_loc', locality.now_syn_loc, ['lid', 'syn_id'])
+  await writeHandler.logUpdatesAndComplete(comment ?? '', references ?? [], authorizer)
   await writeHandler.end()
   return locality.lid
 }

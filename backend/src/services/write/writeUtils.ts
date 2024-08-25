@@ -1,26 +1,11 @@
 import { PoolConnection } from 'mariadb'
 import { EditDataType, Reference, ReferenceDetailsType } from '../../../../frontend/src/backendTypes'
-import { COORDINATOR, NOW_DB_NAME, RUNNING_ENV } from '../../utils/config'
+import { NOW_DB_NAME, RUNNING_ENV } from '../../utils/config'
 import { nowDb } from '../../utils/db'
 import { logger } from '../../utils/logger'
-import { createUpdateEntry, writeLogRows } from './updateAndLog'
+import { writeLogRows } from './updateAndLog'
 import { WriteContext } from './write'
-
-const tableNameToPrefix = {
-  now_loc: 'lau',
-  com_species: 'sau',
-  now_time_unit: 'tau',
-  now_tu_bound: 'bau',
-} as Record<PrimaryTables, 'sau' | 'tau' | 'lau' | 'bau'>
-
-/* Updates to certain tables have to be logged in a different table
-   than the one the user edited. Sometimes several tables. For example,
-   user editing locality and changing now_ls will require update entry
-   to both now_loc and com_species. If this table doesn't have entry for a
-   table, assume it goes to the "main" update entry e.g. if user edited locality, now_loc. */
-const tableToUpdateTargets = {
-  now_ls: ['now_loc', 'com_species'],
-} as Record<AllowedTables, PrimaryTables[] | undefined>
+import { UpdateEntry } from '../writeOperations/updateLogHandler'
 
 export type PrimaryTables = 'now_loc' | 'com_species' | 'now_time_unit' | 'now_tu_bound'
 
@@ -33,14 +18,6 @@ export type LogRow = Item & {
   buid?: number
   tuid?: number
   type: ActionType
-}
-
-type UpdateEntry = {
-  table: PrimaryTables
-  logRows: LogRow[]
-  type: ActionType
-  id: string | number // Id of the item that was changed
-  entryId?: number // Id of the created update entry
 }
 
 export const logAllUpdates = async (
@@ -127,60 +104,10 @@ export const logAllUpdates = async (
     if (logRow.type !== 'delete') return logRow
     return { ...logRow, oldValue: logRow.value, value: null }
   }
+
   const logRows = mergeLogRows(updateEntries).map(logRow => fixDeleteRows(logRow))
 
   await writeLogRows(writeContext.connection, logRows, userInitials)
-}
-
-const getUpdateIdField = (tableName: PrimaryTables) => `${tableName[4]}uid` as 'buid' | 'luid' | 'suid' | 'tuid'
-
-const writeReferences = async (updateEntries: UpdateEntry[], connection: PoolConnection, references: Reference[]) => {
-  const referenceIds = references.map(ref => ref.rid)
-  for (const updateEntry of updateEntries) {
-    const id = updateEntry.entryId
-    const idField = getUpdateIdField(updateEntry.table)
-    const referenceJoinTable = `now_${idField[0]}r`
-    for (const referenceId of referenceIds) {
-      await connection.query(`INSERT INTO ${NOW_DB_NAME}.${referenceJoinTable} (${idField}, rid) VALUES (?, ?)`, [
-        id,
-        referenceId,
-      ])
-    }
-  }
-}
-
-const mergeLogRows = (updateEntries: UpdateEntry[]) => {
-  const getLogRowKey = (logRow: LogRow) => {
-    return `${logRow.column}-${logRow.value}-${logRow.oldValue}-${logRow.table}-${logRow.pkData}`
-  }
-
-  const logRowMap: Record<string, LogRow> = {}
-
-  // Iterate through updateEntries. Collect logrows into map. LogRows with identical data may be in multiple
-  // updateEntries, such as now_ls rows in locality and species. These should be merged so that only one is left,
-  // but with both id's (luid and suid) found in the updateEntries.
-  for (const updateEntry of updateEntries) {
-    const idFieldName = getUpdateIdField(updateEntry.table)
-    for (const logRow of updateEntry.logRows) {
-      const key = getLogRowKey(logRow)
-      logRowMap[key] = { ...(logRowMap[key] ? logRowMap[key] : logRow), [idFieldName]: updateEntry.entryId }
-    }
-  }
-  return Object.values(logRowMap)
-}
-
-const writeUpdateEntries = async (
-  updateEntries: UpdateEntry[],
-  connection: PoolConnection,
-  authorizer: string,
-  comment: string
-) => {
-  for (const updateEntry of updateEntries) {
-    const prefix = tableNameToPrefix[updateEntry.table]
-    const createdId = await createUpdateEntry(connection, prefix, COORDINATOR, authorizer, comment, updateEntry.id)
-    updateEntry.entryId = createdId
-  }
-  return updateEntries
 }
 
 // Some tables are not logged at all.

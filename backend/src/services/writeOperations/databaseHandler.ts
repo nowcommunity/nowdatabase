@@ -10,6 +10,7 @@ const createWhereClause = (idColumns: string[]) => `${idColumns.map(idColumn => 
 export class DatabaseHandler {
   connection?: PoolConnection
   dbName: string
+
   constructor(dbName: string) {
     this.dbName = dbName
   }

@@ -1,15 +1,21 @@
-import { EditDataType, SpeciesDetailsType } from '../../../../frontend/src/backendTypes'
+import { EditDataType, Reference, SpeciesDetailsType } from '../../../../frontend/src/backendTypes'
 import { NOW_DB_NAME } from '../../utils/config'
 import { WriteHandler } from '../writeOperations/writeHandler'
 import { getFieldsOfTables } from '../../utils/db'
 
-export const writeSpecies = async (species: EditDataType<SpeciesDetailsType>) => {
-  const writeHandler = new WriteHandler(
-    NOW_DB_NAME,
-    'com_species',
-    'species_id',
-    getFieldsOfTables(['com_species', 'now_ls'])
-  )
+export const writeSpecies = async (
+  species: EditDataType<SpeciesDetailsType>,
+  comment: string | undefined,
+  references: Reference[] | undefined,
+  authorizer: string
+) => {
+  const writeHandler = new WriteHandler({
+    dbName: NOW_DB_NAME,
+    table: 'com_species',
+    idColumn: 'species_id',
+    allowedColumns: getFieldsOfTables(['com_species', 'now_ls']),
+    type: species.species_id ? 'update' : 'add',
+  })
 
   await writeHandler.start()
 
@@ -22,10 +28,10 @@ export const writeSpecies = async (species: EditDataType<SpeciesDetailsType>) =>
 
   writeHandler.idValue = species.species_id
 
-  await writeHandler.upsertList('now_ls', species.now_ls, ['lid', 'species_id'])
-  await writeHandler.upsertList('com_taxa_synonym', species.com_taxa_synonym, ['synonym_id', 'species_id'])
-  console.log(JSON.stringify(writeHandler.writeList))
-  await writeHandler.logUpdates()
+  await writeHandler.applyListChanges('now_ls', species.now_ls, ['lid', 'species_id'])
+  await writeHandler.applyListChanges('com_taxa_synonym', species.com_taxa_synonym, ['synonym_id', 'species_id'])
+  await writeHandler.logUpdatesAndComplete(comment ?? '', references ?? [], authorizer)
   await writeHandler.end()
+
   return species.species_id
 }

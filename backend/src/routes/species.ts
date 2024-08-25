@@ -20,7 +20,8 @@ router.get('/:id', async (req, res) => {
 
 router.put('/', async (req: Request<object, object, { species: SpeciesDetailsType & EditMetaData }>, res) => {
   const editedSpecies = req.body.species
-  const id = await writeSpecies(editedSpecies)
+  const { comment, references } = editedSpecies
+  const id = await writeSpecies(editedSpecies, comment, references, req.user!.initials)
   return res.status(200).send({ id })
 })
 

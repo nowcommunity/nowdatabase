@@ -1,8 +1,17 @@
-import { RowState } from '../../../../frontend/src/backendTypes'
+import { Reference, RowState } from '../../../../frontend/src/backendTypes'
 import { logger } from '../../utils/logger'
-import { AllowedTables, DbValue, Item, logAllUpdates, PrimaryTables, WriteItem } from '../write/writeUtils'
+import { logAllUpdates } from './updateLogHandler'
 import { DatabaseHandler, DbWriteItem } from './databaseHandler'
 import { fixBoolean, getItemList, valueIsDifferent } from './utils'
+import { ActionType, AllowedTables, DbValue, Item, PrimaryTables, WriteItem } from '../write/writeUtils'
+
+type WriteHandlerParams = {
+  dbName: string
+  table: PrimaryTables
+  idColumn: string
+  allowedColumns: string[]
+  type: ActionType
+}
 
 /* Handles writing logic that are agnostic of datatype, but not directly operations to db. */
 /* Usage: after constructor, initialize with writeHandler.start. Assign value to idValue whever you have it. */
@@ -12,12 +21,14 @@ export class WriteHandler extends DatabaseHandler {
   idColumn: string
   idValue?: string | number
   allowedColumns: string[]
+  type: ActionType
 
-  constructor(dbName: string, table: PrimaryTables, idColumn: string, allowedColumns: string[]) {
+  constructor({ dbName, table, type, idColumn, allowedColumns }: WriteHandlerParams) {
     super(dbName)
     this.table = table
     this.idColumn = idColumn
     this.allowedColumns = allowedColumns
+    this.type = type
   }
 
   async createRow<T extends Record<string, DbValue>>(table: AllowedTables, items: DbWriteItem[], ids: string[]) {
@@ -72,6 +83,18 @@ export class WriteHandler extends DatabaseHandler {
     return await this.updateRow<Record<keyof T, DbValue>>(table, itemsToWrite, ids)
   }
 
+  async deleteObject<T extends Record<string, unknown>>(table: AllowedTables, object: T, idColumns: string[]) {
+    // Get id's, log as deleted, delete
+    const ids = idColumns.map(idColumn => ({ column: idColumn, value: object[idColumn] as DbValue }))
+    this.writeList.push({
+      table,
+      type: 'delete',
+      // oldValue and value are swapped here, but they are logged correctly in update.
+      items: ids.map(id => ({ value: id.value, oldValue: null, table, column: id.column })),
+    })
+    return await this.delete(table, ids)
+  }
+
   async upsertObject<T extends Record<string, unknown>>(table: AllowedTables, object: T, idColumns: string[]) {
     if (idColumns.includes(this.idColumn) && this.idValue && !object[this.idColumn]) {
       ;(object as Record<string, unknown>)[this.idColumn] = this.idValue
@@ -80,32 +103,25 @@ export class WriteHandler extends DatabaseHandler {
     return await this.updateObject<T>(table, object, idColumns)
   }
 
-  async upsertList<T extends { rowState?: RowState }>(table: AllowedTables, objects: T[], idColumns: string[]) {
+  /* Takes in a list of objects which are of Editable type, meaning they have a rowState field. Either adds or removes a join relation. */
+  async applyListChanges<T extends { rowState?: RowState }>(table: AllowedTables, objects: T[], idColumns: string[]) {
     for (const object of objects) {
       const rowState = object.rowState
       if (rowState === 'new') {
         await this.createObject(table, object, idColumns)
       } else if (rowState === 'removed') {
-        await this.delete(
-          table,
-          idColumns.map(idColumn => ({ column: idColumn, value: object[idColumn as keyof T] as DbValue }))
-        )
+        await this.deleteObject(table, object, idColumns)
       }
     }
   }
 
-  async logUpdates() {
+  async logUpdatesAndComplete(comment: string, references: Reference[], authorizer: string) {
     if (this.writeList.length === 0) {
       logger.info(`No changes detected, skipping logging.`)
       return
     }
-    await logAllUpdates(
-      { connection: this.connection!, username: 'ArK', writeList: this.writeList, type: 'add' },
-      this.table,
-      'ArK',
-      'comment',
-      this.idValue!,
-      []
-    )
+    console.log(JSON.stringify(this.writeList))
+    await logAllUpdates(this, this.writeList, this.table, this.idValue!, authorizer, comment, references, this.type)
+    await this.end()
   }
 }
