@@ -8,7 +8,7 @@ export const writeLocality = async (locality: EditDataType<LocalityDetailsType>)
     NOW_DB_NAME,
     'now_loc',
     'lid',
-    getFieldsOfTables(['now_loc', 'com_species', 'now_mus', 'now_ss', 'now_coll_meth', 'now_syn_loc'])
+    getFieldsOfTables(['now_loc', 'now_ls', 'com_species', 'now_mus', 'now_ss', 'now_coll_meth', 'now_syn_loc'])
   )
   await writeHandler.start()
 

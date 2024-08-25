@@ -120,7 +120,7 @@ export const logAllUpdates = async (
   await writeUpdateEntries(updateEntries, writeContext.connection, userInitials, comment)
 
   await writeReferences(updateEntries, writeContext.connection, references)
-  console.log({ writeList })
+
   // The write has value and oldValue swapped for 'delete' type logRows due to reasons.
   // It is simpler to fix it here than changing how write works, because values are used to find id's above.
   const fixDeleteRows = (logRow: LogRow) => {

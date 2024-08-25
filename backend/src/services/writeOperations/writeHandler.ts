@@ -20,13 +20,16 @@ export class WriteHandler extends DatabaseHandler {
     this.allowedColumns = allowedColumns
   }
 
-  async createRow<T extends Record<string, DbValue>>(
-    table: AllowedTables,
-    items: DbWriteItem[],
-    idsToReturn: string[]
-  ) {
+  async createRow<T extends Record<string, DbValue>>(table: AllowedTables, items: DbWriteItem[], ids: string[]) {
+    const returnValue = await super.insert<T>(table, items, ids)
+    // If ID was created, add it to writelist also.
+    for (const id of ids) {
+      if (!items.find(item => item.column === id && item.value)) {
+        items.push({ column: id, value: returnValue[id] })
+      }
+    }
     this.writeList.push({ table, type: 'add', items: items.map(item => ({ ...item, table })) })
-    return await super.insert<T>(table, items, idsToReturn)
+    return returnValue
   }
 
   /* Checks each field for their old value and if they did not (meaningfully) change,
@@ -37,13 +40,12 @@ export class WriteHandler extends DatabaseHandler {
   async updateRow<T extends Record<string, DbValue>>(table: AllowedTables, items: DbWriteItem[], ids: DbWriteItem[]) {
     const oldObject = await super.select<T>(table, [], ids)
     const fieldsToWrite: Item[] = []
-    // TODO put oldValue here too for logging
+
     for (const { column, value } of items) {
       const oldValue = oldObject[column as keyof T]
 
       const fixedValue = fixBoolean(value)
       if (!valueIsDifferent(fixedValue, oldValue)) continue
-      console.log({ value: fixedValue, oldValue, column })
       fieldsToWrite.push({ column, value: fixedValue, oldValue, table })
     }
 
