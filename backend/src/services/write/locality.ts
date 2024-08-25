@@ -34,7 +34,7 @@ export const writeLocality = async (locality: EditDataType<LocalityDetailsType>)
   await writeHandler.upsertList('now_ss', locality.now_ss, ['lid', 'sed_struct'])
   await writeHandler.upsertList('now_coll_meth', locality.now_coll_meth, ['lid', 'coll_meth'])
   await writeHandler.upsertList('now_syn_loc', locality.now_syn_loc, ['lid', 'syn_id'])
-
+  await writeHandler.logUpdates()
   await writeHandler.end()
   return locality.lid
 }

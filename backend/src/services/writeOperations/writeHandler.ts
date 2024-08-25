@@ -1,5 +1,6 @@
 import { RowState } from '../../../../frontend/src/backendTypes'
-import { AllowedTables, DbValue, PrimaryTables, WriteItem } from '../write/writeUtils'
+import { logger } from '../../utils/logger'
+import { AllowedTables, DbValue, Item, logAllUpdates, PrimaryTables, WriteItem } from '../write/writeUtils'
 import { DatabaseHandler, DbWriteItem } from './databaseHandler'
 import { fixBoolean, getItemList, valueIsDifferent } from './utils'
 
@@ -35,20 +36,22 @@ export class WriteHandler extends DatabaseHandler {
      ids: Column & value pairs that define which item to write to. Empty if new item. */
   async updateRow<T extends Record<string, DbValue>>(table: AllowedTables, items: DbWriteItem[], ids: DbWriteItem[]) {
     const oldObject = await super.select<T>(table, [], ids)
-    const fieldsToWrite: DbWriteItem[] = []
+    const fieldsToWrite: Item[] = []
     // TODO put oldValue here too for logging
     for (const { column, value } of items) {
       const oldValue = oldObject[column as keyof T]
 
       const fixedValue = fixBoolean(value)
       if (!valueIsDifferent(fixedValue, oldValue)) continue
-
-      fieldsToWrite.push({ column, value: fixedValue })
+      console.log({ value: fixedValue, oldValue, column })
+      fieldsToWrite.push({ column, value: fixedValue, oldValue, table })
     }
+
     if (items.find(item => !this.allowedColumns.includes(item.column))) {
       throw new Error('Unallowed column in SQL')
     }
-    this.writeList.push({ table, type: 'update', items: items.map(item => ({ ...item, table })) })
+
+    this.writeList.push({ table, type: 'update', items: fieldsToWrite.map(item => ({ ...item, table })) })
     if (fieldsToWrite.length === 0) return
     return await super.update(table, fieldsToWrite, ids)
   }
@@ -87,5 +90,20 @@ export class WriteHandler extends DatabaseHandler {
         )
       }
     }
+  }
+
+  async logUpdates() {
+    if (this.writeList.length === 0) {
+      logger.info(`No changes detected, skipping logging.`)
+      return
+    }
+    await logAllUpdates(
+      { connection: this.connection!, username: 'ArK', writeList: this.writeList, type: 'add' },
+      this.table,
+      'ArK',
+      'comment',
+      this.idValue!,
+      []
+    )
   }
 }
