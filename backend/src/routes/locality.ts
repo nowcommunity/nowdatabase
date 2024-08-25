@@ -4,7 +4,7 @@ import { fixBigInt } from '../utils/common'
 import { EditDataType, EditMetaData, LocalityDetailsType } from '../../../frontend/src/backendTypes'
 import { requireOneOf } from '../middlewares/authorizer'
 import { Role } from '../../../frontend/src/types'
-import { deleteLocality } from '../services/write/delete'
+// import { deleteLocality } from '../services/write/delete'
 import { writeLocality } from '../services/write/locality'
 
 const router = Router()
@@ -42,7 +42,7 @@ router.put(
 
 router.delete('/:id', requireOneOf([Role.Admin]), async (req, res) => {
   const id = parseInt(req.params.id)
-  await deleteLocality(id)
+  //   await deleteLocality(id)
   return res.status(200).send()
 })
 

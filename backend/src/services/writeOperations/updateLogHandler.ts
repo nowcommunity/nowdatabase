@@ -157,6 +157,7 @@ const writeReferences = async (writeHandler: WriteHandler, updateEntries: Update
 
 const tableToId: Record<string, string> = { now_lau: 'lid', now_sau: 'species_id', now_tau: 'tu_name', now_bau: 'bid' }
 const getUpdateIdField = (tableName: string) => `${tableName[4]}uid`
+export const getFormattedDate = () => new Date().toISOString().split('T')[0]
 
 export const createUpdateEntry = async (
   writeHandler: WriteHandler,
@@ -173,7 +174,7 @@ export const createUpdateEntry = async (
     {
       [`${prefix}_coordinator`]: coordinator,
       [`${prefix}_authorizer`]: authorizer,
-      [`${prefix}_date`]: new Date(),
+      [`${prefix}_date`]: getFormattedDate(),
       [tableToId[table]]: id,
       [`${prefix}_comment`]: comment,
     },
@@ -190,7 +191,7 @@ export const writeLogRows = async (writeHandler: WriteHandler, logRows: LogRow[]
     update: 3,
   }
   const updateRows = logRows.map(logRow => ({
-    event_time: new Date(),
+    event_time: getFormattedDate(),
     user_name: authorizer,
     server_name: 'sysbiol',
     table_name: logRow.table,
