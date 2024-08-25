@@ -1,6 +1,6 @@
 import { Reference } from '../../../../frontend/src/backendTypes'
 import { COORDINATOR, LOG_DB_NAME } from '../../utils/config'
-import { ActionType, AllowedTables, Item, LogRow, PrimaryTables, WriteItem } from '../write/writeUtils'
+import { AllowedTables, ActionType, Item, LogRow, PrimaryTables, WriteItem, UpdateEntry } from './types'
 import { WriteHandler } from './writeHandler'
 
 const tableNameToPrefix = {
@@ -18,14 +18,6 @@ const tableNameToPrefix = {
 const tableToUpdateTargets = {
   now_ls: ['now_loc', 'com_species'],
 } as Record<AllowedTables, PrimaryTables[] | undefined>
-
-export type UpdateEntry = {
-  table: PrimaryTables
-  logRows: LogRow[]
-  type: ActionType
-  id: string | number // Id of the item that was changed
-  entryId?: number // Id of the created update entry
-}
 
 export const logAllUpdates = async (
   writeHandler: WriteHandler,

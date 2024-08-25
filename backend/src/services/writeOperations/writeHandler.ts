@@ -3,7 +3,7 @@ import { logger } from '../../utils/logger'
 import { logAllUpdates } from './updateLogHandler'
 import { DatabaseHandler, DbWriteItem } from './databaseHandler'
 import { fixBoolean, getItemList, valueIsDifferent } from './utils'
-import { ActionType, AllowedTables, DbValue, Item, PrimaryTables, WriteItem } from '../write/writeUtils'
+import { ActionType, AllowedTables, DbValue, Item, PrimaryTables, WriteItem } from './types'
 
 type WriteHandlerParams = {
   dbName: string
@@ -120,7 +120,6 @@ export class WriteHandler extends DatabaseHandler {
       logger.info(`No changes detected, skipping logging.`)
       return
     }
-    console.log(JSON.stringify(this.writeList))
     await logAllUpdates(this, this.writeList, this.table, this.idValue!, authorizer, comment, references, this.type)
     await this.end()
   }

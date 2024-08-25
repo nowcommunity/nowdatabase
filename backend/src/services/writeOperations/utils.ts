@@ -1,5 +1,5 @@
-import { DbValue } from '../write/writeUtils'
 import { DbWriteItem } from './databaseHandler'
+import { DbValue } from './types'
 
 const isEmptyValue = (value: unknown) => {
   if (value === null || value === undefined) return true
