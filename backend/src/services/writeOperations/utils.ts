@@ -25,3 +25,9 @@ export const getItemList = (object: Record<string, unknown>, skipEmptyValues?: b
   if (skipEmptyValues) return list.filter(item => item.value !== '')
   return list
 }
+
+export const fixBoolean = (value: unknown) => {
+  if (value === false) return 0
+  if (value === true) return 1
+  return value as DbValue
+}

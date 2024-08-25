@@ -66,10 +66,13 @@ export class DatabaseHandler {
     const columnsString = columns.length === 0 ? '*' : columns.map(col => `${this.dbName}.${col}`).join(', ')
     const { columns: idColumns, values: idValues } = this.getValuesAndColumns(ids)
     const whereClause = createWhereClause(idColumns)
-    return await this.executeQuery<T>(
-      `SELECT ${columnsString} FROM ${this.dbName}.${table} WHERE ${whereClause}`,
-      idValues
-    )
+    const returnValue = (
+      await this.executeQuery<T[]>(
+        `SELECT ${columnsString} FROM ${this.dbName}.${table} WHERE ${whereClause}`,
+        idValues
+      )
+    )[0]
+    return returnValue
   }
 
   async executeQuery<T>(query: string, values?: Array<DbValue>) {

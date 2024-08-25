@@ -28,6 +28,7 @@ export const writeLocality = async (locality: EditDataType<LocalityDetailsType>)
     const { species_id } = await writeHandler.createObject('com_species', species, ['species_id'])
     species.species_id = species_id as number
   }
+
   await writeHandler.upsertList('now_ls', locality.now_ls, ['lid', 'species_id'])
   await writeHandler.upsertList('now_mus', locality.now_mus, ['lid', 'museum'])
   await writeHandler.upsertList('now_ss', locality.now_ss, ['lid', 'sed_struct'])
