@@ -14,13 +14,14 @@ export const valueIsDifferent = (newValue: unknown, oldValue: unknown) => {
   return true
 }
 
-/* Takes in an object and returns only the non-object fields with their field name (column) and value */
-export const getItemList = (object: Record<string, unknown>) => {
+export const getItemList = (object: Record<string, unknown>, skipEmptyValues?: boolean) => {
   const list: DbWriteItem[] = Object.entries(object)
     .map(([field, value]) => ({
       column: field,
       value: value as DbValue,
     }))
-    .filter(item => typeof item.value === 'object')
+    .filter(item => typeof item.value !== 'object')
+    .filter(item => item.column !== 'rowState')
+  if (skipEmptyValues) return list.filter(item => item.value !== '')
   return list
 }

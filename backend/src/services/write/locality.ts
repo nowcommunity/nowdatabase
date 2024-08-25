@@ -1,46 +1,32 @@
-import {
-  EditDataType,
-  LocalityDetailsType,
-  LocalitySpeciesDetailsType,
-  SpeciesDetailsType,
-} from '../../../../frontend/src/backendTypes'
+import { EditDataType, LocalityDetailsType } from '../../../../frontend/src/backendTypes'
 import { NOW_DB_NAME } from '../../utils/config'
 import { WriteHandler } from '../writeOperations/writeHandler'
-import { DbValue } from './writeUtils'
 
 export const writeLocality = async (locality: EditDataType<LocalityDetailsType>) => {
-  const writeHandler = new WriteHandler(NOW_DB_NAME, 'now_loc')
+  const writeHandler = new WriteHandler(NOW_DB_NAME, 'now_loc', 'lid')
   await writeHandler.start()
-  for (const ls of locality.now_ls) {
-    if (ls.rowState === 'new') {
-      await writeLocalitySpecies(writeHandler, ls)
-    } else if (ls.rowState === 'removed') {
-      await deleteLocalitySpecies(writeHandler, ls.lid!, ls.species_id!)
-    }
+
+  if (!locality.lid) {
+    const { lid: newLid } = await writeHandler.createObject('now_loc', locality, ['lid'])
+    locality.lid = newLid as number
   }
-}
 
-/* Writes now_ls entries, and also any new species inside. */
-const writeLocalitySpecies = async (
-  writeHandler: WriteHandler,
-  localitySpecies: EditDataType<LocalitySpeciesDetailsType>
-) => {
-  let species_id: DbValue | undefined = localitySpecies.com_species!.species_id
-  if (!localitySpecies.species_id) {
-    species_id = await writeSpecies(writeHandler, localitySpecies.com_species!)
+  writeHandler.idValue = locality.lid
+
+  /* Write possible new species of now_ls, and save those id's to now_ls objects */
+  for (const localitySpecies of locality.now_ls) {
+    const species = localitySpecies.com_species!
+    if (species.species_id) continue
+    const { species_id } = await writeHandler.createObject('com_species', species, ['species_id'])
+    species.species_id = species_id as number
   }
-  if (species_id) localitySpecies.com_species!.species_id = species_id
-  return await writeHandler.createObject('now_ls', localitySpecies, ['lid', 'species_id'])
-}
 
-const writeSpecies = async (writeHandler: WriteHandler, species: EditDataType<SpeciesDetailsType>) => {
-  const { species_id } = await writeHandler.createObject('com_species', species, ['species_id'])
-  return species_id as number
-}
+  await writeHandler.upsertList('now_ls', locality.now_ls, ['lid', 'species_id'])
+  await writeHandler.upsertList('now_mus', locality.now_mus, ['lid', 'museum'])
+  await writeHandler.upsertList('now_ss', locality.now_ss, ['lid', 'sed_struct'])
+  await writeHandler.upsertList('now_coll_meth', locality.now_coll_meth, ['lid', 'coll_meth'])
+  await writeHandler.upsertList('now_syn_loc', locality.now_syn_loc, ['lid', 'syn_id'])
 
-const deleteLocalitySpecies = async (writeHandler: WriteHandler, lid: number, species_id: number) => {
-  return await writeHandler.delete('now_ls', [
-    { column: 'lid', value: lid },
-    { column: 'species_id', value: species_id },
-  ])
+  await writeHandler.end()
+  return locality.lid
 }

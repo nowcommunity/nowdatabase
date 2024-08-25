@@ -31,11 +31,11 @@ export class DatabaseHandler {
   async insert<T>(table: AllowedTables, items: DbWriteItem[], returnColumns?: string[]) {
     const returnString = returnColumns ? `RETURNING ${returnColumns.join(', ')}` : ''
     const { columns, values } = this.getValuesAndColumns(items)
-
-    return await this.executeQuery<T>(`INSERT INTO ${this.dbName}.${table} (?) VALUES (?) ${returnString}`, [
-      columns,
-      values,
-    ])
+    const returnValue = await this.executeQuery<T>(
+      `INSERT INTO ${this.dbName}.${table} (${columns.join(', ')}) VALUES (${values.map(() => '?').join(', ')}) ${returnString}`,
+      values
+    )
+    return (returnValue as T[])[0]
   }
 
   async update(table: AllowedTables, items: DbWriteItem[], ids: DbWriteItem[]) {
@@ -46,8 +46,8 @@ export class DatabaseHandler {
     const whereClause = createWhereClause(idColumns)
 
     await this.executeQuery(`UPDATE ${this.dbName}.${table} (${columnsString}) WHERE ${whereClause}`, [
-      values,
-      idValues,
+      ...values,
+      ...idValues,
     ])
   }
 
@@ -58,7 +58,7 @@ export class DatabaseHandler {
     const returningClause = returnColumns?.join(' ,') ?? `${idColumns.join(', ')}`
     return await this.executeQuery(
       `DELETE FROM ${this.dbName}.${table} WHERE ${whereClause} RETURNING ${returningClause}`,
-      [idValues]
+      idValues
     )
   }
 
@@ -66,16 +66,22 @@ export class DatabaseHandler {
     const columnsString = columns.length === 0 ? '*' : columns.map(col => `${this.dbName}.${col}`).join(', ')
     const { columns: idColumns, values: idValues } = this.getValuesAndColumns(ids)
     const whereClause = createWhereClause(idColumns)
-    return await this.executeQuery<T>(`SELECT ${columnsString} FROM ${this.dbName}.${table} WHERE ${whereClause}`, [
-      idValues,
-    ])
+    return await this.executeQuery<T>(
+      `SELECT ${columnsString} FROM ${this.dbName}.${table} WHERE ${whereClause}`,
+      idValues
+    )
   }
 
-  async executeQuery<T>(query: string, values?: Array<DbValue[]>) {
+  async executeQuery<T>(query: string, values?: Array<DbValue>) {
     if (!this.connection) throw new Error('DB connection not initialized')
 
-    logger.info(`Executing SQL query: ${query}`)
-
-    return await this.connection.query<T>(query, values)
+    logger.info(`Executing SQL query: ${query} \nWith values ${JSON.stringify(values)}\n`)
+    let returnValue
+    if (values) {
+      returnValue = await this.connection.query<T>(query, values)
+    } else {
+      returnValue = await this.connection.query<T>(query)
+    }
+    return returnValue
   }
 }

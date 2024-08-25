@@ -1,15 +1,20 @@
+import { RowState } from '../../../../frontend/src/backendTypes'
 import { AllowedTables, DbValue, PrimaryTables, WriteItem } from '../write/writeUtils'
 import { DatabaseHandler, DbWriteItem } from './databaseHandler'
 import { getItemList, valueIsDifferent } from './utils'
 
 /* Handles writing logic that are agnostic of datatype, but not directly operations to db. */
+/* Usage: after constructor, initialize with writeHandler.start. Assign value to idValue whever you have it. */
 export class WriteHandler extends DatabaseHandler {
   table: PrimaryTables
   writeList: WriteItem[] = []
+  idColumn: string
+  idValue?: string | number
 
-  constructor(dbName: string, table: PrimaryTables) {
+  constructor(dbName: string, table: PrimaryTables, idColumn: string) {
     super(dbName)
     this.table = table
+    this.idColumn = idColumn
   }
 
   async createRow<T extends Record<string, DbValue>>(
@@ -44,7 +49,7 @@ export class WriteHandler extends DatabaseHandler {
   }
 
   async createObject<T extends Record<string, unknown>>(table: AllowedTables, object: T, idColumns: string[]) {
-    const itemsToWrite = getItemList(object)
+    const itemsToWrite = getItemList({ ...object }, true)
     return await this.createRow<Record<keyof T, DbValue>>(table, itemsToWrite, idColumns)
   }
 
@@ -52,5 +57,27 @@ export class WriteHandler extends DatabaseHandler {
     const ids = idColumns.map(column => ({ column, value: object[column] as DbValue }))
     const itemsToWrite = getItemList(object)
     return await this.updateRow<Record<keyof T, DbValue>>(table, itemsToWrite, ids)
+  }
+
+  async upsertObject<T extends Record<string, unknown>>(table: AllowedTables, object: T, idColumns: string[]) {
+    if (idColumns.includes(this.idColumn) && this.idValue && !object[this.idColumn]) {
+      ;(object as Record<string, unknown>)[this.idColumn] = this.idValue
+      return await this.createObject(table, object, idColumns)
+    }
+    return await this.updateObject<T>(table, object, idColumns)
+  }
+
+  async upsertList<T extends { rowState?: RowState }>(table: AllowedTables, objects: T[], ids: string[]) {
+    for (const object of objects) {
+      const rowState = object.rowState
+      if (rowState === 'new') {
+        await this.upsertObject(table, object, ids)
+      } else if (rowState === 'removed') {
+        await this.delete(
+          table,
+          ids.map(id => ({ column: id, value: object[id as keyof T] as DbValue }))
+        )
+      }
+    }
   }
 }
