@@ -13,6 +13,7 @@ export type AllowedTables =
   | 'now_time_unit'
   | 'now_tu_bound'
   | 'ref_ref'
+  | 'now_tu_sequence'
 
 export type PrimaryTables = 'now_loc' | 'com_species' | 'now_time_unit' | 'now_tu_bound'
 

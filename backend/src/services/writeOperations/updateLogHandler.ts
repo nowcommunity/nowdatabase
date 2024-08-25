@@ -87,6 +87,7 @@ export const logAllUpdates = async (
       }
     }
   }
+
   for (const tableUpdates of Object.values(secondaryUpdateEntries)) {
     for (const singleUpdateOfTable of Object.values(tableUpdates)) {
       updateEntries.push(singleUpdateOfTable)
@@ -120,7 +121,8 @@ const mergeLogRows = (updateEntries: UpdateEntry[]) => {
   // updateEntries, such as now_ls rows in locality and species. These should be merged so that only one is left,
   // but with both id's (luid and suid) found in the updateEntries.
   for (const updateEntry of updateEntries) {
-    const idFieldName = getUpdateIdField(updateEntry.table)
+    const idFieldName = prefixToIdColumn[tableNameToPrefix[updateEntry.table]]
+    console.log({ idFieldName, updateEntry })
     for (const logRow of updateEntry.logRows) {
       const key = getLogRowKey(logRow)
       logRowMap[key] = { ...(logRowMap[key] ? logRowMap[key] : logRow), [idFieldName]: updateEntry.entryId }
@@ -147,17 +149,29 @@ const writeReferences = async (writeHandler: WriteHandler, updateEntries: Update
   const referenceIds = references.map(ref => ref.rid)
   for (const updateEntry of updateEntries) {
     const id = updateEntry.entryId
-    const idField = getUpdateIdField(updateEntry.table)
-    const referenceJoinTable = `now_${idField[0]}r` as AllowedTables
+    const idField = prefixToIdColumn[tableNameToPrefix[updateEntry.table]]
+    const referenceJoinTable = `now_${tableNameToPrefix[updateEntry.table][0]}r` as AllowedTables
     for (const referenceId of referenceIds) {
       await writeHandler.createObject(referenceJoinTable, { [idField]: id, rid: referenceId }, [idField, 'rid'])
     }
   }
 }
 
-const tableToId: Record<string, string> = { now_lau: 'lid', now_sau: 'species_id', now_tau: 'tu_name', now_bau: 'bid' }
-const getUpdateIdField = (tableName: string) => `${tableName[4]}uid`
-export const getFormattedDate = () => new Date().toISOString().split('T')[0]
+const updateTableToIdColumn: Record<string, string> = {
+  now_lau: 'lid',
+  now_sau: 'species_id',
+  now_tau: 'tu_name',
+  now_bau: 'bid',
+}
+
+const prefixToIdColumn = {
+  lau: 'luid',
+  sau: 'suid',
+  tau: 'tuid',
+  bau: 'buid',
+}
+
+export const getFormattedDate = () => new Date()
 
 export const createUpdateEntry = async (
   writeHandler: WriteHandler,
@@ -168,20 +182,20 @@ export const createUpdateEntry = async (
   id: string | number
 ) => {
   const table = `now_${prefix}` as AllowedTables
-  const idField = getUpdateIdField(table)
+  const idField = prefixToIdColumn[prefix]
   const result = await writeHandler.createObject(
     table,
     {
       [`${prefix}_coordinator`]: coordinator,
       [`${prefix}_authorizer`]: authorizer,
       [`${prefix}_date`]: getFormattedDate(),
-      [tableToId[table]]: id,
+      [updateTableToIdColumn[table]]: id,
       [`${prefix}_comment`]: comment,
     },
     [idField]
   )
-
-  return result[idField as keyof object] as number
+  console.log({ result, up: updateTableToIdColumn, table, idField, prefix })
+  return result[idField] as number
 }
 
 export const writeLogRows = async (writeHandler: WriteHandler, logRows: LogRow[], authorizer: string) => {
@@ -190,6 +204,7 @@ export const writeLogRows = async (writeHandler: WriteHandler, logRows: LogRow[]
     add: 2,
     update: 3,
   }
+
   const updateRows = logRows.map(logRow => ({
     event_time: getFormattedDate(),
     user_name: authorizer,
@@ -197,7 +212,6 @@ export const writeLogRows = async (writeHandler: WriteHandler, logRows: LogRow[]
     table_name: logRow.table,
     pk_data: logRow.pkData,
     column_name: logRow.column,
-    // 1 = delete, 2 = add, 3 = update
     log_action: actionTypeToDbFormat[logRow.type],
     old_data: logRow.oldValue,
     new_data: logRow.value,

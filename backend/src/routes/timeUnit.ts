@@ -3,6 +3,7 @@ import { getAllTimeUnits, getTimeUnitDetails, getTimeUnitLocalities } from '../s
 import { fixBigInt } from '../utils/common'
 import { EditDataType, EditMetaData, TimeUnitDetailsType } from '../../../frontend/src/backendTypes'
 import { getAllSequences } from '../services/sequence'
+import { writeTimeUnit } from '../services/write/timeUnit'
 
 const router = Router()
 
@@ -33,6 +34,11 @@ router.put(
   '/',
   async (req: Request<object, object, { timeUnit: EditDataType<TimeUnitDetailsType> & EditMetaData }>, res) => {
     const editedObject = req.body.timeUnit
+    const { comment, references } = editedObject
+    delete editedObject.comment
+    delete editedObject.references
+    const result = await writeTimeUnit(editedObject, comment, references, req.user!.initials)
+    return res.status(200).send({ id: result })
   }
 )
 

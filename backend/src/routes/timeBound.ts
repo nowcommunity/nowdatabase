@@ -2,6 +2,7 @@ import { Request, Router } from 'express'
 import { getAllTimeBounds, getTimeBoundDetails, getTimeBoundTimeUnits } from '../services/timeBound'
 import { fixBigInt } from '../utils/common'
 import { EditDataType, EditMetaData, TimeBoundDetailsType } from '../../../frontend/src/backendTypes'
+import { writeTimeBound } from '../services/write/timeBound'
 
 const router = Router()
 
@@ -27,6 +28,11 @@ router.put(
   '/',
   async (req: Request<object, object, { timeBound: EditDataType<TimeBoundDetailsType> & EditMetaData }>, res) => {
     const editedObject = req.body.timeBound
+    const { comment, references } = editedObject
+    delete editedObject.comment
+    delete editedObject.references
+    const result = await writeTimeBound(editedObject, comment, references, req.user!.initials)
+    return res.status(200).send({ id: result })
   }
 )
 

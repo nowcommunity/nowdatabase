@@ -20,7 +20,12 @@ export const getItemList = (object: Record<string, unknown>, skipEmptyValues?: b
       column: field,
       value: value as DbValue,
     }))
-    .filter(item => typeof item.value !== 'object')
+    .filter(
+      item =>
+        // Filter out object fields, except date.
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-explicit-any
+        typeof item.value !== 'object' || item.value === null || typeof (item.value as any).getMonth === 'function'
+    )
     .filter(item => item.column !== 'rowState')
   if (skipEmptyValues) return list.filter(item => item.value !== '')
   return list
