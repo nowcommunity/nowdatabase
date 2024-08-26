@@ -27,24 +27,9 @@ router.get('/time-units/:id', async (req, res) => {
 router.put(
   '/',
   async (req: Request<object, object, { timeBound: EditDataType<TimeBoundDetailsType> & EditMetaData }>, res) => {
-    const editedObject = req.body.timeBound
-<<<<<<< HEAD
-    const result = await write(
-      editedObject,
-      'now_tu_bound',
-      req.user!.initials,
-      editedObject.comment ?? '',
-      editedObject.bid ? 'update' : 'add',
-      editedObject.references ?? []
-    )
-    return res.status(200).send(result ? { result: result } : { error: 'error' })
-=======
-    const { comment, references } = editedObject
-    delete editedObject.comment
-    delete editedObject.references
-    const result = await writeTimeBound(editedObject, comment, references, req.user!.initials)
+    const { comment, references, ...editedTimeBound } = req.body.timeBound
+    const result = await writeTimeBound(editedTimeBound, comment, references, req.user!.initials)
     return res.status(200).send({ id: result })
->>>>>>> reWrite2
   }
 )
 

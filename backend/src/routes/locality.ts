@@ -26,12 +26,8 @@ router.put(
   requireOneOf([Role.Admin, Role.EditRestricted, Role.EditUnrestricted]),
   // TODO: Check if edit restricted has rights to edit the locality.
   async (req: Request<object, object, { locality: EditDataType<LocalityDetailsType> & EditMetaData }>, res) => {
-    const editedLocality = req.body.locality
-    const { comment, references } = editedLocality
-    delete editedLocality.comment
-    delete editedLocality.references
+    const { comment, references, ...editedLocality } = req.body.locality
     const validationErrors = validateEntireLocality(editedLocality)
-
     if (validationErrors.length > 0) {
       return res.status(400).send({ validationErrors })
     }

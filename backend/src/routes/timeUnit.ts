@@ -33,11 +33,8 @@ router.get('/localities/:id', async (req, res) => {
 router.put(
   '/',
   async (req: Request<object, object, { timeUnit: EditDataType<TimeUnitDetailsType> & EditMetaData }>, res) => {
-    const editedObject = req.body.timeUnit
-    const { comment, references } = editedObject
-    delete editedObject.comment
-    delete editedObject.references
-    const result = await writeTimeUnit(editedObject, comment, references, req.user!.initials)
+    const { comment, references, ...editedTimeUnit } = req.body.timeUnit
+    const result = await writeTimeUnit(editedTimeUnit, comment, references, req.user!.initials)
     return res.status(200).send({ id: result })
   }
 )
