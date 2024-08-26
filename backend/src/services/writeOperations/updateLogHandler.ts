@@ -122,7 +122,6 @@ const mergeLogRows = (updateEntries: UpdateEntry[]) => {
   // but with both id's (luid and suid) found in the updateEntries.
   for (const updateEntry of updateEntries) {
     const idFieldName = prefixToIdColumn[tableNameToPrefix[updateEntry.table]]
-    console.log({ idFieldName, updateEntry })
     for (const logRow of updateEntry.logRows) {
       const key = getLogRowKey(logRow)
       logRowMap[key] = { ...(logRowMap[key] ? logRowMap[key] : logRow), [idFieldName]: updateEntry.entryId }
@@ -194,7 +193,6 @@ export const createUpdateEntry = async (
     },
     [idField]
   )
-  console.log({ result, up: updateTableToIdColumn, table, idField, prefix })
   return result[idField] as number
 }
 
