@@ -1,4 +1,4 @@
-import { LocalityDetailsType, LocalitySpecies, Species } from '@/backendTypes'
+import { LocalityDetailsType, LocalitySpecies, Species, SpeciesDetailsType } from '@/backendTypes'
 import { EditableTable } from '@/components/DetailView/common/EditableTable'
 import { EditingForm } from '@/components/DetailView/common/EditingForm'
 import { SelectingTable } from '@/components/DetailView/common/SelectingTable'
@@ -107,7 +107,7 @@ export const SpeciesTab = () => {
                   {
                     lid: editData.lid,
                     species_id: newSpecies.species_id,
-                    com_species: { ...newSpecies },
+                    com_species: { ...(newSpecies as SpeciesDetailsType) },
                     rowState: 'new',
                   },
                 ],
@@ -129,7 +129,7 @@ export const SpeciesTab = () => {
                   {
                     lid: editData.lid,
                     species_id: newSpecies.species_id,
-                    com_species: { ...newSpecies },
+                    com_species: { ...(newSpecies as SpeciesDetailsType) },
                     rowState: 'new',
                   },
                 ],

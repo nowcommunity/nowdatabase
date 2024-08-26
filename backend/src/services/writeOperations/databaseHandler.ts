@@ -1,7 +1,7 @@
 import { PoolConnection } from 'mariadb'
-import { AllowedTables, DbValue } from '../write/writeUtils'
 import { logger } from '../../utils/logger'
 import { pool } from '../../utils/db'
+import { DbValue, AllowedTables } from './types'
 
 export type DbWriteItem = { column: string; value: DbValue }
 

@@ -10,7 +10,6 @@ export const nowDb = new NowClient()
 
 export const getFieldsOfTables = (tables: string[]) => {
   return tables.flatMap(table =>
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     Object.keys((nowDb[table as keyof object] as unknown as Record<string, { fields: object }>).fields as never)
   )
 }

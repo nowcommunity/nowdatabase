@@ -9,6 +9,9 @@ export type User = {
   initials: string
 }
 
+/* This makes all fields optional, except for array-type fields.
+  Also wraps the objects inside arrays as Editable, adding rowState-field in them.
+  Applies itself recursively to all nested objects even inside arrays. */
 type EditDataType<T> = T extends object
   ? T extends readonly unknown[]
     ? { [I in keyof T]: Editable<EditDataType<T[I]>> }
@@ -19,6 +22,7 @@ type EditDataType<T> = T extends object
       : never
   : T
 
+// Changes all bigints to number type including in nested objects
 export type FixBigInt<T> = {
   [K in keyof T]: T[K] extends bigint | null
     ? number
