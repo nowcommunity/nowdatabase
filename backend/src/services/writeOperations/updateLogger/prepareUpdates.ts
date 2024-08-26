@@ -1,23 +1,9 @@
-import { Reference } from '../../../../frontend/src/backendTypes'
-import { COORDINATOR, LOG_DB_NAME } from '../../utils/config'
-import { AllowedTables, ActionType, Item, LogRow, PrimaryTables, WriteItem, UpdateEntry } from './types'
-import { WriteHandler } from './writeHandler'
-
-const tableNameToPrefix = {
-  now_loc: 'lau',
-  com_species: 'sau',
-  now_time_unit: 'tau',
-  now_tu_bound: 'bau',
-} as Record<PrimaryTables, 'sau' | 'tau' | 'lau' | 'bau'>
-
-/* Updates to certain tables have to be logged in a different table
-   than the one the user edited. Sometimes several tables. For example,
-   user editing locality and changing now_ls will require update entry
-   to both now_loc and com_species. If this table doesn't have entry for a
-   table, assume it goes to the "main" update entry e.g. if user edited locality, now_loc. */
-const tableToUpdateTargets = {
-  now_ls: ['now_loc', 'com_species'],
-} as Record<AllowedTables, PrimaryTables[] | undefined>
+import { Reference } from '../../../../../frontend/src/backendTypes'
+import { COORDINATOR } from '../../../utils/config'
+import { AllowedTables, ActionType, Item, LogRow, PrimaryTables, WriteItem, UpdateEntry } from '../types'
+import { WriteHandler } from '../writeHandler'
+import { prefixToIdColumn, primaryTableToUpdatePrefix, tableToUpdateTargets } from './utils'
+import { createUpdateEntry, writeLogRows, writeReferences } from './writeUpdates'
 
 export const logAllUpdates = async (
   writeHandler: WriteHandler,
@@ -121,7 +107,7 @@ const mergeLogRows = (updateEntries: UpdateEntry[]) => {
   // updateEntries, such as now_ls rows in locality and species. These should be merged so that only one is left,
   // but with both id's (luid and suid) found in the updateEntries.
   for (const updateEntry of updateEntries) {
-    const idFieldName = prefixToIdColumn[tableNameToPrefix[updateEntry.table]]
+    const idFieldName = prefixToIdColumn[primaryTableToUpdatePrefix[updateEntry.table]]
     for (const logRow of updateEntry.logRows) {
       const key = getLogRowKey(logRow)
       logRowMap[key] = { ...(logRowMap[key] ? logRowMap[key] : logRow), [idFieldName]: updateEntry.entryId }
@@ -137,90 +123,9 @@ const writeUpdateEntries = async (
   comment: string
 ) => {
   for (const updateEntry of updateEntries) {
-    const prefix = tableNameToPrefix[updateEntry.table]
+    const prefix = primaryTableToUpdatePrefix[updateEntry.table]
     const createdId = await createUpdateEntry(writeHandler, prefix, COORDINATOR, authorizer, comment, updateEntry.id)
     updateEntry.entryId = createdId
   }
   return updateEntries
-}
-
-const writeReferences = async (writeHandler: WriteHandler, updateEntries: UpdateEntry[], references: Reference[]) => {
-  const referenceIds = references.map(ref => ref.rid)
-  for (const updateEntry of updateEntries) {
-    const id = updateEntry.entryId
-    const idField = prefixToIdColumn[tableNameToPrefix[updateEntry.table]]
-    const referenceJoinTable = `now_${tableNameToPrefix[updateEntry.table][0]}r` as AllowedTables
-    for (const referenceId of referenceIds) {
-      await writeHandler.createObject(referenceJoinTable, { [idField]: id, rid: referenceId }, [idField, 'rid'])
-    }
-  }
-}
-
-const updateTableToIdColumn: Record<string, string> = {
-  now_lau: 'lid',
-  now_sau: 'species_id',
-  now_tau: 'tu_name',
-  now_bau: 'bid',
-}
-
-const prefixToIdColumn = {
-  lau: 'luid',
-  sau: 'suid',
-  tau: 'tuid',
-  bau: 'buid',
-}
-
-export const getFormattedDate = () => new Date()
-
-export const createUpdateEntry = async (
-  writeHandler: WriteHandler,
-  prefix: 'sau' | 'tau' | 'lau' | 'bau',
-  coordinator: string,
-  authorizer: string,
-  comment: string,
-  id: string | number
-) => {
-  const table = `now_${prefix}` as AllowedTables
-  const idField = prefixToIdColumn[prefix]
-  const result = await writeHandler.createObject(
-    table,
-    {
-      [`${prefix}_coordinator`]: coordinator,
-      [`${prefix}_authorizer`]: authorizer,
-      [`${prefix}_date`]: getFormattedDate(),
-      [updateTableToIdColumn[table]]: id,
-      [`${prefix}_comment`]: comment,
-    },
-    [idField]
-  )
-  return result[idField] as number
-}
-
-export const writeLogRows = async (writeHandler: WriteHandler, logRows: LogRow[], authorizer: string) => {
-  const actionTypeToDbFormat: Record<ActionType, number> = {
-    delete: 1,
-    add: 2,
-    update: 3,
-  }
-
-  const updateRows = logRows.map(logRow => ({
-    event_time: getFormattedDate(),
-    user_name: authorizer,
-    server_name: 'sysbiol',
-    table_name: logRow.table,
-    pk_data: logRow.pkData,
-    column_name: logRow.column,
-    log_action: actionTypeToDbFormat[logRow.type],
-    old_data: logRow.oldValue,
-    new_data: logRow.value,
-    suid: logRow.suid ?? null,
-    luid: logRow.luid ?? null,
-    buid: logRow.buid ?? null,
-    tuid: logRow.tuid ?? null,
-  }))
-
-  writeHandler.dbName = LOG_DB_NAME
-  for (const row of updateRows) {
-    await writeHandler.createObject('log' as AllowedTables, row, ['log_id'])
-  }
 }

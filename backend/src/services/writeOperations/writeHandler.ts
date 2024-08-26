@@ -1,6 +1,6 @@
 import { Reference, RowState } from '../../../../frontend/src/backendTypes'
 import { logger } from '../../utils/logger'
-import { logAllUpdates } from './updateLogHandler'
+import { logAllUpdates } from './updateLogger/prepareUpdates'
 import { DatabaseHandler, DbWriteItem } from './databaseHandler'
 import { fixBoolean, getItemList, valueIsDifferent } from './utils'
 import { ActionType, AllowedTables, DbValue, Item, PrimaryTables, WriteItem } from './types'
