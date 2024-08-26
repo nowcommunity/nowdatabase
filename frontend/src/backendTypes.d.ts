@@ -29,11 +29,6 @@ export type FixBigInt<T> = {
         : T[K]
 }
 
-export type LocalityReference = Prisma.now_lr & { ref_ref: ReferenceDetailsType } & {
-  ref_authors: Prisma.ref_authors
-  ref_journal: Prisma.ref_journal
-}
-
 export type SpeciesType = FixBigInt<Prisma.com_species>
 export type RowState = 'new' | 'removed' | 'cancelled' | 'clean'
 export type UpdateComment = { update_comment: string }
@@ -44,6 +39,7 @@ export type SedimentaryStructureValues = Prisma.now_ss_values
 export type CollectingMethod = Prisma.now_coll_meth
 export type LocalityProject = Prisma.now_plr & { now_proj: Prisma.now_proj }
 export type LocalitySpecies = FixBigInt<Prisma.now_ls> & { com_species: SpeciesType }
+export type LocalitySpeciesDetailsType = FixBigInt<Prisma.now_ls> & { com_species: SpeciesDetailsType }
 export type SpeciesLocality = FixBigInt<Prisma.now_ls> & { now_loc: Prisma.now_loc }
 export type LocalityUpdate = Prisma.now_lau & { now_lr: LocalityReference[] } & { updates: UpdateLog[] }
 export type SpeciesUpdate = Prisma.now_sau & { now_sr: Prisma.now_sr }
@@ -64,7 +60,7 @@ export type LocalityDetailsType = Prisma.now_loc & {
 } & {
   projects: Array<Project>
 } & {
-  now_ls: Array<LocalitySpecies>
+  now_ls: Array<LocalitySpeciesDetailsType>
 } & { now_plr: Array<LocalityProject> } & { now_syn_loc: Array<LocalitySynonym> } & {
   now_ss: SedimentaryStructure[]
 } & {
@@ -103,6 +99,52 @@ export type Species = {
   sp_status: boolean | null
 }
 
+export type RegionDetails = Prisma.now_reg_coord & { now_reg_coord_people: Array<RegionCoordinator> } & {
+  now_reg_coord_country: Array<RegionCountry>
+}
+
+export type TimeBound = {
+  bid: number
+  b_name: string
+  age: number
+  b_comment: string
+}
+
+export type TimeBoundDetailsType = Prisma.now_tu_bound & { now_bau: Prisma.now_bau }
+
+export type TimeBoundUpdate = Prisma.now_bau & { now_br: Prisma.now_br }
+
+/* Time Unit */
+export type TimeUnitSequence = Prisma.now_tu_sequence
+
+export type TimeUnitUpdate = Prisma.now_time_update & {
+  now_tr: Prisma.now_tr & { ref_ref: { ref_authors: string; ref_journal: string }[] }
+}
+export type TimeUnitDetailsType = Prisma.now_time_unit & { now_tu_sequence: SequenceDetailsType } & {
+  now_tau: Array<TimeUnitUpdate>
+} & {
+  low_bound: Prisma.now_tu_bound
+  up_bound: Prisma.now_tu_bound
+}
+
+export type TimeUnit = {
+  low_bound: number
+  up_bound: number
+  seq_name: string
+  tu_name: string
+  tu_display_name: string
+  rank: string
+}
+
+export type EditMetaData = { comment?: string; references?: Reference[] }
+
+/* Reference */
+export type ReferenceDetailsType = Prisma.ref_ref
+
+export type ReferenceType = Prisma.ref_ref_type & { ref_field_name: Prisma.ref_field_name[] }
+
+export type ReferenceField = Prisma.ref_field_name
+
 export type Reference = {
   ref_authors: {
     au_num: number
@@ -121,52 +163,9 @@ export type Reference = {
   title_secondary: string
 }
 
-export type ReferenceDetailsType = Prisma.ref_ref
-
-export type RegionDetails = Prisma.now_reg_coord & { now_reg_coord_people: Array<RegionCoordinator> } & {
-  now_reg_coord_country: Array<RegionCountry>
-}
-
-export type TimeBound = {
-  bid: number
-  b_name: string
-  age: number
-  b_comment: string
-}
-
-export type TimeBoundDetailsType = Prisma.now_tu_bound & { now_bau: Prisma.now_bau }
-
-export type TimeUnit = {
-  low_bound: number
-  up_bound: number
-  seq_name: string
-  tu_name: string
-  tu_display_name: string
-  rank: string
-}
-
-export type TimeBoundUpdate = Prisma.now_bau & { now_br: Prisma.now_br }
-
-export type TimeUnitSequence = Prisma.now_tu_sequence
-
-export type TimeUnitUpdate = Prisma.now_time_update & {
-  now_tr: Prisma.now_tr & { ref_ref: { ref_authors: string; ref_journal: string }[] }
-}
-export type TimeUnitDetailsType = Prisma.now_time_unit & { now_tu_sequence: SequenceDetailsType } & {
-  now_tau: Array<TimeUnitUpdate>
-} & {
-  low_bound: Prisma.now_tu_bound
-  up_bound: Prisma.now_tu_bound
-}
-
-export type ReferenceType = Prisma.ref_ref & {
-  ref_field_name: Prisma.ref_field_name
-  ref_ref_type: Prisma.ref_ref_type
+export type ReferenceOfUpdate = Prisma.ref_ref & {
   ref_authors: Prisma.ref_authors[]
-} & { ref_journal: Pick<Prisma.ref_journal, 'journal_title'> }
+  ref_journal: Prisma.ref_journal
+}
 
-export type ReferenceTypeType = Prisma.ref_ref_type & { ref_field_name: Prisma.ref_field_name[] }
-
-export type ReferenceField = Prisma.ref_field_name
-
-export type EditMetaData = { comment?: string; references?: Reference[] }
+export type LocalityReference = Prisma.now_lr & ReferenceOfUpdate

@@ -2,10 +2,10 @@ import { Request, Router } from 'express'
 import { getAllLocalities, getLocalityDetails, validateEntireLocality } from '../services/locality'
 import { fixBigInt } from '../utils/common'
 import { EditDataType, EditMetaData, LocalityDetailsType } from '../../../frontend/src/backendTypes'
-import { write } from '../services/write/write'
 import { requireOneOf } from '../middlewares/authorizer'
 import { Role } from '../../../frontend/src/types'
-import { deleteLocality } from '../services/write/delete'
+// import { deleteLocality } from '../services/write/delete'
+import { writeLocality } from '../services/write/locality'
 
 const router = Router()
 
@@ -35,23 +35,9 @@ router.put(
     if (validationErrors.length > 0) {
       return res.status(400).send({ validationErrors })
     }
-
-    const result = await write(
-      editedLocality,
-      'now_loc',
-      req.user!.initials,
-      comment ?? '',
-      editedLocality.lid ? 'update' : 'add',
-      references ?? []
-    )
-    return res.status(200).send(result ? { id: result } : { error: 'error' })
+    const result = await writeLocality(editedLocality, comment, references, req.user!.initials)
+    return res.status(200).send({ id: result })
   }
 )
-
-router.delete('/:id', requireOneOf([Role.Admin]), async (req, res) => {
-  const id = parseInt(req.params.id)
-  await deleteLocality(id)
-  return res.status(200).send()
-})
 
 export default router

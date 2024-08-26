@@ -2,7 +2,7 @@ import { Request, Router } from 'express'
 import { getAllSpecies, getSpeciesDetails } from '../services/species'
 import { fixBigInt } from '../utils/common'
 import { EditMetaData, SpeciesDetailsType } from '../../../frontend/src/backendTypes'
-import { write } from '../services/write/write'
+import { writeSpecies } from '../services/write/species'
 
 const router = Router()
 
@@ -20,15 +20,9 @@ router.get('/:id', async (req, res) => {
 
 router.put('/', async (req: Request<object, object, { species: SpeciesDetailsType & EditMetaData }>, res) => {
   const editedSpecies = req.body.species
-  const result = await write(
-    editedSpecies,
-    'com_species',
-    req.user!.initials,
-    editedSpecies.comment ?? '',
-    editedSpecies.species_id ? 'update' : 'add',
-    editedSpecies.references ?? []
-  )
-  return res.status(200).send(result ? { result: result } : { error: 'error' })
+  const { comment, references } = editedSpecies
+  const id = await writeSpecies(editedSpecies, comment, references, req.user!.initials)
+  return res.status(200).send({ id })
 })
 
 export default router

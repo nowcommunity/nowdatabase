@@ -8,6 +8,13 @@ import { MARIADB_HOST, MARIADB_PASSWORD, DB_CONNECTION_LIMIT, MARIADB_USER } fro
 export const logDb = new LogClient()
 export const nowDb = new NowClient()
 
+export const getFieldsOfTables = (tables: string[]) => {
+  return tables.flatMap(table =>
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    Object.keys((nowDb[table as keyof object] as unknown as Record<string, { fields: object }>).fields as never)
+  )
+}
+
 export const pool = mariadb.createPool({
   host: MARIADB_HOST,
   password: MARIADB_PASSWORD,
