@@ -4,7 +4,6 @@ import { fixBigInt } from '../utils/common'
 import { EditDataType, EditMetaData, LocalityDetailsType } from '../../../frontend/src/backendTypes'
 import { requireOneOf } from '../middlewares/authorizer'
 import { Role } from '../../../frontend/src/types'
-// import { deleteLocality } from '../services/write/delete'
 import { writeLocality } from '../services/write/locality'
 
 const router = Router()
@@ -23,8 +22,7 @@ router.get('/:id', async (req, res) => {
 
 router.put(
   '/',
-  requireOneOf([Role.Admin, Role.EditRestricted, Role.EditUnrestricted]),
-  // TODO: Check if edit restricted has rights to edit the locality.
+  requireOneOf([Role.Admin, Role.EditUnrestricted]),
   async (req: Request<object, object, { locality: EditDataType<LocalityDetailsType> & EditMetaData }>, res) => {
     const { comment, references, ...editedLocality } = req.body.locality
     const validationErrors = validateEntireLocality(editedLocality)

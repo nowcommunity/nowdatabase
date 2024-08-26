@@ -3,6 +3,8 @@ import { getAllTimeBounds, getTimeBoundDetails, getTimeBoundTimeUnits } from '..
 import { fixBigInt } from '../utils/common'
 import { EditDataType, EditMetaData, TimeBoundDetailsType } from '../../../frontend/src/backendTypes'
 import { writeTimeBound } from '../services/write/timeBound'
+import { requireOneOf } from '../middlewares/authorizer'
+import { Role } from '../../../frontend/src/types'
 
 const router = Router()
 
@@ -26,6 +28,7 @@ router.get('/time-units/:id', async (req, res) => {
 
 router.put(
   '/',
+  requireOneOf([Role.Admin, Role.EditUnrestricted]),
   async (req: Request<object, object, { timeBound: EditDataType<TimeBoundDetailsType> & EditMetaData }>, res) => {
     const { comment, references, ...editedTimeBound } = req.body.timeBound
     const result = await writeTimeBound(editedTimeBound, comment, references, req.user!.initials)

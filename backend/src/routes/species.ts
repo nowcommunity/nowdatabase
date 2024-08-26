@@ -3,6 +3,8 @@ import { getAllSpecies, getSpeciesDetails } from '../services/species'
 import { fixBigInt } from '../utils/common'
 import { EditMetaData, SpeciesDetailsType } from '../../../frontend/src/backendTypes'
 import { writeSpecies } from '../services/write/species'
+import { requireOneOf } from '../middlewares/authorizer'
+import { Role } from '../../../frontend/src/types'
 
 const router = Router()
 
@@ -18,11 +20,15 @@ router.get('/:id', async (req, res) => {
   return res.status(200).send(fixBigInt(species))
 })
 
-router.put('/', async (req: Request<object, object, { species: SpeciesDetailsType & EditMetaData }>, res) => {
-  const editedSpecies = req.body.species
-  const { comment, references } = editedSpecies
-  const id = await writeSpecies(editedSpecies, comment, references, req.user!.initials)
-  return res.status(200).send({ id })
-})
+router.put(
+  '/',
+  requireOneOf([Role.Admin, Role.EditUnrestricted]),
+  async (req: Request<object, object, { species: SpeciesDetailsType & EditMetaData }>, res) => {
+    const editedSpecies = req.body.species
+    const { comment, references } = editedSpecies
+    const id = await writeSpecies(editedSpecies, comment, references, req.user!.initials)
+    return res.status(200).send({ id })
+  }
+)
 
 export default router

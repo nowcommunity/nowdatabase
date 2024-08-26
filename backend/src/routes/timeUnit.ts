@@ -4,6 +4,8 @@ import { fixBigInt } from '../utils/common'
 import { EditDataType, EditMetaData, TimeUnitDetailsType } from '../../../frontend/src/backendTypes'
 import { getAllSequences } from '../services/sequence'
 import { writeTimeUnit } from '../services/write/timeUnit'
+import { requireOneOf } from '../middlewares/authorizer'
+import { Role } from '../../../frontend/src/types'
 
 const router = Router()
 
@@ -32,6 +34,7 @@ router.get('/localities/:id', async (req, res) => {
 
 router.put(
   '/',
+  requireOneOf([Role.Admin, Role.EditUnrestricted]),
   async (req: Request<object, object, { timeUnit: EditDataType<TimeUnitDetailsType> & EditMetaData }>, res) => {
     const { comment, references, ...editedTimeUnit } = req.body.timeUnit
     const result = await writeTimeUnit(editedTimeUnit, comment, references, req.user!.initials)
