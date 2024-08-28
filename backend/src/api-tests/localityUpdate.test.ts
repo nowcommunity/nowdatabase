@@ -126,7 +126,11 @@ describe('Locality write works', () => {
     ]
     for (const expectedRow of expectedLogRows) {
       const receivedRow = logRows.find(
-        row => row.column_name === expectedRow.column && row.table_name === expectedRow.table
+        row =>
+          row.column_name === expectedRow.column &&
+          row.table_name === expectedRow.table &&
+          row.old_data === expectedRow.oldValue &&
+          row.new_data === expectedRow.value
       )
       assert(!!receivedRow, 'Did not find relevant log row')
       const debugLog = `Row: \n${JSON.stringify(receivedRow, null, 2)}\nExpected:\n${JSON.stringify(expectedRow)}`
@@ -137,5 +141,6 @@ describe('Locality write works', () => {
         `Log rows action type differs. ${debugLog}`
       )
     }
+    assert(logRows.length === 5, 'Wrong amount of log rows in relevant update')
   })
 })
