@@ -116,7 +116,7 @@ export class WriteHandler extends DatabaseHandler {
   }
 
   async logUpdatesAndComplete(comment: string, references: Reference[], authorizer: string) {
-    if (this.writeList.length === 0) {
+    if (this.writeList.flatMap(writeItem => writeItem.items).length === 0) {
       logger.info(`No changes detected, skipping logging.`)
       return
     }
