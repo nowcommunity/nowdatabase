@@ -1,4 +1,4 @@
-import { SpeciesDetailsType } from '../../../frontend/src/backendTypes'
+import { Reference, SpeciesDetailsType } from '../../../frontend/src/backendTypes'
 
 export const newLocalityBasis = {
   bfa_max: 'bahean',
@@ -177,4 +177,32 @@ export const newLocalityBasis = {
       },
     },
   ],
+}
+
+export const editedLocality = {
+  lid: 21050,
+  loc_name: 'New test name',
+  now_mus: [],
+  now_ls: [
+    {
+      rowState: 'new',
+      species_id: 21052,
+      lid: 21050,
+      com_species: { species_id: 21052 } as SpeciesDetailsType,
+    },
+    {
+      rowState: 'removed',
+      species_id: 85729,
+      lid: 21050,
+      com_species: { species_id: 85729 } as SpeciesDetailsType,
+    },
+  ],
+  projects: [],
+  now_plr: [],
+  now_ss: [],
+  now_coll_meth: [],
+  now_lau: [],
+  now_syn_loc: [],
+  comment: 'Test update',
+  references: [{ rid: 24188 } as Reference],
 }

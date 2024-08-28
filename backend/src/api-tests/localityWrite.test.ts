@@ -1,9 +1,10 @@
 /* eslint-disable @typescript-eslint/no-floating-promises */
 import assert from 'node:assert/strict'
 import { before, describe, it } from 'node:test'
-import { LocalityDetailsType, Reference, SpeciesDetailsType } from '../../../frontend/src/backendTypes'
+import { LocalityDetailsType } from '../../../frontend/src/backendTypes'
 import { LogRow } from '../services/writeOperations/types'
-import { newLocalityBasis } from './data'
+import { editedLocality, newLocalityBasis } from './data'
+import { login, send } from './utils'
 
 const actionTypeToString = {
   1: 'delete',
@@ -11,103 +12,24 @@ const actionTypeToString = {
   3: 'update',
 } as Record<number, string>
 
-const baseUrl = 'http://localhost:4000'
-
-let token: string | null = null
-
 let resultLocality: LocalityDetailsType | null = null
 
 let createdLocality: LocalityDetailsType | null = null
 
-const locality = {
-  lid: 21050,
-  loc_name: 'New test name',
-  now_mus: [],
-  now_ls: [
-    {
-      rowState: 'new',
-      species_id: 21052,
-      lid: 21050,
-      com_species: { species_id: 21052 } as SpeciesDetailsType,
-    },
-    {
-      rowState: 'removed',
-      species_id: 85729,
-      lid: 21050,
-      com_species: { species_id: 85729 } as SpeciesDetailsType,
-    },
-  ],
-  projects: [],
-  now_plr: [],
-  now_ss: [],
-  now_coll_meth: [],
-  now_lau: [],
-  now_syn_loc: [],
-  comment: 'Test update',
-  references: [{ rid: 24188 } as Reference],
-}
-
-const newLocality = {
-  loc_name: 'New test name',
-  now_mus: [],
-  now_ls: [
-    {
-      rowState: 'new',
-      lid: 21050,
-      com_species: { species_name: 'Newspecies' } as SpeciesDetailsType,
-    },
-    {
-      rowState: 'new',
-      species_id: 21052,
-      lid: 21050,
-      com_species: { species_id: 21052 } as SpeciesDetailsType,
-    },
-  ],
-  projects: [],
-  now_plr: [],
-  now_ss: [],
-  now_coll_meth: [],
-  now_lau: [],
-  now_syn_loc: [],
-  comment: 'Testing adding new',
-  references: [{ rid: 24188 } as Reference],
-}
-
-const send = async <T extends Record<string, unknown>>(
-  path: string,
-  method: 'GET' | 'POST' | 'PUT' | 'DELETE',
-  body?: object
-) => {
-  const headers = new Headers()
-
-  headers.append('Content-Type', 'application/json')
-  if (token) headers.append('authorization', `bearer ${token}`)
-
-  const options = { body: method !== 'GET' ? JSON.stringify(body) : undefined, method, headers }
-  const result = await fetch(`${baseUrl}/${path}`, options)
-  const r = await result.text()
-  if (!r) return { body: {} as T, status: result.status }
-  return { body: JSON.parse(r) as T, status: result.status }
-}
-
 describe('Locality write works', () => {
   before(async () => {
-    await send('test/create-test-users', 'GET')
+    await login()
   })
 
   it('Edits name, synonyms and locality species correctly', async () => {
-    const loginResponse = await send<{ token: string }>('user/login', 'POST', { username: 'testSu', password: 'test' })
-    if (loginResponse?.body?.token) token = loginResponse.body.token
-    else throw Error('Login unsuccessful')
-
-    const writeResult = await send<{ id: number }>('locality', 'PUT', { locality })
-    assert(writeResult.body.id === locality.lid, `Invalid result returned on write: ${writeResult.body.id}`)
-    const { body } = await send<LocalityDetailsType>(`locality/${locality.lid}`, 'GET')
+    const writeResult = await send<{ id: number }>('locality', 'PUT', { locality: editedLocality })
+    assert(writeResult.body.id === editedLocality.lid, `Invalid result returned on write: ${writeResult.body.id}`)
+    const { body } = await send<LocalityDetailsType>(`locality/${editedLocality.lid}`, 'GET')
     resultLocality = body
   })
 
   it('Name changed correctly', () => {
-    assert(resultLocality!.loc_name === locality.loc_name, 'Name was not changed correctly')
+    assert(resultLocality!.loc_name === editedLocality.loc_name, 'Name was not changed correctly')
   })
 
   it('Added locality species is found', () => {
@@ -125,15 +47,15 @@ describe('Locality write works', () => {
     const update = resultLocality!.now_lau
     const lastUpdate = update[update.length - 1]
 
-    assert(lastUpdate.lau_comment === locality.comment, 'Comment wrong')
-    assert(lastUpdate.now_lr[lastUpdate.now_lr.length - 1].rid === locality.references[0].rid)
+    assert(lastUpdate.lau_comment === editedLocality.comment, 'Comment wrong')
+    assert(lastUpdate.now_lr[lastUpdate.now_lr.length - 1].rid === editedLocality.references[0].rid)
 
     const logRows = lastUpdate.updates
 
     const expectedLogRows: Partial<LogRow & { errorMessage: string }>[] = [
       {
         oldValue: 'Dmanisi',
-        value: locality.loc_name,
+        value: editedLocality.loc_name,
         type: 'update',
         column: 'loc_name',
         table: 'now_loc',
@@ -180,19 +102,17 @@ describe('Locality write works', () => {
 
 describe('Creating new locality works', () => {
   before(async () => {
-    await send('test/create-test-users', 'GET')
+    await login()
   })
-  it('Request succeeds and returns valid number id', async () => {
-    const loginResponse = await send<{ token: string }>('user/login', 'POST', { username: 'testSu', password: 'test' })
-    if (loginResponse?.body?.token) token = loginResponse.body.token
-    else throw Error('Login unsuccessful')
-    const { body: resultBody } = await send<{ id: number }>('locality', 'PUT', { locality: newLocalityBasis })
 
+  it('Request succeeds and returns valid number id', async () => {
+    const { body: resultBody } = await send<{ id: number }>('locality', 'PUT', { locality: newLocalityBasis })
     const { id: createdId } = resultBody
     assert(typeof createdId === 'number', `Invalid result returned on write: ${createdId}`)
     const { body } = await send<LocalityDetailsType>(`locality/${createdId}`, 'GET')
     createdLocality = body
   })
+
   it('Contains correct data', () => {
     const { loc_name, now_ls } = createdLocality!
     assert(loc_name === newLocalityBasis.loc_name, 'Name is different')
