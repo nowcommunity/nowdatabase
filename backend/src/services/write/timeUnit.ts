@@ -16,13 +16,17 @@ export const writeTimeUnit = async (
     allowedColumns: getFieldsOfTables(['now_time_unit', 'now_tu_sequence']),
     type: timeUnit.tu_name ? 'update' : 'add',
   })
+  try {
+    await writeHandler.start()
 
-  await writeHandler.start()
+    writeHandler.idValue = timeUnit.tu_name
+    await writeHandler.upsertObject('now_time_unit', timeUnit, ['tu_name'])
+    await writeHandler.logUpdatesAndComplete(comment ?? '', references ?? [], authorizer)
+    await writeHandler.commit()
 
-  writeHandler.idValue = timeUnit.tu_name
-  await writeHandler.upsertObject('now_time_unit', timeUnit, ['tu_name'])
-  await writeHandler.logUpdatesAndComplete(comment ?? '', references ?? [], authorizer)
-  await writeHandler.end()
-
-  return timeUnit.tu_name
+    return timeUnit.tu_name
+  } catch (e) {
+    await writeHandler.end()
+    throw e
+  }
 }

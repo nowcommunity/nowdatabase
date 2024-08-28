@@ -121,6 +121,6 @@ export class WriteHandler extends DatabaseHandler {
       return
     }
     await logAllUpdates(this, this.writeList, this.table, this.idValue!, authorizer, comment, references, this.type)
-    await this.end()
+    await this.commit()
   }
 }

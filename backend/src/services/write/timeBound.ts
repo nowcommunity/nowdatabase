@@ -16,13 +16,17 @@ export const writeTimeBound = async (
     allowedColumns: getFieldsOfTables(['now_tu_bound']),
     type: timeBound.bid ? 'update' : 'add',
   })
+  try {
+    await writeHandler.start()
 
-  await writeHandler.start()
+    writeHandler.idValue = timeBound.bid
+    await writeHandler.upsertObject('now_tu_bound', timeBound, ['bid'])
+    await writeHandler.logUpdatesAndComplete(comment ?? '', references ?? [], authorizer)
+    await writeHandler.commit()
 
-  writeHandler.idValue = timeBound.bid
-  await writeHandler.upsertObject('now_tu_bound', timeBound, ['bid'])
-  await writeHandler.logUpdatesAndComplete(comment ?? '', references ?? [], authorizer)
-  await writeHandler.end()
-
-  return timeBound.bid
+    return timeBound.bid
+  } catch (e) {
+    await writeHandler.end()
+    throw e
+  }
 }

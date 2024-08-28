@@ -17,21 +17,26 @@ export const writeSpecies = async (
     type: species.species_id ? 'update' : 'add',
   })
 
-  await writeHandler.start()
+  try {
+    await writeHandler.start()
 
-  if (!species.species_id) {
-    const { species_id: newId } = await writeHandler.createObject('com_species', species, ['species_id'])
-    species.species_id = newId as number
-  } else {
-    await writeHandler.updateObject('com_species', species, ['species_id'])
+    if (!species.species_id) {
+      const { species_id: newId } = await writeHandler.createObject('com_species', species, ['species_id'])
+      species.species_id = newId as number
+    } else {
+      await writeHandler.updateObject('com_species', species, ['species_id'])
+    }
+
+    writeHandler.idValue = species.species_id
+
+    await writeHandler.applyListChanges('now_ls', species.now_ls, ['lid', 'species_id'])
+    await writeHandler.applyListChanges('com_taxa_synonym', species.com_taxa_synonym, ['synonym_id', 'species_id'])
+    await writeHandler.logUpdatesAndComplete(comment ?? '', references ?? [], authorizer)
+    await writeHandler.commit()
+
+    return species.species_id
+  } catch (e) {
+    await writeHandler.end()
+    throw e
   }
-
-  writeHandler.idValue = species.species_id
-
-  await writeHandler.applyListChanges('now_ls', species.now_ls, ['lid', 'species_id'])
-  await writeHandler.applyListChanges('com_taxa_synonym', species.com_taxa_synonym, ['synonym_id', 'species_id'])
-  await writeHandler.logUpdatesAndComplete(comment ?? '', references ?? [], authorizer)
-  await writeHandler.end()
-
-  return species.species_id
 }

@@ -14,15 +14,26 @@ export class DatabaseHandler {
   constructor(dbName: string) {
     this.dbName = dbName
   }
+
   async start() {
     this.connection = await pool.getConnection()
     await this.connection.beginTransaction()
   }
 
+  async rollback() {
+    if (!this.connection) throw new Error('DB connection not initialized')
+    await this.connection.rollback()
+  }
+
   async end() {
     if (!this.connection) throw new Error('DB connection not initialized')
-    await this.connection.commit()
     await this.connection.end()
+  }
+
+  async commit() {
+    if (!this.connection) throw new Error('DB connection not initialized')
+    await this.connection.commit()
+    await this.end()
   }
 
   getValuesAndColumns(items: DbWriteItem[]) {
