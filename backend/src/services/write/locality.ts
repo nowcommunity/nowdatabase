@@ -43,6 +43,7 @@ export const writeLocality = async (
       if (species.species_id) continue
       const { species_id } = await writeHandler.createObject('com_species', species, ['species_id'])
       species.species_id = species_id as number
+      localitySpecies.species_id = species_id as number
     }
 
     await writeHandler.applyListChanges('now_ls', locality.now_ls, ['lid', 'species_id'])

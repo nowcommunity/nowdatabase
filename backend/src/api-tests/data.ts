@@ -117,11 +117,10 @@ export const newLocalityBasis = {
     },
   ],
   now_ls: [
-    //   {
-    //     rowState: 'new',
-    //     lid: 21050,
-    //     com_species: { species_name: 'Newspecies' } as SpeciesDetailsType,
-    //   },
+    {
+      rowState: 'new',
+      com_species: { species_name: 'Newspecies' } as SpeciesDetailsType,
+    },
     {
       rowState: 'new',
       species_id: 21052,

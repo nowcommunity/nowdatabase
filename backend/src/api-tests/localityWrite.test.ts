@@ -196,8 +196,8 @@ describe('Creating new locality works', () => {
   it('Contains correct data', () => {
     const { loc_name, now_ls } = createdLocality!
     assert(loc_name === newLocalityBasis.loc_name, 'Name is different')
-    //    const newSpecies = now_ls.find(ls => ls.com_species.species_name === 'Newspecies')
-    //    assert(!!newSpecies, 'New species not found')
+    const newSpecies = now_ls.find(ls => ls.com_species.species_name === 'Newspecies')
+    assert(!!newSpecies, 'New species not found')
     const oldSpecies = now_ls.find(ls => ls.species_id === 21052 && ls.lid === createdLocality!.lid)
     assert(!!oldSpecies, 'Old species not found')
   })
