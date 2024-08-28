@@ -4,9 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Tests are ran at root level.\"",
     "dev": "npx tsx watch --clear-screen=false src/index.ts",
     "build": "tsc",
+    "test": "node --import tsx --test src/api-tests/**.ts",
     "start": "node build/index.js",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "prisma": "prisma generate --schema prisma/schema.prisma && prisma generate --schema prisma/schema_log.prisma"

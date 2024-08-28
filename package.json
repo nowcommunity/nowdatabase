@@ -12,12 +12,16 @@
     "check": "echo \"Running checks for both services...\" && npm run check:frontend && npm run check:backend && echo \"All good! :)\"",
     "check:backend": "echo \"Running backend tsc ...\" && cd backend && npx tsc --noEmit && echo \"Running backend eslint ...\"&& npm run lint",
     "check:frontend": "echo \"Running frontend tsc ...\" && cd frontend && npx tsc --noEmit && echo \"Running frontend eslint ...\" && npm run lint",
-    "test": "cypress run --browser chrome",
+    "test:e2e": "cypress run --browser chrome",
+    "test:api": "cd backend && npm test",
     "cypress": "cypress open",
-    "prisma": "cd backend && npx prisma generate --schema prisma/schema.prisma && npx prisma generate --schema prisma/schema_log.prisma"
+    "prisma": "cd backend && npx prisma generate --schema prisma/schema.prisma && npx prisma generate --schema prisma/schema_log.prisma",
+    "reset-anon-db": "docker exec -it nowdb-db-anon sh -c \"mariadb --user root -padmin now_test < /docker-entrypoint-initdb.d/sqlfiles/now_anon.sql\" && docker exec -it nowdb-db-anon sh -c \"mariadb --user root -padmin now_log_test < /docker-entrypoint-initdb.d/sqlfiles/now_log_anon.sql\""
   },
   "author": "",
   "devDependencies": {
-    "cypress": "^13.11.0"
+    "@types/supertest": "^6.0.2",
+    "cypress": "^13.11.0",
+    "supertest": "^7.0.0"
   }
 }
