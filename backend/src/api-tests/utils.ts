@@ -11,7 +11,6 @@ export const send = async <T extends Record<string, unknown>>(
   if (token) headers.append('authorization', `bearer ${token}`)
   const options = { body: method !== 'GET' ? JSON.stringify(body) : undefined, method, headers }
   const response = await fetch(`${baseUrl}/${path}`, options)
-  console.log({ response })
   const responseText = await response.text()
   if (!responseText) return { body: {} as T, status: response.status }
   return { body: JSON.parse(responseText) as T, status: response.status }
