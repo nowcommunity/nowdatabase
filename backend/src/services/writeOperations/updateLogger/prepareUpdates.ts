@@ -2,7 +2,7 @@ import { Reference } from '../../../../../frontend/src/backendTypes'
 import { COORDINATOR } from '../../../utils/config'
 import { AllowedTables, ActionType, Item, LogRow, PrimaryTables, WriteItem, UpdateEntry } from '../types'
 import { WriteHandler } from '../writeHandler'
-import { prefixToIdColumn, primaryTableToUpdatePrefix, tableToUpdateTargets } from './utils'
+import { filterRelevantLogRows, prefixToIdColumn, primaryTableToUpdatePrefix, tableToUpdateTargets } from './utils'
 import { createUpdateEntry, writeLogRows, writeReferences } from './writeUpdates'
 
 export const logAllUpdates = async (
@@ -39,11 +39,13 @@ export const logAllUpdates = async (
     table: tableName,
     id,
     logRows: writeList.flatMap(writeItem =>
-      writeItem.items.map(item => ({
-        ...item,
-        type: writeItem.type,
-        pkData: `${id.toString().length}.${id};${getSecondaryPkData(writeItem.table, writeItem.items)}`,
-      }))
+      writeItem.items
+        .filter(item => filterRelevantLogRows(item, tableName))
+        .map(item => ({
+          ...item,
+          type: writeItem.type,
+          pkData: `${id.toString().length}.${id};${getSecondaryPkData(writeItem.table, writeItem.items)}`,
+        }))
     ),
   }
 
@@ -65,11 +67,21 @@ export const logAllUpdates = async (
         throw new Error(`Error when creating update entries: id not found for targetTable: ${targetTable}`)
       if (!secondaryUpdateEntries[targetTable]) secondaryUpdateEntries[targetTable] = {}
       const pkData = `${id.toString().length}.${id};${secondaryId.toString().length}.${secondaryId};`
-      secondaryUpdateEntries[targetTable][secondaryId] = {
-        id: secondaryId,
-        table: targetTable,
-        type: writeListItem.type,
-        logRows: writeListItem.items.map(item => ({ ...item, pkData, type: writeListItem.type })),
+      if (secondaryUpdateEntries[targetTable][secondaryId]) {
+        secondaryUpdateEntries[targetTable][secondaryId] = {
+          ...secondaryUpdateEntries[targetTable][secondaryId],
+          logRows: [
+            ...secondaryUpdateEntries[targetTable][secondaryId].logRows,
+            ...writeListItem.items.map(item => ({ ...item, pkData, type: writeListItem.type })),
+          ],
+        }
+      } else {
+        secondaryUpdateEntries[targetTable][secondaryId] = {
+          id: secondaryId,
+          table: targetTable,
+          type: writeListItem.type,
+          logRows: writeListItem.items.map(item => ({ ...item, pkData, type: writeListItem.type })),
+        }
       }
     }
   }

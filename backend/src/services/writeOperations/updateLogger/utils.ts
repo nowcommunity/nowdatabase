@@ -1,4 +1,4 @@
-import { AllowedTables, PrimaryTables } from '../types'
+import { AllowedTables, Item, PrimaryTables } from '../types'
 
 export const updateTableToIdColumn: Record<string, string> = {
   now_lau: 'lid',
@@ -30,4 +30,15 @@ export const primaryTableToUpdatePrefix = {
    table, assume it goes to the "main" update entry e.g. if user edited locality, now_loc. */
 export const tableToUpdateTargets = {
   now_ls: ['now_loc', 'com_species'],
+  com_species: ['com_species'], // This is because com_species may be updated through now_loc
 } as Record<AllowedTables, PrimaryTables[] | undefined>
+
+/*
+  This returns false for any logRow that should not be shown in the updates of tableName.
+  For example, a com_species entry can be created while editing now_loc, but we don't want
+  to show it in the now_loc update logs, only the now_ls part.
+*/
+export const filterRelevantLogRows = (item: Item, tableName: PrimaryTables) => {
+  if (tableName === 'now_loc' && item.table === 'com_species') return false
+  return true
+}
