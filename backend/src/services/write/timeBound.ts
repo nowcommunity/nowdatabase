@@ -19,8 +19,8 @@ export const writeTimeBound = async (
   try {
     await writeHandler.start()
 
-    writeHandler.idValue = timeBound.bid
-    await writeHandler.upsertObject('now_tu_bound', timeBound, ['bid'])
+    const result = await writeHandler.upsertObject('now_tu_bound', timeBound, ['bid'])
+    writeHandler.idValue = result!.bid as number
     await writeHandler.logUpdatesAndComplete(comment ?? '', references ?? [], authorizer)
     await writeHandler.commit()
 
