@@ -37,19 +37,24 @@ export const TimeUnitTab = () => {
       />,
     ],
   ]
-  const low_bound = [
-    ['Id', data.low_bound.bid],
-    ['Name', data.low_bound.b_name],
-    ['Age', data.low_bound.age],
-    ['Comment', data.low_bound.b_comment],
-  ]
 
-  const up_bound = [
-    ['Id', data.up_bound.bid],
-    ['Name', data.up_bound.b_name],
-    ['Age', data.up_bound.age],
-    ['Comment', data.up_bound.b_comment],
-  ]
+  const low_bound = mode.new
+    ? []
+    : [
+        ['Id', data.low_bound?.bid],
+        ['Name', data.low_bound?.b_name],
+        ['Age', data.low_bound?.age],
+        ['Comment', data.low_bound?.b_comment],
+      ]
+
+  const up_bound = mode.new
+    ? []
+    : [
+        ['Id', data.up_bound?.bid],
+        ['Name', data.up_bound?.b_name],
+        ['Age', data.up_bound?.age],
+        ['Comment', data.up_bound?.b_comment],
+      ]
 
   const time_bound_edit = [
     [
@@ -75,8 +80,12 @@ export const TimeUnitTab = () => {
   return (
     <>
       <ArrayFrame array={timeUnit} title="Time Unit" />
-      <ArrayFrame array={low_bound} title="Lower bound" />
-      <ArrayFrame array={up_bound} title="Upper bound" />
+      {!mode.new && (
+        <>
+          <ArrayFrame array={low_bound} title="Lower bound" />
+          <ArrayFrame array={up_bound} title="Upper bound" />
+        </>
+      )}
       {!mode.read && <ArrayFrame array={time_bound_edit} title="Edit bounds" />}
     </>
   )
