@@ -8,7 +8,7 @@ export enum Role {
   ReadOnly = 7,
 }
 
-import { LocalityDetailsType } from '../src/backendTypes'
+import { EditDataType, LocalityDetailsType } from '../src/backendTypes'
 
 export const calculateMeanHypsodonty = (locality: LocalityDetailsType) => {
   // Mean hypsodonty calculation has been made based on html/include/database.php line 2567 onwards
@@ -44,3 +44,18 @@ export const calculateMeanHypsodonty = (locality: LocalityDetailsType) => {
   const meanHypsodonty = species.length > 0 ? sum / (species.length * 1.0) : 0.0
   return parseFloat((Math.floor(meanHypsodonty * 100) / 100).toFixed(2))
 }
+
+const hominins = [
+  'sahelanthropus',
+  'orrorin',
+  'ardipithecus',
+  'kenyanthropus',
+  'australopithecus',
+  'paranthropus',
+  'homo',
+]
+
+export const getHomininSkeletalRemains = (locality: EditDataType<LocalityDetailsType>) =>
+  !!locality.now_ls.find(
+    ({ com_species }) => com_species?.genus_name && hominins.includes(com_species.genus_name.toLowerCase())
+  )

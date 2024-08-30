@@ -2,6 +2,7 @@ import { LocalityDetailsType } from '@/backendTypes'
 import { emptyOption } from '@/components/DetailView/common/misc'
 import { ArrayFrame } from '@/components/DetailView/common/tabLayoutHelpers'
 import { useDetailContext } from '@/components/DetailView/Context/DetailContext'
+import { getHomininSkeletalRemains } from '@/types'
 
 export const ArchaeologyTab = () => {
   const { dropdown, radioSelection, data } = useDetailContext<LocalityDetailsType>()
@@ -41,21 +42,8 @@ export const ArchaeologyTab = () => {
     { display: 'Tabun B', value: 'tabun_b' },
   ]
 
-  const hominins = [
-    'sahelanthropus',
-    'orrorin',
-    'ardipithecus',
-    'kenyanthropus',
-    'australopithecus',
-    'paranthropus',
-    'homo',
-  ]
-
   const archaeology = [
-    [
-      'Hominin skeletal remains',
-      data.now_ls.find(({ com_species }) => hominins.includes(com_species.genus_name.toLowerCase())) ? 'Yes' : 'No',
-    ],
+    ['Hominin skeletal remains', getHomininSkeletalRemains(data) ? 'Yes' : 'No'],
     [
       'Stone tool cut marks on bones',
       radioSelection(

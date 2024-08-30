@@ -2,6 +2,7 @@ import { EditDataType, LocalityDetailsType, Reference } from '../../../../fronte
 import { NOW_DB_NAME } from '../../utils/config'
 import { WriteHandler } from '../writeOperations/writeHandler'
 import { getFieldsOfTables } from '../../utils/db'
+import { getHomininSkeletalRemains } from '../../../../frontend/src/types'
 
 export const writeLocality = async (
   locality: EditDataType<LocalityDetailsType>,
@@ -24,6 +25,8 @@ export const writeLocality = async (
     ]),
     type: locality.lid ? 'update' : 'add',
   })
+
+  locality.hominin_skeletal_remains = getHomininSkeletalRemains(locality)
 
   try {
     await writeHandler.start()
