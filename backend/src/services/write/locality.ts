@@ -1,16 +1,14 @@
-import { EditDataType, LocalityDetailsType, Reference } from '../../../../frontend/src/backendTypes'
+import { EditDataType, LocalityDetailsType, Reference, User } from '../../../../frontend/src/backendTypes'
 import { NOW_DB_NAME } from '../../utils/config'
 import { WriteHandler } from '../writeOperations/writeHandler'
 import { getFieldsOfTables } from '../../utils/db'
 import { getHomininSkeletalRemains } from '../../../../frontend/src/types'
+import { getLocalityDetails } from '../locality'
+import { ActionType } from '../writeOperations/types'
+import { makeListRemoved } from '../writeOperations/utils'
 
-export const writeLocality = async (
-  locality: EditDataType<LocalityDetailsType>,
-  comment: string | undefined,
-  references: Reference[] | undefined,
-  authorizer: string
-) => {
-  const writeHandler = new WriteHandler({
+const getLocalityWriteHandler = (type: ActionType) => {
+  return new WriteHandler({
     dbName: NOW_DB_NAME,
     table: 'now_loc',
     idColumn: 'lid',
@@ -23,8 +21,17 @@ export const writeLocality = async (
       'now_coll_meth',
       'now_syn_loc',
     ]),
-    type: locality.lid ? 'update' : 'add',
+    type,
   })
+}
+
+export const writeLocality = async (
+  locality: EditDataType<LocalityDetailsType>,
+  comment: string | undefined,
+  references: Reference[] | undefined,
+  authorizer: string
+) => {
+  const writeHandler = getLocalityWriteHandler(locality.lid ? 'update' : 'add')
 
   locality.hominin_skeletal_remains = getHomininSkeletalRemains(locality)
 
@@ -54,9 +61,37 @@ export const writeLocality = async (
     await writeHandler.applyListChanges('now_ss', locality.now_ss, ['lid', 'sed_struct'])
     await writeHandler.applyListChanges('now_coll_meth', locality.now_coll_meth, ['lid', 'coll_meth'])
     await writeHandler.applyListChanges('now_syn_loc', locality.now_syn_loc, ['lid', 'syn_id'])
-    await writeHandler.logUpdatesAndComplete(comment ?? '', references ?? [], authorizer)
-    await writeHandler.commit()
+
+    await writeHandler.logUpdatesAndComplete(authorizer, comment ?? '', references ?? [])
     return locality.lid
+  } catch (e) {
+    await writeHandler.end()
+    throw e
+  }
+}
+
+export const deleteLocality = async (lid: number, user: User) => {
+  const locality = (await getLocalityDetails(lid, user)) as EditDataType<LocalityDetailsType>
+  if (!locality) throw new Error('Locality not found')
+
+  const writeHandler = getLocalityWriteHandler('delete')
+  await writeHandler.start()
+  writeHandler.idValue = locality.lid
+
+  makeListRemoved(locality.now_ls)
+  makeListRemoved(locality.now_mus)
+  makeListRemoved(locality.now_ss)
+  makeListRemoved(locality.now_coll_meth)
+  makeListRemoved(locality.now_syn_loc)
+
+  try {
+    await writeHandler.applyListChanges('now_ls', locality.now_ls, ['lid', 'species_id'])
+    await writeHandler.applyListChanges('now_mus', locality.now_mus, ['lid', 'museum'])
+    await writeHandler.applyListChanges('now_ss', locality.now_ss, ['lid', 'sed_struct'])
+    await writeHandler.applyListChanges('now_coll_meth', locality.now_coll_meth, ['lid', 'coll_meth'])
+    await writeHandler.applyListChanges('now_syn_loc', locality.now_syn_loc, ['lid', 'syn_id'])
+    await writeHandler.deleteObject('now_loc', locality, ['lid'])
+    await writeHandler.logUpdatesAndComplete(user.initials)
   } catch (e) {
     await writeHandler.end()
     throw e

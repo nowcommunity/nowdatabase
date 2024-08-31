@@ -11,10 +11,13 @@ export const logAllUpdates = async (
   tableName: PrimaryTables,
   id: string | number,
   userInitials: string,
-  comment: string,
-  references: Reference[],
-  type: ActionType
+  type: ActionType,
+  comment?: string,
+  references?: Reference[]
 ) => {
+  if (type !== 'delete' && (comment === undefined || !references))
+    throw new Error('Comment or references missing on update')
+
   const updateEntries: UpdateEntry[] = []
   const getIdColumn = (targetTable: AllowedTables) => {
     if (targetTable === 'com_species') return 'species_id'
@@ -34,23 +37,24 @@ export const logAllUpdates = async (
     return `${secondaryId.toString().length}.${secondaryId};`
   }
 
-  const rootUpdateEntry: UpdateEntry = {
-    type,
-    table: tableName,
-    id,
-    logRows: writeList.flatMap(writeItem =>
-      writeItem.items
-        .filter(item => filterRelevantLogRows(item, tableName))
-        .map(item => ({
-          ...item,
-          type: writeItem.type,
-          pkData: `${id.toString().length}.${id};${getSecondaryPkData(writeItem.table, writeItem.items)}`,
-        }))
-    ),
+  if (type !== 'delete') {
+    const rootUpdateEntry: UpdateEntry = {
+      type,
+      table: tableName,
+      id,
+      logRows: writeList.flatMap(writeItem =>
+        writeItem.items
+          .filter(item => filterRelevantLogRows(item, tableName))
+          .map(item => ({
+            ...item,
+            type: writeItem.type,
+            pkData: `${id.toString().length}.${id};${getSecondaryPkData(writeItem.table, writeItem.items)}`,
+          }))
+      ),
+    }
+
+    updateEntries.push(rootUpdateEntry)
   }
-
-  updateEntries.push(rootUpdateEntry)
-
   // Create "secondary" update-entries. This map holds by the primary table and id, e.g. secondaryUpdateEntries['species_id'][10001]
   const secondaryUpdateEntries = {} as Record<PrimaryTables, Record<string | number, UpdateEntry>>
 
@@ -92,10 +96,12 @@ export const logAllUpdates = async (
     }
   }
 
-  // Write the update-entries: This inserts the id's that are created into the objects.
-  await writeUpdateEntries(writeHandler, updateEntries, userInitials, comment)
+  if (type !== 'delete') {
+    // Write the update-entries: This inserts the id's that are created into the objects.
+    await writeUpdateEntries(writeHandler, updateEntries, userInitials, comment!)
 
-  await writeReferences(writeHandler, updateEntries, references)
+    await writeReferences(writeHandler, updateEntries, references!)
+  }
 
   // The write has value and oldValue swapped for 'delete' type logRows due to reasons.
   // It is simpler to fix it here than changing how write works, because values are used to find id's above.

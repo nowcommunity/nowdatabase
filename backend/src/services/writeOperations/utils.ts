@@ -1,3 +1,4 @@
+import { Editable } from '../../../../frontend/src/backendTypes'
 import { DbWriteItem } from './databaseHandler'
 import { DbValue } from './types'
 
@@ -35,4 +36,10 @@ export const fixBoolean = (value: unknown) => {
   if (value === false) return 0
   if (value === true) return 1
   return value as DbValue
+}
+
+export const makeListRemoved = (list: Editable<Record<string, unknown>>[]) => {
+  for (const item of list) {
+    item.rowState = 'removed'
+  }
 }

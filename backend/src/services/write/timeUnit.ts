@@ -22,9 +22,14 @@ export const writeTimeUnit = async (
   try {
     await writeHandler.start()
 
+    if (timeUnit.tu_name) {
+      await writeHandler.updateObject('now_time_unit', timeUnit, ['tu_name'])
+    } else {
+      timeUnit.tu_name = createTimeUnitId(timeUnit.tu_display_name!)
+      await writeHandler.createObject('now_time_unit', timeUnit, ['tu_name'])
+    }
     writeHandler.idValue = createdId
-    await writeHandler.createObject('now_time_unit', timeUnit, ['tu_name'])
-    await writeHandler.logUpdatesAndComplete(comment ?? '', references ?? [], authorizer)
+    await writeHandler.logUpdatesAndComplete(authorizer, comment ?? '', references ?? [])
     await writeHandler.commit()
 
     return timeUnit.tu_name

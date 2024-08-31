@@ -86,11 +86,13 @@ export class WriteHandler extends DatabaseHandler {
   async deleteObject<T extends Record<string, unknown>>(table: AllowedTables, object: T, idColumns: string[]) {
     // Get id's, log as deleted, delete
     const ids = idColumns.map(idColumn => ({ column: idColumn, value: object[idColumn] as DbValue }))
+    const oldObject = await this.select<T>(table, [], ids)
+    const deletedItems = getItemList(oldObject)
     this.writeList.push({
       table,
       type: 'delete',
       // oldValue and value are swapped here, but they are logged correctly in update.
-      items: ids.map(id => ({ value: id.value, oldValue: null, table, column: id.column })),
+      items: deletedItems.map(item => ({ table, column: item.column, oldValue: '', value: item.value })),
     })
     return await this.delete(table, ids)
   }
@@ -111,16 +113,19 @@ export class WriteHandler extends DatabaseHandler {
         await this.createObject(table, object, idColumns)
       } else if (rowState === 'removed') {
         await this.deleteObject(table, object, idColumns)
+      } else {
+        throw new Error('Invalid rowState in list item object while writing')
       }
     }
   }
 
-  async logUpdatesAndComplete(comment: string, references: Reference[], authorizer: string) {
+  async logUpdatesAndComplete(authorizer: string, comment?: string, references?: Reference[]) {
     if (this.writeList.flatMap(writeItem => writeItem.items).length === 0) {
       logger.info(`No changes detected, skipping logging.`)
       return
     }
-    await logAllUpdates(this, this.writeList, this.table, this.idValue!, authorizer, comment, references, this.type)
+    await logAllUpdates(this, this.writeList, this.table, this.idValue!, authorizer, this.type, comment, references)
     await this.commit()
+    await this.end()
   }
 }
