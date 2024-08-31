@@ -24,17 +24,9 @@ jobs:
         with:
           node-version: 20
 
-      - name: 'Install root dependencies'
-        run: npm ci
+      - name: 'Run setup'
+        run: npm run setup
 
-        # Has to be installed out-of-container because prisma client needs these, and it isnt run by docker...
-        # Could fix, but would require checking in the container if prisma clients are generated
-      - name: 'Install backend dependencies' 
-        working-directory: 'backend'
-        run: npm ci
-
-      - name: 'Generate prisma clients' # has to be after root ci, but before checking code.
-        run: npm run prisma
       - name: 'Start containers'
         run: npm run start:anon -- -d && sleep 60
       - name: Cypress
