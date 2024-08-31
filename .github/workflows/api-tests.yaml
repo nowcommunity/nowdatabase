@@ -1,0 +1,36 @@
+name: 'Api-tests'
+
+on:
+  pull_request:
+    types: [opened, reopened]
+  push:
+    branches:
+      - '**'
+    paths-ignore:
+      - '**/*.md'
+      - '.github/workflows/build.yaml'
+
+jobs:
+  api-tests:
+    name: 'Api tests'
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: 'Install root dependencies'
+        run: npm run setup
+
+      - name: 'Start containers'
+        run: npm run start:anon -- -d && sleep 60
+      - name: Run api-tests
+        run: npm run test:api
+      - name: Dump docker logs on failure
+        if: failure()
+        uses: jwalton/gh-docker-logs@v2
