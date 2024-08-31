@@ -2,7 +2,7 @@ import { Reference, RowState } from '../../../../frontend/src/backendTypes'
 import { logger } from '../../utils/logger'
 import { logAllUpdates } from './updateLogger/prepareUpdates'
 import { DatabaseHandler, DbWriteItem } from './databaseHandler'
-import { fixBoolean, getItemList, valueIsDifferent } from './utils'
+import { fixBoolean, getItemList, isEmptyValue, valueIsDifferent } from './utils'
 import { ActionType, AllowedTables, DbValue, Item, PrimaryTables, WriteItem } from './types'
 
 type WriteHandlerParams = {
@@ -92,7 +92,9 @@ export class WriteHandler extends DatabaseHandler {
       table,
       type: 'delete',
       // oldValue and value are swapped here, but they are logged correctly in update.
-      items: deletedItems.map(item => ({ table, column: item.column, oldValue: '', value: item.value })),
+      items: deletedItems
+        .filter(item => !isEmptyValue(item.value))
+        .map(item => ({ table, column: item.column, oldValue: '', value: item.value })),
     })
     return await this.delete(table, ids)
   }

@@ -2,7 +2,7 @@ import { Editable } from '../../../../frontend/src/backendTypes'
 import { DbWriteItem } from './databaseHandler'
 import { DbValue } from './types'
 
-const isEmptyValue = (value: unknown) => {
+export const isEmptyValue = (value: unknown) => {
   if (value === null || value === undefined) return true
   if (typeof value === 'string' && value === '') return true
   return false
