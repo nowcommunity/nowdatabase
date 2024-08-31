@@ -39,7 +39,11 @@ export class WriteHandler extends DatabaseHandler {
         items.push({ column: id, value: returnValue[id] })
       }
     }
-    this.writeList.push({ table, type: 'add', items: items.map(item => ({ ...item, table })) })
+    this.writeList.push({
+      table,
+      type: 'add',
+      items: items.filter(item => !isEmptyValue(item.value)).map(item => ({ ...item, table })),
+    })
     return returnValue
   }
 
