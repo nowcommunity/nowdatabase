@@ -30,7 +30,7 @@ describe('Creating new locality works', () => {
     assert(!!oldSpecies, 'Old species not found')
   })
 
-  void it('Species update also logged correctly', async () => {
+  it('Species update also logged correctly', async () => {
     const speciesId = createdLocality!.now_ls.find(ls => ls.com_species.species_name === 'Newspecies')?.species_id
     const speciesResult = await send<SpeciesDetailsType>(`species/${speciesId}`, 'GET')
     const update = speciesResult.body.now_sau[0]

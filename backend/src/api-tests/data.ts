@@ -100,8 +100,8 @@ export const newLocalityBasis = {
   regional_culture_3: null,
   now_mus: [
     {
-      lid: 20920,
       museum: 'RGM',
+      rowState: 'new',
       com_mlist: {
         museum: 'RGM',
         institution: 'Naturalis: National Museum of Natural History',
@@ -129,43 +129,40 @@ export const newLocalityBasis = {
   ],
   now_syn_loc: [
     {
-      syn_id: 2373,
-      lid: 20920,
+      rowState: 'new',
       synonym: 'Shuijiazui',
     },
     {
-      syn_id: 6066,
-      lid: 20920,
+      rowState: 'new',
       synonym: 'Bahe',
     },
   ],
   now_ss: [
     {
-      lid: 20920,
       sed_struct: 'crocodile_frags',
+      rowState: 'new',
     },
     {
-      lid: 20920,
       sed_struct: 'm_cones',
+      rowState: 'new',
     },
     {
-      lid: 20920,
       sed_struct: 'tool_marks',
+      rowState: 'new',
     },
   ],
   now_coll_meth: [
     {
-      lid: 20920,
       coll_meth: 'surface',
+      rowState: 'new',
     },
     {
-      lid: 20920,
       coll_meth: 'systematic_loc_survey',
+      rowState: 'new',
     },
   ],
   now_plr: [
     {
-      lid: 20920,
       pid: 3,
       now_proj: {
         pid: 3,
@@ -175,6 +172,7 @@ export const newLocalityBasis = {
         proj_status: 'current',
         proj_records: false,
       },
+      rowState: 'new',
     },
   ],
 }
