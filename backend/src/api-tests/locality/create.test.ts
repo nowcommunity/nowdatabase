@@ -16,7 +16,9 @@ describe('Creating new locality works', () => {
   it('Request succeeds and returns valid number id', async () => {
     const { body: resultBody } = await send<{ id: number }>('locality', 'PUT', { locality: newLocalityBasis })
     const { id: createdId } = resultBody
+
     assert(typeof createdId === 'number', `Invalid result returned on write: ${createdId}`)
+
     const { body } = await send<LocalityDetailsType>(`locality/${createdId}`, 'GET')
     createdLocality = body
   })
