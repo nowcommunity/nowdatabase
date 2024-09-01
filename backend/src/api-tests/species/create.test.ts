@@ -8,7 +8,7 @@ import { login, send, testLogRows } from '../utils'
 
 let createdSpecies: SpeciesDetailsType | null = null
 
-describe.only('Creating new species works', () => {
+describe('Creating new species works', () => {
   before(async () => {
     await login()
   })

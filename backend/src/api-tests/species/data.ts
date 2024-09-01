@@ -1,4 +1,4 @@
-import { EditDataType, SpeciesDetailsType } from '../../../../frontend/src/backendTypes'
+import { EditDataType, EditMetaData, Reference, SpeciesDetailsType } from '../../../../frontend/src/backendTypes'
 
 export const newSpeciesBasis: EditDataType<SpeciesDetailsType> = {
   class_name: 'Mammalia',
@@ -104,4 +104,15 @@ export const newSpeciesBasis: EditDataType<SpeciesDetailsType> = {
   ],
   now_sau: [],
   com_taxa_synonym: [],
+}
+
+export const editedSpecies: EditDataType<SpeciesDetailsType & EditMetaData> = {
+  species_id: 21426,
+  sp_comment: 'Test comment',
+  species_name: 'Test species name',
+  now_ls: [{ rowState: 'new', lid: 20920 }],
+  com_taxa_synonym: [],
+  now_sau: [],
+  comment: 'species edit test',
+  references: [{ rid: 24188 } as Reference],
 }
