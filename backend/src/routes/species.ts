@@ -2,7 +2,7 @@ import { Request, Router } from 'express'
 import { getAllSpecies, getSpeciesDetails } from '../services/species'
 import { fixBigInt } from '../utils/common'
 import { EditMetaData, SpeciesDetailsType } from '../../../frontend/src/backendTypes'
-import { writeSpecies } from '../services/write/species'
+import { deleteSpecies, writeSpecies } from '../services/write/species'
 import { requireOneOf } from '../middlewares/authorizer'
 import { Role } from '../../../frontend/src/types'
 
@@ -17,7 +17,7 @@ router.get('/:id', async (req, res) => {
   const id = parseInt(req.params.id)
   const species = await getSpeciesDetails(id)
   if (!species) return res.status(404).send()
-  return res.status(200).send(fixBigInt(species))
+  return res.status(200).send(species)
 })
 
 router.put(
@@ -29,5 +29,11 @@ router.put(
     return res.status(200).send({ id })
   }
 )
+
+router.delete('/:id', requireOneOf([Role.Admin, Role.EditUnrestricted]), async (req, res) => {
+  const id = parseInt(req.params.id)
+  await deleteSpecies(id, req.user!)
+  res.status(200).send()
+})
 
 export default router

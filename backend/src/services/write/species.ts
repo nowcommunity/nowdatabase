@@ -1,7 +1,20 @@
-import { EditDataType, Reference, SpeciesDetailsType } from '../../../../frontend/src/backendTypes'
+import { EditDataType, FixBigInt, Reference, SpeciesDetailsType, User } from '../../../../frontend/src/backendTypes'
 import { NOW_DB_NAME } from '../../utils/config'
 import { WriteHandler } from '../writeOperations/writeHandler'
 import { getFieldsOfTables } from '../../utils/db'
+import { ActionType } from '../writeOperations/types'
+import { getSpeciesDetails } from '../species'
+import { makeListRemoved } from '../writeOperations/utils'
+
+const getSpeciesWriteHandler = (type: ActionType) => {
+  return new WriteHandler({
+    dbName: NOW_DB_NAME,
+    table: 'com_species',
+    idColumn: 'species_id',
+    allowedColumns: getFieldsOfTables(['com_species', 'now_ls']),
+    type: type,
+  })
+}
 
 export const writeSpecies = async (
   species: EditDataType<SpeciesDetailsType>,
@@ -9,14 +22,7 @@ export const writeSpecies = async (
   references: Reference[] | undefined,
   authorizer: string
 ) => {
-  const writeHandler = new WriteHandler({
-    dbName: NOW_DB_NAME,
-    table: 'com_species',
-    idColumn: 'species_id',
-    allowedColumns: getFieldsOfTables(['com_species', 'now_ls']),
-    type: species.species_id ? 'update' : 'add',
-  })
-
+  const writeHandler = getSpeciesWriteHandler(species.species_id ? 'update' : 'add')
   try {
     await writeHandler.start()
 
@@ -35,6 +41,31 @@ export const writeSpecies = async (
     await writeHandler.commit()
 
     return species.species_id
+  } catch (e) {
+    await writeHandler.end()
+    throw e
+  }
+}
+
+export const deleteSpecies = async (species_id: number, user: User) => {
+  const species = (await getSpeciesDetails(species_id)) as EditDataType<FixBigInt<SpeciesDetailsType>>
+  species.now_sau[0].updates
+  if (!species) throw new Error('Species not found')
+
+  const writeHandler = getSpeciesWriteHandler('delete')
+  await writeHandler.start()
+  writeHandler.idValue = species.species_id
+
+  makeListRemoved(species.now_ls)
+  makeListRemoved(species.com_taxa_synonym)
+  makeListRemoved(species.now_sau)
+
+  try {
+    await writeHandler.applyListChanges('now_ls', species.now_ls, ['lid', 'species_id'])
+    await writeHandler.applyListChanges('com_taxa_synonym', species.com_taxa_synonym, ['synonym_id', 'species_id'])
+    await writeHandler.applyListChanges('now_sau', species.now_sau, ['suid'])
+    await writeHandler.deleteObject('com_species', species, ['species_id'])
+    await writeHandler.logUpdatesAndComplete(user.initials)
   } catch (e) {
     await writeHandler.end()
     throw e

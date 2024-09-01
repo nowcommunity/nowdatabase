@@ -25,7 +25,7 @@ type EditDataType<T> = T extends object
 // Changes all bigints to number type including in nested objects
 export type FixBigInt<T> = {
   [K in keyof T]: T[K] extends bigint | null
-    ? number
+    ? number | null
     : T[K] extends (infer U)[]
       ? FixBigInt<U>[]
       : T[K] extends object
@@ -35,7 +35,7 @@ export type FixBigInt<T> = {
 
 export type SpeciesType = FixBigInt<Prisma.com_species>
 export type RowState = 'new' | 'removed' | 'cancelled' | 'clean'
-export type UpdateComment = { update_comment: string }
+
 // Use this for fields that include array that has to be edited by EditableTable.
 // For example see LocalityDetails: museums field
 export type Editable<T> = T & { rowState?: RowState }
@@ -69,7 +69,7 @@ export type LocalityDetailsType = Prisma.now_loc & {
   now_ss: SedimentaryStructure[]
 } & {
   now_coll_meth: CollectingMethod[]
-} & { now_lau: Array<LocalityUpdate> } & UpdateComment
+} & { now_lau: Array<LocalityUpdate> }
 export type UpdateLog = LogPrisma.log
 export type Locality = {
   lid: number
@@ -85,7 +85,7 @@ export type Locality = {
 export type Sequence = Prisma.now_tu_sequence
 export type SequenceDetailsType = Prisma.now_tu_sequence
 
-export type SpeciesDetailsType = SpeciesType & { now_ls: Array<SpeciesLocality> } & {
+export type SpeciesDetailsType = Prisma.com_species & { now_ls: Array<SpeciesLocality> } & {
   com_taxa_synonym: Array<SpeciesSynonym>
 } & { now_sau: Array<SpeciesUpdate> }
 

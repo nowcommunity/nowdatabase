@@ -1,3 +1,5 @@
+import { SpeciesDetailsType } from '../../../frontend/src/backendTypes'
+import { fixBigInt } from '../utils/common'
 import { logDb, nowDb } from '../utils/db'
 
 export const getAllSpecies = async () => {
@@ -59,5 +61,5 @@ export const getSpeciesDetails = async (id: number) => {
     updates: logResult.filter(logRow => logRow.suid === sau.suid),
   }))
 
-  return { ...result, com_taxa_synonym: synonyms || [] }
+  return JSON.parse(fixBigInt({ ...result, com_taxa_synonym: synonyms || [] })!) as SpeciesDetailsType
 }
