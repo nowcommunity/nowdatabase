@@ -121,9 +121,10 @@ export type TimeBoundUpdate = Prisma.now_bau & { now_br: Prisma.now_br }
 /* Time Unit */
 export type TimeUnitSequence = Prisma.now_tu_sequence
 
-export type TimeUnitUpdate = Prisma.now_time_update & {
+export type TimeUnitUpdate = Prisma.now_tau & {
   now_tr: Prisma.now_tr & { ref_ref: { ref_authors: string; ref_journal: string }[] }
-}
+} & { updates: UpdateLog[] }
+
 export type TimeUnitDetailsType = Prisma.now_time_unit & { now_tu_sequence: SequenceDetailsType } & {
   now_tau: Array<TimeUnitUpdate>
 } & {

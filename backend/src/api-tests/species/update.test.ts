@@ -5,7 +5,6 @@ import { EditMetaData, SpeciesDetailsType } from '../../../../frontend/src/backe
 import { LogRow } from '../../services/writeOperations/types'
 import { login, send, testLogRows } from '../utils'
 import { editedSpecies } from './data'
-import { editedLocality } from '../locality/data'
 
 let editedSpeciesResult: (SpeciesDetailsType & EditMetaData) | null = null
 

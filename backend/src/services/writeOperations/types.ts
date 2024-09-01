@@ -15,6 +15,8 @@ export type AllowedTables =
   | 'ref_ref'
   | 'now_tu_sequence'
   | 'now_sau'
+  | 'now_tau'
+  | 'now_bau'
 
 export type PrimaryTables = 'now_loc' | 'com_species' | 'now_time_unit' | 'now_tu_bound'
 
