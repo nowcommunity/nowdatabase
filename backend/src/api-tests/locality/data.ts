@@ -1,4 +1,4 @@
-import { Reference, SpeciesDetailsType } from '../../../frontend/src/backendTypes'
+import { Reference, SpeciesDetailsType } from '../../../../frontend/src/backendTypes'
 
 export const newLocalityBasis = {
   bfa_max: 'bahean',
@@ -175,6 +175,7 @@ export const newLocalityBasis = {
       rowState: 'new',
     },
   ],
+  comment: 'new locality test update',
 }
 
 export const editedLocality = {

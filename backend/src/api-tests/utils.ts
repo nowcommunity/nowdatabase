@@ -15,6 +15,7 @@ export const send = async <T extends Record<string, unknown>>(
   if (token) headers.append('authorization', `bearer ${token}`)
   const options = { body: method !== 'GET' ? JSON.stringify(body) : undefined, method, headers }
   const response = await fetch(`${baseUrl}/${path}`, options)
+  if (response.status > 399) return { body: {} as T, status: response.status }
   const responseText = await response.text()
   if (!responseText) return { body: {} as T, status: response.status }
   return { body: JSON.parse(responseText) as T, status: response.status }
@@ -45,7 +46,7 @@ export const testLogRows = (logRows: UpdateLog[], expectedLogRows: Partial<LogRo
         row.old_data === expectedRow.oldValue &&
         row.new_data === expectedRow.value
     )
-    assert(!!receivedRow, 'Did not find relevant log row')
+    assert(!!receivedRow, `Did not find this expected logrow: ${JSON.stringify(expectedRow)}`)
     const debugLog = `Row: \n${JSON.stringify(receivedRow, null, 2)}\nExpected:\n${JSON.stringify(expectedRow)}`
     assert(receivedRow.new_data === expectedRow.value, `Log rows new data differs. ${debugLog}`)
     assert(receivedRow.old_data === expectedRow.oldValue, `Log rows old data differs. ${debugLog}`)

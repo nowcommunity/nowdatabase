@@ -3,7 +3,7 @@ import assert from 'node:assert/strict'
 import { before, describe, it } from 'node:test'
 import { LocalityDetailsType } from '../../../../frontend/src/backendTypes'
 import { LogRow } from '../../services/writeOperations/types'
-import { editedLocality } from './data'
+import { editedLocality } from '../locality/data'
 import { login, send, testLogRows } from '../utils'
 
 let resultLocality: LocalityDetailsType | null = null

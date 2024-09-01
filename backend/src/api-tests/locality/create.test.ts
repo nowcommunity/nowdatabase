@@ -3,7 +3,7 @@ import assert from 'node:assert/strict'
 import { before, describe, it } from 'node:test'
 import { LocalityDetailsType, SpeciesDetailsType } from '../../../../frontend/src/backendTypes'
 import { LogRow } from '../../services/writeOperations/types'
-import { newLocalityBasis } from '../data'
+import { newLocalityBasis } from './data'
 import { login, send, testLogRows } from '../utils'
 
 let createdLocality: LocalityDetailsType | null = null
@@ -35,7 +35,8 @@ describe('Creating new locality works', () => {
   it('Species update also logged correctly', async () => {
     const speciesId = createdLocality!.now_ls.find(ls => ls.com_species.species_name === 'Newspecies')?.species_id
     const speciesResult = await send<SpeciesDetailsType>(`species/${speciesId}`, 'GET')
-    const update = speciesResult.body.now_sau[0]
+    const update = speciesResult.body.now_sau.find(update => update.sau_comment === 'new locality test update')
+    assert(update, 'Species update not found')
     update.species_id === speciesId
     const logRows = update.updates
     const expectedLogRows: Partial<LogRow>[] = [
