@@ -37,7 +37,7 @@ describe('Creating new locality works', () => {
     const speciesResult = await send<SpeciesDetailsType>(`species/${speciesId}`, 'GET')
     const update = speciesResult.body.now_sau.find(update => update.sau_comment === 'new locality test update')
     assert(update, 'Species update not found')
-    update.species_id === speciesId
+    assert(update?.species_id === speciesId, 'Species update does not have correct id')
     const logRows = update.updates
     const expectedLogRows: Partial<LogRow>[] = [
       {
@@ -49,16 +49,23 @@ describe('Creating new locality works', () => {
       },
       {
         oldValue: null,
-        value: '86515',
+        value: speciesId.toString(),
         type: 'add',
         column: 'species_id',
         table: 'com_species',
       },
       {
         oldValue: null,
-        value: '86515',
+        value: speciesId.toString(),
         type: 'add',
         column: 'species_id',
+        table: 'now_ls',
+      },
+      {
+        oldValue: null,
+        value: createdLocality!.lid.toString(),
+        type: 'add',
+        column: 'lid',
         table: 'now_ls',
       },
     ]
