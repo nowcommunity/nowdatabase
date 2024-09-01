@@ -12,7 +12,7 @@ const getSpeciesWriteHandler = (type: ActionType) => {
     table: 'com_species',
     idColumn: 'species_id',
     allowedColumns: getFieldsOfTables(['com_species', 'now_ls']),
-    type: type,
+    type,
   })
 }
 

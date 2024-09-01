@@ -33,6 +33,7 @@ export const LocalityDetails = () => {
   })
   const notify = useNotify()
   const [deleteMutation, { isSuccess: deleteSuccess, isError: deleteError }] = useDeleteLocalityMutation()
+
   useEffect(() => {
     if (deleteSuccess) {
       notify('Deleted item successfully.')
@@ -41,6 +42,7 @@ export const LocalityDetails = () => {
       notify('Could not delete item. Error happened.', 'error')
     }
   }, [deleteSuccess, deleteError, notify, navigate])
+
   if (isError) return <div>Error loading data</div>
   if (isFetching || (!data && !isNew) || mutationLoading) return <CircularProgress />
 

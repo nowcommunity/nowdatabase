@@ -24,7 +24,14 @@ const speciesApi = api.injectEndpoints({
       invalidatesTags: (result, _error, { species_id }) =>
         result ? [{ type: 'species', id: species_id }, 'specieslist'] : [],
     }),
+    deleteSpecies: builder.mutation<void, number>({
+      query: id => ({
+        url: `/species/${id}`,
+        method: 'DELETE',
+      }),
+    }),
   }),
 })
 
-export const { useGetAllSpeciesQuery, useGetSpeciesDetailsQuery, useEditSpeciesMutation } = speciesApi
+export const { useGetAllSpeciesQuery, useGetSpeciesDetailsQuery, useEditSpeciesMutation, useDeleteSpeciesMutation } =
+  speciesApi

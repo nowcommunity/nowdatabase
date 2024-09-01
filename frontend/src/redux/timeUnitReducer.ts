@@ -34,6 +34,13 @@ const timeunitsApi = api.injectEndpoints({
       invalidatesTags: (result, _error, { tu_name }) =>
         result ? [{ type: 'timeunit', id: tu_name }, 'timeunits'] : [],
     }),
+    deleteTimeUnit: builder.mutation<void, string>({
+      query: id => ({
+        url: `/time-unit/${id}`,
+        method: 'DELETE',
+      }),
+      invalidatesTags: ['timeunits'],
+    }),
   }),
 })
 
@@ -43,4 +50,5 @@ export const {
   useGetTimeUnitDetailsQuery,
   useEditTimeUnitMutation,
   useGetSequencesQuery,
+  useDeleteTimeUnitMutation,
 } = timeunitsApi

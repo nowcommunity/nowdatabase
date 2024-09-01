@@ -1,11 +1,11 @@
 import { Request, Router } from 'express'
-import { getAllTimeUnits, getTimeUnitDetails, getTimeUnitLocalities } from '../services/timeUnit'
-import { fixBigInt } from '../utils/common'
 import { EditDataType, EditMetaData, TimeUnitDetailsType } from '../../../frontend/src/backendTypes'
-import { getAllSequences } from '../services/sequence'
-import { writeTimeUnit } from '../services/write/timeUnit'
-import { requireOneOf } from '../middlewares/authorizer'
 import { Role } from '../../../frontend/src/types'
+import { requireOneOf } from '../middlewares/authorizer'
+import { getAllSequences } from '../services/sequence'
+import { getAllTimeUnits, getTimeUnitDetails, getTimeUnitLocalities } from '../services/timeUnit'
+import { deleteTimeUnit, writeTimeUnit } from '../services/write/timeUnit'
+import { fixBigInt } from '../utils/common'
 
 const router = Router()
 
@@ -41,5 +41,11 @@ router.put(
     return res.status(200).send({ id: result })
   }
 )
+
+router.delete('/:id', requireOneOf([Role.Admin, Role.EditUnrestricted]), async (req, res) => {
+  const id = req.params.id
+  await deleteTimeUnit(id, req.user!)
+  res.status(200).send()
+})
 
 export default router

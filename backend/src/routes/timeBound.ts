@@ -2,7 +2,7 @@ import { Request, Router } from 'express'
 import { getAllTimeBounds, getTimeBoundDetails, getTimeBoundTimeUnits } from '../services/timeBound'
 import { fixBigInt } from '../utils/common'
 import { EditDataType, EditMetaData, TimeBoundDetailsType } from '../../../frontend/src/backendTypes'
-import { writeTimeBound } from '../services/write/timeBound'
+import { deleteTimeUnit, writeTimeBound } from '../services/write/timeBound'
 import { requireOneOf } from '../middlewares/authorizer'
 import { Role } from '../../../frontend/src/types'
 
@@ -35,5 +35,11 @@ router.put(
     return res.status(200).send({ id: result })
   }
 )
+
+router.delete('/:id', requireOneOf([Role.Admin, Role.EditUnrestricted]), async (req, res) => {
+  const id = parseInt(req.params.id)
+  await deleteTimeUnit(id, req.user!)
+  res.status(200).send()
+})
 
 export default router

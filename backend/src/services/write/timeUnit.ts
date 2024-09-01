@@ -1,7 +1,21 @@
-import { EditDataType, Reference, TimeUnitDetailsType } from '../../../../frontend/src/backendTypes'
+import { EditDataType, Reference, TimeUnitDetailsType, User } from '../../../../frontend/src/backendTypes'
 import { NOW_DB_NAME } from '../../utils/config'
 import { WriteHandler } from '../writeOperations/writeHandler'
 import { getFieldsOfTables } from '../../utils/db'
+import { ActionType } from '../writeOperations/types'
+import { getTimeUnitDetails } from '../timeUnit'
+
+const getTimeUnitWriteHandler = (type: ActionType) => {
+  return new WriteHandler({
+    dbName: NOW_DB_NAME,
+    table: 'now_time_unit',
+    idColumn: 'tu_name',
+    allowedColumns: getFieldsOfTables(['now_time_unit', 'now_tu_sequence']),
+    type,
+  })
+}
+
+const createTimeUnitId = (displayName: string) => displayName.toLowerCase().replace(' ', '')
 
 export const writeTimeUnit = async (
   timeUnit: EditDataType<TimeUnitDetailsType>,
@@ -9,13 +23,7 @@ export const writeTimeUnit = async (
   references: Reference[] | undefined,
   authorizer: string
 ) => {
-  const writeHandler = new WriteHandler({
-    dbName: NOW_DB_NAME,
-    table: 'now_time_unit',
-    idColumn: 'tu_name',
-    allowedColumns: getFieldsOfTables(['now_time_unit', 'now_tu_sequence']),
-    type: timeUnit.tu_name ? 'update' : 'add',
-  })
+  const writeHandler = getTimeUnitWriteHandler(timeUnit.tu_name ? 'update' : 'add')
 
   const createdId = createTimeUnitId(timeUnit.tu_display_name!)
 
@@ -39,4 +47,16 @@ export const writeTimeUnit = async (
   }
 }
 
-const createTimeUnitId = (displayName: string) => displayName.toLowerCase().replace(' ', '')
+export const deleteTimeUnit = async (id: string, user: User) => {
+  const timeUnit = await getTimeUnitDetails(id)
+  if (!timeUnit) throw new Error('Time unit not found')
+  const writeHandler = getTimeUnitWriteHandler('delete')
+  try {
+    await writeHandler.start()
+    await writeHandler.deleteObject('now_time_unit', timeUnit, ['tu_name'])
+    await writeHandler.logUpdatesAndComplete(user.initials)
+  } catch (e) {
+    await writeHandler.end()
+    throw e
+  }
+}

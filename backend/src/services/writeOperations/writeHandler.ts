@@ -119,8 +119,6 @@ export class WriteHandler extends DatabaseHandler {
         await this.createObject(table, object, idColumns)
       } else if (rowState === 'removed') {
         await this.deleteObject(table, object, idColumns)
-      } else {
-        throw new Error('Invalid rowState in list item object while writing')
       }
     }
   }

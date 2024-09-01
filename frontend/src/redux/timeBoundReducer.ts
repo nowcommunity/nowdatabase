@@ -28,6 +28,12 @@ const timeboundsApi = api.injectEndpoints({
       }),
       invalidatesTags: (result, _error, { bid }) => (result ? [{ type: 'timebound', id: bid }, 'timebounds'] : []),
     }),
+    deleteTimeBound: builder.mutation<void, number>({
+      query: id => ({
+        url: `/time-bound/${id}`,
+        method: 'DELETE',
+      }),
+    }),
   }),
 })
 
@@ -36,4 +42,5 @@ export const {
   useGetTimeBoundDetailsQuery,
   useGetTimeBoundTimeUnitsQuery,
   useEditTimeBoundMutation,
+  useDeleteTimeBoundMutation,
 } = timeboundsApi

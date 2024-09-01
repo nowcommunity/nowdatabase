@@ -1,20 +1,44 @@
-import { useParams } from 'react-router-dom'
-import { useEditTimeUnitMutation, useGetTimeUnitDetailsQuery } from '../../redux/timeUnitReducer'
+import { EditDataType, TimeUnitDetailsType } from '@/backendTypes'
+import { useNotify } from '@/hooks/notification'
 import { CircularProgress } from '@mui/material'
+import { useEffect } from 'react'
+import { useNavigate, useParams } from 'react-router-dom'
+import {
+  useDeleteTimeUnitMutation,
+  useEditTimeUnitMutation,
+  useGetTimeUnitDetailsQuery,
+} from '../../redux/timeUnitReducer'
+import { emptyTimeUnit } from '../DetailView/common/defaultValues'
+import { UpdateTab } from '../DetailView/common/UpdateTab'
 import { DetailView, TabType } from '../DetailView/DetailView'
 import { LocalityTab } from './Tabs/LocalityTab'
 import { TimeUnitTab } from './Tabs/TimeUnitTab'
-import { UpdateTab } from '../DetailView/common/UpdateTab'
-import { EditDataType, TimeUnitDetailsType } from '@/backendTypes'
-import { emptyTimeUnit } from '../DetailView/common/defaultValues'
 
 export const TimeUnitDetails = () => {
   const { id } = useParams()
   const isNew = id === 'new'
   const { isLoading, isError, isFetching, data } = useGetTimeUnitDetailsQuery(encodeURIComponent(id!), { skip: isNew })
   const [editTimeUnitRequest] = useEditTimeUnitMutation()
+
+  const notify = useNotify()
+  const navigate = useNavigate()
+  const [deleteMutation, { isSuccess: deleteSuccess, isError: deleteError }] = useDeleteTimeUnitMutation()
+
+  useEffect(() => {
+    if (deleteSuccess) {
+      notify('Deleted item successfully.')
+      navigate('/time-unit')
+    } else if (deleteError) {
+      notify('Could not delete item. Error happened.', 'error')
+    }
+  }, [deleteSuccess, deleteError, notify, navigate])
+
   if (isError) return <div>Error loading data</div>
   if (isLoading || isFetching || (!data && !isNew)) return <CircularProgress />
+
+  const deleteFunction = async () => {
+    await deleteMutation(id!).unwrap()
+  }
 
   const onWrite = async (editData: EditDataType<TimeUnitDetailsType>) => {
     await editTimeUnitRequest(editData)
@@ -43,6 +67,7 @@ export const TimeUnitDetails = () => {
       data={isNew ? emptyTimeUnit : data!}
       onWrite={onWrite}
       validator={() => ({ name: '', error: null })}
+      deleteFunction={deleteFunction}
     />
   )
 }

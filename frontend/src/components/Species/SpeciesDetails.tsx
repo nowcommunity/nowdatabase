@@ -1,5 +1,5 @@
-import { useParams } from 'react-router-dom'
-import { useEditSpeciesMutation, useGetSpeciesDetailsQuery } from '../../redux/speciesReducer'
+import { useNavigate, useParams } from 'react-router-dom'
+import { useDeleteSpeciesMutation, useEditSpeciesMutation, useGetSpeciesDetailsQuery } from '../../redux/speciesReducer'
 import { CircularProgress } from '@mui/material'
 import { DetailView, TabType } from '../DetailView/DetailView'
 import { DietTab } from './Tabs/DietTab'
@@ -13,14 +13,33 @@ import { TeethTab } from './Tabs/TeethTab'
 import { UpdateTab } from '../DetailView/common/UpdateTab'
 import { EditDataType, SpeciesDetailsType } from '@/backendTypes'
 import { emptySpecies } from '../DetailView/common/defaultValues'
+import { useNotify } from '@/hooks/notification'
+import { useEffect } from 'react'
 
 export const SpeciesDetails = () => {
   const { id } = useParams()
   const isNew = id === 'new'
   const { isLoading, isError, isFetching, data } = useGetSpeciesDetailsQuery(id!, { skip: isNew })
   const [editSpeciesRequest] = useEditSpeciesMutation()
+  const notify = useNotify()
+  const navigate = useNavigate()
+  const [deleteMutation, { isSuccess: deleteSuccess, isError: deleteError }] = useDeleteSpeciesMutation()
+
+  useEffect(() => {
+    if (deleteSuccess) {
+      notify('Deleted item successfully.')
+      navigate('/species')
+    } else if (deleteError) {
+      notify('Could not delete item. Error happened.', 'error')
+    }
+  }, [deleteSuccess, deleteError, notify, navigate])
+
   if (isError) return <div>Error loading data</div>
   if (isLoading || isFetching || (!data && !isNew)) return <CircularProgress />
+
+  const deleteFunction = async () => {
+    await deleteMutation(parseInt(id!)).unwrap()
+  }
 
   const onWrite = async (editData: EditDataType<SpeciesDetailsType>) => {
     await editSpeciesRequest(editData)
@@ -76,6 +95,7 @@ export const SpeciesDetails = () => {
         name: 'unknown',
         error: null,
       })}
+      deleteFunction={deleteFunction}
     />
   )
 }
