@@ -24,8 +24,7 @@ router.put(
   '/',
   requireOneOf([Role.Admin, Role.EditUnrestricted]),
   async (req: Request<object, object, { species: SpeciesDetailsType & EditMetaData }>, res) => {
-    const editedSpecies = req.body.species
-    const { comment, references } = editedSpecies
+    const { comment, references, ...editedSpecies } = req.body.species
     const id = await writeSpecies(editedSpecies, comment, references, req.user!.initials)
     return res.status(200).send({ id })
   }
