@@ -11,3 +11,15 @@ export const newTimeUnitBasis: EditDataType<TimeUnitDetailsType & EditMetaData> 
   comment: 'test create time unit',
   references: [{ rid: 24188 } as Reference],
 }
+
+export const editedTimeUnit: EditDataType<TimeUnitDetailsType & EditMetaData> = {
+  tu_name: 'bahean',
+  up_bnd: 20214,
+  low_bnd: 20213,
+  rank: 'Age',
+  sequence: 'gcss',
+  tu_comment: 'test comment edited',
+  now_tau: [],
+  comment: 'test updating time unit',
+  references: [{ rid: 24188 } as Reference],
+}
