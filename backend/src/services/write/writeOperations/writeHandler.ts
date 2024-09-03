@@ -1,5 +1,5 @@
-import { Reference, RowState } from '../../../../frontend/src/backendTypes'
-import { logger } from '../../utils/logger'
+import { Reference, RowState } from '../../../../../frontend/src/backendTypes'
+import { logger } from '../../../utils/logger'
 import { logAllUpdates } from './updateLogger/prepareUpdates'
 import { DatabaseHandler, DbWriteItem } from './databaseHandler'
 import { fixBoolean, getItemList, isEmptyValue, valueIsDifferent } from './utils'

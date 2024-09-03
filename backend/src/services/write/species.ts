@@ -1,10 +1,10 @@
 import { EditDataType, FixBigInt, Reference, SpeciesDetailsType, User } from '../../../../frontend/src/backendTypes'
 import { NOW_DB_NAME } from '../../utils/config'
-import { WriteHandler } from '../writeOperations/writeHandler'
+import { WriteHandler } from './writeOperations/writeHandler'
 import { getFieldsOfTables } from '../../utils/db'
-import { ActionType } from '../writeOperations/types'
+import { ActionType } from './writeOperations/types'
 import { getSpeciesDetails } from '../species'
-import { makeListRemoved } from '../writeOperations/utils'
+import { makeListRemoved } from './writeOperations/utils'
 
 const getSpeciesWriteHandler = (type: ActionType) => {
   return new WriteHandler({

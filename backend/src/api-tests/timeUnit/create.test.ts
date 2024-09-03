@@ -2,7 +2,7 @@
 import assert from 'node:assert/strict'
 import { before, describe, it } from 'node:test'
 import { TimeUnitDetailsType } from '../../../../frontend/src/backendTypes'
-import { LogRow } from '../../services/writeOperations/types'
+import { LogRow } from '../../services/write/writeOperations/types'
 import { login, send, testLogRows } from '../utils'
 import { newTimeUnitBasis } from './data'
 

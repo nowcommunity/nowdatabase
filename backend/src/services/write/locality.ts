@@ -1,11 +1,11 @@
 import { EditDataType, LocalityDetailsType, Reference, User } from '../../../../frontend/src/backendTypes'
 import { NOW_DB_NAME } from '../../utils/config'
-import { WriteHandler } from '../writeOperations/writeHandler'
+import { WriteHandler } from './writeOperations/writeHandler'
 import { getFieldsOfTables } from '../../utils/db'
 import { getHomininSkeletalRemains } from '../../../../frontend/src/types'
 import { getLocalityDetails } from '../locality'
-import { ActionType } from '../writeOperations/types'
-import { makeListRemoved } from '../writeOperations/utils'
+import { ActionType } from './writeOperations/types'
+import { makeListRemoved } from './writeOperations/utils'
 
 const getLocalityWriteHandler = (type: ActionType) => {
   return new WriteHandler({

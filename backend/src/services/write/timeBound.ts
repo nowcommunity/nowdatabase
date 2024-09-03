@@ -1,8 +1,8 @@
 import { EditDataType, Reference, TimeBoundDetailsType, User } from '../../../../frontend/src/backendTypes'
 import { NOW_DB_NAME } from '../../utils/config'
-import { WriteHandler } from '../writeOperations/writeHandler'
+import { WriteHandler } from './writeOperations/writeHandler'
 import { getFieldsOfTables } from '../../utils/db'
-import { ActionType } from '../writeOperations/types'
+import { ActionType } from './writeOperations/types'
 import { getTimeBoundDetails } from '../timeBound'
 
 const getTimeBoundWriteHandler = (type: ActionType) => {

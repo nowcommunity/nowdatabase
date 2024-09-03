@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict'
 import { UpdateLog } from '../../../frontend/src/backendTypes'
-import { LogRow } from '../services/writeOperations/types'
+import { LogRow } from '../services/write/writeOperations/types'
 
 let token: string | null = null
 const baseUrl = 'http://localhost:4000'

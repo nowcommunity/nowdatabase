@@ -2,7 +2,7 @@
 import assert from 'node:assert/strict'
 import { before, describe, it } from 'node:test'
 import { LocalityDetailsType, SpeciesDetailsType } from '../../../../frontend/src/backendTypes'
-import { LogRow } from '../../services/writeOperations/types'
+import { LogRow } from '../../services/write/writeOperations/types'
 import { newLocalityBasis } from './data'
 import { login, send, testLogRows } from '../utils'
 

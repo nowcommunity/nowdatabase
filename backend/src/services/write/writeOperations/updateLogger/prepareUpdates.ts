@@ -1,5 +1,5 @@
-import { Reference } from '../../../../../frontend/src/backendTypes'
-import { COORDINATOR } from '../../../utils/config'
+import { Reference } from '../../../../../../frontend/src/backendTypes'
+import { COORDINATOR } from '../../../../utils/config'
 import { AllowedTables, ActionType, Item, LogRow, PrimaryTables, WriteItem, UpdateEntry } from '../types'
 import { WriteHandler } from '../writeHandler'
 import { filterRelevantLogRows, prefixToIdColumn, primaryTableToUpdatePrefix, tableToUpdateTargets } from './utils'

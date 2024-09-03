@@ -1,5 +1,5 @@
-import { Reference } from '../../../../../frontend/src/backendTypes'
-import { LOG_DB_NAME } from '../../../utils/config'
+import { Reference } from '../../../../../../frontend/src/backendTypes'
+import { LOG_DB_NAME } from '../../../../utils/config'
 import { LogRow, ActionType, AllowedTables, UpdateEntry } from '../types'
 import { WriteHandler } from '../writeHandler'
 import { getFormattedDate, prefixToIdColumn, primaryTableToUpdatePrefix, updateTableToIdColumn } from './utils'
