@@ -2,7 +2,6 @@ import { PoolConnection } from 'mariadb'
 import { User } from '../../../frontend/src/backendTypes'
 import { NOW_DB_NAME } from '../utils/config'
 import { Role } from '../../../frontend/src/types'
-import { Response } from 'express'
 import { pool } from '../utils/db'
 
 const getExportList = async (
@@ -34,7 +33,7 @@ const formatValue = (val: unknown) => {
   return `"${val as string}"`
 }
 
-export const getLocalitySpeciesList = async (lids: number[], user: User | undefined, res: Response) => {
+export const getLocalitySpeciesList = async (lids: number[], user: User | undefined) => {
   const exportList: unknown[] = []
 
   const transformRow = (row: unknown) => {
