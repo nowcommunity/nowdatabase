@@ -1,5 +1,4 @@
 import { PoolConnection } from 'mariadb'
-import { logger } from '../../../utils/logger'
 import { pool } from '../../../utils/db'
 import { DbValue, AllowedTables } from './types'
 
@@ -90,7 +89,7 @@ export class DatabaseHandler {
   async executeQuery<T>(query: string, values?: Array<DbValue>) {
     if (!this.connection) throw new Error('DB connection not initialized')
 
-    logger.info(`Executing SQL query: ${query} \nWith values ${JSON.stringify(values)}\n`)
+    // logger.info(`Executing SQL query: ${query} \nWith values ${JSON.stringify(values)}\n`)
     let returnValue
     if (values) {
       returnValue = await this.connection.query<T>(query, values)

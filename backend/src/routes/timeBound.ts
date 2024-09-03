@@ -1,10 +1,10 @@
 import { Request, Router } from 'express'
-import { getAllTimeBounds, getTimeBoundDetails, getTimeBoundTimeUnits } from '../services/timeBound'
-import { fixBigInt } from '../utils/common'
 import { EditDataType, EditMetaData, TimeBoundDetailsType } from '../../../frontend/src/backendTypes'
-import { deleteTimeUnit, writeTimeBound } from '../services/write/timeBound'
-import { requireOneOf } from '../middlewares/authorizer'
 import { Role } from '../../../frontend/src/types'
+import { requireOneOf } from '../middlewares/authorizer'
+import { getAllTimeBounds, getTimeBoundDetails, getTimeBoundTimeUnits } from '../services/timeBound'
+import { deleteTimeBound, writeTimeBound } from '../services/write/timeBound'
+import { fixBigInt } from '../utils/common'
 
 const router = Router()
 
@@ -32,13 +32,14 @@ router.put(
   async (req: Request<object, object, { timeBound: EditDataType<TimeBoundDetailsType> & EditMetaData }>, res) => {
     const { comment, references, ...editedTimeBound } = req.body.timeBound
     const result = await writeTimeBound(editedTimeBound, comment, references, req.user!.initials)
+    console.log({ result })
     return res.status(200).send({ id: result })
   }
 )
 
 router.delete('/:id', requireOneOf([Role.Admin, Role.EditUnrestricted]), async (req, res) => {
   const id = parseInt(req.params.id)
-  await deleteTimeUnit(id, req.user!)
+  await deleteTimeBound(id, req.user!)
   res.status(200).send()
 })
 

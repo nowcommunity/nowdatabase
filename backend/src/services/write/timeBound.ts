@@ -25,20 +25,17 @@ export const writeTimeBound = async (
 
   try {
     await writeHandler.start()
-
     const result = await writeHandler.upsertObject('now_tu_bound', timeBound, ['bid'])
     writeHandler.idValue = result!.bid as number
     await writeHandler.logUpdatesAndComplete(authorizer, comment ?? '', references ?? [])
-    await writeHandler.commit()
-
-    return timeBound.bid
+    return result!.bid as number
   } catch (e) {
     await writeHandler.end()
     throw e
   }
 }
 
-export const deleteTimeUnit = async (id: number, user: User) => {
+export const deleteTimeBound = async (id: number, user: User) => {
   const timeBound = await getTimeBoundDetails(id)
   if (!timeBound) throw new Error('Time bound not found')
   const writeHandler = getTimeBoundWriteHandler('delete')

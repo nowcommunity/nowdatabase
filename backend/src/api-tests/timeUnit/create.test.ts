@@ -8,7 +8,7 @@ import { newTimeUnitBasis } from './data'
 
 let createdTimeUnit: TimeUnitDetailsType | null = null
 
-describe('Creating new species works', () => {
+describe('Creating new time unit works', () => {
   before(async () => {
     await login()
   })

@@ -8,7 +8,7 @@ import { login, send, testLogRows } from '../utils'
 
 let resultLocality: LocalityDetailsType | null = null
 
-describe('Locality write works', () => {
+describe('Locality update works', () => {
   before(async () => {
     await login()
   })

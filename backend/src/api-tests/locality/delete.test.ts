@@ -8,9 +8,9 @@ describe('Deleting a locality works', async () => {
     await login()
   })
   await it('Deleting works', async () => {
-    const deleteResult = await send<{ id: number }>('locality/28518', 'DELETE')
+    const deleteResult = await send<{ id: number }>('locality/49999', 'DELETE')
     assert(deleteResult.status === 200)
-    const getResult = await send('locality/28518', 'GET')
+    const getResult = await send('locality/49999', 'GET')
     assert(getResult.status === 404, 'Locality response status was not 404 after deletion')
   })
 })

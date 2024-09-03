@@ -114,9 +114,9 @@ export type TimeBound = {
   b_comment: string
 }
 
-export type TimeBoundDetailsType = Prisma.now_tu_bound & { now_bau: Prisma.now_bau }
+export type TimeBoundDetailsType = Prisma.now_tu_bound & { now_bau: TimeBoundUpdate[] }
 
-export type TimeBoundUpdate = Prisma.now_bau & { now_br: Prisma.now_br }
+export type TimeBoundUpdate = Prisma.now_bau & { now_br: Prisma.now_br } & { updates: UpdateLog[] }
 
 /* Time Unit */
 export type TimeUnitSequence = Prisma.now_tu_sequence
