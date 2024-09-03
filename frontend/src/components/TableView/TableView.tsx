@@ -176,13 +176,15 @@ export const TableView = <T extends MRT_RowData>({
                 </span>
               }
             >
-              <Button
-                variant="contained"
-                disabled={exportIsLoading}
-                onClick={() => void combinedExport(table.getSortedRowModel().rows.map(d => d.original.lid as number))}
-              >
-                Export localities with their species
-              </Button>
+              <span>
+                <Button
+                  variant="contained"
+                  disabled={exportIsLoading}
+                  onClick={() => void combinedExport(table.getSortedRowModel().rows.map(d => d.original.lid as number))}
+                >
+                  Export localities with their species
+                </Button>
+              </span>
             </Tooltip>{' '}
             {exportIsLoading && <CircularProgress />}
           </Box>
