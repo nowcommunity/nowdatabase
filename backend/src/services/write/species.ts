@@ -11,7 +11,7 @@ const getSpeciesWriteHandler = (type: ActionType) => {
     dbName: NOW_DB_NAME,
     table: 'com_species',
     idColumn: 'species_id',
-    allowedColumns: getFieldsOfTables(['com_species', 'now_ls']),
+    allowedColumns: getFieldsOfTables(['com_species', 'now_ls', 'now_sau', 'now_lau']),
     type,
   })
 }

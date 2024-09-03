@@ -20,14 +20,12 @@ export class WriteHandler extends DatabaseHandler {
   writeList: WriteItem[] = []
   idColumn: string
   idValue?: string | number
-  allowedColumns: string[]
   type: ActionType
 
   constructor({ dbName, table, type, idColumn, allowedColumns }: WriteHandlerParams) {
-    super(dbName)
+    super(dbName, allowedColumns)
     this.table = table
     this.idColumn = idColumn
-    this.allowedColumns = allowedColumns
     this.type = type
   }
 
@@ -62,10 +60,6 @@ export class WriteHandler extends DatabaseHandler {
       const fixedValue = fixBoolean(value)
       if (!valueIsDifferent(fixedValue, oldValue)) continue
       fieldsToWrite.push({ column, value: fixedValue, oldValue, table })
-    }
-
-    if (items.find(item => !this.allowedColumns.includes(item.column))) {
-      throw new Error('Unallowed column in SQL')
     }
 
     this.writeList.push({ table, type: 'update', items: fieldsToWrite.map(item => ({ ...item, table })) })

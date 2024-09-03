@@ -10,7 +10,7 @@ const getTimeUnitWriteHandler = (type: ActionType) => {
     dbName: NOW_DB_NAME,
     table: 'now_time_unit',
     idColumn: 'tu_name',
-    allowedColumns: getFieldsOfTables(['now_time_unit', 'now_tu_sequence']),
+    allowedColumns: getFieldsOfTables(['now_time_unit', 'now_tu_sequence', 'now_tau']),
     type,
   })
 }

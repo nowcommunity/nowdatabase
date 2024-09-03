@@ -10,7 +10,7 @@ const getTimeBoundWriteHandler = (type: ActionType) => {
     dbName: NOW_DB_NAME,
     table: 'now_tu_bound',
     idColumn: 'bid',
-    allowedColumns: getFieldsOfTables(['now_tu_bound']),
+    allowedColumns: getFieldsOfTables(['now_tu_bound', 'now_bau']),
     type: type,
   })
 }

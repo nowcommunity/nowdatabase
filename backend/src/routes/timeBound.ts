@@ -32,7 +32,6 @@ router.put(
   async (req: Request<object, object, { timeBound: EditDataType<TimeBoundDetailsType> & EditMetaData }>, res) => {
     const { comment, references, ...editedTimeBound } = req.body.timeBound
     const result = await writeTimeBound(editedTimeBound, comment, references, req.user!.initials)
-    console.log({ result })
     return res.status(200).send({ id: result })
   }
 )

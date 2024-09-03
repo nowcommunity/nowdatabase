@@ -5,7 +5,7 @@ export const validateTimeBound = (
   editData: EditDataType<TimeBoundDetailsType>,
   fieldName: keyof TimeBoundDetailsType
 ) => {
-  const validators: Validators<EditDataType<TimeBoundDetailsType>> = {
+  const validators: Validators<EditDataType<Partial<TimeBoundDetailsType>>> = {
     b_name: {
       name: 'Locality name',
     },

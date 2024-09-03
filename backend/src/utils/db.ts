@@ -9,9 +9,13 @@ export const logDb = new LogClient()
 export const nowDb = new NowClient()
 
 export const getFieldsOfTables = (tables: string[]) => {
-  return tables.flatMap(table =>
-    Object.keys((nowDb[table as keyof object] as unknown as Record<string, { fields: object }>).fields as never)
-  )
+  return [
+    ...tables.flatMap(table =>
+      Object.keys((nowDb[table as keyof object] as unknown as Record<string, { fields: object }>).fields as never)
+    ),
+    ...Object.keys(logDb.log.fields),
+    ...Object.keys(nowDb.ref_ref.fields),
+  ]
 }
 
 export const pool = mariadb.createPool({
