@@ -8,7 +8,7 @@ const getExportList = async (
   conn: PoolConnection,
   lids: number[],
   includeDrafts: boolean,
-  rowHandler: (row: unknown) => void
+  rowHandler: (row: Record<string, unknown>) => void
 ) => {
   return new Promise(resolve => {
     const excludeDraftsString = includeDrafts
@@ -42,9 +42,18 @@ export const getLocalitySpeciesList = async (lids: number[], user: User | undefi
   }
 
   const conn = await pool.getConnection()
-  await getExportList(conn, lids, (user && [Role.Admin, Role.EditUnrestricted].includes(user.role)) || false, row => {
-    exportList.push(transformRow(row))
-  })
+  await getExportList(
+    conn,
+    lids,
+    (user && [Role.Admin, Role.EditUnrestricted].includes(user.role)) || false,
+    (row: Record<string, unknown>) => {
+      if (exportList.length === 0) {
+        // Push the column titles for the first row
+        exportList.push(Object.keys(row))
+      }
+      exportList.push(transformRow(row))
+    }
+  )
   await conn.end()
   return exportList
 }
