@@ -16,7 +16,7 @@
     "test:api": "cd backend && npm test",
     "cypress": "cypress open",
     "prisma": "cd backend && npx prisma generate --schema prisma/schema.prisma && npx prisma generate --schema prisma/schema_log.prisma",
-    "reset-anon-db": "docker exec -it nowdb-db-anon sh -c \"mariadb --user root -padmin now_test < /docker-entrypoint-initdb.d/sqlfiles/now_anon.sql\" && docker exec -it nowdb-db-anon sh -c \"mariadb --user root -padmin now_log_test < /docker-entrypoint-initdb.d/sqlfiles/now_log_anon.sql\""
+    "reset-anon-db": "docker exec -it nowdb-db-anon sh -c \"mariadb --user root -padmin now_test < /docker-entrypoint-initdb.d/sqlfiles/now_test.sql\" && docker exec -it nowdb-db-anon sh -c \"mariadb --user root -padmin now_log_test < /docker-entrypoint-initdb.d/sqlfiles/now_log_test.sql\""
   },
   "author": "",
   "devDependencies": {
