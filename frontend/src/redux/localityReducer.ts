@@ -20,6 +20,9 @@ const localitiesApi = api.injectEndpoints({
         url: `/locality-species`,
         body: { lids },
         method: 'POST',
+        responseHandler: response => {
+          return response.text()
+        },
       }),
     }),
     editLocality: builder.mutation<{ id: number }, EditDataType<LocalityDetailsType>>({

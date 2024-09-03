@@ -50,8 +50,11 @@ export const LocalityTable = ({ selectorFn }: { selectorFn?: (newObject: Localit
       notify(`Please filter the table more. Current rows: ${lids.length}. Limit: ${limit}`, 'error')
       return
     }
+
     const result = await getLocalitySpeciesList(lids).unwrap()
-    const dataString = result.map(row => row.join(',')).join('\n')
+    console.log(result)
+    const parsedData = JSON.parse(JSON.stringify(result.substring(1)) + ']') as Array<Array<unknown>>
+    const dataString = parsedData.map(row => row.join(',')).join('\n')
     const blob = new Blob([dataString], { type: 'text/csv' })
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')

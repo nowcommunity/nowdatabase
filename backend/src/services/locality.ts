@@ -8,26 +8,29 @@ import { Role } from '../../../frontend/src/types'
 import { AccessError } from '../middlewares/authorizer'
 import { NOW_DB_NAME } from '../utils/config'
 import { PoolConnection } from 'mariadb'
+import { Response } from 'express'
 
-const CHUNK_SIZE = 20000
-
-const getChunk = async (
+const getExportList = async (
   conn: PoolConnection,
-  limit: number,
-  offset: number,
   lids: number[],
-  includeDrafts: boolean
+  includeDrafts: boolean,
+  rowHandler: (row: unknown) => void
 ) => {
-  const excludeDraftsString = includeDrafts
-    ? ''
-    : `AND (loc_status = 0 AND lid NOT IN (SELECT DISTINCT ${NOW_DB_NAME}.now_plr.lid FROM ${NOW_DB_NAME}.now_plr JOIN ${NOW_DB_NAME}.now_proj ON ${NOW_DB_NAME}.now_plr.pid = ${NOW_DB_NAME}.now_proj.pid WHERE ${NOW_DB_NAME}.now_proj.proj_records = 1))`
-  const result: { [index: string]: string | number | null | bigint | boolean }[] = await conn.query(
-    `
-    SELECT * FROM ${NOW_DB_NAME}.now_v_export_locsp WHERE lid IN (${lids.map(() => '?').join(', ')}) ${excludeDraftsString} ORDER BY loc_name LIMIT ${limit} OFFSET ${offset}
+  return new Promise(resolve => {
+    const excludeDraftsString = includeDrafts
+      ? ''
+      : `AND (loc_status = 0 AND lid NOT IN (SELECT DISTINCT ${NOW_DB_NAME}.now_plr.lid FROM ${NOW_DB_NAME}.now_plr JOIN ${NOW_DB_NAME}.now_proj ON ${NOW_DB_NAME}.now_plr.pid = ${NOW_DB_NAME}.now_proj.pid WHERE ${NOW_DB_NAME}.now_proj.proj_records = 1))`
+    resolve(
+      conn
+        .queryStream(
+          `
+    SELECT * FROM ${NOW_DB_NAME}.now_v_export_locsp WHERE lid IN (${lids.map(() => '?').join(', ')}) ${excludeDraftsString} ORDER BY loc_name
     `,
-    [...lids]
-  )
-  return result
+          [...lids]
+        )
+        .on('data', rowHandler)
+    )
+  })
 }
 
 const formatValue = (val: unknown) => {
@@ -36,30 +39,19 @@ const formatValue = (val: unknown) => {
   return `"${val as string}"`
 }
 
-const getExportList = async (conn: PoolConnection, lids: number[], includeDrafts: boolean) => {
-  const chunks = []
+export const getLocalitySpeciesList = async (lids: number[], user: User | undefined, res: Response) => {
+  const exportList: unknown[] = []
 
-  let columnHeaders: null | string[] = null
-
-  for (let i = 0; ; i += 1) {
-    const chunk = await getChunk(conn, CHUNK_SIZE, i * CHUNK_SIZE, lids, includeDrafts)
-    if (chunk.length === 0) break
-
-    // Get column headers
-    if (!columnHeaders) columnHeaders = Object.keys(chunk[0])
-
-    chunks.push(...chunk.map(c => Object.values(c).map(val => formatValue(val))))
+  const transformRow = (row: unknown) => {
+    const values = Object.values(row as object)
+    return values.map(value => formatValue(value))
   }
-  return [columnHeaders, ...chunks]
-}
-
-export const getLocalitySpeciesList = async (lids: number[], user: User | undefined) => {
+  let count = 0
   const conn = await pool.getConnection()
-  const exportList = await getExportList(
-    conn,
-    lids,
-    (user && [Role.Admin, Role.EditUnrestricted].includes(user.role)) || false
-  )
+  await getExportList(conn, lids, (user && [Role.Admin, Role.EditUnrestricted].includes(user.role)) || false, row => {
+    res.write(',' + JSON.stringify(transformRow(row)))
+    count++
+  })
   await conn.end()
   return exportList
 }
