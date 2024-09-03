@@ -4,9 +4,9 @@ DROP DATABASE IF EXISTS now_log_test; CREATE DATABASE now_log_test CHARACTER SET
 SET names 'latin1';
 
 USE now_test
-SOURCE /docker-entrypoint-initdb.d/sqlfiles/now_anon.sql
+SOURCE /docker-entrypoint-initdb.d/sqlfiles/now_test.sql
 USE now_log_test
-SOURCE /docker-entrypoint-initdb.d/sqlfiles/now_log_anon.sql
+SOURCE /docker-entrypoint-initdb.d/sqlfiles/now_log_test.sql
 USE now_test
 
 CREATE USER 'now_test'@'localhost' IDENTIFIED BY 'mariadb_password';
