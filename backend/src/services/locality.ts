@@ -1,68 +1,11 @@
-import { logDb, nowDb, pool } from '../utils/db'
 import { EditDataType, LocalityDetailsType, User } from '../../../frontend/src/backendTypes'
-import Prisma from '../../prisma/generated/now_test_client'
+import { Role } from '../../../frontend/src/types'
 import { validateLocality } from '../../../frontend/src/validators/locality'
 import { ValidationObject } from '../../../frontend/src/validators/validator'
-import { fixBigInt } from '../utils/common'
-import { Role } from '../../../frontend/src/types'
+import Prisma from '../../prisma/generated/now_test_client'
 import { AccessError } from '../middlewares/authorizer'
-import { NOW_DB_NAME } from '../utils/config'
-import { PoolConnection } from 'mariadb'
-
-const CHUNK_SIZE = 20000
-
-const getChunk = async (
-  conn: PoolConnection,
-  limit: number,
-  offset: number,
-  lids: number[],
-  includeDrafts: boolean
-) => {
-  const excludeDraftsString = includeDrafts
-    ? ''
-    : `AND (loc_status = 0 AND lid NOT IN (SELECT DISTINCT ${NOW_DB_NAME}.now_plr.lid FROM ${NOW_DB_NAME}.now_plr JOIN ${NOW_DB_NAME}.now_proj ON ${NOW_DB_NAME}.now_plr.pid = ${NOW_DB_NAME}.now_proj.pid WHERE ${NOW_DB_NAME}.now_proj.proj_records = 1))`
-  const result: { [index: string]: string | number | null | bigint | boolean }[] = await conn.query(
-    `
-    SELECT * FROM ${NOW_DB_NAME}.now_v_export_locsp WHERE lid IN (${lids.map(() => '?').join(', ')}) ${excludeDraftsString} ORDER BY loc_name LIMIT ${limit} OFFSET ${offset}
-    `,
-    [...lids]
-  )
-  return result
-}
-
-const formatValue = (val: unknown) => {
-  if (typeof val === 'bigint') return `"${Number(val)}"`
-  if (val === null) return `""`
-  return `"${val as string}"`
-}
-
-const getExportList = async (conn: PoolConnection, lids: number[], includeDrafts: boolean) => {
-  const chunks = []
-
-  let columnHeaders: null | string[] = null
-
-  for (let i = 0; ; i += 1) {
-    const chunk = await getChunk(conn, CHUNK_SIZE, i * CHUNK_SIZE, lids, includeDrafts)
-    if (chunk.length === 0) break
-
-    // Get column headers
-    if (!columnHeaders) columnHeaders = Object.keys(chunk[0])
-
-    chunks.push(...chunk.map(c => Object.values(c).map(val => formatValue(val))))
-  }
-  return [columnHeaders, ...chunks]
-}
-
-export const getLocalitySpeciesList = async (lids: number[], user: User | undefined) => {
-  const conn = await pool.getConnection()
-  const exportList = await getExportList(
-    conn,
-    lids,
-    (user && [Role.Admin, Role.EditUnrestricted].includes(user.role)) || false
-  )
-  await conn.end()
-  return exportList
-}
+import { fixBigInt } from '../utils/common'
+import { logDb, nowDb } from '../utils/db'
 
 const getIdsOfUsersProjects = async (user: User) => {
   const usersProjects = await nowDb.now_proj_people.findMany({
