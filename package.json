@@ -9,6 +9,8 @@
     "start": "docker compose -f docker-compose.yml up",
     "start:anon": "docker compose -f docker-compose.anon.yml up",
     "dev": "docker compose -f docker-compose.dev.yml up",
+    "dev:down": "docker compose -f docker-compose.dev.yml down -v",
+    "anon:down": "docker compose -f docker-compose.anon.yml down -v",
     "check": "echo \"Running checks for both services...\" && npm run check:frontend && npm run check:backend && echo \"All good! :)\"",
     "check:backend": "echo \"Running backend tsc ...\" && cd backend && npx tsc --noEmit && echo \"Running backend eslint ...\"&& npm run lint",
     "check:frontend": "echo \"Running frontend tsc ...\" && cd frontend && npx tsc --noEmit && echo \"Running frontend eslint ...\" && npm run lint",
