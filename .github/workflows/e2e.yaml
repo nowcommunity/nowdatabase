@@ -3,7 +3,6 @@ name: 'End-to-end tests'
 on:
   pull_request:
     types: [opened, reopened]
-  push:
     branches:
       - '**'
     paths-ignore:
