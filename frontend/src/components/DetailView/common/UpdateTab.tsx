@@ -167,7 +167,7 @@ const DetailsModal = <RefType extends { ref_ref: ReferenceOfUpdate }>({
             <b>Date:</b> {formatDate(date)}
           </p>
           <p>
-            <b>Authorizer:</b> {authorizer}
+            <b>Editor:</b> {authorizer}
           </p>
           <p>
             <b>Coordinator:</b> {coordinator}
