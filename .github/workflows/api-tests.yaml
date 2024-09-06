@@ -2,7 +2,12 @@ name: 'Api-tests'
 
 on:
   pull_request:
+<<<<<<< Updated upstream
     types: [opened, reopened]
+=======
+    types: [opened, reopened, synchronize]
+  push:
+>>>>>>> Stashed changes
     branches:
       - '**'
     paths-ignore:
