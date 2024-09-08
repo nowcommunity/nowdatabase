@@ -100,7 +100,14 @@ export const TableView = <T extends MRT_RowData>({
     autoResetPageIndex: false,
     positionPagination: selectorFn ? 'top' : 'both',
     paginationDisplayMode: 'pages',
-    muiTablePaperProps: { elevation: 0 },
+    muiTablePaperProps: {
+      elevation: 0,
+      sx: {
+        '& .MuiTableCell-root': {
+          borderLeft: '1px solid rgba(224, 224, 224, 1)',
+        },
+      },
+    },
     enableDensityToggle: false,
     enableGlobalFilter: false,
     enableColumnActions: false,
