@@ -45,6 +45,7 @@ export const NavBar = () => {
         { title: 'Email', url: '/email' },
       ],
     },
+    { title: 'Map', url: '/map' },
   ]
 
   if (user.username) pages.push({ title: 'User', url: '/person/user-page' })
