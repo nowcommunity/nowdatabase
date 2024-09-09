@@ -65,7 +65,7 @@ export const NavBar = () => {
   )
 
   const renderLink = (link: LinkDefinition) => {
-	if (ENV !== 'dev' && link.title == 'Cross-Search') return null
+    if (ENV !== 'dev' && link.title == 'Cross-Search') return null
     if (link.children) {
       return (
         <MenuItem key={`${link.url}-menuitem`} style={{ display: 'inline-block', padding: 0 }}>
@@ -128,7 +128,7 @@ export const NavBar = () => {
           <Typography fontSize={'2.2em'}>NOW Database {getModeText()}</Typography>
         </MenuItem>
         <MenuList style={{ alignContent: 'center' }}>
-		  {pages
+          {pages
             .filter(childLink => !childLink.allowedRoles || childLink.allowedRoles.includes(user.role))
             .map(page => renderLink(page))}
         </MenuList>
