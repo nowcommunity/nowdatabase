@@ -44,7 +44,9 @@ app.use(tokenExtractor)
 app.use(userExtractor)
 
 app.use('/user', userRouter)
-app.use('/crosssearch', crossSearchRouter)
+if (RUNNING_ENV == 'dev') {
+  app.use('/crosssearch', crossSearchRouter)
+}
 app.use('/locality', localityRouter)
 app.use('/locality-species', localitySpeciesRouter)
 app.use('/species', speciesRouter)

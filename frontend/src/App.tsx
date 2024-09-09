@@ -16,6 +16,7 @@ import {
 } from './components/pages'
 import { Notification, NotificationContextProvider } from './components/Notification'
 import { EmailPage } from './components/EmailPage'
+import { ENV } from './util/config'
 
 const App = () => {
   return (
@@ -31,7 +32,9 @@ const App = () => {
           <Container maxWidth="xl" fixed style={{ marginTop: '2em', marginBottom: '2em' }}>
             <Grid item>
               <Routes>
-                <Route element={crossSearchPage} path="/crosssearch/:id?" />
+                {ENV == 'dev' &&
+				<Route element={crossSearchPage} path="/crosssearch/:id?" />
+				}
                 <Route element={localityPage} path="/locality/:id?" />
                 <Route element={speciesPage} path="/species/:id?" />
                 <Route element={referencePage} path="/reference/:id?" />
