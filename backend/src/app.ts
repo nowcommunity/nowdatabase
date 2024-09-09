@@ -1,6 +1,7 @@
 import 'express-async-errors'
 import express from 'express'
 import cors from 'cors'
+import crossSearchRouter from './routes/crossSearch'
 import localityRouter from './routes/locality'
 import museumRouter from './routes/museum'
 import referenceRouter from './routes/reference'
@@ -43,6 +44,9 @@ app.use(tokenExtractor)
 app.use(userExtractor)
 
 app.use('/user', userRouter)
+if (RUNNING_ENV == 'dev') {
+  app.use('/crosssearch', crossSearchRouter)
+}
 app.use('/locality', localityRouter)
 app.use('/locality-species', localitySpeciesRouter)
 app.use('/species', speciesRouter)

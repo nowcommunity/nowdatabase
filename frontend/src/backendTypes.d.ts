@@ -81,6 +81,16 @@ export type Locality = {
   country: string | null
   loc_status: boolean | null
 }
+export type CrossSearch = {
+  lid: number
+  loc_name: string
+  bfa_max: string | null
+  bfa_min: string | null
+  max_age: number
+  min_age: number
+  country: string | null
+  loc_status: boolean | null
+}
 
 export type Sequence = Prisma.now_tu_sequence
 export type SequenceDetailsType = Prisma.now_tu_sequence
