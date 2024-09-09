@@ -30,6 +30,7 @@ export const NavBar = () => {
     { title: 'Front Page', url: '/' },
     { title: 'Localities', url: '/locality' },
     { title: 'Species', url: '/species' },
+	{ title: 'Cross-Search', url: '/crosssearch' },
     { title: 'References', url: '/reference' },
     { title: 'Time Units', url: '/time-unit' },
     { title: 'Time Bounds', url: '/time-bound', allowedRoles: [Role.Admin, Role.EditUnrestricted] },

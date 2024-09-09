@@ -51,6 +51,7 @@ export const api = createApi({
   reducerPath: 'api',
   tagTypes: [
     'user',
+	'crosssearch',
     'locality',
     'localities',
     'species',

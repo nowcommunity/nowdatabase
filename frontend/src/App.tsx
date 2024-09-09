@@ -4,6 +4,7 @@ import { NavBar } from './components/NavBar'
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import { Login } from './components/Login'
 import {
+	crossSearchPage,
   localityPage,
   personPage,
   projectPage,
@@ -30,6 +31,7 @@ const App = () => {
           <Container maxWidth="xl" fixed style={{ marginTop: '2em', marginBottom: '2em' }}>
             <Grid item>
               <Routes>
+				<Route element={crossSearchPage} path="/crosssearch/:id?" />
                 <Route element={localityPage} path="/locality/:id?" />
                 <Route element={speciesPage} path="/species/:id?" />
                 <Route element={referencePage} path="/reference/:id?" />
