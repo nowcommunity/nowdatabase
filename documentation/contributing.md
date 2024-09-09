@@ -1,7 +1,16 @@
 ### Contributing and CI / CD
 
 **Contributing workflow**
-+ Commit code to some branch, preferably other than `main`. Once the test workflows all pass, and preferably someone else reviews your code, you can make a pull request to main and merge it.
++ See an issue on Github Issues or Projects tab that you want to fix/implement.
++ Assign the issue to yourself and start work on the issue on a new local branch. *REMEMBER TO PULL MAIN BEFORE CREATING THE BRANCH!* Just for your own sake.
++ Move the task on Github Projects to "In progress".
++ Work on the task on hand while making small commits along the way.
++ Finish work? Remember to check if all tests still pass!
++ Test passing, it's now time to push the changes to a new branch on Github and create a pull request to main.
++ Now wait for all of the checks to pass (and fixing them if they do not pass) and then it's a waiting game for someone else to approve the pull request.
++ When merged you can safely delete the local branch, pull main and admire your work.
++ Don't forget to close your issue and to tag the pull request in the issue by just adding #PR_NUMBER. Also move the task on GH Projects to "Done".
++ Repeat.
 
 **Tests & linting**
 
