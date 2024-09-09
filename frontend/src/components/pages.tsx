@@ -50,16 +50,16 @@ export const localityPage = (
 
 export const crossSearchPage = (
   <Page
-	tableView={<CrossSearchTable />}
-	detailView={<LocalityDetails />}
-	viewName="crosssearch"
-	idFieldName="lid"
-	createTitle={(loc: LocalityDetailsType) => `${loc.loc_name}`}
-	getEditRights={(user: UserState, id: string | number) => {
-	  if ([Role.Admin, Role.EditUnrestricted].includes(user.role)) return fullRights
-	  if (user.role === Role.EditRestricted && user.localities.includes(id as number)) return limitedRights
-	  return noRights
-	}}
+    tableView={<CrossSearchTable />}
+    detailView={<LocalityDetails />}
+    viewName="crosssearch"
+    idFieldName="lid"
+    createTitle={(loc: LocalityDetailsType) => `${loc.loc_name}`}
+    getEditRights={(user: UserState, id: string | number) => {
+      if ([Role.Admin, Role.EditUnrestricted].includes(user.role)) return fullRights
+      if (user.role === Role.EditRestricted && user.localities.includes(id as number)) return limitedRights
+      return noRights
+    }}
   />
 )
 
