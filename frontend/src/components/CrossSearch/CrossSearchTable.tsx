@@ -36,14 +36,32 @@ export const CrossSearchTable = ({ selectorFn }: { selectorFn?: (newObject: Cros
         filterVariant: 'range',
       },
 	  {
-		accessorFn: row => row.now_ls.map((item: any) => item.com_species.species_id),
-		id: 'species_id',
+		accessorKey: 'now_ls',
 		header: 'Species IDs',
+		enableSorting: false,
+		Cell: ({ cell }) => (
+		  <div>
+			{cell.getValue().map((speciesObj: any, index: number) => (
+			  <div key={index}>
+		        {speciesObj.com_species.species_id}
+		      </div>
+		    ))}
+		  </div>
+		)
 	  },
 	  {
-		accessorFn: row => row.now_ls.map((item: any) => item.com_species.genus_name),
-		id: 'genus_name',
+		accessorKey: 'now_ls',
 		header: 'Genus',
+		enableSorting: false,
+		Cell: ({ cell }) => (
+		  <div>
+            {cell.getValue().map((speciesObj: any, index: number) => (
+              <div key={index}>
+                {speciesObj.com_species.genus_name}
+              </div>
+            ))}
+          </div>
+		)
 	  }
     ],
     []
