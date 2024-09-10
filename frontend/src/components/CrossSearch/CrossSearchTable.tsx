@@ -48,20 +48,6 @@ export const CrossSearchTable = ({ selectorFn }: { selectorFn?: (newObject: Cros
 		    ))}
 		  </div>
 		)
-	  },
-	  {
-		accessorKey: 'now_ls',
-		header: 'Genus',
-		enableSorting: false,
-		Cell: ({ cell }) => (
-		  <div>
-            {cell.getValue().map((speciesObj: any, index: number) => (
-              <div key={index}>
-                {speciesObj.com_species.genus_name}
-              </div>
-            ))}
-          </div>
-		)
 	  }
     ],
     []
