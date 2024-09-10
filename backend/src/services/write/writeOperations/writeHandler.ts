@@ -89,7 +89,7 @@ export class WriteHandler extends DatabaseHandler {
     this.writeList.push({
       table,
       type: 'delete',
-      // oldValue and value are swapped here, but they are logged correctly in update.
+      // NOTE: oldValue and value are swapped here, but they are logged correctly in update!
       items: deletedItems
         .filter(item => !isEmptyValue(item.value))
         .map(item => ({ table, column: item.column, oldValue: '', value: item.value })),
