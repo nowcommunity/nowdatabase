@@ -36,9 +36,14 @@ export const CrossSearchTable = ({ selectorFn }: { selectorFn?: (newObject: Cros
         filterVariant: 'range',
       },
 	  {
-		accessorKey: 'species',
-		header: 'Species',
-		formatter: (species: any) => species.map((s: any) => s.species_name).join(', '),
+		accessorFn: row => row.now_ls.map((item: any) => item.com_species.species_id),
+		id: 'species_id',
+		header: 'Species IDs',
+	  },
+	  {
+		accessorFn: row => row.now_ls.map((item: any) => item.com_species.genus_name),
+		id: 'genus_name',
+		header: 'Genus',
 	  }
     ],
     []
