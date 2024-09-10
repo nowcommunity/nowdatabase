@@ -14,7 +14,7 @@ router.get('/all', async (req, res) => {
   const crossSearch = await getAllCrossSearch(req.user)
   console.log(crossSearch[2])
   console.log(crossSearch[2]?.now_ls[0].com_species)
-  return res.status(200).send(fixBigInt(localities))
+  return res.status(200).send(fixBigInt(crossSearch))
 })
 
 router.get('/:id', async (req, res) => {
