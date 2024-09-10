@@ -1,5 +1,6 @@
 import { Request, Router } from 'express'
 import { getAllLocalities, getLocalityDetails, validateEntireLocality } from '../services/locality'
+import { getAllCrossSearch } from '../services/crossSearch'
 import { fixBigInt } from '../utils/common'
 import { EditDataType, EditMetaData, LocalityDetailsType } from '../../../frontend/src/backendTypes'
 import { requireOneOf } from '../middlewares/authorizer'
@@ -10,6 +11,9 @@ const router = Router()
 
 router.get('/all', async (req, res) => {
   const localities = await getAllLocalities(req.user)
+  const crossSearch = await getAllCrossSearch(req.user)
+  console.log(crossSearch[2])
+  console.log(crossSearch[2]?.now_ls[0].com_species)
   return res.status(200).send(fixBigInt(localities))
 })
 
