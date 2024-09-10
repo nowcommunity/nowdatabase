@@ -35,6 +35,11 @@ export const CrossSearchTable = ({ selectorFn }: { selectorFn?: (newObject: Cros
         header: 'Min age',
         filterVariant: 'range',
       },
+	  {
+		accessorKey: 'species',
+		header: 'Species',
+		formatter: (species: any) => species.map((s: any) => s.species_name).join(', '),
+	  }
     ],
     []
   )
