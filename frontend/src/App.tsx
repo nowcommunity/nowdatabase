@@ -45,7 +45,7 @@ const App = () => {
                 <Route element={<EmailPage />} path="/email/" />
                 <Route element={<Login />} path="/login" />
                 <Route element={<FrontPage />} path="/" />
-                <Route element={<MapPage />} path="/map" />
+                {ENV == 'dev' && <Route element={<MapPage />} path="/map" />}
                 <Route element={<div>Page not found.</div>} path="*" />
               </Routes>
             </Grid>

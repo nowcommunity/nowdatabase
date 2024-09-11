@@ -67,6 +67,7 @@ export const NavBar = () => {
 
   const renderLink = (link: LinkDefinition) => {
     if (ENV !== 'dev' && link.title == 'Cross-Search') return null
+    if (ENV !== 'dev' && link.title == 'Map') return null
     if (link.children) {
       return (
         <MenuItem key={`${link.url}-menuitem`} style={{ display: 'inline-block', padding: 0 }}>
