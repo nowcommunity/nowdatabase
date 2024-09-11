@@ -35,20 +35,20 @@ export const CrossSearchTable = ({ selectorFn }: { selectorFn?: (newObject: Cros
         header: 'Min age',
         filterVariant: 'range',
       },
-	//   {
-	// 	accessorKey: 'now_ls',
-	// 	header: 'Species IDs',
-	// 	enableSorting: false,
-	// 	Cell: ({ cell }) => (
-	// 	  <div>
-	// 		{cell.getValue().map((speciesObj: any, index: number) => (
-	// 		  <div key={index}>
-	// 	        {speciesObj.com_species.species_id}
-	// 	      </div>
-	// 	    ))}
-	// 	  </div>
-	// 	)
-	//   }
+      //   {
+      // 	accessorKey: 'now_ls',
+      // 	header: 'Species IDs',
+      // 	enableSorting: false,
+      // 	Cell: ({ cell }) => (
+      // 	  <div>
+      // 		{cell.getValue().map((speciesObj: any, index: number) => (
+      // 		  <div key={index}>
+      // 	        {speciesObj.com_species.species_id}
+      // 	      </div>
+      // 	    ))}
+      // 	  </div>
+      // 	)
+      //   }
     ],
     []
   )
