@@ -1,11 +1,6 @@
-import { User } from '../../../frontend/src/backendTypes' //EditDataType, LocalityDetailsType, 
+import { User } from '../../../frontend/src/backendTypes'
 import { Role } from '../../../frontend/src/types'
-//import { validateLocality } from '../../../frontend/src/validators/locality'
-//import { ValidationObject } from '../../../frontend/src/validators/validator'
-//import Prisma from '../../prisma/generated/now_test_client'
-//import { AccessError } from '../middlewares/authorizer'
-//import { fixBigInt } from '../utils/common'
-import { nowDb } from '../utils/db' //logDb, 
+import { nowDb } from '../utils/db'
 
 const getIdsOfUsersProjects = async (user: User) => {
   const usersProjects = await nowDb.now_proj_people.findMany({
@@ -26,7 +21,6 @@ type CrossSearchListType = {
   country: string | null
   loc_status: boolean | null
   species_id: number
-
   now_plr: {
     pid: number
   now_ls:{
@@ -54,7 +48,7 @@ export const getAllCrossSearch = async (user?: User) => {
   }
 
   const result = await nowDb.now_loc.findMany({
-    take: 5,
+    // take: 5,
 	select: {
 	  lid: true,
 	  //columns from now_loc
@@ -91,13 +85,13 @@ export const getAllCrossSearch = async (user?: User) => {
     }
   })
 
-  //if (showAll) return result.map(removeProjects)
+  if (showAll) return result.map(removeProjects)
 
-  //if (!user) return result.filter(loc => loc.loc_status === false).map(removeProjects)
+  if (!user) return result.filter(loc => loc.loc_status === false).map(removeProjects)
 
-  //const usersProjects = await getIdsOfUsersProjects(user)
+  const usersProjects = await getIdsOfUsersProjects(user)
 
   return result
-  //  .filter(loc => !loc.loc_status || loc.now_plr.find(now_plr => usersProjects.has(now_plr.pid)))
-  //  .map(removeProjects)
+   .filter(loc => !loc.loc_status || loc.now_plr.find(now_plr => usersProjects.has(now_plr.pid)))
+   .map(removeProjects)
 }
