@@ -90,7 +90,7 @@ export type CrossSearch = {
   min_age: number
   country: string | null
   loc_status: boolean | null
-  subRows?: now_ls[];
+  now_ls: Array<Species>
 }
 
 export type Sequence = Prisma.now_tu_sequence

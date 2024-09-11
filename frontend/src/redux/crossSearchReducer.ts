@@ -39,7 +39,4 @@ const crossSearchApi = api.injectEndpoints({
   }),
 })
 
-export const {
-  useGetAllCrossSearchQuery,
-  useGetCrossSearchListMutation,
-} = crossSearchApi
+export const { useGetAllCrossSearchQuery, useGetCrossSearchListMutation } = crossSearchApi

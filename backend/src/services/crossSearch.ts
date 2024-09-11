@@ -20,35 +20,40 @@ type CrossSearchListType = {
   min_age: number
   country: string | null
   loc_status: boolean | null
-  species_id: number
   now_plr: {
     pid: number
-  now_ls:{
-	species_id: number
-	subclass_or_superorder_name: string
-	order_name: string
-	suborder_or_superfamily_name: string
-	family_name: string
-	subfamily_name: string
-	genus_name: string
-	species_name: string
-	unique_identifier: string
-	taxonomic_status: string
-	sp_status: string
-  }
   }[]
+  now_ls: {
+    com_species: {
+      species_id: number
+      subclass_or_superorder_name: string | null
+      order_name: string
+      suborder_or_superfamily_name: string | null
+      family_name: string
+      subfamily_name: string | null
+      genus_name: string
+      species_name: string
+      unique_identifier: string
+      taxonomic_status: string
+      sp_status: boolean | null
+    }
+  }[]
+  
 }
+
 
 export const getAllCrossSearch = async (user?: User) => {
   const showAll = user && [Role.Admin, Role.EditUnrestricted].includes(user.role)
   const removeProjects: (loc: CrossSearchListType) => Omit<CrossSearchListType, 'now_plr'> = loc => {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { now_plr, ...rest } = loc
+    console.log(typeof loc)
+    // console.log(loc)
     return rest
   }
 
   const result = await nowDb.now_loc.findMany({
-    // take: 5,
+    take: 5,
 	select: {
 	  lid: true,
 	  //columns from now_loc
@@ -65,7 +70,7 @@ export const getAllCrossSearch = async (user?: User) => {
 	  now_ls: {
 		select: {
 	      com_species: {
-			select: {
+			  select: {
 			  //columns from com_species
 			  species_id: true,
 			  subclass_or_superorder_name: true,
