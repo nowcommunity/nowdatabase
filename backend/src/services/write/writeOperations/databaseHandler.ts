@@ -3,6 +3,7 @@ import { pool } from '../../../utils/db'
 import { DbValue, AllowedTables } from './types'
 import { RUNNING_ENV } from '../../../utils/config'
 import { logger } from '../../../utils/logger'
+import { fixBigInt } from '../../../utils/common'
 
 export type DbWriteItem = { column: string; value: DbValue }
 
@@ -99,7 +100,7 @@ export class DatabaseHandler {
         idValues
       )
     )[0]
-    return returnValue
+    return JSON.parse(fixBigInt(returnValue as object)!) as T
   }
 
   async executeQuery<T>(query: string, values?: Array<DbValue>) {
