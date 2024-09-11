@@ -1,5 +1,6 @@
 import { Container, Grid } from '@mui/material'
 import { FrontPage } from './components/FrontPage'
+import { MapPage } from './components/MapPage'
 import { NavBar } from './components/NavBar'
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import { Login } from './components/Login'
@@ -44,6 +45,7 @@ const App = () => {
                 <Route element={<EmailPage />} path="/email/" />
                 <Route element={<Login />} path="/login" />
                 <Route element={<FrontPage />} path="/" />
+                {ENV == 'dev' && <Route element={<MapPage />} path="/map" />}
                 <Route element={<div>Page not found.</div>} path="*" />
               </Routes>
             </Grid>
