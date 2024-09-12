@@ -1,4 +1,4 @@
-import assert from 'node:assert/strict'
+import { expect } from '@jest/globals'
 import { UpdateLog } from '../../../frontend/src/backendTypes'
 import { LogRow } from '../services/write/writeOperations/types'
 
@@ -44,14 +44,13 @@ export const testLogRows = (logRows: UpdateLog[], expectedLogRows: Partial<LogRo
         row.old_data === expectedRow.oldValue &&
         row.new_data === expectedRow.value
     )
-    assert(!!receivedRow, `Did not find this expected logrow: ${JSON.stringify(expectedRow)}`)
-    const debugLog = `Row: \n${JSON.stringify(receivedRow, null, 2)}\nExpected:\n${JSON.stringify(expectedRow)}`
-    assert(receivedRow.new_data === expectedRow.value, `Log rows new data differs. ${debugLog}`)
-    assert(receivedRow.old_data === expectedRow.oldValue, `Log rows old data differs. ${debugLog}`)
-    assert(
-      actionTypeToString[receivedRow.log_action!] === expectedRow.type,
-      `Log rows action type differs. ${debugLog}`
-    )
+
+    expect(!!receivedRow).toEqual(true) //`Did not find this expected logrow: ${JSON.stringify(expectedRow)}`)
+    if (!receivedRow) throw new Error(`Did not find this expected logrow: ${JSON.stringify(expectedRow)}`)
+    // const debugLog = `Row: \n${JSON.stringify(receivedRow, null, 2)}\nExpected:\n${JSON.stringify(expectedRow)}`
+    expect(receivedRow.new_data).toEqual(expectedRow.value) // `Log rows new data differs. ${debugLog}`)
+    expect(receivedRow.old_data).toEqual(expectedRow.oldValue) // `Log rows old data differs. ${debugLog}`)
+    expect(actionTypeToString[receivedRow.log_action!]).toEqual(expectedRow.type) // `Log rows action type differs. ${debugLog}`
   }
-  assert(logRows.length === expectedAmount, 'Wrong amount of log rows in relevant update')
+  expect(logRows.length).toEqual(expectedAmount) // 'Wrong amount of log rows in relevant update')
 }
