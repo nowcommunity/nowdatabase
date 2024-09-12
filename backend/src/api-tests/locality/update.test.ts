@@ -1,6 +1,4 @@
-/* eslint-disable @typescript-eslint/no-floating-promises */
-import assert from 'node:assert/strict'
-import { before, describe, it } from 'node:test'
+import { beforeEach, describe, it, expect } from '@jest/globals'
 import { LocalityDetailsType } from '../../../../frontend/src/backendTypes'
 import { LogRow } from '../../services/write/writeOperations/types'
 import { editedLocality } from './data'
@@ -9,40 +7,40 @@ import { login, send, testLogRows } from '../utils'
 let resultLocality: LocalityDetailsType | null = null
 
 describe('Locality update works', () => {
-  before(async () => {
+  beforeEach(async () => {
     await login()
   })
 
   it('Edits name, synonyms and locality species correctly', async () => {
     const writeResult = await send<{ id: number }>('locality', 'PUT', { locality: editedLocality })
 
-    assert(writeResult.body.id === editedLocality.lid, `Invalid result returned on write: ${writeResult.body.id}`)
+    expect(writeResult.body.id).toEqual(editedLocality.lid) // `Invalid result returned on write: ${writeResult.body.id}`
 
     const { body } = await send<LocalityDetailsType>(`locality/${editedLocality.lid}`, 'GET')
     resultLocality = body
   })
 
   it('Name changed correctly', () => {
-    assert(resultLocality!.loc_name === editedLocality.loc_name, 'Name was not changed correctly')
+    expect(resultLocality!.loc_name).toEqual(editedLocality.loc_name) // 'Name was not changed correctly'
   })
 
   it('Added locality species is found', () => {
-    assert(
-      resultLocality!.now_ls.find(ls => ls.species_id === 21052 && ls.lid === 21050),
-      'Added locality species not found'
-    )
+    resultLocality!.now_ls.find(ls => {
+      ls.species_id === 21052 && ls.lid === 21050
+    }) //'Added locality species not found'
+    expect(!!resultLocality).toEqual(true)
   })
 
   it('Locality species include exactly two entries', () => {
-    assert(resultLocality!.now_ls.length === 2, `Unexpected now_ls length: ${resultLocality!.now_ls.length}`)
+    expect(resultLocality!.now_ls.length).toEqual(2) // `Unexpected now_ls length: ${resultLocality!.now_ls.length}`
   })
 
   it('Changes were logged correctly', () => {
     const update = resultLocality!.now_lau
     const lastUpdate = update[update.length - 1]
 
-    assert(lastUpdate.lau_comment === editedLocality.comment, 'Comment wrong')
-    assert(lastUpdate.now_lr[lastUpdate.now_lr.length - 1].rid === editedLocality.references[0].rid)
+    expect(lastUpdate.lau_comment).toEqual(editedLocality.comment) // 'Comment wrong'
+    expect(lastUpdate.now_lr[lastUpdate.now_lr.length - 1].rid).toEqual(editedLocality.references[0].rid)
 
     const logRows = lastUpdate.updates
 
