@@ -27,6 +27,9 @@ export const LocalityDetails = () => {
   const { id } = useParams()
   const navigate = useNavigate()
   const isNew = id === 'new'
+  if (isNew) {
+    document.title = 'New locality'
+  }
   const [editLocalityRequest, { isLoading: mutationLoading }] = useEditLocalityMutation()
   const { isFetching, isError, data } = useGetLocalityDetailsQuery(id!, {
     skip: isNew,

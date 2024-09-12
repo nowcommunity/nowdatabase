@@ -17,6 +17,9 @@ import { TimeUnitTab } from './Tabs/TimeUnitTab'
 export const TimeUnitDetails = () => {
   const { id } = useParams()
   const isNew = id === 'new'
+  if (isNew) {
+    document.title = 'New time unit'
+  }
   const { isLoading, isError, isFetching, data } = useGetTimeUnitDetailsQuery(encodeURIComponent(id!), { skip: isNew })
   const [editTimeUnitRequest] = useEditTimeUnitMutation()
 

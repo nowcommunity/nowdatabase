@@ -17,6 +17,9 @@ import { TimeUnitTab } from './Tabs/TimeUnitTab.tsx'
 export const TimeBoundDetails = () => {
   const { id } = useParams()
   const isNew = id === 'new'
+  if (isNew) {
+    document.title = 'New time bound'
+  }
   const { isLoading, isFetching, isError, data } = useGetTimeBoundDetailsQuery(decodeURIComponent(id!), {
     skip: isNew,
   })

@@ -19,6 +19,9 @@ import { useEffect } from 'react'
 export const SpeciesDetails = () => {
   const { id } = useParams()
   const isNew = id === 'new'
+  if (isNew) {
+    document.title = 'New species'
+  }
   const { isLoading, isError, isFetching, data } = useGetSpeciesDetailsQuery(id!, { skip: isNew })
   const [editSpeciesRequest] = useEditSpeciesMutation()
   const notify = useNotify()
