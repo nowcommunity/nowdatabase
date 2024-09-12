@@ -9,12 +9,6 @@ const crossSearchApi = api.injectEndpoints({
       }),
       providesTags: result => (result ? [{ type: 'localities' }] : []),
     }),
-    // getCrossSearchDetails: builder.query<LocalityDetailsType, string>({
-    //   query: id => ({
-    //     url: `/locality/${id}`,
-    //   }),
-    //   providesTags: result => (result ? [{ type: 'locality', id: result.lid }] : []),
-    // }),
     getCrossSearchList: builder.mutation<string[][], number[]>({
       query: (lids: number[]) => ({
         url: `/locality-species`,
@@ -22,20 +16,6 @@ const crossSearchApi = api.injectEndpoints({
         method: 'POST',
       }),
     }),
-    // editLocality: builder.mutation<{ id: number }, EditDataType<LocalityDetailsType>>({
-    //   query: locality => ({
-    //     url: `/locality`,
-    //     method: 'PUT',
-    //     body: { locality },
-    //   }),
-    //   invalidatesTags: (result, _error, { lid }) => (result ? [{ type: 'locality', id: lid }, 'localities'] : []),
-    // }),
-    // deleteLocality: builder.mutation<void, number>({
-    //   query: id => ({
-    //     url: `/locality/${id}`,
-    //     method: 'DELETE',
-    //   }),
-    // }),
   }),
 })
 
