@@ -31,6 +31,7 @@ export const LocalityDetails = () => {
   const { isFetching, isError, data } = useGetLocalityDetailsQuery(id!, {
     skip: isNew,
   })
+
   const notify = useNotify()
   const [deleteMutation, { isSuccess: deleteSuccess, isError: deleteError }] = useDeleteLocalityMutation()
 
@@ -45,6 +46,9 @@ export const LocalityDetails = () => {
 
   if (isError) return <div>Error loading data</div>
   if (isFetching || (!data && !isNew) || mutationLoading) return <CircularProgress />
+  if (data) {
+    document.title = `Locality - ${data.loc_name}`
+  }
 
   const deleteFunction = async () => {
     await deleteMutation(parseInt(id!)).unwrap()

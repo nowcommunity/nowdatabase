@@ -12,6 +12,8 @@ export const EmailPage = () => {
   const [sendEmailMutation, { isSuccess, isLoading, isError }] = useEmailMutation()
   if (user.role !== Role.Admin) return <Box>Your user is not authorized to view this page.</Box>
 
+  document.title = 'Send Email'
+
   const parseRecipients = () => {
     return recipients.replace(' ', '').replace('\n', ',').replace(',', '\n').split(';')
   }

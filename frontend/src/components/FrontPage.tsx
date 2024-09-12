@@ -3,6 +3,11 @@ import { Divider } from '@mui/material'
 import Box from '@mui/material/Box'
 
 export const FrontPage = () => {
+  if (ENV === 'dev') {
+    document.title = 'NOW Database (dev)'
+  } else {
+    document.title = 'NOW Database'
+  }
   return (
     <Box sx={{ fontSize: 20, maxWidth: '40em' }}>
       <h1>Welcome</h1>

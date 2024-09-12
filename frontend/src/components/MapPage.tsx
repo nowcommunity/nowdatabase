@@ -7,6 +7,8 @@ export const MapPage = () => {
   const latitude = 30
   const longitude = -5
 
+  document.title = 'Map'
+
   return (
     <MapContainer center={[latitude, longitude]} zoom={2} ref={mapRef} style={{ height: '50vh', width: '50vw' }}>
       <TileLayer

@@ -36,6 +36,9 @@ export const SpeciesDetails = () => {
 
   if (isError) return <div>Error loading data</div>
   if (isLoading || isFetching || (!data && !isNew)) return <CircularProgress />
+  if (data) {
+    document.title = `Species - ${data.species_name}`
+  }
 
   const deleteFunction = async () => {
     await deleteMutation(parseInt(id!)).unwrap()

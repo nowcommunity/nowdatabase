@@ -35,6 +35,9 @@ export const TimeUnitDetails = () => {
 
   if (isError) return <div>Error loading data</div>
   if (isLoading || isFetching || (!data && !isNew)) return <CircularProgress />
+  if (data) {
+    document.title = `Time Unit - ${data.tu_display_name}`
+  }
 
   const deleteFunction = async () => {
     await deleteMutation(id!).unwrap()
