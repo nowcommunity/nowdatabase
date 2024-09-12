@@ -1,4 +1,4 @@
-import { expect } from "@jest/globals"
+import { expect } from '@jest/globals'
 import { UpdateLog } from '../../../frontend/src/backendTypes'
 import { LogRow } from '../services/write/writeOperations/types'
 

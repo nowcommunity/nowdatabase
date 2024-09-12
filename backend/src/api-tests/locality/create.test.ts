@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-floating-promises */
 import { beforeEach, describe, it, expect } from '@jest/globals'
 import { LocalityDetailsType, SpeciesDetailsType } from '../../../../frontend/src/backendTypes'
 import { LogRow } from '../../services/write/writeOperations/types'
@@ -35,8 +34,8 @@ describe('Creating new locality works', () => {
     const speciesId = createdLocality!.now_ls.find(ls => ls.com_species.species_name === 'Newspecies')?.species_id
     const speciesResult = await send<SpeciesDetailsType>(`species/${speciesId}`, 'GET')
     const update = speciesResult.body.now_sau.find(update => update.sau_comment === 'new locality test update')
-    if (!update) throw new Error("Species update not found")
-    if (!speciesId) throw new Error("Species id not found")
+    if (!update) throw new Error('Species update not found')
+    if (!speciesId) throw new Error('Species id not found')
     expect(update?.species_id).toEqual(speciesId) // 'Species update does not have correct id'
     const logRows = update.updates
     const expectedLogRows: Partial<LogRow>[] = [
