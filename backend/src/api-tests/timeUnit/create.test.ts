@@ -1,6 +1,4 @@
-/* eslint-disable @typescript-eslint/no-floating-promises */
-import assert from 'node:assert/strict'
-import { before, describe, it } from 'node:test'
+import { beforeEach, describe, it, expect } from '@jest/globals'
 import { TimeUnitDetailsType } from '../../../../frontend/src/backendTypes'
 import { LogRow } from '../../services/write/writeOperations/types'
 import { login, send, testLogRows } from '../utils'
@@ -9,7 +7,7 @@ import { newTimeUnitBasis } from './data'
 let createdTimeUnit: TimeUnitDetailsType | null = null
 
 describe('Creating new time unit works', () => {
-  before(async () => {
+  beforeEach(async () => {
     await login()
   })
 
@@ -20,7 +18,7 @@ describe('Creating new time unit works', () => {
 
     const { id: createdId } = resultBody
 
-    assert(typeof createdId === 'string', `Invalid result returned on write: ${createdId}`)
+    expect(typeof createdId).toEqual('string') // `Invalid result returned on write: ${createdId}`)
 
     const { body } = await send<TimeUnitDetailsType>(`time-unit/${createdId}`, 'GET')
     createdTimeUnit = body
@@ -28,17 +26,14 @@ describe('Creating new time unit works', () => {
 
   it('Contains correct data', () => {
     const { tu_name, tu_display_name, tu_comment } = createdTimeUnit!
-    assert(
-      tu_name === newTimeUnitBasis.tu_display_name?.toLowerCase().replace(' ', ''),
-      'Name is different than expected'
-    )
-    assert(tu_display_name === newTimeUnitBasis.tu_display_name, 'Display name differs')
-    assert(tu_comment === newTimeUnitBasis.tu_comment, 'Comment differs')
+    expect(tu_name).toEqual(newTimeUnitBasis.tu_display_name?.toLowerCase().replace(' ', '')) //'Name is different than expected'
+    expect(tu_display_name).toEqual(newTimeUnitBasis.tu_display_name) // 'Display name differs')
+    expect(tu_comment).toEqual(newTimeUnitBasis.tu_comment) // 'Comment differs'
   })
 
   it('Update logs are correct', () => {
     const lastUpdate = createdTimeUnit!.now_tau[createdTimeUnit!.now_tau.length - 1]
-    assert(lastUpdate.tau_comment === newTimeUnitBasis.comment, 'Comment is correct')
+    expect(lastUpdate.tau_comment).toEqual(newTimeUnitBasis.comment) // 'Comment is correct'
     const logRows = lastUpdate.updates
     const expectedLogRows: Partial<LogRow>[] = [
       {
