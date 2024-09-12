@@ -72,7 +72,6 @@ export const getAllCrossSearch = async (user?: User) => {
   }
 
   const result = (await nowDb.now_loc.findMany({
-    take: 5,
     select: {
       lid: true,
       //columns from now_loc
