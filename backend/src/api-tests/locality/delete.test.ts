@@ -1,16 +1,16 @@
 /* eslint-disable @typescript-eslint/no-floating-promises */
-import assert from 'node:assert/strict'
-import { describe, it, before } from 'node:test'
+import { beforeEach, describe, it, expect } from '@jest/globals'
 import { login, send } from '../utils'
 
-describe('Deleting a locality works', async () => {
-  before(async () => {
+describe('Deleting a locality works', () => {
+  beforeEach(async () => {
     await login()
   })
-  await it('Deleting works', async () => {
+
+  it('Deleting works', async () => {
     const deleteResult = await send<{ id: number }>('locality/49999', 'DELETE')
-    assert(deleteResult.status === 200)
+    expect(deleteResult.status).toEqual(200)
     const getResult = await send('locality/49999', 'GET')
-    assert(getResult.status === 404, 'Locality response status was not 404 after deletion')
+    expect(getResult.status).toEqual(404) // Locality response status was not 404 after deletion
   })
 })
