@@ -26,6 +26,9 @@ export const PersonDetails = () => {
 
   if (isError) return <div>Error loading data</div>
   if (isLoading || !data) return <CircularProgress />
+  if (data) {
+    document.title = `User - ${data.user?.user_name}`
+  }
 
   const tabs: TabType[] = [
     {

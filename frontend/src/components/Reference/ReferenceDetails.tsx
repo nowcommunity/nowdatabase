@@ -9,6 +9,9 @@ import { emptyReference } from '../DetailView/common/defaultValues'
 export const ReferenceDetails = () => {
   const { id } = useParams()
   const isNew = id === 'new'
+  if (isNew) {
+    document.title = 'New reference'
+  }
   const { isLoading, isFetching, isError, data } = useGetReferenceDetailsQuery(id!, { skip: isNew })
   const [editReferenceMutation] = useEditReferenceMutation()
   if (isError) return <div>Error loading data</div>

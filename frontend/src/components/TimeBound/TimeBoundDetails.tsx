@@ -17,6 +17,9 @@ import { TimeUnitTab } from './Tabs/TimeUnitTab.tsx'
 export const TimeBoundDetails = () => {
   const { id } = useParams()
   const isNew = id === 'new'
+  if (isNew) {
+    document.title = 'New time bound'
+  }
   const { isLoading, isFetching, isError, data } = useGetTimeBoundDetailsQuery(decodeURIComponent(id!), {
     skip: isNew,
   })
@@ -37,6 +40,9 @@ export const TimeBoundDetails = () => {
 
   if (isError) return <div>Error loading data</div>
   if (isLoading || isFetching || (!data && !isNew)) return <CircularProgress />
+  if (data) {
+    document.title = `Time Bound - ${data.b_name}`
+  }
 
   const deleteFunction = async () => {
     await deleteMutation(parseInt(id!)).unwrap()

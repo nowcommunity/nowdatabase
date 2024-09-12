@@ -19,6 +19,9 @@ import { useEffect } from 'react'
 export const SpeciesDetails = () => {
   const { id } = useParams()
   const isNew = id === 'new'
+  if (isNew) {
+    document.title = 'New species'
+  }
   const { isLoading, isError, isFetching, data } = useGetSpeciesDetailsQuery(id!, { skip: isNew })
   const [editSpeciesRequest] = useEditSpeciesMutation()
   const notify = useNotify()
@@ -36,6 +39,9 @@ export const SpeciesDetails = () => {
 
   if (isError) return <div>Error loading data</div>
   if (isLoading || isFetching || (!data && !isNew)) return <CircularProgress />
+  if (data) {
+    document.title = `Species - ${data.species_name}`
+  }
 
   const deleteFunction = async () => {
     await deleteMutation(parseInt(id!)).unwrap()

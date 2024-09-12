@@ -77,6 +77,9 @@ export const TableView = <T extends MRT_RowData>({
     }
     return res
   }
+  if (title) {
+    document.title = `${title}`
+  }
 
   const table = useMaterialReactTable({
     columns: columns,

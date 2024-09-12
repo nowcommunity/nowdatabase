@@ -10,6 +10,9 @@ export const RegionDetails = () => {
 
   if (isError) return <div>Error loading data</div>
   if (isLoading || !data) return <CircularProgress />
+  if (data) {
+    document.title = `${data.region}`
+  }
 
   const tabs: TabType[] = [
     {

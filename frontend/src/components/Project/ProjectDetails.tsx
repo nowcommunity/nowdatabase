@@ -10,6 +10,9 @@ export const ProjectDetails = () => {
 
   if (isError) return <div>Error loading data</div>
   if (isLoading || !data) return <CircularProgress />
+  if (data) {
+    document.title = `Project - ${data.proj_name}`
+  }
 
   const tabs: TabType[] = [
     {
