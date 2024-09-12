@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "npx tsx watch --clear-screen=false src/index.ts",
     "build": "tsc",
-    "test": "jest src/api-tests/locality src/api-tests/species",
+    "test": "jest src",
     "test:with_reset": "cd .. && npm run anon:down && npm run start:anon -- -d && sleep 60 && cd backend && npm run test; cd .. && npm run anon:down",
     "start": "node build/index.js",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
