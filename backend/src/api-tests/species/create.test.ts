@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-floating-promises */
 import { beforeEach, describe, it, expect } from '@jest/globals'
 import { LocalityDetailsType, SpeciesDetailsType } from '../../../../frontend/src/backendTypes'
 import { LogRow } from '../../services/write/writeOperations/types'
@@ -36,7 +35,7 @@ describe('Creating new species works', () => {
     if (!localityFound) throw new Error('Locality was not found in now_ls')
     const speciesResult = await send<LocalityDetailsType>(`locality/24750`, 'GET')
     const update = speciesResult.body.now_lau.find(lau => lau.lid === 24750 && lau.lau_comment === 'species test')
-    if(!update) throw new Error('Update not found')
+    if (!update) throw new Error('Update not found')
     const logRows = update.updates
     const expectedLogRows: Partial<LogRow>[] = [
       {

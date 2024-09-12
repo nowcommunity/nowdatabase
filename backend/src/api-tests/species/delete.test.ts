@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-floating-promises */
 import { beforeEach, describe, it, expect } from '@jest/globals'
 import { login, send } from '../utils'
 

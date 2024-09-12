@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-floating-promises */
 import { beforeEach, describe, it, expect } from '@jest/globals'
 import { EditMetaData, SpeciesDetailsType } from '../../../../frontend/src/backendTypes'
 import { LogRow } from '../../services/write/writeOperations/types'
@@ -27,8 +26,8 @@ describe('Updating species works', () => {
   })
 
   it('Added locality species is found', () => {
-      editedSpeciesResult!.now_ls.find(ls => ls.species_id === editedSpecies.species_id && ls.lid === 20920) //'Added locality species not found'
-      expect(!!editedSpeciesResult).toEqual(true)
+    editedSpeciesResult!.now_ls.find(ls => ls.species_id === editedSpecies.species_id && ls.lid === 20920) //'Added locality species not found'
+    expect(!!editedSpeciesResult).toEqual(true)
   })
 
   it('Locality species include correct amount of entries', () => {
