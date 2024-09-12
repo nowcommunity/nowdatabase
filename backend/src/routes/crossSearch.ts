@@ -1,5 +1,6 @@
 import { Request, Router } from 'express'
-import { getAllLocalities, getLocalityDetails, validateEntireLocality } from '../services/locality'
+import { getLocalityDetails, validateEntireLocality } from '../services/locality'
+import { getAllCrossSearch } from '../services/crossSearch'
 import { fixBigInt } from '../utils/common'
 import { EditDataType, EditMetaData, LocalityDetailsType } from '../../../frontend/src/backendTypes'
 import { requireOneOf } from '../middlewares/authorizer'
@@ -9,8 +10,8 @@ import { deleteLocality, writeLocality } from '../services/write/locality'
 const router = Router()
 
 router.get('/all', async (req, res) => {
-  const localities = await getAllLocalities(req.user)
-  return res.status(200).send(fixBigInt(localities))
+  const crossSearch = await getAllCrossSearch(req.user)
+  return res.status(200).send(fixBigInt(crossSearch))
 })
 
 router.get('/:id', async (req, res) => {
