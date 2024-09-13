@@ -33,7 +33,7 @@ const App = () => {
           <Container maxWidth="xl" fixed style={{ marginTop: '2em', marginBottom: '2em' }}>
             <Grid item>
               <Routes>
-                {ENV == 'dev' && <Route element={crossSearchPage} path="/crosssearch/:id?" />}
+                <Route element={crossSearchPage} path="/crosssearch/:id?" />
                 <Route element={localityPage} path="/locality/:id?" />
                 <Route element={speciesPage} path="/species/:id?" />
                 <Route element={referencePage} path="/reference/:id?" />
