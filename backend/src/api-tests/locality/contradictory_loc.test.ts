@@ -19,7 +19,6 @@ describe('Min and max age checks work', () => {
     expect(putReqStatus).toEqual(400)
 
     const { body: getReqBody, status: getReqStatus } = await send<LocalityDetailsType>(`locality/all`, 'GET')
-    console.log(getReqBody)
     expect(getReqStatus).toEqual(200)
     expect(getReqBody).not.toContain(newLocalityBasis)
   })
