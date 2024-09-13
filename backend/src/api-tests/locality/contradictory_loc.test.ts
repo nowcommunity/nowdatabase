@@ -23,11 +23,23 @@ describe('Min and max age checks work', () => {
     expect(getReqBody).not.toContain(newLocalityBasis)
   })
 
+  it('Editing a locality with contradictory min and max ages does not work', async () => {
+    const locality = editedLocality
+    // @ts-expect-error: min age property is not implied to exist in locality
+    locality.min_age = 10
+    // @ts-expect-error: max age property is not implied to exist in locality
+    locality.max_age = 9
+    const writeResult = await send<{ id: number }>('locality', 'PUT', { locality: locality })
+
+    expect(writeResult.status).toEqual(400)
+    expect(writeResult.body).toEqual({})
+  })
+  
   it('Editing locality without changing anything should succeed', async () => {
     const locality = editedLocality
     const writeResult = await send<{ id: number }>('locality', 'PUT', { locality: locality })
     expect(writeResult.status).toEqual(200)
 
-    expect(writeResult.body.id).toEqual(editedLocality.lid) // `Invalid result returned on write: ${writeResult.body.id}`
+    expect(writeResult.body.id).toEqual(editedLocality.lid) // `Invalid result returned on write: ${writeResult.body.id}
   })
 })
