@@ -29,7 +29,7 @@ jobs:
         run: npm run start:anon -- -d && sleep 60
 
       - name: Cypress
-        working_directory: "./frontend"
+        working-directory: "./frontend"
         uses: cypress-io/github-action@v6
 
       - name: Dump docker logs on failure
