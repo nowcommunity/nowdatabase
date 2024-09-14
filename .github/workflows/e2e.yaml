@@ -27,8 +27,11 @@ jobs:
 
       - name: 'Start containers'
         run: npm run start:anon -- -d && sleep 60
+
       - name: Cypress
+        working_directory: "./frontend"
         uses: cypress-io/github-action@v6
+
       - name: Dump docker logs on failure
         if: failure()
         uses: jwalton/gh-docker-logs@v2
