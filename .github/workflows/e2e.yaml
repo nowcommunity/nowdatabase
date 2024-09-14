@@ -30,7 +30,9 @@ jobs:
 
       - name: Cypress
         uses: cypress-io/github-action@v6
-        with:
+        with:     
+          # we have already installed node_modules
+          install: false
           working-directory: ./frontend
 
       - name: Dump docker logs on failure
