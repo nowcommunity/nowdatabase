@@ -10,12 +10,16 @@ services:
     env_file: .anon.env
   backend:
     container_name: nowdb-backend-anon
+    depends_on:
+      db-anon:
+        condition: service_healthy
     env_file: .anon.env
     ports:
       - 127.0.0.1:4000:4000
     build:
       context: .
       dockerfile: ./backend/Dockerfile
+
   db-anon:
     container_name: nowdb-db-anon
     image: mariadb:11.4.3
@@ -25,6 +29,12 @@ services:
       - nowdb-db-anon:/var/lib/mysql/data
     ports:
       - 127.0.0.1:3306:3306
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      start_period: 10s
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
 volumes:
   nowdb-db-anon:
-
