@@ -13,6 +13,9 @@
     "prisma": "prisma generate --schema prisma/schema.prisma && prisma generate --schema prisma/schema_log.prisma",
     "clean": "rm -rf node_modules && rm -rf prisma/generated && rm -rf build"
   },
+  "jest": {
+      "testPathIgnorePatterns": ["build", "node_modules"]
+  },
   "author": "",
   "devDependencies": {
     "@babel/core": "^7.18.5",
