@@ -6,16 +6,16 @@ import {
 } from '../../redux/localityReducer'
 import { CircularProgress } from '@mui/material'
 import { DetailView, TabType } from '../DetailView/DetailView'
-import { AgeTab } from './Tabs/AgeTab'
-import { ArchaeologyTab } from './Tabs/ArchaeologyTab'
-import { ClimateTab } from './Tabs/ClimateTab'
-import { EcometricsTab } from './Tabs/EcometricsTab'
-import { LithologyTab } from './Tabs/LithologyTab'
-import { LocalityTab } from './Tabs/LocalityTab'
-import { MuseumTab } from './Tabs/MuseumTab'
-import { ProjectTab } from './Tabs/ProjectTab'
-import { SpeciesTab } from './Tabs/SpeciesTab'
-import { TaphonomyTab } from './Tabs/TaphonomyTab'
+import { AgeTab } from '../Locality/Tabs/AgeTab'
+import { ArchaeologyTab } from '../Locality/Tabs/ArchaeologyTab'
+import { ClimateTab } from '../Locality/Tabs/ClimateTab'
+import { EcometricsTab } from '../Locality/Tabs/EcometricsTab'
+import { LithologyTab } from '../Locality/Tabs/LithologyTab'
+import { LocalityTab } from '../Locality/Tabs/LocalityTab'
+import { MuseumTab } from '../Locality/Tabs/MuseumTab'
+import { ProjectTab } from '../Locality/Tabs/ProjectTab'
+import { SpeciesTab } from '../Locality/Tabs/SpeciesTab'
+import { TaphonomyTab } from '../Locality/Tabs/TaphonomyTab'
 import { EditDataType, LocalityDetailsType } from '@/backendTypes'
 import { validateLocality } from '@/validators/locality'
 import { UpdateTab } from '../DetailView/common/UpdateTab'
@@ -27,14 +27,10 @@ export const LocalityDetails = () => {
   const { id } = useParams()
   const navigate = useNavigate()
   const isNew = id === 'new'
-  if (isNew) {
-    document.title = 'New locality'
-  }
   const [editLocalityRequest, { isLoading: mutationLoading }] = useEditLocalityMutation()
   const { isFetching, isError, data } = useGetLocalityDetailsQuery(id!, {
     skip: isNew,
   })
-
   const notify = useNotify()
   const [deleteMutation, { isSuccess: deleteSuccess, isError: deleteError }] = useDeleteLocalityMutation()
 
@@ -49,9 +45,6 @@ export const LocalityDetails = () => {
 
   if (isError) return <div>Error loading data</div>
   if (isFetching || (!data && !isNew) || mutationLoading) return <CircularProgress />
-  if (data) {
-    document.title = `Locality - ${data.loc_name}`
-  }
 
   const deleteFunction = async () => {
     await deleteMutation(parseInt(id!)).unwrap()

@@ -19,6 +19,8 @@ export const Login = () => {
   const loginHadExpired = search.get('expired')
   const notify = useNotify()
 
+  document.title = 'Login'
+
   useEffect(() => {
     if (loginHadExpired) notify('Your login expired. Please log in again.')
     // Putting notify into this causes the notification to not disappear, so don't do it.

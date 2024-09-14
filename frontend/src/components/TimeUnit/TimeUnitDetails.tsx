@@ -17,6 +17,9 @@ import { TimeUnitTab } from './Tabs/TimeUnitTab'
 export const TimeUnitDetails = () => {
   const { id } = useParams()
   const isNew = id === 'new'
+  if (isNew) {
+    document.title = 'New time unit'
+  }
   const { isLoading, isError, isFetching, data } = useGetTimeUnitDetailsQuery(encodeURIComponent(id!), { skip: isNew })
   const [editTimeUnitRequest] = useEditTimeUnitMutation()
 
@@ -35,6 +38,9 @@ export const TimeUnitDetails = () => {
 
   if (isError) return <div>Error loading data</div>
   if (isLoading || isFetching || (!data && !isNew)) return <CircularProgress />
+  if (data) {
+    document.title = `Time Unit - ${data.tu_display_name}`
+  }
 
   const deleteFunction = async () => {
     await deleteMutation(id!).unwrap()

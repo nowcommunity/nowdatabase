@@ -25,8 +25,10 @@ Testing:
 + `npm run start:anon`
   + Uses `docker-compose.anon.yml`
   + Runs the app with anonymized test-database. Make cypress-tests using this version
-+ `npm test`
-  + Runs cypress-tests in headless mode, same as in GitHub Actions. Requires the above command to be ran first.
++ `npm run test:e2e`
+  + Runs cypress-tests in headless mode, same as in GitHub Actions. Requires `npm run start:anon` to be ran first.
++ `npm run test:api`
+  + Runs backend api tests. Requires `npm run start:anon` to be ran first.
 + `npm run cypress`
   + Opens cypress. You can run tests and see what they do.
 

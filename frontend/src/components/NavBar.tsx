@@ -30,6 +30,7 @@ export const NavBar = () => {
     { title: 'Front Page', url: '/' },
     { title: 'Localities', url: '/locality' },
     { title: 'Species', url: '/species' },
+    { title: 'Cross-Search', url: '/crosssearch' },
     { title: 'References', url: '/reference' },
     { title: 'Time Units', url: '/time-unit' },
     { title: 'Time Bounds', url: '/time-bound', allowedRoles: [Role.Admin, Role.EditUnrestricted] },
@@ -44,6 +45,7 @@ export const NavBar = () => {
         { title: 'Email', url: '/email' },
       ],
     },
+    { title: 'Map', url: '/map' },
   ]
 
   if (user.username) pages.push({ title: 'User', url: '/person/user-page' })
@@ -64,6 +66,7 @@ export const NavBar = () => {
   )
 
   const renderLink = (link: LinkDefinition) => {
+    if (ENV !== 'dev' && link.title == 'Map') return null
     if (link.children) {
       return (
         <MenuItem key={`${link.url}-menuitem`} style={{ display: 'inline-block', padding: 0 }}>

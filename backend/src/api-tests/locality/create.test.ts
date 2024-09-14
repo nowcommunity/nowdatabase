@@ -1,6 +1,4 @@
-/* eslint-disable @typescript-eslint/no-floating-promises */
-import assert from 'node:assert/strict'
-import { before, describe, it } from 'node:test'
+import { beforeEach, describe, it, expect } from '@jest/globals'
 import { LocalityDetailsType, SpeciesDetailsType } from '../../../../frontend/src/backendTypes'
 import { LogRow } from '../../services/write/writeOperations/types'
 import { newLocalityBasis } from './data'
@@ -9,7 +7,7 @@ import { login, send, testLogRows } from '../utils'
 let createdLocality: LocalityDetailsType | null = null
 
 describe('Creating new locality works', () => {
-  before(async () => {
+  beforeEach(async () => {
     await login()
   })
 
@@ -17,7 +15,7 @@ describe('Creating new locality works', () => {
     const { body: resultBody } = await send<{ id: number }>('locality', 'PUT', { locality: newLocalityBasis })
     const { id: createdId } = resultBody
 
-    assert(typeof createdId === 'number', `Invalid result returned on write: ${createdId}`)
+    expect(typeof createdId).toEqual('number') // `Invalid result returned on write: ${createdId}`)
 
     const { body } = await send<LocalityDetailsType>(`locality/${createdId}`, 'GET')
     createdLocality = body
@@ -25,19 +23,20 @@ describe('Creating new locality works', () => {
 
   it('Contains correct data', () => {
     const { loc_name, now_ls } = createdLocality!
-    assert(loc_name === newLocalityBasis.loc_name, 'Name is different')
+    expect(loc_name).toEqual(newLocalityBasis.loc_name) //'Name is different'
     const newSpecies = now_ls.find(ls => ls.com_species.species_name === 'Newspecies')
-    assert(!!newSpecies, 'New species not found')
+    expect(!!newSpecies).toEqual(true) // 'New species not found'
     const oldSpecies = now_ls.find(ls => ls.species_id === 21052 && ls.lid === createdLocality!.lid)
-    assert(!!oldSpecies, 'Old species not found')
+    expect(!!oldSpecies).toEqual(true) // 'Old species not found'
   })
 
   it('Species update also logged correctly', async () => {
     const speciesId = createdLocality!.now_ls.find(ls => ls.com_species.species_name === 'Newspecies')?.species_id
     const speciesResult = await send<SpeciesDetailsType>(`species/${speciesId}`, 'GET')
     const update = speciesResult.body.now_sau.find(update => update.sau_comment === 'new locality test update')
-    assert(update, 'Species update not found')
-    assert(update?.species_id === speciesId, 'Species update does not have correct id')
+    if (!update) throw new Error('Species update not found')
+    if (!speciesId) throw new Error('Species id not found')
+    expect(update?.species_id).toEqual(speciesId) // 'Species update does not have correct id'
     const logRows = update.updates
     const expectedLogRows: Partial<LogRow>[] = [
       {

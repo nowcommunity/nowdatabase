@@ -22,6 +22,7 @@
   },
   "author": "",
   "devDependencies": {
+    "@types/leaflet": "^1.9.12",
     "@types/supertest": "^6.0.2",
     "cypress": "^13.11.0",
     "supertest": "^7.0.0"

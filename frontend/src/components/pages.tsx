@@ -8,6 +8,7 @@ import {
   ProjectDetailsType,
   RegionDetails as RegionDetailsType,
 } from '@/backendTypes'
+import { CrossSearchTable } from './CrossSearch/CrossSearchTable'
 import { LocalityDetails } from './Locality/LocalityDetails'
 import { LocalityTable } from './Locality/LocalityTable'
 import { EditRights, Page } from './Page'
@@ -37,6 +38,21 @@ export const localityPage = (
     tableView={<LocalityTable />}
     detailView={<LocalityDetails />}
     viewName="locality"
+    idFieldName="lid"
+    createTitle={(loc: LocalityDetailsType) => `${loc.loc_name}`}
+    getEditRights={(user: UserState, id: string | number) => {
+      if ([Role.Admin, Role.EditUnrestricted].includes(user.role)) return fullRights
+      if (user.role === Role.EditRestricted && user.localities.includes(id as number)) return limitedRights
+      return noRights
+    }}
+  />
+)
+
+export const crossSearchPage = (
+  <Page
+    tableView={<CrossSearchTable />}
+    detailView={<LocalityDetails />}
+    viewName="crosssearch"
     idFieldName="lid"
     createTitle={(loc: LocalityDetailsType) => `${loc.loc_name}`}
     getEditRights={(user: UserState, id: string | number) => {
