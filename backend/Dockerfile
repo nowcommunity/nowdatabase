@@ -3,15 +3,16 @@ FROM node:20-alpine3.16 AS backend-build
 ENV TZ="Europe/Helsinki"
 
 WORKDIR /usr/src/app
-
 RUN mkdir -p /usr/src/app/frontend/src/validators
 
-COPY frontend/src/backendTypes.d.ts /usr/src/app/frontend/src/backendTypes.d.ts
-COPY frontend/src/types.ts /usr/src/app/frontend/src/types.ts
-COPY frontend/src/validators /usr/src/app/frontend/src/validators
-COPY backend/package.json backend/
-COPY backend/package-lock.json backend/
-COPY backend/prisma backend
+USER node
+
+COPY --chown=node frontend/src/backendTypes.d.ts /usr/src/app/frontend/src/backendTypes.d.ts
+COPY --chown=node frontend/src/types.ts /usr/src/app/frontend/src/types.ts
+COPY --chown=node frontend/src/validators /usr/src/app/frontend/src/validators
+COPY --chown=node backend/package.json backend/
+COPY --chown=node backend/package-lock.json backend/
+COPY --chown=node backend/prisma backend
 
 ENV NODE_ENV=production
 
@@ -19,22 +20,26 @@ WORKDIR /usr/src/app/backend
 
 RUN npm ci
 
-COPY backend .
+COPY --chown=node backend .
 RUN npm run prisma
-RUN rm -rf build
 RUN npm run build
+
 
 # NOTE: Has to be alpine3.16 because newer versions have changed a dependency, causing Prisma to fail
 FROM node:20-alpine3.16 AS node-run
 
+# following mkdir needs root (for some reason)
 RUN mkdir -p /usr/src/app/backend/backend/prisma
-WORKDIR /usr/src/app/backend
+RUN chown node:node /usr/src/app -R
 
-COPY --from=backend-build /usr/src/app/frontend/src/backendTypes.d.ts ../frontend/src/backendTypes.d.ts
-COPY --from=backend-build /usr/src/app/frontend/src/types.ts ../frontend/src/types.ts
-COPY --from=backend-build /usr/src/app/backend/build .
-COPY --from=backend-build /usr/src/app/backend/node_modules ./node_modules
-COPY --from=backend-build /usr/src/app/backend/prisma ./backend/prisma
+WORKDIR /usr/src/app/backend
+USER node
+
+COPY --from=backend-build --chown=node /usr/src/app/frontend/src/backendTypes.d.ts ../frontend/src/backendTypes.d.ts
+COPY --from=backend-build --chown=node /usr/src/app/frontend/src/types.ts ../frontend/src/types.ts
+COPY --from=backend-build --chown=node /usr/src/app/backend/build .
+COPY --from=backend-build --chown=node /usr/src/app/backend/node_modules ./node_modules
+COPY --from=backend-build --chown=node /usr/src/app/backend/prisma ./backend/prisma
 
 EXPOSE 4000
 ENV NODE_ENV=production
