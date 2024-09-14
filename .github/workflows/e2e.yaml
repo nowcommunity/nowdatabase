@@ -26,7 +26,7 @@ jobs:
         run: npm run setup
 
       - name: 'Start containers'
-        run: npm run start:anon -- -d && sleep 60
+        run: npm run start:anon -- -d --wait
       - name: Cypress
         uses: cypress-io/github-action@v6
       - name: Dump docker logs on failure
