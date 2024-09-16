@@ -4,7 +4,7 @@
 */
 
 describe('Button Tests', () => {
-    it('Buttons for Localities, Species, References & Time Units are visible', () => {
+    it('Buttons for Localities, Species, References, Cross-Search, Map & Time Units are visible', () => {
       cy.visit('/')
       cy.contains('Welcome').should('be.visible')
       cy.contains('Front Page').should('be.visible')
@@ -12,6 +12,8 @@ describe('Button Tests', () => {
       cy.contains('Species').should('be.visible')
       cy.contains('References').should('be.visible')
       cy.contains('Time Units').should('be.visible')
+      cy.contains('Cross-Search').should('be.visible')
+      cy.contains('Map').should('be.visible')
     })
   
     it('Localities button works', () => {
@@ -33,6 +35,8 @@ describe('Button Tests', () => {
       cy.contains('Species').should('be.visible')
       cy.contains('References').should('be.visible')
       cy.contains('Time Units').should('be.visible')
+      cy.contains('Cross-Search').should('be.visible')
+      cy.contains('Map').should('be.visible')
     })
   
     it('Species button works', () => {
