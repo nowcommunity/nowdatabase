@@ -14,7 +14,8 @@
     "clean": "rm -rf node_modules && rm -rf prisma/generated && rm -rf build"
   },
   "jest": {
-      "testPathIgnorePatterns": ["build", "node_modules"]
+      "testPathIgnorePatterns": ["build", "node_modules", "prisma"],
+      "testEnvironment": "node"
   },
   "author": "",
   "devDependencies": {
