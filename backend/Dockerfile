@@ -12,7 +12,8 @@ COPY --chown=node frontend/src/types.ts /usr/src/app/frontend/src/types.ts
 COPY --chown=node frontend/src/validators /usr/src/app/frontend/src/validators
 COPY --chown=node backend/package.json backend/
 COPY --chown=node backend/package-lock.json backend/
-COPY --chown=node backend/prisma backend
+COPY --chown=node backend/prisma/schema.prisma backend
+COPY --chown=node backend/prisma/schema_log.prisma backend
 
 ENV NODE_ENV=production
 
@@ -29,19 +30,21 @@ RUN npm run build
 FROM node:20-alpine3.16 AS node-run
 
 # following mkdir needs root (for some reason)
-RUN mkdir -p /usr/src/app/backend/backend/prisma
+RUN mkdir -p /usr/src/app/backend/prisma
 RUN chown node:node /usr/src/app -R
 
-WORKDIR /usr/src/app/backend
+WORKDIR /usr/src/app
 USER node
 
 COPY --from=backend-build --chown=node /usr/src/app/frontend/src/backendTypes.d.ts ../frontend/src/backendTypes.d.ts
 COPY --from=backend-build --chown=node /usr/src/app/frontend/src/types.ts ../frontend/src/types.ts
 COPY --from=backend-build --chown=node /usr/src/app/backend/build .
-COPY --from=backend-build --chown=node /usr/src/app/backend/node_modules ./node_modules
+COPY --from=backend-build --chown=node /usr/src/app/backend/node_modules ./backend/node_modules
 COPY --from=backend-build --chown=node /usr/src/app/backend/prisma ./backend/prisma
+
+WORKDIR /usr/src/app/backend
 
 EXPOSE 4000
 ENV NODE_ENV=production
 
-CMD ["node", "backend/src/index.js"]
+CMD ["node", "src/index.js"]
