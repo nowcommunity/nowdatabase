@@ -154,6 +154,7 @@ export const DetailView = <T extends object>({
             )}
             {editRights.edit && !mode.staging && !initialState.mode.new && (
               <Button
+                id="edit-button"
                 onClick={() => setMode(!mode.read ? 'read' : 'edit')}
                 variant={mode.read ? 'contained' : 'outlined'}
                 style={{ width: '12em' }}
