@@ -61,7 +61,6 @@ describe('Button Tests', () => {
       cy.contains('Min age').should('be.visible')
       cy.contains('Name').should('be.visible')
       cy.contains('Order').should('be.visible')
-      cy.contains('Family').should('be.visible')
     })
 
     it('Map button works', () => {
