@@ -26,7 +26,7 @@ jobs:
         run: npm run setup
 
       - name: 'Start containers'
-        run: npm run start:anon -- -d --wait && sleep 10
+        run: npm run start:anon -- -d --wait && sleep 30
       - name: Run api-tests
         run: npm run test:api
       - name: Dump docker logs on failure
