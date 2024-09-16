@@ -10,7 +10,8 @@
     "test:with_reset": "cd .. && npm run anon:down && npm run start:anon -- -d && sleep 60 && cd backend && npm run test; cd .. && npm run anon:down",
     "start": "node build/index.js",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
-    "prisma": "prisma generate --schema prisma/schema.prisma && prisma generate --schema prisma/schema_log.prisma"
+    "prisma": "prisma generate --schema prisma/schema.prisma && prisma generate --schema prisma/schema_log.prisma",
+    "clean": "rm -rf node_modules && rm -rf prisma/generated && rm -rf build"
   },
   "author": "",
   "devDependencies": {
