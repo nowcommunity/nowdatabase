@@ -87,7 +87,7 @@ export const CrossSearchTable = ({ selectorFn }: { selectorFn?: (newObject: Cros
 
   return (
     <TableView<CrossSearch>
-      title="Locality-Species-Cross-Search (UNDER CONSTRUCTION)"
+      title="Locality-Species-Cross-Search"
       selectorFn={selectorFn}
       checkRowRestriction={checkRowRestriction}
       idFieldName="lid"
