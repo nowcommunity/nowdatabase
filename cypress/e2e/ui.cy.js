@@ -53,6 +53,25 @@ describe('Button Tests', () => {
       cy.contains('Sequence').should('be.visible')
     })
 
+    it('Cross Search button works', () => {
+      cy.visit('/')
+      cy.contains('Cross-Search').click()
+      cy.url().should('include', '/crosssearch')
+      cy.contains('Max age').should('be.visible')
+      cy.contains('Min age').should('be.visible')
+      cy.contains('Name').should('be.visible')
+      cy.contains('Order').should('be.visible')
+      cy.contains('Family').should('be.visible')
+    })
+
+    it('Map button works', () => {
+      cy.visit('/')
+      cy.contains('Map').click()
+      cy.url().should('include', '/map')
+      cy.get('.leaflet-container').should('be.visible');
+    })
+
+
     it('Link to species details from species tab', () => {
       cy.visit('/species')
       // Click the button with the SVG icon
