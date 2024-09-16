@@ -43,7 +43,7 @@ describe('Test individual features across the app', () => {
       cy.login('testSu')
       hasStagingMode('locality/24750')
     })
-  
+
     it('Staging mode works on species', () => {
       cy.login('testSu')
       hasStagingMode('species/21052')
@@ -66,7 +66,7 @@ describe('Test individual features across the app', () => {
       cy.login('testSu')
       doesNotHaveStagingMode('reference/10039')
     })
-  
+
     it.skip('Staging mode does not appear on regions', () => {
       cy.login('testSu')
       doesNotHaveStagingMode('region/1')
@@ -78,6 +78,32 @@ describe('Test individual features across the app', () => {
     it.skip('Staging mode does not appear on person page', () => {
       cy.login('testSu')
       doesNotHaveStagingMode('person/AD')
+    })
+  })
+  describe("Min and max age checks work", () => {
+    beforeEach('Login as admin', () => {
+      cy.login('testSu')
+    })
+
+    it("Editing a locality with contradictory min and max ages does not work", () => {
+      cy.on("uncaught:exception", (error) => {
+        // this is here to ignore the error that happens when you put contradictory data to backend
+        // might ignore errors that should not be ignored too!
+        console.log(error)
+        return false
+      })
+
+      cy.visit(`/locality/20920?tab=0`)
+      cy.get('[id=edit-button]').click()
+      // the id's for these next two might change which breaks the test, don't know why
+      cy.get("[id=\\:r3\\:]").first().type("{backspace}{backspace}{backspace}10") // min age input field
+      cy.get("[id=\\:rb\\:]").type("{backspace}{backspace}{backspace}{backspace}{backspace}9") // max age input field
+      cy.contains("Min value cannot be higher than max")
+      cy.get('[id=write-button]').click()
+      cy.get('[id=write-button]').click()
+      // make sure the values didn't change
+      cy.contains("7.2")
+      cy.contains("11.63")
     })
   })
 })

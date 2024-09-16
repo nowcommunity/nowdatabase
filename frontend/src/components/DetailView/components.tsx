@@ -23,6 +23,7 @@ export const WriteButton = <T,>({
   }
   return (
     <Button
+      id="write-button"
       sx={{ width: '20em' }}
       onClick={() => {
         if (!mode.staging && hasStagingMode) {
