@@ -9,14 +9,7 @@ const crossSearchApi = api.injectEndpoints({
       }),
       providesTags: result => (result ? [{ type: 'localities' }] : []),
     }),
-    getCrossSearchList: builder.mutation<string[][], number[]>({
-      query: (lids: number[]) => ({
-        url: `/locality-species`,
-        body: { lids },
-        method: 'POST',
-      }),
-    }),
   }),
 })
 
-export const { useGetAllCrossSearchQuery, useGetCrossSearchListMutation } = crossSearchApi
+export const { useGetAllCrossSearchQuery } = crossSearchApi

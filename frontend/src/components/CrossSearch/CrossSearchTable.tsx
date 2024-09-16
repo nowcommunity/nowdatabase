@@ -1,14 +1,11 @@
 import { useMemo } from 'react'
 import { type MRT_ColumnDef } from 'material-react-table'
-import { useGetAllCrossSearchQuery, useGetCrossSearchListMutation } from '../../redux/crossSearchReducer'
+import { useGetAllCrossSearchQuery } from '../../redux/crossSearchReducer'
 import { CrossSearch } from '@/backendTypes'
 import { TableView } from '../TableView/TableView'
-import { useNotify } from '@/hooks/notification'
 
 export const CrossSearchTable = ({ selectorFn }: { selectorFn?: (newObject: CrossSearch) => void }) => {
   const CrossSearchQuery = useGetAllCrossSearchQuery()
-  const [getCrossSearchList, { isLoading }] = useGetCrossSearchListMutation()
-  const notify = useNotify()
   const columns = useMemo<MRT_ColumnDef<CrossSearch>[]>(
     () => [
       {
@@ -84,27 +81,6 @@ export const CrossSearchTable = ({ selectorFn }: { selectorFn?: (newObject: Cros
     []
   )
 
-  const combinedExport = async (lids: number[]) => {
-    if (isLoading) {
-      notify('Please wait for the last request to complete.', 'warning')
-      return
-    }
-
-    const limit = 99999999
-    if (lids.length > limit) {
-      notify(`Please filter the table more. Current rows: ${lids.length}. Limit: ${limit}`, 'error')
-      return
-    }
-    const result = await getCrossSearchList(lids).unwrap()
-    const dataString = result.map(row => row.join(',')).join('\n')
-    const blob = new Blob([dataString], { type: 'text/csv' })
-    const url = URL.createObjectURL(blob)
-    const a = document.createElement('a')
-    a.href = url
-    a.download = 'localitiesWithSpecies.csv'
-    a.click()
-  }
-
   const checkRowRestriction = (row: CrossSearch) => {
     return !!row.loc_status
   }
@@ -118,8 +94,6 @@ export const CrossSearchTable = ({ selectorFn }: { selectorFn?: (newObject: Cros
       columns={columns}
       data={CrossSearchQuery.data}
       url="crosssearch"
-      combinedExport={combinedExport}
-      exportIsLoading={isLoading}
     />
   )
 }
