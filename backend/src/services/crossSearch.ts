@@ -67,7 +67,6 @@ export const getAllCrossSearch = async (user?: User) => {
   const removeProjects: (loc: CrossSearchListType) => Omit<CrossSearchListType, 'now_plr'> = loc => {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { now_plr, ...rest } = loc
-    // console.log(loc)
     return rest
   }
 
