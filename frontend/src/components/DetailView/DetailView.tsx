@@ -18,12 +18,12 @@ export type TabType = {
 
 export type TextFieldOptions = (
   | {
-    type: 'text'
-  }
+      type: 'text'
+    }
   | {
-    type: 'number'
-    round?: number
-  }
+      type: 'number'
+      round?: number
+    }
 ) & {
   disabled?: boolean
   big?: boolean
@@ -148,11 +148,7 @@ export const DetailView = <T extends object>({
           <Box sx={{ display: 'flex' }} gap={3}>
             {!isUserPage && <ReturnButton />}
             {editRights.delete && (
-              <Button
-                onClick={onDelete}
-                variant="contained"
-                style={{ width: '8em' }}
-              >
+              <Button onClick={onDelete} variant="contained" style={{ width: '8em' }}>
                 Delete
               </Button>
             )}
