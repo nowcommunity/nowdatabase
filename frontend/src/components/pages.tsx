@@ -69,7 +69,7 @@ export const speciesPage = (
     detailView={<SpeciesDetails />}
     viewName="species"
     idFieldName="species_id"
-    createTitle={(species: SpeciesDetailsType) => `${species.species_name}`}
+    createTitle={(species: SpeciesDetailsType) => `${species.genus_name + " " + species.species_name}`}
     getEditRights={(user: UserState) => {
       if ([Role.Admin, Role.EditUnrestricted].includes(user.role)) return fullRights
       if (user.role === Role.EditRestricted) return limitedRights
