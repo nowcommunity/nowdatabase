@@ -165,7 +165,7 @@ export const TableView = <T extends MRT_RowData>({
             <Typography sx={{ margin: '0.4rem' }} variant="h4">
               {title ?? ''}
             </Typography>
-            {editRights.new && (
+            {editRights.new && title != 'Locality-Species-Cross-Search' && (
               <Button sx={{ marginRight: '1rem', marginLeft: '1rem' }} variant="contained" component={Link} to="new">
                 New
               </Button>
