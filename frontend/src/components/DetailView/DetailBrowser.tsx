@@ -16,12 +16,13 @@ export const DetailBrowser = <T extends object>() => {
   const previousIndex = currentIndex - 1
   const style = {
     width: '18em',
-    marginLeft: '2em',
+    marginLeft: '1em',
     overflow: 'hidden',
     whiteSpace: 'nowrap',
     textOverflow: 'ellipsis',
     position: 'relative',
     textAlign: 'left',
+    fontSize: '2.3em',
     '&::after': {
       content: '""',
       position: 'absolute',
@@ -44,11 +45,10 @@ export const DetailBrowser = <T extends object>() => {
   return (
     <Box
       sx={{
-        alignItems: 'center',
+        alignItems: 'left',
         justifyContent: 'center',
         height: '100%',
         display: 'flex',
-        fontSize: '18px',
         gap: '1em',
       }}
     >
