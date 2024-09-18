@@ -45,7 +45,7 @@ export const DetailBrowser = <T extends object>() => {
   return (
     <Box
       sx={{
-        alignItems: 'left',
+        alignItems: 'center',
         justifyContent: 'center',
         height: '100%',
         display: 'flex',
