@@ -145,10 +145,10 @@ export const DetailView = <T extends object>({
     <Stack rowGap={2}>
       <DetailContextProvider contextState={initialState}>
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignContent: 'center', marginTop: 'auto' }}>
-          <Box sx={{ display: 'flex' }} gap={10}>
+          <Box sx={{ display: 'flex' }} gap={3}>
             {!isUserPage && <ReturnButton />}
             {editRights.delete && (
-              <Button onClick={onDelete} variant="contained">
+              <Button onClick={onDelete} variant="contained" style={{ width: '8em' }}>
                 Delete
               </Button>
             )}
@@ -157,7 +157,7 @@ export const DetailView = <T extends object>({
                 id="edit-button"
                 onClick={() => setMode(!mode.read ? 'read' : 'edit')}
                 variant={mode.read ? 'contained' : 'outlined'}
-                style={{ width: '12em' }}
+                style={{ width: '8em' }}
               >
                 <EditIcon style={{ marginRight: '0.5em' }} /> {mode.read ? 'Edit' : 'Cancel edit'}
               </Button>
