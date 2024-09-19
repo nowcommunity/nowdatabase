@@ -15,7 +15,8 @@
   },
   "jest": {
       "testPathIgnorePatterns": ["build", "node_modules", "prisma"],
-      "testEnvironment": "node"
+      "testEnvironment": "node",
+      "roots": ["src"]
   },
   "author": "",
   "devDependencies": {
