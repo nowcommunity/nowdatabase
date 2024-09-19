@@ -29,6 +29,10 @@ RUN npm run build
 # NOTE: Has to be alpine3.16 because newer versions have changed a dependency, causing Prisma to fail
 FROM node:20-alpine3.16 AS node-run
 
+# healthcheck needs this
+USER root
+RUN apk --no-cache add curl
+
 # following mkdir needs root (for some reason)
 RUN mkdir -p /usr/src/app/backend/prisma
 RUN chown node:node /usr/src/app -R

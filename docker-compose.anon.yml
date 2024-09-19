@@ -19,6 +19,13 @@ services:
     build:
       context: .
       dockerfile: ./backend/Dockerfile
+      target: node-run
+    healthcheck:
+      test: curl -f http://localhost:4000/test/ping || exit 1
+      start_period: 10s
+      interval: 30s
+      retries: 3
+      timeout: 15s
 
   db-anon:
     container_name: nowdb-db-anon
