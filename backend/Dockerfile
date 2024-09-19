@@ -52,3 +52,16 @@ EXPOSE 4000
 ENV NODE_ENV=production
 
 CMD ["node", "src/index.js"]
+
+FROM node:20-alpine3.16 AS api-tests
+
+USER node
+WORKDIR /usr/src/app/backend
+
+COPY --chown=node backend/package.json .
+COPY --chown=node backend/package-lock.json .
+
+RUN npm ci
+
+COPY --chown=node backend .
+CMD ["npm", "run", "test"]
