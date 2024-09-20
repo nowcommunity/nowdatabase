@@ -12,6 +12,7 @@ import { TaxonomyTab } from './Tabs/TaxonomyTab'
 import { TeethTab } from './Tabs/TeethTab'
 import { UpdateTab } from '../DetailView/common/UpdateTab'
 import { EditDataType, SpeciesDetailsType } from '@/backendTypes'
+import { validateSpecies } from '@/validators/species'
 import { emptySpecies } from '../DetailView/common/defaultValues'
 import { useNotify } from '@/hooks/notification'
 import { useEffect } from 'react'
@@ -97,10 +98,7 @@ export const SpeciesDetails = () => {
       onWrite={onWrite}
       isNew={isNew}
       hasStagingMode
-      validator={() => ({
-        name: 'unknown',
-        error: null,
-      })}
+      validator={validateSpecies}
       deleteFunction={deleteFunction}
     />
   )
