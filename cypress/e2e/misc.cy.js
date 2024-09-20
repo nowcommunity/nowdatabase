@@ -96,8 +96,8 @@ describe('Test individual features across the app', () => {
       cy.visit(`/locality/20920?tab=0`)
       cy.get('[id=edit-button]').click()
       // the id's for these next two might change which breaks the test, don't know why
-      cy.get("[id=\\:r3\\:]").first().type("{backspace}{backspace}{backspace}10") // min age input field
-      cy.get("[id=\\:rb\\:]").type("{backspace}{backspace}{backspace}{backspace}{backspace}9") // max age input field
+      cy.get("[id=\\:r1\\:]").first().type("{backspace}{backspace}{backspace}10") // min age input field
+      cy.get("[id=\\:r5\\:]").type("{backspace}{backspace}{backspace}{backspace}{backspace}9") // max age input field
       cy.contains("Min value cannot be higher than max")
       cy.get('[id=write-button]').click()
       cy.get('[id=write-button]').click()
