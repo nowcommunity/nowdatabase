@@ -17,18 +17,9 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup node
-        uses: actions/setup-node@v4
-        with:
-          node-version: 22
+      - name: Run e2e tests
+        run: npm run test:docker:ci:e2e
 
-      - name: 'Run setup'
-        run: npm run setup
-
-      - name: 'Start containers'
-        run: npm run anon:down && npm run start:anon -- -d --wait && sleep 60
-      - name: Cypress
-        uses: cypress-io/github-action@v6
       - name: Dump docker logs on failure
         if: failure()
         uses: jwalton/gh-docker-logs@v2
