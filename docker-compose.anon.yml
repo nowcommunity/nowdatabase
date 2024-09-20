@@ -5,9 +5,14 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile
+      args:
+        BACKEND_URL: http://localhost:4000
+        ENABLE_WRITE: true
+        RUNNING_ENV: dev
     ports:
       - 127.0.0.1:5173:5173
     env_file: .anon.env
+
   backend:
     container_name: nowdb-backend-anon
     depends_on:
