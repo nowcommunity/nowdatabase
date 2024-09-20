@@ -3,7 +3,7 @@ import { UpdateLog } from '../../../frontend/src/backendTypes'
 import { LogRow } from '../services/write/writeOperations/types'
 
 let token: string | null = null
-const baseUrl = process.env.API_TESTS_BASEURL ?? "http://localhost:4000"
+const baseUrl = process.env.API_TESTS_BASEURL ?? 'http://localhost:4000'
 
 export const send = async <T extends Record<string, unknown>>(
   path: string,
@@ -14,15 +14,11 @@ export const send = async <T extends Record<string, unknown>>(
   headers.append('Content-Type', 'application/json')
   if (token) headers.append('authorization', `bearer ${token}`)
   const options = { body: method !== 'GET' ? JSON.stringify(body) : undefined, method, headers }
-  try {
-      const response = await fetch(`${baseUrl}/${path}`, options)
-      if (response.status > 399) return { body: {} as T, status: response.status }
-      const responseText = await response.text()
-      if (!responseText) return { body: {} as T, status: response.status }
-      return { body: JSON.parse(responseText) as T, status: response.status }
-  } catch(e){
-      throw new Error(`Fetching ${baseUrl}/${path} failed: ${e}`)
-  }
+  const response = await fetch(`${baseUrl}/${path}`, options)
+  if (response.status > 399) return { body: {} as T, status: response.status }
+  const responseText = await response.text()
+  if (!responseText) return { body: {} as T, status: response.status }
+  return { body: JSON.parse(responseText) as T, status: response.status }
 }
 
 export const setToken = (newToken: string) => (token = newToken)
