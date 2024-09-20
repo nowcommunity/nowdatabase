@@ -9,6 +9,7 @@ export const validateLocality = (
     // const isNew = editData.lid === undefined
     max_age: {
       name: 'Age (max)',
+      required: true,
       asNumber: (num: number) => {
         if (editData.min_age && num < editData.min_age) return 'Max value cannot be lower than min'
         return
@@ -16,6 +17,7 @@ export const validateLocality = (
     },
     min_age: {
       name: 'Age (min)',
+      required: true,
       asNumber: (num: number) => {
         if (editData.max_age && num > editData.max_age) return 'Min value cannot be higher than max'
         return
@@ -23,6 +25,11 @@ export const validateLocality = (
     },
     loc_name: {
       name: 'Locality name',
+      required: true,
+    },
+    country: {
+      name: 'Country',
+      required: true,
     },
     date_meth: {
       name: 'Dating method',
