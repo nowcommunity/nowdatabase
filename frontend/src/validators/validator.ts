@@ -13,7 +13,7 @@ export type Validators<T> = { [field in keyof T]: Validator }
 
 const validate: (validator: Validator, value: unknown) => ValidationError = (validator: Validator, value: unknown) => {
   const { required, minLength, maxLength, asNumber, asString } = validator
-  if (value === null || value === undefined) return required ? 'This field is required' : null
+  if (value === null || value === undefined || value === '') return required ? 'This field is required' : null
   if (asNumber) {
     if (typeof value !== 'number') return 'Value must be a valid number' // If this happens, code is broken somewhere
     if (typeof asNumber === 'function') return asNumber(value)
