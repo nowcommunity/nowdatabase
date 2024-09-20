@@ -147,7 +147,7 @@ export const DetailView = <T extends object>({
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignContent: 'center', marginTop: 'auto' }}>
           <Box sx={{ display: 'flex' }} gap={3}>
             {!isUserPage && <ReturnButton />}
-            {editRights.delete && (
+            {editRights.delete && !isNew && (
               <Button onClick={onDelete} variant="contained" style={{ width: '8em' }}>
                 Delete
               </Button>
