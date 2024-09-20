@@ -57,7 +57,7 @@ export const DropdownSelector = <T extends object>({
         labelId={`${name}-multiselect-label`}
         label={name}
         id={`${name}-multiselect`}
-        value={editData[field] as string}
+        value={(editData[field] as string) ?? ''}
         onChange={(event: SelectChangeEvent) => {
           const setValue = (value: number | string | boolean) => setEditData({ ...editData, [field]: value })
           const asNumber = typeof options[0] === 'number'
