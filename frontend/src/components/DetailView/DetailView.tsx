@@ -144,15 +144,17 @@ export const DetailView = <T extends object>({
   return (
     <Stack rowGap={2}>
       <DetailContextProvider contextState={initialState}>
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignContent: 'center', marginTop: 'auto' }}>
+        {!isUserPage && (
+            <Box >
+              <DetailBrowser<T> />
+            </Box>
+          )}
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignContent: 'space-between', marginTop: 'auto' }}>
           <Box sx={{ display: 'flex' }} gap={3}>
             {!isUserPage && <ReturnButton />}
-            {editRights.delete && !isNew && (
-              <Button onClick={onDelete} variant="contained" style={{ width: '8em' }}>
-                Delete
-              </Button>
-            )}
-            {editRights.edit && !mode.staging && !initialState.mode.new && (
+          </Box>
+          <Box sx={{ display: 'flex' }} gap={1}>
+          {editRights.edit && !mode.staging && !initialState.mode.new && (
               <Button
                 id="edit-button"
                 onClick={() => setMode(!mode.read ? 'read' : 'edit')}
@@ -162,15 +164,16 @@ export const DetailView = <T extends object>({
                 <EditIcon style={{ marginRight: '0.5em' }} /> {mode.read ? 'Edit' : 'Cancel edit'}
               </Button>
             )}
+            {editRights.delete && !isNew && (
+              <Button onClick={onDelete} variant="contained" sx={{ width: '8em', color: 'white'}} color='error'>
+                Delete
+              </Button>
+            )}
             {(!mode.read || initialState.mode.new) && onWrite && (
               <WriteButton onWrite={onWrite} hasStagingMode={hasStagingMode} />
             )}
           </Box>
-          {!isUserPage && (
-            <Box sx={{ marginRight: '3em' }}>
-              <DetailBrowser<T> />
-            </Box>
-          )}
+
         </Box>
         {mode.staging ? stagingView : tabView}
       </DetailContextProvider>
