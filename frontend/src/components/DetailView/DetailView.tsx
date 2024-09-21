@@ -145,16 +145,18 @@ export const DetailView = <T extends object>({
     <Stack rowGap={2}>
       <DetailContextProvider contextState={initialState}>
         {!isUserPage && (
-            <Box >
-              <DetailBrowser<T> />
-            </Box>
-          )}
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignContent: 'space-between', marginTop: 'auto' }}>
+          <Box>
+            <DetailBrowser<T> />
+          </Box>
+        )}
+        <Box
+          sx={{ display: 'flex', justifyContent: 'space-between', alignContent: 'space-between', marginTop: 'auto' }}
+        >
           <Box sx={{ display: 'flex' }} gap={3}>
             {!isUserPage && <ReturnButton />}
           </Box>
           <Box sx={{ display: 'flex' }} gap={1}>
-          {editRights.edit && !mode.staging && !initialState.mode.new && (
+            {editRights.edit && !mode.staging && !initialState.mode.new && (
               <Button
                 id="edit-button"
                 onClick={() => setMode(!mode.read ? 'read' : 'edit')}
@@ -165,7 +167,7 @@ export const DetailView = <T extends object>({
               </Button>
             )}
             {editRights.delete && !isNew && (
-              <Button onClick={onDelete} variant="contained" sx={{ width: '8em', color: 'white'}} color='error'>
+              <Button onClick={onDelete} variant="contained" sx={{ width: '8em', color: 'white' }} color="error">
                 Delete
               </Button>
             )}
@@ -173,7 +175,6 @@ export const DetailView = <T extends object>({
               <WriteButton onWrite={onWrite} hasStagingMode={hasStagingMode} />
             )}
           </Box>
-
         </Box>
         {mode.staging ? stagingView : tabView}
       </DetailContextProvider>
