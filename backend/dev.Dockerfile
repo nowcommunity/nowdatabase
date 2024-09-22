@@ -15,10 +15,11 @@ COPY --chown=node ./backend/prisma/schema_log.prisma backend
 WORKDIR /usr/src/app/backend
 
 RUN npm ci
-RUN npm run prisma
 
 # Be careful with this! Copying local node_modules makes bcrypt.hash fail silently with exit 139!!
 # (incompatible libc versions)
 COPY --chown=node ./backend .
+
+RUN npm run prisma
 
 CMD ["npm", "run", "dev"]
