@@ -12,6 +12,39 @@
 + Don't forget to close your issue and to tag the pull request in the issue by just adding #PR_NUMBER. Also move the task on GH Projects to "Done".
 + Repeat.
 
+**Backlog and taskboard**
+This is for contributors that have access to the nowdatabase Github Project.
+
+Creating issues.
+
++ Come up with a feature / find a bug
++ In case of a feature, write an user story for it. / Bugs => Write an issue that clearly describes what happens, when it happens and under what circumstances it happens.
++ Create an issue to nowdatabase repo that has the user story / short description of the bug as the title.
++ Next think of smaller tasks that need to be done in order to implement the wanted feature / fix the bug. Don't forget to add tests as a task!
++ Now create issues for those tasks too. If there is relevant information regarding the task, it can be written to the description or added as a comment under the issue. *Hint, take note of the issue numbers that Github automatically assigns.*
++ Create a checkbox by typing `- [ ]` and link the tasks to the user story / bug issue by referencing the issue by it's number: `#1234`. With the example issue number we would get: `- [ ] #1234`.
+
+Now the issue is ready for the backlog and the taskboard.
+
++ Open the original user story / bug issue and look to the menu on the right and find a section `Projects` and under that `nowdatabase`.
++ Click on the arrow that expands the view to include all of the fields available on the Github Project. _Don't go to the Github Projects website yet._
++ Set the priority, size and category according to the issue at hand.
++ Do this for all tasks listed in the issue.
++ After that all of the issues should end up to the Github Project `nowdatabase`. All of the issues should be seen on the `Product backlog`, User storys on `Backlog` and Tasks on `Taskboard`.
+
+During sprint planning.
+
++ In `Backlog` move all of the selected user stories to `Sprint Backlog` and set the `Iteration` field to the current sprint.
++ Do this also for all of the tasks and bug reports.
+
+Handling the Project while developing.
+
++ When you start work on an user story / bug, change the matching entries on `Backlog` and `Taskboard` to `In Progress`. You can also assign the user story / bug / task to yourself by clicking on the entry and by selecting yourself on the `Assignees` field on the right.
++ When you finish a task, move it straght to `Done`.
++ User story can be moved to `Done` when all of the tasks and tests are done for that story.
++ All user stories that have been demoed approved by the client are moved to the `Approved`
+
+
 **Tests & linting**
 
 Dynamic tests
