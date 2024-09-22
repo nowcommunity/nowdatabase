@@ -16,7 +16,7 @@ export const DetailBrowser = <T extends object>() => {
   const previousIndex = currentIndex - 1
   const style = {
     width: '18em',
-    marginLeft: '1em',
+    marginLeft: '0em',
     overflow: 'hidden',
     whiteSpace: 'nowrap',
     textOverflow: 'ellipsis',
@@ -45,8 +45,8 @@ export const DetailBrowser = <T extends object>() => {
   return (
     <Box
       sx={{
-        alignItems: 'center',
-        justifyContent: 'center',
+        alignItems: 'left',
+        justifyContent: 'space-between',
         height: '100%',
         display: 'flex',
         gap: '1em',
