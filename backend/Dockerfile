@@ -21,6 +21,7 @@ WORKDIR /usr/src/app/backend
 
 RUN npm ci
 
+# Be careful with this! Copying local node_modules makes bcrypt.hash fail silently with exit 139!!
 COPY --chown=node backend .
 RUN npm run prisma
 RUN npm run build
