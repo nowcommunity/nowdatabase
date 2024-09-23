@@ -62,12 +62,17 @@ export const PersonTable = ({ selectorFn }: { selectorFn?: (id: PersonDetailsTyp
     []
   )
 
+  const hiddenColumns = {
+    id: false,
+  }
+
   return (
     <TableView<PersonDetailsType>
       title="People"
       selectorFn={selectorFn}
       idFieldName="initials"
       columns={columns}
+      hiddenColumns={hiddenColumns}
       data={personQuery.data}
       url="person"
     />

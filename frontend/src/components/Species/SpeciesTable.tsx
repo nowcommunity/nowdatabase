@@ -63,12 +63,18 @@ export const SpeciesTable = ({ selectorFn }: { selectorFn?: (id: Species) => voi
     []
   )
 
+  const hiddenColumns = {
+    name: false,
+    id: false,
+  }
+
   return (
     <TableView<Species>
       title="Species"
       selectorFn={selectorFn}
       idFieldName="species_id"
       columns={columns}
+      hiddenColumns={hiddenColumns}
       data={speciesQuery.data}
       url="species"
     />

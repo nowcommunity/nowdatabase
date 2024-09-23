@@ -37,12 +37,17 @@ export const ProjectTable = ({ selectorFn }: { selectorFn?: (id: Project) => voi
     []
   )
 
+  const hiddenColumns = {
+    id: false,
+  }
+
   return (
     <TableView<Project>
       title="Projects"
       selectorFn={selectorFn}
       idFieldName="pid"
       columns={columns}
+      hiddenColumns={hiddenColumns}
       data={projectQuery.data}
       url="project"
     />

@@ -40,12 +40,17 @@ export const TimeUnitTable = ({ selectorFn }: { selectorFn?: (newTimeUnit: TimeU
     []
   )
 
+  const hiddenColumns = {
+    id: false,
+  }
+
   return (
     <TableView<TimeUnit>
       title="Time units"
       selectorFn={selectorFn}
       idFieldName="tu_name"
       columns={columns}
+      hiddenColumns={hiddenColumns}
       data={time_unitQuery.data}
       url="time-unit"
     />

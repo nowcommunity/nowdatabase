@@ -42,6 +42,10 @@ export const SelectingTable = <T extends MRT_RowData, ParentType extends object>
     return new Set(selectedItems.map(item => item[idFieldName] as T))
   }, [selectedItems, idFieldName])
 
+  const hiddenColumns = {
+    id: false,
+  }
+
   const filteredData = useMemo(() => {
     if (!data) return []
     return data.filter(row => {
@@ -58,6 +62,7 @@ export const SelectingTable = <T extends MRT_RowData, ParentType extends object>
         <TableView<T>
           data={filteredData}
           columns={columns}
+          hiddenColumns={hiddenColumns}
           selectorFn={editingAction ?? defaultEditingAction}
           idFieldName={idFieldName}
         />

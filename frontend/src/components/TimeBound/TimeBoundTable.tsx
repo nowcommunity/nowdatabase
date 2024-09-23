@@ -30,12 +30,18 @@ export const TimeBoundTable = ({ selectorFn }: { selectorFn?: (newTimeBound: Tim
     ],
     []
   )
+
+  const hiddenColumns = {
+    id: false,
+  }
+
   return (
     <TableView<TimeBound>
       title="Time bounds"
       selectorFn={selectorFn}
       idFieldName="bid"
       columns={columns}
+      hiddenColumns={hiddenColumns}
       data={time_boundQuery.data}
       url="time-bound"
     />
