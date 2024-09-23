@@ -1,0 +1,78 @@
+# For running tests with anonymous data, github actions utilize this
+services:
+  frontend:
+    container_name: nowdb-frontend-test
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        BACKEND_URL: http://backend:4000
+        ENABLE_WRITE: true
+        RUNNING_ENV: dev
+    ports:
+      - 127.0.0.1:5173:5173
+    env_file: .anon.env
+
+  backend:
+    container_name: nowdb-backend-test
+    depends_on:
+      db-anon:
+        condition: service_healthy
+    env_file: .anon.env
+    ports:
+      - 127.0.0.1:4000:4000
+    build:
+      context: .
+      dockerfile: ./backend/Dockerfile
+      target: node-run
+    healthcheck:
+      test: curl -f http://localhost:4000/test/ping || exit 1
+      start_period: 10s
+      interval: 5s
+      retries: 10
+      timeout: 15s
+
+  api-tests:
+    container_name: nowdb-api-tests-test
+    depends_on:
+      db-anon:
+        condition: service_healthy
+      backend:
+        condition: service_healthy
+    environment:
+      API_TESTS_BASEURL: http://backend:4000
+    build:
+      context: .
+      dockerfile: ./backend/Dockerfile
+      target: api-tests
+
+  e2e-tests:
+    container_name: nowdb-e2e-tests
+    image: "cypress/included:13.14.2"
+    depends_on:
+      db-anon:
+        condition: service_healthy
+      backend:
+        condition: service_healthy
+    entrypoint: cypress
+    command: run --browser chrome
+    working_dir: /e2e
+    volumes:
+      - ./:/e2e
+    environment:
+      CYPRESS_baseUrl: "http://frontend:5173"
+
+  db-anon:
+    container_name: nowdb-db-anon
+    image: mariadb:11.4.3
+    env_file: .anon.env
+    volumes:
+      - ./test_data/:/docker-entrypoint-initdb.d
+    ports:
+      - 127.0.0.1:3306:3306
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      start_period: 10s
+      interval: 10s
+      timeout: 5s
+      retries: 3

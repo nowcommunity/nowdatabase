@@ -2,25 +2,32 @@
 services:
   frontend:
     container_name: nowdb-frontend-anon
-    image: node:20-alpine3.16
-    volumes:
-      - ./frontend/:/usr/src/app
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
     ports:
       - 127.0.0.1:5173:5173
     env_file: .anon.env
-    command: >
-        sh -c "cd /usr/src/app && npm ci && npm run dev -- --host"
+
   backend:
     container_name: nowdb-backend-anon
-    image: node:20-alpine3.16
+    depends_on:
+      db-anon:
+        condition: service_healthy
     env_file: .anon.env
-    volumes:
-      - ./backend/:/usr/src/app/backend/
-      - ./frontend/src/:/usr/src/app/frontend/src/
     ports:
       - 127.0.0.1:4000:4000
-    command: >
-        sh -c "cd /usr/src/app/backend && npm ci && npm run dev"
+    build:
+      context: .
+      dockerfile: ./backend/Dockerfile
+      target: node-run
+    healthcheck:
+      test: curl -f http://localhost:4000/test/ping || exit 1
+      start_period: 10s
+      interval: 30s
+      retries: 3
+      timeout: 15s
+
   db-anon:
     container_name: nowdb-db-anon
     image: mariadb:11.4.3
@@ -30,6 +37,12 @@ services:
       - nowdb-db-anon:/var/lib/mysql/data
     ports:
       - 127.0.0.1:3306:3306
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      start_period: 10s
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
 volumes:
   nowdb-db-anon:
-

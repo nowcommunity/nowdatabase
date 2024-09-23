@@ -2,11 +2,14 @@ FROM node:20-alpine3.19
 
 ENV TZ="Europe/Helsinki"
 
+USER node
 WORKDIR /usr/src/app
 
-COPY package.json ./
+COPY --chown=node package.json ./
+COPY --chown=node package-lock.json ./
+RUN npm ci
 
-COPY package-lock.json ./
+COPY --chown=node . .
 
 EXPOSE 5173
 
