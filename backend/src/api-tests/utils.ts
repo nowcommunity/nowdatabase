@@ -3,7 +3,7 @@ import { UpdateLog } from '../../../frontend/src/backendTypes'
 import { LogRow } from '../services/write/writeOperations/types'
 
 let token: string | null = null
-const baseUrl = 'http://localhost:4000'
+const baseUrl = process.env.API_TESTS_BASEURL ?? 'http://localhost:4000'
 
 export const send = async <T extends Record<string, unknown>>(
   path: string,

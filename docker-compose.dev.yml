@@ -6,21 +6,23 @@ services:
       context: ./frontend
       dockerfile: ./dev.Dockerfile
     volumes:
-      - ./frontend/:/usr/src/app
+      - ./frontend/src:/usr/src/app/src
     ports:
       - 127.0.0.1:5173:5173
     env_file: .dev.env
+
   backend-dev:
     container_name: nowdb-backend-dev
     build:
       context: .
       dockerfile: ./backend/dev.Dockerfile
     volumes:
-      - ./backend/:/usr/src/app/backend/
+      - ./backend/src:/usr/src/app/backend/src
       - ./frontend/src/:/usr/src/app/frontend/src/
     ports:
       - 127.0.0.1:4000:4000
     env_file: .dev.env
+
   db:
     container_name: nowdb-db-dev
     image: mariadb:11.4.3
@@ -30,6 +32,7 @@ services:
       - nowdb-db:/var/lib/mysql/data
     ports:
       - 127.0.0.1:3306:3306
+
 volumes:
   nowdb-db:
 
