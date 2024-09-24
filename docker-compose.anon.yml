@@ -5,6 +5,8 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile
+      args:
+        ENABLE_WRITE: true
     ports:
       - 127.0.0.1:5173:5173
     env_file: .anon.env
@@ -38,7 +40,7 @@ services:
     ports:
       - 127.0.0.1:3306:3306
     healthcheck:
-      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      test: [ "CMD", "healthcheck.sh", "--connect", "--innodb_initialized" ]
       start_period: 10s
       interval: 10s
       timeout: 5s
