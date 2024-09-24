@@ -6,7 +6,7 @@ import { referenceTableColumns } from '@/common'
 export const ReferenceTable = ({ selectorFn }: { selectorFn?: (id: Reference) => void }) => {
   const referenceQuery = useGetAllReferencesQuery()
 
-  const hiddenColumns = {
+  const visibleColumns = {
     id: false,
   }
 
@@ -16,7 +16,7 @@ export const ReferenceTable = ({ selectorFn }: { selectorFn?: (id: Reference) =>
       selectorFn={selectorFn}
       idFieldName="rid"
       columns={referenceTableColumns}
-      hiddenColumns={hiddenColumns}
+      visibleColumns={visibleColumns}
       data={referenceQuery.data}
       url="reference"
     />

@@ -23,7 +23,7 @@ export const SequenceTable = ({ selectorFn }: { selectorFn?: (id: Sequence) => v
     []
   )
 
-  const hiddenColumns = {
+  const visibleColumns = {
     id: false,
   }
 
@@ -32,7 +32,7 @@ export const SequenceTable = ({ selectorFn }: { selectorFn?: (id: Sequence) => v
       selectorFn={selectorFn}
       idFieldName="sequence"
       columns={columns}
-      hiddenColumns={hiddenColumns}
+      visibleColumns={visibleColumns}
       data={sequenceQuery.data}
       url="sequence"
     />

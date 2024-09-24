@@ -39,7 +39,7 @@ export const LocalityTable = ({ selectorFn }: { selectorFn?: (newObject: Localit
     []
   )
 
-  const hiddenColumns = {
+  const visibleColumns = {
     id: false,
   }
 
@@ -75,7 +75,7 @@ export const LocalityTable = ({ selectorFn }: { selectorFn?: (newObject: Localit
       checkRowRestriction={checkRowRestriction}
       idFieldName="lid"
       columns={columns}
-      hiddenColumns={hiddenColumns}
+      visibleColumns={visibleColumns}
       data={localitiesQuery.data}
       url="locality"
       combinedExport={combinedExport}

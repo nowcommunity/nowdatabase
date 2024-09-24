@@ -40,7 +40,7 @@ export const TimeUnitTable = ({ selectorFn }: { selectorFn?: (newTimeUnit: TimeU
     []
   )
 
-  const hiddenColumns = {
+  const visibleColumns = {
     id: false,
   }
 
@@ -50,7 +50,7 @@ export const TimeUnitTable = ({ selectorFn }: { selectorFn?: (newTimeUnit: TimeU
       selectorFn={selectorFn}
       idFieldName="tu_name"
       columns={columns}
-      hiddenColumns={hiddenColumns}
+      visibleColumns={visibleColumns}
       data={time_unitQuery.data}
       url="time-unit"
     />

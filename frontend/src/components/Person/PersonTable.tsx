@@ -62,7 +62,7 @@ export const PersonTable = ({ selectorFn }: { selectorFn?: (id: PersonDetailsTyp
     []
   )
 
-  const hiddenColumns = {
+  const visibleColumns = {
     id: false,
   }
 
@@ -72,7 +72,7 @@ export const PersonTable = ({ selectorFn }: { selectorFn?: (id: PersonDetailsTyp
       selectorFn={selectorFn}
       idFieldName="initials"
       columns={columns}
-      hiddenColumns={hiddenColumns}
+      visibleColumns={visibleColumns}
       data={personQuery.data}
       url="person"
     />

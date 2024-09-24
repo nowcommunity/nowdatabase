@@ -23,7 +23,7 @@ export const RegionTable = ({ selectorFn }: { selectorFn?: (id: Region) => void 
     []
   )
 
-  const hiddenColumns = {
+  const visibleColumns = {
     id: false,
   }
 
@@ -33,7 +33,7 @@ export const RegionTable = ({ selectorFn }: { selectorFn?: (id: Region) => void 
       selectorFn={selectorFn}
       idFieldName="reg_coord_id"
       columns={columns}
-      hiddenColumns={hiddenColumns}
+      visibleColumns={visibleColumns}
       data={regionQuery.data}
       url="region"
     />

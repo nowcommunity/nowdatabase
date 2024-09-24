@@ -37,7 +37,7 @@ export const ProjectTable = ({ selectorFn }: { selectorFn?: (id: Project) => voi
     []
   )
 
-  const hiddenColumns = {
+  const visibleColumns = {
     id: false,
   }
 
@@ -47,7 +47,7 @@ export const ProjectTable = ({ selectorFn }: { selectorFn?: (id: Project) => voi
       selectorFn={selectorFn}
       idFieldName="pid"
       columns={columns}
-      hiddenColumns={hiddenColumns}
+      visibleColumns={visibleColumns}
       data={projectQuery.data}
       url="project"
     />

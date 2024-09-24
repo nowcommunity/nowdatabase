@@ -30,7 +30,7 @@ const defaultPaginationSmall: MRT_PaginationState = { pageIndex: 0, pageSize: 10
 export const TableView = <T extends MRT_RowData>({
   data,
   columns,
-  hiddenColumns,
+  visibleColumns,
   idFieldName,
   checkRowRestriction,
   selectorFn,
@@ -42,7 +42,7 @@ export const TableView = <T extends MRT_RowData>({
   title?: string
   data: T[] | undefined
   columns: MRT_ColumnDef<T>[]
-  hiddenColumns: MRT_VisibilityState
+  visibleColumns: MRT_VisibilityState
   idFieldName: keyof T
   checkRowRestriction?: (row: T) => boolean
   selectorFn?: (id: T) => void
@@ -95,7 +95,7 @@ export const TableView = <T extends MRT_RowData>({
       density: 'compact',
     },
     initialState: {
-      columnVisibility: hiddenColumns, // HERE ERalfnkJAKFÖLCN!!!!!!!!!!!!!!!
+      columnVisibility: visibleColumns,
     },
     onColumnFiltersChange: setColumnFilters,
     renderRowActions: ({ row }) => <ActionComponent {...{ selectorFn, url, checkRowRestriction, row, idFieldName }} />,

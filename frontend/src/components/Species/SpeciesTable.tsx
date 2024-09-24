@@ -63,7 +63,7 @@ export const SpeciesTable = ({ selectorFn }: { selectorFn?: (id: Species) => voi
     []
   )
 
-  const hiddenColumns = {
+  const visibleColumns = {
     name: false,
     id: false,
   }
@@ -74,7 +74,7 @@ export const SpeciesTable = ({ selectorFn }: { selectorFn?: (id: Species) => voi
       selectorFn={selectorFn}
       idFieldName="species_id"
       columns={columns}
-      hiddenColumns={hiddenColumns}
+      visibleColumns={visibleColumns}
       data={speciesQuery.data}
       url="species"
     />
