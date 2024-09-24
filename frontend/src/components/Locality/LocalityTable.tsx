@@ -39,6 +39,10 @@ export const LocalityTable = ({ selectorFn }: { selectorFn?: (newObject: Localit
     []
   )
 
+  const visibleColumns = {
+    id: false,
+  }
+
   const combinedExport = async (lids: number[]) => {
     if (isLoading) {
       notify('Please wait for the last request to complete.', 'warning')
@@ -71,6 +75,7 @@ export const LocalityTable = ({ selectorFn }: { selectorFn?: (newObject: Localit
       checkRowRestriction={checkRowRestriction}
       idFieldName="lid"
       columns={columns}
+      visibleColumns={visibleColumns}
       data={localitiesQuery.data}
       url="locality"
       combinedExport={combinedExport}

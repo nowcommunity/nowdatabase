@@ -7,6 +7,7 @@ import {
   MRT_PaginationState,
   useMaterialReactTable,
   MaterialReactTable,
+  MRT_VisibilityState,
 } from 'material-react-table'
 import { Box, Button, CircularProgress, Divider, Paper, Tooltip, Typography } from '@mui/material'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
@@ -29,6 +30,7 @@ const defaultPaginationSmall: MRT_PaginationState = { pageIndex: 0, pageSize: 10
 export const TableView = <T extends MRT_RowData>({
   data,
   columns,
+  visibleColumns,
   idFieldName,
   checkRowRestriction,
   selectorFn,
@@ -40,6 +42,7 @@ export const TableView = <T extends MRT_RowData>({
   title?: string
   data: T[] | undefined
   columns: MRT_ColumnDef<T>[]
+  visibleColumns: MRT_VisibilityState
   idFieldName: keyof T
   checkRowRestriction?: (row: T) => boolean
   selectorFn?: (id: T) => void
@@ -92,7 +95,7 @@ export const TableView = <T extends MRT_RowData>({
       density: 'compact',
     },
     initialState: {
-      columnVisibility: { id: false },
+      columnVisibility: visibleColumns,
     },
     onColumnFiltersChange: setColumnFilters,
     renderRowActions: ({ row }) => <ActionComponent {...{ selectorFn, url, checkRowRestriction, row, idFieldName }} />,

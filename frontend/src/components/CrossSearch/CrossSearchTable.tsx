@@ -11,7 +11,7 @@ export const CrossSearchTable = ({ selectorFn }: { selectorFn?: (newObject: Cros
       {
         id: 'id',
         accessorKey: 'lid',
-        header: 'Id',
+        header: 'Location Id',
         size: 20,
       },
       {
@@ -81,6 +81,10 @@ export const CrossSearchTable = ({ selectorFn }: { selectorFn?: (newObject: Cros
     []
   )
 
+  const visibleColumns = {
+    id: false,
+  }
+
   const checkRowRestriction = (row: CrossSearch) => {
     return !!row.loc_status
   }
@@ -92,6 +96,7 @@ export const CrossSearchTable = ({ selectorFn }: { selectorFn?: (newObject: Cros
       checkRowRestriction={checkRowRestriction}
       idFieldName="lid"
       columns={columns}
+      visibleColumns={visibleColumns}
       data={CrossSearchQuery.data}
       url="crosssearch"
     />

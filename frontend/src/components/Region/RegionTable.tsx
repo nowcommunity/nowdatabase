@@ -23,12 +23,17 @@ export const RegionTable = ({ selectorFn }: { selectorFn?: (id: Region) => void 
     []
   )
 
+  const visibleColumns = {
+    id: false,
+  }
+
   return (
     <TableView<Region>
       title="Regions"
       selectorFn={selectorFn}
       idFieldName="reg_coord_id"
       columns={columns}
+      visibleColumns={visibleColumns}
       data={regionQuery.data}
       url="region"
     />

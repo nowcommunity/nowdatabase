@@ -23,11 +23,16 @@ export const SequenceTable = ({ selectorFn }: { selectorFn?: (id: Sequence) => v
     []
   )
 
+  const visibleColumns = {
+    id: false,
+  }
+
   return (
     <TableView<Sequence>
       selectorFn={selectorFn}
       idFieldName="sequence"
       columns={columns}
+      visibleColumns={visibleColumns}
       data={sequenceQuery.data}
       url="sequence"
     />
