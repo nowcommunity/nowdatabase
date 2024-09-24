@@ -4,7 +4,12 @@
 
 + [TableView](../frontend/src/components/TableView/TableView.tsx) is a generic component that takes in column definitions, data, and renders a [material-react-table (click for docs)](https://www.material-react-table.com/). It also handles the tables state management: for example saving column filters into url, and restoring them on first render.
 
-+ Each table have their columns defined in the components own file. For example the columns of Cross-search table are defined in frontend/src/components/CrossSearch/CrossSearchTable.tsx in the variable columns. The simplest definition is to give the column an accessorKey (to access the correct data) and a header. By default, columns are visible. User can toggle the visibility on/off via the interface. Column can be also hidden by default. For this it needs an id in addition to accessorKey and header. Each table also has a variable 'visibleColumns', in which columns can be referenced by their id and set 'false' to be hidden by default.
++ Each table have their columns defined in the components own file. For example the columns of Cross-search table are defined in frontend/src/components/CrossSearch/CrossSearchTable.tsx in the variable columns. The simplest definition is to give the column an accessorKey (to access the correct data) and a header. By default, columns are visible. User can toggle the visibility on/off via the interface. Columns can be also hidden by default. For this it needs an id in addition to accessorKey and header. Each table also has a variable 'visibleColumns', in which columns can be referenced by their id and set 'false' to be hidden by default.
+
+  ![image](https://github.com/user-attachments/assets/e6a2b5d5-e3de-4ecc-9918-e20f17b46366)
+![image](https://github.com/user-attachments/assets/15b71116-8581-4ee3-8393-67a2d878bb42)
+![image](https://github.com/user-attachments/assets/30b7f9d1-5979-4534-81e9-a8b3bd55cdae)
+
 
 + [DetailView](../frontend/src/components/DetailView/)-folder has components that are used by the detailed view: The view which allows looking at and editing a single data item, for example a locality. The DetailView-component is generic, allowing different data types to use it.
 
