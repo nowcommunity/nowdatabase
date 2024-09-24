@@ -1,4 +1,5 @@
 import { beforeEach, describe, it, expect } from '@jest/globals'
+import { CrossSearchListType } from '../../../../frontend/src/backendTypes'
 import { login, send } from '../utils'
 
 describe('Getting cross-search data works', () => {
@@ -13,7 +14,7 @@ describe('Getting cross-search data works', () => {
   })
 
   it('Get all has some correct fields from locality and species', async () => {
-    const { body: getReqBody } = await send(`crosssearch/all`, 'GET')
+    const { body: getReqBody } = await send<CrossSearchListType>(`crosssearch/all`, 'GET')
     expect(getReqBody[0]).toHaveProperty('lid')
     expect(getReqBody[0]).toHaveProperty('loc_name')
     expect(getReqBody[0]).toHaveProperty('subclass_or_superorder_name')
@@ -22,7 +23,7 @@ describe('Getting cross-search data works', () => {
   })
 
   it('Requesting get all has some correct fields', async () => {
-    const { body: getReqBody } = await send(`crosssearch/all`, 'GET')
+    const { body: getReqBody } = await send<CrossSearchListType>(`crosssearch/all`, 'GET')
     expect(getReqBody[0].lid).toEqual(21050)
     expect(getReqBody[0].loc_name).toEqual('Dmanisi')
     expect(getReqBody[0].subclass_or_superorder_name).toEqual('Eutheria')
@@ -30,13 +31,13 @@ describe('Getting cross-search data works', () => {
   })
 
   it("Get all doesn't have a species that doesn't have locality", async () => {
-    const { body: getReqBody } = await send(`crosssearch/all`, 'GET')
+    const { body: getReqBody } = await send<CrossSearchListType>(`crosssearch/all`, 'GET')
     const specieslist = getReqBody.map(e => e.species_name)
     expect(specieslist).not.toContain('legidensis')
   })
 
   it("Get all doesn't have a locality that doesn't have species", async () => {
-    const { body: getReqBody } = await send(`crosssearch/all`, 'GET')
+    const { body: getReqBody } = await send<CrossSearchListType>(`crosssearch/all`, 'GET')
     const loclist = getReqBody.map(e => e.loc_name)
     expect(loclist).not.toContain('Lantian-Shuijiazui')
   })
