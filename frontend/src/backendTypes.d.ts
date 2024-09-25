@@ -108,9 +108,45 @@ export type CrossSearch = {
   bfa_min: string | null
   max_age: number
   min_age: number
-  country: string | null
+  bfa_max_abs: string | null
+  bfa_min_abs: string | null
+  frac_max: string | null
+  frac_min: string | null
+  chron: string | null
+  basin: string | null
+  subbasin: string | null
+  dms_lat: string | null
+  dms_long: string | null
+  dec_lat: number
+  dec_long: number
+  altitude: number
+  country: string
+  state: string | null
+  county: string | null
+  site_area: string | null
+  gen_loc: string | null
+  plate: string | null
+  formation: string | null
+  member: string | null
+  bed: string | null
   loc_status: boolean | null
-  now_ls: Array<Species>
+  species_id: number
+  order_name: string
+  family_name: string
+  subclass_or_superorder_name: string | null
+  suborder_or_superfamily_name: string | null
+  subfamily_name: string | null
+  genus_name: string
+  species_name: string
+  unique_identifier: string
+  taxonomic_status: string
+  common_name: string | null
+  sp_author: string | null
+  strain: string | null
+  gene: string | null
+  body_mass: number | null
+  brain_mass: number | null
+  sp_status: boolean | null
 }
 
 export type Sequence = Prisma.now_tu_sequence

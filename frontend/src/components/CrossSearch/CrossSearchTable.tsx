@@ -11,7 +11,7 @@ export const CrossSearchTable = ({ selectorFn }: { selectorFn?: (newObject: Cros
       {
         id: 'id',
         accessorKey: 'lid',
-        header: 'Location Id',
+        header: 'Id',
         size: 20,
       },
       {
@@ -23,6 +23,24 @@ export const CrossSearchTable = ({ selectorFn }: { selectorFn?: (newObject: Cros
         header: 'Country',
       },
       {
+        accessorKey: 'state',
+        header: 'State',
+      },
+      {
+        accessorKey: 'county',
+        header: 'County',
+      },
+      {
+        accessorKey: 'bfa_max',
+        header: 'BFA max',
+        filterVariant: 'range',
+      },
+      {
+        accessorKey: 'bfa_min',
+        header: 'BFA min',
+        filterVariant: 'range',
+      },
+      {
         accessorKey: 'max_age',
         header: 'Max age',
         filterVariant: 'range',
@@ -31,6 +49,77 @@ export const CrossSearchTable = ({ selectorFn }: { selectorFn?: (newObject: Cros
         accessorKey: 'min_age',
         header: 'Min age',
         filterVariant: 'range',
+      },
+      {
+        accessorKey: 'frac_max',
+        header: 'Frac max',
+      },
+      {
+        accessorKey: 'frac_min',
+        header: 'Frac min',
+      },
+      {
+        accessorKey: 'chron',
+        header: 'Chron',
+      },
+      {
+        accessorKey: 'basin',
+        header: 'Basin',
+      },
+      {
+        accessorKey: 'subbasin',
+        header: 'Subbasin',
+      },
+      {
+        accessorKey: 'dms_lat',
+        header: 'DMS lat',
+      },
+      {
+        accessorKey: 'dms_long',
+        header: 'DMS long',
+      },
+      {
+        accessorKey: 'dec_lat',
+        header: 'Dec lat',
+        filterVariant: 'range',
+      },
+      {
+        accessorKey: 'dec_long',
+        header: 'Dec long',
+        filterVariant: 'range',
+      },
+      {
+        accessorKey: 'altitude',
+        header: 'Altitude',
+      },
+      {
+        accessorKey: 'site_area',
+        header: 'Site area',
+      },
+      {
+        accessorKey: 'gen_loc',
+        header: 'Gen locality',
+      },
+      {
+        accessorKey: 'plate',
+        header: 'Plate',
+      },
+      {
+        accessorKey: 'formation',
+        header: 'Formation',
+      },
+      {
+        accessorKey: 'member',
+        header: 'Member',
+      },
+      {
+        accessorKey: 'bed',
+        header: 'Bed',
+      },
+      {
+        accessorKey: 'species_id',
+        header: 'Id',
+        size: 20,
       },
       {
         accessorKey: 'subclass_or_superorder_name',
@@ -77,12 +166,80 @@ export const CrossSearchTable = ({ selectorFn }: { selectorFn?: (newObject: Cros
         header: 'Taxonomic Status',
         size: 20,
       },
+      {
+        accessorKey: 'common_name',
+        header: 'Common Name',
+        size: 20,
+      },
+      {
+        accessorKey: 'sp_author',
+        header: 'Author',
+        size: 20,
+      },
+      {
+        accessorKey: 'strain',
+        header: 'Strain',
+        size: 20,
+      },
+      {
+        accessorKey: 'gene',
+        header: 'Gene',
+        size: 20,
+      },
+      {
+        accessorKey: 'body_mass',
+        header: 'Body Mass',
+        size: 20,
+      },
+      {
+        accessorKey: 'brain_mass',
+        header: 'Brain Mass',
+        size: 20,
+      },
     ],
     []
   )
 
   const visibleColumns = {
     id: false,
+    bfa_max: false,
+    bfa_min: false,
+    max_age: false,
+    min_age: false,
+    bfa_max_abs: false,
+    bfa_min_abs: false,
+    frac_max: false,
+    frac_min: false,
+    chron: false,
+    basin: false,
+    subbasin: false,
+    dms_lat: false,
+    dms_long: false,
+    dec_lat: false,
+    dec_long: false,
+    altitude: false,
+    state: false,
+    county: false,
+    site_area: false,
+    gen_loc: false,
+    plate: false,
+    formation: false,
+    member: false,
+    bed: false,
+    species_id: false,
+    subclass_or_superorder_name: false,
+    order_name: false,
+    suborder_or_superfamily_name: false,
+    family_name: false,
+    subfamily_name: false,
+    unique_identifier: false,
+    taxonomic_status: false,
+    common_name: false,
+    sp_author: false,
+    strain: false,
+    gene: false,
+    body_mass: false,
+    brain_mass: false,
   }
 
   const checkRowRestriction = (row: CrossSearch) => {
