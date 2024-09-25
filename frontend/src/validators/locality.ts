@@ -43,6 +43,10 @@ export const validateLocality = (
     dec_lat: {
       name: 'Latitude',
       required: true,
+      asNumber: (num: number) => {
+        if (num < -90 || num > 90) return 'Latitude dec must be between -90 and 90'
+        return
+      },
     },
     dms_long: {
       name: 'Longitude',
@@ -51,6 +55,10 @@ export const validateLocality = (
     dec_long: {
       name: 'Latitude',
       required: true,
+      asNumber: (num: number) => {
+        if (num < -180 || num > 180) return 'Longitude dec must be between -180 and 180'
+        return
+      },
     },
   }
 
