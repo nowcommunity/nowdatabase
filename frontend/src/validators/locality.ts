@@ -42,11 +42,11 @@ export const validateLocality = (
       name: 'Dating method',
     },
     dms_lat: {
-      name: 'Latitude',
+      name: 'Latitude (dms)',
       required: true,
     },
     dec_lat: {
-      name: 'Latitude',
+      name: 'Latitude (dec)',
       required: true,
       asNumber: (num: number) => {
         if (num < -90 || num > 90) return 'Latitude dec must be between -90 and 90'
@@ -54,11 +54,11 @@ export const validateLocality = (
       },
     },
     dms_long: {
-      name: 'Longitude',
+      name: 'Longitude (dms)',
       required: true,
     },
     dec_long: {
-      name: 'Latitude',
+      name: 'Longitude (dec)',
       required: true,
       asNumber: (num: number) => {
         if (num < -180 || num > 180) return 'Longitude dec must be between -180 and 180'

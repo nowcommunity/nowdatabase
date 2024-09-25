@@ -51,8 +51,8 @@ export const LocalityTab = () => {
   ]
   const latlong = [
     ['', 'dms', 'dec'],
-    ['Latitude', textField('dms_lat'), textField('dec_lat')],
-    ['Longitude', textField('dms_long'), textField('dec_long')],
+    ['Latitude', textField('dms_lat'), textField('dec_lat', { type: 'number' })],
+    ['Longitude', textField('dms_long'), textField('dec_long', { type: 'number' })],
     ['Approximate Coordinates', dropdown('approx_coord', approximateCoordinatesOptions, 'Approximate Coordinates')],
     ['Altitude (m)', textField('altitude')],
   ]
