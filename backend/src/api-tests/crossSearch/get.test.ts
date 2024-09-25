@@ -1,8 +1,11 @@
-import { describe, it, expect } from '@jest/globals'
+import { beforeAll, describe, it, expect } from '@jest/globals'
 import { CrossSearch } from '../../../../frontend/src/backendTypes'
-import { send } from '../utils'
+import { resetDatabase, send } from '../utils'
 
 describe('Getting cross-search data works', () => {
+  beforeAll(async () => {
+    await resetDatabase()
+  })
   it('Requesting get all has correct length and status code', async () => {
     const { body: getReqBody, status: getReqStatus } = await send(`crosssearch/all`, 'GET')
     expect(getReqStatus).toEqual(200)

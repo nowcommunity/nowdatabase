@@ -1,12 +1,15 @@
-import { beforeEach, describe, it, expect } from '@jest/globals'
+import { beforeEach, beforeAll, describe, it, expect } from '@jest/globals'
 import { LogRow } from '../../services/write/writeOperations/types'
-import { login, send, testLogRows } from '../utils'
+import { login, resetDatabase, send, testLogRows } from '../utils'
 import { newTimeBoundBasis } from './data'
 import { TimeBoundDetailsType } from '../../../../frontend/src/backendTypes'
 
 let createdTimeBound: TimeBoundDetailsType | null = null
 
 describe.only('Creating new time bound works', () => {
+  beforeAll(async () => {
+    await resetDatabase()
+  })
   beforeEach(async () => {
     await login()
   })
