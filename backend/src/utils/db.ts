@@ -5,6 +5,10 @@ import { PrismaClient as LogClient } from '../../prisma/generated/now_log_test_c
 import mariadb from 'mariadb'
 import { MARIADB_HOST, MARIADB_PASSWORD, DB_CONNECTION_LIMIT, MARIADB_USER } from './config'
 
+import { readFile } from "fs/promises"
+import { PathLike } from "fs"
+import { RUNNING_ENV } from "../utils/config"
+
 export const logDb = new LogClient()
 export const nowDb = new NowClient()
 
@@ -66,4 +70,44 @@ export const testDbConnection = async () => {
     await sleep(4000)
   }
   logger.error(`Attempted ${maxAttempts} times, but database connection could not be established`)
+}
+
+export const resetTestDb = async () => {
+    if (RUNNING_ENV === "prod")
+        throw new Error(`Trying to reset test database with RUNNING_ENV ${RUNNING_ENV}`)
+    const testPool = mariadb.createPool({
+      host: MARIADB_HOST,
+      password: MARIADB_PASSWORD,
+      user: MARIADB_USER,
+      connectionLimit: parseInt(DB_CONNECTION_LIMIT),
+      checkDuplicate: false,
+      multipleStatements: true
+    })
+
+    const conn = await testPool.getConnection()
+
+    logger.info(`Current dir: ${process.cwd()}`)
+    const fileContentsNowTest = await readSqlFile("../test_data/sqlfiles/now_test.sql")
+    const fileContentsNowLogTest = await readSqlFile("../test_data/sqlfiles/now_log_test.sql")
+
+    if (!fileContentsNowTest || !fileContentsNowLogTest) {
+        logger.error("Couldn't open sqlfiles")
+        return
+    }
+
+    await conn.query(fileContentsNowTest);
+    await conn.query(fileContentsNowLogTest);
+    return "";
+}
+
+const readSqlFile = async (filename: PathLike): Promise<string | undefined> => {
+    try{
+        const fileContents = await readFile(filename, "utf8");
+        // logger.info(`Opened file and got: ${fileContents}`)
+        return fileContents
+
+    } catch (e) {
+        logger.error(`Couldn't open file ${filename}: ${e}`);
+        return
+    }
 }

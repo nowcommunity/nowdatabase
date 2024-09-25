@@ -23,6 +23,8 @@ services:
       context: .
       dockerfile: ./backend/Dockerfile
       target: node-run
+    volumes:
+      - ./test_data:/usr/src/app/test_data
     healthcheck:
       test: curl -f http://localhost:4000/test/ping || exit 1
       start_period: 10s
