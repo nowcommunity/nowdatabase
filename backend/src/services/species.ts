@@ -15,6 +15,12 @@ export const getAllSpecies = async () => {
       species_name: true,
       unique_identifier: true,
       taxonomic_status: true,
+      common_name: true,
+      sp_author: true,
+      strain: true,
+      gene: true,
+      body_mass: true,
+      brain_mass: true,
       sp_status: true,
     },
   })
