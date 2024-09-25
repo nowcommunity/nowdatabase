@@ -12,6 +12,7 @@ export const validateLocality = (
       required: true,
       asNumber: (num: number) => {
         if (editData.min_age && num < editData.min_age) return 'Max value cannot be lower than min'
+        if (num < 0) return 'Max value must be a positive real value'
         return
       },
     },
@@ -20,6 +21,7 @@ export const validateLocality = (
       required: true,
       asNumber: (num: number) => {
         if (editData.max_age && num > editData.max_age) return 'Min value cannot be higher than max'
+        if (num < 0) return 'Min value must be a positive real value'
         return
       },
     },
@@ -33,6 +35,22 @@ export const validateLocality = (
     },
     date_meth: {
       name: 'Dating method',
+    },
+    dms_lat: {
+      name: 'Latitude',
+      required: true,
+    },
+    dec_lat: {
+      name: 'Latitude',
+      required: true,
+    },
+    dms_long: {
+      name: 'Longitude',
+      required: true,
+    },
+    dec_long: {
+      name: 'Latitude',
+      required: true,
     },
   }
 
