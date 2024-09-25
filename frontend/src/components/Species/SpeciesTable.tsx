@@ -3,13 +3,13 @@ import { type MRT_ColumnDef } from 'material-react-table'
 import { useGetAllSpeciesQuery } from '../../redux/speciesReducer'
 import { Species } from '@/backendTypes'
 import { TableView } from '../TableView/TableView'
+import { uniq } from 'lodash-es'
 
 export const SpeciesTable = ({ selectorFn }: { selectorFn?: (id: Species) => void }) => {
   const speciesQuery = useGetAllSpeciesQuery()
   const columns = useMemo<MRT_ColumnDef<Species>[]>(
     () => [
       {
-        id: 'id',
         accessorKey: 'species_id',
         header: 'Id',
         size: 20,
@@ -89,16 +89,14 @@ export const SpeciesTable = ({ selectorFn }: { selectorFn?: (id: Species) => voi
         header: 'Brain Mass',
         size: 20,
       },
-      {
-        accessorKey: 'sp_status',
-        header: 'Status',
-      }
     ],
     []
   )
 
   const visibleColumns = {
-    id: false,
+    species_id: false,
+    unique_identifier: false,
+    taxonomic_status: false,
     common_name: false,
     sp_author: false,
     strain: false,
