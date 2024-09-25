@@ -18,12 +18,32 @@ const getIdsOfUsersProjects = async (user: User) => {
 
 type LocalityListType = {
   lid: number
+  loc_name: string
   bfa_max: string | null
   bfa_min: string | null
-  loc_name: string
   max_age: number
   min_age: number
-  country: string | null
+  bfa_max_abs: string | null
+  bfa_min_abs: string | null
+  frac_max: string | null
+  frac_min: string | null
+  chron: string | null
+  basin: string | null
+  subbasin: string | null
+  dms_lat: string | null
+  dms_long: string | null
+  dec_lat: number
+  dec_long: number
+  altitude: string | null
+  country: string
+  state: string | null
+  county: string | null
+  site_area: string | null
+  gen_loc: string | null
+  plate: string | null
+  formation: string | null
+  member: string | null
+  bed: string | null
   loc_status: boolean | null
   now_plr: {
     pid: number
@@ -38,7 +58,7 @@ export const getAllLocalities = async (user?: User) => {
     return rest
   }
 
-  const result = await nowDb.now_loc.findMany({
+  const result = (await nowDb.now_loc.findMany({
     select: {
       lid: true,
       loc_name: true,
@@ -46,13 +66,33 @@ export const getAllLocalities = async (user?: User) => {
       bfa_min: true,
       max_age: true,
       min_age: true,
+      bfa_max_abs: true,
+      bfa_min_abs: true,
+      frac_max: true,
+      frac_min: true,
+      chron: true,
+      basin: true,
+      subbasin: true,
+      dms_lat: true,
+      dms_long: true,
+      dec_lat: true,
+      dec_long: true,
+      altitude: true,
       country: true,
+      state: true,
+      county: true,
+      site_area: true,
+      gen_loc: true,
+      plate: true,
+      formation: true,
+      member: true,
+      bed: true,
       loc_status: true,
       now_plr: {
         select: { pid: true },
       },
     },
-  })
+  })) as LocalityListType[]
 
   if (showAll) return result.map(removeProjects)
 
