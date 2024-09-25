@@ -72,36 +72,43 @@ export const testDbConnection = async () => {
   logger.error(`Attempted ${maxAttempts} times, but database connection could not be established`)
 }
 
+// TODO this is very slow to execute, around 4500ms each time. Not good...
 export const resetTestDb = async () => {
-    if (RUNNING_ENV === "prod")
+    if (RUNNING_ENV !== "dev")
         throw new Error(`Trying to reset test database with RUNNING_ENV ${RUNNING_ENV}`)
-    const testPool = mariadb.createPool({
-      host: MARIADB_HOST,
-      password: MARIADB_PASSWORD,
-      user: MARIADB_USER,
-      connectionLimit: parseInt(DB_CONNECTION_LIMIT),
-      checkDuplicate: false,
-      multipleStatements: true
-    })
 
-    const conn = await testPool.getConnection()
+    const createTestConnection = (dbName: string) => {
+      return mariadb.createConnection({
+          host: MARIADB_HOST,
+          password: process.env.MARIADB_ROOT_PASSWORD,
+          user: "root",
+          checkDuplicate: false,
+          multipleStatements: true,
+          database: dbName
+        })
+    }
 
-    logger.info(`Current dir: ${process.cwd()}`)
+    const connNow = await createTestConnection("now_test")
+    const connLog = await createTestConnection("now_log_test")
+
     const fileContentsNowTest = await readSqlFile("../test_data/sqlfiles/now_test.sql")
     const fileContentsNowLogTest = await readSqlFile("../test_data/sqlfiles/now_log_test.sql")
 
     if (!fileContentsNowTest || !fileContentsNowLogTest) {
-        logger.error("Couldn't open sqlfiles")
-        return
+        throw new Error("Sqlfiles not found")
     }
 
-    await conn.query(fileContentsNowTest);
-    await conn.query(fileContentsNowLogTest);
-    return "";
+    await connNow.query(fileContentsNowTest);
+    await connLog.query(fileContentsNowLogTest);
+
+    await connNow.end();
+    await connLog.end();
+
+    return;
 }
 
 const readSqlFile = async (filename: PathLike): Promise<string | undefined> => {
-    try{
+    try {
         const fileContents = await readFile(filename, "utf8");
         // logger.info(`Opened file and got: ${fileContents}`)
         return fileContents
