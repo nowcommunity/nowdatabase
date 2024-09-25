@@ -8,7 +8,7 @@ export const BoundTab = () => {
   const bound = [
     ['Bound Id', data.bid],
     ['Name', textField('b_name')],
-    ['Age (Ma)', textField('age')],
+    ['Age (Ma)', textField('age', { type: 'number' })],
     ['Comment', textField('b_comment')],
   ]
 
