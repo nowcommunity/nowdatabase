@@ -11,7 +11,7 @@ const getIdsOfUsersProjects = async (user: User) => {
   return new Set(usersProjects.map(({ pid }) => pid))
 }
 
-type CrossSearchListType = {
+type CrossSearchPreFilter = {
   lid: number
   loc_name: string
   bfa_max: string | null
@@ -64,7 +64,7 @@ type CrossSearchListType = {
 
 export const getAllCrossSearch = async (user?: User) => {
   const showAll = user && [Role.Admin, Role.EditUnrestricted].includes(user.role)
-  const removeProjects: (loc: CrossSearchListType) => Omit<CrossSearchListType, 'now_plr'> = loc => {
+  const removeProjects: (loc: CrossSearchPreFilter) => Omit<CrossSearchPreFilter, 'now_plr'> = loc => {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { now_plr, ...rest } = loc
     return rest
@@ -178,7 +178,7 @@ export const getAllCrossSearch = async (user?: User) => {
     body_mass: item.com_species.body_mass,
     brain_mass: item.com_species.brain_mass,
     sp_status: item.com_species.sp_status,
-  })) as CrossSearchListType[]
+  })) as CrossSearchPreFilter[]
 
   if (showAll) {
     const result = flattenedResult.map(removeProjects)
