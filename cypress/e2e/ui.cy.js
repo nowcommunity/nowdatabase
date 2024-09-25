@@ -61,10 +61,10 @@ describe('Button Tests', () => {
       cy.visit('/')
       cy.contains('Cross-Search').click()
       cy.url().should('include', '/crosssearch')
-      cy.contains('Max age').should('be.visible')
-      cy.contains('Min age').should('be.visible')
-      cy.contains('Name').should('be.visible')
-      cy.contains('Order').should('be.visible')
+      cy.contains('Locality name').should('be.visible')
+      cy.contains('Country').should('be.visible')
+      cy.contains('Genus').should('be.visible')
+      cy.contains('Species').should('be.visible')
     })
 
     it('Map button works', () => {

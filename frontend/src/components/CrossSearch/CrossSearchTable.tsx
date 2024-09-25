@@ -16,7 +16,7 @@ export const CrossSearchTable = ({ selectorFn }: { selectorFn?: (newObject: Cros
       },
       {
         accessorKey: 'loc_name',
-        header: 'Name',
+        header: 'Locality name',
       },
       {
         accessorKey: 'country',
