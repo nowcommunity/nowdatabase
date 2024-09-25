@@ -9,7 +9,6 @@ export const SpeciesTable = ({ selectorFn }: { selectorFn?: (id: Species) => voi
   const columns = useMemo<MRT_ColumnDef<Species>[]>(
     () => [
       {
-        id: 'id',
         accessorKey: 'species_id',
         header: 'Id',
         size: 20,
@@ -59,13 +58,50 @@ export const SpeciesTable = ({ selectorFn }: { selectorFn?: (id: Species) => voi
         header: 'Taxonomic Status',
         size: 20,
       },
+      {
+        accessorKey: 'common_name',
+        header: 'Common Name',
+        size: 20,
+      },
+      {
+        accessorKey: 'sp_author',
+        header: 'Author',
+        size: 20,
+      },
+      {
+        accessorKey: 'strain',
+        header: 'Strain',
+        size: 20,
+      },
+      {
+        accessorKey: 'gene',
+        header: 'Gene',
+        size: 20,
+      },
+      {
+        accessorKey: 'body_mass',
+        header: 'Body Mass',
+        size: 20,
+      },
+      {
+        accessorKey: 'brain_mass',
+        header: 'Brain Mass',
+        size: 20,
+      },
     ],
     []
   )
 
   const visibleColumns = {
-    name: false,
-    id: false,
+    species_id: false,
+    unique_identifier: false,
+    taxonomic_status: false,
+    common_name: false,
+    sp_author: false,
+    strain: false,
+    gene: false,
+    body_mass: false,
+    brain_mass: false,
   }
 
   return (
