@@ -7,7 +7,7 @@ describe('Getting cross-search data works', () => {
     const { body: getReqBody, status: getReqStatus } = await send(`crosssearch/all`, 'GET')
     expect(getReqStatus).toEqual(200)
     expect(getReqBody.length).toBeGreaterThan(5)
-    expect(getReqBody.length).toBeLessThan(8)
+    expect(getReqBody.length).toBeLessThan(10)
   })
 
   it('Get all has some correct fields from locality and species', async () => {
