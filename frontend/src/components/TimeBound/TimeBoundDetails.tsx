@@ -13,6 +13,7 @@ import { UpdateTab } from '../DetailView/common/UpdateTab.tsx'
 import { DetailView, TabType } from '../DetailView/DetailView'
 import { BoundTab } from './Tabs/BoundTab'
 import { TimeUnitTab } from './Tabs/TimeUnitTab.tsx'
+import { validateTimeBound } from '@/validators/timeBound.ts'
 
 export const TimeBoundDetails = () => {
   const { id } = useParams()
@@ -74,10 +75,7 @@ export const TimeBoundDetails = () => {
       hasStagingMode
       isNew={isNew}
       onWrite={onWrite}
-      validator={() => ({
-        name: 'unknown',
-        error: null,
-      })}
+      validator={validateTimeBound}
       deleteFunction={deleteFunction}
     />
   )

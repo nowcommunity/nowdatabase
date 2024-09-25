@@ -7,7 +7,13 @@ export const validateTimeBound = (
 ) => {
   const validators: Validators<EditDataType<Partial<TimeBoundDetailsType>>> = {
     b_name: {
-      name: 'Locality name',
+      name: 'Name',
+      required: true,
+    },
+    age: {
+      name: 'Age (Ma)',
+      required: true,
+      asNumber: true,
     },
   }
 
