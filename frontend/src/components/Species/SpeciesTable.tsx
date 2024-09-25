@@ -3,7 +3,6 @@ import { type MRT_ColumnDef } from 'material-react-table'
 import { useGetAllSpeciesQuery } from '../../redux/speciesReducer'
 import { Species } from '@/backendTypes'
 import { TableView } from '../TableView/TableView'
-import { uniq } from 'lodash-es'
 
 export const SpeciesTable = ({ selectorFn }: { selectorFn?: (id: Species) => void }) => {
   const speciesQuery = useGetAllSpeciesQuery()
