@@ -131,6 +131,12 @@ export type Species = {
   species_name: string
   unique_identifier: string
   taxonomic_status: string
+  common_name: string | null
+  sp_author: string | null
+  strain: string | null
+  gene: string | null
+  body_mass: number | null
+  brain_mass: number | null
   sp_status: boolean | null
 }
 
