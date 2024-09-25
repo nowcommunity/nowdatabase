@@ -78,7 +78,27 @@ export type Locality = {
   bfa_min: string | null
   max_age: number
   min_age: number
-  country: string | null
+  bfa_max_abs: string | null
+  bfa_min_abs: string | null
+  frac_max: string | null
+  frac_min: string | null
+  chron: string | null
+  basin: string | null
+  subbasin: string | null
+  dms_lat: string | null
+  dms_long: string | null
+  dec_lat: number
+  dec_long: number
+  altitude: number
+  country: string
+  state: string | null
+  county: string | null
+  site_area: string | null
+  gen_loc: string | null
+  plate: string | null
+  formation: string | null
+  member: string | null
+  bed: string | null
   loc_status: boolean | null
 }
 export type CrossSearch = {

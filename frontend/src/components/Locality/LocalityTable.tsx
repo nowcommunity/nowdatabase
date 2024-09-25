@@ -26,6 +26,24 @@ export const LocalityTable = ({ selectorFn }: { selectorFn?: (newObject: Localit
         header: 'Country',
       },
       {
+        accessorKey: 'state',
+        header: 'State',
+      },
+      {
+        accessorKey: 'county',
+        header: 'County',
+      },
+      {
+        accessorKey: 'bfa_max',
+        header: 'BFA max',
+        filterVariant: 'range',
+      },
+      {
+        accessorKey: 'bfa_min',
+        header: 'BFA min',
+        filterVariant: 'range',
+      },
+      {
         accessorKey: 'max_age',
         header: 'Max age',
         filterVariant: 'range',
@@ -35,12 +53,100 @@ export const LocalityTable = ({ selectorFn }: { selectorFn?: (newObject: Localit
         header: 'Min age',
         filterVariant: 'range',
       },
+      {
+        accessorKey: 'frac_max',
+        header: 'Frac max',
+      },
+      {
+        accessorKey: 'frac_min',
+        header: 'Frac min',
+      },
+      {
+        accessorKey: 'chron',
+        header: 'Chron',
+      },
+      {
+        accessorKey: 'basin',
+        header: 'Basin',
+      },
+      {
+        accessorKey: 'subbasin',
+        header: 'Subbasin',
+      },
+      {
+        accessorKey: 'dms_lat',
+        header: 'DMS lat',
+      },
+      {
+        accessorKey: 'dms_long',
+        header: 'DMS long',
+      },
+      {
+        accessorKey: 'dec_lat',
+        header: 'Dec lat',
+        filterVariant: 'range',
+      },
+      {
+        accessorKey: 'dec_long',
+        header: 'Dec long',
+        filterVariant: 'range',
+      },
+      {
+        accessorKey: 'altitude',
+        header: 'Altitude',
+      },
+      {
+        accessorKey: 'site_area',
+        header: 'Site area',
+      },
+      {
+        accessorKey: 'gen_loc',
+        header: 'Gen locality',
+      },
+      {
+        accessorKey: 'plate',
+        header: 'Plate',
+      },
+      {
+        accessorKey: 'formation',
+        header: 'Formation',
+      },
+      {
+        accessorKey: 'member',
+        header: 'Member',
+      },
+      {
+        accessorKey: 'bed',
+        header: 'Bed',
+      },
     ],
     []
   )
 
   const visibleColumns = {
     id: false,
+    bfa_max: false,
+    bfa_min: false,
+    bfa_max_abs: false,
+    bfa_min_abs: false,
+    frac_max: false,
+    frac_min: false,
+    chron: false,
+    basin: false,
+    subbasin: false,
+    dms_lat: false,
+    dms_long: false,
+    dec_lat: false,
+    dec_long: false,
+    altitude: false,
+    state: false,
+    county: false,
+    site_area: false,
+    gen_loc: false,
+    plate: false,
+    formation: false,
+    member: false,
+    bed: false,
   }
 
   const combinedExport = async (lids: number[]) => {
