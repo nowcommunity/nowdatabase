@@ -16,7 +16,7 @@ const getIdsOfUsersProjects = async (user: User) => {
   return new Set(usersProjects.map(({ pid }) => pid))
 }
 
-type LocalityListType = {
+type LocalityPreFilter = {
   lid: number
   loc_name: string
   bfa_max: string | null
@@ -52,7 +52,7 @@ type LocalityListType = {
 
 export const getAllLocalities = async (user?: User) => {
   const showAll = user && [Role.Admin, Role.EditUnrestricted].includes(user.role)
-  const removeProjects: (loc: LocalityListType) => Omit<LocalityListType, 'now_plr'> = loc => {
+  const removeProjects: (loc: LocalityPreFilter) => Omit<LocalityPreFilter, 'now_plr'> = loc => {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { now_plr, ...rest } = loc
     return rest
@@ -92,7 +92,7 @@ export const getAllLocalities = async (user?: User) => {
         select: { pid: true },
       },
     },
-  })) as LocalityListType[]
+  })) as LocalityPreFilter[]
 
   if (showAll) return result.map(removeProjects)
 
