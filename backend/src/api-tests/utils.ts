@@ -56,5 +56,5 @@ export const testLogRows = (logRows: UpdateLog[], expectedLogRows: Partial<LogRo
 }
 
 export const resetDatabase = async () => {
-    await send("test/reset-test-database", "GET")
+  await send('test/reset-test-database', 'GET')
 }
