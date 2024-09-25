@@ -1,5 +1,6 @@
 import { EditDataType, LocalityDetailsType } from '../backendTypes'
 import { Validators, validator } from './validator'
+import { validCountries } from './countryList'
 
 export const validateLocality = (
   editData: EditDataType<LocalityDetailsType>,
@@ -32,6 +33,10 @@ export const validateLocality = (
     country: {
       name: 'Country',
       required: true,
+      asString: (countryName: string) => {
+        if (!validCountries.includes(countryName)) return 'Country is not valid'
+        return
+      },
     },
     date_meth: {
       name: 'Dating method',
