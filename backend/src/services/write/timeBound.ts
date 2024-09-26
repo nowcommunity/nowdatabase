@@ -21,14 +21,15 @@ export const writeTimeBound = async (
   references: Reference[] | undefined,
   authorizer: string
 ) => {
-  const writeHandler = getTimeBoundWriteHandler(timeBound.bid ? 'update' : 'add')
+  const writeHandlerType = timeBound.bid ? 'update' : 'add'
+  const writeHandler = getTimeBoundWriteHandler(writeHandlerType)
 
   try {
     await writeHandler.start()
     const result = await writeHandler.upsertObject('now_tu_bound', timeBound, ['bid'])
-    writeHandler.idValue = result!.bid as number
+    writeHandler.idValue = result ? (result.bid as number) : (timeBound.bid as number)
     await writeHandler.logUpdatesAndComplete(authorizer, comment ?? '', references ?? [])
-    return result!.bid as number
+    return writeHandler.idValue
   } catch (e) {
     await writeHandler.end()
     throw e
