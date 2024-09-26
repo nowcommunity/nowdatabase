@@ -22,7 +22,7 @@ const doesNotHaveStagingMode = (viewUrl) => {
 }
 
 before('Reset database', () => {
-  cy.request(Cypress.env("backendUrl"));
+  cy.request(Cypress.env("databaseResetUrl"));
 });
 
 describe('Test individual features across the app', () => {

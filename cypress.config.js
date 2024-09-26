@@ -8,7 +8,7 @@ module.exports = defineConfig({
     baseUrl: 'http://localhost:5173/',
   },
   env: {
-    backendUrl: "http://backend:4000/test/reset-test-database"
+    databaseResetUrl: "http://backend:4000/test/reset-test-database"
   },
   viewportHeight: 900,
   viewportWidth: 1200,
