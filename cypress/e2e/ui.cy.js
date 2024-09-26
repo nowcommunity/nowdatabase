@@ -3,6 +3,10 @@
   Mostly to prove some user stories are complete
 */
 
+before('Reset database', () => {
+  cy.request(Cypress.env("backendUrl"));
+});
+
 describe('Button Tests', () => {
     it('Buttons for Localities, Species, References, Cross-Search, Map & Time Units are visible', () => {
       cy.visit('/')
