@@ -1,3 +1,6 @@
+before('Reset database', () => {
+  cy.request(Cypress.env("backendUrl"));
+});
 
 describe('Broadly test what different user rights see', () => {
   describe('Admin visibility', () => {
