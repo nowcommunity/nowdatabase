@@ -6,14 +6,13 @@ import { ActionType } from './writeOperations/types'
 import { getTimeBoundDetails } from '../timeBound'
 
 const getTimeBoundWriteHandler = (type: ActionType) => {
-  const timeBoundWriteHandler = new WriteHandler({
+  return new WriteHandler({
     dbName: NOW_DB_NAME,
     table: 'now_tu_bound',
     idColumn: 'bid',
     allowedColumns: getFieldsOfTables(['now_tu_bound', 'now_bau']),
     type: type,
   })
-  return timeBoundWriteHandler
 }
 
 export const writeTimeBound = async (
@@ -28,11 +27,7 @@ export const writeTimeBound = async (
   try {
     await writeHandler.start()
     const result = await writeHandler.upsertObject('now_tu_bound', timeBound, ['bid'])
-    if (result) {
-      writeHandler.idValue = result.bid as number // this happens only if a new timebound is created
-    } else {
-      writeHandler.idValue = timeBound.bid as number
-    }
+    writeHandler.idValue = result ? (result.bid as number) : (timeBound.bid as number)
     await writeHandler.logUpdatesAndComplete(authorizer, comment ?? '', references ?? [])
     return writeHandler.idValue
   } catch (e) {
