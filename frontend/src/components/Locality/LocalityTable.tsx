@@ -12,7 +12,6 @@ export const LocalityTable = ({ selectorFn }: { selectorFn?: (newObject: Localit
   const columns = useMemo<MRT_ColumnDef<Locality>[]>(
     () => [
       {
-        id: 'id',
         accessorKey: 'lid',
         header: 'Id',
         size: 20,
@@ -124,7 +123,7 @@ export const LocalityTable = ({ selectorFn }: { selectorFn?: (newObject: Localit
   )
 
   const visibleColumns = {
-    id: false,
+    lid: false,
     bfa_max: false,
     bfa_min: false,
     bfa_max_abs: false,

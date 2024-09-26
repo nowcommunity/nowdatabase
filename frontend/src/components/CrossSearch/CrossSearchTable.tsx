@@ -9,9 +9,8 @@ export const CrossSearchTable = ({ selectorFn }: { selectorFn?: (newObject: Cros
   const columns = useMemo<MRT_ColumnDef<CrossSearch>[]>(
     () => [
       {
-        id: 'id',
         accessorKey: 'lid',
-        header: 'Id',
+        header: 'Locality Id',
         size: 20,
       },
       {
@@ -118,7 +117,7 @@ export const CrossSearchTable = ({ selectorFn }: { selectorFn?: (newObject: Cros
       },
       {
         accessorKey: 'species_id',
-        header: 'Id',
+        header: 'Species Id',
         size: 20,
       },
       {
@@ -201,7 +200,7 @@ export const CrossSearchTable = ({ selectorFn }: { selectorFn?: (newObject: Cros
   )
 
   const visibleColumns = {
-    id: false,
+    lid: false,
     bfa_max: false,
     bfa_min: false,
     max_age: false,

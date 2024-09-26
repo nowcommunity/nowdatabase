@@ -9,7 +9,6 @@ export const RegionTable = ({ selectorFn }: { selectorFn?: (id: Region) => void 
   const columns = useMemo<MRT_ColumnDef<Region>[]>(
     () => [
       {
-        id: 'id',
         accessorKey: 'reg_coord_id',
         header: 'Region Id',
         size: 20,
@@ -24,7 +23,7 @@ export const RegionTable = ({ selectorFn }: { selectorFn?: (id: Region) => void 
   )
 
   const visibleColumns = {
-    id: false,
+    reg_coord_id: false,
   }
 
   return (

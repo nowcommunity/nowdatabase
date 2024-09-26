@@ -9,7 +9,6 @@ export const SequenceTable = ({ selectorFn }: { selectorFn?: (id: Sequence) => v
   const columns = useMemo<MRT_ColumnDef<Sequence>[]>(
     () => [
       {
-        id: 'id',
         accessorKey: 'sequence',
         header: 'Sequence Id',
         size: 20,
@@ -24,7 +23,7 @@ export const SequenceTable = ({ selectorFn }: { selectorFn?: (id: Sequence) => v
   )
 
   const visibleColumns = {
-    id: false,
+    sequence: false,
   }
 
   return (
