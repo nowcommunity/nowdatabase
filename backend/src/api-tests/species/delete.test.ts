@@ -1,7 +1,10 @@
-import { beforeEach, describe, it, expect } from '@jest/globals'
-import { login, send } from '../utils'
+import { beforeEach, beforeAll, describe, it, expect } from '@jest/globals'
+import { login, resetDatabase, send } from '../utils'
 
 describe('Deleting a species works', () => {
+  beforeAll(async () => {
+    await resetDatabase()
+  })
   beforeEach(async () => {
     await login()
   })

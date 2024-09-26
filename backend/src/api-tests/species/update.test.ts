@@ -1,12 +1,15 @@
-import { beforeEach, describe, it, expect } from '@jest/globals'
+import { beforeEach, beforeAll, describe, it, expect } from '@jest/globals'
 import { EditMetaData, SpeciesDetailsType } from '../../../../frontend/src/backendTypes'
 import { LogRow } from '../../services/write/writeOperations/types'
-import { login, send, testLogRows } from '../utils'
+import { login, resetDatabase, send, testLogRows } from '../utils'
 import { editedSpecies } from './data'
 
 let editedSpeciesResult: (SpeciesDetailsType & EditMetaData) | null = null
 
 describe('Updating species works', () => {
+  beforeAll(async () => {
+    await resetDatabase()
+  })
   beforeEach(async () => {
     await login()
   })

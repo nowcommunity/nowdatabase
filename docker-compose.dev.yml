@@ -19,6 +19,7 @@ services:
     volumes:
       - ./backend/src:/usr/src/app/backend/src
       - ./frontend/src/:/usr/src/app/frontend/src/
+      - ./test_data:/usr/src/app/test_data
     ports:
       - 127.0.0.1:4000:4000
     env_file: .dev.env

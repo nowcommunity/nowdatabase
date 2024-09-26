@@ -54,3 +54,7 @@ export const testLogRows = (logRows: UpdateLog[], expectedLogRows: Partial<LogRo
   }
   expect(logRows.length).toEqual(expectedAmount) // 'Wrong amount of log rows in relevant update')
 }
+
+export const resetDatabase = async () => {
+  await send('test/reset-test-database', 'GET')
+}

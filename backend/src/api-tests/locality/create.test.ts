@@ -1,12 +1,15 @@
-import { beforeEach, describe, it, expect } from '@jest/globals'
+import { beforeEach, beforeAll, describe, it, expect } from '@jest/globals'
 import { LocalityDetailsType, SpeciesDetailsType } from '../../../../frontend/src/backendTypes'
 import { LogRow } from '../../services/write/writeOperations/types'
 import { newLocalityBasis } from './data'
-import { login, send, testLogRows } from '../utils'
+import { login, resetDatabase, send, testLogRows } from '../utils'
 
 let createdLocality: LocalityDetailsType | null = null
 
 describe('Creating new locality works', () => {
+  beforeAll(async () => {
+    await resetDatabase()
+  })
   beforeEach(async () => {
     await login()
   })

@@ -1,10 +1,11 @@
 import { beforeEach, describe, it, expect } from '@jest/globals'
 import { LocalityDetailsType } from '../../../../frontend/src/backendTypes'
 import { editedLocality, newLocalityBasis } from './data'
-import { login, send } from '../utils'
+import { login, resetDatabase, send } from '../utils'
 
 describe('Min and max age checks work', () => {
   beforeEach(async () => {
+    await resetDatabase()
     await login()
   })
 

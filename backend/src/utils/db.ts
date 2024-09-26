@@ -3,7 +3,10 @@ import { logger } from './logger'
 import { PrismaClient as NowClient } from '../../prisma/generated/now_test_client'
 import { PrismaClient as LogClient } from '../../prisma/generated/now_log_test_client'
 import mariadb from 'mariadb'
-import { MARIADB_HOST, MARIADB_PASSWORD, DB_CONNECTION_LIMIT, MARIADB_USER } from './config'
+import { MARIADB_HOST, MARIADB_PASSWORD, DB_CONNECTION_LIMIT, MARIADB_USER, RUNNING_ENV } from './config'
+
+import { readFile } from 'fs/promises'
+import { PathLike } from 'fs'
 
 export const logDb = new LogClient()
 export const nowDb = new NowClient()
@@ -66,4 +69,43 @@ export const testDbConnection = async () => {
     await sleep(4000)
   }
   logger.error(`Attempted ${maxAttempts} times, but database connection could not be established`)
+}
+
+// TODO this is very slow to execute, around 4500ms each time. Not good...
+export const resetTestDb = async () => {
+  if (RUNNING_ENV !== 'dev') throw new Error(`Trying to reset test database with RUNNING_ENV ${RUNNING_ENV}`)
+
+  const createTestConnection = (dbName: string) => {
+    return mariadb.createConnection({
+      host: MARIADB_HOST,
+      password: process.env.MARIADB_ROOT_PASSWORD,
+      user: 'root',
+      checkDuplicate: false,
+      multipleStatements: true,
+      database: dbName,
+    })
+  }
+
+  const connNow = await createTestConnection('now_test')
+  const connLog = await createTestConnection('now_log_test')
+
+  const fileContentsNowTest = await readSqlFile('../test_data/sqlfiles/now_test.sql')
+  const fileContentsNowLogTest = await readSqlFile('../test_data/sqlfiles/now_log_test.sql')
+
+  if (!fileContentsNowTest || !fileContentsNowLogTest) {
+    throw new Error('Sqlfiles not found')
+  }
+
+  await connNow.query(fileContentsNowTest)
+  await connLog.query(fileContentsNowLogTest)
+
+  await connNow.end()
+  await connLog.end()
+
+  return
+}
+
+const readSqlFile = async (filename: PathLike): Promise<string | undefined> => {
+  const fileContents = await readFile(filename, 'utf8')
+  return fileContents
 }
