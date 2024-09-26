@@ -17,6 +17,5 @@ export const validateTimeBound = (
     },
   }
 
-  const returnval = validator<EditDataType<TimeBoundDetailsType>>(validators, editData, fieldName)
-  return returnval
+  return validator<EditDataType<TimeBoundDetailsType>>(validators, editData, fieldName)
 }
