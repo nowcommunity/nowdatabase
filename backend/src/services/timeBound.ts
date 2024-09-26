@@ -1,4 +1,8 @@
 import { logDb, nowDb } from '../utils/db'
+import { validateTimeBound } from '../../../frontend/src/validators/timeBound'
+import { TimeBoundDetailsType, EditDataType } from '../../../frontend/src/backendTypes'
+import Prisma from '../../prisma/generated/now_test_client'
+import { ValidationObject } from '../../../frontend/src/validators/validator'
 
 export const getAllTimeBounds = async () => {
   const result = await nowDb.now_tu_bound.findMany({
@@ -54,4 +58,17 @@ export const getTimeBoundTimeUnits = async (id: number) => {
     where: { OR: [{ up_bnd: id }, { low_bnd: id }] },
   })
   return result
+}
+
+export const validateEntireTimeBound = (editedFields: EditDataType<Prisma.now_bau>) => {
+  const keys = Object.keys(editedFields)
+  const errors: ValidationObject[] = []
+  for (const key of keys) {
+    const error = validateTimeBound(
+      editedFields as EditDataType<TimeBoundDetailsType>,
+      key as keyof TimeBoundDetailsType
+    )
+    if (error.error) errors.push(error)
+  }
+  return errors
 }
