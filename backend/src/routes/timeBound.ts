@@ -2,7 +2,12 @@ import { Request, Router } from 'express'
 import { EditDataType, EditMetaData, TimeBoundDetailsType } from '../../../frontend/src/backendTypes'
 import { Role } from '../../../frontend/src/types'
 import { requireOneOf } from '../middlewares/authorizer'
-import { getAllTimeBounds, getTimeBoundDetails, getTimeBoundTimeUnits } from '../services/timeBound'
+import {
+  getAllTimeBounds,
+  getTimeBoundDetails,
+  getTimeBoundTimeUnits,
+  validateEntireTimeBound,
+} from '../services/timeBound'
 import { deleteTimeBound, writeTimeBound } from '../services/write/timeBound'
 import { fixBigInt } from '../utils/common'
 
@@ -31,6 +36,10 @@ router.put(
   requireOneOf([Role.Admin, Role.EditUnrestricted]),
   async (req: Request<object, object, { timeBound: EditDataType<TimeBoundDetailsType> & EditMetaData }>, res) => {
     const { comment, references, ...editedTimeBound } = req.body.timeBound
+    const validationErrors = validateEntireTimeBound(editedTimeBound)
+    if (validationErrors.length > 0) {
+      return res.status(400).send({ validationErrors })
+    }
     const result = await writeTimeBound(editedTimeBound, comment, references, req.user!.initials)
     return res.status(200).send({ id: result })
   }
