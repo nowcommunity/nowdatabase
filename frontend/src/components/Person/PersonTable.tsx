@@ -10,7 +10,6 @@ export const PersonTable = ({ selectorFn }: { selectorFn?: (id: PersonDetailsTyp
   const columns = useMemo<MRT_ColumnDef<PersonDetailsType>[]>(
     () => [
       {
-        id: 'id',
         accessorKey: 'initials',
         header: 'Person Id',
       },
@@ -63,7 +62,7 @@ export const PersonTable = ({ selectorFn }: { selectorFn?: (id: PersonDetailsTyp
   )
 
   const visibleColumns = {
-    id: false,
+    iniitals: false,
   }
 
   return (

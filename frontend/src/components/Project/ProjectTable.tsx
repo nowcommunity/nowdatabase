@@ -9,7 +9,6 @@ export const ProjectTable = ({ selectorFn }: { selectorFn?: (id: Project) => voi
   const columns = useMemo<MRT_ColumnDef<Project>[]>(
     () => [
       {
-        id: 'id',
         accessorKey: 'pid',
         header: 'Project Id',
       },
@@ -38,7 +37,7 @@ export const ProjectTable = ({ selectorFn }: { selectorFn?: (id: Project) => voi
   )
 
   const visibleColumns = {
-    id: false,
+    pid: false,
   }
 
   return (

@@ -9,7 +9,6 @@ export const TimeBoundTable = ({ selectorFn }: { selectorFn?: (newTimeBound: Tim
   const columns = useMemo<MRT_ColumnDef<TimeBound>[]>(
     () => [
       {
-        id: 'id',
         accessorKey: 'bid',
         header: 'Time Bound Id',
         size: 20,
@@ -32,7 +31,7 @@ export const TimeBoundTable = ({ selectorFn }: { selectorFn?: (newTimeBound: Tim
   )
 
   const visibleColumns = {
-    id: false,
+    bid: false,
   }
 
   return (

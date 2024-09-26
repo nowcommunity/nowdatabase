@@ -9,7 +9,6 @@ export const TimeUnitTable = ({ selectorFn }: { selectorFn?: (newTimeUnit: TimeU
   const columns = useMemo<MRT_ColumnDef<TimeUnit>[]>(
     () => [
       {
-        id: 'id',
         accessorKey: 'tu_name',
         header: 'Time Unit Id',
         size: 20,
@@ -41,7 +40,7 @@ export const TimeUnitTable = ({ selectorFn }: { selectorFn?: (newTimeUnit: TimeU
   )
 
   const visibleColumns = {
-    id: false,
+    tu_name: false,
   }
 
   return (
