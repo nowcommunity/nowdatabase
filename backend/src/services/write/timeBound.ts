@@ -5,7 +5,7 @@ import { getFieldsOfTables } from '../../utils/db'
 import { ActionType } from './writeOperations/types'
 import { getTimeBoundDetails } from '../timeBound'
 
-const getTimeBoundWriteHandler = (type: ActionType, idValue: string | number | null = null) => {
+const getTimeBoundWriteHandler = (type: ActionType) => {
   const timeBoundWriteHandler = new WriteHandler({
     dbName: NOW_DB_NAME,
     table: 'now_tu_bound',
@@ -13,9 +13,6 @@ const getTimeBoundWriteHandler = (type: ActionType, idValue: string | number | n
     allowedColumns: getFieldsOfTables(['now_tu_bound', 'now_bau']),
     type: type,
   })
-  if (idValue) {
-    timeBoundWriteHandler.idValue = idValue
-  }
   return timeBoundWriteHandler
 }
 
@@ -26,12 +23,16 @@ export const writeTimeBound = async (
   authorizer: string
 ) => {
   const writeHandlerType = timeBound.bid ? 'update' : 'add'
-  const writehandlerId = timeBound.bid ?? null
-  const writeHandler = getTimeBoundWriteHandler(writeHandlerType, writehandlerId)
+  const writeHandler = getTimeBoundWriteHandler(writeHandlerType)
 
   try {
     await writeHandler.start()
-    await writeHandler.upsertObject('now_tu_bound', timeBound, ['bid'])
+    const result = await writeHandler.upsertObject('now_tu_bound', timeBound, ['bid'])
+    if (result) {
+      writeHandler.idValue = result.bid as number // this happens only if a new timebound is created
+    } else {
+      writeHandler.idValue = timeBound.bid as number
+    }
     await writeHandler.logUpdatesAndComplete(authorizer, comment ?? '', references ?? [])
     return timeBound.bid as number
   } catch (e) {
