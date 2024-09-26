@@ -1,5 +1,5 @@
 before('Reset database', () => {
-  cy.request(Cypress.env("backendUrl"));
+  cy.request(Cypress.env("databaseResetUrl"));
 });
 
 describe('Broadly test what different user rights see', () => {

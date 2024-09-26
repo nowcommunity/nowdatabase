@@ -4,7 +4,7 @@
 */
 
 before('Reset database', () => {
-  cy.request(Cypress.env("backendUrl"));
+  cy.request(Cypress.env("databaseResetUrl"));
 });
 
 describe('Button Tests', () => {
