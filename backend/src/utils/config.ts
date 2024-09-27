@@ -15,7 +15,7 @@ export const MARIADB_PORT = parseInt(process.env.MARIADB_PORT as string)
     prod    = production with real data
 */
 const allowedRunningEnvs = ['dev', 'staging', 'prod'] as const
-export const RUNNING_ENV = process.env.VITE_RUNNING_ENV as (typeof allowedRunningEnvs)[number]
+export const RUNNING_ENV = (process.env.VITE_RUNNING_ENV as (typeof allowedRunningEnvs)[number]) ?? 'prod'
 if (!allowedRunningEnvs.includes(RUNNING_ENV)) throw new Error('Invalid RUNNING_ENV')
 
 // Enable write operations. If this is not set to 'true', all write (create, update, delete) operations except for allowed ones (like user/login) are disabled.
