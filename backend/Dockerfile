@@ -54,15 +54,15 @@ ENV NODE_ENV=production
 
 CMD ["node", "src/index.js"]
 
+
 FROM node:20-alpine3.16 AS api-tests
 
 USER node
+COPY --chown=node --from=backend-build /usr/src/app /usr/src/app
+
 WORKDIR /usr/src/app/backend
 
-COPY --chown=node backend/package.json .
-COPY --chown=node backend/package-lock.json .
-
 RUN npm ci
+RUN npm run prisma
 
-COPY --chown=node backend .
 CMD ["npm", "run", "test"]

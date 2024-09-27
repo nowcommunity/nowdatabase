@@ -1,17 +1,21 @@
-import { beforeEach, beforeAll, describe, it, expect } from '@jest/globals'
+import { beforeEach, beforeAll, afterAll, describe, it, expect } from '@jest/globals'
 import { LocalityDetailsType, SpeciesDetailsType } from '../../../../frontend/src/backendTypes'
 import { LogRow } from '../../services/write/writeOperations/types'
 import { newSpeciesBasis } from './data'
 import { login, resetDatabase, send, testLogRows } from '../utils'
+import { pool } from '../../utils/db'
 
 let createdSpecies: SpeciesDetailsType | null = null
 
 describe('Creating new species works', () => {
   beforeAll(async () => {
     await resetDatabase()
-  })
+  }, 10 * 1000)
   beforeEach(async () => {
     await login()
+  })
+  afterAll(async () => {
+    await pool.end()
   })
 
   it('Request succeeds and returns valid number id', async () => {

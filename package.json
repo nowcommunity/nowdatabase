@@ -19,7 +19,7 @@
     "test:docker": "docker compose -f docker-compose.test.yml up",
     "test:docker:down": "docker compose -f docker-compose.test.yml down -v",
     "test:docker:ci": "npm run test:docker -- backend db-anon frontend",
-    "test:docker:ci:api": "npm run test:docker -- backend db-anon frontend api-tests --abort-on-container-exit --exit-code-from api-tests",
+    "test:docker:ci:api": "npm run test:docker -- db-anon api-tests --abort-on-container-exit --exit-code-from api-tests",
     "test:docker:ci:e2e": "npm run test:docker -- backend db-anon frontend e2e-tests --abort-on-container-exit --exit-code-from e2e-tests",
     "cypress": "cypress open",
     "prisma": "cd backend && npx prisma generate --schema prisma/schema.prisma && npx prisma generate --schema prisma/schema_log.prisma",
@@ -29,7 +29,6 @@
   "author": "",
   "devDependencies": {
     "@types/leaflet": "^1.9.12",
-    "@types/supertest": "^6.0.2",
     "cypress": "^13.11.0",
     "supertest": "^7.0.0"
   }
