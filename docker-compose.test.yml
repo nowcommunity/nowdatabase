@@ -39,8 +39,10 @@ services:
     depends_on:
       db-anon:
         condition: service_healthy
-      backend:
-        condition: service_healthy
+    env_file: .anon.env
+    volumes:
+      - ./test_data:/usr/src/app/test_data
+      - ./backend/coverage:/usr/src/app/backend/coverage
     environment:
       API_TESTS_BASEURL: http://backend:4000
     build:
