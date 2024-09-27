@@ -18,3 +18,13 @@ export const editedTimeBound: EditDataType<TimeBoundDetailsType & EditMetaData> 
   references: [{ rid: 24188 } as Reference],
   now_bau: [],
 }
+
+export const invalidEditedTimeBound: EditDataType<TimeBoundDetailsType & EditMetaData> = {
+  bid: 11,
+  b_name: 'C6N-y',
+  age: null,
+  b_comment: 'test comment',
+  comment: 'test updating time unit',
+  references: [{ rid: 24188 } as Reference],
+  now_bau: [],
+}
