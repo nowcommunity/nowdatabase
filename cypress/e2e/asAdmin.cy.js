@@ -1,3 +1,6 @@
+before('Reset database', () => {
+  cy.request(Cypress.env("databaseResetUrl"));
+});
 
 describe('Open each page, table view and detail view, and check at least some correct text appears', () => {
   beforeEach('Login as admin', () => {

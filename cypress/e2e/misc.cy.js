@@ -21,7 +21,12 @@ const doesNotHaveStagingMode = (viewUrl) => {
   cy.contains('Edit')
 }
 
+before('Reset database', () => {
+  cy.request(Cypress.env("databaseResetUrl"));
+});
+
 describe('Test individual features across the app', () => {
+
   it('Locality update tab opens, detailed modal works, view-link works', () => {
     cy.visit(`/locality/24750?tab=10`)
     cy.contains('2006-10-16')
