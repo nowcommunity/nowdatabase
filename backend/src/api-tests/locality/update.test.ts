@@ -1,14 +1,21 @@
-import { beforeEach, describe, it, expect } from '@jest/globals'
+import { beforeEach, beforeAll, afterAll, describe, it, expect } from '@jest/globals'
 import { LocalityDetailsType } from '../../../../frontend/src/backendTypes'
 import { LogRow } from '../../services/write/writeOperations/types'
 import { editedLocality } from './data'
-import { login, send, testLogRows } from '../utils'
+import { login, resetDatabase, send, testLogRows } from '../utils'
+import { pool } from '../../utils/db'
 
 let resultLocality: LocalityDetailsType | null = null
 
 describe('Locality update works', () => {
+  beforeAll(async () => {
+    await resetDatabase()
+  }, 10 * 1000)
   beforeEach(async () => {
     await login()
+  })
+  afterAll(async () => {
+    await pool.end()
   })
 
   it('Edits name, synonyms and locality species correctly', async () => {

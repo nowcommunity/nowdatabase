@@ -1,17 +1,21 @@
-import { beforeEach, beforeAll, describe, it, expect } from '@jest/globals'
+import { beforeEach, beforeAll, afterAll, describe, it, expect } from '@jest/globals'
 import { LogRow } from '../../services/write/writeOperations/types'
 import { login, resetDatabase, send, testLogRows } from '../utils'
 import { newTimeBoundBasis } from './data'
 import { TimeBoundDetailsType } from '../../../../frontend/src/backendTypes'
+import { pool } from '../../utils/db'
 
 let createdTimeBound: TimeBoundDetailsType | null = null
 
-describe.only('Creating new time bound works', () => {
+describe('Creating new time bound works', () => {
   beforeAll(async () => {
     await resetDatabase()
-  })
+  }, 10 * 1000)
   beforeEach(async () => {
     await login()
+  })
+  afterAll(async () => {
+    await pool.end()
   })
 
   it('Request succeeds and returns valid number id', async () => {
@@ -24,6 +28,7 @@ describe.only('Creating new time bound works', () => {
     expect(typeof createdId).toEqual('number') // `Invalid result returned on write: ${createdId}`
 
     const { body } = await send<TimeBoundDetailsType>(`time-bound/${createdId}`, 'GET')
+    expect(body).not.toEqual({})
     createdTimeBound = body
   })
 
