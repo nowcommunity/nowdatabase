@@ -1,24 +1,58 @@
+import request from 'supertest'
+import app from '../app'
 import { expect } from '@jest/globals'
 import { UpdateLog } from '../../../frontend/src/backendTypes'
 import { LogRow } from '../services/write/writeOperations/types'
 
 let token: string | null = null
-const baseUrl = process.env.API_TESTS_BASEURL ?? 'http://localhost:4000'
 
 export const send = async <T extends Record<string, unknown>>(
   path: string,
   method: 'GET' | 'POST' | 'PUT' | 'DELETE',
   body?: object
 ) => {
-  const headers = new Headers()
-  headers.append('Content-Type', 'application/json')
-  if (token) headers.append('authorization', `bearer ${token}`)
-  const options = { body: method !== 'GET' ? JSON.stringify(body) : undefined, method, headers }
-  const response = await fetch(`${baseUrl}/${path}`, options)
-  if (response.status > 399) return { body: {} as T, status: response.status }
-  const responseText = await response.text()
-  if (!responseText) return { body: {} as T, status: response.status }
-  return { body: JSON.parse(responseText) as T, status: response.status }
+  let response = null
+  path = '/' + path
+
+  switch (method) {
+    case 'GET':
+      response = await request(app)
+        .get(path)
+        .set('Content-Type', 'application/json')
+        .set('authorization', `bearer ${token ?? ''}`)
+
+      // TODO remove this when fixBigInt is refactored. Also lint-ignore is then not needed
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+      response.body = response.text ? JSON.parse(response.text) : response.body
+      break
+
+    case 'POST':
+      response = await request(app)
+        .post(path)
+        .send(body)
+        .set('Content-Type', 'application/json')
+        .set('authorization', `bearer ${token ?? ''}`)
+      break
+
+    case 'PUT':
+      response = await request(app)
+        .put(path)
+        .send(body)
+        .set('Content-Type', 'application/json')
+        .set('authorization', `bearer ${token ?? ''}`)
+      break
+
+    case 'DELETE':
+      response = await request(app)
+        .delete(path)
+        .send(body)
+        .set('Content-Type', 'application/json')
+        .set('authorization', `bearer ${token ?? ''}`)
+      break
+  }
+
+  if (response.status >= 400) return { body: {} as T, status: response.status }
+  return { body: response.body as unknown as T, status: response.status }
 }
 
 export const setToken = (newToken: string) => (token = newToken)
