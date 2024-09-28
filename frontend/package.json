@@ -46,6 +46,7 @@
     "prettier": "^3.2.5",
     "typescript": "^5.2.2",
     "typescript-eslint": "^7.0.2",
-    "vite": "^5.2.5"
+    "vite": "^5.2.5",
+    "vite-plugin-istanbul": "^6.0.2"
   }
 }
