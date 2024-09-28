@@ -17,6 +17,13 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Setup node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: 'Install root dependencies'
+        run: npm ci
+
       - name: Run e2e tests
         run: npm run test:docker:ci:e2e
 
