@@ -3,6 +3,8 @@ import { useDetailContext } from '@/components/DetailView/Context/DetailContext'
 import { ArrayFrame } from '@/components/DetailView/common/tabLayoutHelpers'
 import { useGetReferenceTypesQuery } from '@/redux/referenceReducer'
 import { CircularProgress } from '@mui/material'
+import { AuthorTab } from './AuthorTab'
+
 
 export const ReferenceTab = () => {
   const { dropdown, data, editData, mode, textField, bigTextField } = useDetailContext<ReferenceDetailsType>()
@@ -31,17 +33,49 @@ export const ReferenceTab = () => {
   // Write here the fields that should have a bigger, resizable text field
   const bigFields = ['title_primary', 'authors_primary', 'ref_abstract', 'gen_notes']
 
-  const fieldsArray = fields?.map(field => [
-    field.ref_field_name,
-    bigFields.includes(field.field_name!)
-      ? bigTextField(field.field_name! as keyof ReferenceDetailsType)
-      : textField(field.field_name! as keyof ReferenceDetailsType),
-  ]) ?? [['Encountered error. Field type could not be found. Please contact project administrators.']]
+  const authorFields = ['authors_primary', 'authors_secondary'];
 
+  //painfully long way to split the arrayframe-component when an authorfield occurs
+  const groupedFieldsArray = []
+  let nonAuthorFieldsArray: [string, JSX.Element][] = []
+
+  fields?.forEach(field => {
+    if (authorFields.includes(field.field_name!)) {
+      if (nonAuthorFieldsArray.length > 0) {
+        groupedFieldsArray.push(
+          <ArrayFrame
+            key={`fields-group-${nonAuthorFieldsArray[0][0]}`}
+            array={nonAuthorFieldsArray}
+            title={`${selectedRefType!.ref_type} information`}
+          />
+        )
+        nonAuthorFieldsArray = [];
+      }
+  
+      groupedFieldsArray.push(<AuthorTab key={field.field_name} />);
+    } else {
+      const fieldComponent = bigFields.includes(field.field_name!)
+        ? bigTextField(field.field_name! as keyof ReferenceDetailsType)
+        : textField(field.field_name! as keyof ReferenceDetailsType);
+  
+      nonAuthorFieldsArray.push([field.ref_field_name, fieldComponent]);
+    }
+  });
+  
+  if (nonAuthorFieldsArray.length > 0) {
+    groupedFieldsArray.push(
+      <ArrayFrame
+        key={`fields-group-${nonAuthorFieldsArray[0][0]}`}
+        array={nonAuthorFieldsArray}
+        title={`${selectedRefType!.ref_type} information`}
+      />
+    );
+  }
+  
   return (
     <>
       <ArrayFrame array={refTypeSelection} title="Reference type" />
-      <ArrayFrame array={fieldsArray} title={`${selectedRefType!.ref_type} information`} />
+      {groupedFieldsArray}
     </>
   )
 }

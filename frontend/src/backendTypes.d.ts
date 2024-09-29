@@ -217,7 +217,18 @@ export type TimeUnit = {
 export type EditMetaData = { comment?: string; references?: Reference[] }
 
 /* Reference */
-export type ReferenceDetailsType = Prisma.ref_ref
+export type ReferenceDetailsType = Prisma.ref_ref & {
+  ref_authors: {
+    au_num: number
+    author_surname: string
+    author_initials: string
+  }[]
+  ref_journal: {
+    journal_title: string
+  }
+  ref_ref_type: {
+    ref_type: string
+  }}
 
 export type ReferenceType = Prisma.ref_ref_type & { ref_field_name: Prisma.ref_field_name[] }
 
@@ -238,22 +249,7 @@ export type Reference = {
   rid: number
   title_primary: string
   date_primary: number
-  title_secondary: string | null
-  volume: string | null
-  issue: string | null
-  start_page: number | null
-  end_page: number | null
-  publisher: string | null
-  pub_place: string | null
-  date_secondary: number | null
-  title_series: string | null
-  issn_isbn: string | null
-  ref_abstract: string | null
-  web_url: string  | null
-  misc_1: string | null
-  misc_2: string | null
-  gen_notes: string | null
-  printed_language: string | null
+  title_secondary: string
 }
 
 export type ReferenceOfUpdate = Prisma.ref_ref & {
@@ -263,3 +259,8 @@ export type ReferenceOfUpdate = Prisma.ref_ref & {
 
 export type LocalityReference = Prisma.now_lr & ReferenceOfUpdate
 export type SpeciesReference = Prisma.now_sr & ReferenceOfUpdate
+
+export type ReferenceJournalType = Prisma.ref_journal
+export type ReferenceAuthorType = Prisma.ref_authors
+
+
