@@ -238,7 +238,22 @@ export type Reference = {
   rid: number
   title_primary: string
   date_primary: number
-  title_secondary: string
+  title_secondary: string | null
+  volume: string | null
+  issue: string | null
+  start_page: number | null
+  end_page: number | null
+  publisher: string | null
+  pub_place: string | null
+  date_secondary: number | null
+  title_series: string | null
+  issn_isbn: string | null
+  ref_abstract: string | null
+  web_url: string  | null
+  misc_1: string | null
+  misc_2: string | null
+  gen_notes: string | null
+  printed_language: string | null
 }
 
 export type ReferenceOfUpdate = Prisma.ref_ref & {
