@@ -1,8 +1,12 @@
 node_modules
-.env
-.env.static
 build
-requests
 prisma/generated
+
+.env
+.env.*
+!.env.template
+
 coverage/*
 !coverage/.gitkeep
+
+requests
