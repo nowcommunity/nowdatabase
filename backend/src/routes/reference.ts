@@ -1,5 +1,5 @@
 import { Request, Router } from 'express'
-import { getAllReferences, getReferenceDetails, getReferenceTypes } from '../services/reference'
+import { getAllReferences, getReferenceDetails, getReferenceTypes, getReferenceAuthors, getReferenceJournals } from '../services/reference'
 import { requireOneOf } from '../middlewares/authorizer'
 import { Role } from '../../../frontend/src/types'
 import { EditMetaData, ReferenceDetailsType } from '../../../frontend/src/backendTypes'
@@ -22,6 +22,16 @@ router.get('/:id', async (req, res) => {
   const reference = await getReferenceDetails(id)
   if (!reference) return res.status(404).send()
   return res.status(200).send(reference)
+})
+
+router.get('/authors', async (_req, res) => {
+  const referenceTypes = await getReferenceAuthors()
+  res.status(200).send(referenceTypes)
+})
+
+router.get('/journals', async (_req, res) => {
+  const referenceTypes = await getReferenceJournals()
+  res.status(200).send(referenceTypes)
 })
 
 router.put(

@@ -40,3 +40,13 @@ export const getReferenceTypes = async () => {
   const referenceTypes = await nowDb.ref_ref_type.findMany({ include: { ref_field_name: true } })
   return referenceTypes
 }
+
+export const getReferenceAuthors = async () => {
+  const referenceAuthorTypes = await nowDb.ref_authors.findMany()
+  return referenceAuthorTypes
+}
+
+export const getReferenceJournals = async () => {
+  const referenceJournalTypes = await nowDb.ref_journal.findMany()
+  return referenceJournalTypes
+}

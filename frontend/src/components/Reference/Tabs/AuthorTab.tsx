@@ -77,7 +77,7 @@ export const AuthorTab = () => {
       {!mode.read && (
         <Box display="flex" gap={1}>
           <EditingForm<ReferenceAuthorType, ReferenceDetailsType>
-            buttonText="Add new suthor"
+            buttonText="Add new author"
             formFields={formFields}
             editAction={(newAuthor: ReferenceAuthorType) => {
               setEditData({

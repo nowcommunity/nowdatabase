@@ -5,7 +5,6 @@ import { ReferenceTab } from './Tabs/ReferenceTab'
 import { useEditReferenceMutation, useGetReferenceDetailsQuery } from '@/redux/referenceReducer'
 import { EditDataType, ReferenceDetailsType } from '@/backendTypes'
 import { emptyReference } from '../DetailView/common/defaultValues'
-import { AuthorTab } from './Tabs/AuthorTab'
 
 export const ReferenceDetails = () => {
   const { id } = useParams()
