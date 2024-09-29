@@ -21,16 +21,37 @@ _____
 Testing:
 
 + `npm run check`
-  + Runs `tsc` and `eslint` for frontend and backend: Use this to check for errors before committing, if you feel like it.
-+ `npm run start:anon`
-  + Uses `docker-compose.anon.yml`
-  + Runs the app with anonymized test-database. Make cypress-tests using this version
-+ `npm run test:e2e`
-  + Runs cypress-tests in headless mode, same as in GitHub Actions. Requires `npm run start:anon` to be ran first.
+  + Runs `tsc` and `eslint` for frontend and backend: Use this to check for errors before committing.
 + `npm run test:api`
-  + Runs backend api tests. Requires `npm run start:anon` to be ran first.
+  + Runs all required containers and api-tests with one command inside Docker. 
+  + Uses `docker-compose.test.yml`
+  + Uses `test_data`
++ `npm run test:e2e`
+  + Runs all required containers and e2e-tests with one command inside Docker. 
+  + Uses `docker-compose.test.yml`
+  + Uses `test_data`
++ `npm run test:up`
+  + Runs the test version of the project with anonymized test-database without tests.
+  + Uses `docker-compose.test.yml`
+  + Uses `test_data`
++ `npm run test:local:e2e`
+  + Runs cypress-tests locally in headless mode. Requires `npm run test:up` to be running first.
++ `npm run test:local:api`
+  + Runs backend api tests. Requires `db-anon` to be running first. (Note: backend doesn't need to be running.)
+  + All environment variables need to be set.
 + `npm run cypress`
   + Opens cypress. You can run tests and see what they do.
+
+Coverage:
+
++ Coverage opening
+  + Coverage can be opened by opening the `coverage/lcov-report/index.html` with your browser of choice.
++ `coverage:sed`
+  + Fixes issues with `.nyc_output` paths. Replaces the paths inside Docker to `$PWD` (current directory).
++ `coverage`
+  + First fixes paths with `coverage:sed` and then recreates `coverage/lcov-report` to match the new path.
++ `coverage:report`
+  + Alias to `npm run coverage`. Used by cypress e2e tests so that `coverage:sed` gets executed automatically.
 
 Run with the same image that is used in production:
 
