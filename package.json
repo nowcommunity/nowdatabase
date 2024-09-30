@@ -26,8 +26,6 @@
     "coverage": "npm run coverage:sed && npx nyc report --reporter=lcov",
     "coverage:sed": "sed -i -e \"s|/usr/src/app|$PWD/frontend|g\" .nyc_output/out.json",
     "coverage:report": "npm run coverage",
-    "coverage:test:e2e": "npm run test:docker:e2e",
-    "coverage:test:api": "npm run test:docker:api",
     "cypress": "cypress open",
     "prisma": "cd backend && npx prisma generate --schema prisma/schema.prisma && npx prisma generate --schema prisma/schema_log.prisma",
     "reset-anon-db": "docker exec -it nowdb-db-anon sh -c \"mariadb --user root -padmin now_test < /docker-entrypoint-initdb.d/sqlfiles/now_test.sql\" && docker exec -it nowdb-db-anon sh -c \"mariadb --user root -padmin now_log_test < /docker-entrypoint-initdb.d/sqlfiles/now_log_test.sql\"",
