@@ -18,7 +18,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Run api-tests
-        run: npm run test:docker:ci:api
+        run: npm run test:ci:api
 
       - name: Dump docker logs on failure
         if: failure()

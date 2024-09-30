@@ -25,7 +25,7 @@ jobs:
         run: npm ci
 
       - name: Run e2e tests
-        run: npm run test:docker:ci:e2e
+        run: npm run test:ci:e2e
 
       - name: Dump docker logs on failure
         if: failure()
