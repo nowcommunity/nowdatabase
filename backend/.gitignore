@@ -4,4 +4,5 @@ node_modules
 build
 requests
 prisma/generated
-coverage
+coverage/*
+!coverage/.gitkeep
