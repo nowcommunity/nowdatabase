@@ -1,5 +1,8 @@
-import { SpeciesDetailsType } from '../../../frontend/src/backendTypes'
+import { EditDataType, SpeciesDetailsType } from '../../../frontend/src/backendTypes'
 import { fixBigInt } from '../utils/common'
+import { validateSpecies } from '../../../frontend/src/validators/species'
+import { ValidationObject } from '../../../frontend/src/validators/validator'
+import Prisma from '../../prisma/generated/now_test_client'
 import { logDb, nowDb } from '../utils/db'
 
 export const getAllSpecies = async () => {
@@ -68,4 +71,14 @@ export const getSpeciesDetails = async (id: number) => {
   }))
 
   return JSON.parse(fixBigInt({ ...result, com_taxa_synonym: synonyms || [] })!) as SpeciesDetailsType
+}
+
+export const validateEntireSpecies = (editedFields: EditDataType<Prisma.com_species>) => {
+  const keys = Object.keys(editedFields)
+  const errors: ValidationObject[] = []
+  for (const key of keys) {
+    const error = validateSpecies(editedFields as EditDataType<SpeciesDetailsType>, key as keyof SpeciesDetailsType)
+    if (error.error) errors.push(error)
+  }
+  return errors
 }
