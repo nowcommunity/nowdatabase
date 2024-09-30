@@ -4,14 +4,12 @@ services:
     container_name: nowdb-frontend-test
     build:
       context: ./frontend
-      dockerfile: Dockerfile
-      args:
-        BACKEND_URL: http://backend:4000
-        ENABLE_WRITE: true
-        RUNNING_ENV: dev
+      dockerfile: dev.Dockerfile
     ports:
       - 127.0.0.1:5173:5173
     env_file: .anon.env
+    environment:
+      VITE_BACKEND_URL: http://backend:4000
 
   backend:
     container_name: nowdb-backend-test
@@ -65,6 +63,7 @@ services:
       - ./:/e2e
     environment:
       CYPRESS_baseUrl: "http://frontend:5173"
+      CYPRESS_databaseResetUrl: "http://backend:4000/test/reset-test-database"
 
   db-anon:
     container_name: nowdb-db-anon

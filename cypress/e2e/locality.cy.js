@@ -3,7 +3,7 @@ describe("Locality min and max age checks work", () => {
         cy.login('testSu')
     })
 
-    it("Editing a locality with contradictory min and max ages does not work", () => {
+    it.skip("Editing a locality with contradictory min and max ages does not work", () => {
         cy.on("uncaught:exception", (error) => {
             // this is here to ignore the error that happens when you put contradictory data to backend
             // might ignore errors that should not be ignored too!

@@ -9,3 +9,5 @@ local_dev
 cypress/videos
 cypress/screenshots
 cypress/downloads
+coverage
+.nyc_output
