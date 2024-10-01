@@ -24,8 +24,8 @@ export const SpeciesDetails = () => {
   if (isNew) {
     document.title = 'New species'
   }
-  const [editSpeciesRequest] = useEditSpeciesMutation()
-  const { isLoading, isError, isFetching, data } = useGetSpeciesDetailsQuery(id!, {
+  const [editSpeciesRequest, { isLoading: mutationLoading }] = useEditSpeciesMutation()
+  const { isError, isFetching, data } = useGetSpeciesDetailsQuery(id!, {
     skip: isNew,
   })
 
@@ -42,7 +42,7 @@ export const SpeciesDetails = () => {
   }, [deleteSuccess, deleteError, notify, navigate])
 
   if (isError) return <div>Error loading data</div>
-  if (isLoading || isFetching || (!data && !isNew)) return <CircularProgress />
+  if (mutationLoading || isFetching || (!data && !isNew)) return <CircularProgress />
   if (data) {
     document.title = `Species - ${data.species_name}`
   }
