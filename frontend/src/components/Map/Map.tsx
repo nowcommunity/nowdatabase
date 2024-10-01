@@ -38,14 +38,11 @@ const DraggableMarker = ({ setMarkerPos }: { setMarkerPos: any }) => {
   )
 }
 
-export const Map = () => {
+export const Map = ({ coordinates, setCoordinates }) => {
   const mapRef = useRef(null)
   const latitude = 30
   const longitude = -5
-
   document.title = 'Map'
-
-  const [markerPos, setMarkerPos] = useState(null)
 
   return (
     <div>
@@ -54,12 +51,10 @@ export const Map = () => {
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
-        {/* Additional map layers or components can be added here */}
-        {/* <LocationMarker /> */}
-        <DraggableMarker setMarkerPos={setMarkerPos} />
+        <DraggableMarker setMarkerPos={setCoordinates} />
       </MapContainer>
       <p>
-        Lat: {markerPos ? markerPos.lat : null} Lon: {markerPos ? markerPos.lng : null}
+        Lat: {coordinates ? coordinates.lat : null} Lon: {coordinates ? coordinates.lng : null}
       </p>
     </div>
   )
