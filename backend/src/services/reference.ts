@@ -42,7 +42,16 @@ export const getReferenceTypes = async () => {
 }
 
 export const getReferenceAuthors = async () => {
-  const referenceAuthorTypes = await nowDb.ref_authors.findMany()
+  const referenceAuthorTypes = await nowDb.ref_authors.findMany({
+    select: {
+      rid: true,
+      field_id: true,
+      au_num: true,
+      author_surname: true,
+      author_initials: true
+    }
+  })
+  console.log(referenceAuthorTypes)
   return referenceAuthorTypes
 }
 

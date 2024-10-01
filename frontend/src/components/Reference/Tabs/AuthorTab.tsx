@@ -8,10 +8,16 @@ import { useGetReferenceAuthorsQuery } from '@/redux/referenceReducer'
 import { Box } from '@mui/material'
 import { skipToken } from '@reduxjs/toolkit/query'
 import { MRT_ColumnDef } from 'material-react-table'
+import { CircularProgress } from '@mui/material'
 
 export const AuthorTab = () => {
   const { mode, editData, setEditData } = useDetailContext<ReferenceDetailsType>()
+  console.log(mode, editData, setEditData)
   const { data: authorData, isError } = useGetReferenceAuthorsQuery(mode.read ? skipToken : undefined)
+  //const { data: authorData} = useGetReferenceAuthorsQuery()
+  console.log(authorData)
+
+  if (!authorData) return <CircularProgress />
 
   const authorColumns: MRT_ColumnDef<ReferenceAuthorType>[] = [
     {
@@ -30,41 +36,7 @@ export const AuthorTab = () => {
       accessorKey: 'field_id',
       header: 'Field ID',
     },
-  ]/*
-  const localitySpeciesColumns: MRT_ColumnDef<LocalitySpecies>[] = [
-    {
-      accessorKey: 'com_species.order_name',
-      header: 'Order',
-    },
-    {
-      accessorKey: 'com_species.family_name',
-      header: 'Family',
-    },
-    {
-      accessorKey: 'com_species.genus_name',
-      header: 'Genus',
-    },
-    {
-      accessorKey: 'com_species.species_name',
-      header: 'Species',
-    },
-    {
-      accessorKey: 'com_species.subclass_or_superorder_name',
-      header: 'Subclass or Superorder',
-    },
-    {
-      accessorKey: 'com_species.suborder_or_superfamily_name',
-      header: 'Suborder or Superfamily',
-    },
-    {
-      accessorKey: 'com_species.unique_identifier',
-      header: 'Unique Identifier',
-    },
-    {
-      accessorKey: 'com_species.taxonomic_status',
-      header: 'Taxon status',
-    },
-  ]*/
+  ]
   const formFields: { name: string; label: string; required?: boolean }[] = [
     { name: 'author_initials', label: 'Author initials', required: true },
     { name: 'author_surname', label: 'Surname', required: true },
@@ -85,8 +57,12 @@ export const AuthorTab = () => {
                 ref_authors: [
                   ...editData.ref_authors,
                   {
+                    rid: editData.rid,
+                    author_initials: newAuthor.author_initials,
+                    author_surname: newAuthor.author_surname,
+                    field_id: newAuthor.field_id,
                     au_num: newAuthor.au_num,
-                   // ref_authors: { ...(newAuthor as ReferenceAuthorType) },
+                    ref_ref: { ...(editData as ReferenceDetailsType) },
                     rowState: 'new',
                   },
                 ],

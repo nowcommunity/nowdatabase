@@ -19,6 +19,7 @@ const referencesApi = api.injectEndpoints({
       query: () => ({
         url: 'reference/types',
       }),
+      providesTags: result => (result ? [{ type: 'author' }] : []),
     }),
     getReferenceAuthors: builder.query<ReferenceAuthorType[], void>({
       query: () => ({
