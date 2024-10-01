@@ -19,14 +19,17 @@ import { useEffect } from 'react'
 
 export const SpeciesDetails = () => {
   const { id } = useParams()
+  const navigate = useNavigate()
   const isNew = id === 'new'
   if (isNew) {
     document.title = 'New species'
   }
-  const { isLoading, isError, isFetching, data } = useGetSpeciesDetailsQuery(id!, { skip: isNew })
   const [editSpeciesRequest] = useEditSpeciesMutation()
+  const { isLoading, isError, isFetching, data } = useGetSpeciesDetailsQuery(id!, {
+    skip: isNew
+  })
+
   const notify = useNotify()
-  const navigate = useNavigate()
   const [deleteMutation, { isSuccess: deleteSuccess, isError: deleteError }] = useDeleteSpeciesMutation()
 
   useEffect(() => {
@@ -96,11 +99,11 @@ export const SpeciesDetails = () => {
     <DetailView
       tabs={tabs}
       data={isNew ? emptySpecies : data!}
-      onWrite={onWrite}
       isNew={isNew}
-      hasStagingMode
+      onWrite={onWrite}
       validator={validateSpecies}
       deleteFunction={deleteFunction}
+      hasStagingMode
     />
   )
 }
