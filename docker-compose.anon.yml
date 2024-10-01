@@ -4,9 +4,7 @@ services:
     container_name: nowdb-frontend-anon
     build:
       context: ./frontend
-      dockerfile: Dockerfile
-      args:
-        ENABLE_WRITE: true
+      dockerfile: dev.Dockerfile
     ports:
       - 127.0.0.1:5173:5173
     env_file: .anon.env
