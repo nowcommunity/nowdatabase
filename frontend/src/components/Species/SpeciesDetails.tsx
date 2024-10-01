@@ -26,7 +26,7 @@ export const SpeciesDetails = () => {
   }
   const [editSpeciesRequest] = useEditSpeciesMutation()
   const { isLoading, isError, isFetching, data } = useGetSpeciesDetailsQuery(id!, {
-    skip: isNew
+    skip: isNew,
   })
 
   const notify = useNotify()
