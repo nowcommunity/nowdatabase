@@ -14,6 +14,7 @@ module.exports = defineConfig({
   env: {
     databaseResetUrl: "http://localhost:4000/test/reset-test-database"
   },
+  screenshotOnRunFailure: false,
   viewportHeight: 900,
   viewportWidth: 1200,
 });
