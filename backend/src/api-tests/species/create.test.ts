@@ -1,7 +1,7 @@
 import { beforeEach, beforeAll, afterAll, describe, it, expect } from '@jest/globals'
 import { LocalityDetailsType, SpeciesDetailsType } from '../../../../frontend/src/backendTypes'
 import { LogRow } from '../../services/write/writeOperations/types'
-import { newSpeciesBasis } from './data'
+import { newSpeciesBasis, newSpeciesWithoutRequiredFields } from './data'
 import { login, resetDatabase, send, testLogRows } from '../utils'
 import { pool } from '../../utils/db'
 
@@ -54,5 +54,12 @@ describe('Creating new species works', () => {
       },
     ]
     testLogRows(logRows, expectedLogRows, 2)
+  })
+
+  it('Species without required fields fails', async () => {
+    const res = await send('species', 'PUT', {
+      species: { ...newSpeciesWithoutRequiredFields, comment: 'species test' },
+    })
+    expect(res.status).toEqual(400)
   })
 })
