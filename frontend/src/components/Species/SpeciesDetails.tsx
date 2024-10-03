@@ -23,8 +23,8 @@ export const SpeciesDetails = () => {
   if (isNew) {
     document.title = 'New species'
   }
-  const { isLoading, isError, isFetching, data } = useGetSpeciesDetailsQuery(id!, { skip: isNew })
-  const [editSpeciesRequest] = useEditSpeciesMutation()
+  const [editSpeciesRequest, { isLoading: mutationLoading }] = useEditSpeciesMutation()
+  const { isError, isFetching, data } = useGetSpeciesDetailsQuery(id!, { skip: isNew })
   const notify = useNotify()
   const navigate = useNavigate()
   const [deleteMutation, { isSuccess: deleteSuccess, isError: deleteError }] = useDeleteSpeciesMutation()
@@ -39,7 +39,7 @@ export const SpeciesDetails = () => {
   }, [deleteSuccess, deleteError, notify, navigate])
 
   if (isError) return <div>Error loading data</div>
-  if (isLoading || isFetching || (!data && !isNew)) return <CircularProgress />
+  if (isFetching || (!data && !isNew) || mutationLoading) return <CircularProgress />
   if (data) {
     document.title = `Species - ${data.species_name}`
   }
@@ -49,7 +49,6 @@ export const SpeciesDetails = () => {
   }
 
   const onWrite = async (editData: EditDataType<SpeciesDetailsType>) => {
-    console.log(editData)
     const { species_id } = await editSpeciesRequest(editData).unwrap()
     navigate(`/species/${species_id}`)
   }
