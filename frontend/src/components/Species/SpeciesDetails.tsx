@@ -50,7 +50,7 @@ export const SpeciesDetails = () => {
 
   const onWrite = async (editData: EditDataType<SpeciesDetailsType>) => {
     const { species_id } = await editSpeciesRequest(editData).unwrap()
-    setTimeout (() => navigate(`/species/${species_id}`), 15)
+    setTimeout(() => navigate(`/species/${species_id}`), 15)
   }
 
   const tabs: TabType[] = [
