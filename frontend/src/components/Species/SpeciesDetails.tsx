@@ -49,7 +49,9 @@ export const SpeciesDetails = () => {
   }
 
   const onWrite = async (editData: EditDataType<SpeciesDetailsType>) => {
-    await editSpeciesRequest(editData)
+    console.log(editData)
+    const { species_id } = await editSpeciesRequest(editData).unwrap()
+    navigate(`/species/${species_id}`)
   }
 
   const tabs: TabType[] = [

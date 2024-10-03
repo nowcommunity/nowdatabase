@@ -19,10 +19,10 @@ describe('Creating new species works', () => {
   })
 
   it('Request succeeds and returns valid number id', async () => {
-    const { body: resultBody } = await send<{ id: number }>('species', 'PUT', {
+    const { body: resultBody } = await send<{ species_id: number }>('species', 'PUT', {
       species: { ...newSpeciesBasis, comment: 'species test' },
     })
-    const { id: createdId } = resultBody
+    const { species_id: createdId } = resultBody
 
     expect(typeof createdId).toEqual('number') // `Invalid result returned on write: ${createdId}`
 

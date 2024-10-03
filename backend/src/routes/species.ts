@@ -29,8 +29,8 @@ router.put(
     if (validationErrors.length > 0) {
       return res.status(400).send()
     }
-    const id = await writeSpecies(editedSpecies, comment, references, req.user!.initials)
-    return res.status(200).send({ id })
+    const species_id = await writeSpecies(editedSpecies, comment, references, req.user!.initials)
+    return res.status(200).send({ species_id })
   }
 )
 
