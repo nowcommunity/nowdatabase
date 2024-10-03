@@ -34,6 +34,7 @@ services:
 
   api-tests:
     container_name: nowdb-api-tests-test
+    user: node
     depends_on:
       db-anon:
         condition: service_healthy
@@ -51,6 +52,7 @@ services:
   e2e-tests:
     container_name: nowdb-e2e-tests
     image: "cypress/included:13.14.2"
+    user: node
     depends_on:
       db-anon:
         condition: service_healthy
