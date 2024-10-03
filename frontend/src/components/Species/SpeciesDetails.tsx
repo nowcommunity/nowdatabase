@@ -49,8 +49,18 @@ export const SpeciesDetails = () => {
   }
 
   const onWrite = async (editData: EditDataType<SpeciesDetailsType>) => {
+    try {
     const { species_id } = await editSpeciesRequest(editData).unwrap()
     setTimeout(() => navigate(`/species/${species_id}`), 15)
+    } catch (e: any) {
+      console.log(e)
+      let message = 'Could not save item. Missing: '
+      Object.keys(e.data).forEach(key => {
+        message += `${e.data[key].name}. `
+      })
+      console.log(message)
+      notify(message, 'error')
+    }
   }
 
   const tabs: TabType[] = [

@@ -60,6 +60,6 @@ describe('Creating new species works', () => {
     const res = await send('species', 'PUT', {
       species: { ...newSpeciesWithoutRequiredFields, comment: 'species test' },
     })
-    expect(res.status).toEqual(400)
+    expect(res.status).toEqual(403)
   })
 })

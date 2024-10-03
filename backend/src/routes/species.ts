@@ -27,7 +27,7 @@ router.put(
     const { comment, references, ...editedSpecies } = req.body.species
     const validationErrors = validateEntireSpecies(editedSpecies)
     if (validationErrors.length > 0) {
-      return res.status(400).send()
+      return res.status(403).send(validationErrors)
     }
     const species_id = await writeSpecies(editedSpecies, comment, references, req.user!.initials)
     return res.status(200).send({ species_id })
