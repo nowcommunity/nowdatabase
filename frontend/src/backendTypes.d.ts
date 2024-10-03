@@ -248,3 +248,8 @@ export type ReferenceOfUpdate = Prisma.ref_ref & {
 
 export type LocalityReference = Prisma.now_lr & ReferenceOfUpdate
 export type SpeciesReference = Prisma.now_sr & ReferenceOfUpdate
+
+export type ValidationErrors = {
+  status: string
+  data: { [key: string]: { name: string; message: string } }
+}

@@ -11,7 +11,7 @@ import { SynonymTab } from './Tabs/SynonymTab'
 import { TaxonomyTab } from './Tabs/TaxonomyTab'
 import { TeethTab } from './Tabs/TeethTab'
 import { UpdateTab } from '../DetailView/common/UpdateTab'
-import { EditDataType, SpeciesDetailsType } from '@/backendTypes'
+import { EditDataType, SpeciesDetailsType, ValidationErrors } from '@/backendTypes'
 import { validateSpecies } from '@/validators/species'
 import { emptySpecies } from '../DetailView/common/defaultValues'
 import { useNotify } from '@/hooks/notification'
@@ -50,15 +50,14 @@ export const SpeciesDetails = () => {
 
   const onWrite = async (editData: EditDataType<SpeciesDetailsType>) => {
     try {
-    const { species_id } = await editSpeciesRequest(editData).unwrap()
-    setTimeout(() => navigate(`/species/${species_id}`), 15)
-    } catch (e: any) {
-      console.log(e)
+      const { species_id } = await editSpeciesRequest(editData).unwrap()
+      setTimeout(() => navigate(`/species/${species_id}`), 15)
+    } catch (e) {
+      const error = e as ValidationErrors
       let message = 'Could not save item. Missing: '
-      Object.keys(e.data).forEach(key => {
-        message += `${e.data[key].name}. `
+      Object.keys(error.data).forEach(key => {
+        message += `${error.data[key].name}. `
       })
-      console.log(message)
       notify(message, 'error')
     }
   }
