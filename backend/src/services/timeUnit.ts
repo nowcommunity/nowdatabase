@@ -94,7 +94,7 @@ export const validateEntireTimeUnit = (editedFields: EditDataType<Prisma.now_tim
   const keys = Object.keys(editedFields)
   const errors: ValidationObject[] = []
   for (const key of keys) {
-    const error = validateTimeUnit(editedFields, key as keyof TimeUnitDetailsType)
+    const error = validateTimeUnit(editedFields as EditDataType<TimeUnitDetailsType>, key as keyof TimeUnitDetailsType)
     if (error.error) errors.push(error)
   }
   return errors
