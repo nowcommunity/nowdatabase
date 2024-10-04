@@ -13,6 +13,7 @@ import { UpdateTab } from '../DetailView/common/UpdateTab'
 import { DetailView, TabType } from '../DetailView/DetailView'
 import { LocalityTab } from './Tabs/LocalityTab'
 import { TimeUnitTab } from './Tabs/TimeUnitTab'
+import { validateTimeUnit } from '@/validators/timeUnit'
 
 export const TimeUnitDetails = () => {
   const { id } = useParams()
@@ -72,7 +73,7 @@ export const TimeUnitDetails = () => {
       hasStagingMode
       data={isNew ? emptyTimeUnit : data!}
       onWrite={onWrite}
-      validator={() => ({ name: '', error: null })}
+      validator={validateTimeUnit}
       deleteFunction={deleteFunction}
     />
   )
