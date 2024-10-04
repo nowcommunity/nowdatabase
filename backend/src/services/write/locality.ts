@@ -37,6 +37,10 @@ export const writeLocality = async (
 
   locality.hominin_skeletal_remains = getHomininSkeletalRemains(locality)
 
+  locality.bipedal_footprints = !!locality.bipedal_footprints
+  locality.stone_tool_cut_marks_on_bones = !!locality.stone_tool_cut_marks_on_bones
+  locality.stone_tool_technology = !!locality.stone_tool_technology
+
   try {
     await writeHandler.start()
 
