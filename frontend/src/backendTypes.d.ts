@@ -219,12 +219,13 @@ export type EditMetaData = { comment?: string; references?: Reference[] }
 /* Reference */
 export type ReferenceDetailsType = Prisma.ref_ref & {
   ref_authors: {
-    au_num: number
-    author_surname: string
-    author_initials: string
+    au_num: number | null
+    author_surname: string | null
+    author_initials: string | null
+    field_num: string | null
   }[]
   ref_journal: {
-    journal_title: string
+    journal_title: string | null
   }
   ref_ref_type: {
     ref_type: string

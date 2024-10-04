@@ -51,7 +51,6 @@ export const getReferenceAuthors = async () => {
       author_initials: true
     }
   })
-  console.log(referenceAuthorTypes)
   return referenceAuthorTypes
 }
 

@@ -11,13 +11,18 @@ import { MRT_ColumnDef } from 'material-react-table'
 import { CircularProgress } from '@mui/material'
 
 export const AuthorTab = () => {
-  const { mode, editData, setEditData } = useDetailContext<ReferenceDetailsType>()
-  console.log(mode, editData, setEditData)
+  const { data, mode, editData, setEditData } = useDetailContext<ReferenceDetailsType>()
+ // console.log(mode, editData, setEditData)
   const { data: authorData, isError } = useGetReferenceAuthorsQuery(mode.read ? skipToken : undefined)
-  //const { data: authorData} = useGetReferenceAuthorsQuery()
-  console.log(authorData)
-
-  if (!authorData) return <CircularProgress />
+  //const { data: authorData, isError} = useGetReferenceAuthorsQuery()
+  console.log(editData)
+  console.log(editData.ref_authors, !editData.ref_authors)
+  console.log(authorData, !authorData)
+  
+  if (!authorData || !editData.ref_authors){
+    console.log('thisfailed')
+    return <CircularProgress />
+  }
 
   const authorColumns: MRT_ColumnDef<ReferenceAuthorType>[] = [
     {
@@ -43,7 +48,26 @@ export const AuthorTab = () => {
     { name: 'au_num', label: 'Author number', required: true },
     { name: 'field_id', label: 'Field ID', required: true },
   ]
+  const referenceAuthorColumns: MRT_ColumnDef<ReferenceAuthorType>[] = [
+    {
+      accessorKey: 'author_initials',
+      header: 'Author initials',
+    },
+    {
+      accessorKey: 'author_surname',
+      header: 'Surname',
+    },
+    {
+      accessorKey: 'au_num',
+      header: 'Author number',
+    },
+    {
+      accessorKey: 'field_id',
+      header: 'Field ID',
+    },
+  ]
 
+  console.log('before big return')
   return (
     <Grouped title="Authors">
       {!mode.read && (
@@ -62,7 +86,7 @@ export const AuthorTab = () => {
                     author_surname: newAuthor.author_surname,
                     field_id: newAuthor.field_id,
                     au_num: newAuthor.au_num,
-                    ref_ref: { ...(editData as ReferenceDetailsType) },
+                   // ref_ref: { ...(editData as ReferenceDetailsType) },
                     rowState: 'new',
                   },
                 ],
@@ -75,14 +99,19 @@ export const AuthorTab = () => {
             isError={isError}
             columns={authorColumns}
             fieldName="ref_authors"
-            idFieldName="rid"
+            idFieldName="au_num"
             editingAction={(newAuthor: ReferenceAuthorType) => {
               setEditData({
                 ...editData,
                 ref_authors: [
                   ...editData.ref_authors,
                   {
+                    rid: editData.rid,
                     au_num: newAuthor.au_num,
+                    author_initials: newAuthor.author_initials,
+                    author_surname: newAuthor.author_surname,
+                    field_id: newAuthor.field_id,
+                  //  ref_ref: { ...(editData as ReferenceDetailsType) },
              //       com_species: { ...(newSpecies as SpeciesDetailsType) },
                     rowState: 'new',
                   },
@@ -92,7 +121,7 @@ export const AuthorTab = () => {
           />
         </Box>
       )}
-      <EditableTable<ReferenceAuthorType, ReferenceDetailsType> columns={authorColumns} field="ref_authors" />
+      <EditableTable<ReferenceAuthorType, ReferenceDetailsType> columns={referenceAuthorColumns} field="ref_authors" />
     </Grouped>
   )
 }
