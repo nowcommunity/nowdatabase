@@ -22,20 +22,25 @@ export const TimeUnitDetails = () => {
     document.title = 'New time unit'
   }
   const { isLoading, isError, isFetching, data } = useGetTimeUnitDetailsQuery(encodeURIComponent(id!), { skip: isNew })
-  const [editTimeUnitRequest] = useEditTimeUnitMutation()
+  const [editTimeUnitRequest, { isSuccess: editSuccess, isError: editError }] = useEditTimeUnitMutation()
 
   const notify = useNotify()
   const navigate = useNavigate()
   const [deleteMutation, { isSuccess: deleteSuccess, isError: deleteError }] = useDeleteTimeUnitMutation()
 
   useEffect(() => {
+    if (editSuccess) {
+      notify('Edited item successfully.')
+    } else if (editError) {
+      notify('Could not edit item. Error happened.', 'error')
+    }
     if (deleteSuccess) {
       notify('Deleted item successfully.')
       navigate('/time-unit')
     } else if (deleteError) {
       notify('Could not delete item. Error happened.', 'error')
     }
-  }, [deleteSuccess, deleteError, notify, navigate])
+  }, [editSuccess, editError, deleteSuccess, deleteError, notify, navigate])
 
   if (isError) return <div>Error loading data</div>
   if (isLoading || isFetching || (!data && !isNew)) return <CircularProgress />
