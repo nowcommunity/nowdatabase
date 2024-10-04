@@ -3,7 +3,12 @@ import { EditDataType, EditMetaData, TimeUnitDetailsType } from '../../../fronte
 import { Role } from '../../../frontend/src/types'
 import { requireOneOf } from '../middlewares/authorizer'
 import { getAllSequences } from '../services/sequence'
-import { getAllTimeUnits, getTimeUnitDetails, getTimeUnitLocalities } from '../services/timeUnit'
+import {
+  getAllTimeUnits,
+  getTimeUnitDetails,
+  getTimeUnitLocalities,
+  validateEntireTimeUnit,
+} from '../services/timeUnit'
 import { deleteTimeUnit, writeTimeUnit } from '../services/write/timeUnit'
 import { fixBigInt } from '../utils/common'
 
@@ -37,6 +42,10 @@ router.put(
   requireOneOf([Role.Admin, Role.EditUnrestricted]),
   async (req: Request<object, object, { timeUnit: EditDataType<TimeUnitDetailsType> & EditMetaData }>, res) => {
     const { comment, references, ...editedTimeUnit } = req.body.timeUnit
+    const validationErrors = validateEntireTimeUnit(editedTimeUnit)
+    if (validationErrors.length > 0) {
+      return res.status(400).send({ validationErrors })
+    }
     const result = await writeTimeUnit(editedTimeUnit, comment, references, req.user!.initials)
     return res.status(200).send({ id: result })
   }
