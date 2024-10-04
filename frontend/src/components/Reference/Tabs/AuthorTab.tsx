@@ -8,21 +8,12 @@ import { useGetReferenceAuthorsQuery } from '@/redux/referenceReducer'
 import { Box } from '@mui/material'
 import { skipToken } from '@reduxjs/toolkit/query'
 import { MRT_ColumnDef } from 'material-react-table'
-import { CircularProgress } from '@mui/material'
 
-export const AuthorTab = () => {
-  const { data, mode, editData, setEditData } = useDetailContext<ReferenceDetailsType>()
- // console.log(mode, editData, setEditData)
+export const AuthorTab = ({field_num_param}) => {
+  const { mode, editData, setEditData } = useDetailContext<ReferenceDetailsType>()
+
+  console.log(mode, editData, setEditData)
   const { data: authorData, isError } = useGetReferenceAuthorsQuery(mode.read ? skipToken : undefined)
-  //const { data: authorData, isError} = useGetReferenceAuthorsQuery()
-  console.log(editData)
-  console.log(editData.ref_authors, !editData.ref_authors)
-  console.log(authorData, !authorData)
-  
-  if (!authorData || !editData.ref_authors){
-    console.log('thisfailed')
-    return <CircularProgress />
-  }
 
   const authorColumns: MRT_ColumnDef<ReferenceAuthorType>[] = [
     {
@@ -36,10 +27,6 @@ export const AuthorTab = () => {
     {
       accessorKey: 'au_num',
       header: 'Author number',
-    },
-    {
-      accessorKey: 'field_id',
-      header: 'Field ID',
     },
   ]
   const formFields: { name: string; label: string; required?: boolean }[] = [
@@ -61,13 +48,8 @@ export const AuthorTab = () => {
       accessorKey: 'au_num',
       header: 'Author number',
     },
-    {
-      accessorKey: 'field_id',
-      header: 'Field ID',
-    },
   ]
 
-  console.log('before big return')
   return (
     <Grouped title="Authors">
       {!mode.read && (
@@ -76,21 +58,26 @@ export const AuthorTab = () => {
             buttonText="Add new author"
             formFields={formFields}
             editAction={(newAuthor: ReferenceAuthorType) => {
+              const updatedAuthors = [
+                ...editData.ref_authors,
+                {
+                  rid: editData.rid,
+                  author_initials: newAuthor.author_initials,
+                  author_surname: newAuthor.author_surname,
+                  field_num: field_num_param,
+                  au_num: newAuthor.au_num,
+                  rowState: 'new',
+                },
+              ];
+            
               setEditData({
                 ...editData,
-                ref_authors: [
-                  ...editData.ref_authors,
-                  {
-                    rid: editData.rid,
-                    author_initials: newAuthor.author_initials,
-                    author_surname: newAuthor.author_surname,
-                    field_id: newAuthor.field_id,
-                    au_num: newAuthor.au_num,
-                   // ref_ref: { ...(editData as ReferenceDetailsType) },
-                    rowState: 'new',
-                  },
-                ],
+                ref_authors: updatedAuthors, // Update the ref_authors array
+                visible_ref_authors: updatedAuthors.filter((author) => author.field_num === field_num_param) // Filter using updatedAuthors, not editData.ref_authors
               })
+            
+              console.log('inside the thing');
+              console.log(editData.visible_ref_authors)
             }}
           />
           <SelectingTable<ReferenceAuthorType, ReferenceDetailsType>
@@ -100,23 +87,27 @@ export const AuthorTab = () => {
             columns={authorColumns}
             fieldName="ref_authors"
             idFieldName="au_num"
-            editingAction={(newAuthor: ReferenceAuthorType) => {
+            editAction={(newAuthor: ReferenceAuthorType) => {
+              const updatedAuthors = [
+                ...editData.ref_authors,
+                {
+                  rid: editData.rid,
+                  author_initials: newAuthor.author_initials,
+                  author_surname: newAuthor.author_surname,
+                  field_num: field_num_param,
+                  au_num: newAuthor.au_num,
+                  rowState: 'new',
+                },
+              ];
+            
               setEditData({
                 ...editData,
-                ref_authors: [
-                  ...editData.ref_authors,
-                  {
-                    rid: editData.rid,
-                    au_num: newAuthor.au_num,
-                    author_initials: newAuthor.author_initials,
-                    author_surname: newAuthor.author_surname,
-                    field_id: newAuthor.field_id,
-                  //  ref_ref: { ...(editData as ReferenceDetailsType) },
-             //       com_species: { ...(newSpecies as SpeciesDetailsType) },
-                    rowState: 'new',
-                  },
-                ],
-              })
+                ref_authors: updatedAuthors, // Update the ref_authors array
+                visible_ref_authors: updatedAuthors.filter((author) => author.field_num === field_num_param) // Filter using updatedAuthors, not editData.ref_authors
+              });
+            
+              console.log('inside the thing');
+              console.log(editData.visible_ref_authors); // Log filtered updatedAuthors
             }}
           />
         </Box>

@@ -233,4 +233,7 @@ export const emptyReference = {
   used_morph: null,
   used_now: null,
   used_gene: null,
+  ref_authors: [],
+  ref_journal: [],
+  visible_ref_authors: [],
 } as unknown as ReferenceDetailsType

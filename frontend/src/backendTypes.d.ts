@@ -229,7 +229,12 @@ export type ReferenceDetailsType = Prisma.ref_ref & {
   }
   ref_ref_type: {
     ref_type: string
-  }}
+  }
+} & VisibleRefAuthors
+
+export type VisibleRefAuthors = {
+  visible_ref_authors?: []
+}
 
 export type ReferenceType = Prisma.ref_ref_type & { ref_field_name: Prisma.ref_field_name[] }
 
