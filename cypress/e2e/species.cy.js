@@ -3,7 +3,7 @@ describe("Species validators work", () => {
         cy.login('testSu')
     })
 
-    it.skip("Creating a species with missing required fields does not work", () => {
+    it("Creating a species with missing required fields does not work", () => {
         cy.visit('/species/new')
         cy.contains("This field is required")
         cy.get('[id=write-button]').click()
