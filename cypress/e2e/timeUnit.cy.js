@@ -5,7 +5,17 @@ describe("Editing time unit", () => {
     beforeEach('Reset database', () => {
         cy.request(Cypress.env("databaseResetUrl"));
     });
-    it.skip("User editing time unit with correct values succeeds", () => {
+    it("User editing time unit with correct values succeeds", () => {
+        cy.visit(`/time-unit/bahean?tab=0`)
+        cy.contains('Bahean')
+        cy.get('[id=edit-button]').click()
+        cy.get("[id=\\:r7\\:]").first().click()
+        cy.get("[data-cy=detailview-button-ALMAAsianlandmammalage]").first().click()
+        cy.get('[id=write-button]').click()
+        cy.get('[id=write-button]').click()
+        cy.contains("ALMAAsianlandmammalage")
+    })
+    it("User editing time unit with incorrect values does not succeed and is notified about it", () => {
         cy.visit(`/time-unit/bahean?tab=0`)
         cy.contains('Bahean')
         cy.get('[id=edit-button]').click()
@@ -15,16 +25,5 @@ describe("Editing time unit", () => {
         cy.get('[id=write-button]').click()
         cy.get('[id=write-button]').click()
         cy.contains("Bahean")
-    })
-    it.skip("User editing time unit with incorrect values is notified about it", () => {
-        cy.visit(`/time-unit/bahean?tab=0`)
-        cy.contains('Bahean')
-        cy.get('[id=edit-button]').click()
-        cy.get("[id=\\:r7\\:]").first().click()
-        cy.get("[data-cy=detailview-button-ALMAAsianlandmammalage]").first().click()
-        cy.contains("ALMAAsianlandmammalage")
-        cy.get('[id=write-button]').click()
-        cy.get('[id=write-button]').click()
-        cy.contains("ALMAAsianlandmammalage")
     })
 })
