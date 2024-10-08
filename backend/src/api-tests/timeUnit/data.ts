@@ -13,7 +13,8 @@ export const newTimeUnitBasis: EditDataType<TimeUnitDetailsType & EditMetaData> 
 }
 
 export const editedTimeUnit: EditDataType<TimeUnitDetailsType & EditMetaData> = {
-  tu_name: 'bahean',
+  tu_name: 'baheantest',
+  tu_display_name: 'Bahean Test',
   up_bnd: 20214,
   low_bnd: 20213,
   rank: 'Age',
