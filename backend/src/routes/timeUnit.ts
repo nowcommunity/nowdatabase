@@ -44,10 +44,10 @@ router.put(
     const { comment, references, ...editedTimeUnit } = req.body.timeUnit
     const validationErrors = validateEntireTimeUnit(editedTimeUnit)
     if (validationErrors.length > 0) {
-      return res.status(400).send({ validationErrors })
+      return res.status(403).send(validationErrors)
     }
-    const result = await writeTimeUnit(editedTimeUnit, comment, references, req.user!.initials)
-    return res.status(200).send({ id: result })
+    const tu_name = await writeTimeUnit(editedTimeUnit, comment, references, req.user!.initials)
+    return res.status(200).send({ tu_name })
   }
 )
 

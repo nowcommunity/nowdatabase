@@ -1,4 +1,4 @@
-import { EditDataType, TimeUnitDetailsType } from '@/backendTypes'
+import { EditDataType, TimeUnitDetailsType, ValidationErrors } from '@/backendTypes'
 import { useNotify } from '@/hooks/notification'
 import { CircularProgress } from '@mui/material'
 import { useEffect } from 'react'
@@ -22,25 +22,20 @@ export const TimeUnitDetails = () => {
     document.title = 'New time unit'
   }
   const { isLoading, isError, isFetching, data } = useGetTimeUnitDetailsQuery(encodeURIComponent(id!), { skip: isNew })
-  const [editTimeUnitRequest, { isSuccess: editSuccess, isError: editError }] = useEditTimeUnitMutation()
+  const [editTimeUnitRequest] = useEditTimeUnitMutation()
 
   const notify = useNotify()
   const navigate = useNavigate()
   const [deleteMutation, { isSuccess: deleteSuccess, isError: deleteError }] = useDeleteTimeUnitMutation()
 
   useEffect(() => {
-    if (editSuccess) {
-      notify('Edited item successfully.')
-    } else if (editError) {
-      notify('Could not edit item. Error happened.', 'error')
-    }
     if (deleteSuccess) {
       notify('Deleted item successfully.')
       navigate('/time-unit')
     } else if (deleteError) {
       notify('Could not delete item. Error happened.', 'error')
     }
-  }, [editSuccess, editError, deleteSuccess, deleteError, notify, navigate])
+  }, [deleteSuccess, deleteError, notify, navigate])
 
   if (isError) return <div>Error loading data</div>
   if (isLoading || isFetching || (!data && !isNew)) return <CircularProgress />
@@ -53,7 +48,22 @@ export const TimeUnitDetails = () => {
   }
 
   const onWrite = async (editData: EditDataType<TimeUnitDetailsType>) => {
-    await editTimeUnitRequest(editData)
+    try {
+      const { tu_name } = await editTimeUnitRequest(editData).unwrap()
+      setTimeout(() => navigate(`/time-unit/${tu_name}`), 15)
+      notify('Edited item succesfully.')
+    } catch (e) {
+      if (e && typeof e === 'object' && 'status' in e && e.status !== 403) {
+        notify('Could not edit item. Error happened.', 'error')
+      } else {
+        const error = e as ValidationErrors
+        let message = 'Could not save item. Missing: '
+        Object.keys(error.data).forEach(key => {
+          message += `${error.data[key].name}. `
+        })
+        notify(message, 'error')
+      }
+    }
   }
 
   const tabs: TabType[] = [
