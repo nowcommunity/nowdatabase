@@ -25,3 +25,26 @@ describe("Locality min and max age checks work", () => {
         cy.contains("11.63")
     })
 })
+
+// WIP
+describe('Locality\'s Map works', () => {
+    beforeEach('Login as admin', () => {
+        cy.login('testSu')
+    })
+
+    it('Opening map view in edit works', () => {
+        cy.visit(`/locality/20920?tab=1`)
+        cy.contains('Coordinates')
+        cy.get('[id=edit-button]').click()
+        cy.contains('Latitude')
+        cy.contains('Open Map').click()
+        cy.contains('OpenStreetMap')
+        cy.contains('Leaflet')
+
+        cy.contains('Save').click()
+        cy.contains('OpenStreetMap').should('not.exist')
+        cy.contains('Longitude')
+        cy.contains('60.202665856') //breaks here
+        cy.contains('24.957662836') //and here
+    })
+  })
