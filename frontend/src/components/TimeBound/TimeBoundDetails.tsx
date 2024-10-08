@@ -52,7 +52,7 @@ export const TimeBoundDetails = () => {
   const onWrite = async (editedTimeBound: EditDataType<TimeBoundDetailsType>) => {
     try {
       const { bid } = await editTimeBoundRequest(editedTimeBound).unwrap()
-      setTimeout(() => navigate(`/species/${bid}`), 15)
+      setTimeout(() => navigate(`/time-bound/${bid}`), 15)
       notify('Edited item succesfully')
     } catch (e) {
       const error = e as ValidationErrors
