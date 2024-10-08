@@ -5,7 +5,7 @@ import { getFieldsOfTables } from '../../utils/db'
 import { getHomininSkeletalRemains } from '../../../../frontend/src/types'
 import { getLocalityDetails } from '../locality'
 import { ActionType } from './writeOperations/types'
-import { makeListRemoved } from './writeOperations/utils'
+import { makeListRemoved, fixRadioSelection } from './writeOperations/utils'
 
 const getLocalityWriteHandler = (type: ActionType) => {
   return new WriteHandler({
@@ -36,6 +36,10 @@ export const writeLocality = async (
   const writeHandler = getLocalityWriteHandler(locality.lid ? 'update' : 'add')
 
   locality.hominin_skeletal_remains = getHomininSkeletalRemains(locality)
+
+  locality.stone_tool_cut_marks_on_bones = fixRadioSelection(locality.stone_tool_cut_marks_on_bones)
+  locality.bipedal_footprints = fixRadioSelection(locality.bipedal_footprints)
+  locality.stone_tool_technology = fixRadioSelection(locality.stone_tool_technology)
 
   try {
     await writeHandler.start()

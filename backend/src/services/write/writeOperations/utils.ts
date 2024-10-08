@@ -43,3 +43,10 @@ export const makeListRemoved = (list: Editable<Record<string, unknown>>[]) => {
     item.rowState = 'removed'
   }
 }
+
+export const fixRadioSelection = (value: unknown) => {
+  if (typeof value === 'string') {
+    return value === '1' ? true : false
+  }
+  return false
+}

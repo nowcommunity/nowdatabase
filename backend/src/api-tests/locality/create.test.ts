@@ -30,8 +30,12 @@ describe('Creating new locality works', () => {
   })
 
   it('Contains correct data', () => {
-    const { loc_name, now_ls } = createdLocality!
+    const { loc_name, now_ls, stone_tool_cut_marks_on_bones, bipedal_footprints, stone_tool_technology } =
+      createdLocality!
     expect(loc_name).toEqual(newLocalityBasis.loc_name) //'Name is different'
+    expect(stone_tool_cut_marks_on_bones).toEqual(true) //'Stone tool cut marks on bones is different'
+    expect(bipedal_footprints).toEqual(false) //'Bipedal footprints is different'
+    expect(stone_tool_technology).toEqual(false) //'Stone tool technology is different'
     const newSpecies = now_ls.find(ls => ls.com_species.species_name === 'Newspecies')
     expect(!!newSpecies).toEqual(true) // 'New species not found'
     const oldSpecies = now_ls.find(ls => ls.species_id === 21052 && ls.lid === createdLocality!.lid)
