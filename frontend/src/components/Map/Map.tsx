@@ -1,14 +1,9 @@
-import { useRef, useState, useMemo, useCallback } from 'react'
-import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet'
+import { useRef, useState, useMemo } from 'react'
+import { MapContainer, TileLayer, Marker } from 'react-leaflet'
 import 'leaflet/dist/leaflet.css'
 
-const DraggableMarker = ({ setMarkerPos }: { setMarkerPos: any }) => {
-  const center = {
-    lat: 61.5,
-    lng: 25.01,
-  }
-  const [draggable, setDraggable] = useState(false)
-  const [position, setPosition] = useState(center)
+const DraggableMarker = ({ setMarkerPos, coord }: { setMarkerPos: any }) => {
+  const [position, setPosition] = useState(coord)
   const markerRef = useRef(null)
   const eventHandlers = useMemo(
     () => ({
@@ -21,21 +16,10 @@ const DraggableMarker = ({ setMarkerPos }: { setMarkerPos: any }) => {
         }
       },
     }),
-    []
+    [setMarkerPos]
   )
-  const toggleDraggable = useCallback(() => {
-    setDraggable(d => !d)
-  }, [])
 
-  return (
-    <Marker draggable={draggable} eventHandlers={eventHandlers} position={position} ref={markerRef}>
-      <Popup minWidth={90}>
-        <span onClick={toggleDraggable}>
-          {draggable ? 'Marker is draggable' : 'Click here to make marker draggable'}
-        </span>
-      </Popup>
-    </Marker>
-  )
+  return <Marker draggable={true} eventHandlers={eventHandlers} position={position} ref={markerRef} />
 }
 
 export const Map = ({ coordinates, setCoordinates }) => {
@@ -51,7 +35,7 @@ export const Map = ({ coordinates, setCoordinates }) => {
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
-        <DraggableMarker setMarkerPos={setCoordinates} />
+        <DraggableMarker coord={coordinates} setMarkerPos={setCoordinates} />
       </MapContainer>
       <p>
         Lat: {coordinates ? coordinates.lat : null} Lon: {coordinates ? coordinates.lng : null}

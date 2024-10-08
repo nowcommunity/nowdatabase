@@ -13,7 +13,6 @@ import { useState } from 'react'
 export const LocalityTab = () => {
   const { textField, radioSelection, dropdown, mode, bigTextField } = useDetailContext<LocalityDetailsType>()
   const { editData, setEditData } = useDetailContext<LocalityDetailsType>()
-  const [coordinates, setCoordinates] = useState(null)
 
   const approximateCoordinatesOptions = [
     { display: 'No', value: 'false' },
@@ -87,7 +86,10 @@ export const LocalityTab = () => {
     </EditingModal>
   )
 
-  // eslint-disable-next-line @typescript-eslint/require-await
+  // Kumpula Coordinates, could be changed later to be existing coordinates if exists
+  const [coordinates, setCoordinates] = useState({ lat: 60.202665856, lng: 24.957662836 })
+
+  // ONLY dec coordinates, no conversion to dms yet
   const onSaveCoord = async () => {
     console.log('Coordinates:', coordinates.lat, coordinates.lng) //this is just dec
     setEditData({ ...editData, dec_lat: coordinates.lat, dec_long: coordinates.lng })
@@ -96,7 +98,7 @@ export const LocalityTab = () => {
 
   // TODO name this better, plagiarized from editingModal
   const coordinateButton = (
-    <EditingModal buttonText="Get Coordinates" onSave={onSaveCoord}>
+    <EditingModal buttonText="Open Map" onSave={onSaveCoord}>
       <Box sx={{ display: 'flex', flexDirection: 'column', gap: '1em' }}>
         <Map coordinates={coordinates} setCoordinates={setCoordinates} />
       </Box>
