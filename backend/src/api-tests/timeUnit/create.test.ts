@@ -19,11 +19,11 @@ describe('Creating new time unit works', () => {
   })
 
   it('Request succeeds and returns valid number id', async () => {
-    const { body: resultBody } = await send<{ id: string }>('time-unit', 'PUT', {
+    const { body: resultBody } = await send<{ tu_name: string }>('time-unit', 'PUT', {
       timeUnit: { ...newTimeUnitBasis },
     })
 
-    const { id: createdId } = resultBody
+    const { tu_name: createdId } = resultBody
 
     expect(typeof createdId).toEqual('string') // `Invalid result returned on write: ${createdId}`)
 
@@ -34,7 +34,7 @@ describe('Creating new time unit works', () => {
   it('Contains correct data', () => {
     const { tu_name, tu_display_name, tu_comment } = createdTimeUnit!
     expect(tu_name).toEqual(newTimeUnitBasis.tu_display_name?.toLowerCase().replace(' ', '')) //'Name is different than expected'
-    expect(tu_display_name).toEqual(newTimeUnitBasis.tu_display_name) // 'Display name differs')
+    expect(tu_display_name).toEqual(newTimeUnitBasis.tu_display_name) // 'Display name differs'
     expect(tu_comment).toEqual(newTimeUnitBasis.tu_comment) // 'Comment differs'
   })
 
