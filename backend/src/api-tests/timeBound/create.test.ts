@@ -19,11 +19,11 @@ describe('Creating new time bound works', () => {
   })
 
   it('Request succeeds and returns valid number id', async () => {
-    const { body: resultBody } = await send<{ id: number }>('time-bound', 'PUT', {
+    const { body: resultBody } = await send<{ bid: number }>('time-bound', 'PUT', {
       timeBound: { ...newTimeBoundBasis },
     })
 
-    const { id: createdId } = resultBody
+    const { bid: createdId } = resultBody
 
     expect(typeof createdId).toEqual('number') // `Invalid result returned on write: ${createdId}`
 

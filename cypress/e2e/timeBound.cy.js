@@ -10,7 +10,7 @@ describe("Editing time bound", () => {
         cy.contains('C2N-y')
         cy.get('[id=edit-button]').click()
         // this id might change which breaks the test, don't know why
-        cy.get("[id=\\:r1\\:]").first().type("{backspace}{backspace}{backspace}{backspace}{backspace}2.5")
+        cy.get("[id=\\:r3\\:]").first().type("{backspace}{backspace}{backspace}{backspace}{backspace}2.5")
         cy.contains("This field is required").should('not.exist')
         cy.get('[id=write-button]').click()
         cy.get('[id=write-button]').click()
@@ -21,7 +21,7 @@ describe("Editing time bound", () => {
         cy.contains('C2N-y')
         cy.get('[id=edit-button]').click()
         // this id might change which breaks the test, don't know why
-        cy.get("[id=\\:r1\\:]").first().type("{backspace}{backspace}{backspace}{backspace}{backspace}")
+        cy.get("[id=\\:r3\\:]").first().type("{backspace}{backspace}{backspace}{backspace}{backspace}")
         cy.contains("This field is required")
         cy.get('[id=write-button]').click()
         cy.get('[id=write-button]').click()
