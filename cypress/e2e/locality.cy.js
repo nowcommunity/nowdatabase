@@ -26,12 +26,12 @@ describe("Locality min and max age checks work", () => {
     })
 })
 
-// WIP
 describe('Locality\'s Map works', () => {
     beforeEach('Login as admin', () => {
         cy.login('testSu')
     })
 
+    // note that this changes only dec coordinates, dms is still the old one
     it('Opening map view in edit works', () => {
         cy.visit(`/locality/20920?tab=1`)
         cy.contains('Coordinates')
@@ -44,7 +44,10 @@ describe('Locality\'s Map works', () => {
         cy.contains('Save').click()
         cy.contains('OpenStreetMap').should('not.exist')
         cy.contains('Longitude')
-        cy.contains('60.202665856') //breaks here
-        cy.contains('24.957662836') //and here
+        cy.contains('Finalize entry').click()
+        cy.contains('Complete and save').click()
+        cy.visit(`/locality/20920?tab=1`)
+        cy.contains('60.202665856')
+        cy.contains('24.957662836')
     })
   })
