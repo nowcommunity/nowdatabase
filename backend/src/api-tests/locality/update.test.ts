@@ -2,7 +2,7 @@ import { beforeEach, beforeAll, afterAll, describe, it, expect } from '@jest/glo
 import { LocalityDetailsType } from '../../../../frontend/src/backendTypes'
 import { LogRow } from '../../services/write/writeOperations/types'
 import { editedLocality } from './data'
-import { login, resetDatabase, send, testLogRows } from '../utils'
+import { login, resetDatabase, send, testLogRows, resetDatabaseTimeout } from '../utils'
 import { pool } from '../../utils/db'
 
 let resultLocality: LocalityDetailsType | null = null
@@ -10,7 +10,7 @@ let resultLocality: LocalityDetailsType | null = null
 describe('Locality update works', () => {
   beforeAll(async () => {
     await resetDatabase()
-  }, 10 * 1000)
+  }, resetDatabaseTimeout)
   beforeEach(async () => {
     await login()
   })

@@ -1,12 +1,12 @@
 import { beforeAll, afterAll, describe, it, expect } from '@jest/globals'
 import { CrossSearch } from '../../../../frontend/src/backendTypes'
-import { resetDatabase, send } from '../utils'
+import { resetDatabase, send, resetDatabaseTimeout } from '../utils'
 import { pool } from '../../utils/db'
 
 describe('Getting cross-search data works', () => {
   beforeAll(async () => {
     await resetDatabase()
-  }, 10 * 1000)
+  }, resetDatabaseTimeout)
   afterAll(async () => {
     await pool.end()
   })

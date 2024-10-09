@@ -2,7 +2,7 @@ import { beforeEach, beforeAll, afterAll, describe, it, expect } from '@jest/glo
 import { LocalityDetailsType, SpeciesDetailsType } from '../../../../frontend/src/backendTypes'
 import { LogRow } from '../../services/write/writeOperations/types'
 import { newLocalityBasis } from './data'
-import { login, resetDatabase, send, testLogRows } from '../utils'
+import { login, resetDatabase, send, testLogRows, resetDatabaseTimeout } from '../utils'
 import { pool } from '../../utils/db'
 
 let createdLocality: LocalityDetailsType | null = null
@@ -10,7 +10,7 @@ let createdLocality: LocalityDetailsType | null = null
 describe('Creating new locality works', () => {
   beforeAll(async () => {
     await resetDatabase()
-  }, 10 * 1000)
+  }, resetDatabaseTimeout)
   beforeEach(async () => {
     await login()
   })
