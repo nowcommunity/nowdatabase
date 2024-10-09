@@ -1,8 +1,9 @@
 import { describe, it, beforeEach, beforeAll, afterAll, expect } from '@jest/globals'
 import { TimeUnitDetailsType } from '../../../../frontend/src/backendTypes'
-import { login, resetDatabase, send } from '../utils'
+import { login, resetDatabase, send, testLogRows } from '../utils'
 import { editedTimeUnit, newTimeUnitBasis } from './data'
 import { pool } from '../../utils/db'
+import { LogRow } from '../../services/write/writeOperations/types'
 
 const existingTimeUnit = { ...newTimeUnitBasis, tu_name: 'baheantest' }
 
@@ -62,5 +63,26 @@ describe('Time unit updating works', () => {
     expect(body.tu_display_name).toEqual(existingTimeUnit.tu_display_name)
     expect(body.up_bnd).toEqual(existingTimeUnit.up_bnd)
     expect(body.low_bnd).toEqual(existingTimeUnit.low_bnd)
+  })
+  it('Update logs are correct', async () => {
+    // edit time unit to create a log update
+    const { body: resultBody } = await send<{ tu_name: string }>('time-unit', 'PUT', {
+      timeUnit: editedTimeUnit,
+    })
+    const { tu_name: createdId } = resultBody
+    const { body: createdTimeUnit } = await send<TimeUnitDetailsType>(`time-unit/${createdId}`, 'GET')
+    const lastUpdate = createdTimeUnit.now_tau[createdTimeUnit.now_tau.length - 1]
+    expect(lastUpdate.tau_comment).toEqual(editedTimeUnit.comment) // 'Comment is correct'
+    const logRows = lastUpdate.updates
+    const expectedLogRows: Partial<LogRow>[] = [
+      {
+        table: 'now_time_unit',
+        column: 'sequence',
+        oldValue: newTimeUnitBasis.sequence,
+        value: editedTimeUnit.sequence,
+        type: 'update',
+      },
+    ]
+    testLogRows(logRows, expectedLogRows, 2)
   })
 })
