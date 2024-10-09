@@ -27,7 +27,7 @@ router.put(
     const { comment, references, ...editedLocality } = req.body.locality
     const validationErrors = validateEntireLocality(editedLocality)
     if (validationErrors.length > 0) {
-      return res.status(400).send({ validationErrors })
+      return res.status(403).send(validationErrors)
     }
     const result = await writeLocality(editedLocality, comment, references, req.user!.initials)
     return res.status(200).send({ id: result })
