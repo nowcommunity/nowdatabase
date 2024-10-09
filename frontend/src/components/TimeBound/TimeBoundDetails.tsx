@@ -1,4 +1,4 @@
-import { EditDataType, TimeBoundDetailsType } from '@/backendTypes.js'
+import { EditDataType, TimeBoundDetailsType, ValidationErrors } from '@/backendTypes.js'
 import { useNotify } from '@/hooks/notification.ts'
 import { CircularProgress } from '@mui/material'
 import { useEffect } from 'react'
@@ -24,25 +24,20 @@ export const TimeBoundDetails = () => {
   const { isLoading, isFetching, isError, data } = useGetTimeBoundDetailsQuery(decodeURIComponent(id!), {
     skip: isNew,
   })
-  const [editTimeBoundRequest, { isSuccess: editSuccess, isError: editError }] = useEditTimeBoundMutation()
+  const [editTimeBoundRequest] = useEditTimeBoundMutation()
 
   const notify = useNotify()
   const navigate = useNavigate()
   const [deleteMutation, { isSuccess: deleteSuccess, isError: deleteError }] = useDeleteTimeBoundMutation()
 
   useEffect(() => {
-    if (editSuccess) {
-      notify('Edited item succesfully')
-    } else if (editError) {
-      notify('Could not edit item. Error happened.', 'error')
-    }
     if (deleteSuccess) {
       notify('Deleted item successfully.')
       navigate('/time-bound')
     } else if (deleteError) {
       notify('Could not delete item. Error happened.', 'error')
     }
-  }, [editSuccess, editError, deleteSuccess, deleteError, notify, navigate])
+  }, [deleteSuccess, deleteError, notify, navigate])
 
   if (isError) return <div>Error loading data</div>
   if (isLoading || isFetching || (!data && !isNew)) return <CircularProgress />
@@ -55,7 +50,17 @@ export const TimeBoundDetails = () => {
   }
 
   const onWrite = async (editedTimeBound: EditDataType<TimeBoundDetailsType>) => {
-    await editTimeBoundRequest(editedTimeBound)
+    try {
+      const { bid } = await editTimeBoundRequest(editedTimeBound).unwrap()
+      setTimeout(() => navigate(`/time-bound/${bid}`), 15)
+    } catch (e) {
+      const error = e as ValidationErrors
+      let message = 'Could not save item. Missing: '
+      Object.keys(error.data).forEach(key => {
+        message += `${error.data[key].name}. `
+      })
+      notify(message, 'error')
+    }
   }
 
   const tabs: TabType[] = [

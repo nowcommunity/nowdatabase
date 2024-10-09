@@ -13,10 +13,10 @@ describe('Time bound updating', () => {
     await login()
   })
   it('Update request with valid timebound succeeds and returns valid number id', async () => {
-    const { body: resultBody } = await send<{ id: number }>('time-bound', 'PUT', {
+    const { body: resultBody } = await send<{ bid: number }>('time-bound', 'PUT', {
       timeBound: editedTimeBound,
     })
-    const { id: existingId } = resultBody
+    const { bid: existingId } = resultBody
 
     expect(typeof existingId).toEqual('number')
     expect(existingId).toEqual(11)
@@ -27,10 +27,10 @@ describe('Time bound updating', () => {
     expect(body.age).toEqual(editedTimeBound.age)
   })
   it('Update request that does not change anything works', async () => {
-    const { body: resultBody } = await send<{ id: number }>('time-bound', 'PUT', {
+    const { body: resultBody } = await send<{ bid: number }>('time-bound', 'PUT', {
       timeBound: existingTimeBound,
     })
-    const { id: existingId } = resultBody
+    const { bid: existingId } = resultBody
 
     expect(typeof existingId).toEqual('number')
     expect(existingId).toEqual(11)
@@ -42,10 +42,10 @@ describe('Time bound updating', () => {
   })
   it('Update request with invalid timebound age fails', async () => {
     const invalidAgeTimeBound = { ...existingTimeBound, age: null }
-    const { body: resultBody } = await send<{ id: number }>('time-bound', 'PUT', {
+    const { body: resultBody } = await send<{ bid: number }>('time-bound', 'PUT', {
       timeBound: { ...invalidAgeTimeBound },
     })
-    const { id: existingId } = resultBody
+    const { bid: existingId } = resultBody
     expect(typeof existingId).toEqual('undefined')
 
     const { body } = await send<TimeBoundDetailsType>(`time-bound/${existingTimeBound.bid}`, 'GET')
