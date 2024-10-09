@@ -1,6 +1,6 @@
 import { describe, it, beforeEach, beforeAll, afterAll, expect } from '@jest/globals'
 import { TimeUnitDetailsType } from '../../../../frontend/src/backendTypes'
-import { login, resetDatabase, send } from '../utils'
+import { login, resetDatabase, send, resetDatabaseTimeout } from '../utils'
 import { editedTimeUnit, newTimeUnitBasis } from './data'
 import { pool } from '../../utils/db'
 
@@ -9,7 +9,7 @@ const existingTimeUnit = { ...newTimeUnitBasis, tu_name: 'baheantest' }
 describe('Time unit updating works', () => {
   beforeAll(async () => {
     await resetDatabase()
-  }, 10 * 1000)
+  }, resetDatabaseTimeout)
   beforeEach(async () => {
     await login()
     // create the existing time unit that is edited

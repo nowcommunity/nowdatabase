@@ -1,11 +1,11 @@
 import { beforeEach, beforeAll, afterAll, describe, it, expect } from '@jest/globals'
-import { login, resetDatabase, send } from '../utils'
+import { login, resetDatabase, send, resetDatabaseTimeout } from '../utils'
 import { pool } from '../../utils/db'
 
 describe('Deleting a species works', () => {
   beforeAll(async () => {
     await resetDatabase()
-  }, 10 * 1000)
+  }, resetDatabaseTimeout)
   beforeEach(async () => {
     await login()
   })

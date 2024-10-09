@@ -1,6 +1,6 @@
 import { describe, it, beforeAll, beforeEach, expect } from '@jest/globals'
 import { editedTimeBound, newTimeBoundBasis } from './data'
-import { send, resetDatabase, login } from '../utils'
+import { send, resetDatabase, login, resetDatabaseTimeout } from '../utils'
 import { TimeBoundDetailsType } from '../../../../frontend/src/backendTypes'
 
 const existingTimeBound = { ...newTimeBoundBasis, bid: 11 }
@@ -8,7 +8,7 @@ const existingTimeBound = { ...newTimeBoundBasis, bid: 11 }
 describe('Time bound updating', () => {
   beforeAll(async () => {
     await resetDatabase()
-  })
+  }, resetDatabaseTimeout)
   beforeEach(async () => {
     await login()
   })
