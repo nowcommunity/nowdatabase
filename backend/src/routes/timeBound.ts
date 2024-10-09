@@ -41,7 +41,7 @@ router.put(
       return res.status(403).send({ validationErrors })
     }
     const result = await writeTimeBound(editedTimeBound, comment, references, req.user!.initials)
-    return res.status(200).send({ id: result })
+    return res.status(200).send({ bid: result })
   }
 )
 
