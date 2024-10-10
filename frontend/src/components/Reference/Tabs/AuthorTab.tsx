@@ -1,4 +1,4 @@
-import { ReferenceDetailsType, ReferenceAuthorType } from '@/backendTypes'
+import { ReferenceDetailsType, ReferenceAuthorType, VisibleRefAuthors } from '@/backendTypes'
 import { EditableTable } from '@/components/DetailView/common/EditableTable'
 import { EditingForm } from '@/components/DetailView/common/EditingForm'
 import { SelectingTable } from '@/components/DetailView/common/SelectingTable'
@@ -7,13 +7,19 @@ import { useDetailContext } from '@/components/DetailView/Context/DetailContext'
 import { useGetReferenceAuthorsQuery } from '@/redux/referenceReducer'
 import { Box } from '@mui/material'
 import { skipToken } from '@reduxjs/toolkit/query'
-import { MRT_ColumnDef } from 'material-react-table'
+import { type MRT_ColumnDef, MaterialReactTable, MRT_Row } from 'material-react-table'
 
 export const AuthorTab = ({field_num_param}) => {
+  console.log(field_num_param)
   const { mode, editData, setEditData } = useDetailContext<ReferenceDetailsType>()
-
-  console.log(mode, editData, setEditData)
   const { data: authorData, isError } = useGetReferenceAuthorsQuery(mode.read ? skipToken : undefined)
+  console.log(editData.ref_authors)
+
+  var visible_ref_authors = editData.ref_authors.filter((author) => {
+    //console.log(`author.field_num: ${author.field_id}, field_num_param: ${field_num_param}`)
+    return author.field_id?.toString() === field_num_param?.toString()
+  })
+  
 
   const authorColumns: MRT_ColumnDef<ReferenceAuthorType>[] = [
     {
@@ -33,7 +39,6 @@ export const AuthorTab = ({field_num_param}) => {
     { name: 'author_initials', label: 'Author initials', required: true },
     { name: 'author_surname', label: 'Surname', required: true },
     { name: 'au_num', label: 'Author number', required: true },
-    { name: 'field_id', label: 'Field ID', required: true },
   ]
   const referenceAuthorColumns: MRT_ColumnDef<ReferenceAuthorType>[] = [
     {
@@ -64,7 +69,7 @@ export const AuthorTab = ({field_num_param}) => {
                   rid: editData.rid,
                   author_initials: newAuthor.author_initials,
                   author_surname: newAuthor.author_surname,
-                  field_num: field_num_param,
+                  field_id: field_num_param,
                   au_num: newAuthor.au_num,
                   rowState: 'new',
                 },
@@ -72,12 +77,12 @@ export const AuthorTab = ({field_num_param}) => {
             
               setEditData({
                 ...editData,
-                ref_authors: updatedAuthors, // Update the ref_authors array
-                visible_ref_authors: updatedAuthors.filter((author) => author.field_num === field_num_param) // Filter using updatedAuthors, not editData.ref_authors
+                ref_authors: updatedAuthors
               })
+              visible_ref_authors =  updatedAuthors.filter((author) => author.field_id?.toString() == field_num_param?.toString())
             
               console.log('inside the thing');
-              console.log(editData.visible_ref_authors)
+              console.log(visible_ref_authors)
             }}
           />
           <SelectingTable<ReferenceAuthorType, ReferenceDetailsType>
@@ -94,7 +99,7 @@ export const AuthorTab = ({field_num_param}) => {
                   rid: editData.rid,
                   author_initials: newAuthor.author_initials,
                   author_surname: newAuthor.author_surname,
-                  field_num: field_num_param,
+                  field_id: field_num_param,
                   au_num: newAuthor.au_num,
                   rowState: 'new',
                 },
@@ -102,17 +107,17 @@ export const AuthorTab = ({field_num_param}) => {
             
               setEditData({
                 ...editData,
-                ref_authors: updatedAuthors, // Update the ref_authors array
-                visible_ref_authors: updatedAuthors.filter((author) => author.field_num === field_num_param) // Filter using updatedAuthors, not editData.ref_authors
+                ref_authors: updatedAuthor
               });
+              visible_ref_authors = updatedAuthors.filter((author) => author.field_id?.toString() == field_num_param?.toString())
             
               console.log('inside the thing');
-              console.log(editData.visible_ref_authors); // Log filtered updatedAuthors
+              console.log(visible_ref_authors)
             }}
           />
         </Box>
       )}
-      <EditableTable<ReferenceAuthorType, ReferenceDetailsType> columns={referenceAuthorColumns} field="ref_authors" />
+      <EditableTable<ReferenceAuthorType, ReferenceDetailsType> columns={referenceAuthorColumns} field="ref_authors" visible_data={visible_ref_authors}/>
     </Grouped>
   )
 }

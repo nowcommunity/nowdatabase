@@ -52,7 +52,7 @@ export const ReferenceTab = () => {
         nonAuthorFieldsArray = [];
       }
   
-      groupedFieldsArray.push(<AuthorTab key={field.field_name} fieldId={field.field_ID}/>);
+      groupedFieldsArray.push(<AuthorTab key={field.field_name} field_num_param={field.field_ID}/>);
     } else {
       const fieldComponent = bigFields.includes(field.field_name!)
         ? bigTextField(field.field_name! as keyof ReferenceDetailsType)
