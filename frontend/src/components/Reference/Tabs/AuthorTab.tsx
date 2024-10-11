@@ -1,4 +1,4 @@
-import { ReferenceDetailsType, ReferenceAuthorType, VisibleRefAuthors } from '@/backendTypes'
+import { ReferenceDetailsType, ReferenceAuthorType } from '@/backendTypes'
 import { EditableTable } from '@/components/DetailView/common/EditableTable'
 import { EditingForm } from '@/components/DetailView/common/EditingForm'
 import { SelectingTable } from '@/components/DetailView/common/SelectingTable'
@@ -7,9 +7,9 @@ import { useDetailContext } from '@/components/DetailView/Context/DetailContext'
 import { useGetReferenceAuthorsQuery } from '@/redux/referenceReducer'
 import { Box } from '@mui/material'
 import { skipToken } from '@reduxjs/toolkit/query'
-import { type MRT_ColumnDef, MaterialReactTable, MRT_Row } from 'material-react-table'
+import { type MRT_ColumnDef } from 'material-react-table'
 
-export const AuthorTab = ({field_num_param}) => {
+export const AuthorTab = ({field_num_param, tab_name}) => {
   console.log(field_num_param)
   const { mode, editData, setEditData } = useDetailContext<ReferenceDetailsType>()
   const { data: authorData, isError } = useGetReferenceAuthorsQuery(mode.read ? skipToken : undefined)
@@ -56,7 +56,7 @@ export const AuthorTab = ({field_num_param}) => {
   ]
 
   return (
-    <Grouped title="Authors">
+    <Grouped title={tab_name}>
       {!mode.read && (
         <Box display="flex" gap={1}>
           <EditingForm<ReferenceAuthorType, ReferenceDetailsType>

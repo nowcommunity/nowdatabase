@@ -4,11 +4,14 @@ import { ArrayFrame } from '@/components/DetailView/common/tabLayoutHelpers'
 import { useGetReferenceTypesQuery } from '@/redux/referenceReducer'
 import { CircularProgress } from '@mui/material'
 import { AuthorTab } from './AuthorTab'
+import { JournalTab } from './JournalTab'
 
 
 export const ReferenceTab = () => {
   const { dropdown, data, editData, mode, textField, bigTextField } = useDetailContext<ReferenceDetailsType>()
   const { data: referenceTypes } = useGetReferenceTypesQuery()
+
+  console.log(editData)
 
   if (!referenceTypes) return <CircularProgress />
 
@@ -30,10 +33,12 @@ export const ReferenceTab = () => {
 
   const fields = selectedRefType?.ref_field_name.filter(field => field.display)
 
+  console.log(fields)
+
   // Write here the fields that should have a bigger, resizable text field
   const bigFields = ['title_primary', 'authors_primary', 'ref_abstract', 'gen_notes']
 
-  const authorFields = ['authors_primary', 'authors_secondary'];
+  const authorFields = ['authors_primary', 'authors_secondary', 'authors_series'];
 
   //painfully long way to split the arrayframe-component when an authorfield occurs
   const groupedFieldsArray = []
@@ -52,7 +57,19 @@ export const ReferenceTab = () => {
         nonAuthorFieldsArray = [];
       }
   
-      groupedFieldsArray.push(<AuthorTab key={field.field_name} field_num_param={field.field_ID}/>);
+      groupedFieldsArray.push(<AuthorTab key={field.field_name} field_num_param={field.field_ID} tab_name={field.ref_field_name}/>);
+    } else if (field.field_name == 'journal_id') {
+        if (nonAuthorFieldsArray.length > 0) {
+          groupedFieldsArray.push(
+            <ArrayFrame
+              key={`fields-group-${nonAuthorFieldsArray[0][0]}`}
+              array={nonAuthorFieldsArray}
+              title={`${selectedRefType!.ref_type} information`}
+            />
+          )
+          nonAuthorFieldsArray = [];
+        }
+        groupedFieldsArray.push(<JournalTab key={field.field_name} tab_name={field.ref_field_name} />);
     } else {
       const fieldComponent = bigFields.includes(field.field_name!)
         ? bigTextField(field.field_name! as keyof ReferenceDetailsType)
