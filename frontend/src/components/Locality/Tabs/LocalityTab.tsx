@@ -90,8 +90,8 @@ export const LocalityTab = () => {
   const [coordinates, setCoordinates] = useState({ lat: 60.202665856, lng: 24.957662836 })
 
   // ONLY dec coordinates, no conversion to dms yet
+  // eslint-disable-next-line @typescript-eslint/require-await
   const onSaveCoord = async () => {
-    console.log('Coordinates:', coordinates.lat, coordinates.lng) //this is just dec
     setEditData({ ...editData, dec_lat: coordinates.lat, dec_long: coordinates.lng })
     return Object.keys(errors).length === 0 //no idea if this is needed, just copypasted
   }

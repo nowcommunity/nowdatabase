@@ -2,16 +2,22 @@ import { useRef, useState, useMemo } from 'react'
 import { MapContainer, TileLayer, Marker } from 'react-leaflet'
 import 'leaflet/dist/leaflet.css'
 
-const DraggableMarker = ({ setMarkerPos, coord }: { setMarkerPos: any }) => {
+type Coordinate = {
+  lat: number
+  lng: number
+}
+
+type CoordinateSetter = (Coordinate: Coordinate) => void
+
+const DraggableMarker = ({ setMarkerPos, coord }: { setMarkerPos: CoordinateSetter; coord: Coordinate }) => {
   const [position, setPosition] = useState(coord)
-  const markerRef = useRef(null)
+  const markerRef = useRef<L.Marker>(null)
   const eventHandlers = useMemo(
     () => ({
       dragend() {
         const marker = markerRef.current
         if (marker != null) {
           setPosition(marker.getLatLng())
-          console.log(marker.getLatLng())
           setMarkerPos(marker.getLatLng())
         }
       },
@@ -22,7 +28,7 @@ const DraggableMarker = ({ setMarkerPos, coord }: { setMarkerPos: any }) => {
   return <Marker draggable={true} eventHandlers={eventHandlers} position={position} ref={markerRef} />
 }
 
-export const Map = ({ coordinates, setCoordinates }) => {
+export const Map = ({ coordinates, setCoordinates }: { coordinates: Coordinate; setCoordinates: CoordinateSetter }) => {
   const mapRef = useRef(null)
   const latitude = 30
   const longitude = -5
