@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import { ReferenceDetailsType, ReferenceJournalType } from '@/backendTypes'
 import { EditableTable } from '@/components/DetailView/common/EditableTable'
 import { EditingForm } from '@/components/DetailView/common/EditingForm'
@@ -9,7 +10,11 @@ import { Box } from '@mui/material'
 import { skipToken } from '@reduxjs/toolkit/query'
 import { type MRT_ColumnDef } from 'material-react-table'
 
-export const JournalTab = ({tab_name}) => {
+interface JournalTabProps {
+  tab_name?: string
+}
+
+export const JournalTab: React.FC<JournalTabProps> = ({ tab_name = 'Journal' }) => {
   const { mode, editData, setEditData } = useDetailContext<ReferenceDetailsType>()
   const { data: journalData, isError } = useGetReferenceJournalsQuery(mode.read ? skipToken : undefined)
 
@@ -72,11 +77,11 @@ export const JournalTab = ({tab_name}) => {
                   ISSN: newJournal.ISSN,
                   rowState: 'new',
                 },
-              ];
-            
+              ]
+
               setEditData({
                 ...editData,
-                ref_journal: updatedJournal
+                ref_journal: updatedJournal,
               })
             }}
           />
@@ -97,16 +102,19 @@ export const JournalTab = ({tab_name}) => {
                   rowState: 'new',
                 },
               ]
-            
+
               setEditData({
                 ...editData,
-                ref_journal: updatedJournal
-              });
+                ref_journal: updatedJournal,
+              })
             }}
           />
         </Box>
       )}
-      <EditableTable<ReferenceJournalType, ReferenceDetailsType> columns={referenceJournalColumns} field="ref_journal"/>
+      <EditableTable<ReferenceJournalType, ReferenceDetailsType>
+        columns={referenceJournalColumns}
+        field="ref_journal"
+      />
     </Grouped>
   )
 }

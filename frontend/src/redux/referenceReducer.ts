@@ -1,5 +1,12 @@
 import { api } from './api'
-import { EditDataType, Reference, ReferenceAuthorType, ReferenceDetailsType, ReferenceJournalType, ReferenceType } from '@/backendTypes'
+import {
+  EditDataType,
+  Reference,
+  ReferenceAuthorType,
+  ReferenceDetailsType,
+  ReferenceJournalType,
+  ReferenceType,
+} from '@/backendTypes'
 
 const referencesApi = api.injectEndpoints({
   endpoints: builder => ({

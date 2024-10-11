@@ -15,9 +15,7 @@ const getReferenceWriteHandler = (type: ActionType) => {
   })
 }
 
-export const writeReference = async (
-  reference: EditDataType<ReferenceDetailsType>,
-) => {
+export const writeReference = async (reference: EditDataType<ReferenceDetailsType>) => {
   const writeHandler = getReferenceWriteHandler(reference.rid ? 'update' : 'add')
   try {
     await writeHandler.start()
@@ -47,7 +45,6 @@ export const deleteReference = async (rid: number, user: User) => {
   const writeHandler = getReferenceWriteHandler('delete')
   await writeHandler.start()
   writeHandler.idValue = reference.rid
-
 
   try {
     await writeHandler.deleteObject('ref_ref', reference, ['rid'])

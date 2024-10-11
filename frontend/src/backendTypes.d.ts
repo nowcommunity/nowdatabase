@@ -222,13 +222,13 @@ export type ReferenceDetailsType = Prisma.ref_ref & {
     au_num: number | null
     author_surname: string | null
     author_initials: string | null
-    field_num: string | null
+    field_id: string | null
   }[]
   ref_journal: {
-    journal_title: string,
-    short_title: string | null,
-    alt_title: string | null,
-    ISSN: string,
+    journal_title: string
+    short_title: string | null
+    alt_title: string | null
+    ISSN: string
   }
   ref_ref_type: {
     ref_type: string
@@ -267,5 +267,3 @@ export type SpeciesReference = Prisma.now_sr & ReferenceOfUpdate
 
 export type ReferenceJournalType = Prisma.ref_journal
 export type ReferenceAuthorType = Prisma.ref_authors
-
-

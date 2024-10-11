@@ -1,5 +1,11 @@
 import { Request, Router } from 'express'
-import { getAllReferences, getReferenceDetails, getReferenceTypes, getReferenceAuthors, getReferenceJournals } from '../services/reference'
+import {
+  getAllReferences,
+  getReferenceDetails,
+  getReferenceTypes,
+  getReferenceAuthors,
+  getReferenceJournals,
+} from '../services/reference'
 import { requireOneOf } from '../middlewares/authorizer'
 import { Role } from '../../../frontend/src/types'
 import { EditMetaData, ReferenceDetailsType } from '../../../frontend/src/backendTypes'

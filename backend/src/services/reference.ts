@@ -32,7 +32,10 @@ export const getAllReferences = async () => {
 
 export const getReferenceDetails = async (id: number) => {
   // TODO: Check if user has access
-  const result = await nowDb.ref_ref.findUnique({ where: { rid: id }, include: { ref_authors: true, ref_journal: true } })
+  const result = await nowDb.ref_ref.findUnique({
+    where: { rid: id },
+    include: { ref_authors: true, ref_journal: true },
+  })
   return result
 }
 
@@ -48,8 +51,8 @@ export const getReferenceAuthors = async () => {
       field_id: true,
       au_num: true,
       author_surname: true,
-      author_initials: true
-    }
+      author_initials: true,
+    },
   })
   return referenceAuthorTypes
 }

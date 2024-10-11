@@ -12,7 +12,6 @@ import { MRT_ColumnDef } from 'material-react-table'
 export const SpeciesTab = () => {
   const { mode, editData, setEditData } = useDetailContext<LocalityDetailsType>()
   const { data: speciesData, isError } = useGetAllSpeciesQuery(mode.read ? skipToken : undefined)
-  console.log(editData)
 
   const speciesColumns: MRT_ColumnDef<Species>[] = [
     {

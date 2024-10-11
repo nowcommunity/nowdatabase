@@ -25,7 +25,7 @@ export const ReferenceDetails = () => {
     {
       title: 'Reference',
       content: <ReferenceTab />,
-    }
+    },
   ]
 
   return (
