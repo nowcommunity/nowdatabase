@@ -14,7 +14,7 @@ export const editedTimeBound: EditDataType<TimeBoundDetailsType & EditMetaData> 
   b_name: 'C6N-y',
   age: 1.778,
   b_comment: 'test comment',
-  comment: 'test updating time unit',
+  comment: 'test updating time bound',
   references: [{ rid: 24188 } as Reference],
   now_bau: [],
 }
