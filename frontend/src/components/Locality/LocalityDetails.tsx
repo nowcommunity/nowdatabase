@@ -16,7 +16,7 @@ import { MuseumTab } from './Tabs/MuseumTab'
 import { ProjectTab } from './Tabs/ProjectTab'
 import { SpeciesTab } from './Tabs/SpeciesTab'
 import { TaphonomyTab } from './Tabs/TaphonomyTab'
-import { EditDataType, LocalityDetailsType } from '@/backendTypes'
+import { EditDataType, LocalityDetailsType, ValidationErrors } from '@/backendTypes'
 import { validateLocality } from '@/validators/locality'
 import { UpdateTab } from '../DetailView/common/UpdateTab'
 import { emptyLocality } from '../DetailView/common/defaultValues'
@@ -58,8 +58,22 @@ export const LocalityDetails = () => {
   }
 
   const onWrite = async (editData: EditDataType<LocalityDetailsType>) => {
-    const { id } = await editLocalityRequest(editData).unwrap()
-    navigate(`/locality/${id}`)
+    try {
+      const { id } = await editLocalityRequest(editData).unwrap()
+      setTimeout(() => navigate(`/locality/${id}`), 15)
+      notify('Edited item succesfully.')
+    } catch (e) {
+      if (e && typeof e === 'object' && 'status' in e && e.status !== 403) {
+        notify('Could not edit item. Error happened.', 'error')
+      } else {
+        const error = e as ValidationErrors
+        let message = 'Could not save item. Missing: '
+        Object.keys(error.data).forEach(key => {
+          message += `${error.data[key].name}, `
+        })
+        notify(message, 'error')
+      }
+    }
   }
 
   const tabs: TabType[] = [
