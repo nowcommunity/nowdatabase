@@ -93,6 +93,7 @@ export const AuthorTab: React.FC<AuthorTabProps> = ({ field_num_param, tab_name 
             columns={authorColumns}
             fieldName="ref_authors"
             idFieldName="au_num"
+            useObject={true}
             editAction={(newAuthor: ReferenceAuthorType) => {
               const updatedAuthors = [
                 ...editData.ref_authors,

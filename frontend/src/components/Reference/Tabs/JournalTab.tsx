@@ -17,6 +17,10 @@ interface JournalTabProps {
 export const JournalTab: React.FC<JournalTabProps> = ({ tab_name = 'Journal' }) => {
   const { mode, editData, setEditData } = useDetailContext<ReferenceDetailsType>()
   const { data: journalData, isError } = useGetReferenceJournalsQuery(mode.read ? skipToken : undefined)
+  let visible_ref_journal = []
+  if (editData.ref_journal) {
+    visible_ref_journal = [Object.assign({}, editData.ref_journal)]
+  }
 
   const journalColumns: MRT_ColumnDef<ReferenceJournalType>[] = [
     {
@@ -40,7 +44,7 @@ export const JournalTab: React.FC<JournalTabProps> = ({ tab_name = 'Journal' }) 
     { name: 'journal_title', label: 'Journal Title', required: true },
     { name: 'short_title', label: 'Short title', required: false },
     { name: 'alt_title', label: 'Alternative title', required: false },
-    { name: 'ISSN', label: 'ISSN', required: true },
+    { name: 'ISSN', label: 'ISSN', required: false },
   ]
   const referenceJournalColumns: MRT_ColumnDef<ReferenceJournalType>[] = [
     {
@@ -69,16 +73,14 @@ export const JournalTab: React.FC<JournalTabProps> = ({ tab_name = 'Journal' }) 
             buttonText="Add new journal"
             formFields={formFields}
             editAction={(newJournal: ReferenceJournalType) => {
-              const updatedJournal = [
-                {
-                  journal_title: newJournal.journal_title,
-                  short_title: newJournal.short_title,
-                  alt_title: newJournal.alt_title,
-                  ISSN: newJournal.ISSN,
-                  rowState: 'new',
-                },
-              ]
-
+              const updatedJournal = {
+                journal_id: newJournal.journal_id,
+                journal_title: newJournal.journal_title,
+                short_title: newJournal.short_title,
+                alt_title: newJournal.alt_title,
+                ISSN: newJournal.ISSN,
+                row: 'new',
+              }
               setEditData({
                 ...editData,
                 ref_journal: updatedJournal,
@@ -92,17 +94,16 @@ export const JournalTab: React.FC<JournalTabProps> = ({ tab_name = 'Journal' }) 
             columns={journalColumns}
             fieldName="ref_journal"
             idFieldName="journal_id"
-            editAction={(newJournal: ReferenceJournalType) => {
-              const updatedJournal = [
-                {
-                  journal_title: newJournal.journal_title,
-                  short_title: newJournal.short_title,
-                  alt_title: newJournal.alt_title,
-                  ISSN: newJournal.ISSN,
-                  rowState: 'new',
-                },
-              ]
-
+            useObject={true}
+            editingAction={(newJournal: ReferenceJournalType) => {
+              const updatedJournal = {
+                journal_id: newJournal.journal_id,
+                journal_title: newJournal.journal_title,
+                short_title: newJournal.short_title,
+                alt_title: newJournal.alt_title,
+                ISSN: newJournal.ISSN,
+                row: 'new',
+              }
               setEditData({
                 ...editData,
                 ref_journal: updatedJournal,
@@ -114,6 +115,7 @@ export const JournalTab: React.FC<JournalTabProps> = ({ tab_name = 'Journal' }) 
       <EditableTable<ReferenceJournalType, ReferenceDetailsType>
         columns={referenceJournalColumns}
         field="ref_journal"
+        visible_data={visible_ref_journal}
       />
     </Grouped>
   )
