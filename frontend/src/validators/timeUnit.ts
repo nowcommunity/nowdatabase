@@ -21,7 +21,24 @@ export const validateTimeUnit = (editData: EditDataType<TimeUnitDetailsType>, fi
       required: true,
       asNumber: true,
     },
+    up_bound: {
+      name: 'Upper Bound',
+      required: true,
+      checkObject: () => {
+        if (editData.low_bound && editData.low_bound.age! < editData.up_bound!.age!)
+          return 'Upper bound age has to be lower than lower bound age'
+        return
+      },
+    },
+    low_bound: {
+      name: 'Upper Bound',
+      required: true,
+      checkObject: () => {
+        if (editData.up_bound && editData.up_bound.age! > editData.low_bound!.age!)
+          return 'Lower bound age has to be higher than upper bound age'
+        return
+      },
+    },
   }
-
   return validator<EditDataType<TimeUnitDetailsType>>(validators, editData, fieldName)
 }

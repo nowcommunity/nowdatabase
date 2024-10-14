@@ -1,5 +1,5 @@
 import { SequenceDetailsType, TimeBoundDetailsType, TimeUnitDetailsType } from '@/backendTypes'
-import { FieldWithTableSelection } from '@/components/DetailView/common/editingComponents'
+import { FieldWithTableSelection, TimeBoundSelection } from '@/components/DetailView/common/editingComponents'
 import { emptyOption } from '@/components/DetailView/common/misc'
 import { ArrayFrame } from '@/components/DetailView/common/tabLayoutHelpers'
 import { useDetailContext } from '@/components/DetailView/Context/DetailContext'
@@ -59,7 +59,7 @@ export const TimeUnitTab = () => {
   const time_bound_edit = [
     [
       'New Upper Bound',
-      <FieldWithTableSelection<TimeBoundDetailsType, TimeUnitDetailsType>
+      <TimeBoundSelection<TimeBoundDetailsType, TimeUnitDetailsType>
         key="up_bnd"
         sourceField="bid"
         targetField="up_bnd"
@@ -68,7 +68,7 @@ export const TimeUnitTab = () => {
     ],
     [
       'New Lower Bound',
-      <FieldWithTableSelection<TimeBoundDetailsType, TimeUnitDetailsType>
+      <TimeBoundSelection<TimeBoundDetailsType, TimeUnitDetailsType>
         key="low_bnd"
         sourceField="bid"
         targetField="low_bnd"
