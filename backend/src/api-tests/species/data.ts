@@ -116,3 +116,11 @@ export const editedSpecies: EditDataType<SpeciesDetailsType & EditMetaData> = {
   comment: 'species edit test',
   references: [{ rid: 24188 } as Reference],
 }
+
+export const newSpeciesWithoutRequiredFields: EditDataType<SpeciesDetailsType> = {
+  ...newSpeciesBasis,
+  order_name: '',
+  family_name: '',
+  genus_name: '',
+  species_name: '',
+}

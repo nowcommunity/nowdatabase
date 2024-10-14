@@ -1,5 +1,5 @@
 import { Request, Router } from 'express'
-import { getAllSpecies, getSpeciesDetails } from '../services/species'
+import { getAllSpecies, getSpeciesDetails, validateEntireSpecies } from '../services/species'
 import { fixBigInt } from '../utils/common'
 import { EditMetaData, SpeciesDetailsType } from '../../../frontend/src/backendTypes'
 import { deleteSpecies, writeSpecies } from '../services/write/species'
@@ -25,8 +25,12 @@ router.put(
   requireOneOf([Role.Admin, Role.EditUnrestricted]),
   async (req: Request<object, object, { species: SpeciesDetailsType & EditMetaData }>, res) => {
     const { comment, references, ...editedSpecies } = req.body.species
-    const id = await writeSpecies(editedSpecies, comment, references, req.user!.initials)
-    return res.status(200).send({ id })
+    const validationErrors = validateEntireSpecies(editedSpecies)
+    if (validationErrors.length > 0) {
+      return res.status(403).send(validationErrors)
+    }
+    const species_id = await writeSpecies(editedSpecies, comment, references, req.user!.initials)
+    return res.status(200).send({ species_id })
   }
 )
 

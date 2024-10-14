@@ -13,7 +13,10 @@ export const validateTimeBound = (
     age: {
       name: 'Age (Ma)',
       required: true,
-      asNumber: true,
+      asNumber: (num: number) => {
+        if (num < 0) return 'Age must be a positive number'
+        return
+      },
     },
   }
 

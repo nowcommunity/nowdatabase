@@ -26,6 +26,22 @@ export const validateLocality = (
         return
       },
     },
+    bfa_min_abs: {
+      name: 'Basis for age (Absolute, min)',
+      required: editData.date_meth === 'absolute',
+    },
+    bfa_max_abs: {
+      name: 'Basis for age (Absolute, max)',
+      required: editData.date_meth === 'absolute',
+    },
+    bfa_min: {
+      name: 'Basis for age (Time unit, min)',
+      required: editData.date_meth === 'time_unit',
+    },
+    bfa_max: {
+      name: 'Basis for age (Time unit, max)',
+      required: editData.date_meth === 'time_unit',
+    },
     loc_name: {
       name: 'Locality name',
       required: true,

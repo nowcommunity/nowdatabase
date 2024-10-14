@@ -1,4 +1,4 @@
-import { EditDataType, TimeUnitDetailsType } from '@/backendTypes'
+import { EditDataType, TimeUnitDetailsType, ValidationErrors } from '@/backendTypes'
 import { useNotify } from '@/hooks/notification'
 import { CircularProgress } from '@mui/material'
 import { useEffect } from 'react'
@@ -13,6 +13,7 @@ import { UpdateTab } from '../DetailView/common/UpdateTab'
 import { DetailView, TabType } from '../DetailView/DetailView'
 import { LocalityTab } from './Tabs/LocalityTab'
 import { TimeUnitTab } from './Tabs/TimeUnitTab'
+import { validateTimeUnit } from '@/validators/timeUnit'
 
 export const TimeUnitDetails = () => {
   const { id } = useParams()
@@ -47,7 +48,22 @@ export const TimeUnitDetails = () => {
   }
 
   const onWrite = async (editData: EditDataType<TimeUnitDetailsType>) => {
-    await editTimeUnitRequest(editData)
+    try {
+      const { tu_name } = await editTimeUnitRequest(editData).unwrap()
+      setTimeout(() => navigate(`/time-unit/${tu_name}`), 15)
+      notify('Edited item succesfully.')
+    } catch (e) {
+      if (e && typeof e === 'object' && 'status' in e && e.status !== 403) {
+        notify('Could not edit item. Error happened.', 'error')
+      } else {
+        const error = e as ValidationErrors
+        let message = 'Could not save item. Missing: '
+        Object.keys(error.data).forEach(key => {
+          message += `${error.data[key].name}. `
+        })
+        notify(message, 'error')
+      }
+    }
   }
 
   const tabs: TabType[] = [
@@ -72,7 +88,7 @@ export const TimeUnitDetails = () => {
       hasStagingMode
       data={isNew ? emptyTimeUnit : data!}
       onWrite={onWrite}
-      validator={() => ({ name: '', error: null })}
+      validator={validateTimeUnit}
       deleteFunction={deleteFunction}
     />
   )

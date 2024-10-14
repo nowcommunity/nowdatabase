@@ -1,8 +1,8 @@
 import { beforeEach, beforeAll, afterAll, describe, it, expect } from '@jest/globals'
 import { LocalityDetailsType, SpeciesDetailsType } from '../../../../frontend/src/backendTypes'
 import { LogRow } from '../../services/write/writeOperations/types'
-import { newSpeciesBasis } from './data'
-import { login, resetDatabase, send, testLogRows } from '../utils'
+import { newSpeciesBasis, newSpeciesWithoutRequiredFields } from './data'
+import { login, resetDatabase, send, testLogRows, resetDatabaseTimeout } from '../utils'
 import { pool } from '../../utils/db'
 
 let createdSpecies: SpeciesDetailsType | null = null
@@ -10,7 +10,7 @@ let createdSpecies: SpeciesDetailsType | null = null
 describe('Creating new species works', () => {
   beforeAll(async () => {
     await resetDatabase()
-  }, 10 * 1000)
+  }, resetDatabaseTimeout)
   beforeEach(async () => {
     await login()
   })
@@ -19,10 +19,10 @@ describe('Creating new species works', () => {
   })
 
   it('Request succeeds and returns valid number id', async () => {
-    const { body: resultBody } = await send<{ id: number }>('species', 'PUT', {
+    const { body: resultBody } = await send<{ species_id: number }>('species', 'PUT', {
       species: { ...newSpeciesBasis, comment: 'species test' },
     })
-    const { id: createdId } = resultBody
+    const { species_id: createdId } = resultBody
 
     expect(typeof createdId).toEqual('number') // `Invalid result returned on write: ${createdId}`
 
@@ -54,5 +54,12 @@ describe('Creating new species works', () => {
       },
     ]
     testLogRows(logRows, expectedLogRows, 2)
+  })
+
+  it('Species without required fields fails', async () => {
+    const res = await send('species', 'PUT', {
+      species: { ...newSpeciesWithoutRequiredFields, comment: 'species test' },
+    })
+    expect(res.status).toEqual(403)
   })
 })

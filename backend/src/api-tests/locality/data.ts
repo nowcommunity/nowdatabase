@@ -86,9 +86,9 @@ export const newLocalityBasis = {
   pers_pollen_nap: null,
   pers_pollen_other: null,
   hominin_skeletal_remains: false,
-  bipedal_footprints: false,
-  stone_tool_technology: false,
-  stone_tool_cut_marks_on_bones: false,
+  bipedal_footprints: null, // radioselector on frontend is not set
+  stone_tool_technology: '0', // radioselector on frontend is set to no
+  stone_tool_cut_marks_on_bones: '1', // radioselector on frontend is set to yes
   technological_mode_1: null,
   technological_mode_2: null,
   technological_mode_3: null,

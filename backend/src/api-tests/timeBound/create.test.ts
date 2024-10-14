@@ -1,6 +1,6 @@
 import { beforeEach, beforeAll, afterAll, describe, it, expect } from '@jest/globals'
 import { LogRow } from '../../services/write/writeOperations/types'
-import { login, resetDatabase, send, testLogRows } from '../utils'
+import { login, resetDatabase, send, testLogRows, resetDatabaseTimeout } from '../utils'
 import { newTimeBoundBasis } from './data'
 import { TimeBoundDetailsType } from '../../../../frontend/src/backendTypes'
 import { pool } from '../../utils/db'
@@ -10,7 +10,7 @@ let createdTimeBound: TimeBoundDetailsType | null = null
 describe('Creating new time bound works', () => {
   beforeAll(async () => {
     await resetDatabase()
-  }, 10 * 1000)
+  }, resetDatabaseTimeout)
   beforeEach(async () => {
     await login()
   })
@@ -19,11 +19,11 @@ describe('Creating new time bound works', () => {
   })
 
   it('Request succeeds and returns valid number id', async () => {
-    const { body: resultBody } = await send<{ id: number }>('time-bound', 'PUT', {
+    const { body: resultBody } = await send<{ bid: number }>('time-bound', 'PUT', {
       timeBound: { ...newTimeBoundBasis },
     })
 
-    const { id: createdId } = resultBody
+    const { bid: createdId } = resultBody
 
     expect(typeof createdId).toEqual('number') // `Invalid result returned on write: ${createdId}`
 

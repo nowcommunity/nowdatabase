@@ -268,3 +268,7 @@ export type SpeciesReference = Prisma.now_sr & ReferenceOfUpdate
 
 export type ReferenceJournalType = Prisma.ref_journal
 export type ReferenceAuthorType = Prisma.ref_authors
+export type ValidationErrors = {
+  status: string
+  data: { [key: string]: { name: string; message: string } }
+}

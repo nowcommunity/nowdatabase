@@ -1,4 +1,4 @@
-import { EditDataType, TimeBoundDetailsType } from '@/backendTypes.js'
+import { EditDataType, TimeBoundDetailsType, ValidationErrors } from '@/backendTypes.js'
 import { useNotify } from '@/hooks/notification.ts'
 import { CircularProgress } from '@mui/material'
 import { useEffect } from 'react'
@@ -50,7 +50,17 @@ export const TimeBoundDetails = () => {
   }
 
   const onWrite = async (editedTimeBound: EditDataType<TimeBoundDetailsType>) => {
-    await editTimeBoundRequest(editedTimeBound)
+    try {
+      const { bid } = await editTimeBoundRequest(editedTimeBound).unwrap()
+      setTimeout(() => navigate(`/time-bound/${bid}`), 15)
+    } catch (e) {
+      const error = e as ValidationErrors
+      let message = 'Could not save item. Missing: '
+      Object.keys(error.data).forEach(key => {
+        message += `${error.data[key].name}. `
+      })
+      notify(message, 'error')
+    }
   }
 
   const tabs: TabType[] = [

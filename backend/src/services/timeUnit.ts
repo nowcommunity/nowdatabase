@@ -1,4 +1,8 @@
 import { logDb, nowDb } from '../utils/db'
+import { EditDataType, TimeUnitDetailsType } from '../../../frontend/src/backendTypes'
+import { ValidationObject } from '../../../frontend/src/validators/validator'
+import { validateTimeUnit } from '../../../frontend/src/validators/timeUnit'
+import Prisma from '../../prisma/generated/now_test_client'
 
 export const getAllTimeUnits = async () => {
   const result = await nowDb.now_time_unit.findMany({
@@ -84,4 +88,14 @@ export const getTimeUnitLocalities = async (id: string) => {
     where: { OR: [{ bfa_max: id }, { bfa_min: id }] },
   })
   return result
+}
+
+export const validateEntireTimeUnit = (editedFields: EditDataType<Prisma.now_time_unit>) => {
+  const keys = Object.keys(editedFields)
+  const errors: ValidationObject[] = []
+  for (const key of keys) {
+    const error = validateTimeUnit(editedFields as EditDataType<TimeUnitDetailsType>, key as keyof TimeUnitDetailsType)
+    if (error.error) errors.push(error)
+  }
+  return errors
 }

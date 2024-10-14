@@ -1,7 +1,7 @@
 import { beforeEach, beforeAll, afterAll, describe, it, expect } from '@jest/globals'
 import { EditMetaData, SpeciesDetailsType } from '../../../../frontend/src/backendTypes'
 import { LogRow } from '../../services/write/writeOperations/types'
-import { login, resetDatabase, send, testLogRows } from '../utils'
+import { login, resetDatabase, send, testLogRows, resetDatabaseTimeout } from '../utils'
 import { editedSpecies } from './data'
 import { pool } from '../../utils/db'
 
@@ -10,7 +10,7 @@ let editedSpeciesResult: (SpeciesDetailsType & EditMetaData) | null = null
 describe('Updating species works', () => {
   beforeAll(async () => {
     await resetDatabase()
-  }, 10 * 1000)
+  }, resetDatabaseTimeout)
   beforeEach(async () => {
     await login()
   })
@@ -19,11 +19,11 @@ describe('Updating species works', () => {
   })
 
   it('Edits name, comment and locality-species correctly', async () => {
-    const writeResult = await send<{ id: number }>('species', 'PUT', { species: editedSpecies })
+    const writeResult = await send<{ species_id: number }>('species', 'PUT', { species: editedSpecies })
     expect(writeResult.status).toEqual(200) // 'Response status was OK'
-    expect(writeResult.body.id).toEqual(editedSpecies.species_id) // `Invalid result returned on write: ${writeResult.body.id}`
+    expect(writeResult.body.species_id).toEqual(editedSpecies.species_id) // `Invalid result returned on write: ${writeResult.body.id}`
 
-    const { body, status } = await send<SpeciesDetailsType>(`species/${writeResult.body.id}`, 'GET')
+    const { body, status } = await send<SpeciesDetailsType>(`species/${writeResult.body.species_id}`, 'GET')
     expect(status).toEqual(200) // 'Status on response to GET added species request was OK'
     editedSpeciesResult = body
   })

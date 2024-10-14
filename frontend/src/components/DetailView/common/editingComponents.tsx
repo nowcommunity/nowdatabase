@@ -7,6 +7,7 @@ import {
   TextField,
   RadioGroup,
   FormControlLabel,
+  FormHelperText,
   Radio,
   Box,
   Modal,
@@ -49,9 +50,10 @@ export const DropdownSelector = <T extends object>({
   field: keyof EditDataType<T>
   disabled?: boolean
 }) => {
-  const { setEditData, editData } = useDetailContext<T>()
+  const { setEditData, editData, validator } = useDetailContext<T>()
+  const { error } = validator(editData, field)
   const editingComponent = (
-    <FormControl size="small">
+    <FormControl size="small" error={!!error}>
       <InputLabel id={`${name}-multiselect-label`}>{name}</InputLabel>
       <Select
         labelId={`${name}-multiselect-label`}
@@ -73,6 +75,7 @@ export const DropdownSelector = <T extends object>({
           </MenuItem>
         ))}
       </Select>
+      {error && <FormHelperText>{error}</FormHelperText>}
     </FormControl>
   )
 
@@ -225,7 +228,8 @@ export const FieldWithTableSelection = <T extends object, ParentType extends obj
   selectorTable: ReactElement
   disabled?: boolean
 }) => {
-  const { editData, setEditData } = useDetailContext<ParentType>()
+  const { editData, setEditData, validator } = useDetailContext<ParentType>()
+  const { error } = validator(editData, targetField as keyof EditDataType<ParentType>)
   const [open, setOpen] = useState(false)
   const selectorFn = (selected: T) => {
     setEditData({ ...editData, [targetField]: selected[sourceField] })
@@ -254,6 +258,8 @@ export const FieldWithTableSelection = <T extends object, ParentType extends obj
     <TextField
       variant="outlined"
       size="small"
+      error={!!error}
+      helperText={error ?? ''}
       value={editData[targetField as keyof EditDataType<ParentType>]}
       onClick={() => setOpen(true)}
       disabled={disabled}

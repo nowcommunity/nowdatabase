@@ -7,9 +7,12 @@ import { useForm } from 'react-hook-form'
 import { EditableTable } from '@/components/DetailView/common/EditableTable'
 import { EditingModal } from '@/components/DetailView/common/EditingModal'
 import { emptyOption } from '@/components/DetailView/common/misc'
+import { Map } from '@/components/Map/Map'
+import { useState } from 'react'
 
 export const LocalityTab = () => {
   const { textField, radioSelection, dropdown, mode, bigTextField } = useDetailContext<LocalityDetailsType>()
+  const { editData, setEditData } = useDetailContext<LocalityDetailsType>()
 
   const approximateCoordinatesOptions = [
     { display: 'No', value: 'false' },
@@ -83,6 +86,25 @@ export const LocalityTab = () => {
     </EditingModal>
   )
 
+  // Kumpula Coordinates, could be changed later to be existing coordinates if exists
+  const [coordinates, setCoordinates] = useState({ lat: 60.202665856, lng: 24.957662836 })
+
+  // ONLY dec coordinates, no conversion to dms yet
+  // eslint-disable-next-line @typescript-eslint/require-await
+  const onSaveCoord = async () => {
+    setEditData({ ...editData, dec_lat: coordinates.lat, dec_long: coordinates.lng })
+    return Object.keys(errors).length === 0 //no idea if this is needed, just copypasted
+  }
+
+  // TODO name this better, plagiarized from editingModal
+  const coordinateButton = (
+    <EditingModal buttonText="Open Map" onSave={onSaveCoord}>
+      <Box sx={{ display: 'flex', flexDirection: 'column', gap: '1em' }}>
+        <Map coordinates={coordinates} setCoordinates={setCoordinates} />
+      </Box>
+    </EditingModal>
+  )
+
   return (
     <>
       <HalfFrames>
@@ -90,7 +112,10 @@ export const LocalityTab = () => {
         <ArrayFrame half array={country} title="Country" />
       </HalfFrames>
 
-      <ArrayFrame array={latlong} title="Latitude & Longitude" />
+      <Grouped>
+        <ArrayFrame array={latlong} title="Latitude & Longitude" />
+        {!mode.read && coordinateButton}
+      </Grouped>
 
       <Grouped title="Synonyms">
         {!mode.read && editingModal}

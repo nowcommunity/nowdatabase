@@ -24,6 +24,8 @@ export const referenceTableColumns: MRT_ColumnDef<Reference>[] = [
     accessorKey: 'date_primary',
     header: 'Year',
     maxSize: 60,
+    filterVariant: 'range',
+    filterFn: 'between',
   },
   {
     id: 'title_primary',
