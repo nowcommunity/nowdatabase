@@ -11,17 +11,16 @@ import { skipToken } from '@reduxjs/toolkit/query'
 import { type MRT_ColumnDef } from 'material-react-table'
 
 interface JournalTabProps {
-  tab_name?: string
+  tab_name?: string | null
 }
 
 export const JournalTab: React.FC<JournalTabProps> = ({ tab_name = 'Journal' }) => {
   const { mode, editData, setEditData } = useDetailContext<ReferenceDetailsType>()
   const { data: journalData, isError } = useGetReferenceJournalsQuery(mode.read ? skipToken : undefined)
-  let visible_ref_journal = []
+  let visible_ref_journal: Array<ReferenceJournalType> = []
   if (editData.ref_journal) {
     visible_ref_journal = [Object.assign({}, editData.ref_journal)]
   }
-
   const journalColumns: MRT_ColumnDef<ReferenceJournalType>[] = [
     {
       accessorKey: 'journal_title',
@@ -66,24 +65,16 @@ export const JournalTab: React.FC<JournalTabProps> = ({ tab_name = 'Journal' }) 
   ]
 
   return (
-    <Grouped title={tab_name}>
+    <Grouped title={tab_name ? tab_name : 'Journal'}>
       {!mode.read && (
         <Box display="flex" gap={1}>
           <EditingForm<ReferenceJournalType, ReferenceDetailsType>
             buttonText="Add new journal"
             formFields={formFields}
             editAction={(newJournal: ReferenceJournalType) => {
-              const updatedJournal = {
-                journal_id: newJournal.journal_id,
-                journal_title: newJournal.journal_title,
-                short_title: newJournal.short_title,
-                alt_title: newJournal.alt_title,
-                ISSN: newJournal.ISSN,
-                row: 'new',
-              }
               setEditData({
                 ...editData,
-                ref_journal: updatedJournal,
+                ref_journal: { ...newJournal, journal_id: undefined },
               })
             }}
           />
@@ -96,17 +87,9 @@ export const JournalTab: React.FC<JournalTabProps> = ({ tab_name = 'Journal' }) 
             idFieldName="journal_id"
             useObject={true}
             editingAction={(newJournal: ReferenceJournalType) => {
-              const updatedJournal = {
-                journal_id: newJournal.journal_id,
-                journal_title: newJournal.journal_title,
-                short_title: newJournal.short_title,
-                alt_title: newJournal.alt_title,
-                ISSN: newJournal.ISSN,
-                row: 'new',
-              }
               setEditData({
                 ...editData,
-                ref_journal: updatedJournal,
+                ref_journal: { ...newJournal, journal_id: newJournal.journal_id },
               })
             }}
           />

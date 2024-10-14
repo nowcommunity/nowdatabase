@@ -11,8 +11,8 @@ import { skipToken } from '@reduxjs/toolkit/query'
 import { type MRT_ColumnDef } from 'material-react-table'
 
 interface AuthorTabProps {
-  field_num_param: string
-  tab_name?: string
+  field_num_param: number
+  tab_name?: string | null
 }
 
 export const AuthorTab: React.FC<AuthorTabProps> = ({ field_num_param, tab_name = 'Authors' }) => {
@@ -58,7 +58,7 @@ export const AuthorTab: React.FC<AuthorTabProps> = ({ field_num_param, tab_name 
   ]
 
   return (
-    <Grouped title={tab_name}>
+    <Grouped title={tab_name ? tab_name : 'Authors'}>
       {!mode.read && (
         <Box display="flex" gap={1}>
           <EditingForm<ReferenceAuthorType, ReferenceDetailsType>
@@ -93,8 +93,7 @@ export const AuthorTab: React.FC<AuthorTabProps> = ({ field_num_param, tab_name 
             columns={authorColumns}
             fieldName="ref_authors"
             idFieldName="au_num"
-            useObject={true}
-            editAction={(newAuthor: ReferenceAuthorType) => {
+            editingAction={(newAuthor: ReferenceAuthorType) => {
               const updatedAuthors = [
                 ...editData.ref_authors,
                 {

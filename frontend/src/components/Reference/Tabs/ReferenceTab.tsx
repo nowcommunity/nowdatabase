@@ -37,7 +37,7 @@ export const ReferenceTab = () => {
 
   //painfully long way to split the arrayframe-component when an authorfield occurs
   const groupedFieldsArray = []
-  let nonAuthorFieldsArray: [string, JSX.Element][] = []
+  let nonAuthorFieldsArray: [string | null, JSX.Element][] = []
 
   fields?.forEach(field => {
     if (authorFields.includes(field.field_name!)) {
