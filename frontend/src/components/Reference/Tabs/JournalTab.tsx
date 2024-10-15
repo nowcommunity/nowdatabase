@@ -74,7 +74,8 @@ export const JournalTab: React.FC<JournalTabProps> = ({ tab_name = 'Journal' }) 
             editAction={(newJournal: ReferenceJournalType) => {
               setEditData({
                 ...editData,
-                ref_journal: { ...newJournal, journal_id: undefined },
+                journal_id: undefined,
+                ref_journal: { ...newJournal, journal_id: undefined, rowState: 'new' },
               })
             }}
           />
@@ -89,7 +90,8 @@ export const JournalTab: React.FC<JournalTabProps> = ({ tab_name = 'Journal' }) 
             editingAction={(newJournal: ReferenceJournalType) => {
               setEditData({
                 ...editData,
-                ref_journal: { ...newJournal, journal_id: newJournal.journal_id },
+                journal_id: newJournal.journal_id,
+                ref_journal: { ...newJournal, rowState: 'new' },
               })
             }}
           />

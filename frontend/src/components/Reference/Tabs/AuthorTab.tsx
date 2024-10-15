@@ -1,5 +1,5 @@
 /* eslint-disable react/prop-types */
-import { ReferenceDetailsType, ReferenceAuthorType } from '@/backendTypes'
+import { ReferenceDetailsType, ReferenceAuthorType, RowState } from '@/backendTypes'
 import { EditableTable } from '@/components/DetailView/common/EditableTable'
 import { EditingForm } from '@/components/DetailView/common/EditingForm'
 import { SelectingTable } from '@/components/DetailView/common/SelectingTable'
@@ -65,7 +65,10 @@ export const AuthorTab: React.FC<AuthorTabProps> = ({ field_num_param, tab_name 
             buttonText="Add new author"
             formFields={formFields}
             editAction={(newAuthor: ReferenceAuthorType) => {
-              const updatedAuthors = [...editData.ref_authors, { ...newAuthor, rid: editData.rid }]
+              const updatedAuthors = [
+                ...editData.ref_authors,
+                { ...newAuthor, rid: editData.rid, rowState: 'new' as RowState },
+              ]
 
               setEditData({
                 ...editData,
@@ -84,7 +87,10 @@ export const AuthorTab: React.FC<AuthorTabProps> = ({ field_num_param, tab_name 
             fieldName="ref_authors"
             idFieldName="au_num"
             editingAction={(newAuthor: ReferenceAuthorType) => {
-              const updatedAuthors = [...editData.ref_authors, { ...newAuthor, rid: editData.rid }]
+              const updatedAuthors = [
+                ...editData.ref_authors,
+                { ...newAuthor, rid: editData.rid, rowState: 'new' as RowState },
+              ]
 
               setEditData({
                 ...editData,

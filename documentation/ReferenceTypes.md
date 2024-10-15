@@ -6,6 +6,31 @@ In the test_data/sqlfiles/now_test.sql code related to adding reference types is
 
 Do concider other options before you try to alter the data by hand.
 
+## Existing fields & their ids
+    title_primary 1
+    authors_primary 2
+    date_primary 3
+    journal_id 4
+    volume 5
+    issue 6
+    start_page 7
+    end_page 8
+    publisher 9
+    pub_place 10
+    title_secondary 11
+    authors_secondary 12
+    date_secondary 13
+    title_series 14
+    authors_series 15
+    issn_isbn 16
+    abstract 17
+    web_url 18
+    misc_1 19
+    misc_2 20
+    gen_notes 21
+    language 22
+    exact_date 23
+
 "ref_type_id": 1, "ref_type": "Journal"'
     Title / title_primary
     Authors / authors_primary
