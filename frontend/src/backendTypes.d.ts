@@ -282,7 +282,10 @@ export type ReferenceAuthorType = {
   author_initials?: string
   field_id?: string
 }
+
 export type ValidationErrors = {
   status: string
   data: { [key: string]: { name: string; message: string } }
 }
+
+export type PrismaReference = Prisma.ref_ref

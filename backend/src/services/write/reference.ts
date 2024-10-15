@@ -1,4 +1,10 @@
-import { EditDataType, FixBigInt, ReferenceDetailsType, User } from '../../../../frontend/src/backendTypes'
+import {
+  EditDataType,
+  FixBigInt,
+  PrismaReference,
+  ReferenceDetailsType,
+  User,
+} from '../../../../frontend/src/backendTypes'
 import { NOW_DB_NAME } from '../../utils/config'
 import { WriteHandler } from './writeOperations/writeHandler'
 import { getFieldsOfTables } from '../../utils/db'
@@ -39,7 +45,7 @@ export const writeReference = async (reference: EditDataType<ReferenceDetailsTyp
 }
 
 export const deleteReference = async (rid: number, user: User) => {
-  const reference = (await getReferenceDetails(rid)) as EditDataType<FixBigInt<ReferenceDetailsType>>
+  const reference = (await getReferenceDetails(rid)) as EditDataType<FixBigInt<PrismaReference>>
   if (!reference) throw new Error('Reference not found')
 
   const writeHandler = getReferenceWriteHandler('delete')

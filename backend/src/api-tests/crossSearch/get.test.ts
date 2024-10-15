@@ -6,7 +6,7 @@ import { pool } from '../../utils/db'
 describe('Getting cross-search data works', () => {
   beforeAll(async () => {
     await resetDatabase()
-  }, 10 * 1000)
+  }, resetDatabaseTimeout)
   afterAll(async () => {
     await pool.end()
   })
