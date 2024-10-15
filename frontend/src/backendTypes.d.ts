@@ -253,3 +253,12 @@ export type ValidationErrors = {
   status: string
   data: { [key: string]: { name: string; message: string } }
 }
+
+export type ColumnCategory = {
+  columns: string[]
+  buttonstate: boolean
+}
+
+export type ColumnCategories = {
+  [key: string]: ColumnCategory
+}

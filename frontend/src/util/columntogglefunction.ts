@@ -1,22 +1,24 @@
 import { MRT_VisibilityState } from 'material-react-table';
-import { useState } from 'react';
 
-export const columnCategoryToggler = (visibleColumns: MRT_VisibilityState, columnCategory: string[], buttonstate: boolean) => {
-  const [newVisibleColumns, setNewVisibleColumns] = useState(visibleColumns) as [MRT_VisibilityState, (visibleColumns: MRT_VisibilityState) => void];
+export const columnCategoryToggler = (visibleColumns: MRT_VisibilityState, setVisibleColumns: (columns: MRT_VisibilityState) => void, columns: string[], buttonstate: boolean) => {
   if (buttonstate) {
-    const filteredColumns = Object.keys(newVisibleColumns)
-      .filter((key) => !columnCategory.includes(key))
+    const filteredColumns = Object.keys(visibleColumns)
+      .filter((key) => !columns.includes(key))
       .reduce((obj, key) => {
-        obj[key] = newVisibleColumns[key];
+        obj[key] = visibleColumns[key];
         return obj;
       }, {} as MRT_VisibilityState);
-    setNewVisibleColumns(filteredColumns);
+    setVisibleColumns(filteredColumns);
   } else {
-    columnCategory.forEach((category) => {
-      if (!newVisibleColumns[category]) {
-        setNewVisibleColumns({ ...newVisibleColumns, [category]: false });
+    columns.forEach((column) => {
+      if (!visibleColumns[column]) {
+        setVisibleColumns({ ...visibleColumns, [column]: false });
       }
     })
   }
-  return { newVisibleColumns, buttonstate: !buttonstate };
+  return { buttonstate: !buttonstate };
+}
+
+export const buttonStateToggler = (buttonstate: boolean) => {
+  return !buttonstate;
 }

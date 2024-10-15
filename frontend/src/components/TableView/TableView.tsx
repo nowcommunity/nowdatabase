@@ -15,6 +15,8 @@ import { renderCustomToolbar, renderCustomToolbarModalVersion } from './helpers'
 import { ActionComponent } from './ActionComponent'
 import { usePageContext } from '../Page'
 import { useUser } from '@/hooks/user'
+import { columnCategoryToggler, buttonStateToggler } from '@/util/columntogglefunction'
+import { ColumnCategories } from '@/backendTypes'
 
 type TableStateInUrl = 'sorting' | 'columnfilters' | 'pagination'
 
@@ -31,6 +33,8 @@ export const TableView = <T extends MRT_RowData>({
   data,
   columns,
   visibleColumns,
+  setVisibleColumns,
+  columnCategories,
   idFieldName,
   checkRowRestriction,
   selectorFn,
@@ -43,6 +47,8 @@ export const TableView = <T extends MRT_RowData>({
   data: T[] | undefined
   columns: MRT_ColumnDef<T>[]
   visibleColumns: MRT_VisibilityState
+  setVisibleColumns?: (columns: MRT_VisibilityState) => void
+  columnCategories?: ColumnCategories
   idFieldName: keyof T
   checkRowRestriction?: (row: T) => boolean
   selectorFn?: (id: T) => void
@@ -158,6 +164,8 @@ export const TableView = <T extends MRT_RowData>({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [table, columnFilters, sorting])
 
+  const [columnCategoriesState, setColumnCategoriesState] = useState(columnCategories)
+
   if (!data) return <CircularProgress />
 
   return (
@@ -172,7 +180,7 @@ export const TableView = <T extends MRT_RowData>({
               <Button sx={{ marginRight: '1rem', marginLeft: '1rem' }} variant="contained" component={Link} to="new">
                 New
               </Button>
-            )}
+            )}s
           </Box>
           <Divider sx={{ marginTop: '1rem' }} />
         </>
@@ -200,6 +208,22 @@ export const TableView = <T extends MRT_RowData>({
               </span>
             </Tooltip>{' '}
             {exportIsLoading && <CircularProgress />}
+          </Box>
+        </Box>
+      )}
+      {columnCategories && (
+        <Box sx={{ margin: '1em', maxWidth: '25em' }}>
+          <Typography variant="h6">Toggle column categories:</Typography>
+          <Box sx={{ display: 'flex', gap: '0.4em' }}>
+            {Object.entries(columnCategories).map(([category,body]) => (
+              <Button
+                key={category}
+                variant= {category ? "contained" : "outlined"}
+                onClick={() => console.log(category,body)}
+              >
+                {category}
+              </Button>
+            ))}
           </Box>
         </Box>
       )}

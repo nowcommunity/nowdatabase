@@ -107,6 +107,7 @@ export class WriteHandler extends DatabaseHandler {
 
   /* Takes in a list of objects which are of Editable type, meaning they have a rowState field. Either adds or removes a join relation. */
   async applyListChanges<T extends { rowState?: RowState }>(table: AllowedTables, objects: T[], idColumns: string[]) {
+    console.log('applyListChanges', table, idColumns)
     for (const object of objects) {
       const rowState = object.rowState
       if (rowState === 'new') {

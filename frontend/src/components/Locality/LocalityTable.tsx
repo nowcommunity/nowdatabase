@@ -1,7 +1,7 @@
-import { useMemo } from 'react'
-import { type MRT_ColumnDef } from 'material-react-table'
+import { useMemo, useState } from 'react'
+import { MRT_VisibilityState, type MRT_ColumnDef } from 'material-react-table'
 import { useGetAllLocalitiesQuery, useGetLocalitySpeciesListMutation } from '../../redux/localityReducer'
-import { Locality } from '@/backendTypes'
+import { ColumnCategory, ColumnCategories, Locality } from '@/backendTypes'
 import { TableView } from '../TableView/TableView'
 import { useNotify } from '@/hooks/notification'
 
@@ -122,7 +122,7 @@ export const LocalityTable = ({ selectorFn }: { selectorFn?: (newObject: Localit
     []
   )
 
-  const visibleColumns = {
+  const [visibleColumns, setVisibleColumns] = useState({
     lid: false,
     bfa_max: false,
     bfa_min: false,
@@ -146,7 +146,26 @@ export const LocalityTable = ({ selectorFn }: { selectorFn?: (newObject: Localit
     formation: false,
     member: false,
     bed: false,
-  }
+  } as MRT_VisibilityState)
+
+  const columnCategories = {
+    'Location': {
+      columns : ['loc_name', 'country', 'state', 'county', 'dec_lat', 'dec_long', 'altitude'],
+      buttonstate : false
+    } as ColumnCategory,
+    'Biostratigraphy': {
+      columns : ['bfa_max', 'bfa_min', 'max_age', 'min_age', 'frac_max', 'frac_min', 'chron'],
+      buttonstate : false
+    } as ColumnCategory,
+    'Geology': {
+      columns : ['basin', 'subbasin', 'plate', 'formation', 'member', 'bed'],
+      buttonstate : false
+    } as ColumnCategory,
+    'Misc': {
+      columns : ['dms_lat', 'dms_long', 'site_area', 'gen_loc'],
+      buttonstate : false
+    } as ColumnCategory,
+  } as ColumnCategories
 
   const combinedExport = async (lids: number[]) => {
     if (isLoading) {
@@ -181,6 +200,8 @@ export const LocalityTable = ({ selectorFn }: { selectorFn?: (newObject: Localit
       idFieldName="lid"
       columns={columns}
       visibleColumns={visibleColumns}
+      setVisibleColumns={setVisibleColumns}
+      columnCategories={columnCategories}
       data={localitiesQuery.data}
       url="locality"
       combinedExport={combinedExport}
