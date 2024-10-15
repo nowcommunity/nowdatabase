@@ -10,6 +10,44 @@ import { emptyOption } from '@/components/DetailView/common/misc'
 import { Map } from '@/components/Map/Map'
 import { useState } from 'react'
 
+const convertDmsToDec = (dms: string | null | undefined) => {
+  if (typeof dms !== 'string') return
+
+  const dmsArray = dms.split(/[^\d\w.]+/)
+
+  const degrees = dmsArray[0]
+  const minutes = dmsArray[1]
+  const seconds = dmsArray[2]
+  const direction = dmsArray[3]
+
+  let dec = Number((Number(degrees) + Number(minutes) / 60 + Number(seconds) / 3600).toFixed(12))
+
+  if (direction == 'S' || direction == 'W') {
+    dec = dec * -1
+  }
+
+  return dec
+}
+
+const convertDecToDms = (dec: number | null | undefined, isLatitude: boolean) => {
+  if (typeof dec !== 'number') return
+
+  const absolute = Math.abs(dec)
+  const degrees = Math.floor(absolute)
+  const minutesNotTruncated = (absolute - degrees) * 60
+  const minutes = Math.floor(minutesNotTruncated)
+  const seconds = Number(((minutesNotTruncated - minutes) * 60).toFixed(2))
+
+  let direction = ''
+  if (isLatitude) {
+    direction = dec >= 0 ? 'N' : 'S'
+  } else {
+    direction = dec >= 0 ? 'E' : 'W'
+  }
+
+  return degrees + ' ' + minutes + ' ' + seconds + ' ' + direction
+}
+
 export const LocalityTab = () => {
   const { textField, radioSelection, dropdown, mode, bigTextField } = useDetailContext<LocalityDetailsType>()
   const { editData, setEditData } = useDetailContext<LocalityDetailsType>()
