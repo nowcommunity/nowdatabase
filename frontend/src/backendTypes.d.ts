@@ -219,10 +219,11 @@ export type EditMetaData = { comment?: string; references?: Reference[] }
 /* Reference */
 export type ReferenceDetailsType = Prisma.ref_ref & {
   ref_authors: {
-    au_num: number | null
-    author_surname: string | null
-    author_initials: string | null
-    field_id: string | null
+    rid: number
+    au_num: number
+    author_surname?: string
+    author_initials?: string
+    field_id: string
   }[]
   ref_journal: {
     journal_id?: number
@@ -274,7 +275,13 @@ export type ReferenceJournalType = {
   ISSN?: string
 }
 
-export type ReferenceAuthorType = Prisma.ref_authors
+export type ReferenceAuthorType = {
+  rid: number
+  au_num: number
+  author_surname?: string
+  author_initials?: string
+  field_id: string
+}
 export type ValidationErrors = {
   status: string
   data: { [key: string]: { name: string; message: string } }

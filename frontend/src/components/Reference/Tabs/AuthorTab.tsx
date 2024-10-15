@@ -19,7 +19,7 @@ export const AuthorTab: React.FC<AuthorTabProps> = ({ field_num_param, tab_name 
   const { mode, editData, setEditData } = useDetailContext<ReferenceDetailsType>()
   const { data: authorData, isError } = useGetReferenceAuthorsQuery(mode.read ? skipToken : undefined)
 
-  let visible_ref_authors = editData.ref_authors.filter(author => {
+  let visible_ref_authors: Array<ReferenceAuthorType> = editData.ref_authors.filter(author => {
     return author.field_id?.toString() === field_num_param?.toString()
   })
 
@@ -67,14 +67,7 @@ export const AuthorTab: React.FC<AuthorTabProps> = ({ field_num_param, tab_name 
             editAction={(newAuthor: ReferenceAuthorType) => {
               const updatedAuthors = [
                 ...editData.ref_authors,
-                {
-                  rid: editData.rid,
-                  author_initials: newAuthor.author_initials,
-                  author_surname: newAuthor.author_surname,
-                  field_id: field_num_param,
-                  au_num: newAuthor.au_num,
-                  rowState: 'new',
-                },
+                {...newAuthor, rid: editData.rid },
               ]
 
               setEditData({
@@ -96,14 +89,7 @@ export const AuthorTab: React.FC<AuthorTabProps> = ({ field_num_param, tab_name 
             editingAction={(newAuthor: ReferenceAuthorType) => {
               const updatedAuthors = [
                 ...editData.ref_authors,
-                {
-                  rid: editData.rid,
-                  author_initials: newAuthor.author_initials,
-                  author_surname: newAuthor.author_surname,
-                  field_id: field_num_param,
-                  au_num: newAuthor.au_num,
-                  rowState: 'new',
-                },
+                {...newAuthor, rid: editData.rid },
               ]
 
               setEditData({
