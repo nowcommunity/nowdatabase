@@ -20,6 +20,7 @@ export const SelectingTable = <T extends MRT_RowData, ParentType extends object>
   idFieldName,
   selectedValues,
   isError,
+  useObject,
 }: {
   buttonText: string
   data: T[] | undefined
@@ -29,9 +30,18 @@ export const SelectingTable = <T extends MRT_RowData, ParentType extends object>
   idFieldName: keyof T
   selectedValues?: string[]
   isError: boolean
+  useObject?: boolean
 }) => {
   const { editData, setEditData } = useDetailContext<ParentType>()
-  const selectedItems = editData[fieldName as keyof EditDataType<ParentType>] as T[]
+
+  let selectedItems: T[]
+
+  if (!useObject) {
+    selectedItems = editData[fieldName as keyof EditDataType<ParentType>] as T[]
+  } else {
+    const value = editData[fieldName as keyof EditDataType<ParentType>]
+    selectedItems = value ? ([value] as T[]) : ([] as T[])
+  }
 
   const defaultEditingAction = (newObject: T) => {
     if (selectedItems.find(item => item[idFieldName] === newObject[idFieldName])) return

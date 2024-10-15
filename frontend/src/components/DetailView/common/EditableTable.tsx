@@ -26,11 +26,13 @@ export const EditableTable = <T extends MRT_RowData & { rowState?: RowState }, P
   editTableData,
   columns,
   field,
+  visible_data,
 }: {
   tableData?: Array<T> | null
   editTableData?: Array<EditDataType<T>> | null
   columns: MRT_ColumnDef<T>[]
   field: keyof EditDataType<ParentType>
+  visible_data?: Array<T>
 }) => {
   const [pagination, setPagination] = useState<MRT_PaginationState>(defaultPagination)
   const { editData, setEditData, mode, data } = useDetailContext<ParentType>()
@@ -74,6 +76,11 @@ export const EditableTable = <T extends MRT_RowData & { rowState?: RowState }, P
   }
 
   const getData = () => {
+    //be very very careful that visible_data is in the correct form if you use this
+    if (visible_data) {
+      return visible_data
+    }
+
     if (!mode.read) {
       if (!editTableData) return editData[field] as T[]
       return editTableData as T[]
