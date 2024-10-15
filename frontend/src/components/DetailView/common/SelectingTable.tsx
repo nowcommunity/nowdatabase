@@ -34,7 +34,7 @@ export const SelectingTable = <T extends MRT_RowData, ParentType extends object>
 }) => {
   const { editData, setEditData } = useDetailContext<ParentType>()
 
-  let selectedItems
+  let selectedItems: T[]
 
   if (!useObject) {
     selectedItems = editData[fieldName as keyof EditDataType<ParentType>] as T[]
