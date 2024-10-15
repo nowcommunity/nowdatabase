@@ -65,10 +65,7 @@ export const AuthorTab: React.FC<AuthorTabProps> = ({ field_num_param, tab_name 
             buttonText="Add new author"
             formFields={formFields}
             editAction={(newAuthor: ReferenceAuthorType) => {
-              const updatedAuthors = [
-                ...editData.ref_authors,
-                {...newAuthor, rid: editData.rid },
-              ]
+              const updatedAuthors = [...editData.ref_authors, { ...newAuthor, rid: editData.rid }]
 
               setEditData({
                 ...editData,
@@ -87,10 +84,7 @@ export const AuthorTab: React.FC<AuthorTabProps> = ({ field_num_param, tab_name 
             fieldName="ref_authors"
             idFieldName="au_num"
             editingAction={(newAuthor: ReferenceAuthorType) => {
-              const updatedAuthors = [
-                ...editData.ref_authors,
-                {...newAuthor, rid: editData.rid },
-              ]
+              const updatedAuthors = [...editData.ref_authors, { ...newAuthor, rid: editData.rid }]
 
               setEditData({
                 ...editData,
