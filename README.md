@@ -17,6 +17,7 @@ _____
 + `npm run dev` 
   + Uses `docker-compose.dev.yml`
   + Run in development mode: with hot reload
+  + To create test users visit `http://localhost:4000/test/create-test-users`
 
 Testing:
 
@@ -58,6 +59,13 @@ Run with the same image that is used in production:
 + `npm start`
   + Uses `docker-compose.yml`
   + This builds the code and runs it. Mostly you'll want to use this after major technical changes to check the code works also in production mode, before deploying. And then you'll likely want to do: `npm start -- --build` to force rebuild of containers.
+
+Docker:
+
++ `npm run dev:down`
+  + Stops and removes the dev container.
++ `-- --build`
+  + Useful flag to force docker to rebuild the containers. Example usage for dev: `npm run dev -- --build`
 
 **Further documentation**
 
