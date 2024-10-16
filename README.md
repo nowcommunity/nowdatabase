@@ -80,3 +80,5 @@ Docker:
 :mag_right: [Validators](frontend/src/validators/) The readme explains how validators are written
 
 :mag_right: [Class diagram](documentation/class_diagram.md) See the relations of relevant tables. Notice that it omits some unimportant tables and does not show most columns.
+
+:earth_africa: [Map feature](/documentation/map_feat.md) Map's functionality and development notes

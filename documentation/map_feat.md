@@ -1,10 +1,12 @@
 # Map feature
 
-# Functionality for now
+Map made with OpenStreetMap and React-Leaflet
+
+## Functionality for now
 
 - there is a page for a map
 - you can drag the marker with mouse
-  - you can see the lat/lng decimal coordinates under the Map
+  - you can see the current lat/lng decimal coordinates under the Map
 
 - the map is also accessible when editing/adding a locality (Open Map -button)
   - press "Save" button to transfer decimal coordinates to the form
@@ -28,6 +30,7 @@
 ### Dev notes
 - OSM Tile Usage Policy!
   > for production: Tile Usage Policy https://operations.osmfoundation.org/policies/tiles/ of OpenStreetMap if you’re going to use the tiles in production.
+
     > OpenStreetMap data is free for everyone to use. Our tile servers are not.
     > Because OpenStreetMap data is free, many other organisations provide map tiles made from OSM data. If your project doesn’t meet our requirements, you can get OSM-derived map tiles elsewhere. 
 
