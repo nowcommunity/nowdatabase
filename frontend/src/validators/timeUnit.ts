@@ -31,7 +31,7 @@ export const validateTimeUnit = (editData: EditDataType<TimeUnitDetailsType>, fi
       },
     },
     low_bound: {
-      name: 'Upper Bound',
+      name: 'Lower Bound',
       required: true,
       miscCheck: () => {
         if (editData.up_bound && editData.up_bound.age! > editData.low_bound!.age!)
