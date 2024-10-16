@@ -3,7 +3,13 @@ import { Box, Button, Paper, Stack, Tab, Tabs, useTheme } from '@mui/material'
 import EditIcon from '@mui/icons-material/Edit'
 import { useEffect, useState, JSX } from 'react'
 import { DetailContextProvider, ModeOptions, ModeType, makeEditData, modeOptionToMode } from './Context/DetailContext'
-import { DropdownOption, DropdownSelector, EditableTextField, RadioSelector } from './common/editingComponents'
+import {
+  DropdownOption,
+  DropdownOptionValue,
+  DropdownSelector,
+  EditableTextField,
+  RadioSelector,
+} from './common/editingComponents'
 import { DetailBrowser } from './DetailBrowser'
 import { StagingView } from './StagingView'
 import { ReturnButton, WriteButton } from './components'
@@ -89,9 +95,12 @@ export const DetailView = <T extends object>({
     if (deleteFunction) void deleteFunction()
   }
 
-  const radioSelection = (field: keyof EditDataType<T>, options: Array<DropdownOption | string>, name: string) => (
-    <RadioSelector field={field} options={options} name={name} />
-  )
+  const radioSelection = (
+    field: keyof EditDataType<T>,
+    options: Array<DropdownOption | string>,
+    name: string,
+    defaultValue?: DropdownOptionValue
+  ) => <RadioSelector field={field} options={options} name={name} defaultValue={defaultValue} />
 
   const bigTextField = (field: keyof EditDataType<T>) => <EditableTextField<T> field={field} type="text" big />
 

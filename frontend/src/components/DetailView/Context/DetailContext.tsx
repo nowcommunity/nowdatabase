@@ -1,6 +1,6 @@
 /* eslint-disable react-refresh/only-export-components */
 import { ReactNode, createContext, useState, JSX, useEffect, Context, useContext } from 'react'
-import { DropdownOption } from '../common/editingComponents'
+import { DropdownOption, DropdownOptionValue } from '../common/editingComponents'
 import { cloneDeep } from 'lodash-es'
 import { ValidationObject } from '@/validators/validator'
 import { EditDataType } from '@/backendTypes'
@@ -62,7 +62,12 @@ export type DetailContextType<T> = {
     name: string,
     disabled?: boolean
   ) => JSX.Element
-  radioSelection: (field: keyof EditDataType<T>, options: Array<DropdownOption | string>, name: string) => JSX.Element
+  radioSelection: (
+    field: keyof EditDataType<T>,
+    options: Array<DropdownOption | string>,
+    name: string,
+    defaultValue?: DropdownOptionValue
+  ) => JSX.Element
   validator: (editData: EditDataType<T>, field: keyof EditDataType<T>) => ValidationObject
 }
 

@@ -33,7 +33,7 @@ const setDropdownOptionValue = (
   if (value && asNumber) {
     setValue(parseInt(value))
   } else if (value === 'true' || value === 'false') {
-    setValue(value === 'true')
+    setValue(String(value === 'true'))
   } else {
     setValue(value ?? '')
   }
@@ -59,7 +59,7 @@ export const DropdownSelector = <T extends object>({
         labelId={`${name}-multiselect-label`}
         label={name}
         id={`${name}-multiselect`}
-        value={editData[field] as string}
+        value={(editData[field] as string) || ''}
         onChange={(event: SelectChangeEvent) => {
           const setValue = (value: number | string | boolean) => setEditData({ ...editData, [field]: value })
           const asNumber = typeof options[0] === 'number'
@@ -126,12 +126,20 @@ export const RadioSelector = <T extends object>({
   options,
   name,
   field,
+  defaultValue,
 }: {
   options: Array<DropdownOption | DropdownOptionValue>
   name: string
   field: keyof EditDataType<T>
+  defaultValue?: DropdownOptionValue
 }) => {
   const { setEditData, editData } = useDetailContext<T>()
+  if (defaultValue === undefined) {
+    defaultValue = getValue(options[0])
+  }
+  if (editData[field] === null) {
+    setEditData({ ...editData, [field]: getValue(options[0]) })
+  }
   const editingComponent = (
     <FormControl>
       <RadioGroup
@@ -156,7 +164,6 @@ export const RadioSelector = <T extends object>({
       </RadioGroup>
     </FormControl>
   )
-
   return <MultiSelector<T> {...{ editingComponent, field, options }} />
 }
 

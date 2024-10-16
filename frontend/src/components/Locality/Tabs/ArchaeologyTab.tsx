@@ -49,8 +49,8 @@ export const ArchaeologyTab = () => {
       radioSelection(
         'stone_tool_cut_marks_on_bones',
         [
-          { value: '0', display: 'No' },
-          { value: '1', display: 'Yes' },
+          { value: 'false', display: 'No' },
+          { value: 'true', display: 'Yes' },
         ],
         'cut-marks'
       ),
@@ -60,8 +60,8 @@ export const ArchaeologyTab = () => {
       radioSelection(
         'bipedal_footprints',
         [
-          { value: '0', display: 'No' },
-          { value: '1', display: 'Yes' },
+          { value: 'false', display: 'No' },
+          { value: 'true', display: 'Yes' },
         ],
         'bipedal-footprints'
       ),
@@ -71,8 +71,8 @@ export const ArchaeologyTab = () => {
       radioSelection(
         'stone_tool_technology',
         [
-          { value: '0', display: 'No' },
-          { value: '1', display: 'Yes' },
+          { value: 'false', display: 'No' },
+          { value: 'true', display: 'Yes' },
         ],
         'stone-tool-technology'
       ),
