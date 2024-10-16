@@ -8,35 +8,26 @@ import { EditableTable } from '@/components/DetailView/common/EditableTable'
 import { EditingModal } from '@/components/DetailView/common/EditingModal'
 import { emptyOption } from '@/components/DetailView/common/misc'
 import { Map } from '@/components/Map/Map'
-import { useState } from 'react'
-
-const convertDmsToDec = (dms: string | null | undefined) => {
-  if (typeof dms !== 'string') return
-
-  const dmsArray = dms.split(/[^\d\w.]+/)
-
-  const degrees = dmsArray[0]
-  const minutes = dmsArray[1]
-  const seconds = dmsArray[2]
-  const direction = dmsArray[3]
-
-  let dec = Number((Number(degrees) + Number(minutes) / 60 + Number(seconds) / 3600).toFixed(12))
-
-  if (direction == 'S' || direction == 'W') {
-    dec = dec * -1
-  }
-
-  return dec
-}
+import { useEffect, useState } from 'react'
 
 const convertDecToDms = (dec: number | null | undefined, isLatitude: boolean) => {
-  if (typeof dec !== 'number') return
+  if (typeof dec !== 'number') return undefined
+
+  if (isLatitude) {
+    if (dec > 90 || dec < -90) {
+      return undefined
+    }
+  } else {
+    if (dec > 180 || dec < -180) {
+      return undefined
+    }
+  }
 
   const absolute = Math.abs(dec)
   const degrees = Math.floor(absolute)
   const minutesNotTruncated = (absolute - degrees) * 60
   const minutes = Math.floor(minutesNotTruncated)
-  const seconds = Number(((minutesNotTruncated - minutes) * 60).toFixed(2))
+  const seconds = Math.round((minutesNotTruncated - minutes) * 60)
 
   let direction = ''
   if (isLatitude) {
@@ -51,6 +42,15 @@ const convertDecToDms = (dec: number | null | undefined, isLatitude: boolean) =>
 export const LocalityTab = () => {
   const { textField, radioSelection, dropdown, mode, bigTextField } = useDetailContext<LocalityDetailsType>()
   const { editData, setEditData } = useDetailContext<LocalityDetailsType>()
+
+  useEffect(() => {
+    setEditData({
+      ...editData,
+      dms_lat: convertDecToDms(editData.dec_lat, true),
+      dms_long: convertDecToDms(editData.dec_long, false),
+    })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [editData.dec_lat, editData.dec_long])
 
   const approximateCoordinatesOptions = [
     { display: 'No', value: 'false' },
