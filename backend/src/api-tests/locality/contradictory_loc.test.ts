@@ -42,4 +42,12 @@ describe('Min and max age checks work', () => {
     expect(writeResult.status).toEqual(403)
     expect(writeResult.body).toEqual({})
   })
+  
+  it('Editing locality without changing anything should succeed', async () => {
+    const locality = editedLocality
+    const writeResult = await send<{ id: number }>('locality', 'PUT', { locality: locality })
+    expect(writeResult.status).toEqual(200)
+
+    expect(writeResult.body.id).toEqual(editedLocality.lid) // `Invalid result returned on write: ${writeResult.body.id}
+  })
 })
