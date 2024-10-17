@@ -138,7 +138,7 @@ export const RadioSelector = <T extends object>({
     defaultValue = getValue(options[0])
   }
   if (editData[field] === null) {
-    setEditData({ ...editData, [field]: getValue(options[0]) })
+    setEditData({ ...editData, [field]: defaultValue })
   }
   const editingComponent = (
     <FormControl>
