@@ -41,13 +41,15 @@ export const ArrayToTable = ({ array, half }: { array: Array<Array<ReactNode>>; 
 export const ArrayFrame = ({
   array,
   title,
+  highlighted,
   half,
 }: {
   array: Array<Array<ReactNode>>
   title: string
+  highlighted?: boolean
   half?: boolean
 }) => (
-  <Grouped title={title}>
+  <Grouped title={title} highlighted={highlighted}>
     <ArrayToTable half={half} array={array} />
   </Grouped>
 )
@@ -71,10 +73,12 @@ export const HalfFrames = ({ children }: { children: [ReactNode, ReactNode] }) =
 
 export const Grouped = ({
   title,
+  highlighted,
   children,
   style,
 }: {
   title?: string
+  highlighted?: boolean
   children: ReactNode
   style?: React.CSSProperties
 }) => {
@@ -83,13 +87,16 @@ export const Grouped = ({
     paddingBottom: '15px',
     backgroundColor: 'white',
     margin: '0em',
+    borderColor: highlighted ? 'orange' : '',
+    borderRadius: highlighted ? 4 : '',
+    borderStyle: highlighted ? 'none none none solid' : '',
   }
 
   return (
     <Card style={styles}>
       {title && (
         <>
-          <Typography sx={{ fontSize: 16 }} color="text.secondary" gutterBottom>
+          <Typography sx={{ fontSize: 16 }} color={'text.secondary'} gutterBottom>
             {title}
           </Typography>
           <Divider />
