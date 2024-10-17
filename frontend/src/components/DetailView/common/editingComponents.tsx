@@ -322,7 +322,6 @@ export const TimeBoundSelection = <T extends object, ParentType extends object>(
         </Modal>
       </Box>
     )
-
   const editingComponent = (
     <TextField
       variant="outlined"
