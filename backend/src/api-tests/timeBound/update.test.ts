@@ -55,7 +55,6 @@ describe('Time bound updating', () => {
     expect(body.age).toEqual(existingTimeBound.age)
   })
   it('Update logs are correct', async () => {
-    // edit time unit to create a log update
     const { body: resultBody } = await send<{ bid: number }>('time-bound', 'PUT', {
       timeBound: editedTimeBound,
     })
