@@ -96,7 +96,7 @@ export const Grouped = ({
     <Card style={styles}>
       {title && (
         <>
-          <Typography sx={{ fontSize: 16 }} color={'text.secondary'} gutterBottom>
+          <Typography sx={{ fontSize: 16 }} color="text.secondary" gutterBottom>
             {title}
           </Typography>
           <Divider />
