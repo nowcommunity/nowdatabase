@@ -7,7 +7,7 @@ import { SequenceTable } from '@/components/Sequence/SequenceTable'
 import { TimeBoundTable } from '@/components/TimeBound/TimeBoundTable'
 
 export const TimeUnitTab = () => {
-  const { textField, dropdown, data, mode } = useDetailContext<TimeUnitDetailsType>()
+  const { textField, dropdown, data, editData, mode } = useDetailContext<TimeUnitDetailsType>()
 
   const rankOptions = [
     'Age',
@@ -41,38 +41,38 @@ export const TimeUnitTab = () => {
   const low_bound = mode.new
     ? []
     : [
-        ['Id', data.low_bound?.bid],
-        ['Name', data.low_bound?.b_name],
-        ['Age', data.low_bound?.age],
-        ['Comment', data.low_bound?.b_comment],
+        ['Id', editData.low_bound!.bid],
+        ['Name', editData.low_bound!.b_name],
+        ['Age', editData.low_bound!.age],
+        ['Comment', editData.low_bound!.b_comment],
       ]
 
   const up_bound = mode.new
     ? []
     : [
-        ['Id', data.up_bound?.bid],
-        ['Name', data.up_bound?.b_name],
-        ['Age', data.up_bound?.age],
-        ['Comment', data.up_bound?.b_comment],
+        ['Id', editData.up_bound!.bid],
+        ['Name', editData.up_bound!.b_name],
+        ['Age', editData.up_bound!.age],
+        ['Comment', editData.up_bound!.b_comment],
       ]
 
   const time_bound_edit = [
     [
-      'New Upper Bound',
+      'New Upper Bound Id',
       <TimeBoundSelection<TimeBoundDetailsType, TimeUnitDetailsType>
         key="up_bnd"
         sourceField="bid"
         targetField="up_bnd"
-        selectorTable={<TimeBoundTable />}
+        selectorTable={<TimeBoundTable showBid />}
       />,
     ],
     [
-      'New Lower Bound',
+      'New Lower Bound Id',
       <TimeBoundSelection<TimeBoundDetailsType, TimeUnitDetailsType>
         key="low_bnd"
         sourceField="bid"
         targetField="low_bnd"
-        selectorTable={<TimeBoundTable />}
+        selectorTable={<TimeBoundTable showBid />}
       />,
     ],
   ]
@@ -82,8 +82,16 @@ export const TimeUnitTab = () => {
       <ArrayFrame array={timeUnit} title="Time Unit" />
       {!mode.new && (
         <>
-          <ArrayFrame array={low_bound} title="Lower bound" />
-          <ArrayFrame array={up_bound} title="Upper bound" />
+          <ArrayFrame
+            array={low_bound}
+            title={editData.low_bound!.bid === data.low_bound?.bid ? 'Lower bound' : 'Lower Bound (edited)'}
+            highlighted={editData.low_bound!.bid !== data.low_bound?.bid ? true : false}
+          />
+          <ArrayFrame
+            array={up_bound}
+            title={editData.up_bound!.bid === data.up_bound?.bid ? 'Upper bound' : 'Upper Bound (edited)'}
+            highlighted={editData.up_bound!.bid !== data.up_bound?.bid ? true : false}
+          />
         </>
       )}
       {!mode.read && <ArrayFrame array={time_bound_edit} title="Edit bounds" />}
