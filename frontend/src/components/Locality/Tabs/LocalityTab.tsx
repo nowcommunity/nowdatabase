@@ -8,11 +8,49 @@ import { EditableTable } from '@/components/DetailView/common/EditableTable'
 import { EditingModal } from '@/components/DetailView/common/EditingModal'
 import { emptyOption } from '@/components/DetailView/common/misc'
 import { Map } from '@/components/Map/Map'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+
+const convertDecToDms = (dec: number | null | undefined, isLatitude: boolean) => {
+  if (typeof dec !== 'number') return undefined
+
+  if (isLatitude) {
+    if (dec > 90 || dec < -90) {
+      return undefined
+    }
+  } else {
+    if (dec > 180 || dec < -180) {
+      return undefined
+    }
+  }
+
+  const absolute = Math.abs(dec)
+  const degrees = Math.floor(absolute)
+  const minutesNotTruncated = (absolute - degrees) * 60
+  const minutes = Math.floor(minutesNotTruncated)
+  const seconds = Math.round((minutesNotTruncated - minutes) * 60)
+
+  let direction = ''
+  if (isLatitude) {
+    direction = dec >= 0 ? 'N' : 'S'
+  } else {
+    direction = dec >= 0 ? 'E' : 'W'
+  }
+
+  return degrees + ' ' + minutes + ' ' + seconds + ' ' + direction
+}
 
 export const LocalityTab = () => {
   const { textField, radioSelection, dropdown, mode, bigTextField } = useDetailContext<LocalityDetailsType>()
   const { editData, setEditData } = useDetailContext<LocalityDetailsType>()
+
+  useEffect(() => {
+    setEditData({
+      ...editData,
+      dms_lat: convertDecToDms(editData.dec_lat, true),
+      dms_long: convertDecToDms(editData.dec_long, false),
+    })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [editData.dec_lat, editData.dec_long])
 
   const approximateCoordinatesOptions = [
     { display: 'No', value: 'false' },
