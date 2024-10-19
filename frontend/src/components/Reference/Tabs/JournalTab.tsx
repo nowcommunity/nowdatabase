@@ -18,8 +18,8 @@ export const JournalTab: React.FC<JournalTabProps> = ({ tab_name = 'Journal' }) 
   const { mode, editData, setEditData } = useDetailContext<ReferenceDetailsType>()
   const { data: journalData, isError } = useGetReferenceJournalsQuery(mode.read ? skipToken : undefined)
   let visible_ref_journal: Array<ReferenceJournalType> = []
-  if (editData.ref_journal) {
-    visible_ref_journal = [Object.assign({}, editData.ref_journal)]
+  if (editData.ref_journal_obj) {
+    visible_ref_journal = [Object.assign({}, editData.ref_journal_obj)]
   }
   const journalColumns: MRT_ColumnDef<ReferenceJournalType>[] = [
     {
@@ -75,7 +75,7 @@ export const JournalTab: React.FC<JournalTabProps> = ({ tab_name = 'Journal' }) 
               setEditData({
                 ...editData,
                 journal_id: undefined,
-                ref_journal: { ...newJournal, journal_id: undefined, rowState: 'new' },
+                ref_journal_obj: { ...newJournal, journal_id: undefined, rowState: 'new' },
               })
             }}
           />
@@ -84,14 +84,14 @@ export const JournalTab: React.FC<JournalTabProps> = ({ tab_name = 'Journal' }) 
             data={journalData}
             isError={isError}
             columns={journalColumns}
-            fieldName="ref_journal"
+            fieldName="ref_journal_obj"
             idFieldName="journal_id"
             useObject={true}
             editingAction={(newJournal: ReferenceJournalType) => {
               setEditData({
                 ...editData,
                 journal_id: newJournal.journal_id,
-                ref_journal: { ...newJournal, rowState: 'new' },
+                ref_journal_obj: { ...newJournal, rowState: 'new' },
               })
             }}
           />
@@ -99,7 +99,7 @@ export const JournalTab: React.FC<JournalTabProps> = ({ tab_name = 'Journal' }) 
       )}
       <EditableTable<ReferenceJournalType, ReferenceDetailsType>
         columns={referenceJournalColumns}
-        field="ref_journal"
+        field="ref_journal_obj"
         visible_data={visible_ref_journal}
       />
     </Grouped>

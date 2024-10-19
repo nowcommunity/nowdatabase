@@ -223,10 +223,10 @@ export type ReferenceDetailsType = Prisma.ref_ref & {
     au_num: number
     author_surname?: string
     author_initials?: string
-    field_id: string
+    field_id: number
     rowState?: RowState
   }[]
-  ref_journal: {
+  ref_journal_obj: {
     journal_id: number
     journal_title: string
     short_title: string
@@ -283,7 +283,7 @@ export type ReferenceAuthorType = {
   au_num?: number
   author_surname?: string
   author_initials?: string
-  field_id?: string
+  field_id?: number
   rowState?: RowState
 }
 
