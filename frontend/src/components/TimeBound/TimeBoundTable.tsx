@@ -4,7 +4,13 @@ import { useGetAllTimeBoundsQuery } from '../../redux/timeBoundReducer'
 import { TimeBound } from '@/backendTypes'
 import { TableView } from '../TableView/TableView'
 
-export const TimeBoundTable = ({ selectorFn }: { selectorFn?: (newTimeBound: TimeBound) => void }) => {
+export const TimeBoundTable = ({
+  selectorFn,
+  showBid = false,
+}: {
+  selectorFn?: (newTimeBound: TimeBound) => void
+  showBid?: boolean
+}) => {
   const time_boundQuery = useGetAllTimeBoundsQuery()
   const columns = useMemo<MRT_ColumnDef<TimeBound>[]>(
     () => [
@@ -31,7 +37,7 @@ export const TimeBoundTable = ({ selectorFn }: { selectorFn?: (newTimeBound: Tim
   )
 
   const visibleColumns = {
-    bid: false,
+    bid: showBid,
   }
 
   return (

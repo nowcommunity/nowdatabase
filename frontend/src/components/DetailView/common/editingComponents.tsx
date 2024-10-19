@@ -33,7 +33,7 @@ const setDropdownOptionValue = (
   if (value && asNumber) {
     setValue(parseInt(value))
   } else if (value === 'true' || value === 'false') {
-    setValue(value === 'true')
+    setValue(String(value === 'true'))
   } else {
     setValue(value ?? '')
   }
@@ -59,7 +59,7 @@ export const DropdownSelector = <T extends object>({
         labelId={`${name}-multiselect-label`}
         label={name}
         id={`${name}-multiselect`}
-        value={editData[field] as string}
+        value={(editData[field] as string) || ''}
         onChange={(event: SelectChangeEvent) => {
           const setValue = (value: number | string | boolean) => setEditData({ ...editData, [field]: value })
           const asNumber = typeof options[0] === 'number'
@@ -126,12 +126,20 @@ export const RadioSelector = <T extends object>({
   options,
   name,
   field,
+  defaultValue,
 }: {
   options: Array<DropdownOption | DropdownOptionValue>
   name: string
   field: keyof EditDataType<T>
+  defaultValue?: DropdownOptionValue
 }) => {
   const { setEditData, editData } = useDetailContext<T>()
+  if (defaultValue === undefined) {
+    defaultValue = getValue(options[0])
+  }
+  if (editData[field] === null) {
+    setEditData({ ...editData, [field]: defaultValue })
+  }
   const editingComponent = (
     <FormControl>
       <RadioGroup
@@ -156,7 +164,6 @@ export const RadioSelector = <T extends object>({
       </RadioGroup>
     </FormControl>
   )
-
   return <MultiSelector<T> {...{ editingComponent, field, options }} />
 }
 
@@ -260,6 +267,67 @@ export const FieldWithTableSelection = <T extends object, ParentType extends obj
       size="small"
       error={!!error}
       helperText={error ?? ''}
+      value={editData[targetField as keyof EditDataType<ParentType>]}
+      onClick={() => setOpen(true)}
+      disabled={disabled}
+      sx={{ backgroundColor: disabled ? 'grey' : '' }}
+      inputProps={{ readOnly: true }}
+    />
+  )
+  return <DataValue<ParentType> field={targetField as keyof EditDataType<ParentType>} EditElement={editingComponent} />
+}
+
+export const TimeBoundSelection = <T extends object, ParentType extends object>({
+  targetField,
+  sourceField,
+  selectorTable,
+  disabled,
+}: {
+  targetField: keyof ParentType
+  sourceField: keyof T
+  selectorTable: ReactElement
+  disabled?: boolean
+}) => {
+  const { editData, setEditData, validator } = useDetailContext<ParentType>()
+  const { error: boundError } = validator(
+    editData,
+    (targetField === 'up_bnd' ? 'up_bound' : 'low_bound') as keyof EditDataType<ParentType>
+  )
+  const [open, setOpen] = useState(false)
+
+  const selectorFn = (selected: T) => {
+    if (targetField === 'up_bnd') {
+      setEditData({ ...editData, [targetField]: selected[sourceField], ['up_bound']: selected })
+    } else if (targetField === 'low_bnd') {
+      setEditData({ ...editData, [targetField]: selected[sourceField], ['low_bound']: selected })
+    }
+    setOpen(false)
+  }
+
+  const selectorTableWithFn = cloneElement(selectorTable, { selectorFn })
+  if (open)
+    return (
+      <Box>
+        <Modal
+          open={open}
+          aria-labelledby={`modal-${targetField as string}`}
+          aria-describedby={`modal-${targetField as string}`}
+        >
+          <Box sx={{ ...modalStyle }}>
+            <Box marginBottom="2em" marginTop="1em">
+              {selectorTableWithFn}
+            </Box>
+            <Button onClick={() => setOpen(false)}>Cancel</Button>
+          </Box>
+        </Modal>
+      </Box>
+    )
+  const editingComponent = (
+    <TextField
+      variant="outlined"
+      size="small"
+      error={!!boundError}
+      helperText={boundError ?? ''}
       value={editData[targetField as keyof EditDataType<ParentType>]}
       onClick={() => setOpen(true)}
       disabled={disabled}

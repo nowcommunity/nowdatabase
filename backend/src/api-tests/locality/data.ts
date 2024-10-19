@@ -88,7 +88,7 @@ export const newLocalityBasis = {
   hominin_skeletal_remains: false,
   bipedal_footprints: null, // radioselector on frontend is not set
   stone_tool_technology: '0', // radioselector on frontend is set to no
-  stone_tool_cut_marks_on_bones: '1', // radioselector on frontend is set to yes
+  stone_tool_cut_marks_on_bones: 'true', // radioselector on frontend is set to yes
   technological_mode_1: null,
   technological_mode_2: null,
   technological_mode_3: null,

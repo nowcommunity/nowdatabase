@@ -17,6 +17,7 @@ _____
 + `npm run dev` 
   + Uses `docker-compose.dev.yml`
   + Run in development mode: with hot reload
+  + To create test users visit `http://localhost:4000/test/create-test-users`
 
 Testing:
 
@@ -59,6 +60,13 @@ Run with the same image that is used in production:
   + Uses `docker-compose.yml`
   + This builds the code and runs it. Mostly you'll want to use this after major technical changes to check the code works also in production mode, before deploying. And then you'll likely want to do: `npm start -- --build` to force rebuild of containers.
 
+Docker:
+
++ `npm run dev:down`
+  + Stops and removes the dev container.
++ `-- --build`
+  + Useful flag to force docker to rebuild the containers. Example usage for dev: `npm run dev -- --build`
+
 **Further documentation**
 
 :rocket: [Initialize app & restore db](documentation/init.md) How to get the app up & running, and initialize database from sql-dumps
@@ -72,3 +80,5 @@ Run with the same image that is used in production:
 :mag_right: [Validators](frontend/src/validators/) The readme explains how validators are written
 
 :mag_right: [Class diagram](documentation/class_diagram.md) See the relations of relevant tables. Notice that it omits some unimportant tables and does not show most columns.
+
+:earth_africa: [Map feature](/documentation/map_feat.md) Map's functionality and development notes
