@@ -32,8 +32,8 @@ export const ReferenceTab = () => {
 
   // Write here the fields that should have a bigger, resizable text field
   const bigFields = ['title_primary', 'authors_primary', 'ref_abstract', 'gen_notes']
-
   const authorFields = ['authors_primary', 'authors_secondary', 'authors_series']
+  const numberFields = ['ref_type_id', 'date_primary', 'date_secondary', 'start_page', 'end_page']
 
   //painfully long way to split the arrayframe-component when an authorfield occurs
   const groupedFieldsArray = []
@@ -71,8 +71,14 @@ export const ReferenceTab = () => {
       const fieldComponent = bigFields.includes(field.field_name!)
         ? bigTextField(field.field_name! as keyof ReferenceDetailsType)
         : textField(field.field_name! as keyof ReferenceDetailsType)
-
-      nonAuthorFieldsArray.push([field.ref_field_name, fieldComponent])
+      if (field.field_name && numberFields.includes(field.field_name)) {
+        nonAuthorFieldsArray.push([
+          field.ref_field_name,
+          textField(field.field_name as keyof ReferenceDetailsType, { type: 'number' }),
+        ])
+      } else {
+        nonAuthorFieldsArray.push([field.ref_field_name, fieldComponent])
+      }
     }
   })
 

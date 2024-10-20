@@ -52,7 +52,7 @@ router.put(
 
 router.delete('/:id', requireOneOf([Role.Admin]), async (req, res) => {
   const id = parseInt(req.params.id)
-  await deleteReference(id, req.user!)
+  await deleteReference(id)
   res.status(200).send()
 })
 
