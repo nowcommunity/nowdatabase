@@ -62,6 +62,7 @@ export const api = createApi({
     'timeunit',
     'timebound',
     'timebounds',
+    'author',
   ],
   baseQuery: baseQueryWithReauth,
   endpoints: () => ({}),
