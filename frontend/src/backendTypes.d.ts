@@ -285,6 +285,7 @@ export type ReferenceAuthorType = {
   author_initials?: string
   field_id?: number
   rowState?: RowState
+  data_id?: number
 }
 
 export type ValidationErrors = {

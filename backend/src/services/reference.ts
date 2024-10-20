@@ -45,16 +45,25 @@ export const getReferenceTypes = async () => {
 }
 
 export const getReferenceAuthors = async () => {
-  const referenceAuthorTypes = await nowDb.ref_authors.findMany({
-    select: {
-      rid: true,
-      field_id: true,
-      au_num: true,
-      author_surname: true,
-      author_initials: true,
+  const uniqueReferenceAuthors = await nowDb.ref_authors.groupBy({
+    by: ['author_surname', 'author_initials'],
+    where: {
+      author_surname: {
+        not: null,
+      },
     },
   })
-  return referenceAuthorTypes
+
+  const sortedAuthors = uniqueReferenceAuthors
+    .map((author, index) => ({
+      data_id: index + 1,
+      author_surname: author.author_surname,
+      author_initials: author.author_initials,
+    }))
+    .filter(author => author.author_surname !== null)
+    .sort((a, b) => a.author_surname!.localeCompare(b.author_surname!))
+
+  return sortedAuthors
 }
 
 export const getReferenceJournals = async () => {

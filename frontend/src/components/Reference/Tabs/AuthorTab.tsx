@@ -32,15 +32,10 @@ export const AuthorTab: React.FC<AuthorTabProps> = ({ field_num_param, tab_name 
       accessorKey: 'author_surname',
       header: 'Surname',
     },
-    {
-      accessorKey: 'au_num',
-      header: 'Author number',
-    },
   ]
   const formFields: { name: string; label: string; required?: boolean }[] = [
     { name: 'author_initials', label: 'Author initials', required: true },
     { name: 'author_surname', label: 'Surname', required: true },
-    { name: 'au_num', label: 'Author number', required: true },
   ]
   const referenceAuthorColumns: MRT_ColumnDef<ReferenceAuthorType>[] = [
     {
@@ -50,10 +45,6 @@ export const AuthorTab: React.FC<AuthorTabProps> = ({ field_num_param, tab_name 
     {
       accessorKey: 'author_surname',
       header: 'Surname',
-    },
-    {
-      accessorKey: 'au_num',
-      header: 'Author number',
     },
   ]
 
@@ -67,12 +58,18 @@ export const AuthorTab: React.FC<AuthorTabProps> = ({ field_num_param, tab_name 
             editAction={(newAuthor: ReferenceAuthorType) => {
               const updatedAuthors = [
                 ...editData.ref_authors,
-                { ...newAuthor, rid: editData.rid, rowState: 'new' as RowState },
+                {
+                  ...newAuthor,
+                  rid: editData.rid,
+                  au_num: editData.ref_authors.length + 1,
+                  field_id: field_num_param,
+                  rowState: 'new' as RowState,
+                },
               ]
 
               setEditData({
                 ...editData,
-                ref_authors: updatedAuthors,
+                ref_authors: [...updatedAuthors],
               })
               visible_ref_authors = updatedAuthors.filter(
                 author => author.field_id?.toString() == field_num_param?.toString()
@@ -85,16 +82,22 @@ export const AuthorTab: React.FC<AuthorTabProps> = ({ field_num_param, tab_name 
             isError={isError}
             columns={authorColumns}
             fieldName="ref_authors"
-            idFieldName="au_num"
+            idFieldName="data_id"
             editingAction={(newAuthor: ReferenceAuthorType) => {
               const updatedAuthors = [
                 ...editData.ref_authors,
-                { ...newAuthor, rid: editData.rid, rowState: 'new' as RowState },
+                {
+                  ...newAuthor,
+                  rid: editData.rid,
+                  au_num: editData.ref_authors.length + 1,
+                  field_id: field_num_param,
+                  rowState: 'new' as RowState,
+                },
               ]
 
               setEditData({
                 ...editData,
-                ref_authors: updatedAuthors,
+                ref_authors: [...updatedAuthors],
               })
               visible_ref_authors = updatedAuthors.filter(
                 author => author.field_id?.toString() == field_num_param?.toString()
