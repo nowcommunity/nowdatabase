@@ -32,12 +32,10 @@ export const CrossSearchTable = ({ selectorFn }: { selectorFn?: (newObject: Cros
       {
         accessorKey: 'bfa_max',
         header: 'BFA max',
-        filterVariant: 'range',
       },
       {
         accessorKey: 'bfa_min',
         header: 'BFA min',
-        filterVariant: 'range',
       },
       {
         accessorKey: 'max_age',
