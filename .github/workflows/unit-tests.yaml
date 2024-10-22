@@ -20,8 +20,8 @@ jobs:
         with:
           node-version: 20
 
-      - name: 'Install root dependencies'
-        run: npm ci
+      - name: 'Install dependencies'
+        run: npm setup
 
       - name: Run frontend unit-tests
         run: npm run test:unit:frontend
