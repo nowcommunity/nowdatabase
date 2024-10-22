@@ -24,7 +24,7 @@ export const TimeUnitTab = () => {
   ]
 
   const timeUnit = [
-    ['Name', textField('tu_display_name')],
+    ['Name', textField('tu_display_name', { type: 'text', disabled: true })],
     ['Rank', dropdown('rank', rankOptions, 'Rank')],
     ['Comment', textField('tu_comment')],
     [
