@@ -28,12 +28,23 @@ export const writeTimeUnit = async (
 
   const createdId = createTimeUnitId(timeUnit.tu_display_name!)
 
+  const loggerInfo = {
+    authorizer,
+    comment,
+    references,
+  }
+
   try {
     await writeHandler.start()
 
     if (timeUnit.tu_name) {
       await writeHandler.updateObject('now_time_unit', timeUnit, ['tu_name'])
-      const cascadeErrors = await checkAndHandleTimeUnitCascade(timeUnit, writeHandler)
+      const {cascadeErrors, localitiesToUpdate} = await checkAndHandleTimeUnitCascade(timeUnit, loggerInfo)
+      if (cascadeErrors.length > 0) {
+        throw new Error(`Could not update localities: ${cascadeErrors.join(', ')}`)
+      } else {
+       console.log('Clear') 
+      }
     } else {
       timeUnit.tu_name = createTimeUnitId(timeUnit.tu_display_name!)
       await writeHandler.createObject('now_time_unit', timeUnit, ['tu_name'])

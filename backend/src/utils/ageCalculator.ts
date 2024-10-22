@@ -1,24 +1,23 @@
-import { EditDataType, TimeUnitDetailsType } from "../../../frontend/src/backendTypes"
-import Prisma from '../../prisma/generated/now_test_client'
-
-export const calculateLocalityMax = (locality: Prisma.now_loc, timeUnit: EditDataType<TimeUnitDetailsType>) => {
-  if (locality.frac_max) {
-    console.log('Fractional max')
-  } else {
-    return timeUnit.low_bound?.age
-  console.log('Calculating new max')
-  console.log('Locality:')
-  console.log('max:', locality.max_age)
-  console.log('max frac:', locality.frac_max)
-  console.log('min:', locality.min_age)
-  console.log('min frac:', locality.frac_min)
-}
-}
-
-export const calculateLocalityMin = (locality: Prisma.now_loc, timeUnit: EditDataType<TimeUnitDetailsType>) => {
-  if (locality.frac_min) {
-    console.log('Fractional min')
-  } else {
-    return timeUnit.up_bound?.age
+export const calculateLocalityMaxAge = (minAge: number, maxAge: number, frac: string | null) => {
+  if (frac === null) {
+    return maxAge
   }
+  const parts = frac.split(':')
+
+  const numerator = parseInt(parts[0])
+  const denominator = parseInt(parts[1])
+
+  return minAge + (maxAge - minAge) * numerator / denominator
+}
+
+export const calculateLocalityMinAge = (minAge: number, maxAge: number, frac: string | null) => {
+  if (frac === null) {
+    return minAge
+  }
+  const parts = frac.split(':')
+
+  const numerator = parseInt(parts[0])
+  const denominator = parseInt(parts[1])
+
+  return maxAge - (maxAge - minAge) * (numerator - 1) / denominator
 }
