@@ -1,0 +1,19 @@
+name: 'Unit-tests'
+
+on:
+  pull_request:
+    types: [opened, reopened, synchronize]
+    branches:
+      - '**'
+
+jobs:
+  unit-tests:
+    name: 'Unit tests'
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Run frontend unit-tests
+        run: npm run test:unit:frontend
