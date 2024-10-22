@@ -16,6 +16,7 @@
   - The **DataValue** renders, depending on the mode (reading or editing), the value or a component that allows the user to edit the value.
   - The **ArrayFrame** allows you to write an entire "frame" (a grouping of data within a tab: for example in a Locality > Age tab > Age) as a two-dimensional array, which can contain for example labels or datavalues. See example in AgeTab. This is the best way to write most tabs.
 
-**Detailed explanation of editingComponents**
+**Detailed documentation for editingComponents**
 
-[RadioSelector](./editingComponents/radioselector.md)
+[RadioSelector](./editingComponents/RadioSelector.md)
+[DropDownSelector](./editingComponents/DropDownSelector.md)
