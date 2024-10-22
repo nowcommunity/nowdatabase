@@ -61,6 +61,7 @@ export const checkAndHandleTimeUnitCascade = async (
   if (!cascadeErrors.length) {
     for (const locality of localitiesToUpdate) {
       console.log('Updating locality:', locality.loc_name)
+      console.log('New max:', locality.max_age, 'New min:', locality.min_age)
     }
   }
   return {cascadeErrors, localitiesToUpdate}
