@@ -1,23 +1,23 @@
-export const calculateLocalityMaxAge = (minAge: number, maxAge: number, frac: string | null) => {
+export const calculateLocalityMaxAge = (upperBound: number, lowerBound: number, frac: string | null) => {
   if (frac === null) {
-    return maxAge
+    return lowerBound
   }
   const parts = frac.split(':')
 
   const numerator = parseInt(parts[0])
   const denominator = parseInt(parts[1])
 
-  return minAge + (maxAge - minAge) * numerator / denominator
+  return upperBound + (lowerBound - upperBound) * numerator / denominator
 }
 
-export const calculateLocalityMinAge = (minAge: number, maxAge: number, frac: string | null) => {
+export const calculateLocalityMinAge = (upperBound: number, lowerBound: number, frac: string | null) => {
   if (frac === null) {
-    return minAge
+    return upperBound
   }
   const parts = frac.split(':')
 
   const numerator = parseInt(parts[0])
   const denominator = parseInt(parts[1])
 
-  return maxAge - (maxAge - minAge) * (numerator - 1) / denominator
+  return lowerBound - (lowerBound - upperBound) * (numerator - 1) / denominator
 }
