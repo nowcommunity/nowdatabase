@@ -4,6 +4,7 @@ import { WriteHandler } from './writeOperations/writeHandler'
 import { getFieldsOfTables } from '../../utils/db'
 import { ActionType } from './writeOperations/types'
 import { getTimeUnitDetails } from '../timeUnit'
+import { checkAndHandleTimeUnitCascade } from '../../utils/cascadeHandler'
 
 const getTimeUnitWriteHandler = (type: ActionType) => {
   return new WriteHandler({
@@ -32,6 +33,7 @@ export const writeTimeUnit = async (
 
     if (timeUnit.tu_name) {
       await writeHandler.updateObject('now_time_unit', timeUnit, ['tu_name'])
+      const cascadeErrors = await checkAndHandleTimeUnitCascade(timeUnit, writeHandler)
     } else {
       timeUnit.tu_name = createTimeUnitId(timeUnit.tu_display_name!)
       await writeHandler.createObject('now_time_unit', timeUnit, ['tu_name'])
