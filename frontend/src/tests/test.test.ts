@@ -1,7 +1,7 @@
-import { expect, it, describe } from "@jest/globals";
+import { expect, it, describe } from '@jest/globals'
 
-describe("Tests work", () => {
-  it("at all", () => {
-    expect(true).toEqual(true);
-  });
-});
+describe('Tests work', () => {
+  it('at all', () => {
+    expect(true).toEqual(true)
+  })
+})
