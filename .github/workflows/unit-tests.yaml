@@ -21,7 +21,7 @@ jobs:
           node-version: 20
 
       - name: 'Install dependencies'
-        run: npm setup
+        run: npm run setup
 
       - name: Run frontend unit-tests
         run: npm run test:unit:frontend
