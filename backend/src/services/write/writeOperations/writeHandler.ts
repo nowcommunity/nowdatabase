@@ -122,6 +122,7 @@ export class WriteHandler extends DatabaseHandler {
       logger.info(`No changes detected, skipping logging.`)
       return
     }
+    console.log(this)
     await logAllUpdates(this, this.writeList, this.table, this.idValue!, authorizer, this.type, comment, references)
     await this.commit()
     await this.end()
