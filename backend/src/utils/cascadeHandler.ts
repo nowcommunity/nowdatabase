@@ -9,7 +9,6 @@ export const checkAndHandleTimeUnitCascade = async (
   timeUnit: EditDataType<TimeUnitDetailsType>,
   loggerInfo: { authorizer: string, comment: string | undefined, references: Reference[] | undefined }
 ) => {
-  const cascadeErrors: string[] = []
   const localities = await nowDb.now_loc.findMany({
     where: {
       OR: [{ bfa_max: timeUnit.tu_name },
@@ -17,6 +16,7 @@ export const checkAndHandleTimeUnitCascade = async (
       ]
     }
   })
+  const cascadeErrors: string[] = []
   const localitiesToUpdate = []
   for (const locality of localities) {
     if (locality.bfa_max === timeUnit.tu_name && locality.bfa_min === timeUnit.tu_name) {
@@ -54,8 +54,6 @@ export const checkAndHandleTimeUnitCascade = async (
       } else {
         cascadeErrors.push(locality.loc_name)
       }
-    } else {
-      console.log('No update')
     }
   }
   if (!cascadeErrors.length) {

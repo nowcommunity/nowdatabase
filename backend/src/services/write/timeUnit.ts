@@ -41,7 +41,7 @@ export const writeTimeUnit = async (
       await writeHandler.updateObject('now_time_unit', timeUnit, ['tu_name'])
       const {cascadeErrors, localitiesToUpdate} = await checkAndHandleTimeUnitCascade(timeUnit, loggerInfo)
       if (cascadeErrors.length > 0) {
-        throw new Error(`Could not update localities: ${cascadeErrors.join(', ')}`)
+        throw new Error(`Following localities would be contradicting: \n${cascadeErrors.join('\n')}`)
       } else {
        console.log('Clear') 
       }
