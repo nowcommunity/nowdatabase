@@ -20,3 +20,4 @@
 
 [RadioSelector](./editingComponents/RadioSelector.md)
 [DropDownSelector](./editingComponents/DropDownSelector.md)
+[FieldWithTableSelection](./editingComponents/FieldWithTableSelection.md)
