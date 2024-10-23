@@ -7,6 +7,10 @@ export const calculateLocalityMaxAge = (upperBound: number, lowerBound: number, 
   const numerator = parseInt(parts[0])
   const denominator = parseInt(parts[1])
 
+  if (denominator === 0) {
+    throw new Error('Denominator cannot be 0')
+  }
+
   return upperBound + ((lowerBound - upperBound) * numerator) / denominator
 }
 
@@ -18,6 +22,10 @@ export const calculateLocalityMinAge = (upperBound: number, lowerBound: number, 
 
   const numerator = parseInt(parts[0])
   const denominator = parseInt(parts[1])
+
+  if (denominator === 0) {
+    throw new Error('Denominator cannot be 0')
+  }
 
   return lowerBound - ((lowerBound - upperBound) * (numerator - 1)) / denominator
 }
