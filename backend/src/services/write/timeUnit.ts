@@ -1,10 +1,11 @@
-import { EditDataType, Reference, TimeUnitDetailsType, User } from '../../../../frontend/src/backendTypes'
+import { EditDataType, LocalityDetailsType, Reference, TimeUnitDetailsType, User } from '../../../../frontend/src/backendTypes'
 import { NOW_DB_NAME } from '../../utils/config'
 import { WriteHandler } from './writeOperations/writeHandler'
 import { getFieldsOfTables } from '../../utils/db'
 import { ActionType } from './writeOperations/types'
 import { getTimeUnitDetails } from '../timeUnit'
-import { checkAndHandleTimeUnitCascade } from '../../utils/cascadeHandler'
+import { checkTimeUnitCascade } from '../../utils/cascadeHandler'
+import { writeLocalityCascade } from './locality'
 
 const getTimeUnitWriteHandler = (type: ActionType) => {
   return new WriteHandler({
@@ -39,11 +40,16 @@ export const writeTimeUnit = async (
 
     if (timeUnit.tu_name) {
       await writeHandler.updateObject('now_time_unit', timeUnit, ['tu_name'])
-      const {cascadeErrors, localitiesToUpdate} = await checkAndHandleTimeUnitCascade(timeUnit, loggerInfo)
+      const { cascadeErrors, calculatorErrors, localitiesToUpdate } = await checkTimeUnitCascade(timeUnit, loggerInfo)
+      if (calculatorErrors.length > 0) {
+        throw new Error(`Following localities have invalid age values: \n${calculatorErrors.join('\n')}`)
+      }
       if (cascadeErrors.length > 0) {
         throw new Error(`Following localities would be contradicting: \n${cascadeErrors.join('\n')}`)
       } else {
-       console.log('Clear') 
+        for (const locality of localitiesToUpdate) {
+          await writeLocalityCascade(locality as EditDataType<LocalityDetailsType>, comment, references, authorizer)
+        }
       }
     } else {
       timeUnit.tu_name = createTimeUnitId(timeUnit.tu_display_name!)

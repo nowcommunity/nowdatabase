@@ -5,7 +5,7 @@ import { calculateLocalityMaxAge, calculateLocalityMinAge } from './ageCalculato
 import { getFieldsOfTables } from './db'
 import { NOW_DB_NAME } from './config'
 
-export const checkAndHandleTimeUnitCascade = async (
+export const checkTimeUnitCascade = async (
   timeUnit: EditDataType<TimeUnitDetailsType>,
   loggerInfo: { authorizer: string, comment: string | undefined, references: Reference[] | undefined }
 ) => {
@@ -17,50 +17,35 @@ export const checkAndHandleTimeUnitCascade = async (
     }
   })
   const cascadeErrors: string[] = []
+  const calculatorErrors: string[] = []
   const localitiesToUpdate = []
   for (const locality of localities) {
-    if (locality.bfa_max === timeUnit.tu_name && locality.bfa_min === timeUnit.tu_name) {
-      const new_max = calculateLocalityMaxAge(timeUnit.up_bound?.age as number, timeUnit.low_bound?.age as number, locality.frac_max)
-      const new_min = calculateLocalityMinAge(timeUnit.up_bound?.age as number, timeUnit.low_bound?.age as number, locality.frac_min)
-      if (new_max && new_min && new_max > new_min) {
-        const updatedLocality = {
-          ...locality,
-          max_age: new_max,
-          min_age: new_min,
-        }
-        localitiesToUpdate.push(updatedLocality)
-      } else {
-        cascadeErrors.push(locality.loc_name)
-      }
-    } else if (locality.bfa_max === timeUnit.tu_name) {
-      const new_max = calculateLocalityMaxAge(timeUnit.up_bound?.age as number, timeUnit.low_bound?.age as number, locality.frac_max)
-      if (new_max && new_max > locality.min_age) {
-        const updatedLocality = {
-          ...locality,
-          max_age: new_max,
-        }
-        localitiesToUpdate.push(updatedLocality)
-      } else {
-        cascadeErrors.push(locality.loc_name)
-      }
-    } else if (locality.bfa_min === timeUnit.tu_name) {
-      const new_min = calculateLocalityMinAge(timeUnit.up_bound?.age as number, timeUnit.low_bound?.age as number, locality.frac_max)
-      if (new_min && new_min < locality.max_age) {
-        const updatedLocality = {
-          ...locality,
-          min_age: new_min,
-        }
-        localitiesToUpdate.push(updatedLocality)
-      } else {
-        cascadeErrors.push(locality.loc_name)
+    let maxAgeAfterUpdate = locality.max_age
+    let minAgeAfterUpdate = locality.min_age
+    if (locality.bfa_max === timeUnit.tu_name) {
+      try {
+        maxAgeAfterUpdate = calculateLocalityMaxAge(timeUnit.up_bound?.age as number, timeUnit.low_bound?.age as number, locality.frac_max)
+      } catch (e) {
+        calculatorErrors.push(locality.loc_name)
       }
     }
-  }
-  if (!cascadeErrors.length) {
-    for (const locality of localitiesToUpdate) {
-      console.log('Updating locality:', locality.loc_name)
-      console.log('New max:', locality.max_age, 'New min:', locality.min_age)
+    if (locality.bfa_min === timeUnit.tu_name) {
+      try {
+        minAgeAfterUpdate = calculateLocalityMinAge(timeUnit.up_bound?.age as number, timeUnit.low_bound?.age as number, locality.frac_max)
+      } catch (e) {
+        calculatorErrors.push(locality.loc_name)
+      }
+    }
+    if (minAgeAfterUpdate < maxAgeAfterUpdate) {
+      const updatedLocality = {
+        ...locality,
+        min_age: minAgeAfterUpdate,
+        max_age: maxAgeAfterUpdate
+      }
+      localitiesToUpdate.push(updatedLocality)
+    } else {
+      cascadeErrors.push(locality.loc_name)
     }
   }
-  return {cascadeErrors, localitiesToUpdate}
+  return { cascadeErrors, calculatorErrors, localitiesToUpdate }
 }
