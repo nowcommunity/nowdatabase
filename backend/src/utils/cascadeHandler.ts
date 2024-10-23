@@ -1,20 +1,12 @@
-import { EditDataType, TimeUnitDetailsType, Reference } from '../../../frontend/src/backendTypes'
-import { WriteHandler } from '../services/write/writeOperations/writeHandler'
+import { EditDataType, TimeUnitDetailsType } from '../../../frontend/src/backendTypes'
 import { nowDb } from './db'
 import { calculateLocalityMaxAge, calculateLocalityMinAge } from './ageCalculator'
-import { getFieldsOfTables } from './db'
-import { NOW_DB_NAME } from './config'
 
-export const checkTimeUnitCascade = async (
-  timeUnit: EditDataType<TimeUnitDetailsType>,
-  loggerInfo: { authorizer: string, comment: string | undefined, references: Reference[] | undefined }
-) => {
+export const checkTimeUnitCascade = async (timeUnit: EditDataType<TimeUnitDetailsType>) => {
   const localities = await nowDb.now_loc.findMany({
     where: {
-      OR: [{ bfa_max: timeUnit.tu_name },
-      { bfa_min: timeUnit.tu_name },
-      ]
-    }
+      OR: [{ bfa_max: timeUnit.tu_name }, { bfa_min: timeUnit.tu_name }],
+    },
   })
   const cascadeErrors: string[] = []
   const calculatorErrors: string[] = []
@@ -24,14 +16,22 @@ export const checkTimeUnitCascade = async (
     let minAgeAfterUpdate = locality.min_age
     if (locality.bfa_max === timeUnit.tu_name) {
       try {
-        maxAgeAfterUpdate = calculateLocalityMaxAge(timeUnit.up_bound?.age as number, timeUnit.low_bound?.age as number, locality.frac_max)
+        maxAgeAfterUpdate = calculateLocalityMaxAge(
+          timeUnit.up_bound?.age as number,
+          timeUnit.low_bound?.age as number,
+          locality.frac_max
+        )
       } catch (e) {
         calculatorErrors.push(locality.loc_name)
       }
     }
     if (locality.bfa_min === timeUnit.tu_name) {
       try {
-        minAgeAfterUpdate = calculateLocalityMinAge(timeUnit.up_bound?.age as number, timeUnit.low_bound?.age as number, locality.frac_max)
+        minAgeAfterUpdate = calculateLocalityMinAge(
+          timeUnit.up_bound?.age as number,
+          timeUnit.low_bound?.age as number,
+          locality.frac_max
+        )
       } catch (e) {
         calculatorErrors.push(locality.loc_name)
       }
@@ -40,7 +40,7 @@ export const checkTimeUnitCascade = async (
       const updatedLocality = {
         ...locality,
         min_age: minAgeAfterUpdate,
-        max_age: maxAgeAfterUpdate
+        max_age: maxAgeAfterUpdate,
       }
       localitiesToUpdate.push(updatedLocality)
     } else {

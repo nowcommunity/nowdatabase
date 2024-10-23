@@ -103,3 +103,21 @@ export const deleteLocality = async (lid: number, user: User) => {
     throw e
   }
 }
+
+export const writeLocalityCascade = async (
+  locality: EditDataType<LocalityDetailsType>,
+  comment: string | undefined,
+  references: Reference[] | undefined,
+  authorizer: string
+) => {
+  const writeHandler = getLocalityWriteHandler('update')
+  try {
+    await writeHandler.start()
+    await writeHandler.updateObject('now_loc', locality, ['lid'])
+    writeHandler.idValue = locality.lid
+    await writeHandler.logUpdatesAndComplete(authorizer, comment ?? '', references ?? [])
+  } catch (e) {
+    await writeHandler.end()
+    throw e
+  }
+}

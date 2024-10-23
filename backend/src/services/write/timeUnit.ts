@@ -1,4 +1,10 @@
-import { EditDataType, LocalityDetailsType, Reference, TimeUnitDetailsType, User } from '../../../../frontend/src/backendTypes'
+import {
+  EditDataType,
+  LocalityDetailsType,
+  Reference,
+  TimeUnitDetailsType,
+  User,
+} from '../../../../frontend/src/backendTypes'
 import { NOW_DB_NAME } from '../../utils/config'
 import { WriteHandler } from './writeOperations/writeHandler'
 import { getFieldsOfTables } from '../../utils/db'
@@ -29,18 +35,12 @@ export const writeTimeUnit = async (
 
   const createdId = createTimeUnitId(timeUnit.tu_display_name!)
 
-  const loggerInfo = {
-    authorizer,
-    comment,
-    references,
-  }
-
   try {
     await writeHandler.start()
 
     if (timeUnit.tu_name) {
       await writeHandler.updateObject('now_time_unit', timeUnit, ['tu_name'])
-      const { cascadeErrors, calculatorErrors, localitiesToUpdate } = await checkTimeUnitCascade(timeUnit, loggerInfo)
+      const { cascadeErrors, calculatorErrors, localitiesToUpdate } = await checkTimeUnitCascade(timeUnit)
       if (calculatorErrors.length > 0) {
         throw new Error(`Following localities have invalid age values: \n${calculatorErrors.join('\n')}`)
       }
