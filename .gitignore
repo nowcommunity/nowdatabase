@@ -2,6 +2,7 @@ node_modules
 data/sqlfiles/*
 *.env
 !.anon.env
+!.test.env
 !.env.template
 dump/
 dump.zip
