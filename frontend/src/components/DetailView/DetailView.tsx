@@ -33,6 +33,7 @@ export type TextFieldOptions = (
 ) & {
   disabled?: boolean
   big?: boolean
+  changeSetter?: React.Dispatch<React.SetStateAction<number>>
 }
 
 export const DetailView = <T extends object>({
