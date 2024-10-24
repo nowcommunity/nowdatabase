@@ -19,6 +19,7 @@
     "test:ci": "docker compose -f docker-compose.test.yml up",
     "test:api": "npm run test:ci -- api-tests --abort-on-container-exit --exit-code-from api-tests",
     "test:e2e": "npm run test:ci -- backend frontend e2e-tests --abort-on-container-exit --exit-code-from e2e-tests",
+    "test:unit:frontend": "cd frontend && npm run test",
     "test:ci:api": "npm run test:api",
     "test:ci:e2e": "npm run test:e2e",
     "test:local:e2e": "cypress run --browser chrome",

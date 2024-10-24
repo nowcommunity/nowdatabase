@@ -10,7 +10,7 @@ module.exports = {
     'plugin:import/typescript',
     'plugin:@typescript-eslint/recommended-type-checked',
   ],
-  ignorePatterns: ['dist', '.eslintrc.cjs', 'babel.config.js', '*/node_modules/*', 'vite.config.ts', 'vite-env.d.ts'],
+  ignorePatterns: ['dist', '.eslintrc.cjs', 'babel.config.js', '*/node_modules/*', 'vite.config.ts', 'vite-env.d.ts', 'jest.config.ts'],
   parser: '@typescript-eslint/parser',
   plugins: ['react-refresh', '@typescript-eslint', 'react', 'import'],
   rules: {
