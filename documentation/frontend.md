@@ -21,3 +21,5 @@
 [RadioSelector](./editingComponents/RadioSelector.md)
 [DropDownSelector](./editingComponents/DropDownSelector.md)
 [FieldWithTableSelection](./editingComponents/FieldWithTableSelection.md)
+[TimeBoundSelection](./editingComponents/TimeBoundSelection.md)
+[EditableTextField](./editingComponents/EditableTextField.md)
