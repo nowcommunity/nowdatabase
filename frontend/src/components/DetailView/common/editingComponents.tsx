@@ -236,17 +236,29 @@ export const FieldWithTableSelection = <T extends object, ParentType extends obj
   sourceField,
   selectorTable,
   disabled,
+  secondaryTargetField,
+  secondarySourceField,
 }: {
   targetField: keyof ParentType
   sourceField: keyof T
   selectorTable: ReactElement
   disabled?: boolean
+  secondaryTargetField?: keyof ParentType
+  secondarySourceField?: keyof T
 }) => {
   const { editData, setEditData, validator } = useDetailContext<ParentType>()
   const { error } = validator(editData, targetField as keyof EditDataType<ParentType>)
   const [open, setOpen] = useState(false)
   const selectorFn = (selected: T) => {
-    setEditData({ ...editData, [targetField]: selected[sourceField] })
+    if (secondaryTargetField && secondarySourceField) {
+      setEditData({
+        ...editData,
+        [targetField]: selected[sourceField],
+        [secondaryTargetField]: selected[secondarySourceField],
+      })
+    } else {
+      setEditData({ ...editData, [targetField]: selected[sourceField] })
+    }
     setOpen(false)
   }
 

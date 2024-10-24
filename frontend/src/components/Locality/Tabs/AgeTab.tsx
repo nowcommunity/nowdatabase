@@ -63,6 +63,8 @@ export const AgeTab = () => {
         targetField="bfa_min"
         selectorTable={<TimeUnitTable />}
         disabled={editData.date_meth === 'absolute'}
+        secondarySourceField="up_bound"
+        secondaryTargetField="min_age"
       />,
       dropdown('frac_min', fracOptions, 'Minimum fraction', editData.date_meth === 'absolute'),
     ],
@@ -76,6 +78,8 @@ export const AgeTab = () => {
         targetField="bfa_max"
         selectorTable={<TimeUnitTable />}
         disabled={editData.date_meth === 'absolute'}
+        secondarySourceField="low_bound"
+        secondaryTargetField="max_age"
       />,
       dropdown('frac_max', fracOptions, 'Maximum fraction', editData.date_meth === 'absolute'),
     ],
