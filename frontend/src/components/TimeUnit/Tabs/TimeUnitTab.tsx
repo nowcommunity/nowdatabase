@@ -38,23 +38,25 @@ export const TimeUnitTab = () => {
     ],
   ]
 
-  const low_bound = mode.new
-    ? []
-    : [
-        ['Id', editData.low_bound ? editData.low_bound.bid : data.low_bound.bid],
-        ['Name', editData.low_bound ? editData.low_bound.b_name : data.low_bound.b_name],
-        ['Age', editData.low_bound ? editData.low_bound.age : data.low_bound.age],
-        ['Comment', editData.low_bound ? editData.low_bound.b_comment : data.low_bound.b_comment],
-      ]
+  const low_bound =
+    mode.new || !data.low_bound
+      ? []
+      : [
+          ['Id', editData.low_bound ? editData.low_bound.bid : data.low_bound.bid],
+          ['Name', editData.low_bound ? editData.low_bound.b_name : data.low_bound.b_name],
+          ['Age', editData.low_bound ? editData.low_bound.age : data.low_bound.age],
+          ['Comment', editData.low_bound ? editData.low_bound.b_comment : data.low_bound.b_comment],
+        ]
 
-  const up_bound = mode.new
-    ? []
-    : [
-        ['Id', editData.up_bound ? editData.up_bound.bid : data.up_bound.bid],
-        ['Name', editData.up_bound ? editData.up_bound.b_name : data.up_bound.b_name],
-        ['Age', editData.up_bound ? editData.up_bound.age : data.up_bound.age],
-        ['Comment', editData.up_bound ? editData.up_bound.b_comment : data.up_bound.b_comment],
-      ]
+  const up_bound =
+    mode.new || !data.up_bound
+      ? []
+      : [
+          ['Id', editData.up_bound ? editData.up_bound.bid : data.up_bound.bid],
+          ['Name', editData.up_bound ? editData.up_bound.b_name : data.up_bound.b_name],
+          ['Age', editData.up_bound ? editData.up_bound.age : data.up_bound.age],
+          ['Comment', editData.up_bound ? editData.up_bound.b_comment : data.up_bound.b_comment],
+        ]
 
   const time_bound_edit = [
     [
@@ -92,7 +94,7 @@ export const TimeUnitTab = () => {
   return (
     <>
       <ArrayFrame array={timeUnit} title="Time Unit" />
-      {!mode.new && (
+      {!mode.new && data.low_bound && data.up_bound && (
         <>
           <ArrayFrame
             array={low_bound}
