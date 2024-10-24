@@ -1,5 +1,12 @@
 import { api } from './api'
-import { EditDataType, Reference, ReferenceDetailsType, ReferenceType } from '@/backendTypes'
+import {
+  EditDataType,
+  Reference,
+  ReferenceAuthorType,
+  ReferenceDetailsType,
+  ReferenceJournalType,
+  ReferenceType,
+} from '@/backendTypes'
 
 const referencesApi = api.injectEndpoints({
   endpoints: builder => ({
@@ -19,6 +26,17 @@ const referencesApi = api.injectEndpoints({
       query: () => ({
         url: 'reference/types',
       }),
+      providesTags: result => (result ? [{ type: 'author' }] : []),
+    }),
+    getReferenceAuthors: builder.query<ReferenceAuthorType[], void>({
+      query: () => ({
+        url: 'reference/authors',
+      }),
+    }),
+    getReferenceJournals: builder.query<ReferenceJournalType[], void>({
+      query: () => ({
+        url: 'reference/journals',
+      }),
     }),
     editReference: builder.mutation<ReferenceDetailsType, EditDataType<ReferenceDetailsType>>({
       query: reference => ({
@@ -35,5 +53,7 @@ export const {
   useGetAllReferencesQuery,
   useGetReferenceDetailsQuery,
   useGetReferenceTypesQuery,
+  useGetReferenceAuthorsQuery,
+  useGetReferenceJournalsQuery,
   useEditReferenceMutation,
 } = referencesApi
