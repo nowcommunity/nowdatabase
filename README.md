@@ -49,7 +49,7 @@ Windows testing:
 + Both `e2e` and `api-tests` have a Windows specific command.
   + `e2e` is `npm run test:e2e:windows`
   + `api-tests` is `npm run test:api:windows`
-  + For `api-tests`: inside `.test.env`, if compared to `.anon.env`, you need to change all instances of `nowdb-db-anon` to `host.docker.internal`.
+  + For `api-tests`: inside `.test.env`, you need to change all instances of `localhost` to `host.docker.internal`.
     + These include `MARIADB_HOST`, `DATABASE_URL` and `LOG_DATABASE_URL`.
   + Note: these are not tested yet.
 
@@ -57,7 +57,7 @@ Test env-file:
 
 + `.test.env`
   + `api-tests` requires `.test.env` to set the correct environment variables.
-  + This can be created by copying `.anon.env` and changing all instances of `nowdb-db-anon` to `localhost`.
+  + This is created by copying `.anon.env` and changing all instances of `nowdb-db-anon` to `localhost`.
     + These include `MARIADB_HOST`, `DATABASE_URL` and `LOG_DATABASE_URL`.
 
 Coverage:
