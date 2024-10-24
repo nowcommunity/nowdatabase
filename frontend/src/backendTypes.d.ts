@@ -226,7 +226,7 @@ export type ReferenceDetailsType = Prisma.ref_ref & {
     field_id: number
     rowState?: RowState
   }[]
-  ref_journal_obj: {
+  ref_journal: {
     journal_id: number
     journal_title: string
     short_title: string
@@ -295,3 +295,4 @@ export type ValidationErrors = {
 
 export type PrismaReference = Prisma.ref_ref
 export type PrismaAuthor = Prisma.ref_authors
+export type PrismaJournal = Prisma.ref_journal

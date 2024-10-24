@@ -66,6 +66,29 @@ export const getReferenceAuthors = async () => {
   return sortedAuthors
 }
 
+export const getAuthorsOfReference = async (rid: number) => {
+  const authors = await nowDb.ref_authors.findMany({
+    where: {
+      rid: rid,
+    },
+  })
+  return authors
+}
+
+export const getAuthorById = async (rid: number, au_num: number, field_id: number) => {
+  const author = await nowDb.ref_authors.findUnique({
+    where: {
+      rid_field_id_au_num: {
+        // Composite key field
+        rid: rid,
+        au_num: au_num,
+        field_id: field_id,
+      },
+    },
+  })
+  return author
+}
+
 export const getReferenceJournals = async () => {
   const referenceJournalTypes = await nowDb.ref_journal.findMany()
   return referenceJournalTypes

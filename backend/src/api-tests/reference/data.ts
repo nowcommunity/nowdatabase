@@ -45,19 +45,17 @@ export const newReferenceBasis: EditDataType<ReferenceDetailsType> = {
   used_morph: null,
   used_now: null,
   used_gene: null,
-  ref_authors: [],
-  /*
-    ref_authors: [
-        {
-            rid: undefined,
-            au_num: 1,
-            author_surname: 'testiauthor',
-            author_initials: 'testi-initials',
-            field_id: 2,
-            rowState: 'new',
-        }
-    ]*/
-  ref_journal_obj: {
+  ref_authors: [
+    {
+      rid: undefined,
+      au_num: 1,
+      author_surname: 'testiauthor',
+      author_initials: 'testi-initials',
+      field_id: 2,
+      rowState: 'new',
+    },
+  ],
+  ref_journal: {
     journal_title: 'testijournal',
     short_title: 'shorttitle',
     alt_title: 'alttitle',

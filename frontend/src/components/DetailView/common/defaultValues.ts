@@ -234,6 +234,6 @@ export const emptyReference = {
   used_now: null,
   used_gene: null,
   ref_authors: [],
-  ref_journal_obj: null,
+  ref_journal: null,
   visible_ref_authors: [],
 } as unknown as ReferenceDetailsType
