@@ -1,6 +1,6 @@
 ### FieldWithTableSelection Component
 
-The FieldWithTableSelection component is used by giving it
+The FieldWithTableSelection component is a field that, when clicked, opens a table view that can be used to select a value. The component is used by giving it
 
 - a `targetField` which is the field in editData that the component should change (Required)
 - a `sourceField` which is a field in the object that the FieldWithTableSelection receives when the user selects an item (Required)
