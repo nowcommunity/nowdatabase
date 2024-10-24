@@ -15,6 +15,14 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Setup node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: 'Start containers'
+        run: npm run start:anon:api -- --wait -d
+
       - name: Run api-tests
         run: npm run test:ci:api
 

@@ -19,8 +19,12 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
+
       - name: 'Install root dependencies'
         run: npm ci
+
+      - name: 'Start containers'
+        run: npm run start:anon -- --wait -d
 
       - name: Run e2e tests
         run: npm run test:ci:e2e
