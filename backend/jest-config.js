@@ -9,5 +9,9 @@ module.exports = {
     ],
     roots: [
         "./src"
+    ],
+    coverageReporters: [
+        "text",
+        "lcov"
     ]
 }
