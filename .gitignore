@@ -1,8 +1,8 @@
 node_modules
 data/sqlfiles/*
-.env
-.db.env
-.dev.env
+*.env
+!.anon.env
+!.env.template
 dump/
 dump.zip
 local_dev
