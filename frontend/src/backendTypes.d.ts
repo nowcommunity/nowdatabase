@@ -294,3 +294,4 @@ export type ValidationErrors = {
 }
 
 export type PrismaReference = Prisma.ref_ref
+export type PrismaAuthor = Prisma.ref_authors
