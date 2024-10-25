@@ -1,4 +1,7 @@
 import { nowDb } from '../utils/db'
+import { EditDataType, ReferenceDetailsType, PrismaReference } from '../../../frontend/src/backendTypes'
+import { ValidationObject } from '../../../frontend/src/validators/validator'
+import { validateReference } from '../../../frontend/src/validators/reference'
 
 export const getAllReferences = async () => {
   const result = await nowDb.ref_ref.findMany({
@@ -92,4 +95,17 @@ export const getAuthorById = async (rid: number, au_num: number, field_id: numbe
 export const getReferenceJournals = async () => {
   const referenceJournalTypes = await nowDb.ref_journal.findMany()
   return referenceJournalTypes
+}
+
+export const validateEntireReference = (editedFields: EditDataType<PrismaReference>) => {
+  const keys = Object.keys(editedFields)
+  const errors: ValidationObject[] = []
+  for (const key of keys) {
+    const error = validateReference(
+      editedFields as EditDataType<ReferenceDetailsType>,
+      key as keyof ReferenceDetailsType
+    )
+    if (error.error) errors.push(error)
+  }
+  return errors
 }
