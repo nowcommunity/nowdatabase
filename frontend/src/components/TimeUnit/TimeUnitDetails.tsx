@@ -88,7 +88,6 @@ export const TimeUnitDetails = () => {
         } else {
           notify('Could not save item. Error happened.', 'error')
         }
-
       }
     }
   }
