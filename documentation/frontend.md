@@ -16,10 +16,37 @@
   - The **DataValue** renders, depending on the mode (reading or editing), the value or a component that allows the user to edit the value.
   - The **ArrayFrame** allows you to write an entire "frame" (a grouping of data within a tab: for example in a Locality > Age tab > Age) as a two-dimensional array, which can contain for example labels or datavalues. See example in AgeTab. This is the best way to write most tabs.
 
+**editData and Context**
+
+Anytime a user edits some data (by typing a value in a text field, selecting a value from a dropdown list...), a corresponding property is edited in `editData`. `editData` is an object that has fields for all the properties of the edited item, and is given by the context. The following image shows a part of the `editData` object for a **locality**:
+
+![abs](./images/editData.png)
+
+A **context** is basically the state of a given page. A context is initialized in a DetailView component, which is used in all the detail components (such as LocalityDetails or SpeciesDetails). For example, every LocalityDetails component has a DetailView component inside it, which has its own context, and because of this every tab inside that component can access and modify a single `editData` object. You cannot access the `editData` object of locality X from locality Y, because they are not in the same context.
+
+Example graph:
+
+```mermaid
+graph TD;
+    LocalityDetails-->1["DetailView (initializes context)"];
+    1["DetailView (initializes context)"]-->AgeTab;
+    1["DetailView (initializes context)"]-->LithologyTab;
+    AgeTab-->EditableTextField;
+    LithologyTab-->DropDownSelector;
+    EditableTextField-. modifies editData .-> editData;
+    DropDownSelector-. modifies editData .-> editData;
+```
+
+LocalityDetails has multiple tabs with their own editing components. Because these components belong to the same context, they can access and modify a single `editData` object. In a different LocalityDetails component (or a SpeciesDetails component, etc.) the context and thus the `editData` object will be different.
+
+Because the DetailView is a child component of LocalityDetails, you cannot access the `editData` object from the LocalityDetails component directly. It can only be accessed in child components of the DetailView, such as inside tabs.
+
+The context can also be used to access, for example, the **setEditData** setter, or a validator that can be used to validate data inside an editing component.
+
 **Detailed documentation for editingComponents**
 
-[RadioSelector](./editingComponents/RadioSelector.md)
-[DropDownSelector](./editingComponents/DropDownSelector.md)
-[FieldWithTableSelection](./editingComponents/FieldWithTableSelection.md)
-[TimeBoundSelection](./editingComponents/TimeBoundSelection.md)
-[EditableTextField](./editingComponents/EditableTextField.md)
+- [RadioSelector](./editingComponents/RadioSelector.md)
+- [DropDownSelector](./editingComponents/DropDownSelector.md)
+- [FieldWithTableSelection](./editingComponents/FieldWithTableSelection.md)
+- [TimeBoundSelection](./editingComponents/TimeBoundSelection.md)
+- [EditableTextField](./editingComponents/EditableTextField.md)
