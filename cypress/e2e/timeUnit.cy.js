@@ -15,7 +15,7 @@ describe("Editing time unit", () => {
         cy.get('[id=write-button]').click()
         cy.contains("ALMAAsianlandmammalage")
     })
-    it.skip("User editing time unit with incorrect values does not succeed and is notified about it", () => {
+    it("User editing time unit with incorrect bounds does not succeed and is notified about it", () => {
         cy.visit(`/time-unit/bahean?tab=0`)
         cy.contains('Bahean')
         cy.get('[id=edit-button]').click()
