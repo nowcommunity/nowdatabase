@@ -42,9 +42,9 @@ export const writeTimeUnit = async (
       const { cascadeErrors, calculatorErrors, localitiesToUpdate } = await checkTimeUnitCascade(timeUnit)
       if (calculatorErrors.length > 0 || cascadeErrors.length > 0) {
         const calculatorErrorsString =
-          calculatorErrors.length > 0 ? `Check fractions of following localities: ${calculatorErrors.join('\n')}` : ''
+          calculatorErrors.length > 0 ? `Check fractions of following localities: ${calculatorErrors.join(', ')}` : ''
         const cascadeErrorsString =
-          cascadeErrors.length > 0 ? `Following localities would become contradicting: ${cascadeErrors.join('\n')}` : ''
+          cascadeErrors.length > 0 ? `Following localities would become contradicting: ${cascadeErrors.join(', ')}` : ''
         const ErrorObject = {
           name: 'cascade',
           calculatorErrors: calculatorErrorsString,
