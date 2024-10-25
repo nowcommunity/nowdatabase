@@ -2,7 +2,7 @@ import { beforeEach, beforeAll, afterAll, describe, it, expect } from '@jest/glo
 import { LocalityDetailsType, SpeciesDetailsType } from '../../../../frontend/src/backendTypes'
 import { LogRow } from '../../services/write/writeOperations/types'
 import { newSpeciesBasis, newSpeciesWithoutRequiredFields } from './data'
-import { login, resetDatabase, send, testLogRows, resetDatabaseTimeout } from '../utils'
+import { login, logout, resetDatabase, send, testLogRows, resetDatabaseTimeout } from '../utils'
 import { pool } from '../../utils/db'
 
 let createdSpecies: SpeciesDetailsType | null = null
@@ -61,5 +61,24 @@ describe('Creating new species works', () => {
       species: { ...newSpeciesWithoutRequiredFields, comment: 'species test' },
     })
     expect(res.status).toEqual(403)
+  })
+
+  it('Creation fails without permissions', async () => {
+    logout()
+
+    const result = await send('species', 'PUT', {
+      species: { ...newSpeciesBasis, comment: 'species test' },
+    })
+    expect(result.status).toEqual(403)
+  })
+
+  it('Creation fails without permissions', async () => {
+    logout()
+    await login('testEr', 'test')
+
+    const result = await send('species', 'PUT', {
+      species: { ...newSpeciesBasis, comment: 'species test' },
+    })
+    expect(result.status).toEqual(403)
   })
 })

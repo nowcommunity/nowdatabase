@@ -57,10 +57,14 @@ export const send = async <T extends Record<string, unknown>>(
 
 export const setToken = (newToken: string) => (token = newToken)
 
-export const login = async () => {
+export const login = async (username: string = 'testSu', password: string = 'test') => {
   // Login and set token
-  const result = await send<{ token: string }>('user/login', 'POST', { username: 'testSu', password: 'test' })
+  const result = await send<{ token: string }>('user/login', 'POST', { username, password })
   token = result.body.token
+}
+
+export const logout = () => {
+  token = null
 }
 
 export const actionTypeToString = {
