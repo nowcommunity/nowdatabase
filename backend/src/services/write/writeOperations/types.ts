@@ -18,7 +18,7 @@ export type AllowedTables =
   | 'now_tau'
   | 'now_bau'
 
-export type PrimaryTables = 'now_loc' | 'com_species' | 'now_time_unit' | 'now_tu_bound'
+export type PrimaryTables = 'now_loc' | 'com_species' | 'now_time_unit' | 'now_tu_bound' | 'ref_ref'
 
 export type ActionType = 'delete' | 'update' | 'add'
 

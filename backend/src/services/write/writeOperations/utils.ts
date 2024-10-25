@@ -51,3 +51,14 @@ export const fixRadioSelection = (value: unknown) => {
   if (typeof value === 'boolean') return value
   return false
 }
+
+//Some types in frontend (such as ReferenceDetailsType) may have helper fields that are not present in the DB
+//This function creates a copy of any frontend object that only has the keys that should go into the DB
+export const filterAllowedKeys = <T extends Record<string, T[keyof T]>>(reference: T, allowedKeys: string[]) => {
+  return allowedKeys
+    .filter(key => key in reference)
+    .reduce((obj, key) => {
+      ;(obj as T)[key as keyof T] = reference[key as keyof T]
+      return obj
+    }, {} as Partial<T>)
+}
