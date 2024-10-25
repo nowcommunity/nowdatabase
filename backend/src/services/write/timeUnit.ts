@@ -37,15 +37,21 @@ export const writeTimeUnit = async (
 
   try {
     await writeHandler.start()
-
     if (timeUnit.tu_name) {
       await writeHandler.updateObject('now_time_unit', timeUnit, ['tu_name'])
       const { cascadeErrors, calculatorErrors, localitiesToUpdate } = await checkTimeUnitCascade(timeUnit)
-      if (calculatorErrors.length > 0) {
-        throw new Error(`Following localities have invalid age values: \n${calculatorErrors.join('\n')}`)
-      }
-      if (cascadeErrors.length > 0) {
-        throw new Error(`Following localities would be contradicting: \n${cascadeErrors.join('\n')}`)
+      if (calculatorErrors.length > 0 || cascadeErrors.length > 0) {
+        const calculatorErrorsString =
+          calculatorErrors.length > 0 ? `Check fractions of following localities: ${calculatorErrors.join('\n')}` : ''
+        const cascadeErrorsString =
+          cascadeErrors.length > 0 ? `Following localities would become contradicting: ${cascadeErrors.join('\n')}` : ''
+        const ErrorObject = {
+          name: 'cascade',
+          calculatorErrors: calculatorErrorsString,
+          cascadeErrors: cascadeErrorsString,
+        }
+        await writeHandler.end()
+        return { tu_name: timeUnit.tu_name, errorObject: ErrorObject }
       } else {
         for (const locality of localitiesToUpdate) {
           await writeLocalityCascade(locality as EditDataType<LocalityDetailsType>, comment, references, authorizer)
@@ -59,7 +65,7 @@ export const writeTimeUnit = async (
     await writeHandler.logUpdatesAndComplete(authorizer, comment ?? '', references ?? [])
     await writeHandler.commit()
 
-    return timeUnit.tu_name
+    return { tu_name: timeUnit.tu_name, errorObject: {} }
   } catch (e) {
     await writeHandler.end()
     throw e

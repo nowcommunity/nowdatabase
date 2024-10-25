@@ -47,21 +47,40 @@ export const TimeUnitDetails = () => {
     await deleteMutation(id!).unwrap()
   }
 
+  type CascadeErrorObject = {
+    name: 'cascade'
+    calculatorErrors: string
+    cascadeErrors: string
+  }
+
   const onWrite = async (editData: EditDataType<TimeUnitDetailsType>) => {
     try {
       const { tu_name } = await editTimeUnitRequest(editData).unwrap()
       setTimeout(() => navigate(`/time-unit/${tu_name}`), 15)
       notify('Edited item succesfully.')
     } catch (e) {
-      if (e && typeof e === 'object' && 'status' in e && e.status !== 403) {
-        notify('Could not edit item. Error happened.', 'error')
-      } else {
-        const error = e as ValidationErrors
-        let message = 'Could not save item. Missing: '
-        Object.keys(error.data).forEach(key => {
-          message += `${error.data[key].name}. `
-        })
-        notify(message, 'error')
+      if (
+        e &&
+        typeof e === 'object' &&
+        'status' in e &&
+        e.status === 403 &&
+        'data' in e &&
+        typeof e.data === 'object'
+      ) {
+        if (e.data && 'errorObject' in e.data) {
+          const error = e.data.errorObject as CascadeErrorObject
+          const errorMessage = `${error.calculatorErrors}\n${error.cascadeErrors}`
+          notify(errorMessage, 'error')
+        } else if (e.status === 403) {
+          const error = e as ValidationErrors
+          let message = 'Could not save item. Missing: '
+          Object.keys(error.data).forEach(key => {
+            message += `${error.data[key].name}. `
+          })
+          notify(message, 'error')
+        } else {
+          notify('Could not save item. Error happened.', 'error')
+        }
       }
     }
   }
