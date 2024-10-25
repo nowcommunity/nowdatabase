@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "npx tsx watch --clear-screen=false src/index.ts",
     "build": "tsc",
-    "test": "jest src/api-tests --runInBand --coverage --config jest-config.js --detectOpenHandles --forceExit",
+    "test": "jest src/api-tests --runInBand --coverage --config jest-config.js --detectOpenHandles --forceExit --silent",
+    "test:local": "DOTENV_CONFIG_PATH=../.test.env npm run test -- --setupFiles dotenv/config",
     "start": "node build/index.js",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "prisma": "prisma generate --schema prisma/schema.prisma && prisma generate --schema prisma/schema_log.prisma",
@@ -17,6 +18,7 @@
     "@babel/core": "^7.18.5",
     "@babel/preset-env": "^7.18.2",
     "@babel/preset-typescript": "^7.24.7",
+    "dotenv": "^16.4.5",
     "eslint": "^8.56.0",
     "eslint-config-prettier": "^9.1.0",
     "eslint-import-resolver-typescript": "^3.6.1",

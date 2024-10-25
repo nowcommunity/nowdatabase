@@ -14,6 +14,7 @@ import { DetailView, TabType } from '../DetailView/DetailView'
 import { LocalityTab } from './Tabs/LocalityTab'
 import { TimeUnitTab } from './Tabs/TimeUnitTab'
 import { validateTimeUnit } from '@/validators/timeUnit'
+import { makeEditData } from '../DetailView/Context/DetailContext'
 
 export const TimeUnitDetails = () => {
   const { id } = useParams()
@@ -53,12 +54,18 @@ export const TimeUnitDetails = () => {
     cascadeErrors: string
   }
 
-  const onWrite = async (editData: EditDataType<TimeUnitDetailsType>) => {
+  const onWrite = async (
+    editData: EditDataType<TimeUnitDetailsType>,
+    setEditData: (editData: EditDataType<TimeUnitDetailsType>) => void
+  ) => {
     try {
       const { tu_name } = await editTimeUnitRequest(editData).unwrap()
       setTimeout(() => navigate(`/time-unit/${tu_name}`), 15)
       notify('Edited item succesfully.')
     } catch (e) {
+      if (data) {
+        setEditData(makeEditData(data))
+      }
       if (
         e &&
         typeof e === 'object' &&
@@ -81,6 +88,7 @@ export const TimeUnitDetails = () => {
         } else {
           notify('Could not save item. Error happened.', 'error')
         }
+
       }
     }
   }

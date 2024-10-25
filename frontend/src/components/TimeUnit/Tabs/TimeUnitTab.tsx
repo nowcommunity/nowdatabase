@@ -24,7 +24,7 @@ export const TimeUnitTab = () => {
   ]
 
   const timeUnit = [
-    ['Name', textField('tu_display_name')],
+    ['Name', textField('tu_display_name', { type: 'text', disabled: mode.new ? false : true })],
     ['Rank', dropdown('rank', rankOptions, 'Rank')],
     ['Comment', textField('tu_comment')],
     [
@@ -38,23 +38,25 @@ export const TimeUnitTab = () => {
     ],
   ]
 
-  const low_bound = mode.new
-    ? []
-    : [
-        ['Id', editData.low_bound!.bid],
-        ['Name', editData.low_bound!.b_name],
-        ['Age', editData.low_bound!.age],
-        ['Comment', editData.low_bound!.b_comment],
-      ]
+  const low_bound =
+    mode.new || !data.low_bound
+      ? []
+      : [
+          ['Id', editData.low_bound ? editData.low_bound.bid : data.low_bound.bid],
+          ['Name', editData.low_bound ? editData.low_bound.b_name : data.low_bound.b_name],
+          ['Age', editData.low_bound ? editData.low_bound.age : data.low_bound.age],
+          ['Comment', editData.low_bound ? editData.low_bound.b_comment : data.low_bound.b_comment],
+        ]
 
-  const up_bound = mode.new
-    ? []
-    : [
-        ['Id', editData.up_bound!.bid],
-        ['Name', editData.up_bound!.b_name],
-        ['Age', editData.up_bound!.age],
-        ['Comment', editData.up_bound!.b_comment],
-      ]
+  const up_bound =
+    mode.new || !data.up_bound
+      ? []
+      : [
+          ['Id', editData.up_bound ? editData.up_bound.bid : data.up_bound.bid],
+          ['Name', editData.up_bound ? editData.up_bound.b_name : data.up_bound.b_name],
+          ['Age', editData.up_bound ? editData.up_bound.age : data.up_bound.age],
+          ['Comment', editData.up_bound ? editData.up_bound.b_comment : data.up_bound.b_comment],
+        ]
 
   const time_bound_edit = [
     [
@@ -76,21 +78,33 @@ export const TimeUnitTab = () => {
       />,
     ],
   ]
+  let lowerBoundTitle: string
+  let upperBoundTitle: string
+  if (!editData.low_bound) {
+    lowerBoundTitle = 'Lower bound'
+  } else {
+    lowerBoundTitle = editData.low_bound.bid === data.low_bound.bid ? 'Lower bound' : 'Lower bound (edited)'
+  }
+  if (!editData.up_bound) {
+    upperBoundTitle = 'Upper bound'
+  } else {
+    upperBoundTitle = editData.up_bound.bid === data.up_bound.bid ? 'Upper bound' : 'Upper bound (edited)'
+  }
 
   return (
     <>
       <ArrayFrame array={timeUnit} title="Time Unit" />
-      {!mode.new && (
+      {!mode.new && data.low_bound && data.up_bound && (
         <>
           <ArrayFrame
             array={low_bound}
-            title={editData.low_bound!.bid === data.low_bound?.bid ? 'Lower bound' : 'Lower Bound (edited)'}
-            highlighted={editData.low_bound!.bid !== data.low_bound?.bid ? true : false}
+            title={lowerBoundTitle}
+            highlighted={lowerBoundTitle === 'Lower bound (edited)' ? true : false}
           />
           <ArrayFrame
             array={up_bound}
-            title={editData.up_bound!.bid === data.up_bound?.bid ? 'Upper bound' : 'Upper Bound (edited)'}
-            highlighted={editData.up_bound!.bid !== data.up_bound?.bid ? true : false}
+            title={upperBoundTitle}
+            highlighted={upperBoundTitle === 'Upper bound (edited)' ? true : false}
           />
         </>
       )}

@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "[ -d node_modules ] && npx vite --host || npm ci && npx vite --host",
+    "test": "jest src/tests",
     "build": "vite build",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
@@ -28,6 +29,7 @@
     "styled-components": "^6.1.8"
   },
   "devDependencies": {
+    "@jest/globals": "^29.7.0",
     "@types/lodash-es": "^4.17.12",
     "@types/node": "^20.12.7",
     "@types/react": "^18.2.56",
@@ -43,7 +45,10 @@
     "eslint-plugin-react": "^7.34.1",
     "eslint-plugin-react-hooks": "^4.6.0",
     "eslint-plugin-react-refresh": "^0.4.5",
+    "jest": "^29.7.0",
     "prettier": "^3.2.5",
+    "ts-jest": "^29.2.5",
+    "ts-node": "^10.9.2",
     "typescript": "^5.2.2",
     "typescript-eslint": "^7.0.2",
     "vite": "^5.2.5",

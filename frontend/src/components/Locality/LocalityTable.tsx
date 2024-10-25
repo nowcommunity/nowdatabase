@@ -35,12 +35,10 @@ export const LocalityTable = ({ selectorFn }: { selectorFn?: (newObject: Localit
       {
         accessorKey: 'bfa_max',
         header: 'BFA max',
-        filterVariant: 'range',
       },
       {
         accessorKey: 'bfa_min',
         header: 'BFA min',
-        filterVariant: 'range',
       },
       {
         accessorKey: 'max_age',

@@ -5,6 +5,7 @@ import { ReferenceTab } from './Tabs/ReferenceTab'
 import { useEditReferenceMutation, useGetReferenceDetailsQuery } from '@/redux/referenceReducer'
 import { EditDataType, ReferenceDetailsType } from '@/backendTypes'
 import { emptyReference } from '../DetailView/common/defaultValues'
+import { validateReference } from '@/validators/reference'
 
 export const ReferenceDetails = () => {
   const { id } = useParams()
@@ -34,7 +35,7 @@ export const ReferenceDetails = () => {
       isNew={isNew}
       data={isNew ? emptyReference : data!}
       onWrite={onWrite}
-      validator={() => ({ name: '', error: null })}
+      validator={validateReference}
     />
   )
 }
