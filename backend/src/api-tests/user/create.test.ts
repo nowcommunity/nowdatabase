@@ -10,7 +10,7 @@ describe('Creating an user', () => {
     await pool.end()
   })
 
-  it.todo("is successful with correct data")
-  it.todo("is not successfull with missing data")
-  it.todo("is not successfull with incorrect password")
+  it.todo('is successful with correct data')
+  it.todo('is not successfull with missing data')
+  it.todo('is not successfull with incorrect password')
 })
