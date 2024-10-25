@@ -1,6 +1,6 @@
 ### DropDownSelector Component
 
-The DropDownSelector component is used by giving it
+The DropDownSelector is a component that opens a list of options when clicked. The component is used by giving it
 
 - an array of `options` (Required)
 - a `name` (Required)

@@ -11,10 +11,10 @@ export const WriteButton = <T,>({
   onWrite,
   hasStagingMode = false,
 }: {
-  onWrite: (editData: EditDataType<T>) => Promise<void>
+  onWrite: (editData: EditDataType<T>, setEditData: (editData: EditDataType<T>) => void) => Promise<void>
   hasStagingMode?: boolean
 }) => {
-  const { editData, mode, setMode } = useDetailContext<T>()
+  const { editData, setEditData, mode, setMode } = useDetailContext<T>()
   const [loading, setLoading] = useState(false)
 
   const getButtonText = () => {
@@ -31,7 +31,7 @@ export const WriteButton = <T,>({
           return
         }
         setLoading(true)
-        void onWrite(editData).then(() => {
+        void onWrite(editData, setEditData).then(() => {
           setLoading(false)
           setMode('read')
         })
