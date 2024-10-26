@@ -24,22 +24,22 @@ export const LocalityTab = () => {
   const [decLongChanged, setDecLongChanged] = useState(0)
 
   useEffect(() => {
-    setEditData({ ...editData, dec_lat: convertDmsToDec(editData.dms_lat, true) })
+    setEditData({ ...editData, dec_lat: convertDmsToDec(editData.dms_lat, 'latitude') })
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dmsLatChanged])
 
   useEffect(() => {
-    setEditData({ ...editData, dms_lat: convertDecToDms(editData.dec_lat, true) })
+    setEditData({ ...editData, dms_lat: convertDecToDms(editData.dec_lat, 'latitude') })
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [decLatChanged])
 
   useEffect(() => {
-    setEditData({ ...editData, dec_long: convertDmsToDec(editData.dms_long, false) })
+    setEditData({ ...editData, dec_long: convertDmsToDec(editData.dms_long, 'longitude') })
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dmsLongChanged])
 
   useEffect(() => {
-    setEditData({ ...editData, dms_long: convertDecToDms(editData.dec_long, false) })
+    setEditData({ ...editData, dms_long: convertDecToDms(editData.dec_long, 'longitude') })
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [decLongChanged])
 
