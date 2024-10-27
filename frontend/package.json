@@ -30,6 +30,8 @@
   },
   "devDependencies": {
     "@jest/globals": "^29.7.0",
+    "@testing-library/dom": "^10.4.0",
+    "@testing-library/react": "^16.0.1",
     "@types/lodash-es": "^4.17.12",
     "@types/node": "^20.12.7",
     "@types/react": "^18.2.56",

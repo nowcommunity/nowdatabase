@@ -8,11 +8,40 @@ import { EditableTable } from '@/components/DetailView/common/EditableTable'
 import { EditingModal } from '@/components/DetailView/common/EditingModal'
 import { emptyOption } from '@/components/DetailView/common/misc'
 import { Map } from '@/components/Map/Map'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { convertDmsToDec, convertDecToDms } from '@/util/coordinateConversion'
 
 export const LocalityTab = () => {
   const { textField, radioSelection, dropdown, mode, bigTextField } = useDetailContext<LocalityDetailsType>()
   const { editData, setEditData } = useDetailContext<LocalityDetailsType>()
+
+  /* These states are used to differentiate between user input and automatic conversion (the useEffects below) of coordinate fields.
+     They are passed to the textfield-objects of their respective fields 
+     They are simply incremented, and their value isn't used for anything (only it's change is tracked) */
+  const [dmsLatChanged, setDmsLatChanged] = useState(0)
+  const [decLatChanged, setDecLatChanged] = useState(0)
+  const [dmsLongChanged, setDmsLongChanged] = useState(0)
+  const [decLongChanged, setDecLongChanged] = useState(0)
+
+  useEffect(() => {
+    setEditData({ ...editData, dec_lat: convertDmsToDec(editData.dms_lat, 'latitude') })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dmsLatChanged])
+
+  useEffect(() => {
+    setEditData({ ...editData, dms_lat: convertDecToDms(editData.dec_lat, 'latitude') })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [decLatChanged])
+
+  useEffect(() => {
+    setEditData({ ...editData, dec_long: convertDmsToDec(editData.dms_long, 'longitude') })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dmsLongChanged])
+
+  useEffect(() => {
+    setEditData({ ...editData, dms_long: convertDecToDms(editData.dec_long, 'longitude') })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [decLongChanged])
 
   const approximateCoordinatesOptions = [
     { display: 'No', value: 'false' },
@@ -54,8 +83,16 @@ export const LocalityTab = () => {
   ]
   const latlong = [
     ['', 'dms', 'dec'],
-    ['Latitude', textField('dms_lat'), textField('dec_lat', { type: 'number' })],
-    ['Longitude', textField('dms_long'), textField('dec_long', { type: 'number' })],
+    [
+      'Latitude',
+      textField('dms_lat', { type: 'text', changeSetter: setDmsLatChanged }),
+      textField('dec_lat', { type: 'number', changeSetter: setDecLatChanged }),
+    ],
+    [
+      'Longitude',
+      textField('dms_long', { type: 'text', changeSetter: setDmsLongChanged }),
+      textField('dec_long', { type: 'number', changeSetter: setDecLongChanged }),
+    ],
     ['Approximate Coordinates', dropdown('approx_coord', approximateCoordinatesOptions, 'Approximate Coordinates')],
     ['Altitude (m)', textField('altitude')],
   ]
