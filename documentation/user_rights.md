@@ -48,7 +48,9 @@ Any user can get a list of reference types.
 
 Any user can view the details of a reference.
 
-References cannot be created, updated or deleted by anyone at the moment.
+Creating or updating a reference requires the **Admin** or **EditUnrestricted** roles.
+
+Deleting a reference requires the **Admin** role.
 
 ## Time Unit
 
