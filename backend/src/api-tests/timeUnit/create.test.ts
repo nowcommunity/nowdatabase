@@ -55,4 +55,61 @@ describe('Creating new time unit', () => {
       testLogRows(logRows, expectedLogRows, 7)
     })
   })
+
+  describe('Creating is NOT successful with invalid bounds', () => {
+    it("Without bounds doesn't create a new time unit", async () => {
+      const { body: resultBody, status: getReqStatus } = await send<{ tu_name: string }>('time-unit', 'PUT', {
+        timeUnit: { ...newTimeUnitBasis, low_bnd: null, up_bnd: null },
+      })
+
+      const { tu_name: createdId } = resultBody
+
+      expect(getReqStatus).toEqual(403)
+      expect(typeof createdId).toEqual('undefined') // `would be 'string' if it was an id
+    })
+
+    it('Null lower bound causes error 403', async () => {
+      const { body: resultBody, status: getReqStatus } = await send<{ tu_name: string }>('time-unit', 'PUT', {
+        timeUnit: { ...newTimeUnitBasis, low_bnd: null },
+      })
+
+      const { tu_name: createdId } = resultBody
+
+      expect(getReqStatus).toEqual(403)
+      expect(typeof createdId).toEqual('undefined')
+    })
+
+    it('Null upper bound causes error 403', async () => {
+      const { body: resultBody, status: getReqStatus } = await send<{ tu_name: string }>('time-unit', 'PUT', {
+        timeUnit: { ...newTimeUnitBasis, up_bnd: null },
+      })
+
+      const { tu_name: createdId } = resultBody
+
+      expect(getReqStatus).toEqual(403)
+      expect(typeof createdId).toEqual('undefined')
+    })
+
+    it('Invalid upper bound causes 500 server error', async () => {
+      const { body: resultBody, status: getReqStatus } = await send<{ tu_name: string }>('time-unit', 'PUT', {
+        timeUnit: { ...newTimeUnitBasis, up_bnd: 0 },
+      })
+
+      const { tu_name: createdId } = resultBody
+
+      expect(getReqStatus).toEqual(500)
+      expect(typeof createdId).toEqual('undefined')
+    })
+
+    it('Invalid lower bound causes 500 server error', async () => {
+      const { body: resultBody, status: getReqStatus } = await send<{ tu_name: string }>('time-unit', 'PUT', {
+        timeUnit: { ...newTimeUnitBasis, low_bnd: 30000 },
+      })
+
+      const { tu_name: createdId } = resultBody
+
+      expect(getReqStatus).toEqual(500)
+      expect(typeof createdId).toEqual('undefined')
+    })
+  })
 })
