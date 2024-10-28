@@ -33,7 +33,6 @@ export const writeLocality = async (
   references: Reference[] | undefined,
   user: User | undefined
 ) => {
-
   const updateOrAdd = locality.lid ? 'update' : 'add'
   const writeHandler = getLocalityWriteHandler(updateOrAdd)
 
@@ -49,11 +48,11 @@ export const writeLocality = async (
     await writeHandler.start()
 
     const filteredLocality = await filterDuplicateLocalitySpecies(locality, user)
-    if (updateOrAdd === "update" && filteredLocality) {
+    if (updateOrAdd === 'update' && filteredLocality) {
       locality.now_ls = filteredLocality
     }
 
-    if (updateOrAdd === "add") {
+    if (updateOrAdd === 'add') {
       const { lid: newLid } = await writeHandler.createObject('now_loc', locality, ['lid'])
       locality.lid = newLid as number
     } else {

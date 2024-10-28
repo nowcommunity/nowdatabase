@@ -177,7 +177,10 @@ export const validateEntireLocality = (editedFields: EditDataType<Prisma.now_loc
   return errors
 }
 
-export const filterDuplicateLocalitySpecies = async (locality: EditDataType<LocalityDetailsType>, user: User | undefined) => {
+export const filterDuplicateLocalitySpecies = async (
+  locality: EditDataType<LocalityDetailsType>,
+  user: User | undefined
+) => {
   if (!locality.lid) return
 
   // Get existing data of locality
@@ -190,17 +193,18 @@ export const filterDuplicateLocalitySpecies = async (locality: EditDataType<Loca
     localityDetailsSpeciesIds.push(localitySpecies.species_id)
   }
 
-
   // Compare if the species already exists and that we are trying to add it again
   // and filter those cases out
   const updatedLocalityNow_ls = locality.now_ls.filter(localitySpecies => {
     if (localitySpecies.species_id) {
       // Logic is flipped for filter as we want to skip the ones the check matches
-      return !(localityDetailsSpeciesIds.includes(localitySpecies.species_id) && localitySpecies.rowState === "new")
+      return !(localityDetailsSpeciesIds.includes(localitySpecies.species_id) && localitySpecies.rowState === 'new')
     }
 
     // code shouldn't get here ever
-    logger.info(`Filter already existing species: localitySpecies didn't have species_id. Skipping. ${localitySpecies}`)
+    logger.info(
+      `Filter already existing species: localitySpecies didn't have species_id. Skipping. ${JSON.stringify(localitySpecies)}`
+    )
     return false
   })
 
