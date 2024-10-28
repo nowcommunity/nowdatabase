@@ -41,19 +41,19 @@ describe('Creating new time bound works', () => {
 
   it('Creation fails without permissions', async () => {
     logout()
-    const result1 = await send('time-bound', 'PUT', {
+    const resultNoPerm = await send('time-bound', 'PUT', {
       timeBound: { ...newTimeBoundBasis },
     })
-    expect(result1.body).toEqual({})
-    expect(result1.status).toEqual(403)
+    expect(resultNoPerm.body).toEqual({})
+    expect(resultNoPerm.status).toEqual(403)
 
     logout()
     await login('testEr', 'test')
-    const result2 = await send('time-bound', 'PUT', {
+    const resultEr = await send('time-bound', 'PUT', {
       timeBound: { ...newTimeBoundBasis },
     })
-    expect(result2.body).toEqual({})
-    expect(result2.status).toEqual(403)
+    expect(resultEr.body).toEqual({})
+    expect(resultEr.status).toEqual(403)
   })
 
   it('Update logs are correct', () => {

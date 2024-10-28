@@ -39,19 +39,19 @@ describe('Creating new time unit works', () => {
   })
   it('Creation fails without permissions', async () => {
     logout()
-    const result1 = await send('time-unit', 'PUT', {
+    const resultNoPerm = await send('time-unit', 'PUT', {
       timeUnit: { ...newTimeUnitBasis },
     })
-    expect(result1.body).toEqual({})
-    expect(result1.status).toEqual(403)
+    expect(resultNoPerm.body).toEqual({})
+    expect(resultNoPerm.status).toEqual(403)
 
     logout()
     await login('testEr', 'test')
-    const result2 = await send('time-unit', 'PUT', {
+    const resultEr = await send('time-unit', 'PUT', {
       timeUnit: { ...newTimeUnitBasis },
     })
-    expect(result2.body).toEqual({})
-    expect(result2.status).toEqual(403)
+    expect(resultEr.body).toEqual({})
+    expect(resultEr.status).toEqual(403)
   })
 
   it('Update logs are correct', () => {

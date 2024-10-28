@@ -44,19 +44,19 @@ describe('Creating new locality works', () => {
 
   it('Creation fails without permissions', async () => {
     logout()
-    const result1 = await send('locality', 'PUT', {
+    const resultNoPerm = await send('locality', 'PUT', {
       locality: { ...newLocalityBasis },
     })
-    expect(result1.body).toEqual({})
-    expect(result1.status).toEqual(403)
+    expect(resultNoPerm.body).toEqual({})
+    expect(resultNoPerm.status).toEqual(403)
 
     logout()
     await login('testEr', 'test')
-    const result2 = await send('locality', 'PUT', {
+    const resultEr = await send('locality', 'PUT', {
       locality: { ...newLocalityBasis },
     })
-    expect(result2.body).toEqual({})
-    expect(result2.status).toEqual(403)
+    expect(resultEr.body).toEqual({})
+    expect(resultEr.status).toEqual(403)
   })
 
   it('Species update also logged correctly', async () => {
