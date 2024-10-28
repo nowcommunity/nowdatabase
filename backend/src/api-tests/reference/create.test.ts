@@ -2,7 +2,7 @@ import { beforeEach, beforeAll, afterAll, describe, it, expect } from '@jest/glo
 import { ReferenceDetailsType } from '../../../../frontend/src/backendTypes'
 //import { LogRow } from '../../services/write/writeOperations/types'
 import { newReferenceBasis } from './data'
-import { login, resetDatabase, send, /*testLogRows,*/ resetDatabaseTimeout } from '../utils'
+import { login, logout, resetDatabase, send, /*testLogRows,*/ resetDatabaseTimeout } from '../utils'
 import { pool } from '../../utils/db'
 
 //let createdRef: ReferenceDetailsType | null = null
@@ -29,8 +29,22 @@ describe('Creating new reference works', () => {
 
     const { status: getReqStat } = await send<ReferenceDetailsType>(`reference/${createdId}`, 'GET')
     expect(getReqStat).toEqual(200)
+  })
 
-    //console.log(createdRef)
+  it('Creation fails without permissions', async () => {
+    logout()
+    const { body: resultBody1, status: getReqStatus1 } = await send('reference/', 'PUT', {
+      reference: { ...newReferenceBasis },
+    })
+    expect(resultBody1).toEqual({})
+    expect(getReqStatus1).toEqual(403)
+
+    await login('testEr')
+    const { body: resultBody2, status: getReqStatus2 } = await send('reference/', 'PUT', {
+      reference: { ...newReferenceBasis },
+    })
+    expect(resultBody2).toEqual({})
+    expect(getReqStatus2).toEqual(403)
   })
   /*
   it('Contains correct data', () => {
