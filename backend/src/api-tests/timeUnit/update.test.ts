@@ -22,67 +22,69 @@ describe('Time unit updating works', () => {
     await pool.end()
   })
 
-  it('Update request with valid time unit succeeds and returns valid number id', async () => {
-    const { body: resultBody } = await send<{ tu_name: string }>('time-unit', 'PUT', {
-      timeUnit: editedTimeUnit,
+  describe('Time unit updates with valid data', () => {
+    it('Update request with valid time unit succeeds and returns valid number id', async () => {
+      const { body: resultBody } = await send<{ tu_name: string }>('time-unit', 'PUT', {
+        timeUnit: editedTimeUnit,
+      })
+      const { tu_name: existingId } = resultBody
+
+      expect(typeof existingId).toEqual('string')
+      expect(existingId).toEqual('baheantest')
+
+      const { body } = await send<TimeUnitDetailsType>(`time-unit/${existingId}`, 'GET')
+      expect(body.tu_display_name).toEqual(existingTimeUnit.tu_display_name)
+      expect(body.sequence).toEqual(editedTimeUnit.sequence)
+      expect(body.up_bnd).toEqual(existingTimeUnit.up_bnd)
+      expect(body.low_bnd).toEqual(existingTimeUnit.low_bnd)
     })
-    const { tu_name: existingId } = resultBody
+    it('Update request that does not change anything works', async () => {
+      const { body: resultBody } = await send<{ tu_name: string }>('time-unit', 'PUT', {
+        timeUnit: existingTimeUnit,
+      })
 
-    expect(typeof existingId).toEqual('string')
-    expect(existingId).toEqual('baheantest')
+      const { tu_name: existingId } = resultBody
+      expect(typeof existingId).toEqual('string')
+      expect(existingId).toEqual('baheantest')
 
-    const { body } = await send<TimeUnitDetailsType>(`time-unit/${existingId}`, 'GET')
-    expect(body.tu_display_name).toEqual(existingTimeUnit.tu_display_name)
-    expect(body.sequence).toEqual(editedTimeUnit.sequence)
-    expect(body.up_bnd).toEqual(existingTimeUnit.up_bnd)
-    expect(body.low_bnd).toEqual(existingTimeUnit.low_bnd)
-  })
-  it('Update request that does not change anything works', async () => {
-    const { body: resultBody } = await send<{ tu_name: string }>('time-unit', 'PUT', {
-      timeUnit: existingTimeUnit,
+      const { body } = await send<TimeUnitDetailsType>(`time-unit/${existingId}`, 'GET')
+      expect(body.tu_display_name).toEqual(existingTimeUnit.tu_display_name)
+      expect(body.up_bnd).toEqual(existingTimeUnit.up_bnd)
+      expect(body.low_bnd).toEqual(existingTimeUnit.low_bnd)
     })
+    it('Update request with invalid timeunit sequence fails', async () => {
+      const invalidSequenceTimeUnit = { ...existingTimeUnit, sequence: null }
+      const { body: resultBody } = await send<{ tu_name: string }>('time-unit', 'PUT', {
+        timeUnit: invalidSequenceTimeUnit,
+      })
+      const { tu_name: existingId } = resultBody
+      expect(typeof existingId).toEqual('undefined')
 
-    const { tu_name: existingId } = resultBody
-    expect(typeof existingId).toEqual('string')
-    expect(existingId).toEqual('baheantest')
-
-    const { body } = await send<TimeUnitDetailsType>(`time-unit/${existingId}`, 'GET')
-    expect(body.tu_display_name).toEqual(existingTimeUnit.tu_display_name)
-    expect(body.up_bnd).toEqual(existingTimeUnit.up_bnd)
-    expect(body.low_bnd).toEqual(existingTimeUnit.low_bnd)
-  })
-  it('Update request with invalid timeunit sequence fails', async () => {
-    const invalidSequenceTimeUnit = { ...existingTimeUnit, sequence: null }
-    const { body: resultBody } = await send<{ tu_name: string }>('time-unit', 'PUT', {
-      timeUnit: invalidSequenceTimeUnit,
+      const { body } = await send<TimeUnitDetailsType>(`time-unit/${existingTimeUnit.tu_name}`, 'GET')
+      expect(body.tu_display_name).toEqual(existingTimeUnit.tu_display_name)
+      expect(body.up_bnd).toEqual(existingTimeUnit.up_bnd)
+      expect(body.low_bnd).toEqual(existingTimeUnit.low_bnd)
     })
-    const { tu_name: existingId } = resultBody
-    expect(typeof existingId).toEqual('undefined')
-
-    const { body } = await send<TimeUnitDetailsType>(`time-unit/${existingTimeUnit.tu_name}`, 'GET')
-    expect(body.tu_display_name).toEqual(existingTimeUnit.tu_display_name)
-    expect(body.up_bnd).toEqual(existingTimeUnit.up_bnd)
-    expect(body.low_bnd).toEqual(existingTimeUnit.low_bnd)
-  })
-  it('Update logs are correct', async () => {
-    // edit time unit to create a log update
-    const { body: resultBody } = await send<{ tu_name: string }>('time-unit', 'PUT', {
-      timeUnit: editedTimeUnit,
+    it('Update logs are correct', async () => {
+      // edit time unit to create a log update
+      const { body: resultBody } = await send<{ tu_name: string }>('time-unit', 'PUT', {
+        timeUnit: editedTimeUnit,
+      })
+      const { tu_name: createdId } = resultBody
+      const { body: createdTimeUnit } = await send<TimeUnitDetailsType>(`time-unit/${createdId}`, 'GET')
+      const lastUpdate = createdTimeUnit.now_tau[createdTimeUnit.now_tau.length - 1]
+      expect(lastUpdate.tau_comment).toEqual(editedTimeUnit.comment) // 'Comment is correct'
+      const logRows = lastUpdate.updates
+      const expectedLogRows: Partial<LogRow>[] = [
+        {
+          table: 'now_time_unit',
+          column: 'sequence',
+          oldValue: newTimeUnitBasis.sequence,
+          value: editedTimeUnit.sequence,
+          type: 'update',
+        },
+      ]
+      testLogRows(logRows, expectedLogRows, 2)
     })
-    const { tu_name: createdId } = resultBody
-    const { body: createdTimeUnit } = await send<TimeUnitDetailsType>(`time-unit/${createdId}`, 'GET')
-    const lastUpdate = createdTimeUnit.now_tau[createdTimeUnit.now_tau.length - 1]
-    expect(lastUpdate.tau_comment).toEqual(editedTimeUnit.comment) // 'Comment is correct'
-    const logRows = lastUpdate.updates
-    const expectedLogRows: Partial<LogRow>[] = [
-      {
-        table: 'now_time_unit',
-        column: 'sequence',
-        oldValue: newTimeUnitBasis.sequence,
-        value: editedTimeUnit.sequence,
-        type: 'update',
-      },
-    ]
-    testLogRows(logRows, expectedLogRows, 2)
   })
 })
