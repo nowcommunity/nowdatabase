@@ -33,18 +33,18 @@ describe('Creating new reference works', () => {
 
   it('Creation fails without permissions', async () => {
     logout()
-    const { body: resultBody1, status: getReqStatus1 } = await send('reference/', 'PUT', {
+    const { body: resultBodyNoPerm, status: resultStatusNoPerm } = await send('reference/', 'PUT', {
       reference: { ...newReferenceBasis },
     })
-    expect(resultBody1).toEqual({})
-    expect(getReqStatus1).toEqual(403)
+    expect(resultBodyNoPerm).toEqual({})
+    expect(resultStatusNoPerm).toEqual(403)
 
     await login('testEr')
-    const { body: resultBody2, status: getReqStatus2 } = await send('reference/', 'PUT', {
+    const { body: resultBodyEr, status: resultStatusEr } = await send('reference/', 'PUT', {
       reference: { ...newReferenceBasis },
     })
-    expect(resultBody2).toEqual({})
-    expect(getReqStatus2).toEqual(403)
+    expect(resultBodyEr).toEqual({})
+    expect(resultStatusEr).toEqual(403)
   })
   /*
   it('Contains correct data', () => {
