@@ -1,4 +1,5 @@
-import { beforeAll, beforeEach, describe, expect, it } from '@jest/globals'
+import { afterAll, beforeAll, beforeEach, describe, expect, it } from '@jest/globals'
+import { pool } from '../../utils/db'
 import { login, logout, resetDatabase, resetDatabaseTimeout, send } from '../utils'
 
 describe('Deleting a locality works', () => {
@@ -7,6 +8,9 @@ describe('Deleting a locality works', () => {
   }, resetDatabaseTimeout)
   beforeEach(async () => {
     await login()
+  })
+  afterAll(async () => {
+    await pool.end()
   })
 
   it.todo('Deleting works')
