@@ -46,7 +46,10 @@ router.put(
     if (validationErrors.length > 0) {
       return res.status(403).send(validationErrors)
     }
-    const tu_name = await writeTimeUnit(editedTimeUnit, comment, references, req.user!.initials)
+    const { tu_name, errorObject } = await writeTimeUnit(editedTimeUnit, comment, references, req.user!.initials)
+    if (errorObject !== undefined) {
+      return res.status(403).send({ errorObject })
+    }
     return res.status(200).send({ tu_name })
   }
 )
