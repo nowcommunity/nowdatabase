@@ -29,23 +29,24 @@ describe('Creating new reference works', () => {
 
     const { status: getReqStat } = await send<ReferenceDetailsType>(`reference/${createdId}`, 'GET')
     expect(getReqStat).toEqual(200)
+  })
 
-    it('Creation fails without permissions', async () => {
-      logout()
-      const { body: resultBodyNoPerm, status: resultStatusNoPerm } = await send('reference/', 'PUT', {
-        reference: { ...newReferenceBasis },
-      })
-      expect(resultBodyNoPerm).toEqual({})
-      expect(resultStatusNoPerm).toEqual(403)
-
-      await login('testEr')
-      const { body: resultBodyEr, status: resultStatusEr } = await send('reference/', 'PUT', {
-        reference: { ...newReferenceBasis },
-      })
-      expect(resultBodyEr).toEqual({})
-      expect(resultStatusEr).toEqual(403)
+  it('Creation fails without permissions', async () => {
+    logout()
+    const { body: resultBodyNoPerm, status: resultStatusNoPerm } = await send('reference/', 'PUT', {
+      reference: { ...newReferenceBasis },
     })
-    /*
+    expect(resultBodyNoPerm).toEqual({})
+    expect(resultStatusNoPerm).toEqual(403)
+
+    await login('testEr')
+    const { body: resultBodyEr, status: resultStatusEr } = await send('reference/', 'PUT', {
+      reference: { ...newReferenceBasis },
+    })
+    expect(resultBodyEr).toEqual({})
+    expect(resultStatusEr).toEqual(403)
+  })
+  /*
   it('Contains correct data', () => {
     const { title_primary } = createdRef!
     expect(title_primary).toEqual(newReferenceBasis.title_primary) // 'Name is different'
@@ -76,5 +77,4 @@ describe('Creating new reference works', () => {
     })
     expect(res.status).toEqual(403)
   })*/
-  })
 })
