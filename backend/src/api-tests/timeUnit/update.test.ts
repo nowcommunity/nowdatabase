@@ -90,7 +90,7 @@ describe('Time unit updating works', () => {
 
   describe("Can't update existing Time Unit to have invalid bounds", () => {
     it("Updating null bounds doesn't change time unit's bounds", async () => {
-      const nullBoundsTimeUnit = { ...existingTimeUnit, low_bnd: null, upper_bnd: null }
+      const nullBoundsTimeUnit = { ...existingTimeUnit, low_bnd: null, up_bnd: null }
       const { body: resultBody, status: getReqStatus } = await send<{ tu_name: string }>('time-unit', 'PUT', {
         timeUnit: nullBoundsTimeUnit,
       })
