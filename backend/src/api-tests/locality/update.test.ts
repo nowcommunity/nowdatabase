@@ -1,5 +1,5 @@
 import { beforeEach, beforeAll, afterAll, describe, it, expect } from '@jest/globals'
-import { LocalityDetailsType } from '../../../../frontend/src/backendTypes'
+import { LocalityDetailsType, SpeciesDetailsType } from '../../../../frontend/src/backendTypes'
 import { LogRow } from '../../services/write/writeOperations/types'
 import { editedLocality } from './data'
 import { login, resetDatabase, send, testLogRows, resetDatabaseTimeout } from '../utils'
@@ -75,5 +75,20 @@ describe('Locality update works', () => {
       },
     ]
     testLogRows(logRows, expectedLogRows, 5)
+  })
+
+  it('Editing locality without changing anything should succeed', async () => {
+    const locality = editedLocality
+    // fixing correct species_id, was 85729
+    locality.now_ls[1] = {
+      rowState: 'removed',
+      species_id: 85730,
+      lid: 21050,
+      com_species: { species_id: 85730 } as SpeciesDetailsType,
+    }
+
+    const writeResult = await send<{ id: number }>('locality', 'PUT', { locality: locality })
+    expect(writeResult.status).toEqual(200)
+    expect(writeResult.body.id).toEqual(editedLocality.lid) // `Invalid result returned on write: ${writeResult.body.id}
   })
 })
