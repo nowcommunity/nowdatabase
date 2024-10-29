@@ -1,7 +1,7 @@
 import { beforeEach, beforeAll, afterAll, describe, it, expect } from '@jest/globals'
 import { TimeUnitDetailsType } from '../../../../frontend/src/backendTypes'
 import { LogRow } from '../../services/write/writeOperations/types'
-import { login, resetDatabase, send, testLogRows, resetDatabaseTimeout } from '../utils'
+import { login, logout, resetDatabase, send, testLogRows, resetDatabaseTimeout } from '../utils'
 import { newTimeUnitBasis } from './data'
 import { pool } from '../../utils/db'
 
@@ -36,6 +36,22 @@ describe('Creating new time unit works', () => {
     expect(tu_name).toEqual(newTimeUnitBasis.tu_display_name?.toLowerCase().replace(' ', '')) //'Name is different than expected'
     expect(tu_display_name).toEqual(newTimeUnitBasis.tu_display_name) // 'Display name differs'
     expect(tu_comment).toEqual(newTimeUnitBasis.tu_comment) // 'Comment differs'
+  })
+  it('Creation fails without permissions', async () => {
+    logout()
+    const resultNoPerm = await send('time-unit', 'PUT', {
+      timeUnit: { ...newTimeUnitBasis },
+    })
+    expect(resultNoPerm.body).toEqual({})
+    expect(resultNoPerm.status).toEqual(403)
+
+    logout()
+    await login('testEr', 'test')
+    const resultEr = await send('time-unit', 'PUT', {
+      timeUnit: { ...newTimeUnitBasis },
+    })
+    expect(resultEr.body).toEqual({})
+    expect(resultEr.status).toEqual(403)
   })
 
   it('Update logs are correct', () => {

@@ -74,11 +74,18 @@ describe('Creating new species works', () => {
 
   it('Creation fails without permissions', async () => {
     logout()
-    await login('testEr', 'test')
-
-    const result = await send('species', 'PUT', {
+    const result1 = await send('species', 'PUT', {
       species: { ...newSpeciesBasis, comment: 'species test' },
     })
-    expect(result.status).toEqual(403)
+    expect(result1.body).toEqual({})
+    expect(result1.status).toEqual(403)
+
+    logout()
+    await login('testEr', 'test')
+    const result2 = await send('species', 'PUT', {
+      species: { ...newSpeciesBasis, comment: 'species test' },
+    })
+    expect(result2.body).toEqual({})
+    expect(result2.status).toEqual(403)
   })
 })
