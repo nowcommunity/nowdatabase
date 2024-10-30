@@ -63,7 +63,6 @@ export const TimeUnitDetails = () => {
       if (e && typeof e === 'object' && 'status' in e && e.status !== 403) {
         notify('Could not edit item. Error happened.', 'error')
       } else {
-        console.log(e)
         const error = e as ValidationErrors
         let message = 'Could not save item. Missing: '
         Object.keys(error.data).forEach(key => {

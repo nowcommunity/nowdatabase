@@ -101,7 +101,6 @@ describe('Time unit updating works', () => {
     const { body: resultBody, status: getReqStatus }   = await send('time-unit', 'PUT', {
       timeUnit: { tu_name: 'baheantest', ...conflictingTimeUnit },
     })
-    console.log(resultBody)
     expect(getReqStatus).toEqual(403)
     expect(resultBody).toHaveProperty('cascadeErrors')
   }
