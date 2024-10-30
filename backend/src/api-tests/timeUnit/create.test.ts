@@ -7,6 +7,9 @@ import { pool } from '../../utils/db'
 
 let createdTimeUnit: TimeUnitDetailsType | null = null
 
+////NOTES:
+// - server error 500 jos yritetään samalla nimellä luoda toinen xd
+
 describe('Creating new time unit', () => {
   beforeAll(async () => {
     await resetDatabase()
@@ -20,10 +23,12 @@ describe('Creating new time unit', () => {
 
   describe('Creating is successful with a correct time unit', () => {
     it('Request succeeds and returns valid number id', async () => {
-      const { body: resultBody } = await send<{ tu_name: string }>('time-unit', 'PUT', {
-        timeUnit: { ...newTimeUnitBasis },
+      const okTimeUnit = { ...newTimeUnitBasis, up_bnd: 20214, low_bnd: 20213 }
+      const { body: resultBody, status: getReqStatus } = await send<{ tu_name: string }>('time-unit', 'PUT', {
+        timeUnit: okTimeUnit,
       })
 
+      expect(getReqStatus).toEqual(200)
       const { tu_name: createdId } = resultBody
 
       expect(typeof createdId).toEqual('string') // `Invalid result returned on write: ${createdId}`)
@@ -57,9 +62,9 @@ describe('Creating new time unit', () => {
   })
 
   describe('Creating is NOT successful with invalid bounds', () => {
-    it("Without bounds doesn't create a new time unit", async () => {
+    it("With null bounds doesn't create a new time unit", async () => {
       const { body: resultBody, status: getReqStatus } = await send<{ tu_name: string }>('time-unit', 'PUT', {
-        timeUnit: { ...newTimeUnitBasis, low_bnd: null, up_bnd: null },
+        timeUnit: { ...newTimeUnitBasis, tu_display_name: 'null bounds', low_bnd: null, up_bnd: null },
       })
 
       const { tu_name: createdId } = resultBody
@@ -68,9 +73,9 @@ describe('Creating new time unit', () => {
       expect(typeof createdId).toEqual('undefined') // `would be 'string' if it was an id
     })
 
-    it('Null lower bound causes error 403', async () => {
+    it('Null lower bound id causes error 403', async () => {
       const { body: resultBody, status: getReqStatus } = await send<{ tu_name: string }>('time-unit', 'PUT', {
-        timeUnit: { ...newTimeUnitBasis, low_bnd: null },
+        timeUnit: { ...newTimeUnitBasis, tu_display_name: 'null lower', low_bnd: null },
       })
 
       const { tu_name: createdId } = resultBody
@@ -79,9 +84,9 @@ describe('Creating new time unit', () => {
       expect(typeof createdId).toEqual('undefined')
     })
 
-    it('Null upper bound causes error 403', async () => {
+    it('Null upper bound id causes error 403', async () => {
       const { body: resultBody, status: getReqStatus } = await send<{ tu_name: string }>('time-unit', 'PUT', {
-        timeUnit: { ...newTimeUnitBasis, up_bnd: null },
+        timeUnit: { ...newTimeUnitBasis, tu_display_name: 'null upper', up_bnd: null },
       })
 
       const { tu_name: createdId } = resultBody
@@ -90,9 +95,11 @@ describe('Creating new time unit', () => {
       expect(typeof createdId).toEqual('undefined')
     })
 
-    it('Invalid upper bound causes 500 server error', async () => {
+    // These probably shouldnt really cause 500 server error, but right now they just go 200 ???
+    // This is just switched up from the example ????? and still just goes 200??
+    it('Conflicting bounds causes 500 server error - test 1', async () => {
       const { body: resultBody, status: getReqStatus } = await send<{ tu_name: string }>('time-unit', 'PUT', {
-        timeUnit: { ...newTimeUnitBasis, up_bnd: 0 },
+        timeUnit: { ...newTimeUnitBasis, tu_display_name: 'conflicting bounds', up_bnd: 20213, low_bnd: 20214 },
       })
 
       const { tu_name: createdId } = resultBody
@@ -101,9 +108,32 @@ describe('Creating new time unit', () => {
       expect(typeof createdId).toEqual('undefined')
     })
 
-    it('Invalid lower bound causes 500 server error', async () => {
+    it('Conflicting bounds causes 500 server error - test 2', async () => {
       const { body: resultBody, status: getReqStatus } = await send<{ tu_name: string }>('time-unit', 'PUT', {
-        timeUnit: { ...newTimeUnitBasis, low_bnd: 30000 },
+        timeUnit: { ...newTimeUnitBasis, tu_display_name: 'conflicting bounds 2', up_bnd: 64 },
+      })
+
+      const { tu_name: createdId } = resultBody
+
+      expect(getReqStatus).toEqual(500)
+      expect(typeof createdId).toEqual('undefined')
+    })
+
+    // ???????????
+    it('Conflicting bounds causes 500 server error - test 3', async () => {
+      const { body: resultBody, status: getReqStatus } = await send<{ tu_name: string }>('time-unit', 'PUT', {
+        timeUnit: { ...newTimeUnitBasis, tu_display_name: 'conflicting bounds 3', low_bnd: 64 },
+      })
+
+      const { tu_name: createdId } = resultBody
+
+      expect(getReqStatus).toEqual(500)
+      expect(typeof createdId).toEqual('undefined')
+    })
+
+    it('Invalid bound id causes 500 server error', async () => {
+      const { body: resultBody, status: getReqStatus } = await send<{ tu_name: string }>('time-unit', 'PUT', {
+        timeUnit: { ...newTimeUnitBasis, tu_display_name: 'invalid bound id', low_bnd: 30000 },
       })
 
       const { tu_name: createdId } = resultBody
