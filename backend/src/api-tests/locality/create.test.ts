@@ -2,7 +2,7 @@ import { beforeEach, beforeAll, afterAll, describe, it, expect } from '@jest/glo
 import { LocalityDetailsType, SpeciesDetailsType } from '../../../../frontend/src/backendTypes'
 import { LogRow } from '../../services/write/writeOperations/types'
 import { newLocalityBasis } from './data'
-import { login, logout, resetDatabase, send, testLogRows, resetDatabaseTimeout } from '../utils'
+import { login, logout, resetDatabase, send, testLogRows, resetDatabaseTimeout, noPermError } from '../utils'
 import { pool } from '../../utils/db'
 
 let createdLocality: LocalityDetailsType | null = null
@@ -47,7 +47,7 @@ describe('Creating new locality works', () => {
     const resultNoPerm = await send('locality', 'PUT', {
       locality: { ...newLocalityBasis },
     })
-    expect(resultNoPerm.body).toEqual({})
+    expect(resultNoPerm.body).toEqual(noPermError)
     expect(resultNoPerm.status).toEqual(403)
 
     logout()
@@ -55,7 +55,7 @@ describe('Creating new locality works', () => {
     const resultEr = await send('locality', 'PUT', {
       locality: { ...newLocalityBasis },
     })
-    expect(resultEr.body).toEqual({})
+    expect(resultEr.body).toEqual(noPermError)
     expect(resultEr.status).toEqual(403)
   })
 

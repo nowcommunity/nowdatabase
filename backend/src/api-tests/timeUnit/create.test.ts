@@ -1,7 +1,7 @@
 import { beforeEach, beforeAll, afterAll, describe, it, expect } from '@jest/globals'
 import { TimeUnitDetailsType } from '../../../../frontend/src/backendTypes'
 import { LogRow } from '../../services/write/writeOperations/types'
-import { login, logout, resetDatabase, send, testLogRows, resetDatabaseTimeout } from '../utils'
+import { login, logout, resetDatabase, send, testLogRows, resetDatabaseTimeout, noPermError } from '../utils'
 import { newTimeUnitBasis } from './data'
 import { pool } from '../../utils/db'
 
@@ -42,7 +42,7 @@ describe('Creating new time unit works', () => {
     const resultNoPerm = await send('time-unit', 'PUT', {
       timeUnit: { ...newTimeUnitBasis },
     })
-    expect(resultNoPerm.body).toEqual({})
+    expect(resultNoPerm.body).toEqual(noPermError)
     expect(resultNoPerm.status).toEqual(403)
 
     logout()
@@ -50,7 +50,7 @@ describe('Creating new time unit works', () => {
     const resultEr = await send('time-unit', 'PUT', {
       timeUnit: { ...newTimeUnitBasis },
     })
-    expect(resultEr.body).toEqual({})
+    expect(resultEr.body).toEqual(noPermError)
     expect(resultEr.status).toEqual(403)
   })
 
