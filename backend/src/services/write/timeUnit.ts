@@ -65,7 +65,6 @@ export const writeTimeUnit = async (
     }
     writeHandler.idValue = createdId
     await writeHandler.logUpdatesAndComplete(authorizer, comment ?? '', references ?? [])
-    await writeHandler.commit()
 
     return { tu_name: timeUnit.tu_name, errorObject: undefined }
   } catch (e) {
