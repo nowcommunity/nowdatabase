@@ -90,7 +90,7 @@ export const FormTextField = <T extends string>({
   required = false,
   big = false,
 }: {
-  register: (name: T, options?: RegisterOptions<FieldValues, T> | undefined) => UseFormRegisterReturn<T>
+  register: (name: T, options?: RegisterOptions<FieldValues, T>) => UseFormRegisterReturn<T>
   errors: FieldErrors<FieldValues>
   fieldName: T
   label: string
