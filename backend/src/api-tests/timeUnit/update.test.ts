@@ -98,11 +98,10 @@ describe('Time unit updating works', () => {
   })
 
   it('Updating that would cause a conflicting locality should fail with correct error', async () => {
-    const { body: resultBody, status: getReqStatus }   = await send('time-unit', 'PUT', {
+    const { body: resultBody, status: getReqStatus } = await send('time-unit', 'PUT', {
       timeUnit: { tu_name: 'baheantest', ...conflictingTimeUnit },
     })
     expect(getReqStatus).toEqual(403)
     expect(resultBody).toHaveProperty('cascadeErrors')
-  }
-  )
+  })
 })
