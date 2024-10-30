@@ -74,6 +74,7 @@ export const testDbConnection = async () => {
 // TODO this is very slow to execute, around 4500ms each time. Not good...
 export const resetTestDb = async () => {
   if (RUNNING_ENV !== 'dev') throw new Error(`Trying to reset test database with RUNNING_ENV ${RUNNING_ENV}`)
+  logger.info("Resetting test database...")
 
   const createTestConnection = (dbName: string) => {
     return mariadb.createConnection({
@@ -83,6 +84,7 @@ export const resetTestDb = async () => {
       checkDuplicate: false,
       multipleStatements: true,
       database: dbName,
+      trace: true,
     })
   }
 
