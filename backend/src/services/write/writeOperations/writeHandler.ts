@@ -120,9 +120,9 @@ export class WriteHandler extends DatabaseHandler {
   async logUpdatesAndComplete(authorizer: string, comment?: string, references?: Reference[]) {
     if (this.writeList.flatMap(writeItem => writeItem.items).length === 0) {
       logger.info(`No changes detected, skipping logging.`)
-      return
+    } else {
+      await logAllUpdates(this, this.writeList, this.table, this.idValue!, authorizer, this.type, comment, references)
     }
-    await logAllUpdates(this, this.writeList, this.table, this.idValue!, authorizer, this.type, comment, references)
     await this.commit()
     await this.end()
   }
