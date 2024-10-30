@@ -20,7 +20,7 @@ describe('Logging in', () => {
     expect(result.body.isFirstLogin).toEqual(undefined)
   })
 
-  it('is not successfull with missing data', async () => {
+  it('is not successful with missing data', async () => {
     const resultNoUsername = await send('user/login', 'POST', { password: 'test' })
     const resultNoPassword = await send('user/login', 'POST', { username: 'testSu' })
     expect(resultNoUsername.status).toEqual(403)
@@ -32,7 +32,7 @@ describe('Logging in', () => {
     expect(resultEmptyPassword.status).toEqual(403)
   })
 
-  it('is not successfull with incorrect password', async () => {
+  it('is not successful with incorrect password', async () => {
     const result = await send('user/login', 'POST', { username: 'testSu', password: 'Test' })
     expect(result.status).toEqual(403)
   })
