@@ -19,7 +19,7 @@ describe('Time unit updating works', () => {
     await login()
     // create the existing time unit that is edited
     await send<{ tu_name: string }>('time-unit', 'PUT', {
-      timeUnit: { tu_name: "baheantest", ...newTimeUnitBasis },
+      timeUnit: { tu_name: 'baheantest', ...newTimeUnitBasis },
     })
   })
   afterAll(async () => {
@@ -90,7 +90,7 @@ describe('Time unit updating works', () => {
     testLogRows(logRows, expectedLogRows, 2)
   })
 
-  it("Updating with duplicate data should succeed", async () => {
+  it('Updating with duplicate data should succeed', async () => {
     const result = await send('time-unit', 'PUT', {
       timeUnit: editedTimeUnit,
     })
