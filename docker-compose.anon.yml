@@ -5,6 +5,8 @@ services:
     build:
       context: ./frontend
       dockerfile: dev.Dockerfile
+    volumes:
+      - ./frontend/src:/usr/src/app/src
     ports:
       - 127.0.0.1:5173:5173
     env_file: .anon.env
@@ -19,9 +21,10 @@ services:
       - 127.0.0.1:4000:4000
     build:
       context: .
-      dockerfile: ./backend/Dockerfile
-      target: node-run
+      dockerfile: ./backend/dev.Dockerfile
     volumes:
+      - ./backend/src:/usr/src/app/backend/src
+      - ./frontend/src/:/usr/src/app/frontend/src/
       - ./test_data:/usr/src/app/test_data
     healthcheck:
       test: curl -f http://localhost:4000/test/ping || exit 1

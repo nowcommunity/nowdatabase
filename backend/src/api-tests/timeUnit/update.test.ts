@@ -10,12 +10,16 @@ const existingTimeUnit = { ...newTimeUnitBasis, tu_name: 'baheantest' }
 describe('Time unit updating works', () => {
   beforeAll(async () => {
     await resetDatabase()
+    await login()
+    await send<{ tu_name: string }>('time-unit', 'PUT', {
+      timeUnit: { ...newTimeUnitBasis },
+    })
   }, resetDatabaseTimeout)
   beforeEach(async () => {
     await login()
     // create the existing time unit that is edited
     await send<{ tu_name: string }>('time-unit', 'PUT', {
-      timeUnit: { ...newTimeUnitBasis },
+      timeUnit: { tu_name: 'baheantest', ...newTimeUnitBasis },
     })
   })
   afterAll(async () => {
@@ -84,5 +88,12 @@ describe('Time unit updating works', () => {
       },
     ]
     testLogRows(logRows, expectedLogRows, 2)
+  })
+
+  it('Updating with duplicate data should succeed', async () => {
+    const result = await send('time-unit', 'PUT', {
+      timeUnit: { tu_name: 'baheantest', ...newTimeUnitBasis },
+    })
+    expect(result.status).toEqual(200)
   })
 })
