@@ -1,10 +1,11 @@
+before('Reset database', () => {
+    cy.request(Cypress.env("databaseResetUrl"));
+});
+
 describe("Editing time unit", () => {
     beforeEach('Login as admin', () => {
         cy.login('testSu')
     })
-    beforeEach('Reset database', () => {
-        cy.request(Cypress.env("databaseResetUrl"));
-    });
     it("User editing time unit with correct values succeeds", () => {
         cy.visit(`/time-unit/bahean?tab=0`)
         cy.contains('Bahean')

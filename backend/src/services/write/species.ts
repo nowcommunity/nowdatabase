@@ -38,7 +38,6 @@ export const writeSpecies = async (
     await writeHandler.applyListChanges('now_ls', species.now_ls, ['lid', 'species_id'])
     await writeHandler.applyListChanges('com_taxa_synonym', species.com_taxa_synonym, ['synonym_id', 'species_id'])
     await writeHandler.logUpdatesAndComplete(authorizer, comment ?? '', references ?? [])
-    await writeHandler.commit()
 
     return species.species_id
   } catch (e) {
