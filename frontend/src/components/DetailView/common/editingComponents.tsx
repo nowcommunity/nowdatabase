@@ -200,6 +200,7 @@ export const EditableTextField = <T extends object>({
 }) => {
   const { setEditData, editData, validator } = useDetailContext<T>()
   const { error } = validator(editData, field)
+  const name = String(field)
 
   const editingComponent = (
     <TextField
@@ -215,6 +216,7 @@ export const EditableTextField = <T extends object>({
         }
         setEditData({ ...editData, [field]: parseFloat(value) })
       }}
+      id={`${name}-textfield`}
       value={editData[field] ?? ''}
       variant="outlined"
       size="small"

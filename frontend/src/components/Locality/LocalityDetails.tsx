@@ -61,7 +61,7 @@ export const LocalityDetails = () => {
     try {
       const { id } = await editLocalityRequest(editData).unwrap()
       setTimeout(() => navigate(`/locality/${id}`), 15)
-      notify('Edited item succesfully.')
+      notify('Edited item successfully.')
     } catch (e) {
       if (e && typeof e === 'object' && 'status' in e && e.status !== 403) {
         notify('Could not edit item. Error happened.', 'error')

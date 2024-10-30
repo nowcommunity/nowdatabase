@@ -55,7 +55,7 @@ export const TimeUnitDetails = () => {
     try {
       const { tu_name } = await editTimeUnitRequest(editData).unwrap()
       setTimeout(() => navigate(`/time-unit/${tu_name}`), 15)
-      notify('Edited item succesfully.')
+      notify('Edited item successfully.')
     } catch (e) {
       if (data) {
         setEditData(makeEditData(data))
