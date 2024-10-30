@@ -9,6 +9,7 @@ import {
   getTimeUnitLocalities,
   validateEntireTimeUnit,
 } from '../services/timeUnit'
+import { getTimeBoundDetails } from '../services/timeBound'
 import { deleteTimeUnit, writeTimeUnit } from '../services/write/timeUnit'
 import { fixBigInt } from '../utils/common'
 
@@ -42,7 +43,20 @@ router.put(
   requireOneOf([Role.Admin, Role.EditUnrestricted]),
   async (req: Request<object, object, { timeUnit: EditDataType<TimeUnitDetailsType> & EditMetaData }>, res) => {
     const { comment, references, ...editedTimeUnit } = req.body.timeUnit
-    const validationErrors = validateEntireTimeUnit(editedTimeUnit)
+
+    let validationUpBound = undefined
+    let validationLowBound = undefined
+    if (editedTimeUnit.up_bnd) {
+      validationUpBound = (await getTimeBoundDetails(editedTimeUnit.up_bnd)) ?? undefined
+    }
+    if (editedTimeUnit.low_bnd) {
+      validationLowBound = (await getTimeBoundDetails(editedTimeUnit.low_bnd)) ?? undefined
+    }
+    const validationErrors = validateEntireTimeUnit({
+      ...editedTimeUnit,
+      up_bound: validationUpBound,
+      low_bound: validationLowBound,
+    })
     if (validationErrors.length > 0) {
       return res.status(403).send(validationErrors)
     }
