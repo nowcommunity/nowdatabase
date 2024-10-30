@@ -1,6 +1,6 @@
 import { beforeEach, beforeAll, afterAll, describe, it, expect } from '@jest/globals'
 import { LogRow } from '../../services/write/writeOperations/types'
-import { login, logout, resetDatabase, send, testLogRows, resetDatabaseTimeout } from '../utils'
+import { login, logout, resetDatabase, send, testLogRows, resetDatabaseTimeout, noPermError } from '../utils'
 import { newTimeBoundBasis } from './data'
 import { TimeBoundDetailsType } from '../../../../frontend/src/backendTypes'
 import { pool } from '../../utils/db'
@@ -44,7 +44,7 @@ describe('Creating new time bound works', () => {
     const resultNoPerm = await send('time-bound', 'PUT', {
       timeBound: { ...newTimeBoundBasis },
     })
-    expect(resultNoPerm.body).toEqual({})
+    expect(resultNoPerm.body).toEqual(noPermError)
     expect(resultNoPerm.status).toEqual(403)
 
     logout()
@@ -52,7 +52,7 @@ describe('Creating new time bound works', () => {
     const resultEr = await send('time-bound', 'PUT', {
       timeBound: { ...newTimeBoundBasis },
     })
-    expect(resultEr.body).toEqual({})
+    expect(resultEr.body).toEqual(noPermError)
     expect(resultEr.status).toEqual(403)
   })
 

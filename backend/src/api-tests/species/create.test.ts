@@ -2,7 +2,7 @@ import { beforeEach, beforeAll, afterAll, describe, it, expect } from '@jest/glo
 import { LocalityDetailsType, SpeciesDetailsType } from '../../../../frontend/src/backendTypes'
 import { LogRow } from '../../services/write/writeOperations/types'
 import { newSpeciesBasis, newSpeciesWithoutRequiredFields } from './data'
-import { login, logout, resetDatabase, send, testLogRows, resetDatabaseTimeout } from '../utils'
+import { login, logout, resetDatabase, send, testLogRows, resetDatabaseTimeout, noPermError } from '../utils'
 import { pool } from '../../utils/db'
 
 let createdSpecies: SpeciesDetailsType | null = null
@@ -77,7 +77,7 @@ describe('Creating new species works', () => {
     const result1 = await send('species', 'PUT', {
       species: { ...newSpeciesBasis, comment: 'species test' },
     })
-    expect(result1.body).toEqual({})
+    expect(result1.body).toEqual(noPermError)
     expect(result1.status).toEqual(403)
 
     logout()
@@ -85,7 +85,7 @@ describe('Creating new species works', () => {
     const result2 = await send('species', 'PUT', {
       species: { ...newSpeciesBasis, comment: 'species test' },
     })
-    expect(result2.body).toEqual({})
+    expect(result2.body).toEqual(noPermError)
     expect(result2.status).toEqual(403)
   })
 })

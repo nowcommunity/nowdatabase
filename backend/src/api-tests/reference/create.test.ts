@@ -2,7 +2,7 @@ import { beforeEach, beforeAll, afterAll, describe, it, expect } from '@jest/glo
 import { ReferenceDetailsType } from '../../../../frontend/src/backendTypes'
 //import { LogRow } from '../../services/write/writeOperations/types'
 import { newReferenceBasis } from './data'
-import { login, logout, resetDatabase, send, /*testLogRows,*/ resetDatabaseTimeout } from '../utils'
+import { login, logout, resetDatabase, send, /*testLogRows,*/ resetDatabaseTimeout, noPermError } from '../utils'
 import { pool } from '../../utils/db'
 
 //let createdRef: ReferenceDetailsType | null = null
@@ -36,14 +36,14 @@ describe('Creating new reference works', () => {
     const { body: resultBodyNoPerm, status: resultStatusNoPerm } = await send('reference/', 'PUT', {
       reference: { ...newReferenceBasis },
     })
-    expect(resultBodyNoPerm).toEqual({})
+    expect(resultBodyNoPerm).toEqual(noPermError)
     expect(resultStatusNoPerm).toEqual(403)
 
     await login('testEr')
     const { body: resultBodyEr, status: resultStatusEr } = await send('reference/', 'PUT', {
       reference: { ...newReferenceBasis },
     })
-    expect(resultBodyEr).toEqual({})
+    expect(resultBodyEr).toEqual(noPermError)
     expect(resultStatusEr).toEqual(403)
   })
   /*
