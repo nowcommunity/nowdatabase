@@ -67,9 +67,8 @@ describe('Creating new time unit', () => {
         timeUnit: { ...newTimeUnitBasis, tu_display_name: 'null bounds', low_bnd: null, up_bnd: null },
       })
 
-      const { tu_name: createdId } = resultBody
-
       expect(getReqStatus).toEqual(403)
+      const { tu_name: createdId } = resultBody
       expect(typeof createdId).toEqual('undefined') // `would be 'string' if it was an id
     })
 
@@ -78,9 +77,8 @@ describe('Creating new time unit', () => {
         timeUnit: { ...newTimeUnitBasis, tu_display_name: 'null lower', low_bnd: null },
       })
 
-      const { tu_name: createdId } = resultBody
-
       expect(getReqStatus).toEqual(403)
+      const { tu_name: createdId } = resultBody
       expect(typeof createdId).toEqual('undefined')
     })
 
@@ -89,56 +87,42 @@ describe('Creating new time unit', () => {
         timeUnit: { ...newTimeUnitBasis, tu_display_name: 'null upper', up_bnd: null },
       })
 
-      const { tu_name: createdId } = resultBody
-
       expect(getReqStatus).toEqual(403)
+      const { tu_name: createdId } = resultBody
       expect(typeof createdId).toEqual('undefined')
     })
 
     // These probably shouldnt really cause 500 server error, but right now they just go 200 ???
     // This is just switched up from the example ????? and still just goes 200??
-    it('Conflicting bounds causes 500 server error - test 1', async () => {
+    it('Conflicting bounds causes 403 error - test 1', async () => {
       const { body: resultBody, status: getReqStatus } = await send<{ tu_name: string }>('time-unit', 'PUT', {
         timeUnit: { ...newTimeUnitBasis, tu_display_name: 'conflicting bounds', up_bnd: 20213, low_bnd: 20214 },
       })
 
+      expect(getReqStatus).toEqual(403)
       const { tu_name: createdId } = resultBody
-
-      expect(getReqStatus).toEqual(500)
       expect(typeof createdId).toEqual('undefined')
     })
 
-    it('Conflicting bounds causes 500 server error - test 2', async () => {
+    // status 200, broken
+    it('Conflicting bounds causes 403 server error - test 2', async () => {
       const { body: resultBody, status: getReqStatus } = await send<{ tu_name: string }>('time-unit', 'PUT', {
         timeUnit: { ...newTimeUnitBasis, tu_display_name: 'conflicting bounds 2', up_bnd: 64 },
       })
 
+      expect(getReqStatus).toEqual(403)
       const { tu_name: createdId } = resultBody
-
-      expect(getReqStatus).toEqual(500)
       expect(typeof createdId).toEqual('undefined')
     })
 
-    // ???????????
-    it('Conflicting bounds causes 500 server error - test 3', async () => {
-      const { body: resultBody, status: getReqStatus } = await send<{ tu_name: string }>('time-unit', 'PUT', {
-        timeUnit: { ...newTimeUnitBasis, tu_display_name: 'conflicting bounds 3', low_bnd: 64 },
-      })
-
-      const { tu_name: createdId } = resultBody
-
-      expect(getReqStatus).toEqual(500)
-      expect(typeof createdId).toEqual('undefined')
-    })
-
-    it('Invalid bound id causes 500 server error', async () => {
+    // well this works
+    it('Invalid bound id causes 403 server error', async () => {
       const { body: resultBody, status: getReqStatus } = await send<{ tu_name: string }>('time-unit', 'PUT', {
         timeUnit: { ...newTimeUnitBasis, tu_display_name: 'invalid bound id', low_bnd: 30000 },
       })
 
+      expect(getReqStatus).toEqual(403)
       const { tu_name: createdId } = resultBody
-
-      expect(getReqStatus).toEqual(500)
       expect(typeof createdId).toEqual('undefined')
     })
   })

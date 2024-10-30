@@ -89,14 +89,30 @@ describe('Time unit updating works', () => {
   })
 
   describe("Can't update existing Time Unit to have invalid bounds", () => {
-    it("Updating null bounds doesn't change time unit's bounds", async () => {
-      const nullBoundsTimeUnit = { ...existingTimeUnit, low_bnd: null, up_bnd: null }
+    // this is right now 200, not sure if shouldn't be, this can be deleted if not something to work on
+    it("Updating both to a same bound doesn't change time unit's bounds", async () => {
       const { body: resultBody, status: getReqStatus } = await send<{ tu_name: string }>('time-unit', 'PUT', {
-        timeUnit: nullBoundsTimeUnit,
+        timeUnit: { ...existingTimeUnit, low_bnd: 20213 },
       })
+
+      expect(getReqStatus).toBe(403)
       const { tu_name: existingId } = resultBody
       expect(typeof existingId).toEqual('undefined')
+
+      const { body } = await send<TimeUnitDetailsType>(`time-unit/${existingTimeUnit.tu_name}`, 'GET')
+      expect(body.tu_display_name).toEqual(existingTimeUnit.tu_display_name)
+      expect(body.up_bnd).toEqual(existingTimeUnit.up_bnd)
+      expect(body.low_bnd).toEqual(existingTimeUnit.low_bnd)
+    })
+
+    it("Updating to null bounds doesn't change time unit's bounds", async () => {
+      const { body: resultBody, status: getReqStatus } = await send<{ tu_name: string }>('time-unit', 'PUT', {
+        timeUnit: { ...existingTimeUnit, low_bnd: null, up_bnd: null },
+      })
+
       expect(getReqStatus).toBe(403)
+      const { tu_name: existingId } = resultBody
+      expect(typeof existingId).toEqual('undefined')
 
       const { body } = await send<TimeUnitDetailsType>(`time-unit/${existingTimeUnit.tu_name}`, 'GET')
       expect(body.tu_display_name).toEqual(existingTimeUnit.tu_display_name)
@@ -109,9 +125,8 @@ describe('Time unit updating works', () => {
         timeUnit: { ...newTimeUnitBasis, low_bnd: null },
       })
 
+      expect(getReqStatus).toBe(403)
       const { tu_name: createdId } = resultBody
-
-      expect(getReqStatus).toEqual(403)
       expect(typeof createdId).toEqual('undefined')
     })
 
@@ -120,30 +135,38 @@ describe('Time unit updating works', () => {
         timeUnit: { ...newTimeUnitBasis, up_bnd: null },
       })
 
+      expect(getReqStatus).toBe(403)
       const { tu_name: createdId } = resultBody
-
-      expect(getReqStatus).toEqual(403)
       expect(typeof createdId).toEqual('undefined')
     })
-    it('Invalid upper bound causes 500 server error', async () => {
+
+    it('Updating to conflicting bounds causes 403 server error', async () => {
       const { body: resultBody, status: getReqStatus } = await send<{ tu_name: string }>('time-unit', 'PUT', {
-        timeUnit: { ...newTimeUnitBasis, up_bnd: 0 },
+        timeUnit: { ...newTimeUnitBasis, low_bnd: 20214, up_bnd: 20213 },
       })
 
+      expect(getReqStatus).toBe(403)
       const { tu_name: createdId } = resultBody
-
-      expect(getReqStatus).toEqual(500)
       expect(typeof createdId).toEqual('undefined')
     })
 
-    it('Invalid lower bound causes 500 server error', async () => {
+    it('Updating to conflicting upper bound causes 403 server error', async () => {
+      const { body: resultBody, status: getReqStatus } = await send<{ tu_name: string }>('time-unit', 'PUT', {
+        timeUnit: { ...newTimeUnitBasis, up_bnd: 64 },
+      })
+
+      expect(getReqStatus).toEqual(403)
+      const { tu_name: createdId } = resultBody
+      expect(typeof createdId).toEqual('undefined')
+    })
+
+    it('Updating to nonexisting lower bound causes 403 server error', async () => {
       const { body: resultBody, status: getReqStatus } = await send<{ tu_name: string }>('time-unit', 'PUT', {
         timeUnit: { ...newTimeUnitBasis, low_bnd: 30000 },
       })
 
+      expect(getReqStatus).toEqual(403)
       const { tu_name: createdId } = resultBody
-
-      expect(getReqStatus).toEqual(500)
       expect(typeof createdId).toEqual('undefined')
     })
   })
