@@ -54,7 +54,6 @@ type LocalityPreFilter = {
 export const getAllLocalities = async (user?: User) => {
   const showAll = user && [Role.Admin, Role.EditUnrestricted].includes(user.role)
   const removeProjects: (loc: LocalityPreFilter) => Omit<LocalityPreFilter, 'now_plr'> = loc => {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { now_plr, ...rest } = loc
     return rest
   }
