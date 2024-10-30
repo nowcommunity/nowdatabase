@@ -51,7 +51,7 @@ export const send = async <T extends Record<string, unknown>>(
       break
   }
 
-  if (response.status >= 400) return { body: {} as T, status: response.status }
+  if (response.status >= 500) return { body: {} as T, status: response.status }
   return { body: response.body as unknown as T, status: response.status }
 }
 
@@ -98,3 +98,5 @@ export const resetDatabase = async () => {
 }
 
 export const resetDatabaseTimeout: number = 20000
+
+export const noPermError = { message: 'User not authorized for the requested resource or action' }
