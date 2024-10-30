@@ -92,7 +92,7 @@ describe('Time unit updating works', () => {
 
   it('Updating with duplicate data should succeed', async () => {
     const result = await send('time-unit', 'PUT', {
-      timeUnit: editedTimeUnit,
+      timeUnit: { tu_name: 'baheantest', ...newTimeUnitBasis },
     })
     expect(result.status).toEqual(200)
   })
