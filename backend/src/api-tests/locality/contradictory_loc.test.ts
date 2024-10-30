@@ -41,8 +41,8 @@ describe('Min and max age checks work', () => {
 
     expect(writeResult.status).toEqual(403)
     expect(writeResult.body).toEqual([
-      { "error": "Min value cannot be higher than max", "name": "Age (min)" },
-      { "error": "Max value cannot be lower than min", "name": "Age (max)" }
+      { error: "Min value cannot be higher than max", "name": "Age (min)" },
+      { error: "Max value cannot be lower than min", "name": "Age (max)" }
     ])
   })
 })
