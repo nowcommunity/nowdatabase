@@ -1,6 +1,6 @@
 import { beforeEach, beforeAll, afterAll, describe, it, expect } from '@jest/globals'
 import { LogRow } from '../../services/write/writeOperations/types'
-import { login, resetDatabase, send, testLogRows, resetDatabaseTimeout } from '../utils'
+import { login, logout, resetDatabase, send, testLogRows, resetDatabaseTimeout, noPermError } from '../utils'
 import { newTimeBoundBasis } from './data'
 import { TimeBoundDetailsType } from '../../../../frontend/src/backendTypes'
 import { pool } from '../../utils/db'
@@ -37,6 +37,23 @@ describe('Creating new time bound works', () => {
     expect(b_name).toEqual(newTimeBoundBasis.b_name) // 'Name is different than expected')
     expect(age).toEqual(newTimeBoundBasis.age) // 'Age differs'
     expect(b_comment).toEqual(newTimeBoundBasis.b_comment) // 'Comment differs'
+  })
+
+  it('Creation fails without permissions', async () => {
+    logout()
+    const resultNoPerm = await send('time-bound', 'PUT', {
+      timeBound: { ...newTimeBoundBasis },
+    })
+    expect(resultNoPerm.body).toEqual(noPermError)
+    expect(resultNoPerm.status).toEqual(403)
+
+    logout()
+    await login('testEr', 'test')
+    const resultEr = await send('time-bound', 'PUT', {
+      timeBound: { ...newTimeBoundBasis },
+    })
+    expect(resultEr.body).toEqual(noPermError)
+    expect(resultEr.status).toEqual(403)
   })
 
   it('Update logs are correct', () => {

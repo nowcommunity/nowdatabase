@@ -38,7 +38,6 @@ export const writeSpecies = async (
     await writeHandler.applyListChanges('now_ls', species.now_ls, ['lid', 'species_id'])
     await writeHandler.applyListChanges('com_taxa_synonym', species.com_taxa_synonym, ['synonym_id', 'species_id'])
     await writeHandler.logUpdatesAndComplete(authorizer, comment ?? '', references ?? [])
-    await writeHandler.commit()
 
     return species.species_id
   } catch (e) {
@@ -49,7 +48,6 @@ export const writeSpecies = async (
 
 export const deleteSpecies = async (species_id: number, user: User) => {
   const species = (await getSpeciesDetails(species_id)) as EditDataType<FixBigInt<SpeciesDetailsType>>
-  species.now_sau[0].updates
   if (!species) throw new Error('Species not found')
 
   const writeHandler = getSpeciesWriteHandler('delete')

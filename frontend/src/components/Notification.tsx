@@ -11,6 +11,8 @@ export type NotificationContext = {
   severity?: Severity
 }
 
+// this wasn't spotted earlier due to a (now fixed) bug in the eslint react-refresh plugin
+// eslint-disable-next-line react-refresh/only-export-components
 export const NotificationContext = createContext<NotificationContext>(null!)
 
 export const NotificationContextProvider = ({ children }: { children: ReactNode | ReactNode[] }) => {

@@ -2,6 +2,8 @@ FROM node:20-alpine3.16
 
 ENV TZ="Europe/Helsinki"
 
+RUN apk --no-cache add curl
+
 USER node
 WORKDIR /usr/src/app
 

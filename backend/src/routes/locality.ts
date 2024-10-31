@@ -29,7 +29,7 @@ router.put(
     if (validationErrors.length > 0) {
       return res.status(403).send(validationErrors)
     }
-    const result = await writeLocality(editedLocality, comment, references, req.user!.initials)
+    const result = await writeLocality(editedLocality, comment, references, req.user)
     return res.status(200).send({ id: result })
   }
 )

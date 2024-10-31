@@ -6,7 +6,6 @@ export const errorHandler = (
   error: Error,
   _req: express.Request,
   res: express.Response,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   _next: express.NextFunction
 ) => {
   if ('status' in error && error.status !== 500) {

@@ -1,7 +1,7 @@
 import { describe, it, beforeEach, beforeAll, afterAll, expect } from '@jest/globals'
 import { TimeUnitDetailsType } from '../../../../frontend/src/backendTypes'
 import { login, resetDatabase, send, resetDatabaseTimeout, testLogRows } from '../utils'
-import { editedTimeUnit, newTimeUnitBasis } from './data'
+import { editedTimeUnit, newTimeUnitBasis, conflictingTimeUnit } from './data'
 import { pool } from '../../utils/db'
 import { LogRow } from '../../services/write/writeOperations/types'
 
@@ -10,12 +10,16 @@ const existingTimeUnit = { ...newTimeUnitBasis, tu_name: 'baheantest' }
 describe('Time unit updating works', () => {
   beforeAll(async () => {
     await resetDatabase()
+    await login()
+    await send<{ tu_name: string }>('time-unit', 'PUT', {
+      timeUnit: { ...newTimeUnitBasis },
+    })
   }, resetDatabaseTimeout)
   beforeEach(async () => {
     await login()
     // create the existing time unit that is edited
     await send<{ tu_name: string }>('time-unit', 'PUT', {
-      timeUnit: { ...newTimeUnitBasis },
+      timeUnit: { tu_name: 'baheantest', ...newTimeUnitBasis },
     })
   })
   afterAll(async () => {
@@ -169,5 +173,20 @@ describe('Time unit updating works', () => {
       const { tu_name: createdId } = resultBody
       expect(typeof createdId).toEqual('undefined')
     })
+  })
+
+  it('Updating with duplicate data should succeed', async () => {
+    const result = await send('time-unit', 'PUT', {
+      timeUnit: { tu_name: 'baheantest', ...newTimeUnitBasis },
+    })
+    expect(result.status).toEqual(200)
+  })
+
+  it('Updating that would cause a conflicting locality should fail with correct error', async () => {
+    const { body: resultBody, status: getReqStatus } = await send('time-unit', 'PUT', {
+      timeUnit: { tu_name: 'baheantest', ...conflictingTimeUnit },
+    })
+    expect(getReqStatus).toEqual(403)
+    expect(resultBody).toHaveProperty('cascadeErrors')
   })
 })

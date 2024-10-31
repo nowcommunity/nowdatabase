@@ -2,7 +2,7 @@ import { beforeEach, beforeAll, afterAll, describe, it, expect } from '@jest/glo
 import { LocalityDetailsType, SpeciesDetailsType } from '../../../../frontend/src/backendTypes'
 import { LogRow } from '../../services/write/writeOperations/types'
 import { newLocalityBasis } from './data'
-import { login, resetDatabase, send, testLogRows, resetDatabaseTimeout } from '../utils'
+import { login, logout, resetDatabase, send, testLogRows, resetDatabaseTimeout, noPermError } from '../utils'
 import { pool } from '../../utils/db'
 
 let createdLocality: LocalityDetailsType | null = null
@@ -40,6 +40,23 @@ describe('Creating new locality works', () => {
     expect(!!newSpecies).toEqual(true) // 'New species not found'
     const oldSpecies = now_ls.find(ls => ls.species_id === 21052 && ls.lid === createdLocality!.lid)
     expect(!!oldSpecies).toEqual(true) // 'Old species not found'
+  })
+
+  it('Creation fails without permissions', async () => {
+    logout()
+    const resultNoPerm = await send('locality', 'PUT', {
+      locality: { ...newLocalityBasis },
+    })
+    expect(resultNoPerm.body).toEqual(noPermError)
+    expect(resultNoPerm.status).toEqual(403)
+
+    logout()
+    await login('testEr', 'test')
+    const resultEr = await send('locality', 'PUT', {
+      locality: { ...newLocalityBasis },
+    })
+    expect(resultEr.body).toEqual(noPermError)
+    expect(resultEr.status).toEqual(403)
   })
 
   it('Species update also logged correctly', async () => {

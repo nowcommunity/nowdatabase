@@ -177,7 +177,13 @@ export const DetailView = <T extends object>({
               </Button>
             )}
             {editRights.delete && !isNew && (
-              <Button onClick={onDelete} variant="contained" sx={{ width: '8em', color: 'white' }} color="error">
+              <Button
+                id="delete-button"
+                onClick={onDelete}
+                variant="contained"
+                sx={{ width: '8em', color: 'white' }}
+                color="error"
+              >
                 Delete
               </Button>
             )}

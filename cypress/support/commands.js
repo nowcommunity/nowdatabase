@@ -24,7 +24,7 @@
 // -- This will overwrite an existing command --
 // Cypress.Commands.overwrite('visit', (originalFn, url, options) => { ... })
 
-Cypress.Commands.add('login', (username) => {
+Cypress.Commands.add('login', username => {
   cy.clearLocalStorage()
   cy.visit('/login')
   cy.contains('Login').click()
@@ -34,11 +34,11 @@ Cypress.Commands.add('login', (username) => {
   cy.contains(`Logged in as ${username}`)
 })
 
-Cypress.Commands.add('pageForbidden', (url) => {
+Cypress.Commands.add('pageForbidden', url => {
   cy.visit(url)
   cy.contains('Your user is not authorized to view this page.')
 })
 
-Cypress.Commands.add("resetDatabase", () => {
-    cy.task("resetDatabase")
+Cypress.Commands.add('resetDatabase', () => {
+  cy.task('resetDatabase')
 })

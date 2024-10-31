@@ -1,7 +1,7 @@
 import { beforeEach, beforeAll, afterAll, describe, it, expect } from '@jest/globals'
 import { TimeUnitDetailsType } from '../../../../frontend/src/backendTypes'
 import { LogRow } from '../../services/write/writeOperations/types'
-import { login, resetDatabase, send, testLogRows, resetDatabaseTimeout } from '../utils'
+import { login, logout, resetDatabase, send, testLogRows, resetDatabaseTimeout, noPermError } from '../utils'
 import { newTimeUnitBasis } from './data'
 import { pool } from '../../utils/db'
 
@@ -59,6 +59,22 @@ describe('Creating new time unit', () => {
       ]
       testLogRows(logRows, expectedLogRows, 7)
     })
+  })
+  it('Creation fails without permissions', async () => {
+    logout()
+    const resultNoPerm = await send('time-unit', 'PUT', {
+      timeUnit: { ...newTimeUnitBasis },
+    })
+    expect(resultNoPerm.body).toEqual(noPermError)
+    expect(resultNoPerm.status).toEqual(403)
+
+    logout()
+    await login('testEr', 'test')
+    const resultEr = await send('time-unit', 'PUT', {
+      timeUnit: { ...newTimeUnitBasis },
+    })
+    expect(resultEr.body).toEqual(noPermError)
+    expect(resultEr.status).toEqual(403)
   })
 
   describe('Creating is NOT successful with invalid bounds', () => {

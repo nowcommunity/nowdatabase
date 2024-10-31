@@ -1,8 +1,9 @@
-import { describe, it, beforeAll, beforeEach, expect } from '@jest/globals'
+import { describe, it, beforeAll, afterAll, beforeEach, expect } from '@jest/globals'
 import { editedTimeBound, newTimeBoundBasis } from './data'
 import { send, resetDatabase, login, resetDatabaseTimeout, testLogRows } from '../utils'
 import { TimeBoundDetailsType } from '../../../../frontend/src/backendTypes'
 import { LogRow } from '../../services/write/writeOperations/types'
+import { pool } from '../../utils/db'
 
 const existingTimeBound = { ...newTimeBoundBasis, bid: 11 }
 
@@ -13,6 +14,10 @@ describe('Time bound updating', () => {
   beforeEach(async () => {
     await login()
   })
+  afterAll(async () => {
+    await pool.end()
+  })
+
   it('Update request with valid timebound succeeds and returns valid number id', async () => {
     const { body: resultBody } = await send<{ bid: number }>('time-bound', 'PUT', {
       timeBound: editedTimeBound,

@@ -6,6 +6,7 @@ import Prisma from '../../prisma/generated/now_test_client'
 import { AccessError } from '../middlewares/authorizer'
 import { fixBigInt } from '../utils/common'
 import { logDb, nowDb } from '../utils/db'
+import { logger } from '../utils/logger'
 
 const getIdsOfUsersProjects = async (user: User) => {
   const usersProjects = await nowDb.now_proj_people.findMany({
@@ -53,7 +54,6 @@ type LocalityPreFilter = {
 export const getAllLocalities = async (user?: User) => {
   const showAll = user && [Role.Admin, Role.EditUnrestricted].includes(user.role)
   const removeProjects: (loc: LocalityPreFilter) => Omit<LocalityPreFilter, 'now_plr'> = loc => {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { now_plr, ...rest } = loc
     return rest
   }
@@ -174,4 +174,38 @@ export const validateEntireLocality = (editedFields: EditDataType<Prisma.now_loc
     if (error.error) errors.push(error)
   }
   return errors
+}
+
+export const filterDuplicateLocalitySpecies = async (
+  locality: EditDataType<LocalityDetailsType>,
+  user: User | undefined
+) => {
+  if (!locality.lid) return
+
+  // Get existing data of locality
+  const localityDetails = await getLocalityDetails(locality.lid, user)
+  if (!localityDetails) return
+
+  // Get all pre-existing species_ids from current locality
+  const localityDetailsSpeciesIds: number[] = []
+  for (const localitySpecies of localityDetails.now_ls) {
+    localityDetailsSpeciesIds.push(localitySpecies.species_id)
+  }
+
+  // Compare if the species already exists and that we are trying to add it again
+  // and filter those cases out
+  const updatedLocalityNow_ls = locality.now_ls.filter(localitySpecies => {
+    if (localitySpecies.species_id) {
+      // Logic is flipped for filter as we want to skip the ones the check matches
+      return !(localityDetailsSpeciesIds.includes(localitySpecies.species_id) && localitySpecies.rowState === 'new')
+    }
+
+    // code shouldn't get here ever
+    logger.info(
+      `Filter already existing species: localitySpecies didn't have species_id. Skipping. ${JSON.stringify(localitySpecies)}`
+    )
+    return false
+  })
+
+  return updatedLocalityNow_ls
 }

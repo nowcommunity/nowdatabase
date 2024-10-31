@@ -40,6 +40,9 @@ describe('Min and max age checks work', () => {
     const writeResult = await send<{ id: number }>('locality', 'PUT', { locality: locality })
 
     expect(writeResult.status).toEqual(403)
-    expect(writeResult.body).toEqual({})
+    expect(writeResult.body).toEqual([
+      { error: 'Min value cannot be higher than max', name: 'Age (min)' },
+      { error: 'Max value cannot be lower than min', name: 'Age (max)' },
+    ])
   })
 })

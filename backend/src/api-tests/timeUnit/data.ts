@@ -24,3 +24,16 @@ export const editedTimeUnit: EditDataType<TimeUnitDetailsType & EditMetaData> = 
   comment: 'test updating time unit',
   references: [{ rid: 24188 } as Reference],
 }
+
+export const conflictingTimeUnit: EditDataType<TimeUnitDetailsType & EditMetaData> = {
+  tu_name: 'olduvai',
+  tu_display_name: 'Olduvai',
+  up_bnd: 11,
+  low_bnd: 14,
+  rank: 'Subchron',
+  sequence: 'magneticpolarityts',
+  tu_comment: 'C2n',
+  now_tau: [],
+  comment: 'test updating time unit',
+  references: [{ rid: 24188 } as Reference],
+}
