@@ -33,7 +33,7 @@ describe('Locality update works', () => {
 
   it('Added locality species is found', () => {
     resultLocality!.now_ls.find(ls => {
-      ls.species_id === 21052 && ls.lid === 21050
+      return ls.species_id === 21052 && ls.lid === 21050
     }) //'Added locality species not found'
     expect(!!resultLocality).toEqual(true)
   })

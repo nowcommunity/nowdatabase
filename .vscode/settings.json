@@ -3,9 +3,6 @@
   "editor.codeActionsOnSave": {
     "source.fixAll.eslint": "explicit"
   },
-  "eslint.options": {
-    "extensions": [".js", ".jsx", ".ts", ".tsx"]
-  },
   "eslint.workingDirectories": [
     { "directory": "./frontend", "changeProcessCWD": true },
     { "directory": "./backend", "changeProcessCWD": true }
