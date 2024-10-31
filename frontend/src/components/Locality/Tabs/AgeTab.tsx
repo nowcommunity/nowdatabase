@@ -1,5 +1,5 @@
 import { LocalityDetailsType, TimeUnitDetailsType } from '@/backendTypes'
-import { FieldWithTableSelection } from '@/components/DetailView/common/editingComponents'
+import { BasisForAgeSelection } from '@/components/DetailView/common/editingComponents'
 import { emptyOption } from '@/components/DetailView/common/misc'
 import { ArrayFrame, HalfFrames } from '@/components/DetailView/common/tabLayoutHelpers'
 import { useDetailContext } from '@/components/DetailView/Context/DetailContext'
@@ -57,14 +57,15 @@ export const AgeTab = () => {
       'Minimum age',
       textField('min_age', { type: 'number', round: 3, readonly: editData.date_meth === 'time_unit' }),
       dropdown('bfa_min_abs', bfa_abs_options, 'Min Basis for age (absolute)', editData.date_meth === 'time_unit'),
-      <FieldWithTableSelection<TimeUnitDetailsType, LocalityDetailsType>
+      <BasisForAgeSelection<TimeUnitDetailsType, LocalityDetailsType>
         key="bfa_min"
         sourceField="tu_name"
         targetField="bfa_min"
+        lowBoundField="low_bound"
+        upBoundField="up_bound"
+        fraction={editData.frac_min}
         selectorTable={<TimeUnitTable />}
         disabled={editData.date_meth === 'absolute'}
-        secondarySourceField="up_bound"
-        secondaryTargetField="min_age"
       />,
       dropdown('frac_min', fracOptions, 'Minimum fraction', editData.date_meth === 'absolute'),
     ],
@@ -72,14 +73,15 @@ export const AgeTab = () => {
       'Maximum age',
       textField('max_age', { type: 'number', round: 3, readonly: editData.date_meth === 'time_unit' }),
       dropdown('bfa_max_abs', bfa_abs_options, 'Max Basis for age (absolute)', editData.date_meth === 'time_unit'),
-      <FieldWithTableSelection<TimeUnitDetailsType, LocalityDetailsType>
+      <BasisForAgeSelection<TimeUnitDetailsType, LocalityDetailsType>
         key="bfa_max"
         sourceField="tu_name"
         targetField="bfa_max"
+        lowBoundField="low_bound"
+        upBoundField="up_bound"
+        fraction={editData.frac_max}
         selectorTable={<TimeUnitTable />}
         disabled={editData.date_meth === 'absolute'}
-        secondarySourceField="low_bound"
-        secondaryTargetField="max_age"
       />,
       dropdown('frac_max', fracOptions, 'Maximum fraction', editData.date_meth === 'absolute'),
     ],
