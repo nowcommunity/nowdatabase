@@ -51,6 +51,7 @@ export const SpeciesDetails = () => {
   const onWrite = async (editData: EditDataType<SpeciesDetailsType>) => {
     try {
       const { species_id } = await editSpeciesRequest(editData).unwrap()
+      notify('Saved species entry successfully.')
       setTimeout(() => navigate(`/species/${species_id}`), 15)
     } catch (e) {
       const error = e as ValidationErrors
