@@ -14,15 +14,18 @@ export const WriteButton = <T,>({
   onWrite: (editData: EditDataType<T>, setEditData: (editData: EditDataType<T>) => void) => Promise<void>
   hasStagingMode?: boolean
 }) => {
-  const { editData, setEditData, mode, setMode } = useDetailContext<T>()
+  const { editData, setEditData, mode, setMode, allErrors } = useDetailContext<T>()
   const [loading, setLoading] = useState(false)
+  //console.log(hasError)
 
   const getButtonText = () => {
     if (!mode.staging) return hasStagingMode ? 'Finalize entry' : 'Save changes'
     return 'Complete and save'
   }
+
   return (
     <Button
+      disabled={allErrors.length > 0}
       id="write-button"
       sx={{ width: '20em' }}
       onClick={() => {
