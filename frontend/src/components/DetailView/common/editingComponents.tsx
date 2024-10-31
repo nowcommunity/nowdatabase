@@ -189,6 +189,7 @@ export const EditableTextField = <T extends object>({
   round,
   big = false,
   disabled = false,
+  readonly = false,
   changeSetter,
 }: {
   field: keyof EditDataType<T>
@@ -196,6 +197,7 @@ export const EditableTextField = <T extends object>({
   round?: number
   big?: boolean
   disabled?: boolean
+  readonly?: boolean
   changeSetter?: React.Dispatch<React.SetStateAction<number>>
 }) => {
   const { setEditData, editData, validator } = useDetailContext<T>()
@@ -225,6 +227,7 @@ export const EditableTextField = <T extends object>({
       type={type}
       multiline={big}
       disabled={disabled}
+      InputProps={readonly ? { readOnly: true } : { readOnly: false }}
     />
   )
 

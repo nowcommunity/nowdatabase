@@ -55,7 +55,7 @@ export const AgeTab = () => {
     ['', 'Age (Ma)', 'Basis for age (Absolute)', 'Basis for age (Time Unit)', 'Basis for age (Fraction)'],
     [
       'Minimum age',
-      textField('min_age', { type: 'number', round: 3 }),
+      textField('min_age', { type: 'number', round: 3, readonly: editData.date_meth === 'time_unit' }),
       dropdown('bfa_min_abs', bfa_abs_options, 'Min Basis for age (absolute)', editData.date_meth === 'time_unit'),
       <FieldWithTableSelection<TimeUnitDetailsType, LocalityDetailsType>
         key="bfa_min"
@@ -70,7 +70,7 @@ export const AgeTab = () => {
     ],
     [
       'Maximum age',
-      textField('max_age', { type: 'number', round: 3 }),
+      textField('max_age', { type: 'number', round: 3, readonly: editData.date_meth === 'time_unit' }),
       dropdown('bfa_max_abs', bfa_abs_options, 'Max Basis for age (absolute)', editData.date_meth === 'time_unit'),
       <FieldWithTableSelection<TimeUnitDetailsType, LocalityDetailsType>
         key="bfa_max"
