@@ -29,6 +29,7 @@ export default [
       '**/vite.config.ts',
       '**/vite-env.d.ts',
       '**/jest.config.ts',
+      '**/coverage',
     ],
   },
   ...fixupConfigRules(
