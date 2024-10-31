@@ -16,7 +16,6 @@ export const WriteButton = <T,>({
 }) => {
   const { editData, setEditData, mode, setMode, allErrors } = useDetailContext<T>()
   const [loading, setLoading] = useState(false)
-  //console.log(hasError)
 
   const getButtonText = () => {
     if (!mode.staging) return hasStagingMode ? 'Finalize entry' : 'Save changes'

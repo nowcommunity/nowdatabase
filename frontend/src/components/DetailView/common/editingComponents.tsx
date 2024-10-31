@@ -55,11 +55,11 @@ export const DropdownSelector = <T extends object>({
 
   useEffect(() => {
     if (error && !allErrors.includes(String(field))) {
-      setAllErrors(allErrors.concat([String(field)]))
-    } else {
-      setAllErrors(allErrors.filter(fi => fi !== String(field)))
+      setAllErrors([...allErrors.concat([String(field)])])
+    } else if (!error && allErrors.includes(String(field))) {
+      setAllErrors([...allErrors.filter(fi => fi !== String(field))])
     }
-  }, [error])
+  }, [error, allErrors])
 
   const editingComponent = (
     <FormControl size="small" error={!!error}>
@@ -214,11 +214,11 @@ export const EditableTextField = <T extends object>({
 
   useEffect(() => {
     if (error && !allErrors.includes(String(field))) {
-      setAllErrors(allErrors.concat([String(field)]))
-    } else {
-      setAllErrors(allErrors.filter(fi => fi !== String(field)))
+      setAllErrors([...allErrors.concat([String(field)])])
+    } else if (!error && allErrors.includes(String(field))) {
+      setAllErrors([...allErrors.filter(fi => fi !== String(field))])
     }
-  }, [error])
+  }, [error, allErrors])
 
   const editingComponent = (
     <TextField
@@ -270,11 +270,11 @@ export const FieldWithTableSelection = <T extends object, ParentType extends obj
 
   useEffect(() => {
     if (error && !allErrors.includes(String(targetField))) {
-      setAllErrors(allErrors.concat([String(targetField)]))
-    } else {
-      setAllErrors(allErrors.filter(fi => fi !== String(targetField)))
+      setAllErrors([...allErrors.concat([String(targetField)])])
+    } else if (!error && allErrors.includes(String(targetField))) {
+      setAllErrors([...allErrors.filter(fi => fi !== String(targetField))])
     }
-  }, [error])
+  }, [error, allErrors])
 
   const selectorTableWithFn = cloneElement(selectorTable, { selectorFn })
   if (open)
@@ -339,11 +339,11 @@ export const TimeBoundSelection = <T extends object, ParentType extends object>(
 
   useEffect(() => {
     if (boundError && !allErrors.includes(String(targetField))) {
-      setAllErrors(allErrors.concat([String(targetField)]))
-    } else {
-      setAllErrors(allErrors.filter(fi => fi !== String(targetField)))
+      setAllErrors([...allErrors.concat([String(targetField)])])
+    } else if (!boundError && allErrors.includes(String(targetField))) {
+      setAllErrors([...allErrors.filter(fi => fi !== String(targetField))])
     }
-  }, [boundError])
+  }, [boundError, allErrors])
 
   const selectorTableWithFn = cloneElement(selectorTable, { selectorFn })
   if (open)
