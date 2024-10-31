@@ -99,7 +99,7 @@ describe('Creating a new locality...', () => {
     cy.contains('This field is required')
     cy.get('[id=write-button]').click()
     cy.get('[id=write-button]').click()
-    cy.contains('Could not save item.')
+    cy.contains('Following validators failed: ')
     cy.contains('Edited item successfully.').should('not.exist')
     cy.visit('/locality/')
     cy.contains('Eg').should('not.exist')

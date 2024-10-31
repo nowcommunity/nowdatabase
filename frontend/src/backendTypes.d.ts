@@ -290,7 +290,12 @@ export type ReferenceAuthorType = {
 
 export type ValidationErrors = {
   status: string
-  data: { [key: string]: { name: string; message: string } }
+  data: ValidationErrorItem[]
+}
+
+type ValidationErrorItem = {
+  name: string
+  error: string
 }
 
 export type PrismaReference = Prisma.ref_ref
