@@ -19,6 +19,7 @@ import { useDetailContext } from '../Context/DetailContext'
 import { DataValue } from './tabLayoutHelpers'
 import { modalStyle } from './misc'
 import { EditDataType } from '@/backendTypes'
+import { calculateLocalityMinAge, calculateLocalityMaxAge } from '@/util/ageCalculator'
 
 const fieldWidth = '14em'
 
@@ -189,6 +190,7 @@ export const EditableTextField = <T extends object>({
   round,
   big = false,
   disabled = false,
+  readonly = false,
   changeSetter,
 }: {
   field: keyof EditDataType<T>
@@ -196,6 +198,7 @@ export const EditableTextField = <T extends object>({
   round?: number
   big?: boolean
   disabled?: boolean
+  readonly?: boolean
   changeSetter?: React.Dispatch<React.SetStateAction<number>>
 }) => {
   const { setEditData, editData, validator } = useDetailContext<T>()
@@ -225,6 +228,7 @@ export const EditableTextField = <T extends object>({
       type={type}
       multiline={big}
       disabled={disabled}
+      InputProps={readonly ? { readOnly: true } : { readOnly: false }}
     />
   )
 
@@ -335,6 +339,87 @@ export const TimeBoundSelection = <T extends object, ParentType extends object>(
       size="small"
       error={!!boundError}
       helperText={boundError ?? ''}
+      value={editData[targetField as keyof EditDataType<ParentType>]}
+      onClick={() => setOpen(true)}
+      disabled={disabled}
+      sx={{ backgroundColor: disabled ? 'grey' : '' }}
+      inputProps={{ readOnly: true }}
+    />
+  )
+  return <DataValue<ParentType> field={targetField as keyof EditDataType<ParentType>} EditElement={editingComponent} />
+}
+
+export const BasisForAgeSelection = <T extends object, ParentType extends object>({
+  targetField,
+  sourceField,
+  lowBoundField,
+  upBoundField,
+  fraction,
+  selectorTable,
+  disabled,
+}: {
+  targetField: keyof ParentType
+  sourceField: keyof T
+  selectorTable: ReactElement
+  lowBoundField: keyof T
+  upBoundField: keyof T
+  fraction: string | null | undefined
+  disabled?: boolean
+}) => {
+  const { editData, setEditData, validator } = useDetailContext<ParentType>()
+  const { error } = validator(editData, targetField as keyof EditDataType<ParentType>)
+  const [open, setOpen] = useState(false)
+  const selectorFn = (selected: T) => {
+    if (targetField === 'bfa_min') {
+      setEditData({
+        ...editData,
+        min_age: calculateLocalityMinAge(
+          Number(selected[upBoundField]),
+          Number(selected[lowBoundField]),
+          String(fraction).split(' ')[2]
+        ),
+        [targetField]: selected[sourceField],
+      })
+    } else if (targetField === 'bfa_max') {
+      setEditData({
+        ...editData,
+        max_age: calculateLocalityMaxAge(
+          Number(selected[upBoundField]),
+          Number(selected[lowBoundField]),
+          String(fraction).split(' ')[2]
+        ),
+        [targetField]: selected[sourceField],
+      })
+    } else {
+      setEditData({ ...editData, [targetField]: selected[sourceField] })
+    }
+    setOpen(false)
+  }
+
+  const selectorTableWithFn = cloneElement(selectorTable, { selectorFn })
+  if (open)
+    return (
+      <Box>
+        <Modal
+          open={open}
+          aria-labelledby={`modal-${targetField as string}`}
+          aria-describedby={`modal-${targetField as string}`}
+        >
+          <Box sx={{ ...modalStyle }}>
+            <Box marginBottom="2em" marginTop="1em">
+              {selectorTableWithFn}
+            </Box>
+            <Button onClick={() => setOpen(false)}>Cancel</Button>
+          </Box>
+        </Modal>
+      </Box>
+    )
+  const editingComponent = (
+    <TextField
+      variant="outlined"
+      size="small"
+      error={!!error}
+      helperText={error ?? ''}
       value={editData[targetField as keyof EditDataType<ParentType>]}
       onClick={() => setOpen(true)}
       disabled={disabled}
