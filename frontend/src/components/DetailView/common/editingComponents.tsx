@@ -59,7 +59,7 @@ export const DropdownSelector = <T extends object>({
     } else if (!error && allErrors.includes(String(field))) {
       setAllErrors([...allErrors.filter(fi => fi !== String(field))])
     }
-  }, [error, allErrors])
+  }, [error, allErrors, field, setAllErrors])
 
   const editingComponent = (
     <FormControl size="small" error={!!error}>
@@ -218,7 +218,7 @@ export const EditableTextField = <T extends object>({
     } else if (!error && allErrors.includes(String(field))) {
       setAllErrors([...allErrors.filter(fi => fi !== String(field))])
     }
-  }, [error, allErrors])
+  }, [error, allErrors, field, setAllErrors])
 
   const editingComponent = (
     <TextField
@@ -274,7 +274,7 @@ export const FieldWithTableSelection = <T extends object, ParentType extends obj
     } else if (!error && allErrors.includes(String(targetField))) {
       setAllErrors([...allErrors.filter(fi => fi !== String(targetField))])
     }
-  }, [error, allErrors])
+  }, [error, allErrors, targetField, setAllErrors])
 
   const selectorTableWithFn = cloneElement(selectorTable, { selectorFn })
   if (open)
@@ -343,7 +343,7 @@ export const TimeBoundSelection = <T extends object, ParentType extends object>(
     } else if (!boundError && allErrors.includes(String(targetField))) {
       setAllErrors([...allErrors.filter(fi => fi !== String(targetField))])
     }
-  }, [boundError, allErrors])
+  }, [boundError, allErrors, targetField, setAllErrors])
 
   const selectorTableWithFn = cloneElement(selectorTable, { selectorFn })
   if (open)
