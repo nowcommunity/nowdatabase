@@ -1,6 +1,6 @@
 Current reference types & their field labels / field names (29.09.2024)
 
-As of 29.01.2024 there is no UI to add more entries however you can do it by altering the db itself.
+As of 29.09.2024 there is no UI to add more entries however you can do it by altering the db itself.
 
 In the test_data/sqlfiles/now_test.sql code related to adding reference types is around rows 3665-3700 and the fields for the data types are added around rows 3175-3525.
 
