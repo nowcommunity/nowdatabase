@@ -29,7 +29,7 @@ export const writeTimeBound = async (
     const result = await writeHandler.upsertObject('now_tu_bound', timeBound, ['bid'])
     writeHandler.idValue = result ? (result.bid as number) : (timeBound.bid as number)
     await writeHandler.logUpdatesAndComplete(authorizer, comment ?? '', references ?? [])
-    return writeHandler.idValue
+    return { result: writeHandler.idValue, errorObject: undefined }
   } catch (e) {
     await writeHandler.end()
     throw e
