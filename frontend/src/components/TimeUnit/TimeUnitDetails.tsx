@@ -60,15 +60,28 @@ export const TimeUnitDetails = () => {
       if (data) {
         setEditData(makeEditData(data))
       }
-      if (e && typeof e === 'object' && 'status' in e && e.status !== 403) {
-        notify('Could not edit item. Error happened.', 'error')
+      if (
+        e &&
+        typeof e === 'object' &&
+        'status' in e &&
+        e.status === 403 &&
+        'data' in e &&
+        e.data &&
+        typeof e.data === 'object'
+      ) {
+        if ('name' in e.data) {
+          if ('cascadeErrors' in e.data && e.data.cascadeErrors !== '') {
+            notify(e.data.cascadeErrors as string, 'error')
+          }
+          if ('calculatorErrors' in e.data && e.data.calculatorErrors !== '') {
+            notify(e.data.calculatorErrors as string, 'error')
+          }
+        } else {
+          const error = e as ValidationErrors
+          notify('Following validators failed: ' + error.data.map(e => e.name).join(', '), 'error')
+        }
       } else {
-        const error = e as ValidationErrors
-        let message = 'Could not save item. Missing: '
-        Object.keys(error.data).forEach(key => {
-          message += `${error.data[key].name}. `
-        })
-        notify(message, 'error')
+        notify('Could not edit item. Uncaught error happened.', 'error')
       }
     }
   }

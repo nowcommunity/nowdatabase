@@ -55,11 +55,7 @@ export const SpeciesDetails = () => {
       setTimeout(() => navigate(`/species/${species_id}`), 15)
     } catch (e) {
       const error = e as ValidationErrors
-      let message = 'Could not save item. Missing: '
-      Object.keys(error.data).forEach(key => {
-        message += `${error.data[key].name}. `
-      })
-      notify(message, 'error')
+      notify('Following validators failed: ' + error.data.map(e => e.name).join(', '), 'error')
     }
   }
 

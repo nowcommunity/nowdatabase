@@ -91,10 +91,10 @@ export const getTimeUnitLocalities = async (id: string) => {
 
 export const validateEntireTimeUnit = (editedFields: EditDataType<TimeUnitDetailsType>) => {
   const keys = Object.keys(editedFields)
-  const errors: ValidationObject[] = []
+  const messages: ValidationObject[] = []
   for (const key of keys) {
     const error = validateTimeUnit(editedFields, key as keyof TimeUnitDetailsType)
-    if (error.error) errors.push(error)
+    if (error.error) messages.push(error)
   }
-  return errors
+  return messages
 }
