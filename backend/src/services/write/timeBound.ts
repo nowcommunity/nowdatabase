@@ -4,6 +4,7 @@ import { WriteHandler } from './writeOperations/writeHandler'
 import { getFieldsOfTables } from '../../utils/db'
 import { ActionType } from './writeOperations/types'
 import { getTimeBoundDetails } from '../timeBound'
+import { checkTimeBoundCascade } from '../../utils/cascadeHandler'
 
 const getTimeBoundWriteHandler = (type: ActionType) => {
   return new WriteHandler({
@@ -27,6 +28,7 @@ export const writeTimeBound = async (
   try {
     await writeHandler.start()
     const result = await writeHandler.upsertObject('now_tu_bound', timeBound, ['bid'])
+    const { cascadeErrors, calculatorErrors, localitiesToUpdate } = await checkTimeBoundCascade(timeBound)
     writeHandler.idValue = result ? (result.bid as number) : (timeBound.bid as number)
     await writeHandler.logUpdatesAndComplete(authorizer, comment ?? '', references ?? [])
     return { result: writeHandler.idValue, errorObject: undefined }
