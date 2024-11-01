@@ -63,7 +63,7 @@ type Unit = {
 
 type EditedUnit = {
   timeUnit: Unit
-  editedBounds: { upBoundAge: number, lowBoundAge: number }
+  editedBounds: { upBoundAge: number; lowBoundAge: number }
 }
 
 type Locality = {
@@ -74,7 +74,6 @@ type Locality = {
   bfa_min: string
   frac_max: string
 }
-
 
 export const checkTimeBoundCascade = async (timeBound: EditDataType<TimeBoundDetailsType>) => {
   const cascadeErrors: string[] = []
@@ -104,7 +103,12 @@ export const checkTimeBoundCascade = async (timeBound: EditDataType<TimeBoundDet
       },
     })
 
-    const editedBounds = calculateTimeUnitAges(timeUnit, bounds as Bounds[], timeBound.age as number, timeBound.bid as number);
+    const editedBounds = calculateTimeUnitAges(
+      timeUnit,
+      bounds as Bounds[],
+      timeBound.age as number,
+      timeBound.bid as number
+    )
 
     if (editedBounds) {
       if (editedBounds.lowBoundAge > editedBounds.upBoundAge) {
@@ -117,7 +121,7 @@ export const checkTimeBoundCascade = async (timeBound: EditDataType<TimeBoundDet
     }
   }
   for (const timeUnit of timeUnitsToUpdate) {
-    const localities = await nowDb.now_loc.findMany({
+    const localities = (await nowDb.now_loc.findMany({
       select: {
         loc_name: true,
         max_age: true,
@@ -129,32 +133,29 @@ export const checkTimeBoundCascade = async (timeBound: EditDataType<TimeBoundDet
       where: {
         OR: [{ bfa_max: timeUnit.timeUnit.tu_name }, { bfa_min: timeUnit.timeUnit.tu_name }],
       },
-    }) as Locality[]
+    })) as Locality[]
 
     localitiesToCheck.push(...localities)
   }
 
-  const { cascadeErrorsLocalities, calculatorErrorsLocalities, localitiesToUpdate } = handleLocalityAndTimeUnitLists(localitiesToCheck, timeUnitsToUpdate)
+  const { cascadeErrorsLocalities, calculatorErrorsLocalities, localitiesToUpdate } = handleLocalityAndTimeUnitLists(
+    localitiesToCheck,
+    timeUnitsToUpdate
+  )
   cascadeErrors.push(...cascadeErrorsLocalities)
   calculatorErrors.push(...calculatorErrorsLocalities)
   return { cascadeErrors, calculatorErrors, localitiesToUpdate, timeUnitsToUpdate }
 }
 
-const calculateTimeUnitAges = (
-  unit: Unit,
-  list: Bounds[],
-  editedAge: number,
-  bid: number
-) => {
-  const upBoundEntry = list.find(item => item.bid === unit.up_bnd);
-  const lowBoundEntry = list.find(item => item.bid === unit.low_bnd);
+const calculateTimeUnitAges = (unit: Unit, list: Bounds[], editedAge: number, bid: number) => {
+  const upBoundEntry = list.find(item => item.bid === unit.up_bnd)
+  const lowBoundEntry = list.find(item => item.bid === unit.low_bnd)
   if (upBoundEntry && lowBoundEntry) {
-    const upBoundAge = unit.up_bnd === bid ? editedAge : upBoundEntry.age;
-    const lowBoundAge = unit.low_bnd === bid ? editedAge : lowBoundEntry.age;
-    return { upBoundAge, lowBoundAge };
+    const upBoundAge = unit.up_bnd === bid ? editedAge : upBoundEntry.age
+    const lowBoundAge = unit.low_bnd === bid ? editedAge : lowBoundEntry.age
+    return { upBoundAge, lowBoundAge }
   } else {
-    console.error("One or both bounds not found in the list.");
-    return undefined;
+    return undefined
   }
 }
 
@@ -171,7 +172,11 @@ const handleLocalityAndTimeUnitLists = (localities: Locality[], timeUnits: Edite
     if (timeUnitNames.includes(locality.bfa_max)) {
       const timeUnit = timeUnits.find(unit => unit.timeUnit.tu_name === locality.bfa_max)
       try {
-        maxAgeAfterUpdate = calculateLocalityMaxAge(timeUnit?.editedBounds.upBoundAge as number, timeUnit?.editedBounds.lowBoundAge as number, locality.frac_max)
+        maxAgeAfterUpdate = calculateLocalityMaxAge(
+          timeUnit?.editedBounds.upBoundAge as number,
+          timeUnit?.editedBounds.lowBoundAge as number,
+          locality.frac_max
+        )
       } catch (e) {
         calculatorErrorsLocalities.push(locality.loc_name)
       }
@@ -179,7 +184,11 @@ const handleLocalityAndTimeUnitLists = (localities: Locality[], timeUnits: Edite
     if (timeUnitNames.includes(locality.bfa_min)) {
       const timeUnit = timeUnits.find(unit => unit.timeUnit.tu_name === locality.bfa_min)
       try {
-        minAgeAfterUpdate = calculateLocalityMinAge(timeUnit?.editedBounds.upBoundAge as number, timeUnit?.editedBounds.lowBoundAge as number, locality.frac_max)
+        minAgeAfterUpdate = calculateLocalityMinAge(
+          timeUnit?.editedBounds.upBoundAge as number,
+          timeUnit?.editedBounds.lowBoundAge as number,
+          locality.frac_max
+        )
       } catch (e) {
         calculatorErrorsLocalities.push(locality.loc_name)
       }
