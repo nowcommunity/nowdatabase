@@ -43,6 +43,10 @@ Because the DetailView is a child component of LocalityDetails, you cannot acces
 
 The context can also be used to access, for example, the **setEditData** setter, or a validator that can be used to validate data inside an editing component.
 
+**Documentation for validators**
+
+[Validators](../frontend/src/validators/README.md)
+
 **Detailed documentation for editingComponents**
 
 - [RadioSelector](./editingComponents/RadioSelector.md)
