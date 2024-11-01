@@ -67,6 +67,7 @@ type EditedUnit = {
 }
 
 type Locality = {
+  lid: number
   loc_name: string
   max_age: number
   min_age: number
@@ -123,6 +124,7 @@ export const checkTimeBoundCascade = async (timeBound: EditDataType<TimeBoundDet
   for (const timeUnit of timeUnitsToUpdate) {
     const localities = (await nowDb.now_loc.findMany({
       select: {
+        lid: true,
         loc_name: true,
         max_age: true,
         min_age: true,
