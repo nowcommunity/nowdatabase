@@ -28,7 +28,18 @@ export const writeTimeBound = async (
   try {
     await writeHandler.start()
     const result = await writeHandler.upsertObject('now_tu_bound', timeBound, ['bid'])
-    const { cascadeErrors, calculatorErrors, localitiesToUpdate } = await checkTimeBoundCascade(timeBound)
+    const { cascadeErrors, calculatorErrors, localitiesToUpdate, timeUnitsToUpdate } = await checkTimeBoundCascade(timeBound)
+    if (calculatorErrors.length > 0 || cascadeErrors.length > 0) {
+      const calculatorErrorsString = calculatorErrors.length > 0 ? `Check fractions of following localities: ${calculatorErrors.join(', ')}` : ''
+      const cascadeErrorsString = cascadeErrors.length > 0 ? `Following localities would become contradicting: ${cascadeErrors.join(', ')}` : ''
+      const errorObject = {
+        name: 'cascade',
+        calculatorErrors: calculatorErrorsString,
+        cascadeErrors: cascadeErrorsString,
+      }
+      await writeHandler.end()
+      return { result: writeHandler.idValue, errorObject }
+    }
     writeHandler.idValue = result ? (result.bid as number) : (timeBound.bid as number)
     await writeHandler.logUpdatesAndComplete(authorizer, comment ?? '', references ?? [])
     return { result: writeHandler.idValue, errorObject: undefined }
