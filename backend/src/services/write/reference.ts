@@ -1,13 +1,14 @@
-import { EditDataType, FixBigInt, PrismaReference, ReferenceDetailsType } from '../../../../frontend/src/backendTypes'
+import { EditDataType, FixBigInt, ReferenceDetailsType } from '../../../../frontend/src/backendTypes'
 import { getFieldsOfTables, nowDb } from '../../utils/db'
 import { getReferenceDetails } from '../reference'
 import { filterAllowedKeys } from './writeOperations/utils'
 import { writeReferenceAuthors } from './author'
 import { writeReferenceJournal } from './journal'
+import Prisma from '../../../prisma/generated/now_test_client'
 
 export const writeReference = async (reference: EditDataType<ReferenceDetailsType>) => {
   const allowedColumns = getFieldsOfTables(['ref_ref', 'ref_authors', 'ref_journal'])
-  const filteredReference = filterAllowedKeys(reference, allowedColumns) as PrismaReference
+  const filteredReference = filterAllowedKeys(reference, allowedColumns) as Prisma.ref_ref
 
   //First creates a reference > journal > updates reference with journal_id > creates authors
   //If something fails, nothing should go trough
@@ -31,16 +32,18 @@ export const writeReference = async (reference: EditDataType<ReferenceDetailsTyp
 
   let journalId: number | null = null
   if (reference.ref_journal) {
-    const journal_id = await writeReferenceJournal(reference.ref_journal)
-    journalId = journal_id
+    if (reference.ref_journal.rowState !== 'removed') {
+      const journal_id = await writeReferenceJournal(reference.ref_journal)
+      journalId = journal_id
+    } else journalId = null
   }
 
-  if (journalId !== null) {
-    await nowDb.ref_ref.update({
-      where: { rid: referenceId },
-      data: { journal_id: journalId },
-    })
-  }
+  //set reference.journal_id to null if a journal has been deleted
+  await nowDb.ref_ref.update({
+    where: { rid: referenceId },
+    data: { journal_id: journalId },
+  })
+
   if (reference.ref_authors) {
     const authorsToWrite = reference.ref_authors.filter(author => author.rowState !== 'removed')
     await writeReferenceAuthors(referenceId, authorsToWrite)
@@ -49,7 +52,7 @@ export const writeReference = async (reference: EditDataType<ReferenceDetailsTyp
 }
 
 export const deleteReference = async (rid: number) => {
-  const reference = (await getReferenceDetails(rid)) as EditDataType<FixBigInt<PrismaReference>>
+  const reference = (await getReferenceDetails(rid)) as EditDataType<FixBigInt<Prisma.ref_ref>>
 
   if (!reference) throw new Error('Reference not found')
 

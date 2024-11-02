@@ -298,7 +298,3 @@ type ValidationErrorItem = {
   name: string
   error: string
 }
-
-export type PrismaReference = Prisma.ref_ref
-export type PrismaAuthor = Prisma.ref_authors
-export type PrismaJournal = Prisma.ref_journal
