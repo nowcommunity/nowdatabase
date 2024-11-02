@@ -55,16 +55,16 @@ export const TimeBoundDetails = () => {
       setTimeout(() => navigate(`/time-bound/${bid}`), 15)
       notify('Edited item successfully.')
     } catch (e) {
-    if (
-      e &&
-      typeof e === 'object' &&
-      'status' in e &&
-      e.status === 403 &&
-      'data' in e &&
-      e.data &&
-      typeof e.data === 'object'
-    ) {
-      if ('name' in e.data) {
+      if (
+        e &&
+        typeof e === 'object' &&
+        'status' in e &&
+        e.status === 403 &&
+        'data' in e &&
+        e.data &&
+        typeof e.data === 'object'
+      ) {
+        if ('name' in e.data) {
           if ('cascadeErrors' in e.data && e.data.cascadeErrors !== '') {
             notify(e.data.cascadeErrors as string, 'error')
           }
@@ -78,8 +78,8 @@ export const TimeBoundDetails = () => {
       } else {
         notify('Could not edit item. Uncaught error happened.', 'error')
       }
-    }}
-  
+    }
+  }
 
   const tabs: TabType[] = [
     {
