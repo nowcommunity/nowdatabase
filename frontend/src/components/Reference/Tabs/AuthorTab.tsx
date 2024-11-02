@@ -85,7 +85,7 @@ export const AuthorTab: React.FC<AuthorTabProps> = ({ field_num_param, tab_name 
                 {
                   ...newAuthor,
                   rid: editData.rid,
-                  au_num: editData.ref_authors.length + 1,
+                  au_num: editData.ref_authors.filter(author => author.field_id === field_num_param).length + 1,
                   field_id: field_num_param,
                   rowState: 'new' as RowState,
                 },
@@ -113,7 +113,7 @@ export const AuthorTab: React.FC<AuthorTabProps> = ({ field_num_param, tab_name 
                 {
                   ...newAuthor,
                   rid: editData.rid,
-                  au_num: editData.ref_authors.length + 1,
+                  au_num: editData.ref_authors.filter(author => author.field_id === field_num_param).length + 1,
                   field_id: field_num_param,
                   rowState: 'new' as RowState,
                 },
