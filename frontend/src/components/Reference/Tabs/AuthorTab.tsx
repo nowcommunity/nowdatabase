@@ -1,5 +1,5 @@
-/* eslint-disable react/prop-types */
-import { ReferenceDetailsType, ReferenceAuthorType, RowState } from '@/backendTypes'
+import React, { useEffect } from 'react'
+import { ReferenceDetailsType, ReferenceAuthorType, RowState, EditDataType } from '@/backendTypes'
 import { EditableTable } from '@/components/DetailView/common/EditableTable'
 import { EditingForm } from '@/components/DetailView/common/EditingForm'
 import { SelectingTable } from '@/components/DetailView/common/SelectingTable'
@@ -15,9 +15,34 @@ interface AuthorTabProps {
   tab_name?: string | null
 }
 
+function checkIndexes(editData: EditDataType<ReferenceDetailsType>): boolean {
+  let needsUpdate = false
+  // First, check if any index is incorrect
+  for (let i = 0; i < editData.ref_authors.length; i++) {
+    if (editData.ref_authors[i].index !== i) {
+      needsUpdate = true
+      break
+    }
+  }
+  return needsUpdate
+}
+
 export const AuthorTab: React.FC<AuthorTabProps> = ({ field_num_param, tab_name = 'Authors' }) => {
   const { mode, editData, setEditData } = useDetailContext<ReferenceDetailsType>()
   const { data: authorData, isError } = useGetReferenceAuthorsQuery(mode.read ? skipToken : undefined)
+  useEffect(() => {
+    // Check and update indexes of authors only if they are incorrect
+    if (checkIndexes(editData)) {
+      setEditData({
+        ...editData,
+        ref_authors: editData.ref_authors.map((ref_author, index) => ({
+          ...ref_author,
+          index,
+        })),
+      })
+    }
+  }, [editData, setEditData])
+
   let visible_ref_authors: Array<ReferenceAuthorType> = editData.ref_authors.filter(author => {
     return author.field_id?.toString() === field_num_param?.toString()
   })
@@ -109,6 +134,7 @@ export const AuthorTab: React.FC<AuthorTabProps> = ({ field_num_param, tab_name 
         columns={referenceAuthorColumns}
         field="ref_authors"
         visible_data={visible_ref_authors}
+        useDefinedIndex={true}
       />
     </Grouped>
   )

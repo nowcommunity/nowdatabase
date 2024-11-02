@@ -225,6 +225,7 @@ export type ReferenceDetailsType = Prisma.ref_ref & {
     author_initials?: string
     field_id: number
     rowState?: RowState
+    index?: number
   }[]
   ref_journal: {
     journal_id: number
