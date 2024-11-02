@@ -1,8 +1,36 @@
 import { ENV } from '@/util/config'
 import { Divider } from '@mui/material'
 import Box from '@mui/material/Box'
+import { useState, useEffect } from "react"
+
+
+const dateWhenStarted = new Date(Date.now())
+
 
 export const FrontPage = () => {
+  const [dateString, setDateString] = useState("")
+
+  useEffect(() => {
+    const currentLocalStorage = localStorage.getItem("dateWhenStarted")
+    if (!currentLocalStorage) {
+      localStorage.setItem('dateWhenStarted', dateWhenStarted.toString());
+      return
+    }
+
+    const currentLocalStorageDate = new Date(currentLocalStorage)
+    const optionsForDateFormatting: Intl.DateTimeFormatOptions = {
+      hour: "numeric",
+      minute: "numeric",
+      second: "numeric",
+      year: "numeric",
+      month: 'long',
+      day: 'numeric'
+    }
+    setDateString(currentLocalStorageDate.toLocaleDateString("fi-FI", optionsForDateFormatting))
+
+  }, []);
+
+
   if (ENV === 'dev') {
     document.title = 'NOW Database (dev)'
   } else {
@@ -52,6 +80,7 @@ export const FrontPage = () => {
           <a href="https://github.com/nowcommunity/nowdatabase">https://github.com/nowcommunity/nowdatabase</a>
         </li>
       </ul>
+    { ENV !== "prod" ? <p style={{ opacity: 0.25 }}>{ dateString }</p> : ""}
     </Box>
   )
 }
