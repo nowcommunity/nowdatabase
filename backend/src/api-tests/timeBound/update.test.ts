@@ -59,6 +59,13 @@ describe('Time bound updating', () => {
     expect(body.b_name).toEqual(existingTimeBound.b_name)
     expect(body.age).toEqual(existingTimeBound.age)
   })
+  it('Update request that would create contradictory timeunit or locality fails', async () => {
+    const  { body: resultBody, status: status } = await send<{ bid: number }>('time-bound', 'PUT', {
+      timeBound: { ...existingTimeBound, age: 2.5 },
+    })
+    expect(status).toEqual(403)
+    expect(resultBody).toEqual({"calculatorErrors": "", "cascadeErrors": "Following time units or localities would become contradicting: olduvai", "name": "cascade"})
+  })
   it('Update logs are correct', async () => {
     const { body: resultBody } = await send<{ bid: number }>('time-bound', 'PUT', {
       timeBound: editedTimeBound,
