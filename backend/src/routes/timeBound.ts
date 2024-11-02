@@ -40,7 +40,10 @@ router.put(
     if (validationErrors.length > 0) {
       return res.status(403).send(validationErrors)
     }
-    const result = await writeTimeBound(editedTimeBound, comment, references, req.user!.initials)
+    const { result, errorObject } = await writeTimeBound(editedTimeBound, comment, references, req.user!.initials)
+    if (errorObject) {
+      return res.status(403).send(errorObject)
+    }
     return res.status(200).send({ bid: result })
   }
 )

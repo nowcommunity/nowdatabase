@@ -53,9 +53,31 @@ export const TimeBoundDetails = () => {
     try {
       const { bid } = await editTimeBoundRequest(editedTimeBound).unwrap()
       setTimeout(() => navigate(`/time-bound/${bid}`), 15)
+      notify('Edited item successfully.')
     } catch (e) {
-      const error = e as ValidationErrors
-      notify('Following validators failed: ' + error.data.map(e => e.name).join(', '), 'error')
+      if (
+        e &&
+        typeof e === 'object' &&
+        'status' in e &&
+        e.status === 403 &&
+        'data' in e &&
+        e.data &&
+        typeof e.data === 'object'
+      ) {
+        if ('name' in e.data) {
+          if ('cascadeErrors' in e.data && e.data.cascadeErrors !== '') {
+            notify(e.data.cascadeErrors as string, 'error')
+          }
+          if ('calculatorErrors' in e.data && e.data.calculatorErrors !== '') {
+            notify(e.data.calculatorErrors as string, 'error')
+          }
+        } else {
+          const error = e as ValidationErrors
+          notify('Following validators failed: ' + error.data.map(e => e.name).join(', '), 'error')
+        }
+      } else {
+        notify('Could not edit item. Uncaught error happened.', 'error')
+      }
     }
   }
 
