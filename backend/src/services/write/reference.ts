@@ -56,7 +56,15 @@ export const deleteReference = async (rid: number) => {
 
   if (!reference) throw new Error('Reference not found')
 
-  await nowDb.ref_ref.delete({
-    where: { rid },
+  await nowDb.ref_authors.deleteMany({
+    where: { rid: rid },
   })
+
+  try {
+    await nowDb.ref_ref.delete({
+      where: { rid: rid },
+    })
+  } catch (error) {
+    throw new Error('Failed to delete the reference')
+  }
 }
