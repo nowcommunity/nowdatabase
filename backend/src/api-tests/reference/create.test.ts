@@ -22,8 +22,6 @@ describe('Creating new reference works', () => {
     const { body: resultBody, status: getReqStatus } = await send<{ rid: number }>('reference/', 'PUT', {
       reference: { ...newReferenceBasis },
     })
-    console.log("console works")
-    console.log(resultBody)
     const { rid: createdId } = resultBody
 
     expect(typeof createdId).toEqual('number') // `Invalid result returned on write: ${createdId}`
