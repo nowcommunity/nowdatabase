@@ -31,6 +31,7 @@ export const EditableTable = <
   field,
   visible_data, // use some filtered data instead of the actual data. Allows you to hide some rows. But be careful that the data is in the right format
   useDefinedIndex = false, // Control whether to use the defined index or static index. The index data needs to have a key named 'index'.
+  useObject = false,
 }: {
   tableData?: Array<T> | null
   editTableData?: Array<EditDataType<T>> | null
@@ -38,6 +39,7 @@ export const EditableTable = <
   field: keyof EditDataType<ParentType>
   visible_data?: Array<T>
   useDefinedIndex?: boolean
+  useObject?: boolean
 }) => {
   const [pagination, setPagination] = useState<MRT_PaginationState>(defaultPagination)
   const { editData, setEditData, mode, data } = useDetailContext<ParentType>()
@@ -49,17 +51,23 @@ export const EditableTable = <
 
     // uses either 'row.original.index' or 'staticRowIndex' based on 'useDefinedIndex'
     const rowClicked = () => {
-      const index = useDefinedIndex ? row.original.index : staticRowIndex
+      let index = useDefinedIndex ? row.original.index : staticRowIndex
       if (index === undefined) return
+      let items: Array<EditDataType<T>>
+      if (useObject) {
+        items = [editData[field]]
+        index = 0
+      } else {
+        items = [...editData[field]]
+      }
 
-      const items = [...editData[field]]
       if (items[index].rowState === 'new') {
         items.splice(index, 1)
-        setEditData({ ...editData, [field]: items })
+        setEditData({ ...editData, [field]: useObject ? items[0] : items })
         return
       }
       items[index].rowState = getNewState(state)
-      setEditData({ ...editData, [field]: items })
+      setEditData({ ...editData, [field]: useObject ? items[0] : items })
     }
 
     const getIcon = () => {
