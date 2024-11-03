@@ -6,6 +6,8 @@ import {
   getReferenceAuthors,
   getReferenceJournals,
   validateEntireReference,
+  getAuthorsOfReference,
+  getJournalById,
 } from '../services/reference'
 import { requireOneOf } from '../middlewares/authorizer'
 import { Role } from '../../../frontend/src/types'
@@ -32,6 +34,21 @@ router.get('/authors', async (_req, res) => {
 router.get('/journals', async (_req, res) => {
   const referenceTypes = await getReferenceJournals()
   res.status(200).send(referenceTypes)
+})
+
+// Fetch authors by reference ID
+router.get('/authors/:id', async (req, res) => {
+  const id = parseInt(req.params.id)
+  const authors = await getAuthorsOfReference(id)
+  if (!authors) return res.status(404).send()
+  return res.status(200).send(authors)
+})
+
+router.get('/journal/:id', async (req, res) => {
+  const id = parseInt(req.params.id)
+  const journal = await getJournalById(id)
+  if (!journal) return res.status(404).send()
+  return res.status(200).send(journal)
 })
 
 router.get('/:id', async (req, res) => {
