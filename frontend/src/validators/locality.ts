@@ -60,24 +60,34 @@ export const validateLocality = (
     dms_lat: {
       name: 'Latitude (dms)',
       required: true,
+      asString: (dms_lat: string) => {
+        const dmsLatRegEx = /^(\d{1,3}) (\d{1,2}) (\d{1,2}) ([NS])$/
+        if (!dmsLatRegEx.test(dms_lat)) return 'Must be in the format DD(D) M(M) S(S) N/S'
+        return
+      },
     },
     dec_lat: {
       name: 'Latitude (dec)',
       required: true,
       asNumber: (num: number) => {
-        if (num < -90 || num > 90) return 'Latitude dec must be between -90 and 90'
+        if (num < -90 || num > 90) return 'Must be between -90 and 90'
         return
       },
     },
     dms_long: {
       name: 'Longitude (dms)',
       required: true,
+      asString: (dms_long: string) => {
+        const dmsLongRegEx = /^(\d{1,3}) (\d{1,2}) (\d{1,2}) ([EW])$/
+        if (!dmsLongRegEx.test(dms_long)) return 'Must be in the format DD(D) M(M) S(S) E/W'
+        return
+      },
     },
     dec_long: {
       name: 'Longitude (dec)',
       required: true,
       asNumber: (num: number) => {
-        if (num < -180 || num > 180) return 'Longitude dec must be between -180 and 180'
+        if (num < -180 || num > 180) return 'Must be between -180 and 180'
         return
       },
     },
