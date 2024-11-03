@@ -79,18 +79,13 @@ export const getAuthorsOfReference = async (rid: number) => {
   return authors
 }
 
-export const getAuthorById = async (rid: number, au_num: number, field_id: number) => {
-  const author = await nowDb.ref_authors.findUnique({
+export const getJournalById = async (journal_id: number) => {
+  const authors = await nowDb.ref_journal.findMany({
     where: {
-      rid_field_id_au_num: {
-        // Composite key field
-        rid: rid,
-        au_num: au_num,
-        field_id: field_id,
-      },
+      journal_id: journal_id,
     },
   })
-  return author
+  return authors
 }
 
 export const getReferenceJournals = async () => {
