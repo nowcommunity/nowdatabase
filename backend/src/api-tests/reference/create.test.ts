@@ -122,31 +122,4 @@ describe('Creating new reference works', () => {
     expect(resultBodyEr).toEqual(noPermError)
     expect(resultStatusEr).toEqual(403)
   })
-
-  /*
-  it('Locality-species change was updated also to locality', async () => {
-    const localityFound = createdSpecies!.now_ls.find(ls => ls.now_loc.loc_name.startsWith('Romany'))
-    if (!localityFound) throw new Error('Locality was not found in now_ls')
-    const speciesResult = await send<LocalityDetailsType>(`locality/24750`, 'GET')
-    const update = speciesResult.body.now_lau.find(lau => lau.lid === 24750 && lau.lau_comment === 'species test')
-    if (!update) throw new Error('Update not found')
-    const logRows = update.updates
-    const expectedLogRows: Partial<LogRow>[] = [
-      {
-        oldValue: null,
-        value: '24750',
-        type: 'add',
-        column: 'lid',
-        table: 'now_ls',
-      },
-    ]
-    testLogRows(logRows, expectedLogRows, 2)
-  })
-
-  it('Species without required fields fails', async () => {
-    const res = await send('species', 'PUT', {
-      species: { ...newSpeciesWithoutRequiredFields, comment: 'species test' },
-    })
-    expect(res.status).toEqual(403)
-  })*/
 })
