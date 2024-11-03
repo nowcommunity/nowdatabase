@@ -37,6 +37,11 @@ export type TextFieldOptions = (
   changeSetter?: React.Dispatch<React.SetStateAction<number>>
 }
 
+export type OptionalRadioSelectionProps = {
+  defaultValue?: DropdownOptionValue
+  handleSetEditData?: (value: number | string | boolean) => void
+}
+
 export const DetailView = <T extends object>({
   tabs,
   data,
@@ -101,8 +106,8 @@ export const DetailView = <T extends object>({
     field: keyof EditDataType<T>,
     options: Array<DropdownOption | string>,
     name: string,
-    defaultValue?: DropdownOptionValue
-  ) => <RadioSelector field={field} options={options} name={name} defaultValue={defaultValue} />
+    optionalRadioSelectionProps?: OptionalRadioSelectionProps
+  ) => <RadioSelector field={field} options={options} name={name} {...optionalRadioSelectionProps} />
 
   const bigTextField = (field: keyof EditDataType<T>) => <EditableTextField<T> field={field} type="text" big />
 

@@ -128,11 +128,13 @@ export const RadioSelector = <T extends object>({
   name,
   field,
   defaultValue,
+  handleSetEditData,
 }: {
   options: Array<DropdownOption | DropdownOptionValue>
   name: string
   field: keyof EditDataType<T>
   defaultValue?: DropdownOptionValue
+  handleSetEditData?: (value: number | string | boolean) => void
 }) => {
   const { setEditData, editData } = useDetailContext<T>()
   if (defaultValue === undefined) {
@@ -147,7 +149,12 @@ export const RadioSelector = <T extends object>({
         aria-labelledby={`${name}-radio-selection`}
         name={name}
         onChange={(event: ChangeEvent<HTMLInputElement>) => {
-          const setValue = (value: number | string | boolean) => setEditData({ ...editData, [field]: value })
+          let setValue: (value: number | string | boolean) => void
+          if (handleSetEditData) {
+            setValue = (value: number | string | boolean) => handleSetEditData(value)
+          } else {
+            setValue = (value: number | string | boolean) => setEditData({ ...editData, [field]: value })
+          }
           const asNumber = typeof options[0] === 'number'
           setDropdownOptionValue(setValue, event?.currentTarget?.value, asNumber)
         }}
