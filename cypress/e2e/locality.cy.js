@@ -63,6 +63,15 @@ describe('Creating a new locality...', () => {
     cy.get('[name=dating-method][value=absolute]').click()
     cy.get('[id="Min Basis for age (absolute)-multiselect"]').click()
     cy.get('[data-value=other_absolute]').click()
+    cy.contains('other_absolute')
+
+    // test clearing of age fields
+    cy.get('[name=dating-method][value=time_unit]').click()
+    cy.contains('other_absolute').should('not.exist')
+
+    cy.get('[name=dating-method][value=absolute]').click()
+    cy.get('[id="Min Basis for age (absolute)-multiselect"]').click()
+    cy.get('[data-value=other_absolute]').click()
     cy.get('[id="Max Basis for age (absolute)-multiselect"]').click()
     cy.get('[data-value=other_absolute]').click()
     cy.get('[id=min_age-textfield]').type('10.23')

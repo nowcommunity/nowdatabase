@@ -6,7 +6,8 @@ import { useDetailContext } from '@/components/DetailView/Context/DetailContext'
 import { TimeUnitTable } from '@/components/TimeUnit/TimeUnitTable'
 
 export const AgeTab = () => {
-  const { textField, radioSelection, dropdown, bigTextField, editData } = useDetailContext<LocalityDetailsType>()
+  const { textField, radioSelection, dropdown, bigTextField, editData, setEditData } =
+    useDetailContext<LocalityDetailsType>()
 
   const fracOptions = [
     emptyOption,
@@ -37,6 +38,23 @@ export const AgeTab = () => {
     'U/Th',
   ]
 
+  const handleDateMethChange = (value: number | string | boolean) => {
+    // this is to satisfy type requirements of handleSetEditData
+    if (typeof value !== 'string') return
+    setEditData({
+      ...editData,
+      date_meth: value,
+      min_age: undefined,
+      bfa_min_abs: '',
+      bfa_min: '',
+      frac_min: '',
+      max_age: undefined,
+      bfa_max_abs: '',
+      bfa_max: '',
+      frac_max: '',
+    })
+  }
+
   // TODO: The date_meth options should come from db: distinct(now_loc.date_meth)
   const age = [
     [
@@ -48,7 +66,8 @@ export const AgeTab = () => {
           { value: 'absolute', display: 'Absolute' },
           { value: 'composite', display: 'Composite' },
         ],
-        'dating-method'
+        'dating-method',
+        { handleSetEditData: handleDateMethChange }
       ),
     ],
     [''],
