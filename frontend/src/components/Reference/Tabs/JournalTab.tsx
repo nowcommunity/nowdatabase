@@ -18,9 +18,10 @@ export const JournalTab: React.FC<JournalTabProps> = ({ tab_name = 'Journal' }) 
   const { mode, editData, setEditData } = useDetailContext<ReferenceDetailsType>()
   const { data: journalData, isError } = useGetReferenceJournalsQuery(mode.read ? skipToken : undefined)
   let visible_ref_journal: Array<ReferenceJournalType> = []
-  if (editData.ref_journal) {
+  if (editData.ref_journal && Object.keys(editData.ref_journal).length !== 0) {
     visible_ref_journal = [Object.assign({}, editData.ref_journal)]
   }
+
   const journalColumns: MRT_ColumnDef<ReferenceJournalType>[] = [
     {
       accessorKey: 'journal_title',
@@ -101,6 +102,7 @@ export const JournalTab: React.FC<JournalTabProps> = ({ tab_name = 'Journal' }) 
         columns={referenceJournalColumns}
         field="ref_journal"
         visible_data={visible_ref_journal}
+        useObject={true}
       />
     </Grouped>
   )

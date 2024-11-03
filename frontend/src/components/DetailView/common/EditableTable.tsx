@@ -21,37 +21,53 @@ const getNewState = (state: RowState): RowState => {
   return 'clean'
 }
 
-export const EditableTable = <T extends MRT_RowData & { rowState?: RowState }, ParentType extends MRT_RowData>({
+export const EditableTable = <
+  T extends MRT_RowData & { rowState?: RowState; index?: number },
+  ParentType extends MRT_RowData,
+>({
   tableData,
   editTableData,
   columns,
   field,
-  visible_data,
+  visible_data, // use some filtered data instead of the actual data. Allows you to hide some rows. But be careful that the data is in the right format
+  useDefinedIndex = false, // Control whether to use the defined index or static index. The index data needs to have a key named 'index'.
+  useObject = false,
 }: {
   tableData?: Array<T> | null
   editTableData?: Array<EditDataType<T>> | null
   columns: MRT_ColumnDef<T>[]
   field: keyof EditDataType<ParentType>
   visible_data?: Array<T>
+  useDefinedIndex?: boolean
+  useObject?: boolean
 }) => {
   const [pagination, setPagination] = useState<MRT_PaginationState>(defaultPagination)
   const { editData, setEditData, mode, data } = useDetailContext<ParentType>()
+
   if (tableData === null || editTableData === null) return <CircularProgress />
 
   const actionRow = ({ row, staticRowIndex }: { row: MRT_Row<T>; staticRowIndex?: number | undefined }) => {
     const state = row.original.rowState ?? 'clean'
 
-    // TODO: Using static index - need to use some id, sorting breaks this
-    const rowClicked = (index: number | undefined) => {
+    // uses either 'row.original.index' or 'staticRowIndex' based on 'useDefinedIndex'
+    const rowClicked = () => {
+      let index = useDefinedIndex ? row.original.index : staticRowIndex
       if (index === undefined) return
-      const items = [...editData[field]]
+      let items: Array<EditDataType<T>>
+      if (useObject) {
+        items = [editData[field]]
+        index = 0
+      } else {
+        items = [...editData[field]]
+      }
+
       if (items[index].rowState === 'new') {
         items.splice(index, 1)
-        setEditData({ ...editData, [field]: items })
+        setEditData({ ...editData, [field]: useObject ? items[0] : items })
         return
       }
       items[index].rowState = getNewState(state)
-      setEditData({ ...editData, items })
+      setEditData({ ...editData, [field]: useObject ? items[0] : items })
     }
 
     const getIcon = () => {
@@ -61,7 +77,7 @@ export const EditableTable = <T extends MRT_RowData & { rowState?: RowState }, P
 
     return (
       <Box>
-        <Button onClick={() => rowClicked(staticRowIndex)}>{getIcon()}</Button>
+        <Button onClick={rowClicked}>{getIcon()}</Button>
       </Box>
     )
   }
@@ -76,7 +92,7 @@ export const EditableTable = <T extends MRT_RowData & { rowState?: RowState }, P
   }
 
   const getData = () => {
-    //be very very careful that visible_data is in the correct form if you use this
+    // Ensure `visible_data` is in the correct form before using it
     if (visible_data) {
       return visible_data
     }

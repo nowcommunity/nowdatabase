@@ -19,10 +19,10 @@ describe('Creating new reference works', () => {
   })
 
   it('Request succeeds and returns valid number id', async () => {
-    const { body: resultBody, status: getReqStatus } = await send<{ id: number }>('reference/', 'PUT', {
+    const { body: resultBody, status: getReqStatus } = await send<{ rid: number }>('reference/', 'PUT', {
       reference: { ...newReferenceBasis },
     })
-    const { id: createdId } = resultBody
+    const { rid: createdId } = resultBody
 
     expect(typeof createdId).toEqual('number') // `Invalid result returned on write: ${createdId}`
     expect(getReqStatus).toEqual(200)

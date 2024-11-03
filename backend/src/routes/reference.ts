@@ -50,14 +50,14 @@ router.put(
     if (validationErrors.length > 0) {
       return res.status(403).send(validationErrors)
     }
-    const id = await writeReference(editedReference)
-    return res.status(200).send({ id })
+    const rid = await writeReference(editedReference)
+    return res.status(200).send({ rid })
   }
 )
 
 router.delete('/:id', requireOneOf([Role.Admin]), async (req, res) => {
-  const id = parseInt(req.params.id)
-  await deleteReference(id)
+  const rid = parseInt(req.params.id)
+  await deleteReference(rid)
   res.status(200).send()
 })
 
