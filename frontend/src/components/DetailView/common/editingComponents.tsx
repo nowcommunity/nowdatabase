@@ -198,7 +198,7 @@ export const EditableTextField = <T extends object>({
   big = false,
   disabled = false,
   readonly = false,
-  changeSetter,
+  handleSetEditData,
 }: {
   field: keyof EditDataType<T>
   type?: React.HTMLInputTypeAttribute
@@ -206,7 +206,7 @@ export const EditableTextField = <T extends object>({
   big?: boolean
   disabled?: boolean
   readonly?: boolean
-  changeSetter?: React.Dispatch<React.SetStateAction<number>>
+  handleSetEditData?: (value: number | string) => void
 }) => {
   const { setEditData, editData, validator } = useDetailContext<T>()
   const { error } = validator(editData, field)
@@ -217,14 +217,15 @@ export const EditableTextField = <T extends object>({
       sx={{ width: fieldWidth, backgroundColor: disabled ? 'grey' : '' }}
       onChange={(event: ChangeEvent<HTMLInputElement>) => {
         const value = event?.currentTarget?.value
-        if (changeSetter) {
-          changeSetter(x => x + 1)
+        if (handleSetEditData) {
+          handleSetEditData(value)
+        } else {
+          if (type === 'text' || value === '') {
+            setEditData({ ...editData, [field]: value })
+            return
+          }
+          setEditData({ ...editData, [field]: parseFloat(value) })
         }
-        if (type === 'text' || value === '') {
-          setEditData({ ...editData, [field]: value })
-          return
-        }
-        setEditData({ ...editData, [field]: parseFloat(value) })
       }}
       id={`${name}-textfield`}
       value={editData[field] ?? ''}
