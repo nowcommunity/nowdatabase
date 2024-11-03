@@ -4,4 +4,4 @@ The TimeBoundSelection component is almost exactly the same as `FieldWithTableSe
 
 Should not be used for purposes other than time bound/time unit editing!
 
-Check the documentation for [FieldWithTableSelection](./editingComponents/FieldWithTableSelection.md)
+Check the documentation for [FieldWithTableSelection](./FieldWithTableSelection.md)
