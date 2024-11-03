@@ -34,7 +34,7 @@ export type TextFieldOptions = (
   disabled?: boolean
   big?: boolean
   readonly?: boolean
-  changeSetter?: React.Dispatch<React.SetStateAction<number>>
+  handleSetEditData?: (value: number | string) => void
 }
 
 export type OptionalRadioSelectionProps = {
