@@ -6,7 +6,7 @@
 2. Place the database dump files `now_test.sql`, `now_log_test.sql` and `now_view.sql` inside it.
 3. Notice, that the container will have to be able to read these files and execute `data/restore_and_create_user.sql`, so you may have to adjust the necessary rights depending on your operating system.
 
-See [technical explanations](technical_explanations.md) for how this works.
+See [technical explanations](./guides/technical_explanations.md) for how this works.
 
 **Init the project** :rocket:
 
