@@ -49,6 +49,8 @@ describe("Locality's Map works", () => {
     cy.visit(`/locality/20920?tab=1`)
     cy.contains('60.202665856')
     cy.contains('24.957662836')
+    cy.contains('60 12 9 N')
+    cy.contains('24 57 27 E')
   })
 })
 
