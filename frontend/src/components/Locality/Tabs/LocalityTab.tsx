@@ -127,10 +127,15 @@ export const LocalityTab = () => {
   // Kumpula Coordinates, could be changed later to be existing coordinates if exists
   const [coordinates, setCoordinates] = useState({ lat: 60.202665856, lng: 24.957662836 })
 
-  // ONLY dec coordinates, no conversion to dms yet
   // eslint-disable-next-line @typescript-eslint/require-await
   const onSaveCoord = async () => {
-    setEditData({ ...editData, dec_lat: coordinates.lat, dec_long: coordinates.lng })
+    setEditData({
+      ...editData,
+      dec_lat: coordinates.lat,
+      dms_lat: convertDecToDms(coordinates.lat, 'latitude'),
+      dec_long: coordinates.lng,
+      dms_long: convertDecToDms(coordinates.lng, 'longitude'),
+    })
     return Object.keys(errors).length === 0 //no idea if this is needed, just copypasted
   }
 
