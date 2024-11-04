@@ -6,3 +6,4 @@
 + Appropriate tests for the code have been written
 + The code passes all tests
 + The code is appropriately documented
++ The feature is online in staging
