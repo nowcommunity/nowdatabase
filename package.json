@@ -12,9 +12,11 @@
     "dev": "docker compose -f docker-compose.dev.yml up",
     "dev:down": "docker compose -f docker-compose.dev.yml down -v",
     "anon:down": "docker compose -f docker-compose.anon.yml down -v",
-    "check": "echo \"Running checks for both services...\" && npm run check:frontend && npm run check:backend && echo \"All good! :)\"",
+    "check": "echo \"Running checks for both services and cypress tests...\" && npm run check:frontend && npm run check:backend && npm run check:cypress && echo \"All good! :)\"",
     "check:backend": "echo \"Running backend tsc ...\" && cd backend && npx tsc --noEmit && echo \"Running backend eslint ...\"&& npm run lint",
     "check:frontend": "echo \"Running frontend tsc ...\" && cd frontend && npx tsc --noEmit && echo \"Running frontend eslint ...\" && npm run lint",
+    "check:cypress": "echo \"Running cypress eslint ...\" && npm run lint:cypress",
+    "lint:cypress": "eslint --report-unused-disable-directives --max-warnings 0 cypress/e2e/**.cy.js",
     "test:up": "docker compose -f docker-compose.test.yml up db-anon backend frontend",
     "test:down": "docker compose -f docker-compose.test.yml down -v",
     "test:ci": "docker compose -f docker-compose.test.yml up",
@@ -44,8 +46,15 @@
   "author": "",
   "devDependencies": {
     "@cypress/code-coverage": "^3.13.2",
+    "@eslint/js": "^9.14.0",
     "@types/leaflet": "^1.9.12",
     "cypress": "^13.11.0",
+    "eslint": "^9.14.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-cypress": "^4.1.0",
+    "eslint-plugin-prettier": "^5.2.1",
+    "globals": "^15.12.0",
+    "prettier": "^3.3.3",
     "supertest": "^7.0.0"
   }
 }

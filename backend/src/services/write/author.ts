@@ -1,6 +1,7 @@
-import { EditDataType, FixBigInt, ReferenceAuthorType, PrismaAuthor } from '../../../../frontend/src/backendTypes'
+import { EditDataType, FixBigInt, ReferenceAuthorType } from '../../../../frontend/src/backendTypes'
 import { getFieldsOfTables, nowDb } from '../../utils/db'
 import { filterAllowedKeys } from './writeOperations/utils'
+import Prisma from '../../../prisma/generated/now_test_client'
 
 export const writeReferenceAuthors = async (rid: number, authors: EditDataType<FixBigInt<ReferenceAuthorType>>[]) => {
   const allowedColumns = getFieldsOfTables(['ref_authors'])
@@ -12,7 +13,7 @@ export const writeReferenceAuthors = async (rid: number, authors: EditDataType<F
     })
 
     for (const author of authors) {
-      const filteredAuthor = filterAllowedKeys(author, allowedColumns) as FixBigInt<PrismaAuthor>
+      const filteredAuthor = filterAllowedKeys(author, allowedColumns) as FixBigInt<Prisma.ref_authors>
 
       await prisma.ref_authors.create({
         data: {

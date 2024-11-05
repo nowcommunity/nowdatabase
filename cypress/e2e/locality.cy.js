@@ -49,6 +49,8 @@ describe("Locality's Map works", () => {
     cy.visit(`/locality/20920?tab=1`)
     cy.contains('60.202665856')
     cy.contains('24.957662836')
+    cy.contains('60 12 9 N')
+    cy.contains('24 57 27 E')
   })
 })
 
@@ -60,6 +62,15 @@ describe('Creating a new locality...', () => {
   it('with valid data works', () => {
     cy.visit('/locality/new/')
     cy.contains('Creating new locality')
+    cy.get('[name=dating-method][value=absolute]').click()
+    cy.get('[id="Min Basis for age (absolute)-multiselect"]').click()
+    cy.get('[data-value=other_absolute]').click()
+    cy.contains('other_absolute')
+
+    // test clearing of age fields
+    cy.get('[name=dating-method][value=time_unit]').click()
+    cy.contains('other_absolute').should('not.exist')
+
     cy.get('[name=dating-method][value=absolute]').click()
     cy.get('[id="Min Basis for age (absolute)-multiselect"]').click()
     cy.get('[data-value=other_absolute]').click()
@@ -99,7 +110,7 @@ describe('Creating a new locality...', () => {
     cy.contains('This field is required')
     cy.get('[id=write-button]').click()
     cy.get('[id=write-button]').click()
-    cy.contains('Could not save item.')
+    cy.contains('Following validators failed: ')
     cy.contains('Edited item successfully.').should('not.exist')
     cy.visit('/locality/')
     cy.contains('Eg').should('not.exist')

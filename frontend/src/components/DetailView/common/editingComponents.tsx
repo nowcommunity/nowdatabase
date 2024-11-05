@@ -19,6 +19,7 @@ import { useDetailContext } from '../Context/DetailContext'
 import { DataValue } from './tabLayoutHelpers'
 import { modalStyle } from './misc'
 import { EditDataType } from '@/backendTypes'
+import { calculateLocalityMinAge, calculateLocalityMaxAge } from '@/util/ageCalculator'
 
 const fieldWidth = '14em'
 
@@ -127,11 +128,13 @@ export const RadioSelector = <T extends object>({
   name,
   field,
   defaultValue,
+  handleSetEditData,
 }: {
   options: Array<DropdownOption | DropdownOptionValue>
   name: string
   field: keyof EditDataType<T>
   defaultValue?: DropdownOptionValue
+  handleSetEditData?: (value: number | string | boolean) => void
 }) => {
   const { setEditData, editData } = useDetailContext<T>()
   if (defaultValue === undefined) {
@@ -146,7 +149,12 @@ export const RadioSelector = <T extends object>({
         aria-labelledby={`${name}-radio-selection`}
         name={name}
         onChange={(event: ChangeEvent<HTMLInputElement>) => {
-          const setValue = (value: number | string | boolean) => setEditData({ ...editData, [field]: value })
+          let setValue: (value: number | string | boolean) => void
+          if (handleSetEditData) {
+            setValue = (value: number | string | boolean) => handleSetEditData(value)
+          } else {
+            setValue = (value: number | string | boolean) => setEditData({ ...editData, [field]: value })
+          }
           const asNumber = typeof options[0] === 'number'
           setDropdownOptionValue(setValue, event?.currentTarget?.value, asNumber)
         }}
@@ -189,14 +197,16 @@ export const EditableTextField = <T extends object>({
   round,
   big = false,
   disabled = false,
-  changeSetter,
+  readonly = false,
+  handleSetEditData,
 }: {
   field: keyof EditDataType<T>
   type?: React.HTMLInputTypeAttribute
   round?: number
   big?: boolean
   disabled?: boolean
-  changeSetter?: React.Dispatch<React.SetStateAction<number>>
+  readonly?: boolean
+  handleSetEditData?: (value: number | string) => void
 }) => {
   const { setEditData, editData, validator } = useDetailContext<T>()
   const { error } = validator(editData, field)
@@ -207,14 +217,15 @@ export const EditableTextField = <T extends object>({
       sx={{ width: fieldWidth, backgroundColor: disabled ? 'grey' : '' }}
       onChange={(event: ChangeEvent<HTMLInputElement>) => {
         const value = event?.currentTarget?.value
-        if (changeSetter) {
-          changeSetter(x => x + 1)
+        if (handleSetEditData) {
+          handleSetEditData(value)
+        } else {
+          if (type === 'text' || value === '') {
+            setEditData({ ...editData, [field]: value })
+            return
+          }
+          setEditData({ ...editData, [field]: parseFloat(value) })
         }
-        if (type === 'text' || value === '') {
-          setEditData({ ...editData, [field]: value })
-          return
-        }
-        setEditData({ ...editData, [field]: parseFloat(value) })
       }}
       id={`${name}-textfield`}
       value={editData[field] ?? ''}
@@ -225,6 +236,7 @@ export const EditableTextField = <T extends object>({
       type={type}
       multiline={big}
       disabled={disabled}
+      InputProps={readonly ? { readOnly: true } : { readOnly: false }}
     />
   )
 
@@ -335,6 +347,87 @@ export const TimeBoundSelection = <T extends object, ParentType extends object>(
       size="small"
       error={!!boundError}
       helperText={boundError ?? ''}
+      value={editData[targetField as keyof EditDataType<ParentType>]}
+      onClick={() => setOpen(true)}
+      disabled={disabled}
+      sx={{ backgroundColor: disabled ? 'grey' : '' }}
+      inputProps={{ readOnly: true }}
+    />
+  )
+  return <DataValue<ParentType> field={targetField as keyof EditDataType<ParentType>} EditElement={editingComponent} />
+}
+
+export const BasisForAgeSelection = <T extends object, ParentType extends object>({
+  targetField,
+  sourceField,
+  lowBoundField,
+  upBoundField,
+  fraction,
+  selectorTable,
+  disabled,
+}: {
+  targetField: keyof ParentType
+  sourceField: keyof T
+  selectorTable: ReactElement
+  lowBoundField: keyof T
+  upBoundField: keyof T
+  fraction: string | null | undefined
+  disabled?: boolean
+}) => {
+  const { editData, setEditData, validator } = useDetailContext<ParentType>()
+  const { error } = validator(editData, targetField as keyof EditDataType<ParentType>)
+  const [open, setOpen] = useState(false)
+  const selectorFn = (selected: T) => {
+    if (targetField === 'bfa_min') {
+      setEditData({
+        ...editData,
+        min_age: calculateLocalityMinAge(
+          Number(selected[upBoundField]),
+          Number(selected[lowBoundField]),
+          String(fraction).split(' ')[2]
+        ),
+        [targetField]: selected[sourceField],
+      })
+    } else if (targetField === 'bfa_max') {
+      setEditData({
+        ...editData,
+        max_age: calculateLocalityMaxAge(
+          Number(selected[upBoundField]),
+          Number(selected[lowBoundField]),
+          String(fraction).split(' ')[2]
+        ),
+        [targetField]: selected[sourceField],
+      })
+    } else {
+      setEditData({ ...editData, [targetField]: selected[sourceField] })
+    }
+    setOpen(false)
+  }
+
+  const selectorTableWithFn = cloneElement(selectorTable, { selectorFn })
+  if (open)
+    return (
+      <Box>
+        <Modal
+          open={open}
+          aria-labelledby={`modal-${targetField as string}`}
+          aria-describedby={`modal-${targetField as string}`}
+        >
+          <Box sx={{ ...modalStyle }}>
+            <Box marginBottom="2em" marginTop="1em">
+              {selectorTableWithFn}
+            </Box>
+            <Button onClick={() => setOpen(false)}>Cancel</Button>
+          </Box>
+        </Modal>
+      </Box>
+    )
+  const editingComponent = (
+    <TextField
+      variant="outlined"
+      size="small"
+      error={!!error}
+      helperText={error ?? ''}
       value={editData[targetField as keyof EditDataType<ParentType>]}
       onClick={() => setOpen(true)}
       disabled={disabled}

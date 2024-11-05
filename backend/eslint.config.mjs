@@ -24,6 +24,7 @@ export default [
       '**/babel.config.js',
       '*/node_modules/*',
       '**/prisma',
+      '**/coverage',
     ],
   },
   ...fixupConfigRules(

@@ -86,3 +86,15 @@ export const deleteTimeUnit = async (id: string, user: User) => {
     throw e
   }
 }
+
+export const logTimeUnit = (
+  timeUnit: EditDataType<TimeUnitDetailsType>,
+  comment: string | undefined,
+  references: Reference[] | undefined,
+  authorizer: string
+) => {
+  if (timeUnit && comment && references && authorizer) {
+    // TODO
+  }
+  // TODO
+}

@@ -14,19 +14,29 @@ export const validateTimeUnit = (editData: EditDataType<TimeUnitDetailsType>, fi
     up_bnd: {
       name: 'New Upper Bound',
       required: true,
-      asNumber: true,
+      asNumber: (num: number) => {
+        if (num === editData.low_bnd) return 'Upper and lower bounds cannot be the same'
+        return
+      },
     },
     low_bnd: {
       name: 'New Lower Bound',
       required: true,
-      asNumber: true,
+      asNumber: (num: number) => {
+        if (num === editData.up_bnd) return 'Upper and lower bounds cannot be the same'
+        return
+      },
     },
     up_bound: {
       name: 'Upper Bound',
       required: true,
       miscCheck: () => {
-        if (editData.low_bound && editData.low_bound.age! < editData.up_bound!.age!)
+        if (editData.low_bound && editData.low_bound.age! === editData.up_bound!.age!) {
+          return 'Upper bound age cannot be the same as lower bound age'
+        }
+        if (editData.low_bound && editData.low_bound.age! < editData.up_bound!.age!) {
           return 'Upper bound age has to be lower than lower bound age'
+        }
         return
       },
     },
@@ -34,8 +44,12 @@ export const validateTimeUnit = (editData: EditDataType<TimeUnitDetailsType>, fi
       name: 'Lower Bound',
       required: true,
       miscCheck: () => {
-        if (editData.up_bound && editData.up_bound.age! > editData.low_bound!.age!)
+        if (editData.up_bound && editData.up_bound.age! === editData.low_bound!.age!) {
+          return 'Lower bound age cannot be the same as upper bound age'
+        }
+        if (editData.up_bound && editData.up_bound.age! > editData.low_bound!.age!) {
           return 'Lower bound age has to be higher than upper bound age'
+        }
         return
       },
     },

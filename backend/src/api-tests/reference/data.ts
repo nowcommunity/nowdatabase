@@ -54,6 +54,22 @@ export const newReferenceBasis: EditDataType<ReferenceDetailsType> = {
       field_id: 2,
       rowState: 'new',
     },
+    {
+      rid: undefined,
+      au_num: 2,
+      author_surname: 'testiauthor2',
+      author_initials: 'testi-initials2',
+      field_id: 2,
+      rowState: 'new',
+    },
+    {
+      rid: undefined,
+      au_num: 1,
+      author_surname: 'testiauthor3',
+      author_initials: 'testi-initials3',
+      field_id: 12,
+      rowState: 'new',
+    },
   ],
   ref_journal: {
     journal_title: 'testijournal',

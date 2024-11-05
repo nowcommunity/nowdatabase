@@ -6,6 +6,8 @@ import {
   getReferenceAuthors,
   getReferenceJournals,
   validateEntireReference,
+  getAuthorsOfReference,
+  getJournalById,
 } from '../services/reference'
 import { requireOneOf } from '../middlewares/authorizer'
 import { Role } from '../../../frontend/src/types'
@@ -34,6 +36,21 @@ router.get('/journals', async (_req, res) => {
   res.status(200).send(referenceTypes)
 })
 
+// Fetch authors by reference ID
+router.get('/authors/:id', async (req, res) => {
+  const id = parseInt(req.params.id)
+  const authors = await getAuthorsOfReference(id)
+  if (!authors) return res.status(404).send()
+  return res.status(200).send(authors)
+})
+
+router.get('/journal/:id', async (req, res) => {
+  const id = parseInt(req.params.id)
+  const journal = await getJournalById(id)
+  if (!journal) return res.status(404).send()
+  return res.status(200).send(journal)
+})
+
 router.get('/:id', async (req, res) => {
   const id = parseInt(req.params.id)
   const reference = await getReferenceDetails(id)
@@ -50,14 +67,14 @@ router.put(
     if (validationErrors.length > 0) {
       return res.status(403).send(validationErrors)
     }
-    const id = await writeReference(editedReference)
-    return res.status(200).send({ id })
+    const rid = await writeReference(editedReference)
+    return res.status(200).send({ rid })
   }
 )
 
 router.delete('/:id', requireOneOf([Role.Admin]), async (req, res) => {
-  const id = parseInt(req.params.id)
-  await deleteReference(id)
+  const rid = parseInt(req.params.id)
+  await deleteReference(rid)
   res.status(200).send()
 })
 
