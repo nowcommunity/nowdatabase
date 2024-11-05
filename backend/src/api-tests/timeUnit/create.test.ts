@@ -7,9 +7,6 @@ import { pool } from '../../utils/db'
 
 let createdTimeUnit: TimeUnitDetailsType | null = null
 
-////NOTES:
-// - server error 500 jos yritetään samalla nimellä luoda toinen xd
-
 describe('Creating new time unit', () => {
   beforeAll(async () => {
     await resetDatabase()
@@ -108,8 +105,6 @@ describe('Creating new time unit', () => {
       expect(typeof createdId).toEqual('undefined')
     })
 
-    // These probably shouldnt really cause 500 server error, but right now they just go 200 ???
-    // This is just switched up from the example ????? and still just goes 200??
     it('Conflicting bounds causes 403 error - test 1', async () => {
       const { body: resultBody, status: getReqStatus } = await send<{ tu_name: string }>('time-unit', 'PUT', {
         timeUnit: { ...newTimeUnitBasis, tu_display_name: 'conflicting bounds', up_bnd: 20213, low_bnd: 20214 },
@@ -120,7 +115,6 @@ describe('Creating new time unit', () => {
       expect(typeof createdId).toEqual('undefined')
     })
 
-    // status 200, broken
     it('Conflicting bounds causes 403 server error - test 2', async () => {
       const { body: resultBody, status: getReqStatus } = await send<{ tu_name: string }>('time-unit', 'PUT', {
         timeUnit: { ...newTimeUnitBasis, tu_display_name: 'conflicting bounds 2', up_bnd: 64 },
@@ -131,7 +125,6 @@ describe('Creating new time unit', () => {
       expect(typeof createdId).toEqual('undefined')
     })
 
-    // well this works
     it('Invalid bound id causes 403 server error', async () => {
       const { body: resultBody, status: getReqStatus } = await send<{ tu_name: string }>('time-unit', 'PUT', {
         timeUnit: { ...newTimeUnitBasis, tu_display_name: 'invalid bound id', low_bnd: 30000 },
