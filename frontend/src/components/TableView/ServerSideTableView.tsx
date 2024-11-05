@@ -152,11 +152,8 @@ export const TableView = <T extends MRT_RowData>({
 
   useEffect(() => {
     const fetchData = async () => {
-      console.log('fetching data');
-      console.log('tableUrl:', tableUrl);
       try {
-        const testQuery = await fetch(`${BACKEND_URL}/crosssearch/test`)
-        console.log('filteredData:', testQuery);
+        const filteredData = await fetch(BACKEND_URL+tableUrl)
         // setData([...filteredData]);
       } catch (error) {
         console.error('Error fetching data:', error);

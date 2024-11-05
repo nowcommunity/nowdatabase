@@ -10,8 +10,10 @@ router.get('/all/*', async (req, res) => {
   return res.status(200).send(fixBigInt(crossSearch))
 })
 
-router.get(`/test`, async (req, res) => {
-  console.log('filtering cross search');
+router.get(`/`, async (req, res) => {
+  const columnfilter = req.query.columnfilters;
+  const sorting = req.query.sorting;
+  const page = req.query.pagination;
   return res.status(200).send([]);
 });
 
