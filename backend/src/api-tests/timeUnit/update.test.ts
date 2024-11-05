@@ -195,13 +195,6 @@ describe('Time unit updating works', () => {
       expect(body.low_bnd).toEqual(existingTimeUnit.low_bnd)
     })
 
-    it('Update logs are correct', async () => {
-      // edit time unit to create a log update
-      const { body: resultBody } = await send<{ tu_name: string }>('time-unit', 'PUT', {
-        timeUnit: editedTimeUnit,
-      })
-    })
-
     it('Updating with duplicate data should succeed', async () => {
       const result = await send('time-unit', 'PUT', {
         timeUnit: { tu_name: 'baheantest', ...newTimeUnitBasis },
