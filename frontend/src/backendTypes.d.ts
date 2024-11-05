@@ -300,3 +300,18 @@ type ValidationErrorItem = {
   name: string
   error: string
 }
+
+export type ColumnFilter = {
+  column: string
+  value: string
+}
+
+export type Sorting = {
+  column: string
+  direction: 'asc' | 'desc'
+}
+
+export type Page = {
+  pageIndex: number
+  pageSize: number
+}
