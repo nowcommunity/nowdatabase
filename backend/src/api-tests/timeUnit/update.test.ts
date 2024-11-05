@@ -96,10 +96,9 @@ describe('Time unit updating works', () => {
   })
 
   describe("Can't update existing Time Unit to have invalid bounds", () => {
-    // this is right now 200, not sure if shouldn't be, this can be deleted if not something to work on
     it("Updating both to a same bound doesn't change time unit's bounds", async () => {
       const { body: resultBody, status: getReqStatus } = await send<{ tu_name: string }>('time-unit', 'PUT', {
-        timeUnit: { ...existingTimeUnit, low_bnd: 20213 },
+        timeUnit: { ...existingTimeUnit, up_bnd: 20213 },
       })
 
       expect(getReqStatus).toBe(403)
