@@ -48,6 +48,7 @@ export const TableView = <T extends MRT_RowData>({
   const [pagination, setPagination] = useState<MRT_PaginationState>(
     selectorFn ? defaultPaginationSmall : defaultPagination
   )
+  const [rowCount, setRowCount] = useState(5)
 
   const user = useUser()
   const { setIdList, setTableUrl, tableUrl } = usePageContext<T>()
@@ -76,6 +77,7 @@ export const TableView = <T extends MRT_RowData>({
   }
 
   const table = useMaterialReactTable({
+    rowCount,
     columns: columns,
     data: data || [],
     state: {
@@ -110,6 +112,8 @@ export const TableView = <T extends MRT_RowData>({
     enableColumnActions: false,
     enableHiding: true,
     manualFiltering: true,
+    manualPagination: true,
+    manualSorting: true,
     renderToolbarInternalActions:
       /*
         To know what components you can render here if necessary, see the source code:
@@ -155,7 +159,9 @@ export const TableView = <T extends MRT_RowData>({
       try {
         const filteredData = await fetch(BACKEND_URL+tableUrl)
         const body = await filteredData.json()
-        setData([...body]);
+        const data=JSON.parse(body.data)
+        setData([...data]);
+        setRowCount(body.rowCount);
       } catch (error) {
         console.error('Error fetching data:', error);
       }

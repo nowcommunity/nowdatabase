@@ -204,6 +204,8 @@ export const getFilteredCrossSearch = async (columnfilter: ColumnFilter[] | [], 
     return rest
   }
 
+  // const rowCount = await nowDb.now_ls.count()
+
   const queryResult = await nowDb.now_ls.findMany({
     take: page.pageSize,
     skip: page.pageIndex * page.pageSize,
@@ -331,5 +333,40 @@ export const getFilteredCrossSearch = async (columnfilter: ColumnFilter[] | [], 
     .filter(loc => !loc.loc_status || loc.now_plr.find(now_plr => usersProjects.has(now_plr.pid)))
     .map(removeProjects)
 
-  return result
+  return { data: result }
+}
+
+export const getFilteredCrossSearchLength = async (columnfilter: ColumnFilter[] | [], user?: User) => {
+  const showAll = user && [Role.Admin, Role.EditUnrestricted].includes(user.role)
+
+  const queryResult = await nowDb.now_ls.findMany({
+    select: {
+      now_loc: {
+        select: {
+          lid: true,
+          loc_status: true,
+          now_plr: {
+            select: { pid: true },
+          },
+        },
+      },
+    },
+  })
+
+  const flattenedResult = queryResult.map(item => ({
+    lid: item.now_loc.lid,
+    loc_status: item.now_loc.loc_status,
+    now_plr: item.now_loc.now_plr,
+  })) as CrossSearchPreFilter[]
+
+  if (showAll) {
+    return flattenedResult.length
+  }
+  if (!user) {
+    return flattenedResult.filter(loc => loc.loc_status === false).length
+  }
+
+  const usersProjects = await getIdsOfUsersProjects(user)
+
+  return flattenedResult.filter(loc => !loc.loc_status || loc.now_plr.find(now_plr => usersProjects.has(now_plr.pid))).length
 }
