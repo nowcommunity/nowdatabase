@@ -63,7 +63,8 @@ export const DropdownSelector = <T extends object>({
       // removes valid field from the array
       setAllErrors(allErrors.filter(err => err !== errorField))
     }
-  }, [error, allErrors, field, setAllErrors])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [error])
 
   const editingComponent = (
     <FormControl size="small" error={!!error}>
@@ -234,7 +235,8 @@ export const EditableTextField = <T extends object>({
       // removes valid field from the array
       setAllErrors(allErrors.filter(err => err !== errorField))
     }
-  }, [error, allErrors, field, setAllErrors])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [error])
 
   const editingComponent = (
     <TextField
@@ -295,7 +297,8 @@ export const FieldWithTableSelection = <T extends object, ParentType extends obj
       // removes valid field from the array
       setAllErrors(allErrors.filter(err => err !== errorField))
     }
-  }, [error, allErrors, targetField, setAllErrors])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [error])
 
   const selectorTableWithFn = cloneElement(selectorTable, { selectorFn })
   if (open)
@@ -367,7 +370,8 @@ export const TimeBoundSelection = <T extends object, ParentType extends object>(
       // removes valid field from the array
       setAllErrors(allErrors.filter(err => err !== errorField))
     }
-  }, [boundError, allErrors, targetField, setAllErrors])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [boundError])
 
   const selectorTableWithFn = cloneElement(selectorTable, { selectorFn })
   if (open)
