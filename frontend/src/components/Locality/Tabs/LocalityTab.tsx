@@ -54,45 +54,61 @@ export const LocalityTab = () => {
     ['Plate', textField('plate')],
   ]
 
-  const handleDmsLatChange = (value: number | string) => {
-    const valueAsString = String(value)
-    setEditData({ ...editData, dms_lat: valueAsString, dec_lat: convertDmsToDec(valueAsString, 'latitude') })
-  }
+  const handleCoordinateChange = (
+    value: number | string,
+    dmsOrDec: 'dms' | 'dec',
+    latitudeOrLongitude: 'latitude' | 'longitude'
+  ) => {
+    const latOrLong = latitudeOrLongitude === 'latitude' ? 'lat' : 'long'
+    const dmsField = 'dms' + '_' + latOrLong
+    const decField = 'dec' + '_' + latOrLong
 
-  const handleDmsLongChange = (value: number | string) => {
-    const valueAsString = String(value)
-    setEditData({ ...editData, dms_long: valueAsString, dec_long: convertDmsToDec(valueAsString, 'longitude') })
-  }
-
-  const handleDecLatChange = (value: number | string) => {
-    if (value === '') {
-      setEditData({ ...editData, dec_lat: undefined, dms_lat: undefined })
-      return
+    if (dmsOrDec === 'dms') {
+      const valueAsString = String(value)
+      setEditData({
+        ...editData,
+        [dmsField]: valueAsString,
+        [decField]: convertDmsToDec(valueAsString, latitudeOrLongitude),
+      })
+    } else {
+      if (value === '') {
+        setEditData({ ...editData, dec_long: undefined, dms_long: undefined })
+        return
+      }
+      const valueAsNumber = Number(value)
+      setEditData({
+        ...editData,
+        [decField]: Number(value),
+        [dmsField]: convertDecToDms(valueAsNumber, latitudeOrLongitude),
+      })
     }
-    const valueAsNumber = Number(value)
-    setEditData({ ...editData, dec_lat: Number(value), dms_lat: convertDecToDms(valueAsNumber, 'latitude') })
   }
 
-  const handleDecLongChange = (value: number | string) => {
-    if (value === '') {
-      setEditData({ ...editData, dec_lat: undefined, dms_lat: undefined })
-      return
-    }
-    const valueAsNumber = Number(value)
-    setEditData({ ...editData, dec_long: Number(value), dms_long: convertDecToDms(valueAsNumber, 'longitude') })
-  }
+  //pitäs olla funktio mikä palauttaa funktion?
 
   const latlong = [
     ['', 'dms', 'dec'],
     [
       'Latitude',
-      textField('dms_lat', { type: 'text', handleSetEditData: handleDmsLatChange }),
-      textField('dec_lat', { type: 'number', handleSetEditData: handleDecLatChange }),
+      textField('dms_lat', {
+        type: 'text',
+        handleSetEditData: value => handleCoordinateChange(value, 'dms', 'latitude'),
+      }),
+      textField('dec_lat', {
+        type: 'number',
+        handleSetEditData: value => handleCoordinateChange(value, 'dec', 'latitude'),
+      }),
     ],
     [
       'Longitude',
-      textField('dms_long', { type: 'text', handleSetEditData: handleDmsLongChange }),
-      textField('dec_long', { type: 'number', handleSetEditData: handleDecLongChange }),
+      textField('dms_long', {
+        type: 'text',
+        handleSetEditData: value => handleCoordinateChange(value, 'dms', 'longitude'),
+      }),
+      textField('dec_long', {
+        type: 'number',
+        handleSetEditData: value => handleCoordinateChange(value, 'dec', 'longitude'),
+      }),
     ],
     ['Approximate Coordinates', dropdown('approx_coord', approximateCoordinatesOptions, 'Approximate Coordinates')],
     ['Altitude (m)', textField('altitude')],
