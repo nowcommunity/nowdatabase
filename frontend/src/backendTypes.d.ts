@@ -307,8 +307,8 @@ export type ColumnFilter = {
 }
 
 export type Sorting = {
-  column: string
-  direction: 'asc' | 'desc'
+  id: string
+  desc: boolean
 }
 
 export type Page = {
