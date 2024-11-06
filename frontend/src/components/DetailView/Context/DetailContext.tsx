@@ -69,6 +69,8 @@ export type DetailContextType<T> = {
     optionalRadioSelectionProps?: OptionalRadioSelectionProps
   ) => JSX.Element
   validator: (editData: EditDataType<T>, field: keyof EditDataType<T>) => ValidationObject
+  allErrors: Array<string>
+  setAllErrors: (newAllErrors: Array<string>) => void
 }
 
 export const DetailContext = createContext<DetailContextType<unknown>>(null!)
