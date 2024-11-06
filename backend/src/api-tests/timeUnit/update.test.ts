@@ -1,11 +1,14 @@
 import { describe, it, beforeEach, beforeAll, afterAll, expect } from '@jest/globals'
-import { TimeUnitDetailsType } from '../../../../frontend/src/backendTypes'
+import { TimeUnitDetailsType, EditDataType, EditMetaData } from '../../../../frontend/src/backendTypes'
 import { login, resetDatabase, send, resetDatabaseTimeout, testLogRows } from '../utils'
 import { editedTimeUnit, newTimeUnitBasis, conflictingTimeUnit } from './data'
 import { pool } from '../../utils/db'
 import { LogRow } from '../../services/write/writeOperations/types'
 
-const existingTimeUnit = { ...newTimeUnitBasis, tu_name: 'baheantest' }
+const existingTimeUnit: EditDataType<TimeUnitDetailsType & EditMetaData> = {
+  ...newTimeUnitBasis,
+  tu_name: 'baheantest',
+}
 
 describe('Time unit updating works', () => {
   beforeAll(async () => {
@@ -59,6 +62,19 @@ describe('Time unit updating works', () => {
     const invalidSequenceTimeUnit = { ...existingTimeUnit, sequence: null }
     const { body: resultBody } = await send<{ tu_name: string }>('time-unit', 'PUT', {
       timeUnit: invalidSequenceTimeUnit,
+    })
+    const { tu_name: existingId } = resultBody
+    expect(typeof existingId).toEqual('undefined')
+
+    const { body } = await send<TimeUnitDetailsType>(`time-unit/${existingTimeUnit.tu_name}`, 'GET')
+    expect(body.tu_display_name).toEqual(existingTimeUnit.tu_display_name)
+    expect(body.up_bnd).toEqual(existingTimeUnit.up_bnd)
+    expect(body.low_bnd).toEqual(existingTimeUnit.low_bnd)
+  })
+  it('Update request with same upper and lower bound fails', async () => {
+    const invalidBoundsTimeUnit = { ...existingTimeUnit, up_bnd: 20214, low_bnd: 20214 }
+    const { body: resultBody } = await send<{ tu_name: string }>('time-unit', 'PUT', {
+      timeUnit: invalidBoundsTimeUnit,
     })
     const { tu_name: existingId } = resultBody
     expect(typeof existingId).toEqual('undefined')

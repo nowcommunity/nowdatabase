@@ -63,15 +63,11 @@ export const LocalityDetails = () => {
       setTimeout(() => navigate(`/locality/${id}`), 15)
       notify('Edited item successfully.')
     } catch (e) {
-      if (e && typeof e === 'object' && 'status' in e && e.status !== 403) {
-        notify('Could not edit item. Error happened.', 'error')
-      } else {
+      if (e && typeof e === 'object' && 'status' in e && e.status === 403) {
         const error = e as ValidationErrors
-        let message = 'Could not save item. Missing: '
-        Object.keys(error.data).forEach(key => {
-          message += `${error.data[key].name}, `
-        })
-        notify(message, 'error')
+        notify('Following validators failed: ' + error.data.map(e => e.name).join(', '), 'error')
+      } else {
+        notify('Could not edit item. Error happened.', 'error')
       }
     }
   }
