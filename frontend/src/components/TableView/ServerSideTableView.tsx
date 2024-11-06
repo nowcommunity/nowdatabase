@@ -157,11 +157,13 @@ export const TableView = <T extends MRT_RowData>({
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const filteredData = await fetch(BACKEND_URL+tableUrl)
-        const body = await filteredData.json()
-        const data=JSON.parse(body.data)
-        setData([...data]);
-        setRowCount(body.rowCount);
+        const filteredData = await fetch(BACKEND_URL + tableUrl)
+        if (filteredData !== undefined) {
+          const body = await filteredData.json()
+          const data = JSON.parse(body.data)
+          setData([...data])
+          setRowCount(body.rowCount)
+        }
       } catch (error) {
         console.error('Error fetching data:', error);
       }
@@ -174,21 +176,19 @@ export const TableView = <T extends MRT_RowData>({
 
   return (
     <Paper elevation={5} style={{ paddingTop: '0.1rem' }}>
-      {!selectorFn && user && (
-        <>
-          <Box sx={{ display: 'flex', flexGap: '2', marginTop: '1rem', justifyContent: 'center', maxHeight: '3.2em' }}>
-            <Typography sx={{ margin: '0.4rem' }} variant="h4">
-              {title ?? ''}
-            </Typography>
-            {editRights.new && title != 'Locality-Species-Cross-Search' && (
-              <Button sx={{ marginRight: '1rem', marginLeft: '1rem' }} variant="contained" component={Link} to="new">
-                New
-              </Button>
-            )}
-          </Box>
-          <Divider sx={{ marginTop: '1rem' }} />
-        </>
-      )}
+      <>
+        <Box sx={{ display: 'flex', flexGap: '2', marginTop: '1rem', justifyContent: 'center', maxHeight: '3.2em' }}>
+          <Typography sx={{ margin: '0.4rem' }} variant="h4">
+            {title ?? ''}
+          </Typography>
+          {editRights.new && title != 'Locality-Species-Cross-Search' && (
+            <Button sx={{ marginRight: '1rem', marginLeft: '1rem' }} variant="contained" component={Link} to="new">
+              New
+            </Button>
+          )}
+        </Box>
+        <Divider sx={{ marginTop: '1rem' }} />
+      </>
       <MaterialReactTable table={table} />
     </Paper>
   )

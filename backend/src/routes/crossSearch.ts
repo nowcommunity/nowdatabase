@@ -12,13 +12,16 @@ router.get('/all/*', async (req, res) => {
 })
 
 router.get(`/`, async (req, res) => {
-  const columnfilter = req.query.columnfilters as ColumnFilter[] | []
-  const sorting = req.query.sorting as Sorting[] | []
+  const columnfilter = req.query.columnfilters as unknown as string
+  const sorting = req.query.sorting as unknown as string
   const page = req.query.pagination as unknown as string
   if (!page) return res.status(200).send([])  // there is no pagination in the request when navigating to the page at first
+  const columnfilterObject = JSON.parse(columnfilter as string) as ColumnFilter[]
+  const sortingObject = JSON.parse(sorting as string) as Sorting[]
+  console.log('sortingObject',sortingObject)
   const pageObject = JSON.parse(page as string) as Page
-  const data = await getFilteredCrossSearch(columnfilter, sorting, pageObject, req.user) as any
-  const rowCount = await getFilteredCrossSearchLength(columnfilter, req.user)
+  const data = await getFilteredCrossSearch(columnfilterObject, sortingObject, pageObject, req.user) as any
+  const rowCount = await getFilteredCrossSearchLength(columnfilterObject, req.user)
   const result = {
     data: fixBigInt(data),
     rowCount,

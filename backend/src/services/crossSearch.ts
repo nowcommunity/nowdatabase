@@ -10,8 +10,7 @@ const getIdsOfUsersProjects = async (user: User) => {
 
   return new Set(usersProjects.map(({ pid }) => pid))
 }
-
-type CrossSearchPreFilter = {
+type CrossSearchLocalities = {
   lid: number
   loc_name: string
   bfa_max: string | null
@@ -39,15 +38,13 @@ type CrossSearchPreFilter = {
   formation: string | null
   member: string | null
   bed: string | null
-  loc_status: boolean | null
-  now_plr: {
-    pid: number
-  }[]
+}
+type CrossSearchSpecies = {
   species_id: number
-  order_name: string
-  family_name: string
   subclass_or_superorder_name: string | null
+  order_name: string
   suborder_or_superfamily_name: string | null
+  family_name: string
   subfamily_name: string | null
   genus_name: string
   species_name: string
@@ -59,8 +56,8 @@ type CrossSearchPreFilter = {
   gene: string | null
   body_mass: number | null
   brain_mass: number | null
-  sp_status: boolean | null
 }
+type CrossSearchPreFilter = CrossSearchLocalities & CrossSearchSpecies & { loc_status: boolean | null, now_plr: { pid: number }[], sp_status: string | null }
 
 export const getAllCrossSearch = async (user?: User) => {
   const showAll = user && [Role.Admin, Role.EditUnrestricted].includes(user.role)
