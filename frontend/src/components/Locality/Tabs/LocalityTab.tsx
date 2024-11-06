@@ -84,8 +84,6 @@ export const LocalityTab = () => {
     }
   }
 
-  //pitäs olla funktio mikä palauttaa funktion?
-
   const latlong = [
     ['', 'dms', 'dec'],
     [
