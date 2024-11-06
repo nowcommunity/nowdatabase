@@ -151,13 +151,11 @@ export const TableView = <T extends MRT_RowData>({
   }, [table, columnFilters, sorting])
 
   useEffect(() => {
-    console.log('wut')
     const fetchData = async () => {
       try {
         const filteredData = await fetch(BACKEND_URL+tableUrl)
         const body = await filteredData.json()
-        console.log('filteredData:', body)
-        // setData([...filteredData]);
+        setData([...body]);
       } catch (error) {
         console.error('Error fetching data:', error);
       }

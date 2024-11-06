@@ -1,4 +1,4 @@
-import { User, ColumnFilter, Sorting } from '../../../frontend/src/backendTypes'
+import { User, ColumnFilter, Sorting, Page } from '../../../frontend/src/backendTypes'
 import { Role } from '../../../frontend/src/types'
 import { nowDb } from '../utils/db'
 
@@ -197,7 +197,7 @@ export const getAllCrossSearch = async (user?: User) => {
   return result
 }
 
-export const getFilteredCrossSearch = async (columnfilter: ColumnFilter[] | [], sorting: Sorting[] | [], user?: User) => {
+export const getFilteredCrossSearch = async (columnfilter: ColumnFilter[] | [], sorting: Sorting[] | [], page: Page, user?: User) => {
   const showAll = user && [Role.Admin, Role.EditUnrestricted].includes(user.role)
   const removeProjects: (loc: CrossSearchPreFilter) => Omit<CrossSearchPreFilter, 'now_plr'> = loc => {
     const { now_plr, ...rest } = loc
@@ -205,6 +205,8 @@ export const getFilteredCrossSearch = async (columnfilter: ColumnFilter[] | [], 
   }
 
   const queryResult = await nowDb.now_ls.findMany({
+    take: page.pageSize,
+    skip: page.pageIndex * page.pageSize,
     select: {
       now_loc: {
         select: {
