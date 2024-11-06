@@ -129,6 +129,21 @@ export const DetailView = <T extends object>({
     setAllErrors,
   }
 
+  useEffect(() => {
+    if (mode.option === 'edit' || mode.option === 'new') {
+      const validationErrors: Array<string> = []
+      for (const field in initialState.editData) {
+        // if (field === 'references') continue
+        const { error } = validator(initialState.editData, field)
+        if (error) {
+          validationErrors.push(field)
+        }
+      }
+      setAllErrors(validationErrors)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [mode])
+
   const paperProps = {
     style: {
       minHeight: '10em',
