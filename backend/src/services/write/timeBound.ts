@@ -1,9 +1,19 @@
-import { EditDataType, Reference, TimeBoundDetailsType, User } from '../../../../frontend/src/backendTypes'
+import {
+  EditDataType,
+  Reference,
+  TimeBoundDetailsType,
+  LocalityDetailsType,
+  TimeUnitDetailsType,
+  User,
+} from '../../../../frontend/src/backendTypes'
 import { NOW_DB_NAME } from '../../utils/config'
 import { WriteHandler } from './writeOperations/writeHandler'
 import { getFieldsOfTables } from '../../utils/db'
 import { ActionType } from './writeOperations/types'
 import { getTimeBoundDetails } from '../timeBound'
+import { checkTimeBoundCascade } from '../../utils/cascadeHandler'
+import { writeLocalityCascade } from './locality'
+import { logTimeUnit } from './timeUnit'
 
 const getTimeBoundWriteHandler = (type: ActionType) => {
   return new WriteHandler({
@@ -28,8 +38,39 @@ export const writeTimeBound = async (
     await writeHandler.start()
     const result = await writeHandler.upsertObject('now_tu_bound', timeBound, ['bid'])
     writeHandler.idValue = result ? (result.bid as number) : (timeBound.bid as number)
+
+    const { cascadeErrors, calculatorErrors, localitiesToUpdate, timeUnitsToUpdate } =
+      await checkTimeBoundCascade(timeBound)
+
+    if (calculatorErrors.length > 0 || cascadeErrors.length > 0) {
+      const calculatorErrorsString =
+        calculatorErrors.length > 0 ? `Check fractions of following localities: ${calculatorErrors.join(', ')}` : ''
+      const cascadeErrorsString =
+        cascadeErrors.length > 0
+          ? `Following time units or localities would become contradicting: ${cascadeErrors.join(', ')}`
+          : ''
+      const errorObject = {
+        name: 'cascade',
+        calculatorErrors: calculatorErrorsString,
+        cascadeErrors: cascadeErrorsString,
+      }
+      await writeHandler.end()
+      return { result: writeHandler.idValue, errorObject }
+    }
+    if (localitiesToUpdate.length > 0) {
+      for (const locality of localitiesToUpdate) {
+        await writeLocalityCascade(locality as EditDataType<LocalityDetailsType>, comment, references, authorizer)
+      }
+    }
+
+    if (timeUnitsToUpdate.length > 0) {
+      for (const timeUnit of timeUnitsToUpdate) {
+        logTimeUnit(timeUnit as unknown as EditDataType<TimeUnitDetailsType>, comment, references, authorizer)
+      }
+    }
+
     await writeHandler.logUpdatesAndComplete(authorizer, comment ?? '', references ?? [])
-    return writeHandler.idValue
+    return { result: writeHandler.idValue, errorObject: undefined }
   } catch (e) {
     await writeHandler.end()
     throw e

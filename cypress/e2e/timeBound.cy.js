@@ -10,11 +10,11 @@ describe('Editing time bound', () => {
     cy.visit(`/time-bound/11?tab=0`)
     cy.contains('C2N-y')
     cy.get('[id=edit-button]').click()
-    cy.get('[id=age-textfield]').first().type('{backspace}{backspace}{backspace}{backspace}{backspace}2.5')
+    cy.get('[id=age-textfield]').first().type('{backspace}{backspace}{backspace}{backspace}{backspace}1.5')
     cy.contains('This field is required').should('not.exist')
     cy.get('[id=write-button]').click()
     cy.get('[id=write-button]').click()
-    cy.contains('2.5')
+    cy.contains('1.5')
   })
 
   it('User editing time bound with incorrect values is notified about it', () => {

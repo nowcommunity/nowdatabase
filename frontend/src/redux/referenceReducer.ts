@@ -46,6 +46,12 @@ const referencesApi = api.injectEndpoints({
       }),
       invalidatesTags: (result, _error, { rid }) => (result ? [{ type: 'reference', id: rid }, 'references'] : []),
     }),
+    deleteReference: builder.mutation<void, number>({
+      query: id => ({
+        url: `/reference/${id}`,
+        method: 'DELETE',
+      }),
+    }),
   }),
 })
 
@@ -56,4 +62,5 @@ export const {
   useGetReferenceAuthorsQuery,
   useGetReferenceJournalsQuery,
   useEditReferenceMutation,
+  useDeleteReferenceMutation,
 } = referencesApi

@@ -1,7 +1,8 @@
 import { nowDb } from '../utils/db'
-import { EditDataType, ReferenceDetailsType, PrismaReference } from '../../../frontend/src/backendTypes'
+import { EditDataType, ReferenceDetailsType } from '../../../frontend/src/backendTypes'
 import { ValidationObject } from '../../../frontend/src/validators/validator'
 import { validateReference } from '../../../frontend/src/validators/reference'
+import Prisma from '../../prisma/generated/now_test_client'
 
 export const getAllReferences = async () => {
   const result = await nowDb.ref_ref.findMany({
@@ -78,18 +79,13 @@ export const getAuthorsOfReference = async (rid: number) => {
   return authors
 }
 
-export const getAuthorById = async (rid: number, au_num: number, field_id: number) => {
-  const author = await nowDb.ref_authors.findUnique({
+export const getJournalById = async (journal_id: number) => {
+  const authors = await nowDb.ref_journal.findMany({
     where: {
-      rid_field_id_au_num: {
-        // Composite key field
-        rid: rid,
-        au_num: au_num,
-        field_id: field_id,
-      },
+      journal_id: journal_id,
     },
   })
-  return author
+  return authors
 }
 
 export const getReferenceJournals = async () => {
@@ -97,7 +93,7 @@ export const getReferenceJournals = async () => {
   return referenceJournalTypes
 }
 
-export const validateEntireReference = (editedFields: EditDataType<PrismaReference>) => {
+export const validateEntireReference = (editedFields: EditDataType<Prisma.ref_ref>) => {
   const keys = Object.keys(editedFields)
   const errors: ValidationObject[] = []
   for (const key of keys) {

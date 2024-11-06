@@ -1,10 +1,11 @@
-import { EditDataType, FixBigInt, PrismaJournal, ReferenceJournalType } from '../../../../frontend/src/backendTypes'
+import { EditDataType, FixBigInt, ReferenceJournalType } from '../../../../frontend/src/backendTypes'
 import { getFieldsOfTables, nowDb } from '../../utils/db'
 import { filterAllowedKeys } from './writeOperations/utils'
+import Prisma from '../../../prisma/generated/now_test_client'
 
 export const writeReferenceJournal = async (journal: EditDataType<FixBigInt<ReferenceJournalType>>) => {
   const allowedColumns = getFieldsOfTables(['ref_journal'])
-  const filteredJournal = filterAllowedKeys(journal, allowedColumns) as FixBigInt<PrismaJournal>
+  const filteredJournal = filterAllowedKeys(journal, allowedColumns) as FixBigInt<Prisma.ref_journal>
 
   const journal_id = await nowDb.$transaction(async prisma => {
     if (journal.journal_id) {
