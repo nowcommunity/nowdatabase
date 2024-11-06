@@ -13,7 +13,7 @@ import {
   Modal,
   Button,
 } from '@mui/material'
-import { cloneElement, ChangeEvent, ReactNode, useState, ReactElement } from 'react'
+import { cloneElement, ChangeEvent, ReactNode, useState, ReactElement, useEffect } from 'react'
 import { RegisterOptions, FieldValues, UseFormRegisterReturn, FieldErrors } from 'react-hook-form'
 import { useDetailContext } from '../Context/DetailContext'
 import { DataValue } from './tabLayoutHelpers'
@@ -51,8 +51,20 @@ export const DropdownSelector = <T extends object>({
   field: keyof EditDataType<T>
   disabled?: boolean
 }) => {
-  const { setEditData, editData, validator } = useDetailContext<T>()
+  const { setEditData, editData, validator, allErrors, setAllErrors } = useDetailContext<T>()
   const { error } = validator(editData, field)
+
+  useEffect(() => {
+    const errorField = String(field)
+    if (error && !allErrors.includes(errorField)) {
+      // saves invalid field into array of errors in context
+      setAllErrors([...allErrors, errorField])
+    } else if (!error && allErrors.includes(errorField)) {
+      // removes valid field from the array
+      setAllErrors(allErrors.filter(err => err !== errorField))
+    }
+  }, [error, allErrors, field, setAllErrors])
+
   const editingComponent = (
     <FormControl size="small" error={!!error}>
       <InputLabel id={`${name}-multiselect-label`}>{name}</InputLabel>
@@ -143,6 +155,7 @@ export const RadioSelector = <T extends object>({
   if (editData[field] === null) {
     setEditData({ ...editData, [field]: defaultValue })
   }
+
   const editingComponent = (
     <FormControl>
       <RadioGroup
@@ -208,9 +221,20 @@ export const EditableTextField = <T extends object>({
   readonly?: boolean
   handleSetEditData?: (value: number | string) => void
 }) => {
-  const { setEditData, editData, validator } = useDetailContext<T>()
+  const { setEditData, editData, validator, allErrors, setAllErrors } = useDetailContext<T>()
   const { error } = validator(editData, field)
   const name = String(field)
+
+  useEffect(() => {
+    const errorField = String(field)
+    if (error && !allErrors.includes(errorField)) {
+      // saves invalid field into array of errors in context
+      setAllErrors([...allErrors, errorField])
+    } else if (!error && allErrors.includes(errorField)) {
+      // removes valid field from the array
+      setAllErrors(allErrors.filter(err => err !== errorField))
+    }
+  }, [error, allErrors, field, setAllErrors])
 
   const editingComponent = (
     <TextField
@@ -254,13 +278,24 @@ export const FieldWithTableSelection = <T extends object, ParentType extends obj
   selectorTable: ReactElement
   disabled?: boolean
 }) => {
-  const { editData, setEditData, validator } = useDetailContext<ParentType>()
+  const { editData, setEditData, validator, allErrors, setAllErrors } = useDetailContext<ParentType>()
   const { error } = validator(editData, targetField as keyof EditDataType<ParentType>)
   const [open, setOpen] = useState(false)
   const selectorFn = (selected: T) => {
     setEditData({ ...editData, [targetField]: selected[sourceField] })
     setOpen(false)
   }
+
+  useEffect(() => {
+    const errorField = String(targetField)
+    if (error && !allErrors.includes(errorField)) {
+      // saves invalid field into array of errors in context
+      setAllErrors([...allErrors, errorField])
+    } else if (!error && allErrors.includes(errorField)) {
+      // removes valid field from the array
+      setAllErrors(allErrors.filter(err => err !== errorField))
+    }
+  }, [error, allErrors, targetField, setAllErrors])
 
   const selectorTableWithFn = cloneElement(selectorTable, { selectorFn })
   if (open)
@@ -307,7 +342,7 @@ export const TimeBoundSelection = <T extends object, ParentType extends object>(
   selectorTable: ReactElement
   disabled?: boolean
 }) => {
-  const { editData, setEditData, validator } = useDetailContext<ParentType>()
+  const { editData, setEditData, validator, allErrors, setAllErrors } = useDetailContext<ParentType>()
   const { error: boundError } = validator(
     editData,
     (targetField === 'up_bnd' ? 'up_bound' : 'low_bound') as keyof EditDataType<ParentType>
@@ -322,6 +357,17 @@ export const TimeBoundSelection = <T extends object, ParentType extends object>(
     }
     setOpen(false)
   }
+
+  useEffect(() => {
+    const errorField = String(targetField)
+    if (boundError && !allErrors.includes(errorField)) {
+      // saves invalid field into array of errors in context
+      setAllErrors([...allErrors, errorField])
+    } else if (!boundError && allErrors.includes(errorField)) {
+      // removes valid field from the array
+      setAllErrors(allErrors.filter(err => err !== errorField))
+    }
+  }, [boundError, allErrors, targetField, setAllErrors])
 
   const selectorTableWithFn = cloneElement(selectorTable, { selectorFn })
   if (open)

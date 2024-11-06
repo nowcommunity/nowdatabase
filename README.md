@@ -88,14 +88,14 @@ Docker:
 
 :rocket: [Initialize app & restore db](documentation/init.md) How to get the app up & running, and initialize database from sql-dumps
 
-:wrench: [Technical explanations](documentation/technical_explanations.md) Explanations of how things work, and guides for some more rare tasks like updating database-schema
+:wrench: [Technical explanations](documentation/guides/technical_explanations.md) Explanations of how things work, and guides for some more rare tasks like updating database-schema
 
-:raised_hands: [Contributing & integration flow](documentation/contributing.md) Where to commit? Where are tests run? How is the code deployed?
+:raised_hands: [Contributing & integration flow](documentation/guides/contributing.md) Where to commit? Where are tests run? How is the code deployed?
 
-:memo: [Frontend](documentation/frontend.md) Explanation of the frontend logic and how to add views
+:memo: [Frontend](documentation/components/frontend.md) Explanation of the frontend logic and how to add views
 
-:mag_right: [Validators](frontend/src/validators/) The readme explains how validators are written
+:mag_right: [Validators](frontend/src/validators/) The [readme](frontend/src/validators/README.md) explains how validators are written
 
 :mag_right: [Class diagram](documentation/class_diagram.md) See the relations of relevant tables. Notice that it omits some unimportant tables and does not show most columns.
 
-:earth_africa: [Map feature](/documentation/map_feat.md) Map's functionality and development notes
+:earth_africa: [Map feature](/documentation/components/map_feat.md) Map's functionality and development notes

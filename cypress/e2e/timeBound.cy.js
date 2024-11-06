@@ -23,9 +23,6 @@ describe('Editing time bound', () => {
     cy.get('[id=edit-button]').click()
     cy.get('[id=age-textfield]').first().type('{backspace}{backspace}{backspace}{backspace}{backspace}')
     cy.contains('This field is required')
-    cy.get('[id=write-button]').click()
-    cy.get('[id=write-button]').click()
-    // make sure the age value didn't change
-    cy.contains('1.778')
+    cy.get('[id=write-button]').should('be.disabled')
   })
 })
