@@ -54,10 +54,13 @@ export const DropdownSelector = <T extends object>({
   const { error } = validator(editData, field)
 
   useEffect(() => {
-    if (error && !allErrors.includes(String(field))) {
-      setAllErrors([...allErrors.concat([String(field)])])
-    } else if (!error && allErrors.includes(String(field))) {
-      setAllErrors([...allErrors.filter(fi => fi !== String(field))])
+    const errorField = String(field)
+    if (error && !allErrors.includes(errorField)) {
+      // saves invalid field into array of errors in context
+      setAllErrors([...allErrors, errorField])
+    } else if (!error && allErrors.includes(errorField)) {
+      // removes valid field from the array
+      setAllErrors(allErrors.filter(err => err !== errorField))
     }
   }, [error, allErrors, field, setAllErrors])
 
@@ -213,10 +216,13 @@ export const EditableTextField = <T extends object>({
   const name = String(field)
 
   useEffect(() => {
-    if (error && !allErrors.includes(String(field))) {
-      setAllErrors([...allErrors.concat([String(field)])])
-    } else if (!error && allErrors.includes(String(field))) {
-      setAllErrors([...allErrors.filter(fi => fi !== String(field))])
+    const errorField = String(field)
+    if (error && !allErrors.includes(errorField)) {
+      // saves invalid field into array of errors in context
+      setAllErrors([...allErrors, errorField])
+    } else if (!error && allErrors.includes(errorField)) {
+      // removes valid field from the array
+      setAllErrors(allErrors.filter(err => err !== errorField))
     }
   }, [error, allErrors, field, setAllErrors])
 
@@ -269,10 +275,13 @@ export const FieldWithTableSelection = <T extends object, ParentType extends obj
   }
 
   useEffect(() => {
-    if (error && !allErrors.includes(String(targetField))) {
-      setAllErrors([...allErrors.concat([String(targetField)])])
-    } else if (!error && allErrors.includes(String(targetField))) {
-      setAllErrors([...allErrors.filter(fi => fi !== String(targetField))])
+    const errorField = String(targetField)
+    if (error && !allErrors.includes(errorField)) {
+      // saves invalid field into array of errors in context
+      setAllErrors([...allErrors, errorField])
+    } else if (!error && allErrors.includes(errorField)) {
+      // removes valid field from the array
+      setAllErrors(allErrors.filter(err => err !== errorField))
     }
   }, [error, allErrors, targetField, setAllErrors])
 
@@ -338,10 +347,13 @@ export const TimeBoundSelection = <T extends object, ParentType extends object>(
   }
 
   useEffect(() => {
-    if (boundError && !allErrors.includes(String(targetField))) {
-      setAllErrors([...allErrors.concat([String(targetField)])])
-    } else if (!boundError && allErrors.includes(String(targetField))) {
-      setAllErrors([...allErrors.filter(fi => fi !== String(targetField))])
+    const errorField = String(targetField)
+    if (boundError && !allErrors.includes(errorField)) {
+      // saves invalid field into array of errors in context
+      setAllErrors([...allErrors, errorField])
+    } else if (!boundError && allErrors.includes(errorField)) {
+      // removes valid field from the array
+      setAllErrors(allErrors.filter(err => err !== errorField))
     }
   }, [boundError, allErrors, targetField, setAllErrors])
 
