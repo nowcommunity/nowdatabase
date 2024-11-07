@@ -29,11 +29,12 @@ const DraggableMarker = ({ setMarkerPos, coord }: { setMarkerPos: CoordinateSett
 }
 
 const SearchField = () => {
-  const provider = new OpenStreetMapProvider()
-
   const searchControl = new GeoSearchControl({
-    provider: provider,
-    autoComplete: false,
+    provider: new OpenStreetMapProvider(),
+    autocomplete: true,
+    autoCompleteDelay: 1300, // has to be slow enough to be ok for Nominatim Policy
+    style: 'bar',
+    notFoundMessage: 'Sorry, that address could not be found.',
   })
 
   const map = useMap()
