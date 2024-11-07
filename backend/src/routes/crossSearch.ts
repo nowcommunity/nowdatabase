@@ -1,5 +1,5 @@
 import { Router } from 'express'
-import { getAllCrossSearch, getFilteredCrossSearch, getFilteredCrossSearchLength } from '../services/crossSearch'
+import { getAllCrossSearch, getFilteredCrossSearch, getFilteredCrossSearchLength, getTestQuery } from '../services/crossSearch'
 import { fixBigInt } from '../utils/common'
 import { ColumnFilter, Sorting, Page } from '../../../frontend/src/backendTypes'
 
@@ -9,6 +9,12 @@ router.get('/all/*', async (req, res) => {
   console.log('getting all cross search')
   const crossSearch = await getAllCrossSearch(req.user)
   return res.status(200).send(fixBigInt(crossSearch))
+})
+
+router.get('/testing', async (req, res) => {
+  console.log('getting all cross search')
+  await getTestQuery()
+  return res.status(200).send()
 })
 
 router.get(`/`, async (req, res) => {
