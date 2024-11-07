@@ -70,7 +70,7 @@ export type DetailContextType<T> = {
   ) => JSX.Element
   validator: (editData: EditDataType<T>, field: keyof EditDataType<T>) => ValidationObject
   allErrors: Array<string>
-  setAllErrors: (newAllErrors: Array<string>) => void
+  setAllErrors: (updaterFn: (prevErrors: Array<string>) => Array<string>) => void
 }
 
 export const DetailContext = createContext<DetailContextType<unknown>>(null!)

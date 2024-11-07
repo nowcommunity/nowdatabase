@@ -58,12 +58,17 @@ export const DropdownSelector = <T extends object>({
     const errorField = String(field)
     if (error && !allErrors.includes(errorField)) {
       // saves invalid field into array of errors in context
-      setAllErrors([...allErrors, errorField])
+      setAllErrors(prevErrors => {
+        return [...prevErrors, errorField]
+      })
     } else if (!error && allErrors.includes(errorField)) {
       // removes valid field from the array
-      setAllErrors(allErrors.filter(err => err !== errorField))
+      setAllErrors(prevErrors => {
+        return prevErrors.filter(err => err !== errorField)
+      })
     }
-  }, [error, allErrors, field, setAllErrors])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [error])
 
   const editingComponent = (
     <FormControl size="small" error={!!error}>
@@ -229,12 +234,17 @@ export const EditableTextField = <T extends object>({
     const errorField = String(field)
     if (error && !allErrors.includes(errorField)) {
       // saves invalid field into array of errors in context
-      setAllErrors([...allErrors, errorField])
+      setAllErrors(prevErrors => {
+        return [...prevErrors, errorField]
+      })
     } else if (!error && allErrors.includes(errorField)) {
       // removes valid field from the array
-      setAllErrors(allErrors.filter(err => err !== errorField))
+      setAllErrors(prevErrors => {
+        return prevErrors.filter(err => err !== errorField)
+      })
     }
-  }, [error, allErrors, field, setAllErrors])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [error])
 
   const editingComponent = (
     <TextField
@@ -290,12 +300,17 @@ export const FieldWithTableSelection = <T extends object, ParentType extends obj
     const errorField = String(targetField)
     if (error && !allErrors.includes(errorField)) {
       // saves invalid field into array of errors in context
-      setAllErrors([...allErrors, errorField])
+      setAllErrors(prevErrors => {
+        return [...prevErrors, errorField]
+      })
     } else if (!error && allErrors.includes(errorField)) {
       // removes valid field from the array
-      setAllErrors(allErrors.filter(err => err !== errorField))
+      setAllErrors(prevErrors => {
+        return prevErrors.filter(err => err !== errorField)
+      })
     }
-  }, [error, allErrors, targetField, setAllErrors])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [error])
 
   const selectorTableWithFn = cloneElement(selectorTable, { selectorFn })
   if (open)
@@ -362,12 +377,17 @@ export const TimeBoundSelection = <T extends object, ParentType extends object>(
     const errorField = String(targetField)
     if (boundError && !allErrors.includes(errorField)) {
       // saves invalid field into array of errors in context
-      setAllErrors([...allErrors, errorField])
+      setAllErrors(prevErrors => {
+        return [...prevErrors, errorField]
+      })
     } else if (!boundError && allErrors.includes(errorField)) {
       // removes valid field from the array
-      setAllErrors(allErrors.filter(err => err !== errorField))
+      setAllErrors(prevErrors => {
+        return prevErrors.filter(err => err !== errorField)
+      })
     }
-  }, [boundError, allErrors, targetField, setAllErrors])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [boundError])
 
   const selectorTableWithFn = cloneElement(selectorTable, { selectorFn })
   if (open)

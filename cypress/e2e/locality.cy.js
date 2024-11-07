@@ -97,6 +97,7 @@ describe('Creating a new locality...', () => {
   it("with missing country, min basis for age and longitude doesn't work", () => {
     cy.visit('/locality/new/')
     cy.contains('Creating new locality')
+    cy.get('[id=write-button]').should('be.disabled')
     cy.get('[name=dating-method][value=absolute]').click()
     cy.get('[id="Max Basis for age (absolute)-multiselect"]').click()
     cy.get('[data-value=other_absolute]').click()
@@ -108,6 +109,43 @@ describe('Creating a new locality...', () => {
     cy.get('[id=dec_lat-textfield]').type('48.68')
     cy.get('[id=dms_lat-textfield]').should('have.value', '48 40 48 N')
     cy.contains('This field is required')
+    cy.get('[id=write-button]').should('be.disabled')
+  })
+
+  it("and filling, then erasing needed data doesn't work", () => {
+    cy.visit('/locality/new/')
+    cy.contains('Creating new locality')
+    cy.get('[name=dating-method][value=absolute]').click()
+    cy.get('[id="Min Basis for age (absolute)-multiselect"]').click()
+    cy.get('[data-value=other_absolute]').click()
+    cy.get('[id="Max Basis for age (absolute)-multiselect"]').click()
+    cy.get('[data-value=other_absolute]').click()
+    cy.get('[id=min_age-textfield]').type('11.61')
+    cy.get('[id=max_age-textfield]').type('35.22')
+
+    cy.get('[role=tablist]').contains('Locality').click()
+    cy.get('[id=loc_name-textfield]').type('Bugat')
+    cy.get('[id=country-textfield]').type('Mongolia')
+    cy.get('[id=dec_lat-textfield]').type('49.07')
+    cy.get('[id=dec_long-textfield]').type('103.67')
+    cy.get('[id=dms_lat-textfield]').should('have.value', '49 4 12 N')
+    cy.get('[id=dms_long-textfield]').should('have.value', '103 40 12 E')
+    // all required data is provided so the write button is enabled
+    cy.get('[id=write-button]').should('not.be.disabled')
+
+    cy.get('[id=dec_lat-textfield]').type('{backspace}{backspace}{backspace}{backspace}{backspace}')
+    cy.contains('This field is required')
+    cy.get('[id=write-button]').should('be.disabled')
+    cy.get('[id=dec_lat-textfield]').type('49.07')
+    cy.get('[id=write-button]').should('not.be.disabled')
+
+    cy.get('[role=tablist]').contains('Age').click()
+    cy.get('[id=min_age-textfield]').type('{backspace}{backspace}{backspace}{backspace}{backspace}')
+    cy.contains('This field is required')
+    cy.get('[id=write-button]').should('be.disabled')
+
+    // make sure errors in other tabs disable the write button
+    cy.get('[role=tablist]').contains('Locality').click()
     cy.get('[id=write-button]').should('be.disabled')
   })
 })

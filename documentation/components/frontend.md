@@ -47,6 +47,16 @@ The context can also be used to access, for example, the **setEditData** setter,
 
 [Validators](../../frontend/src/validators/README.md)
 
+**editingComponents**
+
+If an editingComponent has an error, the `field` value of the component is added to the `allErrors` array in the context. editingComponents have a useEffect hook that runs every time their `error` value changes which either adds or removes them from the `allErrors` array. This array is used to make sure all fields have a proper value before allowing the user to add a new entry (the "Finalize Entry" button is disabled if `allErrors` has anything in it).
+
+Instead of calling the `setAllErrors` function directly with the new array of errors, editingComponents pass an updater function to it.
+
+![setAllErrors](../images/set_all_errors.png)
+
+This ensures that when multiple components try to update the state at the same time, they don't overwrite each other. The react documentation goes into more detail: https://react.dev/reference/react/useState#updating-state-based-on-the-previous-state
+
 **Detailed documentation for editingComponents**
 
 - [RadioSelector](../editingComponents/RadioSelector.md)
