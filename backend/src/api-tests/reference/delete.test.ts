@@ -5,7 +5,7 @@ import { ReferenceDetailsType } from '../../../../frontend/src/backendTypes'
 import Prisma from '../../../prisma/generated/now_test_client'
 import { newReferenceBasis } from './data'
 
-describe('Deleting a locality works', () => {
+describe('Deleting a reference', () => {
   beforeAll(async () => {
     await resetDatabase()
   }, resetDatabaseTimeout)
@@ -16,31 +16,7 @@ describe('Deleting a locality works', () => {
     await pool.end()
   })
 
-  it.todo('Deleting works')
-
-  it('Deleting fails without permissions', async () => {
-    logout()
-    const deleteResultNoPerm = await send('reference/10039', 'DELETE')
-    expect(deleteResultNoPerm.status).toEqual(403)
-    const { status: getReqStatusNoPerm } = await send('reference/10039', 'GET')
-    expect(getReqStatusNoPerm).toEqual(200)
-
-    logout()
-    await login('testEr')
-    const deleteResultEr = await send('reference/10039', 'DELETE')
-    expect(deleteResultEr.status).toEqual(403)
-    const { status: getReqStatusEr } = await send('reference/10039', 'GET')
-    expect(getReqStatusEr).toEqual(200)
-
-    logout()
-    await login('testEu')
-    const deleteResultEu = await send('reference/10039', 'DELETE')
-    expect(deleteResultEu.status).toEqual(403)
-    const { status: getReqStatusEu } = await send('reference/10039', 'GET')
-    expect(getReqStatusEu).toEqual(200)
-  })
-
-  it('Deleting a reference with correct permission works', async () => {
+  it('with permissions succeeds', async () => {
     await login('testSu')
 
     // Deleting a reference doesn't work if it is still used by some other entity so creating a new one
@@ -74,5 +50,27 @@ describe('Deleting a locality works', () => {
     const { body, status: getReqStatus3 } = await send(`reference/authors/${createdId}`, 'GET')
     expect(getReqStatus3).toEqual(200)
     expect(body.length).toEqual(0) //There should be no authors linked to the id of the ledeted reference
+  })
+
+  it('without permissions fails', async () => {
+    logout()
+    const deleteResultNoPerm = await send('reference/10039', 'DELETE')
+    expect(deleteResultNoPerm.status).toEqual(403)
+    const getResultNoPerm = await send('reference/10039', 'GET')
+    expect(getResultNoPerm.status).toEqual(200)
+
+    logout()
+    await login('testEr')
+    const deleteResultEr = await send('reference/10039', 'DELETE')
+    expect(deleteResultEr.status).toEqual(403)
+    const getResultEr = await send('reference/10039', 'GET')
+    expect(getResultEr.status).toEqual(200)
+
+    logout()
+    await login('testEu')
+    const deleteResultEu = await send('reference/10039', 'DELETE')
+    expect(deleteResultEu.status).toEqual(403)
+    const getResultEu = await send('reference/10039', 'GET')
+    expect(getResultEu.status).toEqual(200)
   })
 })

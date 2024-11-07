@@ -1,5 +1,5 @@
 import { beforeEach, beforeAll, afterAll, describe, it, expect } from '@jest/globals'
-import { login, resetDatabase, send, resetDatabaseTimeout } from '../utils'
+import { login, logout, resetDatabase, send, resetDatabaseTimeout } from '../utils'
 import { pool } from '../../utils/db'
 
 describe('Deleting a species works', () => {
@@ -25,5 +25,19 @@ describe('Deleting a species works', () => {
     expect(deleteResult.status).toEqual(200)
     const getResult = await send('species/23065', 'GET')
     expect(getResult.status).toEqual(404) // 'Species response status was not 404 after deletion'
+  })
+
+  it('Deleting fails without permissions', async () => {
+    logout()
+    const deleteResultNoPerm = await send<{ id: number }>('species/21052', 'DELETE')
+    expect(deleteResultNoPerm.status).toEqual(403)
+    const getResultNoPerm = await send('species/21052', 'GET')
+    expect(getResultNoPerm.status).toEqual(200)
+
+    await login('testEr')
+    const deleteResultEr = await send<{ id: number }>('species/21052', 'DELETE')
+    expect(deleteResultEr.status).toEqual(403)
+    const getResultEr = await send('species/21052', 'GET')
+    expect(getResultEr.status).toEqual(200)
   })
 })
