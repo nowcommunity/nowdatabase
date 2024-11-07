@@ -6,7 +6,7 @@ describe('Editing time bound', () => {
     cy.request(Cypress.env('databaseResetUrl'))
   })
 
-  it('User editing time bound with correct values succeeds', () => {
+  it('with correct values works', () => {
     cy.visit(`/time-bound/11?tab=0`)
     cy.contains('C2N-y')
     cy.get('[id=edit-button]').click()
@@ -17,7 +17,7 @@ describe('Editing time bound', () => {
     cy.contains('1.5')
   })
 
-  it('User editing time bound with incorrect values is notified about it', () => {
+  it('with incorrect values does not work', () => {
     cy.visit(`/time-bound/11?tab=0`)
     cy.contains('C2N-y')
     cy.get('[id=edit-button]').click()

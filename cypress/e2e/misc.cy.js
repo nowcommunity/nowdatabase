@@ -58,12 +58,12 @@ describe('Test individual features across the app', () => {
       hasStagingMode('species/21052')
     })
 
-    it('Staging mode works on locality', () => {
+    it('Staging mode works on time unit', () => {
       cy.login('testSu')
       hasStagingMode('time-unit/bahean')
     })
 
-    it('Staging mode works on locality', () => {
+    it('Staging mode works on time bound', () => {
       cy.login('testSu')
       hasStagingMode('time-bound/11')
     })
