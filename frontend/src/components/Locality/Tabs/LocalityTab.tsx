@@ -72,7 +72,7 @@ export const LocalityTab = () => {
       })
     } else {
       if (value === '') {
-        setEditData({ ...editData, dec_long: undefined, dms_long: undefined })
+        setEditData({ ...editData, [decField]: undefined, [dmsField]: undefined })
         return
       }
       const valueAsNumber = Number(value)
