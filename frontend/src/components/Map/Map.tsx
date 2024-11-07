@@ -3,6 +3,7 @@ import { MapContainer, TileLayer, Marker, useMap } from 'react-leaflet'
 import { GeoSearchControl, OpenStreetMapProvider } from 'leaflet-geosearch'
 import 'leaflet/dist/leaflet.css'
 import 'leaflet-geosearch/assets/css/leaflet.css'
+import '@types/leaflet-geosearch'
 
 type Coordinate = {
   lat: number
