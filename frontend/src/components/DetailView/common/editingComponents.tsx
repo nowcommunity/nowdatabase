@@ -137,7 +137,8 @@ const getDisplay = (item: DropdownOption | DropdownOptionValue, inMenu?: boolean
   strings 'true' or 'false' will be handled by the app (and server) as boolean-type.
   This also means that the options cannot be 'true' or 'false' if you want
   to actually write those as strings to database. If that is required, this
-  needs to be changed.
+  needs to be changed. Empty strings or null should not be used as options either, 
+  because the RadioSelector will overwrite those with the default value.
   ALSO: All options have to be of same type! This isn't enforced with types.
 */
 export const RadioSelector = <T extends object>({
@@ -157,7 +158,7 @@ export const RadioSelector = <T extends object>({
   if (defaultValue === undefined) {
     defaultValue = getValue(options[0])
   }
-  if (editData[field] === null) {
+  if (editData[field] === null || editData[field] === '') {
     setEditData({ ...editData, [field]: defaultValue })
   }
 
