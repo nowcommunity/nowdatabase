@@ -6,6 +6,7 @@ describe('Creating a new locality', () => {
   it('with valid data works', () => {
     cy.visit('/locality/new/')
     cy.contains('Creating new locality')
+    cy.get('[name=dating-method]').should('have.value', 'time_unit')
     cy.get('[name=dating-method][value=absolute]').click()
     cy.get('[id="Min Basis for age (absolute)-multiselect"]').click()
     cy.get('[data-value=other_absolute]').click()
