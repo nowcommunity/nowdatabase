@@ -51,6 +51,8 @@ Do concider other options before you try to alter the data by hand.
     Notes / gen_notes
     Language / printed_language
 
+Mandatory fields: title_primary, date_primary, authors_primary OR authors_secondary, journal
+
 "ref_type_id": 2, "ref_type": "Book",
     Title / title_primary
     Authors / authors_primary
@@ -68,6 +70,8 @@ Do concider other options before you try to alter the data by hand.
     Web/URL / web_url
     Notes / gen_notes
     Language / printed_language
+
+Mandatory fields: title_primary, date_primary, authors_primary OR authors_secondary OR authors_series
 
 "ref_type_id": 3, "ref_type": Book Chapter'
     Title / title_primary
@@ -90,6 +94,8 @@ Do concider other options before you try to alter the data by hand.
     Notes / gen_notes
     Language / printed_language
 
+Mandatory fields: title_primary OR title_secondary OR title_series OR gen_notes, date_primary, authors_primary OR authors_secondary OR authors_series
+
 "ref_type_id": 4, "ref_type": Thesis/Dissertation'
     Title / title_primary
     Authors / authors_primary
@@ -101,6 +107,8 @@ Do concider other options before you try to alter the data by hand.
     Degree / misc_1
     Notes / gen_notes
     Language / printed_language
+
+Mandatory fields: title_primary OR gen_notes, date_primary, authors_primary
 
 "ref_type_id": 5, "ref_type": Conference Proceeding'
     Title / title_primary
@@ -123,6 +131,8 @@ Do concider other options before you try to alter the data by hand.
     Notes / gen_notes
     Language / printed_language
 
+Mandatory fields: title_primary OR title_secondary OR title_series OR gen_notes, date_primary, authors_primary OR authors_secondary OR authors_series, journal
+
 "ref_type_id": 6, "ref_type": Electronic Citation'
     Title / title_primary
     Authors / authors_primary
@@ -136,6 +146,8 @@ Do concider other options before you try to alter the data by hand.
     Language / printed_language
     Access Date / exact_date
 
+Mandatory fields: title_primary OR title_secondary OR gen_notes, date_primary, authors_primary OR authors_secondary, exact_date
+
 "ref_type_id": 7, "ref_type": Internet Communication'
     Subject / title_primary
     Sender / authors_primary
@@ -146,6 +158,8 @@ Do concider other options before you try to alter the data by hand.
     Notes / gen_notes
     Language / printed_language
     Date of Message / exact_date
+
+Mandatory fields: title_primary OR gen_notes, date_primary, authors_primary OR authors_secondary, exact_date
 
 "ref_type_id": 8, "ref_type": Report'
     Title / title_primary
@@ -165,6 +179,8 @@ Do concider other options before you try to alter the data by hand.
     Notes / gen_notes
     Language / printed_language
 
+Mandatory fields: title_primary OR title_secondary OR title_series OR gen_notes, date_primary, authors_primary OR authors_secondary
+
 "ref_type_id": 9, "ref_type": Unpublished Work'
     Title / title_primary
     Authors / authors_primary
@@ -178,6 +194,8 @@ Do concider other options before you try to alter the data by hand.
     Notes / gen_notes
     Language / printed_language
 
+Mandatory fields: title_primary OR title_secondary OR title_series OR gen_notes, date_primary, authors_primary OR authors_secondary
+
 "ref_type_id": 10, "ref_type": Personal Communication'
     Authors / authors_primary
     Year / date_primary
@@ -186,6 +204,8 @@ Do concider other options before you try to alter the data by hand.
     Notes / gen_notes
     Language / printed_language
     Date Sent / exact_date
+
+Mandatory fields: gen_notes, date_primary, authors_primary OR authors_secondary, exact_date
 
 "ref_type_id": 11, "ref_type": Manuscript'
     Title / title_primary
@@ -199,6 +219,8 @@ Do concider other options before you try to alter the data by hand.
     Language / printed_language
     Date / exact_date
 
+Mandatory fields: title_primary OR title_secondary OR title_series OR gen_notes, date_primary, authors_primary OR authors_secondary OR authors_series, exact_date
+
 "ref_type_id": 12, "ref_type": Notes'
     Subject / title_primary
     Authors / authors_primary
@@ -206,12 +228,16 @@ Do concider other options before you try to alter the data by hand.
     Notes / gen_notes
     Date / exact_date
 
+Mandatory fields: title_primary OR gen_notes, date_primary, authors_primary, exact_date
+
 "ref_type_id": 13, "ref_type": Editing'
     Title / title_primary
     Authors / authors_primary
     Year / date_primary
     Notes / gen_notes
     Date / exact_date
+
+Mandatory fields: title_primary OR gen_notes, date_primary, authors_primary, exact_date
 
 "ref_type_id": 14, "ref_type": Undefined'
     title_primary / title_primary
@@ -237,3 +263,5 @@ Do concider other options before you try to alter the data by hand.
     gen_notes / gen_notes
     language / language
     exact_date / exact_date
+
+Mandatory fields: title_primary OR title_secondary OR title_series OR gen_notes, date_primary, authors_primary OR authors_secondary OR authors_series, exact_date, journal_id
