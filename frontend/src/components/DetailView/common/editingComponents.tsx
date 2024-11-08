@@ -51,19 +51,19 @@ export const DropdownSelector = <T extends object>({
   field: keyof EditDataType<T>
   disabled?: boolean
 }) => {
-  const { setEditData, editData, validator, allErrors, setAllErrors } = useDetailContext<T>()
+  const { setEditData, editData, validator, fieldsWithErrors, setFieldsWithErrors } = useDetailContext<T>()
   const { error } = validator(editData, field)
 
   useEffect(() => {
     const errorField = String(field)
-    if (error && !allErrors.includes(errorField)) {
+    if (error && !fieldsWithErrors.includes(errorField)) {
       // saves invalid field into array of errors in context
-      setAllErrors(prevErrors => {
+      setFieldsWithErrors(prevErrors => {
         return [...prevErrors, errorField]
       })
-    } else if (!error && allErrors.includes(errorField)) {
+    } else if (!error && fieldsWithErrors.includes(errorField)) {
       // removes valid field from the array
-      setAllErrors(prevErrors => {
+      setFieldsWithErrors(prevErrors => {
         return prevErrors.filter(err => err !== errorField)
       })
     }
@@ -227,20 +227,20 @@ export const EditableTextField = <T extends object>({
   readonly?: boolean
   handleSetEditData?: (value: number | string) => void
 }) => {
-  const { setEditData, editData, validator, allErrors, setAllErrors } = useDetailContext<T>()
+  const { setEditData, editData, validator, fieldsWithErrors, setFieldsWithErrors } = useDetailContext<T>()
   const { error } = validator(editData, field)
   const name = String(field)
 
   useEffect(() => {
     const errorField = String(field)
-    if (error && !allErrors.includes(errorField)) {
+    if (error && !fieldsWithErrors.includes(errorField)) {
       // saves invalid field into array of errors in context
-      setAllErrors(prevErrors => {
+      setFieldsWithErrors(prevErrors => {
         return [...prevErrors, errorField]
       })
-    } else if (!error && allErrors.includes(errorField)) {
+    } else if (!error && fieldsWithErrors.includes(errorField)) {
       // removes valid field from the array
-      setAllErrors(prevErrors => {
+      setFieldsWithErrors(prevErrors => {
         return prevErrors.filter(err => err !== errorField)
       })
     }
@@ -294,7 +294,7 @@ export const FieldWithTableSelection = <T extends object, ParentType extends obj
   selectorTable: ReactElement
   disabled?: boolean
 }) => {
-  const { editData, setEditData, validator, allErrors, setAllErrors } = useDetailContext<ParentType>()
+  const { editData, setEditData, validator, fieldsWithErrors, setFieldsWithErrors } = useDetailContext<ParentType>()
   const { error } = validator(editData, targetField as keyof EditDataType<ParentType>)
   const [open, setOpen] = useState(false)
   const selectorFn = (selected: T) => {
@@ -304,14 +304,14 @@ export const FieldWithTableSelection = <T extends object, ParentType extends obj
 
   useEffect(() => {
     const errorField = String(targetField)
-    if (error && !allErrors.includes(errorField)) {
+    if (error && !fieldsWithErrors.includes(errorField)) {
       // saves invalid field into array of errors in context
-      setAllErrors(prevErrors => {
+      setFieldsWithErrors(prevErrors => {
         return [...prevErrors, errorField]
       })
-    } else if (!error && allErrors.includes(errorField)) {
+    } else if (!error && fieldsWithErrors.includes(errorField)) {
       // removes valid field from the array
-      setAllErrors(prevErrors => {
+      setFieldsWithErrors(prevErrors => {
         return prevErrors.filter(err => err !== errorField)
       })
     }
@@ -363,7 +363,7 @@ export const TimeBoundSelection = <T extends object, ParentType extends object>(
   selectorTable: ReactElement
   disabled?: boolean
 }) => {
-  const { editData, setEditData, validator, allErrors, setAllErrors } = useDetailContext<ParentType>()
+  const { editData, setEditData, validator, fieldsWithErrors, setFieldsWithErrors } = useDetailContext<ParentType>()
   const { error: boundError } = validator(
     editData,
     (targetField === 'up_bnd' ? 'up_bound' : 'low_bound') as keyof EditDataType<ParentType>
@@ -381,14 +381,14 @@ export const TimeBoundSelection = <T extends object, ParentType extends object>(
 
   useEffect(() => {
     const errorField = String(targetField)
-    if (boundError && !allErrors.includes(errorField)) {
+    if (boundError && !fieldsWithErrors.includes(errorField)) {
       // saves invalid field into array of errors in context
-      setAllErrors(prevErrors => {
+      setFieldsWithErrors(prevErrors => {
         return [...prevErrors, errorField]
       })
-    } else if (!boundError && allErrors.includes(errorField)) {
+    } else if (!boundError && fieldsWithErrors.includes(errorField)) {
       // removes valid field from the array
-      setAllErrors(prevErrors => {
+      setFieldsWithErrors(prevErrors => {
         return prevErrors.filter(err => err !== errorField)
       })
     }

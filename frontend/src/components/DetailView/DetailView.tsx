@@ -73,7 +73,7 @@ export const DetailView = <T extends object>({
   }
   const { editRights } = usePageContext()
   const [mode, setModeState] = useState<ModeType>(isNew ? modeOptionToMode['new'] : modeOptionToMode['read'])
-  const [allErrors, setAllErrors] = useState<Array<string>>([])
+  const [fieldsWithErrors, setFieldsWithErrors] = useState<Array<string>>([])
   const [tab, setTab] = useState(getUrl())
 
   useEffect(() => {
@@ -125,21 +125,18 @@ export const DetailView = <T extends object>({
     radioSelection,
     bigTextField,
     validator,
-    allErrors,
-    setAllErrors,
+    fieldsWithErrors,
+    setFieldsWithErrors,
   }
 
   useEffect(() => {
     if (mode.option === 'edit' || mode.option === 'new') {
-      const validationErrors: Array<string> = []
       for (const field in initialState.editData) {
-        // if (field === 'references') continue
         const { error } = validator(initialState.editData, field)
         if (error) {
-          validationErrors.push(field)
+          setFieldsWithErrors(fieldsWithErrors => fieldsWithErrors.concat(field))
         }
       }
-      setAllErrors(validationErrors)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mode])
