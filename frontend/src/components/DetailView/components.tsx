@@ -58,6 +58,7 @@ export const ReturnButton = () => {
   if (mode.staging) {
     return (
       <Button
+        id="return-to-editing-button"
         onClick={() => {
           if (mode.new) setMode('new')
           else setMode('edit')
