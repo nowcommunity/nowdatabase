@@ -8,12 +8,13 @@ type Validator = {
   asNumber?: ((num: number) => ValidationError) | boolean
   asString?: ((str: string) => ValidationError) | boolean
   miscCheck?: (obj: object) => ValidationError
+  miscArray?: (data: object[]) => ValidationError
 }
 
 export type Validators<T> = { [field in keyof T]: Validator }
 
 const validate: (validator: Validator, value: unknown) => ValidationError = (validator: Validator, value: unknown) => {
-  const { required, minLength, maxLength, asNumber, asString, miscCheck } = validator
+  const { required, minLength, maxLength, asNumber, asString, miscCheck, miscArray } = validator
   if (value === null || value === undefined || value === '') return required ? 'This field is required' : null
   if (asNumber) {
     if (typeof value !== 'number') return 'Value must be a valid number' // If this happens, code is broken somewhere
@@ -28,6 +29,19 @@ const validate: (validator: Validator, value: unknown) => ValidationError = (val
     return null
   }
   if (miscCheck) return miscCheck(value)
+  if (miscArray && Array.isArray(value)) {
+    //Typescript
+    const valueAsArray = value as object[]
+
+    for (let i = 0; i < valueAsArray.length; i++) {
+      if (typeof valueAsArray[i] !== 'object' || valueAsArray[i] === null || Array.isArray(valueAsArray[i])) {
+        return `Element at index ${i} must be an object`
+      }
+    }
+    return miscArray(valueAsArray)
+  } else if (miscArray) {
+    return 'You are using a check intended for arrays on values that are not arrays'
+  }
   return null
 }
 

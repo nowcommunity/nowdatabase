@@ -1,7 +1,7 @@
 import { EditDataType, FixBigInt, ReferenceDetailsType } from '../../../../frontend/src/backendTypes'
 import { getFieldsOfTables, nowDb } from '../../utils/db'
 import { getReferenceDetails } from '../reference'
-import { filterAllowedKeys } from './writeOperations/utils'
+import { filterAllowedKeys, convertToPrismaDate } from './writeOperations/utils'
 import { writeReferenceAuthors } from './author'
 import { writeReferenceJournal } from './journal'
 import Prisma from '../../../prisma/generated/now_test_client'
@@ -9,6 +9,11 @@ import Prisma from '../../../prisma/generated/now_test_client'
 export const writeReference = async (reference: EditDataType<ReferenceDetailsType>) => {
   const allowedColumns = getFieldsOfTables(['ref_ref', 'ref_authors', 'ref_journal'])
   const filteredReference = filterAllowedKeys(reference, allowedColumns) as Prisma.ref_ref
+
+  //frontend returns date as yyyy-MM-dd, prisma needs js Date object
+  if (filteredReference.exact_date) {
+    filteredReference.exact_date = convertToPrismaDate(filteredReference.exact_date.toString())
+  }
 
   //First creates a reference > journal > updates reference with journal_id > creates authors
   //If something fails, nothing should go trough

@@ -264,4 +264,5 @@ Mandatory fields: title_primary OR gen_notes, date_primary, authors_primary, exa
     language / language
     exact_date / exact_date
 
-Mandatory fields: title_primary OR title_secondary OR title_series OR gen_notes, date_primary, authors_primary OR authors_secondary OR authors_series, exact_date, journal_id
+Mandatory fields: title_primary OR title_secondary OR title_series OR gen_notes, date_primary, authors_primary OR authors_secondary OR authors_series, exact_date, journal
+* In old php test version instead of journal, journal_id had to be defined. That seems odd, since when creating a new journal, journal_id will not initally be defined. So that will not be done here.

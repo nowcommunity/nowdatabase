@@ -62,3 +62,11 @@ export const filterAllowedKeys = <T extends Record<string, T[keyof T]>>(referenc
       return obj
     }, {} as Partial<T>)
 }
+
+//convert yyyy-MM-dd string to a dateobject prisma can automatically handle
+export const convertToPrismaDate = (dateString: string): Date => {
+  const [year, month, day] = dateString.split('-').map(Number)
+  const date = new Date(year, month - 1, day) //Month indexes start at 0
+
+  return date
+}
