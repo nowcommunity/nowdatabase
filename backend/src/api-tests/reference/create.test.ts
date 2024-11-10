@@ -42,7 +42,7 @@ describe('Creating new reference works', () => {
     expect(ref_journal.journal_title).toEqual(newReferenceBasis.ref_journal?.journal_title) //journal have been created and is fetched
     expect(journal_id).toBeDefined()
   })
-/*
+  /*
   it('Adding "removed" in rowstate of authors & journal deletes author and clear journal data from reference', async () => {
     const { status: getReqStatus } = await send<{ rid: number }>(`reference/`, 'PUT', {
       reference: {
@@ -76,7 +76,7 @@ describe('Creating new reference works', () => {
     expect(getReqStatus3).toEqual(200)
     expect(body.length).toEqual(0) // Authors should be deleted from db
   })*/
-/*
+  /*
   it('Removing author / journal data from reference should clear the data from db', async () => {
     const { status: getReqStatus } = await send<{ rid: number }>(`reference/`, 'PUT', {
       reference: {
