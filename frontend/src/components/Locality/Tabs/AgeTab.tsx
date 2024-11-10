@@ -1,4 +1,4 @@
-import { EditDataType, LocalityDetailsType, TimeUnitDetailsType } from '@/backendTypes'
+import { LocalityDetailsType, TimeUnitDetailsType } from '@/backendTypes'
 import { BasisForAgeSelection } from '@/components/DetailView/common/editingComponents'
 import { emptyOption } from '@/components/DetailView/common/misc'
 import { ArrayFrame, HalfFrames } from '@/components/DetailView/common/tabLayoutHelpers'
