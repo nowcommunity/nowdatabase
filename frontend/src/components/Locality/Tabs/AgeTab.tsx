@@ -1,4 +1,4 @@
-import { LocalityDetailsType, TimeUnitDetailsType } from '@/backendTypes'
+import { EditDataType, LocalityDetailsType, TimeUnitDetailsType } from '@/backendTypes'
 import { BasisForAgeSelection } from '@/components/DetailView/common/editingComponents'
 import { emptyOption } from '@/components/DetailView/common/misc'
 import { ArrayFrame, HalfFrames } from '@/components/DetailView/common/tabLayoutHelpers'
@@ -55,6 +55,23 @@ export const AgeTab = () => {
     })
   }
 
+  const minAgeAbsoluteDisabled =
+    (editData.date_meth === 'composite' && !!editData.bfa_max_abs) ||
+    (editData.date_meth === 'composite' && !!editData.bfa_min) ||
+    editData.date_meth === 'time_unit'
+  const minAgeTimeUnitDisabled =
+    (editData.date_meth === 'composite' && !!editData.bfa_max) ||
+    (editData.date_meth === 'composite' && !!editData.bfa_min_abs) ||
+    editData.date_meth === 'absolute'
+  const maxAgeAbsoluteDisabled =
+    (editData.date_meth === 'composite' && !!editData.bfa_min_abs) ||
+    (editData.date_meth === 'composite' && !!editData.bfa_max) ||
+    editData.date_meth === 'time_unit'
+  const maxAgeTimeUnitDisabled =
+    (editData.date_meth === 'composite' && !!editData.bfa_min) ||
+    (editData.date_meth === 'composite' && !!editData.bfa_max_abs) ||
+    editData.date_meth === 'absolute'
+
   // TODO: The date_meth options should come from db: distinct(now_loc.date_meth)
   const age = [
     [
@@ -74,8 +91,8 @@ export const AgeTab = () => {
     ['', 'Age (Ma)', 'Basis for age (Absolute)', 'Basis for age (Time Unit)', 'Basis for age (Fraction)'],
     [
       'Minimum age',
-      textField('min_age', { type: 'number', round: 3, readonly: editData.date_meth === 'time_unit' }),
-      dropdown('bfa_min_abs', bfa_abs_options, 'Min Basis for age (absolute)', editData.date_meth === 'time_unit'),
+      textField('min_age', { type: 'number', round: 3, readonly: minAgeAbsoluteDisabled }),
+      dropdown('bfa_min_abs', bfa_abs_options, 'Min Basis for age (absolute)', minAgeAbsoluteDisabled),
       <BasisForAgeSelection<TimeUnitDetailsType, LocalityDetailsType>
         key="bfa_min"
         sourceField="tu_name"
@@ -84,14 +101,14 @@ export const AgeTab = () => {
         upBoundField="up_bound"
         fraction={editData.frac_min}
         selectorTable={<TimeUnitTable />}
-        disabled={editData.date_meth === 'absolute'}
+        disabled={minAgeTimeUnitDisabled}
       />,
-      dropdown('frac_min', fracOptions, 'Minimum fraction', editData.date_meth === 'absolute'),
+      dropdown('frac_min', fracOptions, 'Minimum fraction', minAgeTimeUnitDisabled),
     ],
     [
       'Maximum age',
-      textField('max_age', { type: 'number', round: 3, readonly: editData.date_meth === 'time_unit' }),
-      dropdown('bfa_max_abs', bfa_abs_options, 'Max Basis for age (absolute)', editData.date_meth === 'time_unit'),
+      textField('max_age', { type: 'number', round: 3, readonly: maxAgeAbsoluteDisabled }),
+      dropdown('bfa_max_abs', bfa_abs_options, 'Max Basis for age (absolute)', maxAgeAbsoluteDisabled),
       <BasisForAgeSelection<TimeUnitDetailsType, LocalityDetailsType>
         key="bfa_max"
         sourceField="tu_name"
@@ -100,9 +117,9 @@ export const AgeTab = () => {
         upBoundField="up_bound"
         fraction={editData.frac_max}
         selectorTable={<TimeUnitTable />}
-        disabled={editData.date_meth === 'absolute'}
+        disabled={maxAgeTimeUnitDisabled}
       />,
-      dropdown('frac_max', fracOptions, 'Maximum fraction', editData.date_meth === 'absolute'),
+      dropdown('frac_max', fracOptions, 'Maximum fraction', maxAgeTimeUnitDisabled),
     ],
     [''],
     ['Chronostratigraphic Age', textField('chron')],
