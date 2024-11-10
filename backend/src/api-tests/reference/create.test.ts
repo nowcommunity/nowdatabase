@@ -4,7 +4,7 @@ import { ReferenceDetailsType } from '../../../../frontend/src/backendTypes'
 import { newReferenceBasis } from './data'
 import { login, logout, resetDatabase, send, /*testLogRows,*/ resetDatabaseTimeout, noPermError } from '../utils'
 import { pool } from '../../utils/db'
-import Prisma from '../../../prisma/generated/now_test_client'
+//import Prisma from '../../../prisma/generated/now_test_client'
 
 let createdRef: ReferenceDetailsType | null = null
 
