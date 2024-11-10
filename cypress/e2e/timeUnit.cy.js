@@ -120,7 +120,7 @@ describe('Editing a time unit', () => {
     cy.contains('Bahean')
     cy.get('[id=tu_display_name-textfield]').should('be.disabled')
     cy.get('[id=tu_display_name-textfield]').should('have.value', 'Bahean')
-    cy.get('[id=sequence-tableselecton]').should('have.value', 'CalatayudTeruellocalbiozone')
+    cy.get('[id=sequence-tableselection]').should('have.value', 'CalatayudTeruellocalbiozone')
     cy.get('[id=up_bnd-tableselection]').should('have.value', '11')
     cy.get('[id=low_bnd-tableselection]').should('have.value', '20213')
     cy.get('[id=write-button]').click()
