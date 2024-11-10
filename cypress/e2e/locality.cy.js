@@ -93,6 +93,37 @@ describe('Creating a new locality', () => {
     cy.get('[role=tablist]').contains('Locality').click()
     cy.get('[id=write-button]').should('be.disabled')
   })
+
+  it.only('composite dating method work', () => {
+    cy.visit('/locality/new')
+    cy.get('[name=dating-method][value=composite]').click()
+    cy.get('[id=bfa_min-tableselection-helper-text]').contains(
+      'One age row must follow the rules for Absolute, the other for Time Unit'
+    )
+    cy.get('[id="Max Basis for age (absolute)-multiselect"]').click()
+    cy.get('[data-value=chemical]').click()
+    cy.get('[id=max_age-textfield]').type('12.3')
+    cy.get('[id=bfa_min-tableselection-helper-text]').contains('This field is required')
+    cy.get('[id="Min Basis for age (absolute)-multiselect"]').should('have.attr', 'aria-disabled', 'true')
+    cy.get('[id=bfa_max-tableselection]').should('be.disabled')
+    cy.get('[id="Maximum fraction-multiselect"]').should('have.attr', 'aria-disabled', 'true')
+    cy.get('[id=bfa_min-tableselection]').click()
+    cy.get('[data-cy=detailview-button-bahean]').click()
+    cy.get('[id=min_age-textfield]').should('have.value', '7.2')
+    cy.get('[role=tablist]').contains('Locality').click()
+    cy.get('[id=loc_name-textfield]').type('Bugat')
+    cy.get('[id=country-textfield]').type('Mongolia')
+    cy.get('[id=dec_lat-textfield]').type('49.07')
+    cy.get('[id=dec_long-textfield]').type('103.67')
+    cy.get('[id=write-button]').should('not.be.disabled')
+    cy.get('[id=write-button]').click()
+    cy.get('[id=write-button]').click()
+    cy.contains('Edited item successfully.')
+    cy.contains('Bugat')
+    cy.get('[id=delete-button]').should('exist')
+    cy.visit('/locality/')
+    cy.contains('Bugat')
+  })
 })
 
 describe('Editing a locality', () => {

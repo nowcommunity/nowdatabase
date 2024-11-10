@@ -333,6 +333,7 @@ export const FieldWithTableSelection = <T extends object, ParentType extends obj
     )
   const editingComponent = (
     <TextField
+      id={`${String(targetField)}-tableselection`}
       variant="outlined"
       size="small"
       error={!!error}
@@ -410,6 +411,7 @@ export const TimeBoundSelection = <T extends object, ParentType extends object>(
     )
   const editingComponent = (
     <TextField
+      id={`${String(targetField)}-tableselection`}
       variant="outlined"
       size="small"
       error={!!boundError}
@@ -491,6 +493,7 @@ export const BasisForAgeSelection = <T extends object, ParentType extends object
     )
   const editingComponent = (
     <TextField
+      id={`${String(targetField)}-tableselection`}
       variant="outlined"
       size="small"
       error={!!error}
