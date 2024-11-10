@@ -69,6 +69,55 @@ const journalCheck: (journal: ReferenceJournalType) => ValidationError = (journa
   return null as ValidationError
 }
 
+const dateCheck: (dateString: string) => ValidationError = (dateString: string) => {
+  // Regular expression to match yyyy-MM-dd format
+  const regex = /^\d{4}-\d{2}-\d{2}$/
+  if (!regex.test(dateString)) {
+    return 'Date must be in the format yyyy-MM-dd'
+  }
+  const [year, month, day] = dateString.split('-').map(Number)
+
+  if (month < 1 || month > 12) {
+    return 'Month must be between 01 and 12'
+  }
+
+  const maxDaysInMonth = new Date(year, month, 0).getDate()
+  if (day < 1 || day > maxDaysInMonth) {
+    return `Day must be between 01 and ${maxDaysInMonth} for month ${month}`
+  }
+  return null
+}
+
+const orCheck = (data: EditDataType<ReferenceDetailsType>): ValidationError => {
+  let fields: (keyof EditDataType<ReferenceDetailsType>)[] = []
+
+  if (data.ref_type_id && [1, 2].includes(data.ref_type_id)) {
+    fields = ['title_primary']
+  }
+  if (data.ref_type_id && [3, 5, 8, 9, 11, 14].includes(data.ref_type_id)) {
+    fields = ['title_primary', 'title_secondary', 'title_series', 'gen_notes']
+  }
+  if (data.ref_type_id && [4, 7, 12, 13].includes(data.ref_type_id)) {
+    fields = ['title_primary', 'gen_notes']
+  }
+  if (data.ref_type_id && [6].includes(data.ref_type_id)) {
+    fields = ['title_primary', 'title_secondary', 'gen_notes']
+  }
+  if (data.ref_type_id == 10) {
+    fields = ['gen_notes']
+  }
+
+  const hasValue = fields.some(field => {
+    const value = data[field]
+    return value != null && typeof value === 'string' && value.length > 0
+  })
+
+  if (!hasValue) {
+    return `At least one of the following fields must have text: ${fields.join(', ')}`
+  }
+  return null
+}
+
 export const validateReference = (
   editData: EditDataType<ReferenceDetailsType>,
   fieldName: keyof EditDataType<ReferenceDetailsType>
@@ -76,7 +125,31 @@ export const validateReference = (
   const validators: Validators<Partial<EditDataType<ReferenceDetailsType>>> = {
     title_primary: {
       name: 'title_primary',
-      required: true,
+      useEditData: true,
+      miscCheck: (obj: object) => {
+        return orCheck(obj as EditDataType<ReferenceDetailsType>)
+      },
+    },
+    title_secondary: {
+      name: 'title_secondary',
+      useEditData: true,
+      miscCheck: (obj: object) => {
+        return orCheck(obj as EditDataType<ReferenceDetailsType>)
+      },
+    },
+    title_series: {
+      name: 'title_series',
+      useEditData: true,
+      miscCheck: (obj: object) => {
+        return orCheck(obj as EditDataType<ReferenceDetailsType>)
+      },
+    },
+    gen_notes: {
+      name: 'gen_notes',
+      useEditData: true,
+      miscCheck: (obj: object) => {
+        return orCheck(obj as EditDataType<ReferenceDetailsType>)
+      },
     },
     ref_type_id: {
       name: 'ref_type_id',
@@ -87,6 +160,10 @@ export const validateReference = (
       name: 'date_primary',
       required: true,
       asNumber: true,
+      condition: (data: Partial<EditDataType<ReferenceDetailsType>>) => {
+        const ids: number[] = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14]
+        return data.ref_type_id != null && ids.includes(data.ref_type_id)
+      },
     },
     start_page: {
       name: 'start_page',
@@ -108,11 +185,28 @@ export const validateReference = (
       required: true,
       minLength: 1,
       miscArray: authorCheck,
+      condition: (data: Partial<EditDataType<ReferenceDetailsType>>) => {
+        const ids: number[] = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14]
+        return data.ref_type_id != null && ids.includes(data.ref_type_id)
+      },
     },
     ref_journal: {
       name: 'ref_journal',
       required: true,
       miscCheck: journalCheck,
+      condition: (data: Partial<EditDataType<ReferenceDetailsType>>) => {
+        const ids: number[] = [1, 5, 14]
+        return data.ref_type_id != null && ids.includes(data.ref_type_id)
+      },
+    },
+    exact_date: {
+      name: 'exact_date',
+      required: true,
+      regexCheck: dateCheck,
+      condition: (data: Partial<EditDataType<ReferenceDetailsType>>) => {
+        const ids: number[] = [6, 7, 10, 11, 12, 13, 14]
+        return data.ref_type_id != null && ids.includes(data.ref_type_id)
+      },
     },
   }
 
