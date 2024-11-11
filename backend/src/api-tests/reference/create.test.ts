@@ -4,7 +4,7 @@ import { ReferenceDetailsType } from '../../../../frontend/src/backendTypes'
 import { newReferenceBasis } from './data'
 import { login, logout, resetDatabase, send, /*testLogRows,*/ resetDatabaseTimeout, noPermError } from '../utils'
 import { pool } from '../../utils/db'
-//import Prisma from '../../../prisma/generated/now_test_client'
+import Prisma from '../../../prisma/generated/now_test_client'
 
 let createdRef: ReferenceDetailsType | null = null
 
@@ -42,8 +42,8 @@ describe('Creating new reference works', () => {
     expect(ref_journal.journal_title).toEqual(newReferenceBasis.ref_journal?.journal_title) //journal have been created and is fetched
     expect(journal_id).toBeDefined()
   })
-  /*
-  it('Adding "removed" in rowstate of authors & journal deletes author and clear journal data from reference', async () => {
+
+  it.skip('Adding "removed" in rowstate of authors & journal deletes author and clear journal data from reference', async () => {
     const { status: getReqStatus } = await send<{ rid: number }>(`reference/`, 'PUT', {
       reference: {
         ...createdRef,
@@ -75,9 +75,9 @@ describe('Creating new reference works', () => {
     const { body, status: getReqStatus3 } = await send(`reference/authors/${createdRef?.rid}`, 'GET')
     expect(getReqStatus3).toEqual(200)
     expect(body.length).toEqual(0) // Authors should be deleted from db
-  })*/
-  /*
-  it('Removing author / journal data from reference should clear the data from db', async () => {
+  })
+
+  it.skip('Removing author / journal data from reference should clear the data from db', async () => {
     const { status: getReqStatus } = await send<{ rid: number }>(`reference/`, 'PUT', {
       reference: {
         ...createdRef,
@@ -105,7 +105,7 @@ describe('Creating new reference works', () => {
     const { body, status: getReqStatus3 } = await send(`reference/authors/${createdRef?.rid}`, 'GET')
     expect(getReqStatus3).toEqual(200)
     expect(body.length).toEqual(1) //Unused authors should be deleted from db
-  })*/
+  })
 
   it('Creation fails without permissions', async () => {
     logout()
