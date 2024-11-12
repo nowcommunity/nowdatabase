@@ -55,7 +55,7 @@ export const LocalityTab = () => {
   ]
 
   const handleCoordinateChange = (
-    value: number | string,
+    value: number | string | Date,
     dmsOrDec: 'dms' | 'dec',
     latitudeOrLongitude: 'latitude' | 'longitude'
   ) => {
