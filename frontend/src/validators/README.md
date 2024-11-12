@@ -4,7 +4,6 @@ Validators are created as objects with the following fields. Only `name` is requ
 
 - `name` The clear-language version of the field, usually same as the label shown in frontend. For example 'bfa_min_abs' field would have a name of 'Basis for age (absolute)'
 - `required` Set to true if always requires some (non-empty) value, otherwise
-- `requiredText` Optional custom error text when the field is required. Currently used for age fields when the composite dating method is selected.
 - `minLength`
 - `maxLength` Inclusive min and max length for value, applies only to string fields
 - `asString` Either "true" to just require a string, or a function which can do more complex validation for the string value

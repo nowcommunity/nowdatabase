@@ -30,11 +30,14 @@ export type TextFieldOptions = (
       type: 'number'
       round?: number
     }
+  | {
+      type: 'date'
+    }
 ) & {
   disabled?: boolean
   big?: boolean
   readonly?: boolean
-  handleSetEditData?: (value: number | string) => void
+  handleSetEditData?: (value: number | string | Date) => void
 }
 
 export type OptionalRadioSelectionProps = {

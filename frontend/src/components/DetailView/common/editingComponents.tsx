@@ -247,21 +247,26 @@ export const EditableTextField = <T extends object>({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [error])
 
+  const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const value = event?.currentTarget?.value
+    if (handleSetEditData) {
+      handleSetEditData(value)
+    } else {
+      if (type === 'date') {
+        // For date fields, ensure the value is stored as a string in the format 'YYYY-MM-DD'
+        setEditData({ ...editData, [field]: value })
+      } else if (type === 'text' || value === '') {
+        setEditData({ ...editData, [field]: value })
+      } else {
+        setEditData({ ...editData, [field]: parseFloat(value) })
+      }
+    }
+  }
+
   const editingComponent = (
     <TextField
       sx={{ width: fieldWidth, backgroundColor: disabled ? 'grey' : '' }}
-      onChange={(event: ChangeEvent<HTMLInputElement>) => {
-        const value = event?.currentTarget?.value
-        if (handleSetEditData) {
-          handleSetEditData(value)
-        } else {
-          if (type === 'text' || value === '') {
-            setEditData({ ...editData, [field]: value })
-            return
-          }
-          setEditData({ ...editData, [field]: parseFloat(value) })
-        }
-      }}
+      onChange={handleChange}
       id={`${name}-textfield`}
       value={editData[field] ?? ''}
       variant="outlined"
