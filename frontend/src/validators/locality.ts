@@ -6,18 +6,12 @@ export const validateLocality = (
   editData: EditDataType<LocalityDetailsType>,
   fieldName: keyof EditDataType<LocalityDetailsType>
 ) => {
-  const compositeDatingMethodNoBasesForAges = () => {
-    if (
-      editData.date_meth === 'composite' &&
-      !editData.bfa_min &&
-      !editData.bfa_min_abs &&
-      !editData.bfa_max &&
-      !editData.bfa_max_abs
-    ) {
-      return true
-    }
-    return false
-  }
+  const compositeDatingMethodNoBasesForAges =
+    editData.date_meth === 'composite' &&
+    !editData.bfa_min &&
+    !editData.bfa_min_abs &&
+    !editData.bfa_max &&
+    !editData.bfa_max_abs
 
   const validators: Validators<Partial<EditDataType<LocalityDetailsType>>> = {
     // const isNew = editData.lid === undefined
@@ -46,33 +40,41 @@ export const validateLocality = (
     bfa_min_abs: {
       name: 'Basis for age (Absolute, min)',
       required: editData.date_meth === 'absolute' || (editData.date_meth === 'composite' && !!editData.bfa_max),
-      miscCheck: () => {
-        if (compositeDatingMethodNoBasesForAges())
+      asString: () => {
+        if (compositeDatingMethodNoBasesForAges) {
           return 'One age row must follow the rules for Absolute, the other for Time Unit'
+        }
+        return
       },
     },
     bfa_max_abs: {
       name: 'Basis for age (Absolute, max)',
       required: editData.date_meth === 'absolute' || (editData.date_meth === 'composite' && !!editData.bfa_min),
-      miscCheck: () => {
-        if (compositeDatingMethodNoBasesForAges())
+      asString: () => {
+        if (compositeDatingMethodNoBasesForAges) {
           return 'One age row must follow the rules for Absolute, the other for Time Unit'
+        }
+        return
       },
     },
     bfa_min: {
       name: 'Basis for age (Time unit, min)',
       required: editData.date_meth === 'time_unit' || (editData.date_meth === 'composite' && !!editData.bfa_max_abs),
-      miscCheck: () => {
-        if (compositeDatingMethodNoBasesForAges())
+      asString: () => {
+        if (compositeDatingMethodNoBasesForAges) {
           return 'One age row must follow the rules for Absolute, the other for Time Unit'
+        }
+        return
       },
     },
     bfa_max: {
       name: 'Basis for age (Time unit, max)',
       required: editData.date_meth === 'time_unit' || (editData.date_meth === 'composite' && !!editData.bfa_min_abs),
-      miscCheck: () => {
-        if (compositeDatingMethodNoBasesForAges())
+      asString: () => {
+        if (compositeDatingMethodNoBasesForAges) {
           return 'One age row must follow the rules for Absolute, the other for Time Unit'
+        }
+        return
       },
     },
     loc_name: {
