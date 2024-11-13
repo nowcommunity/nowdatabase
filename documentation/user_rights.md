@@ -118,6 +118,8 @@ Sending an email requires the **Admin** role.
 
 ## User Rights Table
 
+NOTE: This is how user rights are implemented in the current version, it might change later.
+
 | test             | Locality | Species | References | Time Units | Time Bounds | Regions | Persons | Projects | Museums | Sedimentary Structures | Sending Email |
 | ---------------- | -------- | ------- | ---------- | ---------- | ----------- | ------- | ------- | -------- | ------- | ---------------------- | ------------- |
 | Admin            | ALL      | ALL     | ALL        | ALL        | ALL         | ALL     | ALL     | ALL      | ALL     | ALL                    | ALL           |
@@ -141,6 +143,6 @@ ALL = All rights
 
 \*\* = Any user can view a list of projects, but viewing the details of a project requires the **Admin** role.
 
-Here's a picture of the old documentation in case it is needed:
+Here's a matrix showing what the proper user rights should be. Not all of these are implemented yet.
 
-![image](./images/oikeudet.png)
+![image](./images/user_rights_matrix.png)
