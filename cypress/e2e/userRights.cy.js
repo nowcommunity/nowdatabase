@@ -75,6 +75,17 @@ describe('Broadly test what different user rights see', () => {
       cy.pageForbidden('/project')
     })
 
+    it('Direct routes to create new pages do not work', () => {
+      cy.pageForbidden('/locality/new')
+      cy.pageForbidden('/species/new')
+      cy.pageForbidden('/reference/new')
+      cy.pageForbidden('/time-unit/new')
+      cy.pageForbidden('/time-bound/new')
+      cy.pageForbidden('/person/new')
+      cy.pageForbidden('/project/new')
+      cy.pageForbidden('/region/new')
+    })
+
     it('Does not see email page', () => {
       cy.pageForbidden('/email')
     })
