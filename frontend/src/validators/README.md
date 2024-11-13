@@ -3,8 +3,7 @@
 Validators are created as objects with the following fields. Only `name` is required.
 
 - `name` The clear-language version of the field, usually same as the label shown in frontend. For example 'bfa_min_abs' field would have a name of 'Basis for age (absolute)'
-- `required` Set to true if always requires some (non-empty) value, otherwise
-- `required` Custom error string when the field is required, useful for when there is a condition for the field being required. Example usage in locality validators.
+- `required` Set to true if always requires some (non-empty) value. Can also be given a function that returns a ValidationError, if requirement and error strings are more conditional. Example usage can be found in locality validators.
 - `minLength`
 - `maxLength` Inclusive min and max length for value, applies only to string fields
 - `asString` Either "true" to just require a string, or a function which can do more complex validation for the string value

@@ -41,35 +41,39 @@ export const validateLocality = (
     },
     bfa_min_abs: {
       name: 'Basis for age (Absolute, min)',
-      required:
-        editData.date_meth === 'absolute' ||
-        (editData.date_meth === 'composite' && !!editData.bfa_max) ||
-        compositeDatingMethodNoBases,
-      requiredText: compositeDatingMethodNoBases ? compositeDatingMethodRequiredText : 'This field is required',
+      required: () => {
+        if (editData.date_meth === 'absolute' || (editData.date_meth === 'composite' && !!editData.bfa_max))
+          return 'This field is required'
+        if (compositeDatingMethodNoBases) return compositeDatingMethodRequiredText
+        return
+      },
     },
     bfa_max_abs: {
       name: 'Basis for age (Absolute, max)',
-      required:
-        editData.date_meth === 'absolute' ||
-        (editData.date_meth === 'composite' && !!editData.bfa_min) ||
-        compositeDatingMethodNoBases,
-      requiredText: compositeDatingMethodNoBases ? compositeDatingMethodRequiredText : 'This field is required',
+      required: () => {
+        if (editData.date_meth === 'absolute' || (editData.date_meth === 'composite' && !!editData.bfa_min))
+          return 'This field is required'
+        if (compositeDatingMethodNoBases) return compositeDatingMethodRequiredText
+        return
+      },
     },
     bfa_min: {
       name: 'Basis for age (Time unit, min)',
-      required:
-        editData.date_meth === 'time_unit' ||
-        (editData.date_meth === 'composite' && !!editData.bfa_max_abs) ||
-        compositeDatingMethodNoBases,
-      requiredText: compositeDatingMethodNoBases ? compositeDatingMethodRequiredText : 'This field is required',
+      required: () => {
+        if (editData.date_meth === 'time_unit' || (editData.date_meth === 'composite' && !!editData.bfa_max_abs))
+          return 'This field is required'
+        if (compositeDatingMethodNoBases) return compositeDatingMethodRequiredText
+        return
+      },
     },
     bfa_max: {
       name: 'Basis for age (Time unit, max)',
-      required:
-        editData.date_meth === 'time_unit' ||
-        (editData.date_meth === 'composite' && !!editData.bfa_min_abs) ||
-        compositeDatingMethodNoBases,
-      requiredText: compositeDatingMethodNoBases ? compositeDatingMethodRequiredText : 'This field is required',
+      required: () => {
+        if (editData.date_meth === 'time_unit' || (editData.date_meth === 'composite' && !!editData.bfa_min_abs))
+          return 'This field is required'
+        if (compositeDatingMethodNoBases) return compositeDatingMethodRequiredText
+        return
+      },
     },
     loc_name: {
       name: 'Locality name',
