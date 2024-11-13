@@ -60,6 +60,8 @@ Creating or updating a reference requires the **Admin** or **EditUnrestricted** 
 
 Deleting a reference requires the **Admin** role.
 
+NOTE: Users with the **EditRestricted** role should not be able to read references.
+
 ## Time Unit
 
 Any user can get a list of time units.
@@ -81,6 +83,8 @@ Viewing the details of a time bound requires the **Admin** or **EditUnrestricted
 Creating or updating a time bound requires the **Admin** or **EditUnrestricted** roles.
 
 Deleting a time bound requires the **Admin** or **EditUnrestricted** roles.
+
+NOTE: Users with the **EditRestricted** role should be able to get a list of time bounds and view their details, currently they are not allowed to.
 
 ## Region
 
