@@ -155,12 +155,17 @@ export const RadioSelector = <T extends object>({
   handleSetEditData?: (value: number | string | boolean) => void
 }) => {
   const { setEditData, editData } = useDetailContext<T>()
+
   if (defaultValue === undefined) {
     defaultValue = getValue(options[0])
   }
-  if (editData[field] === null || editData[field] === '') {
-    setEditData({ ...editData, [field]: defaultValue })
-  }
+
+  useEffect(() => {
+    if (editData[field] === null || editData[field] === '') {
+      setEditData({ ...editData, [field]: defaultValue })
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [editData])
 
   const editingComponent = (
     <FormControl>
