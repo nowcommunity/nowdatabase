@@ -11,11 +11,11 @@ export const AgeTab = () => {
 
   const fracOptions = [
     emptyOption,
-    'Early half 1:2',
-    'Late half 2:2',
-    'Early third 1:3',
-    'Middle third 2:3',
-    'Late third 3:3',
+    { display: 'Early half 1:2', value: '1:2' },
+    { display: 'Late half 2:2', value: '2:2' },
+    { display: 'Early third 1:3', value: '1:3' },
+    { display: 'Middle third 2:3', value: '2:3' },
+    { display: 'Late third 3:3', value: '3:3' },
   ]
 
   const bfa_abs_options = [
