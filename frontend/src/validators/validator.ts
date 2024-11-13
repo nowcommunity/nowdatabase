@@ -10,7 +10,6 @@ type Validator = {
   asString?: ((str: string) => ValidationError) | boolean
   miscCheck?: (obj: object) => ValidationError
   miscArray?: (data: object[]) => ValidationError
-  regexCheck?: (str: string) => ValidationError
   condition?: (data: object) => boolean // Validator is run if condition returns true, example in ./reference
   useEditData?: boolean
 }

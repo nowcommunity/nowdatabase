@@ -202,7 +202,7 @@ export const validateReference = (
     exact_date: {
       name: 'exact_date',
       required: true,
-      regexCheck: dateCheck,
+      asString: dateCheck,
       condition: (data: Partial<EditDataType<ReferenceDetailsType>>) => {
         const ids: number[] = [6, 7, 10, 11, 12, 13, 14]
         return data.ref_type_id != null && ids.includes(data.ref_type_id)
