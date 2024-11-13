@@ -94,6 +94,27 @@ describe('Creating a new locality', () => {
     cy.get('[id=write-button]').should('be.disabled')
   })
 
+  it('write button is disabled if unvisited tab has validation errors', () => {
+    cy.visit('/locality/new/')
+    cy.contains('Creating new locality')
+    cy.get('[name=dating-method][value=absolute]').click()
+    cy.get('[id="Min Basis for age (absolute)-multiselect"]').click()
+    cy.get('[data-value=other_absolute]').click()
+    cy.get('[id="Max Basis for age (absolute)-multiselect"]').click()
+    cy.get('[data-value=other_absolute]').click()
+    cy.get('[id=min_age-textfield]').type('11.61')
+    cy.get('[id=max_age-textfield]').type('35.22')
+
+    // Age tab has no errors, but Locality tab has unfilled mandatory fields
+    cy.get('[id=write-button]').should('be.disabled')
+    cy.get('[id=min_age-textfield-helper-text]').should('not.exist')
+    cy.get('[id=max_age-textfield-helper-text]').should('not.exist')
+    cy.contains('This field is required').should('not.exist')
+    cy.get('[role=tablist]').contains('Locality').click()
+    cy.contains('This field is required')
+    cy.get('[id=write-button]').should('be.disabled')
+  })
+  
   it('composite dating method work', () => {
     cy.visit('/locality/new')
     cy.get('[name=dating-method][value=composite]').click()

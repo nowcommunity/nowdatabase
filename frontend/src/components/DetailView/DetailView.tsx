@@ -73,7 +73,7 @@ export const DetailView = <T extends object>({
   }
   const { editRights } = usePageContext()
   const [mode, setModeState] = useState<ModeType>(isNew ? modeOptionToMode['new'] : modeOptionToMode['read'])
-  const [allErrors, setAllErrors] = useState<Array<string>>([])
+  const [fieldsWithErrors, setFieldsWithErrors] = useState<Array<string>>([])
   const [tab, setTab] = useState(getUrl())
 
   useEffect(() => {
@@ -125,8 +125,8 @@ export const DetailView = <T extends object>({
     radioSelection,
     bigTextField,
     validator,
-    allErrors,
-    setAllErrors,
+    fieldsWithErrors,
+    setFieldsWithErrors,
   }
 
   const paperProps = {
