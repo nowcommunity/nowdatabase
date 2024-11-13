@@ -154,13 +154,30 @@ export const RadioSelector = <T extends object>({
   defaultValue?: DropdownOptionValue
   handleSetEditData?: (value: number | string | boolean) => void
 }) => {
-  const { setEditData, editData } = useDetailContext<T>()
+  const { setEditData, editData, validator, fieldsWithErrors, setFieldsWithErrors } = useDetailContext<T>()
+  const { error } = validator(editData, field)
   if (defaultValue === undefined) {
     defaultValue = getValue(options[0])
   }
   if (editData[field] === null || editData[field] === '') {
     setEditData({ ...editData, [field]: defaultValue })
   }
+
+  useEffect(() => {
+    const errorField = String(field)
+    if (error && !fieldsWithErrors.includes(errorField)) {
+      // saves invalid field into array of errors in context
+      setFieldsWithErrors(prevErrors => {
+        return [...prevErrors, errorField]
+      })
+    } else if (!error && fieldsWithErrors.includes(errorField)) {
+      // removes valid field from the array
+      setFieldsWithErrors(prevErrors => {
+        return prevErrors.filter(err => err !== errorField)
+      })
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [error])
 
   const editingComponent = (
     <FormControl>
