@@ -5,7 +5,7 @@ import SaveIcon from '@mui/icons-material/Save'
 import { usePageContext } from '../Page'
 import { useDetailContext } from './Context/DetailContext'
 import { EditDataType } from '@/backendTypes'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
 export const WriteButton = <T,>({
   onWrite,
@@ -14,13 +14,37 @@ export const WriteButton = <T,>({
   onWrite: (editData: EditDataType<T>, setEditData: (editData: EditDataType<T>) => void) => Promise<void>
   hasStagingMode?: boolean
 }) => {
-  const { editData, setEditData, mode, setMode, fieldsWithErrors } = useDetailContext<T>()
+  const { editData, setEditData, mode, setMode, validator, fieldsWithErrors, setFieldsWithErrors } =
+    useDetailContext<T>()
   const [loading, setLoading] = useState(false)
 
   const getButtonText = () => {
     if (!mode.staging) return hasStagingMode ? 'Finalize entry' : 'Save changes'
     return 'Complete and save'
   }
+
+  /*  validates all fields when entering new/editing mode
+      to disable write button when unvisited tabs have
+      validation errors (e.g. missing required fields) */
+
+  useEffect(() => {
+    if (mode.option === 'edit' || mode.option === 'new') {
+      for (const field in editData) {
+        const fieldAsString = String(field)
+        const { error } = validator(editData, field)
+        if (error && !fieldsWithErrors.includes(fieldAsString)) {
+          setFieldsWithErrors(prevErrors => {
+            return [...prevErrors, field]
+          })
+        } else if (!error && fieldsWithErrors.includes(fieldAsString)) {
+          setFieldsWithErrors(prevErrors => {
+            return prevErrors.filter(err => err !== fieldAsString)
+          })
+        }
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [mode])
 
   return (
     <Button

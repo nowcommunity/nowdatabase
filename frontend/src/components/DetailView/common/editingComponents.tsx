@@ -448,7 +448,7 @@ export const BasisForAgeSelection = <T extends object, ParentType extends object
   fraction: string | null | undefined
   disabled?: boolean
 }) => {
-  const { editData, setEditData, validator } = useDetailContext<ParentType>()
+  const { editData, setEditData, validator, fieldsWithErrors, setFieldsWithErrors } = useDetailContext<ParentType>()
   const { error } = validator(editData, targetField as keyof EditDataType<ParentType>)
   const [open, setOpen] = useState(false)
   const selectorFn = (selected: T) => {
@@ -477,6 +477,22 @@ export const BasisForAgeSelection = <T extends object, ParentType extends object
     }
     setOpen(false)
   }
+
+  useEffect(() => {
+    const errorField = String(targetField)
+    if (error && !fieldsWithErrors.includes(errorField)) {
+      // saves invalid field into array of errors in context
+      setFieldsWithErrors(prevErrors => {
+        return [...prevErrors, errorField]
+      })
+    } else if (!error && fieldsWithErrors.includes(errorField)) {
+      // removes valid field from the array
+      setFieldsWithErrors(prevErrors => {
+        return prevErrors.filter(err => err !== errorField)
+      })
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [error])
 
   const selectorTableWithFn = cloneElement(selectorTable, { selectorFn })
   if (open)
