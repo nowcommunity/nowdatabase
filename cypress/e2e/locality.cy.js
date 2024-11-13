@@ -93,6 +93,58 @@ describe('Creating a new locality', () => {
     cy.get('[role=tablist]').contains('Locality').click()
     cy.get('[id=write-button]').should('be.disabled')
   })
+
+  it('write button is disabled if unvisited tab has validation errors', () => {
+    cy.visit('/locality/new/')
+    cy.contains('Creating new locality')
+    cy.get('[name=dating-method][value=absolute]').click()
+    cy.get('[id="Min Basis for age (absolute)-multiselect"]').click()
+    cy.get('[data-value=other_absolute]').click()
+    cy.get('[id="Max Basis for age (absolute)-multiselect"]').click()
+    cy.get('[data-value=other_absolute]').click()
+    cy.get('[id=min_age-textfield]').type('11.61')
+    cy.get('[id=max_age-textfield]').type('35.22')
+
+    // Age tab has no errors, but Locality tab has unfilled mandatory fields
+    cy.get('[id=write-button]').should('be.disabled')
+    cy.get('[id=min_age-textfield-helper-text]').should('not.exist')
+    cy.get('[id=max_age-textfield-helper-text]').should('not.exist')
+    cy.contains('This field is required').should('not.exist')
+    cy.get('[role=tablist]').contains('Locality').click()
+    cy.contains('This field is required')
+    cy.get('[id=write-button]').should('be.disabled')
+  })
+  
+  it('composite dating method work', () => {
+    cy.visit('/locality/new')
+    cy.get('[name=dating-method][value=composite]').click()
+    cy.get('[id=bfa_min-tableselection-helper-text]').contains(
+      'One age row must follow the rules for Absolute, the other for Time Unit'
+    )
+    cy.get('[id="Max Basis for age (absolute)-multiselect"]').click()
+    cy.get('[data-value=chemical]').click()
+    cy.get('[id=max_age-textfield]').type('12.3')
+    cy.get('[id=bfa_min-tableselection-helper-text]').contains('This field is required')
+    cy.get('[id="Min Basis for age (absolute)-multiselect"]').should('have.attr', 'aria-disabled', 'true')
+    cy.get('[id=bfa_max-tableselection]').should('be.disabled')
+    cy.get('[id="Maximum fraction-multiselect"]').should('have.attr', 'aria-disabled', 'true')
+    cy.get('[id=bfa_min-tableselection]').click()
+    cy.get('[data-cy=detailview-button-bahean]').click()
+    cy.get('[id=min_age-textfield]').should('have.value', '7.2')
+    cy.get('[role=tablist]').contains('Locality').click()
+    cy.get('[id=loc_name-textfield]').type('Bugat')
+    cy.get('[id=country-textfield]').type('Mongolia')
+    cy.get('[id=dec_lat-textfield]').type('49.07')
+    cy.get('[id=dec_long-textfield]').type('103.67')
+    cy.get('[id=write-button]').should('not.be.disabled')
+    cy.get('[id=write-button]').click()
+    cy.get('[id=write-button]').click()
+    cy.contains('Edited item successfully.')
+    cy.contains('Bugat')
+    cy.get('[id=delete-button]').should('exist')
+    cy.visit('/locality/')
+    cy.contains('Bugat')
+  })
 })
 
 describe('Editing a locality', () => {

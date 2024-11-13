@@ -24,7 +24,7 @@ Depending on the selected dating method, different fields are required:
 
 - When the Time Unit dating method is selected, the `bfa_min` and `bfa_max` fields are required.
 - When the Absolute dating method is selected, the `bfa_min_abs` and `bfa_max_abs` fields are required.
-- When the Composite dating method is selected, only the `min_age` and `max_age` fields are required.
+- When the Composite dating method is selected, a combination of either `bfa_min` and `bfa_max_abs` or `bfa_min_abs` and `bfa_max` are required, e.g. one age must be defined by a time unit and the other absolutely.
 
 When the Time Unit dating method is selected, two time units need to be selected as the basis for the locality's age (both bases can also use the same time unit). When selecting a basis for the minimum age, the upper bound of the time unit is used as the value, and when selecting a basis for the maximum age the lower bound is used.
 

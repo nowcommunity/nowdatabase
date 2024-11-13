@@ -82,7 +82,7 @@ export const Page = <T extends Record<string, unknown>>({
   const { id } = useParams()
   const user = useUser()
   const editRights = ENABLE_WRITE && user ? getEditRights(user, id!) : {}
-  if (allowedRoles && !allowedRoles.includes(user.role))
+  if ((id === 'new' && !editRights.new) || (allowedRoles && !allowedRoles.includes(user.role)))
     return <Box>Your user is not authorized to view this page.</Box>
   return (
     <PageContextProvider<T>
