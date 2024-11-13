@@ -5,11 +5,11 @@ import { referenceTableColumns } from '@/common'
 
 export const ReferenceTable = ({ selectorFn }: { selectorFn?: (id: Reference) => void }) => {
   const referenceQuery = useGetAllReferencesQuery()
-  let filteredData = undefined
+  let fixedNullDateData = undefined
   if (referenceQuery.data) {
     // remove references with null date_primary values to not break the year filter,
     // this needs to be changed later if having null dates is a desired feature
-    filteredData = referenceQuery.data.filter(ref => ref.date_primary !== null)
+    fixedNullDateData = referenceQuery.data.map(ref => (ref.date_primary === null ? { ...ref, date_primary: 0 } : ref))
   }
 
   const visibleColumns = {
@@ -23,7 +23,7 @@ export const ReferenceTable = ({ selectorFn }: { selectorFn?: (id: Reference) =>
       idFieldName="rid"
       columns={referenceTableColumns}
       visibleColumns={visibleColumns}
-      data={filteredData}
+      data={fixedNullDateData}
       url="reference"
     />
   )
