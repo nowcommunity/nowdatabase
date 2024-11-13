@@ -3,7 +3,7 @@ export type ValidationObject = { name: string; error: ValidationError }
 
 type Validator = {
   name: string
-  required?: boolean
+  required?: (() => ValidationError) | boolean
   minLength?: number
   maxLength?: number
   asNumber?: ((num: number) => ValidationError) | boolean
@@ -20,7 +20,10 @@ export type Validators<T> = { [field in keyof T]: Validator } & { [key: string]:
 const validate: (validator: Validator, value: unknown) => ValidationError = (validator: Validator, value: unknown) => {
   const { required, minLength, maxLength, asNumber, asString, miscCheck, miscArray } = validator
 
-  if ((value === null || value === undefined || value === '') && required) return 'This field is required'
+  if ((value === null || value === undefined || value === '') && required) {
+    if (typeof required === 'boolean') return 'This field is required'
+    if (typeof required === 'function') return required()
+  }
   if (asNumber) {
     if (typeof value !== 'number' && value !== null) return 'Value must be a valid number' // If this happens, code is broken somewhere
     if (typeof asNumber === 'function' && typeof value == 'number') return asNumber(value)
