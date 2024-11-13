@@ -114,8 +114,8 @@ describe('Creating a new locality', () => {
     cy.contains('This field is required')
     cy.get('[id=write-button]').should('be.disabled')
   })
-  
-  it('composite dating method work', () => {
+
+  it('composite dating method works', () => {
     cy.visit('/locality/new')
     cy.get('[name=dating-method][value=composite]').click()
     cy.get('[id=bfa_min-tableselection-helper-text]').contains(
@@ -128,9 +128,11 @@ describe('Creating a new locality', () => {
     cy.get('[id="Min Basis for age (absolute)-multiselect"]').should('have.attr', 'aria-disabled', 'true')
     cy.get('[id=bfa_max-tableselection]').should('be.disabled')
     cy.get('[id="Maximum fraction-multiselect"]').should('have.attr', 'aria-disabled', 'true')
+    cy.get('[id="Minimum fraction-multiselect"]').click()
+    cy.get('[data-value=2:3]').click()
     cy.get('[id=bfa_min-tableselection]').click()
     cy.get('[data-cy=detailview-button-bahean]').click()
-    cy.get('[id=min_age-textfield]').should('have.value', '7.2')
+    cy.get('[id=min_age-textfield]').should('have.value', '8,676666666666668')
     cy.get('[role=tablist]').contains('Locality').click()
     cy.get('[id=loc_name-textfield]').type('Bugat')
     cy.get('[id=country-textfield]').type('Mongolia')
@@ -141,6 +143,7 @@ describe('Creating a new locality', () => {
     cy.get('[id=write-button]').click()
     cy.contains('Edited item successfully.')
     cy.contains('Bugat')
+    cy.contains('8.676')
     cy.get('[id=delete-button]').should('exist')
     cy.visit('/locality/')
     cy.contains('Bugat')
