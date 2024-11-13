@@ -23,6 +23,10 @@ export const validateSpecies = (
       name: 'Species',
       required: true,
     },
+    unique_identifier: {
+      name: 'Unique Identifier',
+      required: true,
+    },
   }
 
   return validator<EditDataType<SpeciesDetailsType>>(validators, editData, fieldName)
