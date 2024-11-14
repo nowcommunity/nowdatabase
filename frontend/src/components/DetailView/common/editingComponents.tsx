@@ -156,12 +156,17 @@ export const RadioSelector = <T extends object>({
 }) => {
   const { setEditData, editData, validator, fieldsWithErrors, setFieldsWithErrors } = useDetailContext<T>()
   const { error } = validator(editData, field)
+
   if (defaultValue === undefined) {
     defaultValue = getValue(options[0])
   }
-  if (editData[field] === null || editData[field] === '') {
-    setEditData({ ...editData, [field]: defaultValue })
-  }
+
+  useEffect(() => {
+    if (editData[field] === null || editData[field] === '') {
+      setEditData({ ...editData, [field]: defaultValue })
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [editData])
 
   useEffect(() => {
     const errorField = String(field)
