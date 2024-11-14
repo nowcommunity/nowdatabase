@@ -156,7 +156,7 @@ export const RadioSelector = <T extends object>({
 }) => {
   const { setEditData, editData, validator, fieldsWithErrors, setFieldsWithErrors } = useDetailContext<T>()
   const { error } = validator(editData, field)
-  
+
   if (defaultValue === undefined) {
     defaultValue = getValue(options[0])
   }
