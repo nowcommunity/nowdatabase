@@ -110,11 +110,11 @@ const LocationSearch = () => {
 }
 
 export const CoordinateSelectionMap = ({
-  coordinates,
-  setCoordinates,
+  markerCoordinates,
+  setMarkerCoordinates,
 }: {
-  coordinates: Coordinate
-  setCoordinates: CoordinateSetter
+  markerCoordinates: Coordinate
+  setMarkerCoordinates: CoordinateSetter
 }) => {
   const mapRef = useRef(null)
   const latitude = 30
@@ -127,10 +127,10 @@ export const CoordinateSelectionMap = ({
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
-        <DraggableMarker coord={coordinates} setMarkerPos={setCoordinates} />
+        <DraggableMarker coord={markerCoordinates} setMarkerPos={setMarkerCoordinates} />
       </MapContainer>
       <p>
-        Lat: {coordinates ? coordinates.lat : null} Lon: {coordinates ? coordinates.lng : null}
+        Lat: {markerCoordinates ? markerCoordinates.lat : null} Lon: {markerCoordinates ? markerCoordinates.lng : null}
       </p>
       <LocationSearch />
     </div>
