@@ -480,7 +480,7 @@ export const BasisForAgeSelection = <T extends object, ParentType extends object
         min_age: calculateLocalityMinAge(
           Number(selected[upBoundField]),
           Number(selected[lowBoundField]),
-          String(fraction).split(' ')[2]
+          String(fraction)
         ),
         [targetField]: selected[sourceField],
       })
@@ -490,7 +490,7 @@ export const BasisForAgeSelection = <T extends object, ParentType extends object
         max_age: calculateLocalityMaxAge(
           Number(selected[upBoundField]),
           Number(selected[lowBoundField]),
-          String(fraction).split(' ')[2]
+          String(fraction)
         ),
         [targetField]: selected[sourceField],
       })
