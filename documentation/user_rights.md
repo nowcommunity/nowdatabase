@@ -22,11 +22,15 @@ Any user can get a list of localities.
 
 Any user can view the details of a locality.
 
-FRONTEND ONLY: Users with the **EditRestricted** role can edit **their own** localities, but cannot create localities. This only means that the button to edit shows up in the frontend, the user cannot actually edit anything because the backend doesn't allow it.
-
 Creating or updating a locality requires the **Admin** or **EditUnrestricted** roles.
 
 Deleting a locality requires the **Admin** or **EditUnrestricted** roles.
+
+NOTE: Users with the **EditRestricted** role should only be able to create or update localities which are in the same project with the user. Otherwise they have reading rights only.
+
+Current behaviour:
+
+- Users with the **EditRestricted** role can access the edit view in **their own** localities, but sending the PUT request to the backend fails because the role doesn't have permissions.
 
 ## Species
 
@@ -34,11 +38,15 @@ Any user can get a list of species.
 
 Any user can view the details of a species.
 
-FRONTEND ONLY: Users with the **EditRestricted** role can create new species and edit **any** species. This only means that the buttons to edit/create show up in the frontend, the user cannot actually edit or create new data because the backend doesn't allow it.
-
 Creating or updating a species requires the **Admin** or **EditUnrestricted** roles.
 
 Deleting a species requires the **Admin** or **EditUnrestricted** roles.
+
+NOTE: Users with the **EditRestricted** role should be able to create and update species. This is currently not possible.
+
+Current behaviour:
+
+- Users with the **EditRestricted** role can access the editing/creating new species view from the frontend, but sending the PUT request to the backend fails because the role doesn't have permissions.
 
 ## References
 
@@ -51,6 +59,8 @@ Any user can view the details of a reference.
 Creating or updating a reference requires the **Admin** or **EditUnrestricted** roles.
 
 Deleting a reference requires the **Admin** role.
+
+NOTE: Users with the **EditRestricted** role should not be able to read references.
 
 ## Time Unit
 
@@ -73,6 +83,8 @@ Viewing the details of a time bound requires the **Admin** or **EditUnrestricted
 Creating or updating a time bound requires the **Admin** or **EditUnrestricted** roles.
 
 Deleting a time bound requires the **Admin** or **EditUnrestricted** roles.
+
+NOTE: Users with the **EditRestricted** role should be able to get a list of time bounds and view their details, currently they are not allowed to.
 
 ## Region
 
@@ -106,6 +118,8 @@ Sending an email requires the **Admin** role.
 
 ## User Rights Table
 
+NOTE: This is how user rights are implemented in the current version, it might change later.
+
 | test             | Locality | Species | References | Time Units | Time Bounds | Regions | Persons | Projects | Museums | Sedimentary Structures | Sending Email |
 | ---------------- | -------- | ------- | ---------- | ---------- | ----------- | ------- | ------- | -------- | ------- | ---------------------- | ------------- |
 | Admin            | ALL      | ALL     | ALL        | ALL        | ALL         | ALL     | ALL     | ALL      | ALL     | ALL                    | ALL           |
@@ -129,6 +143,6 @@ ALL = All rights
 
 \*\* = Any user can view a list of projects, but viewing the details of a project requires the **Admin** role.
 
-Here's a picture of the old documentation in case it is needed:
+Here's a matrix showing what the proper user rights should be. Not all of these are implemented yet.
 
-![image](./images/oikeudet.png)
+![image](./images/user_rights_matrix.png)
