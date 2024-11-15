@@ -1,6 +1,6 @@
-import { useRef, useMemo, useState, KeyboardEvent } from 'react'
-import { MapContainer, TileLayer, Marker } from 'react-leaflet'
-import { TextField, List, ListItem, ListItemButton, ListItemText } from '@mui/material'
+import { useRef, useMemo, useState, KeyboardEvent, useEffect } from 'react'
+import { MapContainer, TileLayer, Marker, useMap } from 'react-leaflet'
+import { TextField, List, ListItem, ListItemButton, ListItemText, Box, Button } from '@mui/material'
 import 'leaflet/dist/leaflet.css'
 
 type Coordinate = {
@@ -33,7 +33,21 @@ const DraggableMarker = ({
   return <Marker draggable={true} eventHandlers={eventHandlers} position={markerCoordinates} ref={markerRef} />
 }
 
-const LocationSearch = () => {
+const ViewSetter = ({ viewCoordinates }: { viewCoordinates: Coordinate }) => {
+  const map = useMap()
+  useEffect(() => {
+    map.setView(viewCoordinates)
+  }, [viewCoordinates, map])
+  return null
+}
+
+const LocationSearch = ({
+  setViewCoordinates,
+  setMarkerCoordinates,
+}: {
+  setViewCoordinates: CoordinateSetter
+  setMarkerCoordinates: CoordinateSetter
+}) => {
   type Location = {
     name: string
     country: string
@@ -94,24 +108,35 @@ const LocationSearch = () => {
   }
 
   return (
-    <div>
-      <TextField
-        onChange={event => {
-          setSearchBoxValue(event.target.value)
-        }}
-        value={searchBoxValue}
-        onKeyDown={handleKeyDown}
-      />
+    <Box>
+      <Box sx={{ display: 'flex', alignItems: 'center', gap: '0.5em' }}>
+        <TextField
+          onChange={event => {
+            setSearchBoxValue(event.target.value)
+          }}
+          value={searchBoxValue}
+          onKeyDown={handleKeyDown}
+          placeholder="Search for a place..."
+        />
+        <Button variant="contained" onClick={() => void handleSearch()}>
+          {'Search'}
+        </Button>
+      </Box>
       <List>
         {resultsList.map((result, index) => (
           <ListItem key={index} sx={{ backgroundColor: 'lightgray' }}>
-            <ListItemButton>
+            <ListItemButton
+              onClick={() => {
+                setViewCoordinates({ lat: result.latitude, lng: result.longitude })
+                setMarkerCoordinates({ lat: result.latitude, lng: result.longitude })
+              }}
+            >
               <ListItemText primary={`${result.name}, ${result.country}`} />
             </ListItemButton>
           </ListItem>
         ))}
       </List>
-    </div>
+    </Box>
   )
 }
 
@@ -125,6 +150,7 @@ export const CoordinateSelectionMap = ({
   const mapRef = useRef(null)
   const latitude = 30
   const longitude = -5
+  const [viewCoordinates, setViewCoordinates] = useState({ lat: 60.202665856, lng: 24.957662836 })
 
   return (
     <div>
@@ -134,11 +160,12 @@ export const CoordinateSelectionMap = ({
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
         <DraggableMarker markerCoordinates={markerCoordinates} setMarkerCoordinates={setMarkerCoordinates} />
+        <ViewSetter viewCoordinates={viewCoordinates} />
       </MapContainer>
       <p>
         Lat: {markerCoordinates ? markerCoordinates.lat : null} Lon: {markerCoordinates ? markerCoordinates.lng : null}
       </p>
-      <LocationSearch />
+      <LocationSearch setViewCoordinates={setViewCoordinates} setMarkerCoordinates={setMarkerCoordinates} />
     </div>
   )
 }
