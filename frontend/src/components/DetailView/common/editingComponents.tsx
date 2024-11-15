@@ -12,6 +12,7 @@ import {
   Box,
   Modal,
   Button,
+  Autocomplete,
 } from '@mui/material'
 import { cloneElement, ChangeEvent, ReactNode, useState, ReactElement, useEffect } from 'react'
 import { RegisterOptions, FieldValues, UseFormRegisterReturn, FieldErrors } from 'react-hook-form'
@@ -93,6 +94,72 @@ export const DropdownSelector = <T extends object>({
           </MenuItem>
         ))}
       </Select>
+      {error && <FormHelperText>{error}</FormHelperText>}
+    </FormControl>
+  )
+
+  return <MultiSelector<T> {...{ editingComponent, field, options }} />
+}
+
+export const DropdownSelectorWithSearch = <T extends object>({
+  options,
+  name,
+  field,
+  disabled,
+}: {
+  options: Array<DropdownOption | string>
+  name: string
+  field: keyof EditDataType<T>
+  disabled?: boolean
+}) => {
+  const { setEditData, editData, validator, fieldsWithErrors, setFieldsWithErrors } = useDetailContext<T>()
+  const { error } = validator(editData, field)
+
+  //current state of the search, not the selected option that is set into editData
+  const [inputValue, setInputValue] = useState('')
+
+  useEffect(() => {
+    const errorField = String(field)
+    if (error && !fieldsWithErrors.includes(errorField)) {
+      // saves invalid field into array of errors in context
+      setFieldsWithErrors(prevErrors => {
+        return [...prevErrors, errorField]
+      })
+    } else if (!error && fieldsWithErrors.includes(errorField)) {
+      // removes valid field from the array
+      setFieldsWithErrors(prevErrors => {
+        return prevErrors.filter(err => err !== errorField)
+      })
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [error])
+
+  const editingComponent = (
+    <FormControl size="small" error={!!error}>
+      <InputLabel id={`${name}-multiselect-label`}></InputLabel>
+
+      <Autocomplete
+        id={`${name}-multiselect`}
+        options={options}
+        value={(editData[field] as string) || ''}
+        disabled={disabled}
+        onChange={(_, newValue) => {
+          const setValue = (value: number | string | boolean) => setEditData({ ...editData, [field]: value })
+          const asNumber = typeof options[0] === 'number'
+          if (newValue) {
+            setDropdownOptionValue(setValue, newValue as string, asNumber)
+          } else {
+            setDropdownOptionValue(setValue, '', asNumber)
+          }
+        }}
+        inputValue={inputValue}
+        onInputChange={(_, newInputValue) => {
+          setInputValue(newInputValue)
+        }}
+        sx={{ width: fieldWidth, backgroundColor: disabled ? 'grey' : '' }}
+        renderInput={params => <TextField {...params} label="Choose a country" error={!!error} />}
+      />
+
       {error && <FormHelperText>{error}</FormHelperText>}
     </FormControl>
   )

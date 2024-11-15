@@ -10,9 +10,11 @@ import { emptyOption } from '@/components/DetailView/common/misc'
 import { CoordinateSelectionMap } from '@/components/Map/CoordinateSelectionMap'
 import { useState } from 'react'
 import { convertDmsToDec, convertDecToDms } from '@/util/coordinateConversion'
+import { validCountries } from '@/validators/countryList'
 
 export const LocalityTab = () => {
-  const { textField, radioSelection, dropdown, mode, bigTextField } = useDetailContext<LocalityDetailsType>()
+  const { textField, radioSelection, dropdown, dropdownWithSearch, mode, bigTextField } =
+    useDetailContext<LocalityDetailsType>()
   const { editData, setEditData } = useDetailContext<LocalityDetailsType>()
 
   const approximateCoordinatesOptions = [
@@ -30,6 +32,8 @@ export const LocalityTab = () => {
     { display: '>1000 m2', value: '>1000m2' },
   ]
 
+  const countryOptions = ['', ...validCountries]
+
   const info = [
     ['Name', textField('loc_name')],
     [
@@ -45,7 +49,7 @@ export const LocalityTab = () => {
     ],
   ]
   const country = [
-    ['Country', textField('country')],
+    ['Country', dropdownWithSearch('country', countryOptions, 'Country')],
     ['State', textField('state')],
     ['County', textField('county')],
     ['Detail', bigTextField('loc_detail')],
