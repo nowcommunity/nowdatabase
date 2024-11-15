@@ -10,21 +10,27 @@ type Coordinate = {
 
 type CoordinateSetter = (Coordinate: Coordinate) => void
 
-const DraggableMarker = ({ setMarkerPos, coord }: { setMarkerPos: CoordinateSetter; coord: Coordinate }) => {
+const DraggableMarker = ({
+  markerCoordinates,
+  setMarkerCoordinates,
+}: {
+  markerCoordinates: Coordinate
+  setMarkerCoordinates: CoordinateSetter
+}) => {
   const markerRef = useRef<L.Marker>(null)
   const eventHandlers = useMemo(
     () => ({
       dragend() {
         const marker = markerRef.current
         if (marker != null) {
-          setMarkerPos(marker.getLatLng())
+          setMarkerCoordinates(marker.getLatLng())
         }
       },
     }),
-    [setMarkerPos]
+    [setMarkerCoordinates]
   )
 
-  return <Marker draggable={true} eventHandlers={eventHandlers} position={coord} ref={markerRef} />
+  return <Marker draggable={true} eventHandlers={eventHandlers} position={markerCoordinates} ref={markerRef} />
 }
 
 const LocationSearch = () => {
@@ -127,7 +133,7 @@ export const CoordinateSelectionMap = ({
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
-        <DraggableMarker coord={markerCoordinates} setMarkerPos={setMarkerCoordinates} />
+        <DraggableMarker markerCoordinates={markerCoordinates} setMarkerCoordinates={setMarkerCoordinates} />
       </MapContainer>
       <p>
         Lat: {markerCoordinates ? markerCoordinates.lat : null} Lon: {markerCoordinates ? markerCoordinates.lng : null}

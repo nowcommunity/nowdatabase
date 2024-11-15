@@ -172,7 +172,6 @@ describe("Locality's Map works", () => {
     cy.login('testSu')
   })
 
-  // note that this changes only dec coordinates, dms is still the old one
   it('Opening map view in edit works', () => {
     cy.visit(`/locality/20920?tab=1`)
     cy.contains('Coordinates')
