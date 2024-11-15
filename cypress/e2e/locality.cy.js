@@ -178,7 +178,7 @@ describe("Locality's Map works", () => {
     cy.contains('Coordinates')
     cy.get('[id=edit-button]').click()
     cy.contains('Latitude')
-    cy.contains('Open Map').click()
+    cy.contains('Get Coordinates').click()
     cy.contains('OpenStreetMap')
     cy.contains('Leaflet')
 

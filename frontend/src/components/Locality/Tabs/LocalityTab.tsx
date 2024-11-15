@@ -7,7 +7,7 @@ import { useForm } from 'react-hook-form'
 import { EditableTable } from '@/components/DetailView/common/EditableTable'
 import { EditingModal } from '@/components/DetailView/common/EditingModal'
 import { emptyOption } from '@/components/DetailView/common/misc'
-import { Map } from '@/components/Map/CoordinateSelectionMap'
+import { CoordinateSelectionMap } from '@/components/Map/CoordinateSelectionMap'
 import { useState } from 'react'
 import { convertDmsToDec, convertDecToDms } from '@/util/coordinateConversion'
 
@@ -157,7 +157,7 @@ export const LocalityTab = () => {
   const coordinateButton = (
     <EditingModal buttonText="Get Coordinates" onSave={onSaveCoord}>
       <Box sx={{ display: 'flex', flexDirection: 'column', gap: '1em' }}>
-        <Map coordinates={coordinates} setCoordinates={setCoordinates} />
+        <CoordinateSelectionMap coordinates={coordinates} setCoordinates={setCoordinates} />
       </Box>
     </EditingModal>
   )

@@ -109,11 +109,16 @@ const LocationSearch = () => {
   )
 }
 
-export const Map = ({ coordinates, setCoordinates }: { coordinates: Coordinate; setCoordinates: CoordinateSetter }) => {
+export const CoordinateSelectionMap = ({
+  coordinates,
+  setCoordinates,
+}: {
+  coordinates: Coordinate
+  setCoordinates: CoordinateSetter
+}) => {
   const mapRef = useRef(null)
   const latitude = 30
   const longitude = -5
-  document.title = 'Map'
 
   return (
     <div>
