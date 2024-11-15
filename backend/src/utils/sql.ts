@@ -31,6 +31,34 @@ export const generateFilteredCrossSearchSql = (limit: number) => {
   `
 }
 
+export const generateFilteredCrossSearchSqlWithNoUser = (limit: number, offset: number) => {
+  return Prisma.sql`
+  SELECT 
+    now_loc.lid,
+    loc_name,
+    country,
+    com_species.species_id
+  FROM
+    now_ls
+  LEFT JOIN
+    now_loc
+  ON
+    now_ls.lid = now_loc.lid
+  LEFT JOIN
+    com_species
+  ON
+    now_ls.species_id = com_species.species_id
+  WHERE
+    now_loc.loc_status = 0
+  ORDER BY
+    now_loc.lid
+  LIMIT
+    ${limit}
+  OFFSET
+    ${offset}
+  `
+}
+
 export const oldGenerateFilteredCrossSearchSql = (limit: number) => {
   return Prisma.sql`
   SELECT 
