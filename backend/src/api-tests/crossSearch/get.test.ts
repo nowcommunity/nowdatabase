@@ -88,8 +88,20 @@ describe('Getting cross-search data works', () => {
     const parameters = constructFilterSortPageUrl([], [], { pageIndex: 0, pageSize: 100 })
     await login()
     const result = await send('crosssearch/testing/all?' + parameters, 'GET')
-
     logout()
+
+    expect(result.status).toEqual(200)
+    expect(result.body.result.length).toEqual(22)
+  })
+
+  it('Get filtered with correct but empty parameters with some user rights and large page size returns correct amount of rows', async () => {
+    const parameters = constructFilterSortPageUrl([], [], { pageIndex: 0, pageSize: 100 })
+    await login('testPl', 'test')
+    const result = await send('crosssearch/testing/all?' + parameters, 'GET')
+    console.log('result length: ',result.body.result.length)
+    console.log('result: ',result.body.result)
+    logout()
+
     expect(result.status).toEqual(200)
     expect(result.body.result.length).toEqual(21)
   })
