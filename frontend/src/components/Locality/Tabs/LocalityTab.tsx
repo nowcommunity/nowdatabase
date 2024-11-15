@@ -7,7 +7,7 @@ import { useForm } from 'react-hook-form'
 import { EditableTable } from '@/components/DetailView/common/EditableTable'
 import { EditingModal } from '@/components/DetailView/common/EditingModal'
 import { emptyOption } from '@/components/DetailView/common/misc'
-import { Map } from '@/components/Map/Map'
+import { Map } from '@/components/Map/CoordinateSelectionMap'
 import { useState } from 'react'
 import { convertDmsToDec, convertDecToDms } from '@/util/coordinateConversion'
 
