@@ -64,4 +64,4 @@ WORKDIR /usr/src/app/backend
 RUN npm ci
 RUN npm run prisma
 
-CMD ["npm", "run", "test"]
+CMD ["npm", "run", "test:api"]
