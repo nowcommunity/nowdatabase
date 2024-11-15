@@ -3,7 +3,7 @@ describe('Creating a new locality', () => {
     cy.login('testSu')
   })
 
-  it('with valid data works', () => {
+  it.only('with valid data works', () => {
     cy.visit('/locality/new/')
     cy.contains('Creating new locality')
     cy.get('[name=dating-method]').should('have.value', 'time_unit')
@@ -25,7 +25,8 @@ describe('Creating a new locality', () => {
     cy.get('[id=max_age-textfield]').type('24.01')
     cy.get('[role=tablist]').contains('Locality').click()
     cy.get('[id=loc_name-textfield]').type('Bugat')
-    cy.get('[id=country-textfield]').type('Mongolia')
+    cy.contains('Choose a country').parent().type('Mongo')
+    cy.contains('Mongolia').click()
     cy.get('[id=dec_lat-textfield]').type('49.07')
     cy.get('[id=dec_long-textfield]').type('103.67')
     cy.get('[id=dms_lat-textfield]').should('have.value', '49 4 12 N')
@@ -70,7 +71,8 @@ describe('Creating a new locality', () => {
 
     cy.get('[role=tablist]').contains('Locality').click()
     cy.get('[id=loc_name-textfield]').type('Bugat')
-    cy.get('[id=country-textfield]').type('Mongolia')
+    cy.contains('Choose a country').parent().type('Mongo')
+    cy.contains('Mongolia').click()
     cy.get('[id=dec_lat-textfield]').type('49.07')
     cy.get('[id=dec_long-textfield]').type('103.67')
     cy.get('[id=dms_lat-textfield]').should('have.value', '49 4 12 N')
@@ -135,7 +137,8 @@ describe('Creating a new locality', () => {
     cy.get('[id=min_age-textfield]').should('have.value', '8.676666666666668')
     cy.get('[role=tablist]').contains('Locality').click()
     cy.get('[id=loc_name-textfield]').type('Bugat')
-    cy.get('[id=country-textfield]').type('Mongolia')
+    cy.contains('Choose a country').parent().type('Mongo')
+    cy.contains('Mongolia').click()
     cy.get('[id=dec_lat-textfield]').type('49.07')
     cy.get('[id=dec_long-textfield]').type('103.67')
     cy.get('[id=write-button]').should('not.be.disabled')
