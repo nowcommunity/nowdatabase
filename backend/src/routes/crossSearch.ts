@@ -3,7 +3,6 @@ import {
   getAllCrossSearch,
   getFilteredCrossSearch,
   getFilteredCrossSearchLength,
-  getTestQuery,
   getFilteredCrossSearchRawSql,
 } from '../services/crossSearch'
 import { fixBigInt } from '../utils/common'
@@ -20,11 +19,6 @@ router.get('/all', async (req, res) => {
   return res.status(200).send(fixBigInt(crossSearch))
 })
 
-router.get('/testing', async (_req, res) => {
-  console.log('getting all cross search')
-  await getTestQuery()
-  return res.status(200).send()
-})
 
 router.get('/testing/all', async (req, res) => {
   const columnfilter = req.query.columnfilters
