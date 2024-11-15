@@ -242,33 +242,35 @@ export const getFilteredCrossSearchRawSql = async (
 ) => {
   console.log('Filters:', filters)
   console.log('Sorting:', sorting)
-  console.log('Page:', page)
   console.log('User:', user)
 
   const showAll = user && [Role.Admin, Role.EditUnrestricted].includes(user.role)
   const limit: number = page.pageSize
-  console.log('limit:', limit)
-  if (!user) {
-    const sql = generateFilteredCrossSearchSqlWithNoUser(limit, page.pageIndex * limit)
-    console.log('sql', sql)
+  const offset: number = page.pageIndex * limit
 
+  if (!user) {
+    const sql = generateFilteredCrossSearchSqlWithNoUser(limit, offset)
     const result = await nowDb.$queryRaw(sql)
-    console.log('result', result)
-    
     return result
   }
 
   if (showAll) {
-    const sql = generateFilteredCrossSearchSqlWithAdmin(limit, page.pageIndex * limit)
-    console.log('sql', sql)
-
+    const sql = generateFilteredCrossSearchSqlWithAdmin(limit, offset)
     const result = await nowDb.$queryRaw(sql)
-
     return result
   }
-  const sql = generateFilteredCrossSearchSql(limit)
-  console.log('sql', sql)
 
+  const usersProjects = await getIdsOfUsersProjects(user)
+
+  if (!usersProjects.size) {
+    const sql = generateFilteredCrossSearchSqlWithNoUser(limit, offset)
+    const result = await nowDb.$queryRaw(sql)
+    return result
+  }
+
+  console.log('users projects:',usersProjects)
+  const sql = generateFilteredCrossSearchSql(limit, offset, usersProjects)
+  console.log('sql:',sql)
   const result = await nowDb.$queryRaw(sql)
 
   return result
