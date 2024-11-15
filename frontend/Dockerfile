@@ -1,4 +1,4 @@
-FROM node:20-alpine3.19 AS build
+FROM node:22-alpine3.20 AS build
 
 ARG BACKEND_URL="http://localhost:4000"
 ARG ENABLE_WRITE="false"
@@ -23,7 +23,7 @@ COPY --chown=node . .
 
 RUN npm run build
 
-FROM node:20-alpine3.19 AS serve
+FROM node:22-alpine3.20 AS serve
 
 RUN npm install -g serve
 

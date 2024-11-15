@@ -1,4 +1,4 @@
-FROM node:20-alpine3.16 AS backend-build
+FROM node:22-alpine3.20 AS backend-build
 
 ENV TZ="Europe/Helsinki"
 
@@ -28,7 +28,7 @@ RUN npm run build
 
 
 # NOTE: Has to be alpine3.16 because newer versions have changed a dependency, causing Prisma to fail
-FROM node:20-alpine3.16 AS node-run
+FROM node:22-alpine3.20 AS node-run
 
 # healthcheck needs this
 USER root
@@ -55,7 +55,7 @@ ENV NODE_ENV=production
 CMD ["node", "src/index.js"]
 
 
-FROM node:20-alpine3.16 AS api-tests
+FROM node:22-alpine3.20 AS api-tests
 
 USER node
 COPY --chown=node --from=backend-build /usr/src/app /usr/src/app
