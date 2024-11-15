@@ -1,33 +1,48 @@
 import { Prisma } from '../../prisma/generated/now_test_client'
 
-export const generateFilteredCrossSearchSql = (limit: number) => {
+export const generateFilteredCrossSearchSql = (limit: number, offset: number, usersProjects: Set<number>) => {
+  const projectsArray = Array.from(usersProjects)
+  const projectsArrayString = projectsArray.join(', ')
+
   return Prisma.sql`
   SELECT 
-    now_plr.pid,
     now_loc.lid,
     loc_name, 
     country,
-    com_species.species_id
+    com_species.species_id,
+    now_loc.loc_status
   FROM 
-   now_loc
+    now_ls
   LEFT JOIN
-    now_plr
+    (SELECT
+      now_loc.lid,  loc_name, country, loc_status
+    FROM
+      now_loc
+    LEFT JOIN
+      now_plr
+    ON
+      now_loc.lid = now_plr.lid
+    WHERE
+      loc_status = 0
+    OR
+      now_plr.pid IN (${projectsArrayString})
+    GROUP BY
+      now_loc.lid
+    ) as now_loc
   ON
-    now_loc.lid = now_plr.lid  
+    now_loc.lid = now_ls.lid
+  LEFT JOIN
+    com_species
+  ON
+    com_species.species_id = now_ls.species_id
   WHERE
-    ISNULL(now_loc.pid)
-  LEFT JOIN
-   now_ls 
-  ON
-   now_ls.lid = now_loc.lid 
-  LEFT JOIN
-   com_species
-  ON
-   now_ls.species_id = com_species.species_id
+    now_loc.lid IS NOT NULL
   ORDER BY
     now_loc.lid
   LIMIT
-   ${limit}
+    ${limit}
+  OFFSET
+    ${offset}
   `
 }
 
@@ -37,7 +52,9 @@ export const generateFilteredCrossSearchSqlWithNoUser = (limit: number, offset: 
     now_loc.lid,
     loc_name,
     country,
-    com_species.species_id
+    com_species.species_id,
+    com_species.species_name,
+    com_species.genus_name
   FROM
     now_ls
   LEFT JOIN
