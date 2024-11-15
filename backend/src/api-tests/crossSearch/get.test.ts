@@ -4,6 +4,7 @@ import { resetDatabase, send, resetDatabaseTimeout } from '../utils'
 import { pool } from '../../utils/db'
 import { constructFilterSortPageUrl } from '../../utils/url'
 import { columnFilter, sorting, page } from './data'
+import { login, logout } from '../utils'
 
 describe('Getting cross-search data works', () => {
   beforeAll(async () => {
@@ -82,7 +83,17 @@ describe('Getting cross-search data works', () => {
     expect(result.status).toEqual(200)
     expect(result.body.length).toEqual(0)
   })
-  it.todo('Get filtered with paging returns correct amount of rows')
+
+  it('Get filtered with correct but empty parameters with admin rights and large page size returns correct amount of rows', async () => {
+    const parameters = constructFilterSortPageUrl([], [], { pageIndex: 0, pageSize: 100 })
+    await login()
+    const result = await send('crosssearch/testing/all?' + parameters, 'GET')
+
+    logout()
+    expect(result.status).toEqual(200)
+    expect(result.body.result.length).toEqual(21)
+  })
+
   it.todo('Get filtered with sorting returns with correct sorting')
   it.todo('Get filtered with a filter returns items matching to the filter')
   it.todo('Get filtered with multiple filters returns items matching to all filters')
