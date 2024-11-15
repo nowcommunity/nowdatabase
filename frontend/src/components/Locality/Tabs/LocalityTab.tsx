@@ -7,7 +7,7 @@ import { useForm } from 'react-hook-form'
 import { EditableTable } from '@/components/DetailView/common/EditableTable'
 import { EditingModal } from '@/components/DetailView/common/EditingModal'
 import { emptyOption } from '@/components/DetailView/common/misc'
-import { Map } from '@/components/Map/Map'
+import { CoordinateSelectionMap } from '@/components/Map/CoordinateSelectionMap'
 import { useState } from 'react'
 import { convertDmsToDec, convertDecToDms } from '@/util/coordinateConversion'
 
@@ -139,25 +139,25 @@ export const LocalityTab = () => {
   )
 
   // Kumpula Coordinates, could be changed later to be existing coordinates if exists
-  const [coordinates, setCoordinates] = useState({ lat: 60.202665856, lng: 24.957662836 })
+  const [markerCoordinates, setMarkerCoordinates] = useState({ lat: 60.202665856, lng: 24.957662836 })
 
   // eslint-disable-next-line @typescript-eslint/require-await
-  const onSaveCoord = async () => {
+  const onCoordinateSelectorSave = async () => {
     setEditData({
       ...editData,
-      dec_lat: coordinates.lat,
-      dms_lat: convertDecToDms(coordinates.lat, 'latitude'),
-      dec_long: coordinates.lng,
-      dms_long: convertDecToDms(coordinates.lng, 'longitude'),
+      dec_lat: markerCoordinates.lat,
+      dms_lat: convertDecToDms(markerCoordinates.lat, 'latitude'),
+      dec_long: markerCoordinates.lng,
+      dms_long: convertDecToDms(markerCoordinates.lng, 'longitude'),
     })
     return Object.keys(errors).length === 0 //no idea if this is needed, just copypasted
   }
 
   // TODO name this better, plagiarized from editingModal
   const coordinateButton = (
-    <EditingModal buttonText="Open Map" onSave={onSaveCoord}>
+    <EditingModal buttonText="Get Coordinates" onSave={onCoordinateSelectorSave}>
       <Box sx={{ display: 'flex', flexDirection: 'column', gap: '1em' }}>
-        <Map coordinates={coordinates} setCoordinates={setCoordinates} />
+        <CoordinateSelectionMap markerCoordinates={markerCoordinates} setMarkerCoordinates={setMarkerCoordinates} />
       </Box>
     </EditingModal>
   )
