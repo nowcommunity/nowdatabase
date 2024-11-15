@@ -217,7 +217,9 @@ export type TimeUnit = {
 export type EditMetaData = { comment?: string; references?: Reference[] }
 
 /* Reference */
-export type ReferenceDetailsType = Prisma.ref_ref & {
+export type ReferenceDetailsType = Omit<Prisma.ref_ref, 'exact_date'> & {
+  exact_date: string | null
+} & {
   ref_authors: {
     rid: number
     au_num: number

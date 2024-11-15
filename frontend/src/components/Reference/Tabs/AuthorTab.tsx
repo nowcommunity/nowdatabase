@@ -28,8 +28,10 @@ function checkIndexes(editData: EditDataType<ReferenceDetailsType>): boolean {
 }
 
 export const AuthorTab: React.FC<AuthorTabProps> = ({ field_num_param, tab_name = 'Authors' }) => {
-  const { mode, editData, setEditData } = useDetailContext<ReferenceDetailsType>()
+  const { mode, editData, setEditData, fieldsWithErrors } = useDetailContext<ReferenceDetailsType>()
   const { data: authorData, isError } = useGetReferenceAuthorsQuery(mode.read ? skipToken : undefined)
+  const hasError = fieldsWithErrors.includes('ref_authors')
+
   useEffect(() => {
     // Check and update indexes of authors only if they are incorrect
     if (checkIndexes(editData)) {
@@ -73,69 +75,71 @@ export const AuthorTab: React.FC<AuthorTabProps> = ({ field_num_param, tab_name 
   ]
 
   return (
-    <Grouped title={tab_name ? tab_name : 'Authors'}>
-      {!mode.read && (
-        <Box display="flex" gap={1}>
-          <EditingForm<ReferenceAuthorType, ReferenceDetailsType>
-            buttonText="Add new author"
-            formFields={formFields}
-            editAction={(newAuthor: ReferenceAuthorType) => {
-              const updatedAuthors = [
-                ...editData.ref_authors,
-                {
-                  ...newAuthor,
-                  rid: editData.rid,
-                  au_num: editData.ref_authors.filter(author => author.field_id === field_num_param).length + 1,
-                  field_id: field_num_param,
-                  rowState: 'new' as RowState,
-                },
-              ]
+    <Box border={hasError ? `1px solid #d32f2f` : 'none'} borderRadius={1}>
+      <Grouped title={tab_name ? tab_name : 'Authors'}>
+        {!mode.read && (
+          <Box display="flex" gap={1}>
+            <EditingForm<ReferenceAuthorType, ReferenceDetailsType>
+              buttonText="Add new author"
+              formFields={formFields}
+              editAction={(newAuthor: ReferenceAuthorType) => {
+                const updatedAuthors = [
+                  ...editData.ref_authors,
+                  {
+                    ...newAuthor,
+                    rid: editData.rid,
+                    au_num: editData.ref_authors.filter(author => author.field_id === field_num_param).length + 1,
+                    field_id: field_num_param,
+                    rowState: 'new' as RowState,
+                  },
+                ]
 
-              setEditData({
-                ...editData,
-                ref_authors: [...updatedAuthors],
-              })
-              visible_ref_authors = updatedAuthors.filter(
-                author => author.field_id?.toString() == field_num_param?.toString()
-              )
-            }}
-          />
-          <SelectingTable<ReferenceAuthorType, ReferenceDetailsType>
-            buttonText="Select Author"
-            data={authorData}
-            isError={isError}
-            columns={authorColumns}
-            fieldName="ref_authors"
-            idFieldName="data_id"
-            editingAction={(newAuthor: ReferenceAuthorType) => {
-              const updatedAuthors = [
-                ...editData.ref_authors,
-                {
-                  ...newAuthor,
-                  rid: editData.rid,
-                  au_num: editData.ref_authors.filter(author => author.field_id === field_num_param).length + 1,
-                  field_id: field_num_param,
-                  rowState: 'new' as RowState,
-                },
-              ]
+                setEditData({
+                  ...editData,
+                  ref_authors: [...updatedAuthors],
+                })
+                visible_ref_authors = updatedAuthors.filter(
+                  author => author.field_id?.toString() == field_num_param?.toString()
+                )
+              }}
+            />
+            <SelectingTable<ReferenceAuthorType, ReferenceDetailsType>
+              buttonText="Select Author"
+              data={authorData}
+              isError={isError}
+              columns={authorColumns}
+              fieldName="ref_authors"
+              idFieldName="data_id"
+              editingAction={(newAuthor: ReferenceAuthorType) => {
+                const updatedAuthors = [
+                  ...editData.ref_authors,
+                  {
+                    ...newAuthor,
+                    rid: editData.rid,
+                    au_num: editData.ref_authors.filter(author => author.field_id === field_num_param).length + 1,
+                    field_id: field_num_param,
+                    rowState: 'new' as RowState,
+                  },
+                ]
 
-              setEditData({
-                ...editData,
-                ref_authors: [...updatedAuthors],
-              })
-              visible_ref_authors = updatedAuthors.filter(
-                author => author.field_id?.toString() == field_num_param?.toString()
-              )
-            }}
-          />
-        </Box>
-      )}
-      <EditableTable<ReferenceAuthorType, ReferenceDetailsType>
-        columns={referenceAuthorColumns}
-        field="ref_authors"
-        visible_data={visible_ref_authors}
-        useDefinedIndex={true}
-      />
-    </Grouped>
+                setEditData({
+                  ...editData,
+                  ref_authors: [...updatedAuthors],
+                })
+                visible_ref_authors = updatedAuthors.filter(
+                  author => author.field_id?.toString() == field_num_param?.toString()
+                )
+              }}
+            />
+          </Box>
+        )}
+        <EditableTable<ReferenceAuthorType, ReferenceDetailsType>
+          columns={referenceAuthorColumns}
+          field="ref_authors"
+          visible_data={visible_ref_authors}
+          useDefinedIndex={true}
+        />
+      </Grouped>
+    </Box>
   )
 }

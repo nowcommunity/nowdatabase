@@ -40,6 +40,15 @@ export const getReferenceDetails = async (id: number) => {
     where: { rid: id },
     include: { ref_authors: true, ref_journal: true },
   })
+
+  //changing exact_date to yyyy-mm-dd string since frontend uses that + we don't want to display ISO string in frontend
+  if (result && result.exact_date) {
+    const date = new Date(result.exact_date)
+    const formattedDate = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`
+
+    return { ...result, exact_date: formattedDate }
+  }
+
   return result
 }
 
