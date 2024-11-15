@@ -155,7 +155,7 @@ export const LocalityTab = () => {
 
   // TODO name this better, plagiarized from editingModal
   const coordinateButton = (
-    <EditingModal buttonText="Open Map" onSave={onSaveCoord}>
+    <EditingModal buttonText="Get Coordinates" onSave={onSaveCoord}>
       <Box sx={{ display: 'flex', flexDirection: 'column', gap: '1em' }}>
         <Map coordinates={coordinates} setCoordinates={setCoordinates} />
       </Box>
