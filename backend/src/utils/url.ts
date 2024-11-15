@@ -1,4 +1,11 @@
-import type { ColumnFilter, ColumnFilterUrl, Sorting, SortingUrl, Page } from '../../../frontend/src/backendTypes'
+import type {
+  ColumnFilter,
+  ColumnFilterUrl,
+  Sorting,
+  SortingUrl,
+  Page,
+  PageUrl,
+} from '../../../frontend/src/backendTypes'
 
 // /crosssearch/?&columnfilters=[]&sorting=[]&pagination={%22pageIndex%22:0,%22pageSize%22:15}
 export const constructFilterSortPageUrl = (
@@ -19,4 +26,14 @@ export const constructFilterSortPageUrl = (
 
   const urlString = `&columnfilters=${filterString}&sorting=[${sortingString}]&pagination=${pageString}`
   return urlString
+}
+
+export const parseFilterSortPageUrl = (filterUrl: ColumnFilterUrl, sortingUrl: SortingUrl, pageUrl: PageUrl) => {
+  const filterObj: ColumnFilter = {
+    [filterUrl.id]: filterUrl.value,
+  }
+  const sortingObj = sortingUrl as Sorting
+  const pageObj = pageUrl as Page
+
+  return { filterObj, sortingObj, pageObj }
 }
