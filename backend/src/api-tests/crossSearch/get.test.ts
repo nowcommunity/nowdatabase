@@ -16,7 +16,7 @@ describe('Getting cross-search data works', () => {
   it('Requesting get all has correct length and status code', async () => {
     const { body: getReqBody, status: getReqStatus } = await send(`crosssearch/all`, 'GET')
     expect(getReqStatus).toEqual(200)
-    expect(getReqBody.length).toEqual(6)
+    expect(getReqBody.length).toEqual(20)
   })
 
   it('Get all has some correct fields from locality and species', async () => {
@@ -55,8 +55,27 @@ describe('Getting cross-search data works', () => {
     const result = await send('crosssearch/testing/all?' + parameters, 'GET')
 
     expect(result.status).toEqual(200)
-    expect(result.body.result.length).toEqual(6)
+    expect(result.body.result.length).toEqual(15)
   })
+
+  it('Get filtered with correct but empty parameters no user rights with pagination returns correct amount of rows', async () => {
+    const parameters = constructFilterSortPageUrl([], [], { pageIndex: 3, pageSize: 3 })
+    const result = await send('crosssearch/testing/all?' + parameters, 'GET')
+
+    expect(result.status).toEqual(200)
+    expect(result.body.result.length).toEqual(3)
+    expect(result.body.result[0].lid).toEqual(24750)
+    expect(result.body.result[1].lid).toEqual(24797)
+  })
+
+  it('Get filtered with correct but empty parameters and no user rights with large page size returns correct amount of rows', async () => {
+    const parameters = constructFilterSortPageUrl([], [], { pageIndex: 0, pageSize: 100 })
+    const result = await send('crosssearch/testing/all?' + parameters, 'GET')
+
+    expect(result.status).toEqual(200)
+    expect(result.body.result.length).toEqual(20)
+  })
+
   it('Get filtered with missing parameters returns nothing', async () => {
     const result = await send('crosssearch/testing/all', 'GET')
 
