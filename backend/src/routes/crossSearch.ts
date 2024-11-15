@@ -1,7 +1,6 @@
 import { Router } from 'express'
 import {
   getAllCrossSearch,
-  getFilteredCrossSearch,
   getFilteredCrossSearchLength,
   getFilteredCrossSearchRawSql,
 } from '../services/crossSearch'
@@ -54,7 +53,7 @@ router.get(`/`, async (req, res) => {
   console.log('sortingObject', sortingObject)
   const pageObject = JSON.parse(page as string) as Page
 
-  const data = (await getFilteredCrossSearch(columnfilterObject, sortingObject, pageObject, req.user)) as any
+  const data = (await getFilteredCrossSearchRawSql(columnfilterObject, sortingObject, pageObject, req.user)) as any
   const rowCount = await getFilteredCrossSearchLength(columnfilterObject, req.user)
 
   const result = {
