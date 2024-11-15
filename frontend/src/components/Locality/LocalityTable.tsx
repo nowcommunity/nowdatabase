@@ -44,11 +44,13 @@ export const LocalityTable = ({ selectorFn }: { selectorFn?: (newObject: Localit
         accessorKey: 'max_age',
         header: 'Max age',
         filterVariant: 'range',
+        Cell: ({ cell }) => (cell.getValue() as number).toFixed(3),
       },
       {
         accessorKey: 'min_age',
         header: 'Min age',
         filterVariant: 'range',
+        Cell: ({ cell }) => (cell.getValue() as number).toFixed(3),
       },
       {
         accessorKey: 'frac_max',
