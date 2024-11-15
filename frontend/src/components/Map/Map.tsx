@@ -39,7 +39,7 @@ const LocationSearch = () => {
   const [resultsList, setResultsList] = useState<Location[]>([])
 
   const handleSearch = async () => {
-    const username = ''
+    const username = String(import.meta.env.VITE_GEONAMES_USERNAME)
     const url = `http://api.geonames.org/searchJSON?q=${searchBoxValue}&maxRows=5&username=${username}`
 
     type Geoname = {
