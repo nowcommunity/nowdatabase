@@ -88,7 +88,10 @@ const dateCheck: (dateString: string) => ValidationError = (dateString: string) 
   return null
 }
 
-const orCheck = (data: EditDataType<ReferenceDetailsType>): ValidationError => {
+const orCheck = (
+  data: EditDataType<ReferenceDetailsType>,
+  fieldName: keyof EditDataType<ReferenceDetailsType>
+): ValidationError => {
   let fields: (keyof EditDataType<ReferenceDetailsType>)[] = []
 
   if (data.ref_type_id && [1, 2].includes(data.ref_type_id)) {
@@ -106,6 +109,8 @@ const orCheck = (data: EditDataType<ReferenceDetailsType>): ValidationError => {
   if (data.ref_type_id == 10) {
     fields = ['gen_notes']
   }
+
+  if (!fields.includes(fieldName)) return null
 
   const hasValue = fields.some(field => {
     const value = data[field]
@@ -127,28 +132,28 @@ export const validateReference = (
       name: 'title_primary',
       useEditData: true,
       miscCheck: (obj: object) => {
-        return orCheck(obj as EditDataType<ReferenceDetailsType>)
+        return orCheck(obj as EditDataType<ReferenceDetailsType>, (fieldName = 'title_primary'))
       },
     },
     title_secondary: {
       name: 'title_secondary',
       useEditData: true,
       miscCheck: (obj: object) => {
-        return orCheck(obj as EditDataType<ReferenceDetailsType>)
+        return orCheck(obj as EditDataType<ReferenceDetailsType>, (fieldName = 'title_secondary'))
       },
     },
     title_series: {
       name: 'title_series',
       useEditData: true,
       miscCheck: (obj: object) => {
-        return orCheck(obj as EditDataType<ReferenceDetailsType>)
+        return orCheck(obj as EditDataType<ReferenceDetailsType>, (fieldName = 'title_series'))
       },
     },
     gen_notes: {
       name: 'gen_notes',
       useEditData: true,
       miscCheck: (obj: object) => {
-        return orCheck(obj as EditDataType<ReferenceDetailsType>)
+        return orCheck(obj as EditDataType<ReferenceDetailsType>, (fieldName = 'gen_notes'))
       },
     },
     ref_type_id: {
@@ -202,7 +207,7 @@ export const validateReference = (
     exact_date: {
       name: 'exact_date',
       required: true,
-      regexCheck: dateCheck,
+      asString: dateCheck,
       condition: (data: Partial<EditDataType<ReferenceDetailsType>>) => {
         const ids: number[] = [6, 7, 10, 11, 12, 13, 14]
         return data.ref_type_id != null && ids.includes(data.ref_type_id)
