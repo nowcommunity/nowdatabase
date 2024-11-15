@@ -115,7 +115,6 @@ describe('Creating a new locality', () => {
     cy.get('[id=write-button]').should('be.disabled')
   })
 
-
   it('composite dating method works', () => {
     cy.visit('/locality/new')
     cy.get('[name=dating-method][value=composite]').click()
