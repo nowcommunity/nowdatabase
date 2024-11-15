@@ -1,7 +1,7 @@
 import { User, ColumnFilterUrl, SortingUrl, PageUrl } from '../../../frontend/src/backendTypes'
 import { Role } from '../../../frontend/src/types'
 import { nowDb } from '../utils/db'
-import { generateFilteredCrossSearchSql, generateFilteredCrossSearchSqlWithNoUser } from '../utils/sql'
+import { generateFilteredCrossSearchSql, generateFilteredCrossSearchSqlWithAdmin, generateFilteredCrossSearchSqlWithNoUser } from '../utils/sql'
 
 const getIdsOfUsersProjects = async (user: User) => {
   const usersProjects = await nowDb.now_proj_people.findMany({
@@ -400,6 +400,7 @@ export const getFilteredCrossSearchRawSql = async (
   console.log('Page:', page)
   console.log('User:', user)
 
+  const showAll = user && [Role.Admin, Role.EditUnrestricted].includes(user.role)
   const limit: number = page.pageSize
   console.log('limit:', limit)
   if (!user) {
@@ -409,6 +410,15 @@ export const getFilteredCrossSearchRawSql = async (
     const result = await nowDb.$queryRaw(sql)
     console.log('result', result)
     
+    return result
+  }
+
+  if (showAll) {
+    const sql = generateFilteredCrossSearchSqlWithAdmin(limit, page.pageIndex * limit)
+    console.log('sql', sql)
+
+    const result = await nowDb.$queryRaw(sql)
+
     return result
   }
   const sql = generateFilteredCrossSearchSql(limit)
