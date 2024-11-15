@@ -24,17 +24,12 @@ router.get('/testing/all', async (req, res) => {
   const sorting = req.query.sorting
   const page = req.query.pagination
 
-  console.log('page:', page, !isPage(page))
   if (!isPage(page)) return res.status(200).send([]) // there is no pagination in the request when navigating to the page at first
-
-  console.log('page is')
 
   // TODO remove "as string"
   const columnfilterObject = JSON.parse(columnfilter as string) as ColumnFilter[]
   const sortingObject = JSON.parse(sorting as string) as Sorting[]
   const pageObject = JSON.parse(page as string) as Page
-
-  console.log('pageObject:', pageObject)
 
   const result = (await getFilteredCrossSearchRawSql(columnfilterObject, sortingObject, pageObject, req.user)) as any
 
