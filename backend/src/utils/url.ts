@@ -7,6 +7,8 @@ import type {
   PageUrl,
 } from '../../../frontend/src/backendTypes'
 
+const MAX_PAGE_SIZE = 200
+
 // /crosssearch/?&columnfilters=[]&sorting=[]&pagination={%22pageIndex%22:0,%22pageSize%22:15}
 export const constructFilterSortPageUrl = (
   filters: ColumnFilter | [] = [],
@@ -36,4 +38,27 @@ export const parseFilterSortPageUrl = (filterUrl: ColumnFilterUrl, sortingUrl: S
   const pageObj = pageUrl as Page
 
   return { filterObj, sortingObj, pageObj }
+}
+
+export const isPage = (page: any): page is Page => {
+  console.log('pagetype (alussa)', typeof page, typeof page !== 'object' || typeof page !== 'string')
+  if (typeof page !== 'object' && typeof page !== 'string') return false
+
+  if (typeof page === 'string') {
+    page = JSON.parse(page)
+  }
+
+  console.log('pagetype', typeof page)
+  console.log('page keys', Object.keys(page))
+  if (!Object.keys(page).includes('pageIndex') || !Object.keys(page).includes('pageSize')) {
+    return false
+  }
+
+  console.log('page value types', typeof page.pageIndex, typeof page.pageSize)
+  if (typeof page.pageIndex !== 'number' || typeof page.pageSize !== 'number') return false
+
+  if (page.pageIndex < 0) return false
+  if (page.pageSize > MAX_PAGE_SIZE || page.pageSize < 0) return false
+
+  return true
 }

@@ -2,6 +2,8 @@ import { beforeAll, afterAll, describe, it, expect } from '@jest/globals'
 import { CrossSearch } from '../../../../frontend/src/backendTypes'
 import { resetDatabase, send, resetDatabaseTimeout } from '../utils'
 import { pool } from '../../utils/db'
+import { constructFilterSortPageUrl } from '../../utils/url'
+import { columnFilter, sorting, page } from './data'
 
 describe('Getting cross-search data works', () => {
   beforeAll(async () => {
@@ -47,4 +49,22 @@ describe('Getting cross-search data works', () => {
     const loclist = getReqBody.map(e => e.loc_name)
     expect(loclist).not.toContain('not in cross search')
   })
+
+  it('Get filtered with correct but empty parameters returns everything', async () => {
+    const parameters = constructFilterSortPageUrl([], [], page)
+    const result = await send('crosssearch/testing/all?' + parameters, 'GET')
+
+    expect(result.status).toEqual(200)
+    expect(result.body.result.length).toEqual(6)
+  })
+  it('Get filtered with missing parameters returns nothing', async () => {
+    const result = await send('crosssearch/testing/all', 'GET')
+
+    expect(result.status).toEqual(200)
+    expect(result.body.length).toEqual(0)
+  })
+  it.todo('Get filtered with paging returns correct amount of rows')
+  it.todo('Get filtered with sorting returns with correct sorting')
+  it.todo('Get filtered with a filter returns items matching to the filter')
+  it.todo('Get filtered with multiple filters returns items matching to all filters')
 })

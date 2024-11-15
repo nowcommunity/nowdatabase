@@ -1,6 +1,7 @@
-import { User, ColumnFilter, Sorting, Page } from '../../../frontend/src/backendTypes'
+import { User, ColumnFilterUrl, SortingUrl, PageUrl } from '../../../frontend/src/backendTypes'
 import { Role } from '../../../frontend/src/types'
 import { nowDb } from '../utils/db'
+import { generateFilteredCrossSearchSql } from '../utils/sql'
 
 const getIdsOfUsersProjects = async (user: User) => {
   const usersProjects = await nowDb.now_proj_people.findMany({
@@ -57,7 +58,8 @@ type CrossSearchSpecies = {
   body_mass: number | null
   brain_mass: number | null
 }
-type CrossSearchPreFilter = CrossSearchLocalities & CrossSearchSpecies & { loc_status: boolean | null, now_plr: { pid: number }[], sp_status: string | null }
+type CrossSearchPreFilter = CrossSearchLocalities &
+  CrossSearchSpecies & { loc_status: boolean | null; now_plr: { pid: number }[]; sp_status: string | null }
 
 export const getAllCrossSearch = async (user?: User) => {
   const showAll = user && [Role.Admin, Role.EditUnrestricted].includes(user.role)
@@ -66,6 +68,7 @@ export const getAllCrossSearch = async (user?: User) => {
     return rest
   }
 
+  console.time('cross search query')
   const queryResult = await nowDb.now_ls.findMany({
     select: {
       now_loc: {
@@ -126,6 +129,7 @@ export const getAllCrossSearch = async (user?: User) => {
       },
     },
   })
+  console.timeEnd('cross search query')
 
   const flattenedResult = queryResult.map(item => ({
     lid: item.now_loc.lid,
@@ -194,18 +198,26 @@ export const getAllCrossSearch = async (user?: User) => {
   return result
 }
 
-export const getFilteredCrossSearch = async (columnfilter: ColumnFilter[] | [], sorting: Sorting[] | [], page: Page, user?: User) => {
+export const getFilteredCrossSearch = async (
+  _columnfilter: ColumnFilter[] | [],
+  _sorting: Sorting[] | [],
+  page: Page,
+  user?: User
+) => {
   const showAll = user && [Role.Admin, Role.EditUnrestricted].includes(user.role)
   const removeProjects: (loc: CrossSearchPreFilter) => Omit<CrossSearchPreFilter, 'now_plr'> = loc => {
     const { now_plr, ...rest } = loc
     return rest
   }
 
+  // const parsedColumnFilter = parseCrossSearchFilter(columnfilter)
+
   // const rowCount = await nowDb.now_ls.count()
 
   const queryResult = await nowDb.now_ls.findMany({
     take: page.pageSize,
     skip: page.pageIndex * page.pageSize,
+    relationLoadStrategy: 'query',
     select: {
       now_loc: {
         select: {
@@ -333,7 +345,15 @@ export const getFilteredCrossSearch = async (columnfilter: ColumnFilter[] | [], 
   return { data: result }
 }
 
-export const getFilteredCrossSearchLength = async (columnfilter: ColumnFilter[] | [], user?: User) => {
+/*
+const parseCrossSearchFilter = (columnFilter: ColumnFilter[] | []) => {
+  const parsedColumnFilter: Record<string, string>  = {}
+  columnFilter.map(filter => parsedColumnFilter[filter.id] = filter.value)
+  return parsedColumnFilter
+}
+*/
+
+export const getFilteredCrossSearchLength = async (_columnfilter: ColumnFilter[] | [], user?: User) => {
   const showAll = user && [Role.Admin, Role.EditUnrestricted].includes(user.role)
 
   const queryResult = await nowDb.now_ls.findMany({
@@ -365,13 +385,35 @@ export const getFilteredCrossSearchLength = async (columnfilter: ColumnFilter[] 
 
   const usersProjects = await getIdsOfUsersProjects(user)
 
-  return flattenedResult.filter(loc => !loc.loc_status || loc.now_plr.find(now_plr => usersProjects.has(now_plr.pid))).length
+  return flattenedResult.filter(loc => !loc.loc_status || loc.now_plr.find(now_plr => usersProjects.has(now_plr.pid)))
+    .length
+}
+
+export const getFilteredCrossSearchRawSql = async (
+  filters: ColumnFilterUrl[],
+  sorting: SortingUrl[],
+  page: PageUrl,
+  user: User | undefined
+) => {
+  console.log('Filters:', filters)
+  console.log('Sorting:', sorting)
+  console.log('Page:', page)
+  console.log('User:', user)
+
+  const limit: number = page.pageSize
+  console.log('limit:', limit)
+  const sql = generateFilteredCrossSearchSql(limit)
+  console.log('sql', sql)
+
+  const result = await nowDb.$queryRaw(sql)
+
+  return result
 }
 
 export const getTestQuery = async () => {
   console.log('route working')
   // left side of the union
-  const result = await nowDb.$queryRaw`
+  const result = (await nowDb.$queryRaw`
   SELECT 
     now_plr.pid,
     now_loc.lid,
@@ -392,7 +434,7 @@ export const getTestQuery = async () => {
     -- dec_lat,
     -- dec_long,
     -- altitude,
-    -- country,
+    country,
     -- state,
     -- county,
     -- site_area,
@@ -434,6 +476,8 @@ export const getTestQuery = async () => {
     now_plr
   ON
     now_loc.lid = now_plr.lid  
+  WHERE
+    country LIKE 'M%'
   ORDER BY
     now_loc.lid
   -- UNION
@@ -504,7 +548,7 @@ export const getTestQuery = async () => {
   --  com_species.species_id
   LIMIT
    5
-  ` as CrossSearchPreFilter[]
+  `) as CrossSearchPreFilter[]
 
   console.log('result', result)
 
