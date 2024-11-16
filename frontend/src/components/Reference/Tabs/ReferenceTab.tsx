@@ -5,10 +5,29 @@ import { useGetReferenceTypesQuery } from '@/redux/referenceReducer'
 import { CircularProgress } from '@mui/material'
 import { AuthorTab } from './AuthorTab'
 import { JournalTab } from './JournalTab'
+import { useEffect } from 'react'
 
 export const ReferenceTab = () => {
-  const { dropdown, data, editData, mode, textField, bigTextField } = useDetailContext<ReferenceDetailsType>()
+  const { dropdown, data, editData, mode, textField, bigTextField, fieldsWithErrors, validator, setFieldsWithErrors } =
+    useDetailContext<ReferenceDetailsType>()
   const { data: referenceTypes } = useGetReferenceTypesQuery()
+
+  useEffect(() => {
+    if (mode.option === 'edit' || mode.option === 'new') {
+      for (const field in editData) {
+        const fieldAsKey = field as keyof typeof editData
+        const fieldAsString = String(fieldAsKey)
+        const { error } = validator(editData, fieldAsKey)
+
+        if (error && !fieldsWithErrors.includes(fieldAsString)) {
+          setFieldsWithErrors(prevErrors => [...prevErrors, fieldAsString])
+        } else if (!error && fieldsWithErrors.includes(fieldAsString)) {
+          setFieldsWithErrors(prevErrors => prevErrors.filter(err => err !== fieldAsString))
+        }
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [editData.ref_type_id])
 
   if (!referenceTypes) return <CircularProgress />
 
