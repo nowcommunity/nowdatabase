@@ -1,7 +1,11 @@
 import { User, ColumnFilterUrl, SortingUrl, PageUrl } from '../../../frontend/src/backendTypes'
 import { Role } from '../../../frontend/src/types'
 import { nowDb } from '../utils/db'
-import { generateFilteredCrossSearchSql, generateFilteredCrossSearchSqlWithAdmin, generateFilteredCrossSearchSqlWithNoUser } from '../utils/sql'
+import {
+  generateFilteredCrossSearchSql,
+  generateFilteredCrossSearchSqlWithAdmin,
+  generateFilteredCrossSearchSqlWithNoUser,
+} from '../utils/sql'
 
 const getIdsOfUsersProjects = async (user: User) => {
   const usersProjects = await nowDb.now_proj_people.findMany({
@@ -268,11 +272,9 @@ export const getFilteredCrossSearchRawSql = async (
     return result
   }
 
-  console.log('users projects:',usersProjects)
+  console.log('users projects:', usersProjects)
   const sql = generateFilteredCrossSearchSql(limit, offset, usersProjects)
-  console.log('sql:',sql)
+  console.log('sql:', sql)
   const result = await nowDb.$queryRaw(sql)
-
   return result
 }
-
