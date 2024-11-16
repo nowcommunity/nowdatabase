@@ -60,7 +60,7 @@ const LocationSearch = ({
 
   const handleSearch = async () => {
     const username = String(import.meta.env.VITE_GEONAMES_USERNAME)
-    const url = `http://api.geonames.org/searchJSON?q=${searchBoxValue}&maxRows=5&username=${username}`
+    const url = `https://secure.geonames.org/searchJSON?q=${searchBoxValue}&maxRows=5&username=${username}`
 
     type Geoname = {
       adminCode01: string
