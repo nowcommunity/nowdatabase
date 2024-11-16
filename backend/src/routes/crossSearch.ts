@@ -33,7 +33,7 @@ router.get('/testing/all', async (req, res) => {
 
   const result = (await getFilteredCrossSearchRawSql(columnfilterObject, sortingObject, pageObject, req.user)) as any
 
-  return res.status(200).send({ result })
+  return res.status(200).send(result)
 })
 
 router.get(`/`, async (req, res) => {

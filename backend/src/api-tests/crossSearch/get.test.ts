@@ -56,7 +56,7 @@ describe('Getting cross-search data works', () => {
     const result = await send('crosssearch/testing/all?' + parameters, 'GET')
 
     expect(result.status).toEqual(200)
-    expect(result.body.result.length).toEqual(15)
+    expect(result.body.length).toEqual(15)
   })
 
   it('Get filtered with correct but empty parameters no user rights with pagination returns correct amount of rows', async () => {
@@ -64,9 +64,9 @@ describe('Getting cross-search data works', () => {
     const result = await send('crosssearch/testing/all?' + parameters, 'GET')
 
     expect(result.status).toEqual(200)
-    expect(result.body.result.length).toEqual(3)
-    expect(result.body.result[0].lid).toEqual(24750)
-    expect(result.body.result[1].lid).toEqual(24797)
+    expect(result.body.length).toEqual(3)
+    expect(result.body[0].lid).toEqual(24750)
+    expect(result.body[1].lid).toEqual(24797)
   })
 
   it('Get filtered with correct but empty parameters and no user rights with large page size returns correct amount of rows', async () => {
@@ -74,7 +74,7 @@ describe('Getting cross-search data works', () => {
     const result = await send('crosssearch/testing/all?' + parameters, 'GET')
 
     expect(result.status).toEqual(200)
-    expect(result.body.result.length).toEqual(20)
+    expect(result.body.length).toEqual(20)
   })
 
   it('Get filtered with missing parameters returns nothing', async () => {
@@ -91,7 +91,7 @@ describe('Getting cross-search data works', () => {
     logout()
 
     expect(result.status).toEqual(200)
-    expect(result.body.result.length).toEqual(22)
+    expect(result.body.length).toEqual(22)
   })
 
   it('Get filtered with correct but empty parameters with some user rights and large page size returns correct amount of rows', async () => {
@@ -103,7 +103,7 @@ describe('Getting cross-search data works', () => {
     logout()
 
     expect(result.status).toEqual(200)
-    expect(result.body.result.length).toEqual(21)
+    expect(result.body.length).toEqual(21)
   })
 
   it.todo('Get filtered with sorting returns with correct sorting')
