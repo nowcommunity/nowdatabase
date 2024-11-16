@@ -2,6 +2,8 @@ import { useRef, useMemo, useState, KeyboardEvent, useEffect } from 'react'
 import { MapContainer, TileLayer, Marker, useMap } from 'react-leaflet'
 import { TextField, List, ListItem, ListItemButton, ListItemText, Box, Button } from '@mui/material'
 import 'leaflet/dist/leaflet.css'
+import markerIconPng from 'leaflet/dist/images/marker-icon.png'
+import { Icon } from 'leaflet'
 
 type Coordinate = {
   lat: number
@@ -30,7 +32,15 @@ const DraggableMarker = ({
     [setMarkerCoordinates]
   )
 
-  return <Marker draggable={true} eventHandlers={eventHandlers} position={markerCoordinates} ref={markerRef} />
+  return (
+    <Marker
+      draggable={true}
+      eventHandlers={eventHandlers}
+      position={markerCoordinates}
+      ref={markerRef}
+      icon={new Icon({ iconUrl: markerIconPng, iconSize: [25, 41], iconAnchor: [12, 41] })}
+    />
+  )
 }
 
 const ViewSetter = ({ viewCoordinates }: { viewCoordinates: Coordinate }) => {
