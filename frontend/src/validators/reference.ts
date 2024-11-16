@@ -197,7 +197,6 @@ export const validateReference = (
     },
     ref_journal: {
       name: 'ref_journal',
-      required: true,
       miscCheck: journalCheck,
       condition: (data: Partial<EditDataType<ReferenceDetailsType>>) => {
         const ids: number[] = [1, 5, 14]
