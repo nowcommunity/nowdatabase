@@ -57,7 +57,7 @@ export const validCountries = [
   'Cocos (Keeling) Islands',
   'Colombia',
   'Comoros',
-  'Congo, Democratic republic of the',
+  'Congo, Democratic republic of the (prev. Zaire)',
   'Cook Islands',
   'Coral Sea Islands',
   'Costa Rica',

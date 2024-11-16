@@ -7,6 +7,7 @@ import {
   DropdownOption,
   DropdownOptionValue,
   DropdownSelector,
+  DropdownSelectorWithSearch,
   EditableTextField,
   RadioSelector,
 } from './common/editingComponents'
@@ -101,6 +102,13 @@ export const DetailView = <T extends object>({
     disabled?: boolean
   ) => <DropdownSelector field={field} options={options} name={name} disabled={disabled} />
 
+  const dropdownWithSearch = (
+    field: keyof EditDataType<T>,
+    options: Array<DropdownOption | string>,
+    name: string,
+    disabled?: boolean
+  ) => <DropdownSelectorWithSearch field={field} options={options} name={name} disabled={disabled} />
+
   const onDelete = () => {
     if (!window.confirm('Are you sure you want to delete this item? This operation cannot be undone.')) return
     if (deleteFunction) void deleteFunction()
@@ -122,6 +130,7 @@ export const DetailView = <T extends object>({
     editData: makeEditData(data),
     textField,
     dropdown,
+    dropdownWithSearch,
     radioSelection,
     bigTextField,
     validator,
