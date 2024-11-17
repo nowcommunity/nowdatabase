@@ -58,3 +58,26 @@ export const isPage = (page: any): page is Page => {
 
   return true
 }
+
+type FilterMethod = 'beginsWith' | 'fuzzy' | 'exact'
+
+export const constructFilterSql = (filters: ColumnFilterUrl[], filterMethod: FilterMethod = 'beginsWith') => {
+  if (filterMethod !== 'beginsWith') throw Error(`Method ${filterMethod} not yet implemented`)
+  if (filters.length === 0) return { sqlFilterStringList: [], sqlFilterParameterList: ['TRUE'] }
+
+  const sqlFilterParameterList: string[] = []
+  //const sqlFilterStringList: string[] = Array(filters.length - 1).fill(' AND ')
+  const sqlFilterStringList: string[] = []
+
+  // This is not currently used but is kept for "just in case"
+  filters.map(filter => {
+    if (sqlFilterStringList.length !== 0) sqlFilterStringList.push(' AND ')
+    sqlFilterParameterList.push(filter.id)
+    sqlFilterStringList.push(' LIKE ')
+    sqlFilterParameterList.push(`${filter.value + '%'}`)
+  })
+
+  console.log(sqlFilterStringList, ...sqlFilterParameterList)
+
+  return { sqlFilterStringList, sqlFilterParameterList }
+}

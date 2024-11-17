@@ -1,5 +1,5 @@
+import type { CrossSearch, ColumnFilter } from '../../../../frontend/src/backendTypes'
 import { beforeAll, afterAll, describe, it, expect } from '@jest/globals'
-import { CrossSearch } from '../../../../frontend/src/backendTypes'
 import { resetDatabase, send, resetDatabaseTimeout } from '../utils'
 import { pool } from '../../utils/db'
 import { constructFilterSortPageUrl } from '../../utils/url'
@@ -78,7 +78,7 @@ describe('Getting cross-search data works', () => {
   })
 
   it('Get filtered with missing parameters returns nothing', async () => {
-    const result = await send('crosssearch/testing/all', 'GET')
+    const result = await send('crosssearch/testing/all?', 'GET')
 
     expect(result.status).toEqual(200)
     expect(result.body.length).toEqual(0)
@@ -98,15 +98,28 @@ describe('Getting cross-search data works', () => {
     const parameters = constructFilterSortPageUrl([], [], { pageIndex: 0, pageSize: 100 })
     await login('testPl', 'test')
     const result = await send('crosssearch/testing/all?' + parameters, 'GET')
-    console.log('result length: ',result.body.result.length)
-    console.log('result: ',result.body.result)
+    console.log('result length: ', result.body.length)
+    console.log('result: ', result.body)
     logout()
 
     expect(result.status).toEqual(200)
     expect(result.body.length).toEqual(21)
   })
 
+  it('Get filtered with correct parameters including a filter and with user rights returns only items matching to the filter', async () => {
+    const filter: ColumnFilter = {
+      country: 'Spa',
+      //loc_name: 'Las',
+    }
+    const parameters = constructFilterSortPageUrl(filter, [], { pageIndex: 0, pageSize: 100 })
+    await login()
+    const result = await send('crosssearch/testing/all?' + parameters, 'GET')
+    logout()
+
+    expect(result.status).toEqual(200)
+    expect(result.body.length).toEqual(5)
+  })
+
   it.todo('Get filtered with sorting returns with correct sorting')
-  it.todo('Get filtered with a filter returns items matching to the filter')
   it.todo('Get filtered with multiple filters returns items matching to all filters')
 })
