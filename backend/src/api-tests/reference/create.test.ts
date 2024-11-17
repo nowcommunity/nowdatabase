@@ -1,7 +1,7 @@
 import { beforeEach, beforeAll, afterAll, describe, it, expect } from '@jest/globals'
 import { ReferenceDetailsType } from '../../../../frontend/src/backendTypes'
 //import { LogRow } from '../../services/write/writeOperations/types'
-import { newReferenceBasis } from './data'
+import { newReferenceBasis, emptyReferenceBasis } from './data'
 import { login, logout, resetDatabase, send, /*testLogRows,*/ resetDatabaseTimeout, noPermError } from '../utils'
 import { pool } from '../../utils/db'
 import Prisma from '../../../prisma/generated/now_test_client'
@@ -43,14 +43,38 @@ describe('Creating new reference works', () => {
     expect(journal_id).toBeDefined()
   })
 
-  it.skip('Adding "removed" in rowstate of authors & journal deletes author and clear journal data from reference', async () => {
+  it('Adding "removed" in rowstate of authors & journal deletes author and clear journal data from reference', async () => {
     const { status: getReqStatus } = await send<{ rid: number }>(`reference/`, 'PUT', {
       reference: {
         ...createdRef,
-        ref_authors: createdRef!.ref_authors.map(ref_author => ({
-          ...ref_author,
-          rowState: 'removed',
-        })),
+        //changing type_id to 2 since journals are mandatory on type 1
+        ref_type_id: 2,
+        ref_authors: [
+          {
+            rid: undefined,
+            au_num: 1,
+            author_surname: 'testiauthor',
+            author_initials: 'testi-initials',
+            field_id: 2,
+            rowState: 'removed',
+          },
+          {
+            rid: undefined,
+            au_num: 2,
+            author_surname: 'testiauthor2',
+            author_initials: 'testi-initials2',
+            field_id: 2,
+            rowState: 'removed',
+          },
+          {
+            rid: undefined,
+            au_num: 1,
+            author_surname: 'testiauthor3',
+            author_initials: 'testi-initials3',
+            field_id: 12,
+            rowState: 'new',
+          },
+        ],
         ref_journal: {
           ...createdRef!.ref_journal,
           rowState: 'removed',
@@ -62,7 +86,7 @@ describe('Creating new reference works', () => {
     const updatedRef = resultBody
     const { ref_authors, ref_journal, journal_id } = updatedRef
 
-    expect(ref_authors.length).toEqual(0) //authors have been removed from the reference
+    expect(ref_authors.length).toEqual(1) //authors have been removed from the reference
     expect(journal_id).toBeNull() //journal id set to null
     expect(ref_journal).toBeNull() //no journal fetched
 
@@ -74,13 +98,14 @@ describe('Creating new reference works', () => {
 
     const { body, status: getReqStatus3 } = await send(`reference/authors/${createdRef?.rid}`, 'GET')
     expect(getReqStatus3).toEqual(200)
-    expect(body.length).toEqual(0) // Authors should be deleted from db
+    expect(body.length).toEqual(1) // Authors should be deleted from db
   })
 
-  it.skip('Removing author / journal data from reference should clear the data from db', async () => {
+  it('Removing author / journal data from reference should clear the data from db', async () => {
     const { status: getReqStatus } = await send<{ rid: number }>(`reference/`, 'PUT', {
       reference: {
         ...createdRef,
+        ref_type_id: 2,
         ref_authors: [createdRef!.ref_authors[0]],
         ref_journal: null,
       },
@@ -105,6 +130,47 @@ describe('Creating new reference works', () => {
     const { body, status: getReqStatus3 } = await send(`reference/authors/${createdRef?.rid}`, 'GET')
     expect(getReqStatus3).toEqual(200)
     expect(body.length).toEqual(1) //Unused authors should be deleted from db
+  })
+
+  it('All validators fail with empty reference', async () => {
+    const { body: resultBody, status: getReqStatus } = await send('reference/', 'PUT', {
+      reference: { ...emptyReferenceBasis },
+    })
+    expect(getReqStatus).toEqual(403)
+    expect(resultBody.length).toEqual(8) //There should be 8 validation errors
+  })
+
+  it('All validators pass with correct data', async () => {
+    const { body: resultBody, status: getReqStatus } = await send<{ rid: number }>('reference/', 'PUT', {
+      reference: {
+        ...emptyReferenceBasis,
+        title_primary: 'title_primary',
+        date_primary: 2020,
+        title_secondary: 'title_secondary',
+        title_series: 'title_series',
+        gen_notes: 'gen_notes',
+        exact_date: '2024-11-18',
+        ref_authors: [
+          {
+            rid: undefined,
+            au_num: 1,
+            author_surname: 'testiauthor',
+            author_initials: 'testi-initials',
+            field_id: 2,
+            rowState: 'new',
+          },
+        ],
+        ref_journal: {
+          journal_title: 'testijournal',
+          short_title: 'shorttitle',
+          alt_title: 'alttitle',
+          ISSN: 'issn',
+          rowState: 'new',
+        },
+      },
+    })
+    expect(getReqStatus).toEqual(200)
+    expect(typeof resultBody.rid).toEqual('number')
   })
 
   it('Creation fails without permissions', async () => {
