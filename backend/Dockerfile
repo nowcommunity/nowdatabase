@@ -27,7 +27,6 @@ RUN npm run prisma
 RUN npm run build
 
 
-# NOTE: Has to be alpine3.16 because newer versions have changed a dependency, causing Prisma to fail
 FROM node:22-alpine3.20 AS node-run
 
 # healthcheck needs this
