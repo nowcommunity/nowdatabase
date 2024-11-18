@@ -16,6 +16,8 @@ export const TimeUnitTable = ({ selectorFn }: { selectorFn?: (newTimeUnit: TimeU
       {
         accessorKey: 'tu_display_name',
         header: 'Time Unit',
+        enableHiding: false,
+        filterFn: 'contains',
       },
       {
         accessorKey: 'low_bound',
@@ -30,6 +32,7 @@ export const TimeUnitTable = ({ selectorFn }: { selectorFn?: (newTimeUnit: TimeU
       {
         accessorKey: 'seq_name',
         header: 'Sequence',
+        filterFn: 'contains',
       },
       {
         accessorKey: 'rank',

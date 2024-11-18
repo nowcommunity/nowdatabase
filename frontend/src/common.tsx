@@ -19,6 +19,7 @@ export const referenceTableColumns: MRT_ColumnDef<Reference>[] = [
     Cell,
     header: 'Author',
     maxSize: 60,
+    filterFn: 'contains',
   },
   {
     accessorKey: 'date_primary',
@@ -33,6 +34,7 @@ export const referenceTableColumns: MRT_ColumnDef<Reference>[] = [
     header: 'Title',
     maxSize: 60,
     filterFn: 'contains',
+    enableHiding: false,
   },
   {
     accessorFn: ({ ref_journal }) => ref_journal?.journal_title || '',
