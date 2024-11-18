@@ -42,11 +42,13 @@ export const SpeciesTable = ({ selectorFn }: { selectorFn?: (id: Species) => voi
         accessorKey: 'genus_name',
         header: 'Genus',
         size: 20,
+        enableHiding: false,
       },
       {
         accessorKey: 'species_name',
         header: 'Species',
         size: 20,
+        enableHiding: false,
       },
       {
         accessorKey: 'unique_identifier',

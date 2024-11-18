@@ -16,6 +16,7 @@ export const TimeUnitTable = ({ selectorFn }: { selectorFn?: (newTimeUnit: TimeU
       {
         accessorKey: 'tu_display_name',
         header: 'Time Unit',
+        enableHiding: false,
       },
       {
         accessorKey: 'low_bound',

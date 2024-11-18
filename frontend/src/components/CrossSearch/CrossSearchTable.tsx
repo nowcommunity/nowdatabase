@@ -16,6 +16,7 @@ export const CrossSearchTable = ({ selectorFn }: { selectorFn?: (newObject: Cros
       {
         accessorKey: 'loc_name',
         header: 'Locality name',
+        enableHiding: false,
       },
       {
         accessorKey: 'country',
@@ -147,11 +148,13 @@ export const CrossSearchTable = ({ selectorFn }: { selectorFn?: (newObject: Cros
         accessorKey: 'genus_name',
         header: 'Genus',
         size: 20,
+        enableHiding: false,
       },
       {
         accessorKey: 'species_name',
         header: 'Species',
         size: 20,
+        enableHiding: false,
       },
       {
         accessorKey: 'unique_identifier',

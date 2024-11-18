@@ -19,6 +19,7 @@ export const LocalityTable = ({ selectorFn }: { selectorFn?: (newObject: Localit
       {
         accessorKey: 'loc_name',
         header: 'Name',
+        enableHiding: false,
       },
       {
         accessorKey: 'country',

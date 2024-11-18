@@ -22,6 +22,7 @@ export const TimeBoundTable = ({
       {
         accessorKey: 'b_name',
         header: 'Name',
+        enableHiding: false,
       },
       {
         accessorKey: 'age',
