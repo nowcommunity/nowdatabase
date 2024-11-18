@@ -23,6 +23,7 @@ export const TimeBoundTable = ({
         accessorKey: 'b_name',
         header: 'Name',
         enableHiding: false,
+        filterFn: 'contains',
       },
       {
         accessorKey: 'age',
@@ -32,6 +33,7 @@ export const TimeBoundTable = ({
       {
         accessorKey: 'b_comment',
         header: 'Comment',
+        filterFn: 'contains',
       },
     ],
     []

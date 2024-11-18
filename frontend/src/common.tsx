@@ -19,6 +19,7 @@ export const referenceTableColumns: MRT_ColumnDef<Reference>[] = [
     Cell,
     header: 'Author',
     maxSize: 60,
+    filterFn: 'contains',
   },
   {
     accessorKey: 'date_primary',
