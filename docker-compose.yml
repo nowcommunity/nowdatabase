@@ -10,6 +10,7 @@ services:
         BACKEND_URL: http://localhost:4000
         ENABLE_WRITE: true
         RUNNING_ENV: prod
+        GEONAMES_USERNAME: '${GEONAMES_USERNAME}'
     ports:
       - 127.0.0.1:5173:5173
 
