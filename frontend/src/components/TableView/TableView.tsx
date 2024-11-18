@@ -178,8 +178,8 @@ export const TableView = <T extends MRT_RowData>({
         </>
       )}
       {combinedExport && (
-        <Box sx={{ margin: '1em', maxWidth: '25em' }}>
-          <Box sx={{ display: 'flex', gap: '0.4em' }}>
+        <Box sx={{ margin: '0.5em' }}>
+          <Box sx={{ display: 'flex', gap: '0.4em', justifyContent: 'flex-end' }}>
             <Tooltip
               title={
                 <span style={{ fontSize: 18 }}>
