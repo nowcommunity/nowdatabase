@@ -168,39 +168,39 @@ export const TableView = <T extends MRT_RowData>({
             <Typography sx={{ margin: '0.4rem' }} variant="h4">
               {title ?? ''}
             </Typography>
-            {editRights.new && title != 'Locality-Species-Cross-Search' && (
-              <Button sx={{ marginRight: '1rem', marginLeft: '1rem' }} variant="contained" component={Link} to="new">
-                New
-              </Button>
-            )}
           </Box>
           <Divider sx={{ marginTop: '1rem' }} />
         </>
       )}
+      {editRights.new && title != 'Locality-Species-Cross-Search' && (
+        <Box sx={{ display: 'flex', gap: '0.4em', justifyContent: 'flex-end', margin: '0.5em', marginTop: '1em' }}>
+          <Button variant="contained" component={Link} to="new">
+            New
+          </Button>
+        </Box>
+      )}
       {combinedExport && (
-        <Box sx={{ margin: '0.5em' }}>
-          <Box sx={{ display: 'flex', gap: '0.4em', justifyContent: 'flex-end' }}>
-            <Tooltip
-              title={
-                <span style={{ fontSize: 18 }}>
-                  Export&lsquo;s all localities filtered in the table below with all their species. The export is sorted
-                  by name. This may take up to a minute, so please wait without closing the browser or switching page.
-                  To export only localities use the &lsquo;export&lsquo; button in the top-right corner of the table.
-                </span>
-              }
-            >
-              <span>
-                <Button
-                  variant="contained"
-                  disabled={exportIsLoading}
-                  onClick={() => void combinedExport(table.getSortedRowModel().rows.map(d => d.original.lid as number))}
-                >
-                  Export localities with their species
-                </Button>
+        <Box sx={{ display: 'flex', gap: '0.4em', justifyContent: 'flex-end', margin: '0.5em', marginTop: '1em' }}>
+          <Tooltip
+            title={
+              <span style={{ fontSize: 18 }}>
+                Export&lsquo;s all localities filtered in the table below with all their species. The export is sorted
+                by name. This may take up to a minute, so please wait without closing the browser or switching page. To
+                export only localities use the &lsquo;export&lsquo; button in the top-right corner of the table.
               </span>
-            </Tooltip>{' '}
-            {exportIsLoading && <CircularProgress />}
-          </Box>
+            }
+          >
+            <span>
+              <Button
+                variant="contained"
+                disabled={exportIsLoading}
+                onClick={() => void combinedExport(table.getSortedRowModel().rows.map(d => d.original.lid as number))}
+              >
+                Export localities with their species
+              </Button>
+            </span>
+          </Tooltip>{' '}
+          {exportIsLoading && <CircularProgress />}
         </Box>
       )}
       <MaterialReactTable table={table} />
