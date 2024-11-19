@@ -21,6 +21,8 @@ jobs:
         run: cp .template.env .test.env
       - name: Change .test.env host
         run: sed -i -e "s|nowdb-db-dev|localhost|g" .test.env
+      - name: Change yaml to "=" 
+        run: sed -i -e "s|\:\ |=|g" .test.env
 
       - name: Setup node
         uses: actions/setup-node@v4
