@@ -9,6 +9,8 @@ export const GRACE_PERIOD_SECONDS = parseInt(process.env.GRACE_PERIOD_MINUTES ||
 export const MARIADB_USER = process.env.MARIADB_USER as string
 export const MARIADB_PORT = parseInt(process.env.MARIADB_PORT as string)
 
+export const GEONAMES_USERNAME = process.env.GEONAMES_USERNAME as string
+
 /* Running environment: 
     dev     = development or testing, locally or in GitHub actions
     staging = semi-public test version, non-anonymized test-data
