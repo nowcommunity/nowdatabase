@@ -1,5 +1,6 @@
 import { Router } from 'express'
 import { GEONAMES_USERNAME } from '../utils/config'
+import { logger } from '../utils/logger'
 
 export type Geoname = {
   adminCode01: string
@@ -32,13 +33,12 @@ export type ParsedGeoname = Pick<Geoname, 'name' | 'countryName' | 'lat' | 'lng'
 const router = Router()
 
 router.post('/', async (req, res) => {
-  const locationName: string = req.body.locationName
+  const locationName = req.body.locationName as unknown as string
   const url = `https://secure.geonames.org/searchJSON?q=${locationName}&maxRows=5&username=${GEONAMES_USERNAME}`
 
   if (GEONAMES_USERNAME === '' || GEONAMES_USERNAME == undefined)
     return res.status(401).send({ error: 'No Geonames-api username given.' })
   if (locationName === '' || locationName == undefined) return res.status(400).send({ error: 'No location given' })
-  console.log('url:', url)
 
   try {
     const fetchResponse = (await (await fetch(url)).json()) as GeonamesJSON
@@ -53,7 +53,7 @@ router.post('/', async (req, res) => {
 
     return res.status(200).send({ locations: locations })
   } catch (e) {
-    console.error('Error while fetching Geoname-api:', e)
+    logger.error(`Error while fetching Geoname-api: ${e}`)
     return res.status(400).send({ error: `Something went from while fetcthing locations from Geonames API` })
   }
 })
