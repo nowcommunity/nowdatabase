@@ -5,6 +5,14 @@ import { Locality } from '@/backendTypes'
 import { TableView } from '../TableView/TableView'
 import { useNotify } from '@/hooks/notification'
 
+const decimalCount = (num: number) => {
+  const numAsString = num.toString()
+  if (numAsString.includes('.')) {
+    return numAsString.split('.')[1].length
+  }
+  return 0
+}
+
 export const LocalityTable = ({ selectorFn }: { selectorFn?: (newObject: Locality) => void }) => {
   const localitiesQuery = useGetAllLocalitiesQuery()
   const [getLocalitySpeciesList, { isLoading }] = useGetLocalitySpeciesListMutation()
@@ -55,13 +63,25 @@ export const LocalityTable = ({ selectorFn }: { selectorFn?: (newObject: Localit
         accessorKey: 'max_age',
         header: 'Max age',
         filterVariant: 'range',
-        Cell: ({ cell }) => (cell.getValue() as number).toFixed(3),
+        Cell: ({ cell }) => {
+          const cellVal = cell.getValue() as number
+          if (decimalCount(cellVal) > 3) {
+            return cellVal.toFixed(3)
+          }
+          return cellVal
+        },
       },
       {
         accessorKey: 'min_age',
         header: 'Min age',
         filterVariant: 'range',
-        Cell: ({ cell }) => (cell.getValue() as number).toFixed(3),
+        Cell: ({ cell }) => {
+          const cellVal = cell.getValue() as number
+          if (decimalCount(cellVal) > 3) {
+            return cellVal.toFixed(3)
+          }
+          return cellVal
+        },
       },
       {
         accessorKey: 'frac_max',
