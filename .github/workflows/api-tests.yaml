@@ -20,7 +20,7 @@ jobs:
       - name: Copy .test.env
         run: cp .template.env .test.env
       - name: Change .test.env host
-        run: sed -i -e \"s|nowdb-db|localhost|g\ .test.env"
+        run: sed -i -e \"s|nowdb-db|localhost|g\" .test.env
 
       - name: Setup node
         uses: actions/setup-node@v4
