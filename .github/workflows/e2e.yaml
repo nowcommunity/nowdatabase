@@ -15,6 +15,9 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Copy .anon.env
+        run: cp .template.env .anon.env
+
       - name: Setup node
         uses: actions/setup-node@v4
         with:
