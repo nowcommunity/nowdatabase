@@ -38,18 +38,18 @@ export const TimeUnitTab = () => {
     ],
   ]
 
-  const time_bound_edit = [
+  const low_id = editData.low_bound ? editData.low_bound.bid : data.low_bound ? data.low_bound.bid : ''
+  const low_bname = editData.low_bound ? editData.low_bound.b_name : data.low_bound ? data.low_bound.b_name : ''
+  const low_age = editData.low_bound ? editData.low_bound.age : data.low_bound ? data.low_bound.age : ''
+  const low_bcomment = editData.low_bound
+    ? editData.low_bound.b_comment
+    : data.low_bound
+      ? data.low_bound.b_comment
+      : ''
+
+  const lowBound = [
     [
-      'New Upper Bound Id',
-      <TimeBoundSelection<TimeBoundDetailsType, TimeUnitDetailsType>
-        key="up_bnd"
-        sourceField="bid"
-        targetField="up_bnd"
-        selectorTable={<TimeBoundTable showBid />}
-      />,
-    ],
-    [
-      'New Lower Bound Id',
+      'Select New Lower Bound',
       <TimeBoundSelection<TimeBoundDetailsType, TimeUnitDetailsType>
         key="low_bnd"
         sourceField="bid"
@@ -57,27 +57,32 @@ export const TimeUnitTab = () => {
         selectorTable={<TimeBoundTable showBid />}
       />,
     ],
+    ['Id', low_id],
+    ['Name', low_bname],
+    ['Age', low_age],
+    ['Comment', low_bcomment],
   ]
 
-  const low_bound =
-    mode.new || !data.low_bound
-      ? []
-      : [
-          ['Id', editData.low_bound ? editData.low_bound.bid : data.low_bound.bid],
-          ['Name', editData.low_bound ? editData.low_bound.b_name : data.low_bound.b_name],
-          ['Age', editData.low_bound ? editData.low_bound.age : data.low_bound.age],
-          ['Comment', editData.low_bound ? editData.low_bound.b_comment : data.low_bound.b_comment],
-        ]
+  const up_id = editData.up_bound ? editData.up_bound.bid : data.up_bound ? data.up_bound.bid : ''
+  const up_bname = editData.up_bound ? editData.up_bound.b_name : data.up_bound ? data.up_bound.b_name : ''
+  const up_age = editData.up_bound ? editData.up_bound.age : data.up_bound ? data.up_bound.age : ''
+  const up_bcomment = editData.up_bound ? editData.up_bound.b_comment : data.up_bound ? data.up_bound.b_comment : ''
 
-  const up_bound =
-    mode.new || !data.up_bound
-      ? []
-      : [
-          ['Id', editData.up_bound ? editData.up_bound.bid : data.up_bound.bid],
-          ['Name', editData.up_bound ? editData.up_bound.b_name : data.up_bound.b_name],
-          ['Age', editData.up_bound ? editData.up_bound.age : data.up_bound.age],
-          ['Comment', editData.up_bound ? editData.up_bound.b_comment : data.up_bound.b_comment],
-        ]
+  const upBound = [
+    [
+      'Select New Upper Bound',
+      <TimeBoundSelection<TimeBoundDetailsType, TimeUnitDetailsType>
+        key="up_bnd"
+        sourceField="bid"
+        targetField="up_bnd"
+        selectorTable={<TimeBoundTable showBid />}
+      />,
+    ],
+    ['Id', up_id],
+    ['Name', up_bname],
+    ['Age', up_age],
+    ['Comment', up_bcomment],
+  ]
 
   let lowerBoundTitle: string
   let upperBoundTitle: string
@@ -95,21 +100,18 @@ export const TimeUnitTab = () => {
   return (
     <>
       <ArrayFrame array={timeUnit} title="Time Unit" />
-      {!mode.new && data.low_bound && data.up_bound && (
-        <>
-          <ArrayFrame
-            array={low_bound}
-            title={lowerBoundTitle}
-            highlighted={lowerBoundTitle === 'Lower bound (edited)' ? true : false}
-          />
-          <ArrayFrame
-            array={up_bound}
-            title={upperBoundTitle}
-            highlighted={upperBoundTitle === 'Upper bound (edited)' ? true : false}
-          />
-        </>
-      )}
-      {!mode.read && <ArrayFrame array={time_bound_edit} title="Edit bounds" />}
+      <>
+        <ArrayFrame
+          array={lowBound}
+          title={lowerBoundTitle}
+          highlighted={lowerBoundTitle === 'Lower bound (edited)' ? true : false}
+        />
+        <ArrayFrame
+          array={upBound}
+          title={upperBoundTitle}
+          highlighted={upperBoundTitle === 'Upper bound (edited)' ? true : false}
+        />
+      </>
     </>
   )
 }
