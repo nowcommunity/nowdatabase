@@ -21,14 +21,14 @@ jobs:
           node-version: 20
 
       - name: Create env-files
-        run: npm run config:all
+        env:
+          GEONAMES_USERNAME: ${{ secrets.GEONAMES_USERNAME }}
+        run: GEONAMES_USERNAME=$GEONAMES_USERNAME npm run config:all
 
       - name: Install root dependencies
         run: npm ci
 
       - name: 'Start containers'
-        env:
-          GEONAMES_USERNAME: ${{ secrets.GEONAMES_USERNAME }}
         run: npm run start:anon -- --wait -d
 
       - name: Run e2e tests
