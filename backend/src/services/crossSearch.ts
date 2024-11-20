@@ -1,4 +1,4 @@
-import { User, ColumnFilterUrl, SortingUrl, PageUrl, CrossSearch } from '../../../frontend/src/backendTypes'
+import { User, CrossSearch } from '../../../frontend/src/backendTypes'
 import { Role } from '../../../frontend/src/types'
 import { nowDb } from '../utils/db'
 import {
@@ -72,7 +72,6 @@ export const getAllCrossSearch = async (user?: User) => {
     return rest
   }
 
-  console.time('cross search query')
   const queryResult = await nowDb.now_ls.findMany({
     select: {
       now_loc: {
@@ -133,7 +132,6 @@ export const getAllCrossSearch = async (user?: User) => {
       },
     },
   })
-  console.timeEnd('cross search query')
 
   const flattenedResult = queryResult.map(item => ({
     lid: item.now_loc.lid,
@@ -202,7 +200,7 @@ export const getAllCrossSearch = async (user?: User) => {
   return result
 }
 
-export const getFilteredCrossSearchLength = async (_columnfilter: ColumnFilter[] | [], user?: User) => {
+export const getCrossSearchLength = async (user?: User) => {
   const showAll = user && [Role.Admin, Role.EditUnrestricted].includes(user.role)
 
   const queryResult = await nowDb.now_ls.findMany({
@@ -238,28 +236,19 @@ export const getFilteredCrossSearchLength = async (_columnfilter: ColumnFilter[]
     .length
 }
 
-export const getFilteredCrossSearchRawSql = async (
-  filters: ColumnFilterUrl[],
-  sorting: SortingUrl[],
-  page: PageUrl,
+export const getCrossSearchRawSql = async (
   user: User | undefined
 ) => {
-  console.log('Filters:', filters)
-  console.log('Sorting:', sorting)
-  console.log('User:', user)
 
   const showAll = user && [Role.Admin, Role.EditUnrestricted].includes(user.role)
-  const limit: number = page.pageSize
-  const offset: number = page.pageIndex * limit
-
   if (!user) {
-    const sql = generateFilteredCrossSearchSqlWithNoUser(limit, offset)
+    const sql = generateFilteredCrossSearchSqlWithNoUser()
     const result: Partial<CrossSearch>[] = await nowDb.$queryRaw(sql)
     return result
   }
 
   if (showAll) {
-    const sql = generateFilteredCrossSearchSqlWithAdmin(filters, limit, offset)
+    const sql = generateFilteredCrossSearchSqlWithAdmin()
     const result: Partial<CrossSearch>[] = await nowDb.$queryRaw(sql)
     return result
   }
@@ -267,13 +256,13 @@ export const getFilteredCrossSearchRawSql = async (
   const usersProjects = await getIdsOfUsersProjects(user)
 
   if (!usersProjects.size) {
-    const sql = generateFilteredCrossSearchSqlWithNoUser(limit, offset)
+    const sql = generateFilteredCrossSearchSqlWithNoUser()
     const result: Partial<CrossSearch>[] = await nowDb.$queryRaw(sql)
     return result
   }
 
   console.log('users projects:', usersProjects)
-  const sql = generateFilteredCrossSearchSql(limit, offset, usersProjects)
+  const sql = generateFilteredCrossSearchSql(usersProjects)
   console.log('sql:', sql)
   const result: Partial<CrossSearch>[] = await nowDb.$queryRaw(sql)
   return result

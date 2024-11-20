@@ -2,7 +2,7 @@ import { ColumnFilterUrl } from '../../../frontend/src/backendTypes'
 import { constructFilterSql } from './url'
 import { Prisma } from '../../prisma/generated/now_test_client'
 
-export const generateFilteredCrossSearchSql = (limit: number, offset: number, usersProjects: Set<number>) => {
+export const generateFilteredCrossSearchSql = (usersProjects: Set<number>) => {
   const projectsArray = Array.from(usersProjects)
   const projectsArrayString = projectsArray.join(', ')
 
@@ -41,22 +41,55 @@ export const generateFilteredCrossSearchSql = (limit: number, offset: number, us
     now_loc.lid IS NOT NULL
   ORDER BY
     now_loc.lid
-  LIMIT
-    ${limit}
-  OFFSET
-    ${offset}
   `
 }
 
-export const generateFilteredCrossSearchSqlWithNoUser = (limit: number, offset: number) => {
+export const generateFilteredCrossSearchSqlWithNoUser = () => {
   return Prisma.sql`
   SELECT 
     now_loc.lid,
     loc_name,
+    bfa_max,
+    bfa_min,
+    max_age,
+    min_age,
+    bfa_max_abs,
+    bfa_min_abs,
+    frac_max,
+    frac_min,
+    chron,
+    basin,
+    subbasin,
+    dms_lat,
+    dms_long,
+    dec_lat,
+    dec_long,
+    altitude,
     country,
-    com_species.species_id,
-    com_species.species_name,
-    com_species.genus_name
+    state,
+    county,
+    site_area,
+    gen_loc,
+    plate,
+    formation,
+    member,
+    bed,
+    com_species.species_id
+    subclass_or_superorder_name,
+    order_name,
+    suborder_or_superfamily_name,
+    family_name,
+    subfamily_name,
+    genus_name,
+    species_name,
+    unique_identifier,
+    taxonomic_status,
+    common_name,
+    sp_author,
+    strain,
+    gene,
+    com_species.body_mass,
+    brain_mass
   FROM
     now_ls
   LEFT JOIN
@@ -71,10 +104,6 @@ export const generateFilteredCrossSearchSqlWithNoUser = (limit: number, offset: 
     now_loc.loc_status = 0
   ORDER BY
     now_loc.lid
-  LIMIT
-    ${limit}
-  OFFSET
-    ${offset}
   `
 }
 
@@ -117,8 +146,47 @@ export const originalGenerateFilteredCrossSearchSqlWithAdmin = (limit: number, o
   SELECT 
     now_loc.lid,
     loc_name,
+    bfa_max,
+    bfa_min,
+    max_age,
+    min_age,
+    bfa_max_abs,
+    bfa_min_abs,
+    frac_max,
+    frac_min,
+    chron,
+    basin,
+    subbasin,
+    dms_lat,
+    dms_long,
+    dec_lat,
+    dec_long,
+    altitude,
     country,
+    state,
+    county,
+    site_area,
+    gen_loc,
+    plate,
+    formation,
+    member,
+    bed,
     com_species.species_id
+    subclass_or_superorder_name,
+    order_name,
+    suborder_or_superfamily_name,
+    family_name,
+    subfamily_name,
+    genus_name,
+    species_name,
+    unique_identifier,
+    taxonomic_status,
+    common_name,
+    sp_author,
+    strain,
+    gene,
+    com_species.body_mass,
+    brain_mass
   FROM
     now_ls
   LEFT JOIN
@@ -138,13 +206,52 @@ export const originalGenerateFilteredCrossSearchSqlWithAdmin = (limit: number, o
   `
 }
 
-export const generateFilteredCrossSearchSqlWithAdmin = (filters: ColumnFilterUrl[], limit: number, offset: number) => {
+export const generateFilteredCrossSearchSqlWithAdmin = () => {
   let sql = Prisma.sql`
   SELECT 
     now_loc.lid,
     loc_name,
+    bfa_max,
+    bfa_min,
+    max_age,
+    min_age,
+    bfa_max_abs,
+    bfa_min_abs,
+    frac_max,
+    frac_min,
+    chron,
+    basin,
+    subbasin,
+    dms_lat,
+    dms_long,
+    dec_lat,
+    dec_long,
+    altitude,
     country,
+    state,
+    county,
+    site_area,
+    gen_loc,
+    plate,
+    formation,
+    member,
+    bed,
     com_species.species_id
+    subclass_or_superorder_name,
+    order_name,
+    suborder_or_superfamily_name,
+    family_name,
+    subfamily_name,
+    genus_name,
+    species_name,
+    unique_identifier,
+    taxonomic_status,
+    common_name,
+    sp_author,
+    strain,
+    gene,
+    com_species.body_mass,
+    brain_mass
   FROM
     now_ls
   LEFT JOIN
@@ -154,15 +261,9 @@ export const generateFilteredCrossSearchSqlWithAdmin = (filters: ColumnFilterUrl
   LEFT JOIN
     com_species
   ON
-    now_ls.species_id = com_species.species_id`
-
-  if (filters.length !== 0) sql = Prisma.sql`${sql}\n  WHERE`
-  let i = 0
-  filters.forEach(filter => {
-    if (i === 0) sql = Prisma.sql`${sql} ${filter.id} LIKE '${filter.value}%'`
-    else sql = Prisma.sql`${sql} AND ${filter.id} LIKE '${filter.value}%'`
-    i++
-  })
-  console.log('final sql in generator:', sql)
+    now_ls.species_id = com_species.species_id
+  ORDER BY
+    now_loc.lid
+    `
   return sql
 }
