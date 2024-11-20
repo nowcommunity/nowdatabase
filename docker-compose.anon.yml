@@ -49,5 +49,16 @@ services:
       timeout: 5s
       retries: 3
 
+  phpmyadmin:
+    restart: always
+    image: phpmyadmin:5.2.1
+    environment:
+      PMA_ARBITRARY: 1
+      PMA_HOST: db-anon
+      PMA_PORT: 3306
+    ports:
+      - "8080:80"
+      - "9090:443"
+
 volumes:
   nowdb-db-anon:

@@ -5,6 +5,14 @@ import { Locality } from '@/backendTypes'
 import { TableView } from '../TableView/TableView'
 import { useNotify } from '@/hooks/notification'
 
+const decimalCount = (num: number) => {
+  const numAsString = num.toString()
+  if (numAsString.includes('.')) {
+    return numAsString.split('.')[1].length
+  }
+  return 0
+}
+
 export const LocalityTable = ({ selectorFn }: { selectorFn?: (newObject: Locality) => void }) => {
   const localitiesQuery = useGetAllLocalitiesQuery()
   const [getLocalitySpeciesList, { isLoading }] = useGetLocalitySpeciesListMutation()
@@ -13,44 +21,67 @@ export const LocalityTable = ({ selectorFn }: { selectorFn?: (newObject: Localit
     () => [
       {
         accessorKey: 'lid',
-        header: 'Id',
+        header: 'Locality Id',
         size: 20,
       },
       {
         accessorKey: 'loc_name',
         header: 'Name',
+        enableHiding: false,
+        filterFn: 'contains',
       },
       {
         accessorKey: 'country',
         header: 'Country',
+        filterFn: 'contains',
       },
       {
-        accessorKey: 'state',
+        id: 'state',
+        accessorFn: row => row.state || 'N/A',
         header: 'State',
+        filterFn: 'contains',
       },
       {
-        accessorKey: 'county',
+        id: 'county',
+        accessorFn: row => row.county || 'N/A',
         header: 'County',
+        filterFn: 'contains',
       },
       {
-        accessorKey: 'bfa_max',
+        id: 'bfa_max',
+        accessorFn: row => row.bfa_max || 'N/A',
         header: 'BFA max',
+        filterFn: 'contains',
       },
       {
-        accessorKey: 'bfa_min',
+        id: 'bfa_min',
+        accessorFn: row => row.bfa_min || 'N/A',
         header: 'BFA min',
+        filterFn: 'contains',
       },
       {
         accessorKey: 'max_age',
         header: 'Max age',
         filterVariant: 'range',
-        Cell: ({ cell }) => (cell.getValue() as number).toFixed(3),
+        Cell: ({ cell }) => {
+          const cellVal = cell.getValue() as number
+          if (decimalCount(cellVal) > 3) {
+            return cellVal.toFixed(3)
+          }
+          return cellVal
+        },
       },
       {
         accessorKey: 'min_age',
         header: 'Min age',
         filterVariant: 'range',
-        Cell: ({ cell }) => (cell.getValue() as number).toFixed(3),
+        Cell: ({ cell }) => {
+          const cellVal = cell.getValue() as number
+          if (decimalCount(cellVal) > 3) {
+            return cellVal.toFixed(3)
+          }
+          return cellVal
+        },
       },
       {
         accessorKey: 'frac_max',
@@ -61,16 +92,22 @@ export const LocalityTable = ({ selectorFn }: { selectorFn?: (newObject: Localit
         header: 'Frac min',
       },
       {
-        accessorKey: 'chron',
+        id: 'chron',
+        accessorFn: row => row.chron || 'N/A',
         header: 'Chron',
+        filterFn: 'contains',
       },
       {
-        accessorKey: 'basin',
+        id: 'basin',
+        accessorFn: row => row.basin || 'N/A',
         header: 'Basin',
+        filterFn: 'contains',
       },
       {
-        accessorKey: 'subbasin',
+        id: 'subbasin',
+        accessorFn: row => row.subbasin || 'N/A',
         header: 'Subbasin',
+        filterFn: 'contains',
       },
       {
         accessorKey: 'dms_lat',
@@ -103,16 +140,22 @@ export const LocalityTable = ({ selectorFn }: { selectorFn?: (newObject: Localit
         header: 'Gen locality',
       },
       {
-        accessorKey: 'plate',
+        id: 'plate',
+        accessorFn: row => row.plate || 'N/A',
         header: 'Plate',
+        filterFn: 'contains',
       },
       {
-        accessorKey: 'formation',
+        id: 'formation',
+        accessorFn: row => row.formation || 'N/A',
         header: 'Formation',
+        filterFn: 'contains',
       },
       {
-        accessorKey: 'member',
+        id: 'member',
+        accessorFn: row => row.member || 'N/A',
         header: 'Member',
+        filterFn: 'contains',
       },
       {
         accessorKey: 'bed',
