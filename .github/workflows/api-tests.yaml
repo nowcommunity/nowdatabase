@@ -15,19 +15,13 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Copy .anon.env
-        run: cp .template.env .anon.env
-      - name: Copy .test.env
-        run: cp .template.env .test.env
-      - name: Change .test.env host
-        run: sed -i -e "s|nowdb-db-dev|localhost|g" .test.env
-      - name: Change yaml to "=" 
-        run: sed -i -e "s|\:\ |=|g" .test.env
-
       - name: Setup node
         uses: actions/setup-node@v4
         with:
           node-version: 20
+
+      - name: Create env-files
+        run: npm run config:all
 
       - name: 'Start containers'
         run: npm run start:anon:api -- --wait -d
