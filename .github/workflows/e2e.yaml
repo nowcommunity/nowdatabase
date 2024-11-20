@@ -28,7 +28,7 @@ jobs:
 
       - name: 'Start containers'
         env:
-          GEONAMES_USERNAME: {{ secrets.GEONAMES_USERNAME }}
+          GEONAMES_USERNAME: ${{ secrets.GEONAMES_USERNAME }}
         run: npm run start:anon -- --wait -d
 
       - name: Run e2e tests
