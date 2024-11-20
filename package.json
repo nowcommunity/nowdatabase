@@ -51,7 +51,7 @@
     "config:anon": "npm run config:anon:base && npm run config:anon:host && npm run config:anon:coordinator",
     "config:anon:base": "cp -i .template.env .anon.env",
     "config:anon:host":"sed -i -e \"s|nowdb-db-dev|nowdb-db-anon|g\" .anon.env",
-    "config:anon:coordinator":"sed -i -e \"s|IZ|TEST-SU|g\" .anonenv",
+    "config:anon:coordinator":"sed -i -e \"s|IZ|TEST-SU|g\" .anon.env",
     "config:dev": "cp -i .template.env .dev.env"
   },
   "author": "",
