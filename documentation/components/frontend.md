@@ -2,7 +2,7 @@
 
 **Data tables**
 
-- [TableView](../../frontend/src/components/TableView/TableView.tsx) is a generic component that takes in column definitions, data, and renders a [material-react-table (click for docs)](https://www.material-react-table.com/). It also handles the tables state management: for example saving column filters into url, and restoring them on first render. Creating a new [tableview](../guides/creating_new_tableview.md) in more detail.
+- [TableView](../../frontend/src/components/TableView/TableView.tsx) is a generic component that takes in column definitions, data, and renders a [material-react-table (click for docs)](https://www.material-react-table.com/). It also handles the tables state management: for example saving column filters into url, and restoring them on first render. See [creating a new tableview](../guides/creating_new_tableview.md) for more details, and check out the [TableView](./tableview.md) documentation too.
 
 - [DetailView](../../frontend/src/components/DetailView/)-folder has components that are used by the detailed view: The view which allows looking at and editing a single data item, for example a locality. The DetailView-component is generic, allowing different data types to use it.
 

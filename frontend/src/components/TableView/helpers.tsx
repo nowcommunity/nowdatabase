@@ -37,11 +37,15 @@ export const renderCustomToolbarModalVersion = <T extends MRT_RowData>({ table }
 )
 
 export const renderCustomToolbar = <T extends MRT_RowData>({ table }: { table: MRT_TableInstance<T> }) => (
-  <Box>
-    <MRT_ShowHideColumnsButton table={table} />
-    <MRT_ToggleFullScreenButton table={table} />
-    <Button onClick={() => exportRows(table)} variant="contained">
-      Export table
-    </Button>
-  </Box>
+  <>
+    <Box>
+      <MRT_ShowHideColumnsButton table={table} />
+      <MRT_ToggleFullScreenButton table={table} />
+    </Box>
+    <Box>
+      <Button onClick={() => exportRows(table)} variant="contained">
+        Export table
+      </Button>
+    </Box>
+  </>
 )
