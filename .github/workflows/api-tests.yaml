@@ -27,6 +27,8 @@ jobs:
         run: npm run start:anon:api -- --wait -d
 
       - name: Run api-tests
+        env:
+          GEONAMES_USERNAME: {{ secrets.GEONAMES_USERNAME }}
         run: npm run test:ci:api
 
       - name: Dump docker logs on failure
