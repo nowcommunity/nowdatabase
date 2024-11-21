@@ -1,11 +1,11 @@
 import { useMemo } from 'react'
 import { type MRT_ColumnDef } from 'material-react-table'
-import { useGetAllCrossSearchQuery } from '../../redux/crossSearchReducer'
 import { CrossSearch } from '@/backendTypes'
 import { TableView } from '../TableView/TableView'
+import { useGetAllCrossSearchQuery } from '@/redux/crossSearchReducer'
 
 export const CrossSearchTable = ({ selectorFn }: { selectorFn?: (newObject: CrossSearch) => void }) => {
-  const CrossSearchQuery = useGetAllCrossSearchQuery()
+  const crossSearchQuery = useGetAllCrossSearchQuery()
   const columns = useMemo<MRT_ColumnDef<CrossSearch>[]>(
     () => [
       {
@@ -302,7 +302,7 @@ export const CrossSearchTable = ({ selectorFn }: { selectorFn?: (newObject: Cros
       idFieldName="lid"
       columns={columns}
       visibleColumns={visibleColumns}
-      data={CrossSearchQuery.data}
+      data={crossSearchQuery.data}
       url="crosssearch"
     />
   )

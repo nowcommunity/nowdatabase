@@ -1,6 +1,6 @@
+import type { CrossSearch } from '../../../../frontend/src/backendTypes'
 import { beforeAll, afterAll, describe, it, expect } from '@jest/globals'
-import { CrossSearch } from '../../../../frontend/src/backendTypes'
-import { resetDatabase, send, resetDatabaseTimeout } from '../utils'
+import { resetDatabase, send, resetDatabaseTimeout, login, logout } from '../utils'
 import { pool } from '../../utils/db'
 
 describe('Getting cross-search data works', () => {
@@ -12,9 +12,9 @@ describe('Getting cross-search data works', () => {
   })
 
   it('Requesting get all has correct length and status code', async () => {
-    const { body: getReqBody, status: getReqStatus } = await send(`crosssearch/all`, 'GET')
-    expect(getReqStatus).toEqual(200)
-    expect(getReqBody.length).toEqual(6)
+    const response = await send(`crosssearch/all`, 'GET')
+    expect(response.status).toEqual(200)
+    expect(response.body.length).toEqual(20)
   })
 
   it('Get all has some correct fields from locality and species', async () => {
@@ -46,5 +46,21 @@ describe('Getting cross-search data works', () => {
     const { body: getReqBody } = (await send(`crosssearch/all`, 'GET')) as { body: unknown } as { body: CrossSearch[] }
     const loclist = getReqBody.map(e => e.loc_name)
     expect(loclist).not.toContain('not in cross search')
+  })
+
+  it('Get all with admin has correct amount of data', async () => {
+    await login()
+    const response = await send(`crosssearch/all`, 'GET')
+    expect(response.status).toEqual(200)
+    expect(response.body.length).toEqual(22)
+    logout()
+  })
+
+  it('Get all with some projects has correct amount of data', async () => {
+    await login('testPl', 'test')
+    const response = await send(`crosssearch/all`, 'GET')
+    expect(response.status).toEqual(200)
+    expect(response.body.length).toEqual(21)
+    logout()
   })
 })
