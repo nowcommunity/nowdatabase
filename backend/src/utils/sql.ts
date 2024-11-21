@@ -7,17 +7,83 @@ export const generateFilteredCrossSearchSql = (usersProjects: Set<number>) => {
   const projectsArrayString = projectsArray.join(', ')
 
   return Prisma.sql`
-  SELECT 
+  SELECT
     now_loc.lid,
-    loc_name, 
+    loc_name,
+    now_loc.bfa_max,
+    bfa_min,
+    max_age,
+    min_age,
+    bfa_max_abs,
+    bfa_min_abs,
+    frac_max,
+    frac_min,
+    chron,
+    basin,
+    subbasin,
+    dms_lat,
+    dms_long,
+    dec_lat,
+    dec_long,
+    altitude,
     country,
-    com_species.species_id,
+    state,
+    county,
+    site_area,
+    gen_loc,
+    plate,
+    formation,
+    member,
+    bed,
+    com_species.species_id
+    subclass_or_superorder_name,
+    order_name,
+    suborder_or_superfamily_name,
+    family_name,
+    subfamily_name,
+    genus_name,
+    species_name,
+    unique_identifier,
+    taxonomic_status,
+    common_name,
+    sp_author,
+    strain,
+    gene,
+    com_species.body_mass,
+    brain_mass,
     now_loc.loc_status
   FROM 
     now_ls
   LEFT JOIN
     (SELECT
-      now_loc.lid,  loc_name, country, loc_status
+      now_loc.lid,
+      loc_name,
+      now_loc.bfa_max,
+      bfa_min,
+      max_age,
+      min_age,
+      bfa_max_abs,
+      bfa_min_abs,
+      frac_max,
+      frac_min,
+      chron,
+      basin,
+      subbasin,
+      dms_lat,
+      dms_long,
+      dec_lat,
+      dec_long,
+      altitude,
+      country,
+      state,
+      county,
+      site_area,
+      gen_loc,
+      plate,
+      formation,
+      member,
+      bed,
+      loc_status
     FROM
       now_loc
     LEFT JOIN
@@ -107,40 +173,6 @@ export const generateFilteredCrossSearchSqlWithNoUser = () => {
   `
 }
 
-export const generateFilteredCrossSearchSqlWithAdminTest = (
-  filter: ColumnFilterUrl[],
-  limit: number,
-  offset: number
-) => {
-  const sql = Prisma.sql`
-  SELECT 
-    now_loc.lid,
-    loc_name,
-    country,
-    com_species.species_id
-  FROM
-    now_ls
-  LEFT JOIN
-    now_loc
-  ON
-    now_ls.lid = now_loc.lid
-  LEFT JOIN
-    com_species
-  ON
-    now_ls.species_id = com_species.species_id
-  WHERE
-    ${constructFilterSql(filter)}
-  ORDER BY
-    now_loc.lid
-  LIMIT
-    ${limit}
-  OFFSET
-    ${offset}
-  ;`
-  console.log('final sql:', sql)
-  return sql
-}
-
 export const originalGenerateFilteredCrossSearchSqlWithAdmin = (limit: number, offset: number) => {
   return Prisma.sql`
   SELECT 
@@ -186,7 +218,8 @@ export const originalGenerateFilteredCrossSearchSqlWithAdmin = (limit: number, o
     strain,
     gene,
     com_species.body_mass,
-    brain_mass
+    brain_mass,
+    loc_status
   FROM
     now_ls
   LEFT JOIN
