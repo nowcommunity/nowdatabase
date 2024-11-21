@@ -20,7 +20,12 @@ jobs:
         with:
           node-version: 20
 
-      - name: 'Install root dependencies'
+      - name: Create env-files
+        env:
+          GEONAMES_USERNAME: ${{ secrets.GEONAMES_USERNAME }}
+        run: GEONAMES_USERNAME=$GEONAMES_USERNAME npm run config:all
+
+      - name: Install root dependencies
         run: npm ci
 
       - name: 'Start containers'

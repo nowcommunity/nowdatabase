@@ -20,6 +20,11 @@ jobs:
         with:
           node-version: 20
 
+      - name: Create env-files
+        env:
+          GEONAMES_USERNAME: ${{ secrets.GEONAMES_USERNAME }}
+        run: GEONAMES_USERNAME=$GEONAMES_USERNAME npm run config:all
+
       - name: 'Start containers'
         run: npm run start:anon:api -- --wait -d
 
