@@ -261,9 +261,7 @@ export const getCrossSearchRawSql = async (
     return result
   }
 
-  console.log('users projects:', usersProjects)
   const sql = generateFilteredCrossSearchSql(usersProjects)
-  console.log('sql:', sql)
   const result: Partial<CrossSearch>[] = await nowDb.$queryRaw(sql)
   return result
 }
