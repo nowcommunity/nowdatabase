@@ -432,7 +432,7 @@ export const FieldWithTableSelection = <T extends object, ParentType extends obj
       size="small"
       error={!!error}
       helperText={error ?? ''}
-      value={editData[targetField as keyof EditDataType<ParentType>]}
+      value={editData[targetField as keyof EditDataType<ParentType>] ?? undefined}
       onClick={() => setOpen(true)}
       disabled={disabled}
       sx={{ backgroundColor: disabled ? 'grey' : '' }}
@@ -510,7 +510,7 @@ export const TimeBoundSelection = <T extends object, ParentType extends object>(
       size="small"
       error={!!boundError}
       helperText={boundError ?? ''}
-      value={editData[targetField as keyof EditDataType<ParentType>]}
+      value={editData[targetField as keyof EditDataType<ParentType>] ?? undefined}
       onClick={() => setOpen(true)}
       disabled={disabled}
       sx={{ backgroundColor: disabled ? 'grey' : '' }}
