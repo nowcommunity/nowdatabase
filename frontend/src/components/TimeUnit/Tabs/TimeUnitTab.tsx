@@ -26,7 +26,6 @@ export const TimeUnitTab = () => {
   const timeUnit = [
     ['Name', textField('tu_display_name', { type: 'text', disabled: mode.new ? false : true })],
     ['Rank', dropdown('rank', rankOptions, 'Rank')],
-    ['Comment', textField('tu_comment')],
     [
       'Sequence',
       <FieldWithTableSelection<SequenceDetailsType, TimeUnitDetailsType>
@@ -36,6 +35,7 @@ export const TimeUnitTab = () => {
         selectorTable={<SequenceTable />}
       />,
     ],
+    ['Comment', textField('tu_comment')],
   ]
 
   const up_id = editData.up_bound ? editData.up_bound.bid : data.up_bound ? data.up_bound.bid : ''
