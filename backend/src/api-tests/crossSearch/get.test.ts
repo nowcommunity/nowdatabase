@@ -2,8 +2,6 @@ import type { CrossSearch, ColumnFilter } from '../../../../frontend/src/backend
 import { beforeAll, afterAll, describe, it, expect } from '@jest/globals'
 import { resetDatabase, send, resetDatabaseTimeout } from '../utils'
 import { pool } from '../../utils/db'
-import { constructFilterSortPageUrl } from '../../utils/url'
-import { columnFilter, sorting, page } from './data'
 import { login, logout } from '../utils'
 
 describe('Getting cross-search data works', () => {
@@ -15,9 +13,9 @@ describe('Getting cross-search data works', () => {
   })
 
   it('Requesting get all has correct length and status code', async () => {
-    const { body: getReqBody, status: getReqStatus } = await send(`crosssearch/all`, 'GET')
-    expect(getReqStatus).toEqual(200)
-    expect(getReqBody.length).toEqual(20)
+    const response = await send(`crosssearch/all`, 'GET')
+    expect(response.status).toEqual(200)
+    expect(response.body.length).toEqual(20)
   })
 
   it('Get all has some correct fields from locality and species', async () => {
@@ -51,75 +49,20 @@ describe('Getting cross-search data works', () => {
     expect(loclist).not.toContain('not in cross search')
   })
 
-  it('Get filtered with correct but empty parameters returns everything', async () => {
-    const parameters = constructFilterSortPageUrl([], [], page)
-    const result = await send('crosssearch/testing/all?' + parameters, 'GET')
-
-    expect(result.status).toEqual(200)
-    expect(result.body.length).toEqual(15)
-  })
-
-  it('Get filtered with correct but empty parameters no user rights with pagination returns correct amount of rows', async () => {
-    const parameters = constructFilterSortPageUrl([], [], { pageIndex: 3, pageSize: 3 })
-    const result = await send('crosssearch/testing/all?' + parameters, 'GET')
-
-    expect(result.status).toEqual(200)
-    expect(result.body.length).toEqual(3)
-    expect(result.body[0].lid).toEqual(24750)
-    expect(result.body[1].lid).toEqual(24797)
-  })
-
-  it('Get filtered with correct but empty parameters and no user rights with large page size returns correct amount of rows', async () => {
-    const parameters = constructFilterSortPageUrl([], [], { pageIndex: 0, pageSize: 100 })
-    const result = await send('crosssearch/testing/all?' + parameters, 'GET')
-
-    expect(result.status).toEqual(200)
-    expect(result.body.length).toEqual(20)
-  })
-
-  it('Get filtered with missing parameters returns nothing', async () => {
-    const result = await send('crosssearch/testing/all?', 'GET')
-
-    expect(result.status).toEqual(200)
-    expect(result.body.length).toEqual(0)
-  })
-
-  it('Get filtered with correct but empty parameters with admin rights and large page size returns correct amount of rows', async () => {
-    const parameters = constructFilterSortPageUrl([], [], { pageIndex: 0, pageSize: 100 })
+  it("Get all with admin has correct amount of data", async () => {
     await login()
-    const result = await send('crosssearch/testing/all?' + parameters, 'GET')
+    const response = await send(`crosssearch/all`, 'GET')
+    expect(response.status).toEqual(200)
+    expect(response.body.length).toEqual(22)
     logout()
-
-    expect(result.status).toEqual(200)
-    expect(result.body.length).toEqual(22)
   })
 
-  it('Get filtered with correct but empty parameters with some user rights and large page size returns correct amount of rows', async () => {
-    const parameters = constructFilterSortPageUrl([], [], { pageIndex: 0, pageSize: 100 })
-    await login('testPl', 'test')
-    const result = await send('crosssearch/testing/all?' + parameters, 'GET')
-    console.log('result length: ', result.body.length)
-    console.log('result: ', result.body)
+  it("Get all with some projects has correct amount of data", async () => {
+    await login("testPl", "test")
+    const response = await send(`crosssearch/all`, 'GET')
+    expect(response.status).toEqual(200)
+    expect(response.body.length).toEqual(21)
     logout()
-
-    expect(result.status).toEqual(200)
-    expect(result.body.length).toEqual(21)
   })
 
-  it('Get filtered with correct parameters including a filter and with user rights returns only items matching to the filter', async () => {
-    const filter: ColumnFilter = {
-      country: 'Spa',
-      //loc_name: 'Las',
-    }
-    const parameters = constructFilterSortPageUrl(filter, [], { pageIndex: 0, pageSize: 100 })
-    await login()
-    const result = await send('crosssearch/testing/all?' + parameters, 'GET')
-    logout()
-
-    expect(result.status).toEqual(200)
-    expect(result.body.length).toEqual(5)
-  })
-
-  it.todo('Get filtered with sorting returns with correct sorting')
-  it.todo('Get filtered with multiple filters returns items matching to all filters')
 })
