@@ -300,23 +300,3 @@ type ValidationErrorItem = {
   name: string
   error: string
 }
-
-
-export type ColumnFilter = Partial<CrossSearch>
-export type Sorting = SortingUrl
-export type Page = PageUrl
-
-export type ColumnFilterUrl = {
-  id: string
-  value: string
-}
-
-export type SortingUrl = {
-  id: string
-  desc: boolean
-}
-
-export type PageUrl = {
-  pageIndex: number
-  pageSize: number
-}
