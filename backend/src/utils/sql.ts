@@ -1,5 +1,3 @@
-import { ColumnFilterUrl } from '../../../frontend/src/backendTypes'
-import { constructFilterSql } from './url'
 import { Prisma } from '../../prisma/generated/now_test_client'
 
 export const generateFilteredCrossSearchSql = (usersProjects: Set<number>) => {
