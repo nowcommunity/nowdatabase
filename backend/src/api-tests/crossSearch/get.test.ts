@@ -1,8 +1,7 @@
 import type { CrossSearch } from '../../../../frontend/src/backendTypes'
 import { beforeAll, afterAll, describe, it, expect } from '@jest/globals'
-import { resetDatabase, send, resetDatabaseTimeout } from '../utils'
+import { resetDatabase, send, resetDatabaseTimeout, login, logout } from '../utils'
 import { pool } from '../../utils/db'
-import { login, logout } from '../utils'
 
 describe('Getting cross-search data works', () => {
   beforeAll(async () => {
@@ -49,7 +48,7 @@ describe('Getting cross-search data works', () => {
     expect(loclist).not.toContain('not in cross search')
   })
 
-  it("Get all with admin has correct amount of data", async () => {
+  it('Get all with admin has correct amount of data', async () => {
     await login()
     const response = await send(`crosssearch/all`, 'GET')
     expect(response.status).toEqual(200)
@@ -57,12 +56,11 @@ describe('Getting cross-search data works', () => {
     logout()
   })
 
-  it("Get all with some projects has correct amount of data", async () => {
-    await login("testPl", "test")
+  it('Get all with some projects has correct amount of data', async () => {
+    await login('testPl', 'test')
     const response = await send(`crosssearch/all`, 'GET')
     expect(response.status).toEqual(200)
     expect(response.body.length).toEqual(21)
     logout()
   })
-
 })

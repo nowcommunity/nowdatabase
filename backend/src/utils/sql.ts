@@ -238,7 +238,7 @@ export const originalGenerateFilteredCrossSearchSqlWithAdmin = (limit: number, o
 }
 
 export const generateFilteredCrossSearchSqlWithAdmin = () => {
-  let sql = Prisma.sql`
+  return Prisma.sql`
   SELECT 
     now_loc.lid,
     loc_name,
@@ -296,5 +296,4 @@ export const generateFilteredCrossSearchSqlWithAdmin = () => {
   ORDER BY
     now_loc.lid
     `
-  return sql
 }

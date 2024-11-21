@@ -236,10 +236,7 @@ export const getCrossSearchLength = async (user?: User) => {
     .length
 }
 
-export const getCrossSearchRawSql = async (
-  user: User | undefined
-) => {
-
+export const getCrossSearchRawSql = async (user: User | undefined) => {
   const showAll = user && [Role.Admin, Role.EditUnrestricted].includes(user.role)
   if (!user) {
     const sql = generateFilteredCrossSearchSqlWithNoUser()
