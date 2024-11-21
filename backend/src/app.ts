@@ -17,6 +17,7 @@ import timeUnitRouter from './routes/timeUnit'
 import userRouter from './routes/user'
 import emailRouter from './routes/email'
 import versionRouter from './routes/version'
+import geonamesRouter from './routes/geonames-api'
 import { responseLogger } from './middlewares/requestLogger'
 import compression from 'compression'
 import { ENABLE_WRITE, RUNNING_ENV } from './utils/config'
@@ -59,6 +60,7 @@ app.use('/museum', museumRouter)
 app.use('/sedimentary-structure', sedimentaryStructureRouter)
 app.use('/email', requireOneOf([Role.Admin]), emailRouter)
 app.use('/version', versionRouter)
+app.use('/geonames-api', geonamesRouter)
 if (RUNNING_ENV === 'dev') app.use('/test', testRouter)
 
 export const dateWhenStarted = new Date(Date.now())
