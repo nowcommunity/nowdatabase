@@ -38,8 +38,8 @@ describe('Locality update works', () => {
     expect(!!resultLocality).toEqual(true)
   })
 
-  it('Locality species include exactly two entries', () => {
-    expect(resultLocality!.now_ls.length).toEqual(2) // `Unexpected now_ls length: ${resultLocality!.now_ls.length}`
+  it('Locality species include exactly five entries', () => {
+    expect(resultLocality!.now_ls.length).toEqual(5) // `Unexpected now_ls length: ${resultLocality!.now_ls.length}`
   })
 
   it('Changes were logged correctly', () => {

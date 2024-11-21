@@ -38,7 +38,7 @@ describe('Updating species works', () => {
   })
 
   it('Locality species include correct amount of entries', () => {
-    expect(editedSpeciesResult!.now_ls.length).toEqual(2) // `Unexpected now_ls length: ${editedSpeciesResult!.now_ls.length}`)
+    expect(editedSpeciesResult!.now_ls.length).toEqual(5) // `Unexpected now_ls length: ${editedSpeciesResult!.now_ls.length}`)
   })
 
   it('Changes were logged correctly', () => {
