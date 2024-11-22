@@ -19,7 +19,7 @@ export const TimeBoundDetails = () => {
   const { id } = useParams()
   const isNew = id === 'new'
   if (isNew) {
-    document.title = 'New time bound'
+    document.title = 'New Time Bound'
   }
   const { isLoading, isFetching, isError, data } = useGetTimeBoundDetailsQuery(decodeURIComponent(id!), {
     skip: isNew,

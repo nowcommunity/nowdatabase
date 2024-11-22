@@ -20,7 +20,7 @@ export const TimeUnitDetails = () => {
   const { id } = useParams()
   const isNew = id === 'new'
   if (isNew) {
-    document.title = 'New time unit'
+    document.title = 'New Time Unit'
   }
   const { isLoading, isError, isFetching, data } = useGetTimeUnitDetailsQuery(encodeURIComponent(id!), { skip: isNew })
   const [editTimeUnitRequest] = useEditTimeUnitMutation()

@@ -36,6 +36,9 @@ export const ReferenceDetails = () => {
 
   if (isError) return <div>Error loading data</div>
   if (isFetching || (!data && !isNew) || mutationLoading) return <CircularProgress />
+  if (data) {
+    document.title = `Reference - ${data.title_primary}`
+  }
 
   const onWrite = async (editData: EditDataType<ReferenceDetailsType>) => {
     try {
