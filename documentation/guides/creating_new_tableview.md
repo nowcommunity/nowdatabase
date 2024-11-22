@@ -7,7 +7,7 @@ Following things are needed to create a new page with a table (examples are all 
   - The [App](../../backend/src/app.ts) should use the route.
   - A [route](../../backend/src/routes/crossSearch.ts) function calling the service.
   - A [service](../../backend/src/services/crossSearch.ts) to get the data from the database. There might be a necessities to clean the result, filter the result by project ids (pid) and user's permissions, and create a temp type for typescript.
-  - Earlier we used prisma.findMany-function to fetch the data, but with cross search's 90k rows, the GET-call took approx 40s in staging environment. We found out that prisma.rawSQL with LEFT JOIN would reduce time of the call from 10s to 3s in dev environment. Could possible be implemented for other tables also for better performance.
+  - Earlier we used prisma.findMany-function to fetch the data, but with cross search's 90k rows, the GET-call took approx 40s in staging environment. We found out that prisma.rawSQL with LEFT JOIN would reduce time of the call from 10s to 3s in dev environment. This reduced the call time for staging to approx 10s. Could possible be implemented for other tables also for better performance.
 
 - Frontend:
   - Create necessary types in [backendtypes](../../frontend/src/backendTypes.d.ts)
