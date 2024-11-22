@@ -21,6 +21,7 @@ import { DataValue } from './tabLayoutHelpers'
 import { modalStyle } from './misc'
 import { EditDataType } from '@/backendTypes'
 import { calculateLocalityMinAge, calculateLocalityMaxAge } from '@/util/ageCalculator'
+import { ValidationError } from '@/validators/validator'
 
 const fieldWidth = '14em'
 
@@ -41,6 +42,25 @@ const setDropdownOptionValue = (
   }
 }
 
+const checkFieldErrors = (
+  field: string,
+  error: ValidationError,
+  fieldsWithErrors: string[],
+  setFieldsWithErrors: (updaterFn: (prevErrors: Array<string>) => Array<string>) => void
+) => {
+  if (error && !fieldsWithErrors.includes(field)) {
+    // saves invalid field into array of errors in context
+    setFieldsWithErrors(prevErrors => {
+      return [...prevErrors, field]
+    })
+  } else if (!error && fieldsWithErrors.includes(field)) {
+    // removes valid field from the array
+    setFieldsWithErrors(prevErrors => {
+      return prevErrors.filter(err => err !== field)
+    })
+  }
+}
+
 export const DropdownSelector = <T extends object>({
   options,
   name,
@@ -56,18 +76,7 @@ export const DropdownSelector = <T extends object>({
   const { error } = validator(editData, field)
 
   useEffect(() => {
-    const errorField = String(field)
-    if (error && !fieldsWithErrors.includes(errorField)) {
-      // saves invalid field into array of errors in context
-      setFieldsWithErrors(prevErrors => {
-        return [...prevErrors, errorField]
-      })
-    } else if (!error && fieldsWithErrors.includes(errorField)) {
-      // removes valid field from the array
-      setFieldsWithErrors(prevErrors => {
-        return prevErrors.filter(err => err !== errorField)
-      })
-    }
+    checkFieldErrors(String(field), error, fieldsWithErrors, setFieldsWithErrors)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [error])
 
@@ -119,18 +128,7 @@ export const DropdownSelectorWithSearch = <T extends object>({
   const [inputValue, setInputValue] = useState('')
 
   useEffect(() => {
-    const errorField = String(field)
-    if (error && !fieldsWithErrors.includes(errorField)) {
-      // saves invalid field into array of errors in context
-      setFieldsWithErrors(prevErrors => {
-        return [...prevErrors, errorField]
-      })
-    } else if (!error && fieldsWithErrors.includes(errorField)) {
-      // removes valid field from the array
-      setFieldsWithErrors(prevErrors => {
-        return prevErrors.filter(err => err !== errorField)
-      })
-    }
+    checkFieldErrors(String(field), error, fieldsWithErrors, setFieldsWithErrors)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [error])
 
@@ -236,18 +234,7 @@ export const RadioSelector = <T extends object>({
   }, [editData])
 
   useEffect(() => {
-    const errorField = String(field)
-    if (error && !fieldsWithErrors.includes(errorField)) {
-      // saves invalid field into array of errors in context
-      setFieldsWithErrors(prevErrors => {
-        return [...prevErrors, errorField]
-      })
-    } else if (!error && fieldsWithErrors.includes(errorField)) {
-      // removes valid field from the array
-      setFieldsWithErrors(prevErrors => {
-        return prevErrors.filter(err => err !== errorField)
-      })
-    }
+    checkFieldErrors(String(field), error, fieldsWithErrors, setFieldsWithErrors)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [error])
 
@@ -321,18 +308,7 @@ export const EditableTextField = <T extends object>({
   const name = String(field)
 
   useEffect(() => {
-    const errorField = String(field)
-    if (error && !fieldsWithErrors.includes(errorField)) {
-      // saves invalid field into array of errors in context
-      setFieldsWithErrors(prevErrors => {
-        return [...prevErrors, errorField]
-      })
-    } else if (!error && fieldsWithErrors.includes(errorField)) {
-      // removes valid field from the array
-      setFieldsWithErrors(prevErrors => {
-        return prevErrors.filter(err => err !== errorField)
-      })
-    }
+    checkFieldErrors(String(field), error, fieldsWithErrors, setFieldsWithErrors)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [error])
 
@@ -392,18 +368,7 @@ export const FieldWithTableSelection = <T extends object, ParentType extends obj
   }
 
   useEffect(() => {
-    const errorField = String(targetField)
-    if (error && !fieldsWithErrors.includes(errorField)) {
-      // saves invalid field into array of errors in context
-      setFieldsWithErrors(prevErrors => {
-        return [...prevErrors, errorField]
-      })
-    } else if (!error && fieldsWithErrors.includes(errorField)) {
-      // removes valid field from the array
-      setFieldsWithErrors(prevErrors => {
-        return prevErrors.filter(err => err !== errorField)
-      })
-    }
+    checkFieldErrors(String(targetField), error, fieldsWithErrors, setFieldsWithErrors)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [error])
 
@@ -470,18 +435,7 @@ export const TimeBoundSelection = <T extends object, ParentType extends object>(
   }
 
   useEffect(() => {
-    const errorField = String(targetField)
-    if (boundError && !fieldsWithErrors.includes(errorField)) {
-      // saves invalid field into array of errors in context
-      setFieldsWithErrors(prevErrors => {
-        return [...prevErrors, errorField]
-      })
-    } else if (!boundError && fieldsWithErrors.includes(errorField)) {
-      // removes valid field from the array
-      setFieldsWithErrors(prevErrors => {
-        return prevErrors.filter(err => err !== errorField)
-      })
-    }
+    checkFieldErrors(String(targetField), boundError, fieldsWithErrors, setFieldsWithErrors)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [boundError])
 
@@ -568,18 +522,7 @@ export const BasisForAgeSelection = <T extends object, ParentType extends object
   }
 
   useEffect(() => {
-    const errorField = String(targetField)
-    if (error && !fieldsWithErrors.includes(errorField)) {
-      // saves invalid field into array of errors in context
-      setFieldsWithErrors(prevErrors => {
-        return [...prevErrors, errorField]
-      })
-    } else if (!error && fieldsWithErrors.includes(errorField)) {
-      // removes valid field from the array
-      setFieldsWithErrors(prevErrors => {
-        return prevErrors.filter(err => err !== errorField)
-      })
-    }
+    checkFieldErrors(String(targetField), error, fieldsWithErrors, setFieldsWithErrors)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [error])
 
