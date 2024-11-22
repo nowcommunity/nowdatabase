@@ -39,7 +39,9 @@ export const localityPage = (
     detailView={<LocalityDetails />}
     viewName="locality"
     idFieldName="lid"
-    createTitle={(loc: LocalityDetailsType) => `${loc.loc_name}`}
+    createTitle={(loc: LocalityDetailsType) =>
+      `${loc.lid} ${loc.loc_name}, ${loc.country} \n${loc.dms_lat}, ${loc.dms_long}\n${loc.max_age} Ma (${loc.bfa_max}) – ${loc.min_age} Ma (${loc.bfa_min})`
+    }
     getEditRights={(user: UserState, id: string | number) => {
       if ([Role.Admin, Role.EditUnrestricted].includes(user.role)) return fullRights
       if (user.role === Role.EditRestricted && user.localities.includes(id as number)) return limitedRights
@@ -69,7 +71,13 @@ export const speciesPage = (
     detailView={<SpeciesDetails />}
     viewName="species"
     idFieldName="species_id"
-    createTitle={(species: SpeciesDetailsType) => `${species.genus_name + ' ' + species.species_name}`}
+    createTitle={(species: SpeciesDetailsType) =>
+      `${species.species_id} ${species.genus_name + ' ' + species.species_name}` +
+      `\n${species.unique_identifier}` +
+      `\nOrder ${species.order_name}` +
+      `\nFamily ${species.family_name}` +
+      `\nSubfamily or Tribe ${species.subfamily_name}`
+    }
     getEditRights={(user: UserState) => {
       if ([Role.Admin, Role.EditUnrestricted].includes(user.role)) return fullRights
       if (user.role === Role.EditRestricted) return limitedRights
