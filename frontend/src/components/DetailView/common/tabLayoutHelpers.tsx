@@ -41,15 +41,17 @@ export const ArrayToTable = ({ array, half }: { array: Array<Array<ReactNode>>; 
 export const ArrayFrame = ({
   array,
   title,
-  highlighted,
+  warning,
+  error,
   half,
 }: {
   array: Array<Array<ReactNode>>
   title: string
-  highlighted?: boolean
+  warning?: boolean
+  error?: boolean
   half?: boolean
 }) => (
-  <Grouped title={title} highlighted={highlighted}>
+  <Grouped title={title} warning={warning} error={error}>
     <ArrayToTable half={half} array={array} />
   </Grouped>
 )
@@ -73,12 +75,14 @@ export const HalfFrames = ({ children }: { children: [ReactNode, ReactNode] }) =
 
 export const Grouped = ({
   title,
-  highlighted,
+  warning,
+  error,
   children,
   style,
 }: {
   title?: string
-  highlighted?: boolean
+  warning?: boolean
+  error?: boolean
   children: ReactNode
   style?: React.CSSProperties
 }) => {
@@ -87,16 +91,18 @@ export const Grouped = ({
     paddingBottom: '15px',
     backgroundColor: 'white',
     margin: '0em',
-    borderColor: highlighted ? 'orange' : '',
-    borderRadius: highlighted ? 4 : '',
-    borderStyle: highlighted ? 'none none none solid' : '',
+    borderColor: error ? 'red' : warning ? 'orange' : '',
+    borderRadius: error || warning ? 4 : '',
+    borderStyle: error || warning ? 'none none none solid' : '',
   }
+
+  const titleColor = error ? 'red' : warning ? 'orange' : 'text.secondary'
 
   return (
     <Card style={styles}>
       {title && (
         <>
-          <Typography sx={{ fontSize: 16 }} color="text.secondary" gutterBottom>
+          <Typography sx={{ fontSize: 16 }} color={titleColor} gutterBottom>
             {title}
           </Typography>
           <Divider />

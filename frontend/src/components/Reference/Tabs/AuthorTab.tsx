@@ -74,9 +74,11 @@ export const AuthorTab: React.FC<AuthorTabProps> = ({ field_num_param, tab_name 
     },
   ]
 
+  let title = tab_name ? tab_name : 'Authors'
+  if (hasError) title = title.concat(' (Required)')
   return (
-    <Box border={hasError ? `1px solid #d32f2f` : 'none'} borderRadius={1}>
-      <Grouped title={tab_name ? tab_name : 'Authors'}>
+    <Box>
+      <Grouped error={hasError} title={title}>
         {!mode.read && (
           <Box display="flex" gap={1}>
             <EditingForm<ReferenceAuthorType, ReferenceDetailsType>
