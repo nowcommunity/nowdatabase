@@ -15,6 +15,16 @@ interface AuthorTabProps {
   tab_name?: string | null
 }
 
+const tabNameToButtonText: { [tabName: string]: string } = {
+  Authors: 'author',
+  Editors: 'editor',
+  'Series Editors': 'editor',
+  'Editors of Issue': 'editor',
+  Sender: 'sender',
+  Recipient: 'recipient',
+  Recipients: 'recipient',
+}
+
 function checkIndexes(editData: EditDataType<ReferenceDetailsType>): boolean {
   let needsUpdate = false
   // First, check if any index is incorrect
@@ -74,13 +84,18 @@ export const AuthorTab: React.FC<AuthorTabProps> = ({ field_num_param, tab_name 
     },
   ]
 
+  let buttonText = 'Author'
+  if (tab_name && tabNameToButtonText[tab_name]) {
+    buttonText = tabNameToButtonText[tab_name]
+  }
+
   return (
     <Box border={hasError ? `1px solid #d32f2f` : 'none'} borderRadius={1}>
       <Grouped title={tab_name ? tab_name : 'Authors'}>
         {!mode.read && (
           <Box display="flex" gap={1}>
             <EditingForm<ReferenceAuthorType, ReferenceDetailsType>
-              buttonText="Add new author"
+              buttonText={`Add new ${buttonText}`}
               formFields={formFields}
               editAction={(newAuthor: ReferenceAuthorType) => {
                 const updatedAuthors = [
@@ -104,7 +119,7 @@ export const AuthorTab: React.FC<AuthorTabProps> = ({ field_num_param, tab_name 
               }}
             />
             <SelectingTable<ReferenceAuthorType, ReferenceDetailsType>
-              buttonText="Select Author"
+              buttonText={`Select ${buttonText}`}
               data={authorData}
               isError={isError}
               columns={authorColumns}
