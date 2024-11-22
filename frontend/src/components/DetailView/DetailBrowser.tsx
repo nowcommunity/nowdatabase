@@ -15,22 +15,14 @@ export const DetailBrowser = <T extends object>() => {
   const nextIndex = currentIndex + 1
   const previousIndex = currentIndex - 1
   const style = {
-    width: '18em',
+    width: '50em',
     marginLeft: '0em',
     overflow: 'hidden',
-    whiteSpace: 'nowrap',
+    whiteSpace: 'pre',
     textOverflow: 'ellipsis',
     position: 'relative',
     textAlign: 'left',
     fontSize: '2.3em',
-    '&::after': {
-      content: '""',
-      position: 'absolute',
-      right: 0,
-      width: '20%',
-      height: '100%',
-      background: 'linear-gradient(to right, transparent, white 50%)',
-    },
   }
   const getText = () => {
     if (mode.read) {
