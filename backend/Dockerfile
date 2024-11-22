@@ -2,6 +2,7 @@ FROM node:22-alpine3.20 AS backend-build
 
 ENV TZ="Europe/Helsinki"
 
+RUN  npm i -g npm
 WORKDIR /usr/src/app
 RUN mkdir -p /usr/src/app/frontend/src/validators
 
