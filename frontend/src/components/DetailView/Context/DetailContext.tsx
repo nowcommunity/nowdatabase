@@ -2,7 +2,7 @@
 import { ReactNode, createContext, useState, JSX, useEffect, Context, useContext } from 'react'
 import { DropdownOption } from '../common/editingComponents'
 import { cloneDeep } from 'lodash-es'
-import { ValidationObject } from '@/validators/validator'
+import { ValidationError, ValidationObject } from '@/validators/validator'
 import { EditDataType } from '@/backendTypes'
 import { TextFieldOptions, OptionalRadioSelectionProps } from '../DetailView'
 
@@ -75,8 +75,12 @@ export type DetailContextType<T> = {
     optionalRadioSelectionProps?: OptionalRadioSelectionProps
   ) => JSX.Element
   validator: (editData: EditDataType<T>, field: keyof EditDataType<T>) => ValidationObject
-  fieldsWithErrors: Array<string>
-  setFieldsWithErrors: (updaterFn: (prevErrors: Array<string>) => Array<string>) => void
+  fieldsWithErrors: { [field: string]: ValidationObject | null }
+  setFieldsWithErrors: (
+    updaterFn: (prevFieldsWithErrors: { [field: string]: ValidationObject | null }) => {
+      [field: string]: ValidationObject | null
+    }
+  ) => void
 }
 
 export const DetailContext = createContext<DetailContextType<unknown>>(null!)

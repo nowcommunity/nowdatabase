@@ -46,22 +46,6 @@ export const EditableTable = <
     useDetailContext<ParentType>()
   const { error } = validator(editData, field)
 
-  useEffect(() => {
-    const errorField = String(field)
-    if (error && !fieldsWithErrors.includes(errorField)) {
-      // saves invalid field into array of errors in context
-      setFieldsWithErrors(prevErrors => {
-        return [...prevErrors, errorField]
-      })
-    } else if (!error && fieldsWithErrors.includes(errorField)) {
-      // removes valid field from the array
-      setFieldsWithErrors(prevErrors => {
-        return prevErrors.filter(err => err !== errorField)
-      })
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [error])
-
   if (tableData === null || editTableData === null) return <CircularProgress />
 
   const actionRow = ({ row, staticRowIndex }: { row: MRT_Row<T>; staticRowIndex?: number | undefined }) => {

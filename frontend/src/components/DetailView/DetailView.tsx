@@ -74,8 +74,10 @@ export const DetailView = <T extends object>({
   }
   const { editRights } = usePageContext()
   const [mode, setModeState] = useState<ModeType>(isNew ? modeOptionToMode['new'] : modeOptionToMode['read'])
-  const [fieldsWithErrors, setFieldsWithErrors] = useState<Array<string>>([])
+  const [fieldsWithErrors, setFieldsWithErrors] = useState<{ [field: string]: ValidationObject | null }>({})
   const [tab, setTab] = useState(getUrl())
+
+  console.log(fieldsWithErrors)
 
   useEffect(() => {
     setSearchParams(

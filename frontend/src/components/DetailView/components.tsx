@@ -31,24 +31,28 @@ export const WriteButton = <T,>({
     if (mode.option === 'edit' || mode.option === 'new') {
       for (const field in editData) {
         const fieldAsString = String(field)
-        const { error } = validator(editData, field)
-        if (error && !fieldsWithErrors.includes(fieldAsString)) {
-          setFieldsWithErrors(prevErrors => {
-            return [...prevErrors, field]
-          })
-        } else if (!error && fieldsWithErrors.includes(fieldAsString)) {
-          setFieldsWithErrors(prevErrors => {
-            return prevErrors.filter(err => err !== fieldAsString)
+        const errorObject = validator(editData, field)
+        if (errorObject.error) {
+          if (!fieldsWithErrors[fieldAsString] || !fieldsWithErrors[fieldAsString].error) {
+            setFieldsWithErrors(prevFieldsWithErrors => {
+              return { ...prevFieldsWithErrors, [fieldAsString]: errorObject }
+            })
+          }
+        } else if (!errorObject.error && fieldsWithErrors[fieldAsString] && fieldsWithErrors[fieldAsString].error) {
+          setFieldsWithErrors(prevFieldsWithErrors => {
+            const newthing = prevFieldsWithErrors
+            delete newthing[fieldAsString]
+            return newthing
           })
         }
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [mode])
+  }, [mode, editData])
 
   return (
     <Button
-      disabled={fieldsWithErrors.length > 0}
+      disabled={Object.keys(fieldsWithErrors).length > 0}
       id="write-button"
       sx={{ width: '20em' }}
       onClick={() => {
