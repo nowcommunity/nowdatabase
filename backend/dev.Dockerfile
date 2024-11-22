@@ -3,6 +3,7 @@ FROM node:22-alpine3.20
 ENV TZ="Europe/Helsinki"
 
 RUN apk --no-cache add curl
+RUN  npm i -g npm
 
 USER node
 WORKDIR /usr/src/app
