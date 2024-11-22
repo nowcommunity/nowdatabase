@@ -104,12 +104,12 @@ export const TimeUnitTab = () => {
         <ArrayFrame
           array={upBound}
           title={upperBoundTitle}
-          highlighted={upperBoundTitle === 'Upper bound (edited)' ? true : false}
+          warning={upperBoundTitle === 'Upper bound (edited)' ? true : false}
         />
         <ArrayFrame
           array={lowBound}
           title={lowerBoundTitle}
-          highlighted={lowerBoundTitle === 'Lower bound (edited)' ? true : false}
+          warning={lowerBoundTitle === 'Lower bound (edited)' ? true : false}
         />
       </>
     </>
