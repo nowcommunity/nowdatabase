@@ -6,6 +6,7 @@ import { usePageContext } from '../Page'
 import { useDetailContext } from './Context/DetailContext'
 import { EditDataType } from '@/backendTypes'
 import { useState, useEffect, Fragment } from 'react'
+import { referenceValidator } from '@/validators/validator'
 
 export const WriteButton = <T,>({
   onWrite,
@@ -17,7 +18,6 @@ export const WriteButton = <T,>({
   const { editData, setEditData, mode, setMode, validator, fieldsWithErrors, setFieldsWithErrors } =
     useDetailContext<T>()
   const [loading, setLoading] = useState(false)
-
   const getButtonText = () => {
     if (!mode.staging) return hasStagingMode ? 'Finalize entry' : 'Save changes'
     return 'Complete and save'
@@ -47,8 +47,17 @@ export const WriteButton = <T,>({
         }
       }
     }
+    if (mode.staging === true) {
+      let error: string | null | undefined = null
+      error = referenceValidator(editData.references)
+      if (error && !fieldsWithErrors.includes('references')) {
+        setFieldsWithErrors(prevErrors => [...prevErrors, 'references'])
+      } else if (!error && fieldsWithErrors.includes('references')) {
+        setFieldsWithErrors(prevErrors => prevErrors.filter(err => err !== 'references'))
+      }
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [mode])
+  }, [mode, editData.references])
 
   return (
     <Button

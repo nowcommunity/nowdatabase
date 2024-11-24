@@ -1,3 +1,5 @@
+import { Editable, Reference } from '@/backendTypes'
+
 export type ValidationError = string | null | undefined
 export type ValidationObject = { name: string; error: ValidationError }
 
@@ -67,4 +69,30 @@ export const validator = <T>(
 
   const validationError = validate(fieldValidator, fieldValidator.useEditData ? editData : editData[fieldName])
   return { name: fieldValidator.name, error: validationError }
+}
+
+export const referenceValidator: (references: Editable<Reference>[]) => ValidationError = (
+  references: Editable<Reference>[]
+) => {
+  if (references.length === 0) {
+    return 'There must be at least one reference'
+  }
+
+  // new references have rowState = 'new', old ones don't have a rowState and references that will be deleted have rowstate='removed'
+  // so checking the update has at least one reference that's not queued for removal
+  let nonRemovedReference = false
+  for (const reference of references) {
+    if (reference.rowState && reference.rowState !== 'removed') {
+      nonRemovedReference = true
+      break
+    }
+    if (!reference.rowState) {
+      nonRemovedReference = true
+      break
+    }
+  }
+  if (!nonRemovedReference) {
+    return 'There must be at least one reference'
+  }
+  return null
 }
