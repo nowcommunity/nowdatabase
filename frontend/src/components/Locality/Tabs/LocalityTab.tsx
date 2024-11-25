@@ -18,13 +18,14 @@ export const LocalityTab = () => {
   const { editData, setEditData } = useDetailContext<LocalityDetailsType>()
 
   const approximateCoordinatesOptions = [
+    emptyOption,
     { display: 'No', value: 'false' },
     { display: 'Yes', value: 'true' },
   ]
   const generalLocalityOptions = [emptyOption, { display: 'No', value: 'n' }, { display: 'Yes', value: 'y' }]
 
   const siteAreaOptions = [
-    '',
+    emptyOption,
     { display: '<10 m2', value: '<10m2' },
     { display: '10-50 m2', value: '10-50m2' },
     { display: '50-100 m2', value: '50-100m2' },

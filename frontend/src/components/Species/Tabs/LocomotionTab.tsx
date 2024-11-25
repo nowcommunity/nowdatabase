@@ -1,12 +1,13 @@
 import { SpeciesDetailsType } from '@/backendTypes'
 import { ArrayFrame, HalfFrames } from '@/components/DetailView/common/tabLayoutHelpers'
 import { useDetailContext } from '@/components/DetailView/Context/DetailContext'
+import { emptyOption } from '@/components/DetailView/common/misc'
 
 export const LocomotionTab = () => {
   const { dropdown } = useDetailContext<SpeciesDetailsType>()
 
   const feedingHabitat1Options = [
-    '',
+    emptyOption,
     { display: 'Aerial', value: 'ae' },
     { display: 'Aquatic', value: 'aq' },
     { display: 'Semi-aquatic', value: 'sa' },
@@ -14,7 +15,7 @@ export const LocomotionTab = () => {
   ]
 
   const feedingHabitat2Options = [
-    '',
+    emptyOption,
     { display: 'Feeds primarily while in flight', value: 'aerial' },
     { display: 'Feeds in the trees, never on ground', value: 'canopy' },
     { display: 'Feeds on ground and on trunk, lower branches, or even canopy of trees', value: 'arb/surf' },
@@ -25,7 +26,7 @@ export const LocomotionTab = () => {
   ]
 
   const shelterHabitat1Options = [
-    '',
+    emptyOption,
     { display: 'Aerial', value: 'ae' },
     { display: 'Terrestrial', value: 'te' },
     { display: 'Semi-aquatic', value: 'sa' },
@@ -33,7 +34,7 @@ export const LocomotionTab = () => {
   ]
 
   const shelterHabitat2Options = [
-    '',
+    emptyOption,
     { display: 'Shelters in the trees, never on ground', value: 'canopy' },
     { display: 'Shelters on ground or on trunk, lower branches of trees', value: 'arb/surf' },
     { display: 'Caves', value: 'caves' },
@@ -42,7 +43,7 @@ export const LocomotionTab = () => {
     { display: 'Shelters under or at water surface', value: 'aquatic' },
   ]
   const locomotion1Options = [
-    '',
+    emptyOption,
     { display: 'Aerial', value: 'ae' },
     { display: 'Terrestrial', value: 'te' },
     { display: 'Semi-aquatic', value: 'sa' },
@@ -50,7 +51,7 @@ export const LocomotionTab = () => {
   ]
 
   const locomotion2Options = [
-    '',
+    emptyOption,
     { display: 'Aerial', value: 'aerial' },
     { display: 'Active flying: most birds, bats', value: 'pow_flight' },
     { display: 'Gliding, soaring', value: 'npow_flight' },
@@ -62,7 +63,7 @@ export const LocomotionTab = () => {
   ]
 
   const locomotion3Options = [
-    '',
+    emptyOption,
     { display: 'Arboreal, above branch', value: 'arb_above_br' },
     { display: 'Arboreal, below-branch suspensory', value: 'arb_suspensory' },
     { display: 'Bipedal striding', value: 'bipedal_str' },
@@ -85,7 +86,7 @@ export const LocomotionTab = () => {
   ]
 
   const activityOptions = [
-    '',
+    emptyOption,
     { display: 'Diurnal', value: 'd' },
     { display: 'Crepuscular', value: 'c' },
     { display: 'Nocturnal', value: 'n' },
