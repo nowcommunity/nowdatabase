@@ -1,5 +1,5 @@
 import { beforeEach, beforeAll, afterAll, describe, it, expect } from '@jest/globals'
-import { ReferenceDetailsType } from '../../../../frontend/src/backendTypes'
+import { ReferenceDetailsType } from '../../../../frontend/src/shared/types'
 //import { LogRow } from '../../services/write/writeOperations/types'
 import { newReferenceBasis, emptyReferenceBasis } from './data'
 import { login, logout, resetDatabase, send, /*testLogRows,*/ resetDatabaseTimeout, noPermError } from '../utils'

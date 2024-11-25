@@ -4,7 +4,7 @@ import { SelectingTable } from './common/SelectingTable'
 import { useGetAllReferencesQuery } from '@/redux/referenceReducer'
 import { referenceTableColumns } from '@/common'
 import { MRT_RowData } from 'material-react-table'
-import { Editable, Reference } from '@/backendTypes'
+import { Editable, Reference } from '@/shared/types'
 import { EditableTable } from './common/EditableTable'
 
 export const StagingView = <T extends MRT_RowData>() => {

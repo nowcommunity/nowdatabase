@@ -38,7 +38,7 @@ Not possible trough the interface. However if still necessary, here's some thing
     * You should create a new entry to the table for all of the connections between the new field & the 14 reference types & set the visibility to true or false depending on if you want the new field to be visible to the reference type
     * The field itself is not defined in one specific place and is something more of an emergent entity from all of these connections
     * The new field's field_name needs to match the name of the field in ref_ref where the information will be saved
-* Most of the types relating to references need to be edited in forntend/src/backendTypes.ts
+* Most of the types relating to references need to be edited in forntend/src/shared/types.ts
 
 * You can accomplish the above in testdata/sqlfiles/now_test.sql by adding some rows. Rows 3200+ add the existing fields so looks for help there
 

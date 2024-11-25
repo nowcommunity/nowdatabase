@@ -1,4 +1,4 @@
-import { ReferenceOfUpdate, UpdateLog } from '@/backendTypes'
+import { ReferenceOfUpdate, UpdateLog } from '@/shared/types'
 import { useDetailContext } from '@/components/DetailView/Context/DetailContext'
 import { EditingModal } from '@/components/DetailView/common/EditingModal'
 import { SimpleTable } from '@/components/DetailView/common/SimpleTable'

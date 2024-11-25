@@ -1,4 +1,4 @@
-import { SpeciesDetailsType } from '@/backendTypes'
+import { SpeciesDetailsType } from '@/shared/types'
 import { ArrayFrame, HalfFrames } from '@/components/DetailView/common/tabLayoutHelpers'
 import { useDetailContext } from '@/components/DetailView/Context/DetailContext'
 

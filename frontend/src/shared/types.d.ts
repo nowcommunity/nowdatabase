@@ -1,6 +1,6 @@
-import * as Prisma from '../../backend/prisma/generated/now_test_client/default'
-import * as LogPrisma from '../../backend/prisma/generated/now_log_test_client/default'
-import { Role } from './types'
+import * as Prisma from '../../../backend/prisma/generated/now_test_client/default'
+import * as LogPrisma from '../../../backend/prisma/generated/now_log_test_client/default'
+import { Role } from '../types'
 
 export type User = {
   username: string

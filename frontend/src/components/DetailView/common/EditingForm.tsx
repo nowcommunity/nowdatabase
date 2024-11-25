@@ -1,7 +1,7 @@
 import { Box, TextField } from '@mui/material'
 import { EditingModal } from './EditingModal'
 import { useForm } from 'react-hook-form'
-import { EditDataType, Editable } from '@/backendTypes'
+import { EditDataType, Editable } from '@/shared/types'
 import { useDetailContext } from '../Context/DetailContext'
 
 export type EditingFormField = { name: string; label: string; required?: boolean }

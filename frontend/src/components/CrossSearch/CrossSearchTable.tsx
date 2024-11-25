@@ -1,6 +1,6 @@
 import { useMemo } from 'react'
 import { type MRT_ColumnDef } from 'material-react-table'
-import { CrossSearch } from '@/backendTypes'
+import { CrossSearch } from '@/shared/types'
 import { TableView } from '../TableView/TableView'
 import { useGetAllCrossSearchQuery } from '@/redux/crossSearchReducer'
 

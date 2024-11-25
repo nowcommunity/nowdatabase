@@ -1,4 +1,4 @@
-import { PersonDetailsType } from '@/backendTypes'
+import { PersonDetailsType } from '@/shared/types'
 import { ArrayFrame, Grouped } from '../../DetailView/common/tabLayoutHelpers'
 import { useDetailContext } from '@/components/DetailView/Context/DetailContext'
 import { formatLastLoginDate } from '@/common'

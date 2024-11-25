@@ -1,4 +1,4 @@
-import { SedimentaryStructureValues } from '@/backendTypes'
+import { SedimentaryStructureValues } from '@/shared/types'
 import { api } from './api'
 
 const sedimentaryStructuresApi = api.injectEndpoints({

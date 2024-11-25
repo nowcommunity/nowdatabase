@@ -1,4 +1,4 @@
-import { SequenceDetailsType, TimeBoundDetailsType, TimeUnitDetailsType } from '@/backendTypes'
+import { SequenceDetailsType, TimeBoundDetailsType, TimeUnitDetailsType } from '@/shared/types'
 import { FieldWithTableSelection, TimeBoundSelection } from '@/components/DetailView/common/editingComponents'
 import { emptyOption } from '@/components/DetailView/common/misc'
 import { ArrayFrame } from '@/components/DetailView/common/tabLayoutHelpers'

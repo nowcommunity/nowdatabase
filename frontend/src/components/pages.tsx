@@ -7,7 +7,7 @@ import {
   PersonDetailsType,
   ProjectDetailsType,
   RegionDetails as RegionDetailsType,
-} from '@/backendTypes'
+} from '@/shared/types'
 import { CrossSearchTable } from './CrossSearch/CrossSearchTable'
 import { LocalityDetails } from './Locality/LocalityDetails'
 import { LocalityTable } from './Locality/LocalityTable'

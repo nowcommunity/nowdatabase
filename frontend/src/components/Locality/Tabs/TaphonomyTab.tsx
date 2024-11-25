@@ -1,4 +1,4 @@
-import { Editable, LocalityDetailsType, CollectingMethod } from '@/backendTypes'
+import { Editable, LocalityDetailsType, CollectingMethod } from '@/shared/types'
 import { useDetailContext } from '@/components/DetailView/Context/DetailContext'
 import { Grouped, ArrayFrame, HalfFrames } from '@/components/DetailView/common/tabLayoutHelpers'
 import { MRT_ColumnDef } from 'material-react-table'

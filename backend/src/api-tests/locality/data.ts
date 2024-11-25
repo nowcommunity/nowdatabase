@@ -1,4 +1,4 @@
-import { Reference, SpeciesDetailsType } from '../../../../frontend/src/backendTypes'
+import { Reference, SpeciesDetailsType } from '../../../../frontend/src/shared/types'
 
 export const newLocalityBasis = {
   bfa_max: 'bahean',

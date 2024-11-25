@@ -1,4 +1,4 @@
-import { Museum } from '@/backendTypes'
+import { Museum } from '@/shared/types'
 import { api } from './api'
 
 const museumsApi = api.injectEndpoints({

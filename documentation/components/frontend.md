@@ -45,7 +45,7 @@ The context can also be used to access, for example, the **setEditData** setter,
 
 **Documentation for validators**
 
-[Validators](../../frontend/src/validators/README.md)
+[Validators](../../frontend/src/shared/validators/README.md)
 
 **editingComponents**
 

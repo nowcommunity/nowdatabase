@@ -1,5 +1,5 @@
 /* eslint-disable react/prop-types */
-import { ReferenceDetailsType, ReferenceJournalType } from '@/backendTypes'
+import { ReferenceDetailsType, ReferenceJournalType } from '@/shared/types'
 import { EditableTable } from '@/components/DetailView/common/EditableTable'
 import { EditingForm } from '@/components/DetailView/common/EditingForm'
 import { SelectingTable } from '@/components/DetailView/common/SelectingTable'

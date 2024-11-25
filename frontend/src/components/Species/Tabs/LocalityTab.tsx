@@ -1,4 +1,4 @@
-import { Editable, Locality, SpeciesDetailsType } from '@/backendTypes'
+import { Editable, Locality, SpeciesDetailsType } from '@/shared/types'
 import { Grouped } from '@/components/DetailView/common/tabLayoutHelpers'
 import { EditableTable } from '@/components/DetailView/common/EditableTable'
 import { useDetailContext } from '@/components/DetailView/Context/DetailContext'

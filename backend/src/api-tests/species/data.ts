@@ -1,4 +1,4 @@
-import { EditDataType, EditMetaData, Reference, SpeciesDetailsType } from '../../../../frontend/src/backendTypes'
+import { EditDataType, EditMetaData, Reference, SpeciesDetailsType } from '../../../../frontend/src/shared/types'
 
 export const newSpeciesBasis: EditDataType<SpeciesDetailsType> = {
   class_name: 'Mammalia',

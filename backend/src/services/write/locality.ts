@@ -1,4 +1,4 @@
-import { EditDataType, LocalityDetailsType, Reference, User } from '../../../../frontend/src/backendTypes'
+import { EditDataType, LocalityDetailsType, Reference, User } from '../../../../frontend/src/shared/types'
 import { NOW_DB_NAME } from '../../utils/config'
 import { WriteHandler } from './writeOperations/writeHandler'
 import { getFieldsOfTables } from '../../utils/db'

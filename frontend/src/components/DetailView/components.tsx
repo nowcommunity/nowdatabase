@@ -4,7 +4,7 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack'
 import SaveIcon from '@mui/icons-material/Save'
 import { usePageContext } from '../Page'
 import { useDetailContext } from './Context/DetailContext'
-import { EditDataType } from '@/backendTypes'
+import { EditDataType } from '@/shared/types'
 import { useState, useEffect } from 'react'
 
 export const WriteButton = <T,>({

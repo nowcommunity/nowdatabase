@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react'
-import { ReferenceDetailsType, ReferenceAuthorType, RowState, EditDataType } from '@/backendTypes'
+import { ReferenceDetailsType, ReferenceAuthorType, RowState, EditDataType } from '@/shared/types'
 import { EditableTable } from '@/components/DetailView/common/EditableTable'
 import { EditingForm } from '@/components/DetailView/common/EditingForm'
 import { SelectingTable } from '@/components/DetailView/common/SelectingTable'

@@ -1,8 +1,8 @@
 import { logDb, nowDb } from '../utils/db'
-import { validateTimeBound } from '../../../frontend/src/validators/timeBound'
-import { TimeBoundDetailsType, EditDataType } from '../../../frontend/src/backendTypes'
+import { validateTimeBound } from '../../../frontend/src/shared/validators/timeBound'
+import { TimeBoundDetailsType, EditDataType } from '../../../frontend/src/shared/types'
 import Prisma from '../../prisma/generated/now_test_client'
-import { ValidationObject } from '../../../frontend/src/validators/validator'
+import { ValidationObject } from '../../../frontend/src/shared/validators/validator'
 
 export const getAllTimeBounds = async () => {
   const result = await nowDb.now_tu_bound.findMany({

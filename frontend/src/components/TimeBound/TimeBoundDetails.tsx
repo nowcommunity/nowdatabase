@@ -1,4 +1,4 @@
-import { EditDataType, TimeBoundDetailsType, ValidationErrors } from '@/backendTypes.js'
+import { EditDataType, TimeBoundDetailsType, ValidationErrors } from '@/shared/types.js'
 import { useNotify } from '@/hooks/notification.ts'
 import { CircularProgress } from '@mui/material'
 import { useEffect } from 'react'
@@ -13,7 +13,7 @@ import { UpdateTab } from '../DetailView/common/UpdateTab.tsx'
 import { DetailView, TabType } from '../DetailView/DetailView'
 import { BoundTab } from './Tabs/BoundTab'
 import { TimeUnitTab } from './Tabs/TimeUnitTab.tsx'
-import { validateTimeBound } from '@/validators/timeBound.ts'
+import { validateTimeBound } from '@/shared/validators/timeBound.ts'
 
 export const TimeBoundDetails = () => {
   const { id } = useParams()

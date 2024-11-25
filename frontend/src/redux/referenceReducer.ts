@@ -6,7 +6,7 @@ import {
   ReferenceDetailsType,
   ReferenceJournalType,
   ReferenceType,
-} from '@/backendTypes'
+} from '@/shared/types'
 
 const referencesApi = api.injectEndpoints({
   endpoints: builder => ({

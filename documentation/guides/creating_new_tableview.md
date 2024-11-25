@@ -10,7 +10,7 @@ Following things are needed to create a new page with a table (examples are all 
   - Earlier we used prisma.findMany-function to fetch the data, but with cross search's 90k rows, the GET-call took approx 40s in staging environment. We found out that prisma.rawSQL with LEFT JOIN would reduce time of the call from 10s to 3s in dev environment. This reduced the call time for staging to approx 10s. Could possible be implemented for other tables also for better performance.
 
 - Frontend:
-  - Create necessary types in [backendtypes](../../frontend/src/backendTypes.d.ts)
+  - Create necessary types in [backendtypes](../../frontend/src/shared/types.d.ts)
   - Create a button for the component in [navigation bar](../../frontend/src/components/NavBar.tsx)
   - Create a relevant page-object for [Pages](../../frontend/src/components/pages.tsx)
   - Add a route for the component to [App](../../frontend/src/App.tsx)

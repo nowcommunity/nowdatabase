@@ -1,4 +1,4 @@
-import { TimeUnit, TimeBoundDetailsType } from '@/backendTypes'
+import { TimeUnit, TimeBoundDetailsType } from '@/shared/types'
 import { useGetTimeBoundTimeUnitsQuery } from '@/redux/timeBoundReducer'
 import { CircularProgress } from '@mui/material'
 import { useDetailContext } from '@/components/DetailView/Context/DetailContext'

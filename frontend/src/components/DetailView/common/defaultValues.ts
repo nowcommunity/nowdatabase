@@ -4,7 +4,7 @@ import {
   SpeciesDetailsType,
   TimeBoundDetailsType,
   TimeUnitDetailsType,
-} from '@/backendTypes'
+} from '@/shared/types'
 
 export const emptyLocality = {
   bfa_max: '',

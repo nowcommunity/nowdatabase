@@ -1,4 +1,4 @@
-import { EditDataType, TimeUnitDetailsType, ValidationErrors } from '@/backendTypes'
+import { EditDataType, TimeUnitDetailsType, ValidationErrors } from '@/shared/types'
 import { useNotify } from '@/hooks/notification'
 import { CircularProgress } from '@mui/material'
 import { useEffect } from 'react'
@@ -13,7 +13,7 @@ import { UpdateTab } from '../DetailView/common/UpdateTab'
 import { DetailView, TabType } from '../DetailView/DetailView'
 import { LocalityTab } from './Tabs/LocalityTab'
 import { TimeUnitTab } from './Tabs/TimeUnitTab'
-import { validateTimeUnit } from '@/validators/timeUnit'
+import { validateTimeUnit } from '@/shared/validators/timeUnit'
 import { makeEditData } from '../DetailView/Context/DetailContext'
 
 export const TimeUnitDetails = () => {

@@ -1,7 +1,7 @@
 import { logDb, nowDb } from '../utils/db'
-import { EditDataType, TimeUnitDetailsType } from '../../../frontend/src/backendTypes'
-import { ValidationObject } from '../../../frontend/src/validators/validator'
-import { validateTimeUnit } from '../../../frontend/src/validators/timeUnit'
+import { EditDataType, TimeUnitDetailsType } from '../../../frontend/src/shared/types'
+import { ValidationObject } from '../../../frontend/src/shared/validators/validator'
+import { validateTimeUnit } from '../../../frontend/src/shared/validators/timeUnit'
 
 export const getAllTimeUnits = async () => {
   const result = await nowDb.now_time_unit.findMany({

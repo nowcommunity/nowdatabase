@@ -1,7 +1,7 @@
 import { useMemo } from 'react'
 import { type MRT_ColumnDef } from 'material-react-table'
 import { useGetAllSpeciesQuery } from '../../redux/speciesReducer'
-import { Species } from '@/backendTypes'
+import { Species } from '@/shared/types'
 import { TableView } from '../TableView/TableView'
 
 export const SpeciesTable = ({ selectorFn }: { selectorFn?: (id: Species) => void }) => {

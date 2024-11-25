@@ -1,5 +1,5 @@
 import { api } from './api'
-import { Project, ProjectDetailsType } from '@/backendTypes'
+import { Project, ProjectDetailsType } from '@/shared/types'
 
 const projectsApi = api.injectEndpoints({
   endpoints: builder => ({

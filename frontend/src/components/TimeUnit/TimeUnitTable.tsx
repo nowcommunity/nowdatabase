@@ -1,7 +1,7 @@
 import { useMemo } from 'react'
 import { type MRT_ColumnDef } from 'material-react-table'
 import { useGetAllTimeUnitsQuery } from '../../redux/timeUnitReducer'
-import { TimeUnit } from '@/backendTypes'
+import { TimeUnit } from '@/shared/types'
 import { TableView } from '../TableView/TableView'
 
 export const TimeUnitTable = ({ selectorFn }: { selectorFn?: (newTimeUnit: TimeUnit) => void }) => {

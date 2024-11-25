@@ -8,7 +8,7 @@ RUN  npm i -g npm
 USER node
 WORKDIR /usr/src/app
 
-RUN mkdir -p /usr/src/app/frontend/src/validators
+RUN mkdir -p /usr/src/app/frontend/src/shared/validators
 
 COPY --chown=node ./backend/package.json backend/
 COPY --chown=node ./backend/package-lock.json backend/

@@ -1,5 +1,5 @@
 import { api } from './api'
-import { EditDataType, Species, SpeciesDetailsType } from '@/backendTypes'
+import { EditDataType, Species, SpeciesDetailsType } from '@/shared/types'
 
 const speciesApi = api.injectEndpoints({
   endpoints: builder => ({

@@ -1,4 +1,4 @@
-import { LocalityDetailsType, LocalitySpecies, Species, SpeciesDetailsType } from '@/backendTypes'
+import { LocalityDetailsType, LocalitySpecies, Species, SpeciesDetailsType } from '@/shared/types'
 import { EditableTable } from '@/components/DetailView/common/EditableTable'
 import { EditingForm } from '@/components/DetailView/common/EditingForm'
 import { SelectingTable } from '@/components/DetailView/common/SelectingTable'
