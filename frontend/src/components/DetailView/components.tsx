@@ -40,15 +40,15 @@ export const WriteButton = <T,>({
           }
         } else if (!errorObject.error && fieldsWithErrors[fieldAsString] && fieldsWithErrors[fieldAsString].error) {
           setFieldsWithErrors(prevFieldsWithErrors => {
-            const newthing = prevFieldsWithErrors
-            delete newthing[fieldAsString]
-            return newthing
+            const newFieldsWithErrors = { ...prevFieldsWithErrors }
+            delete newFieldsWithErrors[fieldAsString]
+            return newFieldsWithErrors
           })
         }
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [mode, editData])
+  }, [mode])
 
   return (
     <Button

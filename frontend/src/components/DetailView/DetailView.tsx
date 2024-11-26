@@ -46,6 +46,11 @@ export type OptionalRadioSelectionProps = {
   handleSetEditData?: (value: number | string | boolean) => void
 }
 
+export type fieldsWithErrorsType = { [field: string]: ValidationObject | null }
+export type setFieldsWithErrorsType = (
+  updaterFn: (prevFieldsWithErrors: fieldsWithErrorsType) => fieldsWithErrorsType
+) => void
+
 export const DetailView = <T extends object>({
   tabs,
   data,
@@ -74,10 +79,8 @@ export const DetailView = <T extends object>({
   }
   const { editRights } = usePageContext()
   const [mode, setModeState] = useState<ModeType>(isNew ? modeOptionToMode['new'] : modeOptionToMode['read'])
-  const [fieldsWithErrors, setFieldsWithErrors] = useState<{ [field: string]: ValidationObject | null }>({})
+  const [fieldsWithErrors, setFieldsWithErrors] = useState<fieldsWithErrorsType>({})
   const [tab, setTab] = useState(getUrl())
-
-  console.log(fieldsWithErrors)
 
   useEffect(() => {
     setSearchParams(
