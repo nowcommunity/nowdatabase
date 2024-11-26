@@ -22,7 +22,7 @@ import { modalStyle } from './misc'
 import { EditDataType } from '@/backendTypes'
 import { calculateLocalityMinAge, calculateLocalityMaxAge } from '@/util/ageCalculator'
 import { ValidationObject } from '@/validators/validator'
-import { fieldsWithErrorsType, setFieldsWithErrorsType } from '../DetailView'
+import { FieldsWithErrorsType, SetFieldsWithErrorsType } from '../DetailView'
 
 const fieldWidth = '14em'
 
@@ -46,8 +46,8 @@ const setDropdownOptionValue = (
 const checkFieldErrors = (
   field: string,
   errorObject: ValidationObject,
-  fieldsWithErrors: fieldsWithErrorsType,
-  setFieldsWithErrors: setFieldsWithErrorsType
+  fieldsWithErrors: FieldsWithErrorsType,
+  setFieldsWithErrors: SetFieldsWithErrorsType
 ) => {
   const fieldAsString = String(field)
   if (errorObject.error) {

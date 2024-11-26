@@ -4,7 +4,7 @@ import { DropdownOption } from '../common/editingComponents'
 import { cloneDeep } from 'lodash-es'
 import { ValidationObject } from '@/validators/validator'
 import { EditDataType } from '@/backendTypes'
-import { TextFieldOptions, OptionalRadioSelectionProps, fieldsWithErrorsType } from '../DetailView'
+import { TextFieldOptions, OptionalRadioSelectionProps, FieldsWithErrorsType } from '../DetailView'
 
 export type ModeOptions = 'read' | 'new' | 'edit' | 'staging-edit' | 'staging-new'
 
@@ -76,7 +76,7 @@ export type DetailContextType<T> = {
   ) => JSX.Element
   validator: (editData: EditDataType<T>, field: keyof EditDataType<T>) => ValidationObject
   fieldsWithErrors: { [field: string]: ValidationObject | null }
-  setFieldsWithErrors: (updaterFn: (prevFieldsWithErrors: fieldsWithErrorsType) => fieldsWithErrorsType) => void
+  setFieldsWithErrors: (updaterFn: (prevFieldsWithErrors: FieldsWithErrorsType) => FieldsWithErrorsType) => void
 }
 
 export const DetailContext = createContext<DetailContextType<unknown>>(null!)
