@@ -17,12 +17,19 @@ export const ReferenceTab = () => {
       for (const field in editData) {
         const fieldAsKey = field as keyof typeof editData
         const fieldAsString = String(fieldAsKey)
-        const { error } = validator(editData, fieldAsKey)
-
-        if (error && !fieldsWithErrors.includes(fieldAsString)) {
-          setFieldsWithErrors(prevErrors => [...prevErrors, fieldAsString])
-        } else if (!error && fieldsWithErrors.includes(fieldAsString)) {
-          setFieldsWithErrors(prevErrors => prevErrors.filter(err => err !== fieldAsString))
+        const errorObject = validator(editData, fieldAsKey)
+        if (errorObject.error) {
+          if (!(fieldAsString in fieldsWithErrors)) {
+            setFieldsWithErrors(prevFieldsWithErrors => {
+              return { ...prevFieldsWithErrors, [fieldAsString]: errorObject }
+            })
+          }
+        } else if (!errorObject.error && fieldAsString in fieldsWithErrors) {
+          setFieldsWithErrors(prevFieldsWithErrors => {
+            const newFieldsWithErrors = { ...prevFieldsWithErrors }
+            delete newFieldsWithErrors[fieldAsString]
+            return newFieldsWithErrors
+          })
         }
       }
     }
