@@ -10,7 +10,7 @@ import {
 import { useDetailContext } from '../Context/DetailContext'
 import RemoveCircleOutlineIcon from '@mui/icons-material/RemoveCircleOutline'
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline'
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 
 const defaultPagination: MRT_PaginationState = { pageIndex: 0, pageSize: 15 }
 
@@ -42,9 +42,7 @@ export const EditableTable = <
   useObject?: boolean
 }) => {
   const [pagination, setPagination] = useState<MRT_PaginationState>(defaultPagination)
-  const { editData, setEditData, mode, data, validator, fieldsWithErrors, setFieldsWithErrors } =
-    useDetailContext<ParentType>()
-  const { error } = validator(editData, field)
+  const { editData, setEditData, mode, data } = useDetailContext<ParentType>()
 
   if (tableData === null || editTableData === null) return <CircularProgress />
 

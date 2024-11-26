@@ -33,12 +33,12 @@ export const WriteButton = <T,>({
         const fieldAsString = String(field)
         const errorObject = validator(editData, field)
         if (errorObject.error) {
-          if (!fieldsWithErrors[fieldAsString] || !fieldsWithErrors[fieldAsString].error) {
+          if (!(fieldAsString in fieldsWithErrors)) {
             setFieldsWithErrors(prevFieldsWithErrors => {
               return { ...prevFieldsWithErrors, [fieldAsString]: errorObject }
             })
           }
-        } else if (!errorObject.error && fieldsWithErrors[fieldAsString] && fieldsWithErrors[fieldAsString].error) {
+        } else if (!errorObject.error && fieldAsString in fieldsWithErrors) {
           setFieldsWithErrors(prevFieldsWithErrors => {
             const newFieldsWithErrors = { ...prevFieldsWithErrors }
             delete newFieldsWithErrors[fieldAsString]

@@ -40,7 +40,7 @@ function checkIndexes(editData: EditDataType<ReferenceDetailsType>): boolean {
 export const AuthorTab: React.FC<AuthorTabProps> = ({ field_num_param, tab_name = 'Authors' }) => {
   const { mode, editData, setEditData, fieldsWithErrors } = useDetailContext<ReferenceDetailsType>()
   const { data: authorData, isError } = useGetReferenceAuthorsQuery(mode.read ? skipToken : undefined)
-  const hasError = fieldsWithErrors.includes('ref_authors')
+  const hasError = !!fieldsWithErrors.ref_authors
 
   useEffect(() => {
     // Check and update indexes of authors only if they are incorrect
