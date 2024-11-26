@@ -4,13 +4,14 @@ import { Grouped, ArrayFrame, HalfFrames } from '@/components/DetailView/common/
 import { MRT_ColumnDef } from 'material-react-table'
 import { EditableTable } from '@/components/DetailView/common/EditableTable'
 import { EditingForm } from '@/components/DetailView/common/EditingForm'
+import { emptyOption } from '@/components/DetailView/common/misc'
 
 export const TaphonomyTab = () => {
   const { textField, dropdown } = useDetailContext<LocalityDetailsType>()
   const { mode } = useDetailContext<LocalityDetailsType>()
 
   const assemblageFormationOptions = [
-    '',
+    emptyOption,
     { display: 'Attritional', value: 'attritional' },
     { display: 'Bone collecting vertebrate', value: 'bone_collctr' },
     { display: 'Carnivore ingestion', value: 'carn_ingest' },
@@ -20,7 +21,7 @@ export const TaphonomyTab = () => {
   ]
 
   const transportOptions = [
-    '',
+    emptyOption,
     { display: 'Highly transported', value: 'high_trans' },
     { display: 'All three', value: 'high_trans_winn' },
     { display: 'Transported', value: 'trans' },
@@ -30,14 +31,14 @@ export const TaphonomyTab = () => {
   ]
 
   const abrasionOptions = [
-    '',
+    emptyOption,
     { display: 'Abraded', value: 'abraded' },
     { display: 'Mixed', value: 'mixed_abr' },
     { display: 'Unabraded', value: 'unabrade' },
   ]
 
   const weatheringTramplingOptions = [
-    '',
+    emptyOption,
     { display: 'Mixed weathered and unweathered', value: 'mx' },
     { display: 'Mixed weathered and trampled', value: 'mx_trmp' },
     { display: 'Trampled', value: 'trmp' },
@@ -48,7 +49,7 @@ export const TaphonomyTab = () => {
   ]
 
   const partConcentrationOptions = [
-    '',
+    emptyOption,
     '1-10/m2',
     '10-100/m2',
     '100-1000/m2',
@@ -71,10 +72,10 @@ export const TaphonomyTab = () => {
     { display: 'Isolated occurrence', value: 'isol_occur' },
   ]
 
-  const assemblageComponentSizeOptions = ['', 'both', 'macro', 'micro']
+  const assemblageComponentSizeOptions = [emptyOption, 'both', 'macro', 'micro']
 
   const timeRepresentedOptions = [
-    '',
+    emptyOption,
     '<1',
     '1-10^1',
     '10^1-10^2',
@@ -86,7 +87,7 @@ export const TaphonomyTab = () => {
   ]
 
   const vertebratePreservationOptions = [
-    '',
+    emptyOption,
     'artic_pts',
     'assoc_pts',
     'compression',
@@ -97,9 +98,9 @@ export const TaphonomyTab = () => {
     'not_known',
   ]
 
-  const unbiasedCollectingOptions = ['', { display: 'Yes', value: 'y' }, { display: 'No', value: 'n' }]
+  const unbiasedCollectingOptions = [emptyOption, { display: 'Yes', value: 'y' }, { display: 'No', value: 'n' }]
 
-  const speciesListCompleteOptions = ['', { display: 'Yes', value: 'y' }, { display: 'No', value: 'n' }]
+  const speciesListCompleteOptions = [emptyOption, { display: 'Yes', value: 'y' }, { display: 'No', value: 'n' }]
 
   const fossilAssemblage = [
     ['Assemblage Formation', dropdown('assem_fm', assemblageFormationOptions, 'Assemblage Formation')],
