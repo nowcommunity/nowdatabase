@@ -21,8 +21,7 @@ import { DataValue } from './tabLayoutHelpers'
 import { modalStyle } from './misc'
 import { EditDataType } from '@/backendTypes'
 import { calculateLocalityMinAge, calculateLocalityMaxAge } from '@/util/ageCalculator'
-import { ValidationObject } from '@/validators/validator'
-import { FieldsWithErrorsType, SetFieldsWithErrorsType } from '../DetailView'
+import { checkFieldErrors } from './checkFieldErrors'
 
 const fieldWidth = '14em'
 
@@ -40,28 +39,6 @@ const setDropdownOptionValue = (
     setValue(String(value === 'true'))
   } else {
     setValue(value ?? '')
-  }
-}
-
-const checkFieldErrors = (
-  field: string,
-  errorObject: ValidationObject,
-  fieldsWithErrors: FieldsWithErrorsType,
-  setFieldsWithErrors: SetFieldsWithErrorsType
-) => {
-  const fieldAsString = String(field)
-  if (errorObject.error) {
-    if (!(fieldAsString in fieldsWithErrors)) {
-      setFieldsWithErrors(prevFieldsWithErrors => {
-        return { ...prevFieldsWithErrors, [fieldAsString]: errorObject }
-      })
-    }
-  } else if (!errorObject.error && fieldAsString in fieldsWithErrors) {
-    setFieldsWithErrors(prevFieldsWithErrors => {
-      const newFieldsWithErrors = { ...prevFieldsWithErrors }
-      delete newFieldsWithErrors[fieldAsString]
-      return newFieldsWithErrors
-    })
   }
 }
 
