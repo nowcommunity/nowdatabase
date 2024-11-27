@@ -86,13 +86,41 @@ export const speciesPage = (
   />
 )
 
+// Instead of "Cenozoic Geochronology", use
+// 30
+// Berggren et al. (1985). Cenozoic Geochronology. Geological Society of America Bulletin 96: 1407-1418.
+
+// uh miten saan noi et al. >:/ <-- updateTab / makenamelist
+
+// http://localhost:5173/reference/10031 ?? miksei tee mitään?? AHAA null, no vittu
+// 10031 nyt about toimii
+
+//tää on nyt TÄYSIN varastettu UpdateTabista, paitsi lisätty undefined
+
+const makeNameList = (names: Array<string | null | undefined>) => {
+  if (names.length === 3) {
+    return `${names[0]}, ${names[1]} & ${names[2]}`
+  } else if (names.length >= 4) {
+    return `${names[0]} et al.`
+  } else if (names.length === 2) {
+    return `${names[0]} & ${names[1]}`
+  }
+  return names[0] ?? ''
+}
+
 export const referencePage = (
   <Page
     tableView={<ReferenceTable />}
     detailView={<ReferenceDetails />}
     viewName="reference"
     idFieldName="rid"
-    createTitle={(ref: ReferenceDetailsType) => `${ref.title_primary}`}
+    createTitle={(ref: ReferenceDetailsType) =>
+      `${ref.rid}` +
+      `\n${makeNameList(ref.ref_authors.map(author => author.author_surname))} (${ref.date_primary ? ref.date_primary : 'date missing'}).` +
+      `\n${ref.title_primary ? ref.title_primary + '.' : ''}` +
+      `\n${ref.ref_journal && ref.ref_type_id == 1 ? ref.ref_journal.journal_title + '. ' : ''}${ref.title_secondary ? ref.title_secondary + '. ' : ''}${ref.gen_notes ? ref.gen_notes : ''}` +
+      `\n${ref.volume ? ref.volume + ' ' : ''} ${ref.start_page || ref.end_page ? 'pp: ' : ''}${ref.start_page ? ref.start_page + '-' : ''}${ref.end_page ? ref.end_page : ''} ${ref.publisher ? ref.publisher : ''}${ref.pub_place ? ', ' + ref.pub_place : ''}`
+    }
     getEditRights={(user: UserState) => {
       if ([Role.Admin, Role.EditUnrestricted].includes(user.role)) return fullRights
       if (user.role === Role.EditRestricted) return { new: true }
