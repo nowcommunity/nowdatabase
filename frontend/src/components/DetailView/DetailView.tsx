@@ -13,7 +13,7 @@ import {
 } from './common/editingComponents'
 import { DetailBrowser } from './DetailBrowser'
 import { StagingView } from './StagingView'
-import { ReturnButton, WriteButton } from './components'
+import { ErrorBox, ReturnButton, WriteButton } from './components'
 import { ValidationObject } from '@/validators/validator'
 import { EditDataType } from '@/backendTypes'
 import { usePageContext } from '../Page'
@@ -46,7 +46,7 @@ export type OptionalRadioSelectionProps = {
   handleSetEditData?: (value: number | string | boolean) => void
 }
 
-export type FieldsWithErrorsType = { [field: string]: ValidationObject | null }
+export type FieldsWithErrorsType = { [field: string]: ValidationObject }
 export type SetFieldsWithErrorsType = (
   updaterFn: (prevFieldsWithErrors: FieldsWithErrorsType) => FieldsWithErrorsType
 ) => void
@@ -213,6 +213,7 @@ export const DetailView = <T extends object>({
                 Delete
               </Button>
             )}
+            {Object.keys(fieldsWithErrors).length > 0 && <ErrorBox />}
             {(!mode.read || initialState.mode.new) && onWrite && (
               <WriteButton onWrite={onWrite} hasStagingMode={hasStagingMode} />
             )}
