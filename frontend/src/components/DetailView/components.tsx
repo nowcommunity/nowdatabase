@@ -1,11 +1,11 @@
 import { useNavigate } from 'react-router-dom'
-import { Button, Box, Typography, CircularProgress, Divider, alpha, List, ListItemText } from '@mui/material'
+import { ListItem, Button, Box, Typography, CircularProgress, Divider, alpha, List, ListItemText } from '@mui/material'
 import ArrowBackIcon from '@mui/icons-material/ArrowBack'
 import SaveIcon from '@mui/icons-material/Save'
 import { usePageContext } from '../Page'
 import { useDetailContext } from './Context/DetailContext'
 import { EditDataType } from '@/backendTypes'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Fragment } from 'react'
 
 export const WriteButton = <T,>({
   onWrite,
@@ -99,13 +99,13 @@ export const ErrorBox = <T,>() => {
       </Typography>
       <List sx={{ maxHeight: '5em', maxWidth: '30em', padding: '0em 0.8em 0em 0.8em', overflow: 'auto' }}>
         {fields.map(field => (
-          <>
+          <Fragment key={field}>
+            <Divider component="li" />
             <ListItemText
               sx={{ color: 'text.secondary' }}
               primary={`${fieldsWithErrors[field].name}: ${fieldsWithErrors[field].error}`}
             />
-            <Divider />
-          </>
+          </Fragment>
         ))}
       </List>
     </Box>
