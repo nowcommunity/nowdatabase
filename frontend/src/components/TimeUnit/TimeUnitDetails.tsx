@@ -71,10 +71,10 @@ export const TimeUnitDetails = () => {
       ) {
         if ('name' in e.data) {
           if ('cascadeErrors' in e.data && e.data.cascadeErrors !== '') {
-            notify(e.data.cascadeErrors as string, 'error')
+            notify(e.data.cascadeErrors as string, 'error', null)
           }
           if ('calculatorErrors' in e.data && e.data.calculatorErrors !== '') {
-            notify(e.data.calculatorErrors as string, 'error')
+            notify(e.data.calculatorErrors as string, 'error', null)
           }
         } else {
           const error = e as ValidationErrors
