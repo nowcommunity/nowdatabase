@@ -17,7 +17,7 @@ interface JournalTabProps {
 export const JournalTab: React.FC<JournalTabProps> = ({ tab_name = 'Journal' }) => {
   const { mode, editData, setEditData, fieldsWithErrors } = useDetailContext<ReferenceDetailsType>()
   const { data: journalData, isError } = useGetReferenceJournalsQuery(mode.read ? skipToken : undefined)
-  const hasError = fieldsWithErrors.includes('ref_journal')
+  const hasError = !!fieldsWithErrors.ref_journal
   let visible_ref_journal: Array<ReferenceJournalType> = []
   if (editData.ref_journal && Object.keys(editData.ref_journal).length !== 0) {
     visible_ref_journal = [Object.assign({}, editData.ref_journal)]

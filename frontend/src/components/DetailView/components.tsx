@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom'
-import { Button, CircularProgress } from '@mui/material'
+import { Button, Box, Typography, CircularProgress, Divider, alpha, List, ListItemText } from '@mui/material'
 import ArrowBackIcon from '@mui/icons-material/ArrowBack'
 import SaveIcon from '@mui/icons-material/Save'
 import { usePageContext } from '../Page'
@@ -31,14 +31,18 @@ export const WriteButton = <T,>({
     if (mode.option === 'edit' || mode.option === 'new') {
       for (const field in editData) {
         const fieldAsString = String(field)
-        const { error } = validator(editData, field)
-        if (error && !fieldsWithErrors.includes(fieldAsString)) {
-          setFieldsWithErrors(prevErrors => {
-            return [...prevErrors, field]
-          })
-        } else if (!error && fieldsWithErrors.includes(fieldAsString)) {
-          setFieldsWithErrors(prevErrors => {
-            return prevErrors.filter(err => err !== fieldAsString)
+        const errorObject = validator(editData, field)
+        if (errorObject.error) {
+          if (!(fieldAsString in fieldsWithErrors)) {
+            setFieldsWithErrors(prevFieldsWithErrors => {
+              return { ...prevFieldsWithErrors, [fieldAsString]: errorObject }
+            })
+          }
+        } else if (!errorObject.error && fieldAsString in fieldsWithErrors) {
+          setFieldsWithErrors(prevFieldsWithErrors => {
+            const newFieldsWithErrors = { ...prevFieldsWithErrors }
+            delete newFieldsWithErrors[fieldAsString]
+            return newFieldsWithErrors
           })
         }
       }
@@ -48,7 +52,7 @@ export const WriteButton = <T,>({
 
   return (
     <Button
-      disabled={fieldsWithErrors.length > 0}
+      disabled={Object.keys(fieldsWithErrors).length > 0}
       id="write-button"
       sx={{ width: '20em' }}
       onClick={() => {
@@ -71,6 +75,40 @@ export const WriteButton = <T,>({
       )}
       {getButtonText()}
     </Button>
+  )
+}
+
+export const ErrorBox = <T,>() => {
+  const { fieldsWithErrors } = useDetailContext<T>()
+  const fields = Object.keys(fieldsWithErrors)
+
+  return (
+    <Box
+      sx={{
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        borderRadius: 1,
+        padding: '0.7em',
+        boxShadow: 2,
+        bgcolor: alpha('#ff0000', 0.5),
+      }}
+    >
+      <Typography color="text.secondary" gutterBottom>
+        {`${fields.length} Invalid fields`}
+      </Typography>
+      <List sx={{ maxHeight: '5em', maxWidth: '30em', padding: '0em 0.8em 0em 0.8em', overflow: 'auto' }}>
+        {fields.map(field => (
+          <>
+            <ListItemText
+              sx={{ color: 'text.secondary' }}
+              primary={`${fieldsWithErrors[field].name}: ${fieldsWithErrors[field].error}`}
+            />
+            <Divider />
+          </>
+        ))}
+      </List>
+    </Box>
   )
 }
 
