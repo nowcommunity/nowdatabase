@@ -45,13 +45,13 @@ The context can also be used to access, for example, the **setEditData** setter,
 
 **editingComponents and validator errors**
 
-If an editingComponent has an error, the `field` value of the component is added to the `fieldsWithErrors` array in the context. editingComponents have a useEffect hook that runs every time their `error` value changes which either adds or removes them from the `fieldsWithErrors` array. This array is used to make sure all fields have a proper value before allowing the user to add a new entry (the "Finalize Entry" button is disabled if `fieldsWithErrors` has anything in it). The user is also shown which fields are invalid:
+editingComponents have a useEffect hook that runs every time their `error` value changes which either adds or removes them from the `fieldsWithErrors` object in the context. This object is used to make sure all fields have a proper value before allowing the user to add a new entry (the "Finalize Entry" button is disabled if `fieldsWithErrors` has anything in it). It is also used to show the user which fields are invalid:
 
 ![setFieldsWithErrors](../images/errorlist.png)
 
-In addition to this, the WriteButton component has a similar useEffect hook that validates every field in `editData` once when the user starts editing or creating a new entry. This is done because otherwise missing fields in tabs the user has not visited are not acknowledged in the list of invalid fields.
+In addition to editingComponents, the WriteButton component has a similar useEffect hook that validates every field in `editData` once when the user starts editing or creating a new entry. This is done because otherwise missing fields in tabs the user has not visited are not added to the `fieldsWithErrors` object.
 
-Instead of calling the `setFieldsWithErrors` function directly with the new array of errors, components pass an updater function to it.
+Instead of calling the `setFieldsWithErrors` function directly with the new error object, components pass an updater function to it.
 
 ![setFieldsWithErrors](../images/setFieldsWithErrors.png)
 
