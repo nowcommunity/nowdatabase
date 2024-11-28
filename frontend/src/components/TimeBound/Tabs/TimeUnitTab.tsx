@@ -39,5 +39,12 @@ export const TimeUnitTab = () => {
     },
   ]
 
-  return <SimpleTable<TimeUnit> columns={columns} data={timeUnitsData} />
+  return (
+    <SimpleTable<TimeUnit, TimeBoundDetailsType>
+      columns={columns}
+      data={timeUnitsData}
+      idFieldName="tu_name"
+      url="time-unit"
+    />
+  )
 }

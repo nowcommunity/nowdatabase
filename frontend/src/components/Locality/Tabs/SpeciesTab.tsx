@@ -138,7 +138,12 @@ export const SpeciesTab = () => {
           />
         </Box>
       )}
-      <EditableTable<LocalitySpecies, LocalityDetailsType> columns={localitySpeciesColumns} field="now_ls" />
+      <EditableTable<LocalitySpecies, LocalityDetailsType>
+        columns={localitySpeciesColumns}
+        field="now_ls"
+        idFieldName="species_id"
+        url="species"
+      />
     </Grouped>
   )
 }

@@ -12,6 +12,7 @@ import RemoveCircleOutlineIcon from '@mui/icons-material/RemoveCircleOutline'
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline'
 import { useState, useEffect } from 'react'
 import { checkFieldErrors } from './checkFieldErrors'
+import { ActionComponent } from '@/components/TableView/ActionComponent'
 
 const defaultPagination: MRT_PaginationState = { pageIndex: 0, pageSize: 15 }
 
@@ -33,6 +34,8 @@ export const EditableTable = <
   visible_data, // use some filtered data instead of the actual data. Allows you to hide some rows. But be careful that the data is in the right format
   useDefinedIndex = false, // Control whether to use the defined index or static index. The index data needs to have a key named 'index'.
   useObject = false,
+  idFieldName,
+  url,
 }: {
   tableData?: Array<T> | null
   editTableData?: Array<EditDataType<T>> | null
@@ -41,6 +44,8 @@ export const EditableTable = <
   visible_data?: Array<T>
   useDefinedIndex?: boolean
   useObject?: boolean
+  idFieldName?: keyof T
+  url?: string
 }) => {
   const [pagination, setPagination] = useState<MRT_PaginationState>(defaultPagination)
   const { editData, setEditData, mode, data, validator, fieldsWithErrors, setFieldsWithErrors } =
@@ -90,7 +95,20 @@ export const EditableTable = <
     )
   }
 
-  const actionRowProps = mode.read ? {} : { enableRowActions: true, renderRowActions: actionRow }
+  const linkToDetails = ({ row }: { row: MRT_Row<T> }) => {
+    if (idFieldName && url) return <ActionComponent {...{ row, idFieldName, url }} />
+    return null // code shouldn't get here!
+  }
+
+  const actionRowProps = () => {
+    if (mode.read && (!idFieldName || !url)) {
+      return {}
+    } else if (mode.read && idFieldName && url) {
+      return { enableRowActions: true, renderRowActions: linkToDetails }
+    } else {
+      return { enableRowActions: true, renderRowActions: actionRow }
+    }
+  }
 
   const rowStateToColor = (state: RowState | undefined) => {
     if (mode.read) return null
@@ -115,7 +133,7 @@ export const EditableTable = <
 
   return (
     <MaterialReactTable
-      {...actionRowProps}
+      {...actionRowProps()}
       columns={columns}
       data={getData()}
       enableTopToolbar={false}
