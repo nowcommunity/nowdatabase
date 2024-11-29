@@ -1,4 +1,4 @@
-import type { ParsedGeoname } from '../../routes/geonames-api'
+import type { ParsedGeoname } from '../../../../frontend/src/backendTypes'
 
 export const localities: ParsedGeoname[] = [
   { countryName: 'Finland', lat: 63.05484, lng: 24.75291, name: 'Kumpula' },
