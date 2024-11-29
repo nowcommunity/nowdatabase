@@ -1,6 +1,6 @@
 import { useRef, useMemo, useState, KeyboardEvent, useEffect } from 'react'
 import { MapContainer, TileLayer, Marker, useMap } from 'react-leaflet'
-import { TextField, List, ListItem, ListItemButton, ListItemText, Box, Button } from '@mui/material'
+import { TextField, List, ListItem, ListItemButton, ListItemText, Box, Button, Divider, alpha } from '@mui/material'
 import 'leaflet/dist/leaflet.css'
 import markerIconPng from 'leaflet/dist/images/marker-icon.png'
 import { Icon } from 'leaflet'
@@ -53,6 +53,63 @@ const ViewSetter = ({ viewCoordinates }: { viewCoordinates: Coordinate }) => {
   return null
 }
 
+const ResultsList = ({
+  setViewCoordinates,
+  setMarkerCoordinates,
+  resultsList,
+  queryStatus,
+}: {
+  setViewCoordinates: CoordinateSetter
+  setMarkerCoordinates: CoordinateSetter
+  resultsList: ParsedGeoname[]
+  queryStatus: { isUninitialized: boolean; isSuccess: boolean; isError: boolean }
+}) => {
+  if (queryStatus.isUninitialized) {
+    return <List></List>
+  }
+
+  if (queryStatus.isError) {
+    return (
+      <List>
+        <ListItem sx={{ backgroundColor: alpha('#ff0000', 0.5) }}>
+          <ListItemText primary="An error has occurred" />
+        </ListItem>
+      </List>
+    )
+  }
+  if (queryStatus.isSuccess) {
+    if (resultsList.length > 0) {
+      return (
+        <List>
+          {resultsList.map((result, index) => (
+            <Box key={index}>
+              <ListItem>
+                <ListItemButton
+                  onClick={() => {
+                    setViewCoordinates({ lat: result.lat, lng: result.lng })
+                    setMarkerCoordinates({ lat: result.lat, lng: result.lng })
+                  }}
+                >
+                  <ListItemText primary={`${result.name}, ${result.countryName}`} />
+                </ListItemButton>
+              </ListItem>
+              <Divider component="li" />
+            </Box>
+          ))}
+        </List>
+      )
+    } else {
+      return (
+        <List>
+          <ListItem>
+            <ListItemText primary="No results found" />
+          </ListItem>
+        </List>
+      )
+    }
+  }
+}
+
 const LocationSearch = ({
   setViewCoordinates,
   setMarkerCoordinates,
@@ -63,7 +120,7 @@ const LocationSearch = ({
   const [searchBoxValue, setSearchBoxValue] = useState('')
   const [resultsList, setResultsList] = useState<ParsedGeoname[]>([])
 
-  const [getGeonames] = useLazyGetGeonamesQuery()
+  const [getGeonames, { isUninitialized, isSuccess, isError }] = useLazyGetGeonamesQuery()
 
   const handleSearch = async (search: string) => {
     const { data } = await getGeonames(search)
@@ -74,6 +131,9 @@ const LocationSearch = ({
 
   const handleKeyDown = (event: KeyboardEvent) => {
     if (event.key === 'Enter') {
+      if (!searchBoxValue) {
+        return
+      }
       void handleSearch(searchBoxValue)
     }
   }
@@ -89,24 +149,16 @@ const LocationSearch = ({
           onKeyDown={handleKeyDown}
           placeholder="Search for a place..."
         />
-        <Button variant="contained" onClick={() => void handleSearch(searchBoxValue)}>
+        <Button variant="contained" onClick={() => void handleSearch(searchBoxValue)} disabled={!searchBoxValue}>
           {'Search'}
         </Button>
       </Box>
-      <List>
-        {resultsList.map((result, index) => (
-          <ListItem key={index} sx={{ backgroundColor: 'lightgray' }}>
-            <ListItemButton
-              onClick={() => {
-                setViewCoordinates({ lat: result.lat, lng: result.lng })
-                setMarkerCoordinates({ lat: result.lat, lng: result.lng })
-              }}
-            >
-              <ListItemText primary={`${result.name}, ${result.countryName}`} />
-            </ListItemButton>
-          </ListItem>
-        ))}
-      </List>
+      <ResultsList
+        setViewCoordinates={setViewCoordinates}
+        setMarkerCoordinates={setMarkerCoordinates}
+        resultsList={resultsList}
+        queryStatus={{ isUninitialized, isSuccess, isError }}
+      />
     </Box>
   )
 }
@@ -134,7 +186,8 @@ export const CoordinateSelectionMap = ({
         <ViewSetter viewCoordinates={viewCoordinates} />
       </MapContainer>
       <p>
-        Lat: {markerCoordinates ? markerCoordinates.lat : null} Lon: {markerCoordinates ? markerCoordinates.lng : null}
+        Latitude: {markerCoordinates ? markerCoordinates.lat : null}, Longitude:{' '}
+        {markerCoordinates ? markerCoordinates.lng : null}
       </p>
       <LocationSearch setViewCoordinates={setViewCoordinates} setMarkerCoordinates={setMarkerCoordinates} />
     </div>
