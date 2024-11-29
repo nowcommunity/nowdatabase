@@ -31,6 +31,7 @@ describe('Creating a time unit', () => {
     cy.get('[data-cy=detailview-button-ALMAAsianlandmammalage]').first().click()
     cy.contains('This field is required')
     cy.get('[id=write-button]').should('be.disabled')
+    cy.contains('2 Invalid fields')
   })
 
   it('but returning from staging view before saving works', () => {
@@ -105,6 +106,7 @@ describe('Editing a time unit', () => {
     cy.contains('​Upper bound age has to be lower than lower bound age')
     cy.contains('Lower bound age has to be higher than upper bound age')
     cy.get('[id=write-button]').should('be.disabled')
+    cy.contains('2 Invalid fields')
   })
 
   it('but returning from staging view before saving works', () => {

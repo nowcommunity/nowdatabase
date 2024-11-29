@@ -3,7 +3,7 @@ describe('Creating a new locality', () => {
     cy.login('testSu')
   })
 
-  it.only('with valid data works', () => {
+  it('with valid data works', () => {
     cy.visit('/locality/new/')
     cy.contains('Creating new locality')
     cy.get('[name=dating-method]').should('have.value', 'time_unit')
@@ -56,6 +56,7 @@ describe('Creating a new locality', () => {
     cy.get('[id=dms_lat-textfield]').should('have.value', '48 40 48 N')
     cy.contains('This field is required')
     cy.get('[id=write-button]').should('be.disabled')
+    cy.contains('4 Invalid fields')
   })
 
   it("and filling, then erasing needed data doesn't work", () => {
@@ -90,10 +91,12 @@ describe('Creating a new locality', () => {
     cy.get('[id=min_age-textfield]').type('{backspace}{backspace}{backspace}{backspace}{backspace}')
     cy.contains('This field is required')
     cy.get('[id=write-button]').should('be.disabled')
+    cy.contains('1 Invalid fields')
 
     // make sure errors in other tabs disable the write button
     cy.get('[role=tablist]').contains('Locality').click()
     cy.get('[id=write-button]').should('be.disabled')
+    cy.contains('1 Invalid fields')
   })
 
   it('write button is disabled if unvisited tab has validation errors', () => {
@@ -109,12 +112,12 @@ describe('Creating a new locality', () => {
 
     // Age tab has no errors, but Locality tab has unfilled mandatory fields
     cy.get('[id=write-button]').should('be.disabled')
+    cy.contains('6 Invalid fields')
     cy.get('[id=min_age-textfield-helper-text]').should('not.exist')
     cy.get('[id=max_age-textfield-helper-text]').should('not.exist')
-    cy.contains('This field is required').should('not.exist')
     cy.get('[role=tablist]').contains('Locality').click()
-    cy.contains('This field is required')
     cy.get('[id=write-button]').should('be.disabled')
+    cy.contains('6 Invalid fields')
   })
 
   it('composite dating method works', () => {
@@ -167,6 +170,7 @@ describe('Editing a locality', () => {
     cy.get('[id=max_age-textfield]').type('{backspace}{backspace}{backspace}{backspace}{backspace}9')
     cy.contains('Min value cannot be higher than max')
     cy.get('[id=write-button]').should('be.disabled')
+    cy.contains('4 Invalid fields')
   })
 })
 

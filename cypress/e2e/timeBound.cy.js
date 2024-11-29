@@ -24,5 +24,6 @@ describe('Editing time bound', () => {
     cy.get('[id=age-textfield]').first().type('{backspace}{backspace}{backspace}{backspace}{backspace}')
     cy.contains('This field is required')
     cy.get('[id=write-button]').should('be.disabled')
+    cy.contains('1 Invalid fields')
   })
 })
