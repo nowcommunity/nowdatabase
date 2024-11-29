@@ -19,5 +19,6 @@ describe('Creating a species', () => {
     cy.visit('/species/new')
     cy.contains('This field is required')
     cy.get('[id=write-button]').should('be.disabled')
+    cy.contains('4 Invalid fields')
   })
 })
