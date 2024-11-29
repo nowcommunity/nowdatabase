@@ -134,7 +134,8 @@ export const CoordinateSelectionMap = ({
         <ViewSetter viewCoordinates={viewCoordinates} />
       </MapContainer>
       <p>
-        Lat: {markerCoordinates ? markerCoordinates.lat : null} Lon: {markerCoordinates ? markerCoordinates.lng : null}
+        Latitude: {markerCoordinates ? markerCoordinates.lat : null}, Longitude:{' '}
+        {markerCoordinates ? markerCoordinates.lng : null}
       </p>
       <LocationSearch setViewCoordinates={setViewCoordinates} setMarkerCoordinates={setMarkerCoordinates} />
     </div>
