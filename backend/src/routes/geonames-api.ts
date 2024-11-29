@@ -1,34 +1,7 @@
 import { Router, Request } from 'express'
 import { GEONAMES_USERNAME } from '../utils/config'
 import { logger } from '../utils/logger'
-
-export type Geoname = {
-  adminCode01: string
-  lng: string | number
-  geonameId: number
-  toponymName: string
-  countryId: string
-  fcl: string
-  population: number
-  countryCode: string
-  name: string
-  fclName: string
-  adminCodes1: {
-    ISO3166_2: string
-  }
-  countryName: string
-  fcodeName: string
-  adminName1: string
-  lat: string | number
-  fcode: string
-}
-
-export type GeonamesJSON = {
-  totalResultsCount: number
-  geonames: Geoname[]
-}
-
-export type ParsedGeoname = Pick<Geoname, 'name' | 'countryName' | 'lat' | 'lng'>
+import { GeonamesJSON, ParsedGeoname } from '../../../frontend/src/backendTypes'
 
 const router = Router()
 

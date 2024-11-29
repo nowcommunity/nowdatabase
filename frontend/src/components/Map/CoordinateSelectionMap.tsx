@@ -4,6 +4,8 @@ import { TextField, List, ListItem, ListItemButton, ListItemText, Box, Button } 
 import 'leaflet/dist/leaflet.css'
 import markerIconPng from 'leaflet/dist/images/marker-icon.png'
 import { Icon } from 'leaflet'
+import { useLazyGetGeonamesQuery } from '../../redux/geonamesReducer'
+import { ParsedGeoname } from '../../backendTypes'
 
 type Coordinate = {
   lat: number
@@ -58,62 +60,21 @@ const LocationSearch = ({
   setViewCoordinates: CoordinateSetter
   setMarkerCoordinates: CoordinateSetter
 }) => {
-  type Location = {
-    name: string
-    country: string
-    latitude: number
-    longitude: number
-  }
-
   const [searchBoxValue, setSearchBoxValue] = useState('')
-  const [resultsList, setResultsList] = useState<Location[]>([])
+  const [resultsList, setResultsList] = useState<ParsedGeoname[]>([])
 
-  const handleSearch = async () => {
-    const username = String(import.meta.env.VITE_GEONAMES_USERNAME)
-    const url = `https://secure.geonames.org/searchJSON?q=${searchBoxValue}&maxRows=5&username=${username}`
+  const [getGeonames] = useLazyGetGeonamesQuery()
 
-    type Geoname = {
-      adminCode01: string
-      lng: string
-      geonameId: number
-      toponymName: string
-      countryId: string
-      fcl: string
-      population: number
-      countryCode: string
-      name: string
-      fclName: string
-      adminCodes1: {
-        ISO3166_2: string
-      }
-      countryName: string
-      fcodeName: string
-      adminName1: string
-      lat: string
-      fcode: string
-    }
-    type GeoNamesJSON = {
-      totalResultsCount: number
-      geonames: Geoname[]
-    }
-
-    try {
-      const result = (await (await fetch(url)).json()) as GeoNamesJSON
-      const locations = result.geonames.map(geoname => ({
-        name: geoname.name,
-        country: geoname.countryName,
-        latitude: Number(geoname.lat),
-        longitude: Number(geoname.lng),
-      }))
-      setResultsList(locations)
-    } catch (error) {
-      throw new Error('Location search failed')
+  const handleSearch = async (search: string) => {
+    const { data } = await getGeonames(search)
+    if (data) {
+      setResultsList(data?.locations)
     }
   }
 
   const handleKeyDown = (event: KeyboardEvent) => {
     if (event.key === 'Enter') {
-      void handleSearch()
+      void handleSearch(searchBoxValue)
     }
   }
 
@@ -128,7 +89,7 @@ const LocationSearch = ({
           onKeyDown={handleKeyDown}
           placeholder="Search for a place..."
         />
-        <Button variant="contained" onClick={() => void handleSearch()}>
+        <Button variant="contained" onClick={() => void handleSearch(searchBoxValue)}>
           {'Search'}
         </Button>
       </Box>
@@ -137,11 +98,11 @@ const LocationSearch = ({
           <ListItem key={index} sx={{ backgroundColor: 'lightgray' }}>
             <ListItemButton
               onClick={() => {
-                setViewCoordinates({ lat: result.latitude, lng: result.longitude })
-                setMarkerCoordinates({ lat: result.latitude, lng: result.longitude })
+                setViewCoordinates({ lat: result.lat, lng: result.lng })
+                setMarkerCoordinates({ lat: result.lat, lng: result.lng })
               }}
             >
-              <ListItemText primary={`${result.name}, ${result.country}`} />
+              <ListItemText primary={`${result.name}, ${result.countryName}`} />
             </ListItemButton>
           </ListItem>
         ))}
