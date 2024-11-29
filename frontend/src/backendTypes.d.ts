@@ -300,3 +300,31 @@ type ValidationErrorItem = {
   name: string
   error: string
 }
+
+type Geoname = {
+  adminCode01: string
+  lng: number
+  geonameId: number
+  toponymName: string
+  countryId: string
+  fcl: string
+  population: number
+  countryCode: string
+  name: string
+  fclName: string
+  adminCodes1: {
+    ISO3166_2: string
+  }
+  countryName: string
+  fcodeName: string
+  adminName1: string
+  lat: number
+  fcode: string
+}
+
+export type GeonamesJSON = {
+  totalResultsCount: number
+  geonames: Geoname[]
+}
+
+export type ParsedGeoname = Pick<Geoname, 'name' | 'countryName' | 'lat' | 'lng'>
