@@ -17,7 +17,7 @@ interface JournalTabProps {
 export const JournalTab: React.FC<JournalTabProps> = ({ tab_name = 'Journal' }) => {
   const { mode, editData, setEditData, fieldsWithErrors } = useDetailContext<ReferenceDetailsType>()
   const { data: journalData, isError } = useGetReferenceJournalsQuery(mode.read ? skipToken : undefined)
-  const hasError = fieldsWithErrors.includes('ref_journal')
+  const hasError = !!fieldsWithErrors.ref_journal
   let visible_ref_journal: Array<ReferenceJournalType> = []
   if (editData.ref_journal && Object.keys(editData.ref_journal).length !== 0) {
     visible_ref_journal = [Object.assign({}, editData.ref_journal)]
@@ -66,9 +66,12 @@ export const JournalTab: React.FC<JournalTabProps> = ({ tab_name = 'Journal' }) 
     },
   ]
 
+  let title = tab_name ? tab_name : 'Journal'
+  if (hasError) title = title.concat(' (Required)')
+
   return (
-    <Box border={hasError ? `1px solid #d32f2f` : 'none'} borderRadius={1}>
-      <Grouped title={tab_name ? tab_name : 'Journal'}>
+    <Box>
+      <Grouped error={hasError} title={title}>
         {!mode.read && (
           <Box display="flex" gap={1}>
             <EditingForm<ReferenceJournalType, ReferenceDetailsType>

@@ -13,7 +13,7 @@ import {
 } from './common/editingComponents'
 import { DetailBrowser } from './DetailBrowser'
 import { StagingView } from './StagingView'
-import { ReturnButton, WriteButton } from './components'
+import { ErrorBox, ReturnButton, WriteButton } from './components'
 import { ValidationObject } from '@/validators/validator'
 import { EditDataType } from '@/backendTypes'
 import { usePageContext } from '../Page'
@@ -46,6 +46,11 @@ export type OptionalRadioSelectionProps = {
   handleSetEditData?: (value: number | string | boolean) => void
 }
 
+export type FieldsWithErrorsType = { [field: string]: ValidationObject }
+export type SetFieldsWithErrorsType = (
+  updaterFn: (prevFieldsWithErrors: FieldsWithErrorsType) => FieldsWithErrorsType
+) => void
+
 export const DetailView = <T extends object>({
   tabs,
   data,
@@ -74,7 +79,7 @@ export const DetailView = <T extends object>({
   }
   const { editRights } = usePageContext()
   const [mode, setModeState] = useState<ModeType>(isNew ? modeOptionToMode['new'] : modeOptionToMode['read'])
-  const [fieldsWithErrors, setFieldsWithErrors] = useState<Array<string>>([])
+  const [fieldsWithErrors, setFieldsWithErrors] = useState<FieldsWithErrorsType>({})
   const [tab, setTab] = useState(getUrl())
 
   useEffect(() => {
@@ -208,6 +213,7 @@ export const DetailView = <T extends object>({
                 Delete
               </Button>
             )}
+            {Object.keys(fieldsWithErrors).length > 0 && <ErrorBox />}
             {(!mode.read || initialState.mode.new) && onWrite && (
               <WriteButton onWrite={onWrite} hasStagingMode={hasStagingMode} />
             )}

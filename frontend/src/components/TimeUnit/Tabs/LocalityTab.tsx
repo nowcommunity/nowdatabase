@@ -30,5 +30,5 @@ export const LocalityTab = () => {
     },
   ]
 
-  return <SimpleTable columns={columns} data={localitiesData} />
+  return <SimpleTable columns={columns} data={localitiesData} idFieldName="lid" url="locality" />
 }

@@ -61,6 +61,8 @@ export const CoordinatorTab = () => {
           columns={people}
           editTableData={editData.now_proj_people}
           field="now_proj_people"
+          idFieldName="initials"
+          url="person"
         />
       </Grouped>
     </>

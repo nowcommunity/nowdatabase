@@ -1,12 +1,13 @@
 import { SpeciesDetailsType } from '@/backendTypes'
 import { ArrayFrame, HalfFrames } from '@/components/DetailView/common/tabLayoutHelpers'
 import { useDetailContext } from '@/components/DetailView/Context/DetailContext'
+import { emptyOption } from '@/components/DetailView/common/misc'
 
 export const TaxonomyTab = () => {
   const { textField, dropdown, bigTextField } = useDetailContext<SpeciesDetailsType>()
 
   const taxonStatusOptions = [
-    '',
+    emptyOption,
     'family attrib of genus uncertain',
     'genus attrib of species uncertain',
     'informal species',

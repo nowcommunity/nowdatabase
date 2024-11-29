@@ -65,7 +65,7 @@ export const TeethTab = () => {
   ]
 
   const hypsodontyOptions = [
-    '',
+    emptyOption,
     { display: 'Brachydont', value: 'bra' },
     { display: 'Mesodont', value: 'mes' },
     { display: 'Hypsodont', value: 'hyp' },
@@ -75,7 +75,7 @@ export const TeethTab = () => {
   ]
 
   const horizodontyOptions = [
-    '',
+    emptyOption,
     { display: 'Brachyhorizodont', value: 'bra' },
     { display: 'Mesohorizodont', value: 'mes' },
     { display: 'Hypsohorizodont', value: 'hyp' },

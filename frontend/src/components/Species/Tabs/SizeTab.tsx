@@ -1,12 +1,13 @@
 import { SpeciesDetailsType } from '@/backendTypes'
 import { ArrayFrame, HalfFrames } from '@/components/DetailView/common/tabLayoutHelpers'
 import { useDetailContext } from '@components/DetailView/Context/DetailContext'
+import { emptyOption } from '@/components/DetailView/common/misc'
 
 export const SizeTab = () => {
   const { dropdown, textField } = useDetailContext<SpeciesDetailsType>()
 
   const snoutVentLengthOptions = [
-    '',
+    emptyOption,
     { display: '< 10cm', value: '<10cm' },
     { display: '10cm - 1m', value: '10cm-1m' },
     { display: '1m - 2m', value: '1m-2m' },
@@ -14,11 +15,15 @@ export const SizeTab = () => {
     { display: '> 5m', value: '>5m' },
   ]
 
-  const sexualDimorphismSizeOptions = ['', { display: 'Yes', value: 'y' }, { display: 'No', value: 'n' }]
+  const sexualDimorphismSizeOptions = [emptyOption, { display: 'Yes', value: 'y' }, { display: 'No', value: 'n' }]
 
-  const sexualDimorphismDisplayOptions = ['', { display: 'Yes', value: 'y' }, { display: 'No', value: 'n' }]
+  const sexualDimorphismDisplayOptions = [emptyOption, { display: 'Yes', value: 'y' }, { display: 'No', value: 'n' }]
 
-  const populationStructureOptions = ['', { display: 'Social', value: 'soc' }, { display: 'Solitary ', value: 'sol' }]
+  const populationStructureOptions = [
+    emptyOption,
+    { display: 'Social', value: 'soc' },
+    { display: 'Solitary ', value: 'sol' },
+  ]
 
   const size = [
     ['Body Mass (g)', textField('body_mass', { type: 'number' })],

@@ -15,6 +15,16 @@ interface AuthorTabProps {
   tab_name?: string | null
 }
 
+const tabNameToButtonText: { [tabName: string]: string } = {
+  Authors: 'author',
+  Editors: 'editor',
+  'Series Editors': 'editor',
+  'Editors of Issue': 'editor',
+  Sender: 'sender',
+  Recipient: 'recipient',
+  Recipients: 'recipient',
+}
+
 function checkIndexes(editData: EditDataType<ReferenceDetailsType>): boolean {
   let needsUpdate = false
   // First, check if any index is incorrect
@@ -30,7 +40,7 @@ function checkIndexes(editData: EditDataType<ReferenceDetailsType>): boolean {
 export const AuthorTab: React.FC<AuthorTabProps> = ({ field_num_param, tab_name = 'Authors' }) => {
   const { mode, editData, setEditData, fieldsWithErrors } = useDetailContext<ReferenceDetailsType>()
   const { data: authorData, isError } = useGetReferenceAuthorsQuery(mode.read ? skipToken : undefined)
-  const hasError = fieldsWithErrors.includes('ref_authors')
+  const hasError = !!fieldsWithErrors.ref_authors
 
   useEffect(() => {
     // Check and update indexes of authors only if they are incorrect
@@ -74,15 +84,21 @@ export const AuthorTab: React.FC<AuthorTabProps> = ({ field_num_param, tab_name 
     },
   ]
 
+  let buttonText = 'Author'
+  if (tab_name && tabNameToButtonText[tab_name]) {
+    buttonText = tabNameToButtonText[tab_name]
+  }
+
   let title = tab_name ? tab_name : 'Authors'
   if (hasError) title = title.concat(' (Required)')
+
   return (
     <Box>
       <Grouped error={hasError} title={title}>
         {!mode.read && (
           <Box display="flex" gap={1}>
             <EditingForm<ReferenceAuthorType, ReferenceDetailsType>
-              buttonText="Add new author"
+              buttonText={`Add new ${buttonText}`}
               formFields={formFields}
               editAction={(newAuthor: ReferenceAuthorType) => {
                 const updatedAuthors = [
@@ -106,7 +122,7 @@ export const AuthorTab: React.FC<AuthorTabProps> = ({ field_num_param, tab_name 
               }}
             />
             <SelectingTable<ReferenceAuthorType, ReferenceDetailsType>
-              buttonText="Select Author"
+              buttonText={`Select ${buttonText}`}
               data={authorData}
               isError={isError}
               columns={authorColumns}

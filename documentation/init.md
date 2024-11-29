@@ -12,7 +12,7 @@ See [technical explanations](./guides/technical_explanations.md) for how this wo
 
 Requirements: Some modern installation of Docker engine with Docker compose.
 
-1. `npm run setup` in project root to install all node modules, generate prisma-client and create all required config files.
+1. `npm run setup` in project root to install all node modules, generate prisma-client and create all required config files (doesn't overwrite previous ones!).
 2. If you wish to use the staging database, you need to copy the dump files into `data/sqlfiles/` directory. See example of how anonymized test data is in `test_data/sqlfiles/`
 3. `npm run dev` to run with the staging database or `npm run start:anon` to run with the anonymized small test-db included in the repository.
 4. Check if it worked: The docker logs should have a line saying database connection works. Open `localhost:5173` in browser to check if frontend works and shows data.
