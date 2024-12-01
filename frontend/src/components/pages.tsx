@@ -135,7 +135,12 @@ export const timeUnitPage = (
     detailView={<TimeUnitDetails />}
     viewName="time-unit"
     idFieldName="tu_name"
-    createTitle={(tu: TimeUnitDetailsType) => `${tu.tu_display_name}`}
+    createTitle={(tu: TimeUnitDetailsType) =>
+      `(${tu.tu_name}) ${tu.tu_display_name} - ${tu.tu_comment}` +
+      `\n${tu.up_bnd} Ma – ${tu.low_bnd}` +
+      `\n${tu.sequence}` +
+      `\n${tu.rank}`
+    }
     getEditRights={(user: UserState) => {
       if ([Role.Admin, Role.EditUnrestricted].includes(user.role)) return fullRights
       return noRights
@@ -150,7 +155,7 @@ export const timeBoundPage = (
     detailView={<TimeBoundDetails />}
     viewName="time-bound"
     idFieldName="bid"
-    createTitle={(tb: TimeBoundDetailsType) => `${tb.b_name}`}
+    createTitle={(tb: TimeBoundDetailsType) => `${tb.bid} ${tb.b_name}`}
     getEditRights={(user: UserState) => {
       if ([Role.Admin, Role.EditUnrestricted].includes(user.role)) return fullRights
       return noRights
