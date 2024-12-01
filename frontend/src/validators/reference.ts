@@ -94,19 +94,19 @@ const orCheck = (
 ): ValidationError => {
   let fields: (keyof EditDataType<ReferenceDetailsType>)[] = []
 
-  if (data.ref_type_id && [1, 2].includes(data.ref_type_id)) {
-    fields = ['title_primary']
+  if (data.ref_type_id && data.ref_type_id === 2) {
+    fields = ['title_primary', 'title_series', 'gen_notes']
   }
-  if (data.ref_type_id && [3, 5, 8, 9, 11, 14].includes(data.ref_type_id)) {
+  if (data.ref_type_id && [1, 3, 5, 8, 9, 11, 14].includes(data.ref_type_id)) {
     fields = ['title_primary', 'title_secondary', 'title_series', 'gen_notes']
   }
   if (data.ref_type_id && [4, 7, 12, 13].includes(data.ref_type_id)) {
     fields = ['title_primary', 'gen_notes']
   }
-  if (data.ref_type_id && [6].includes(data.ref_type_id)) {
+  if (data.ref_type_id && data.ref_type_id === 6) {
     fields = ['title_primary', 'title_secondary', 'gen_notes']
   }
-  if (data.ref_type_id == 10) {
+  if (data.ref_type_id && data.ref_type_id === 10) {
     fields = ['gen_notes']
   }
 
@@ -118,7 +118,7 @@ const orCheck = (
   })
 
   if (!hasValue) {
-    return `At least one of the following fields must have text: ${fields.join(', ')}`
+    return `At least one of the following fields is required: ${fields.join(', ')}`
   }
   return null
 }
