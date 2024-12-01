@@ -148,8 +148,14 @@ const LocationSearch = ({
           value={searchBoxValue}
           onKeyDown={handleKeyDown}
           placeholder="Search for a place..."
+          id="geonames-search-textfield"
         />
-        <Button variant="contained" onClick={() => void handleSearch(searchBoxValue)} disabled={!searchBoxValue}>
+        <Button
+          id="geonames-search-button"
+          variant="contained"
+          onClick={() => void handleSearch(searchBoxValue)}
+          disabled={!searchBoxValue}
+        >
           {'Search'}
         </Button>
       </Box>
