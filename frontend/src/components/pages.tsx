@@ -109,7 +109,7 @@ const createReferenceSubtitle = (ref: ReferenceDetailsType) => {
   const authorsPart = `${makeNameList(authorsSurnames)}`
   const editorsPart = `${makeNameList(editorsSurnames)} ${editorsSurnames.length > 1 ? '(eds)' : '(ed)'}`
 
-  let title = `${authorsPart} ${ref.date_primary}.`
+  let title = `${authorsPart} (${ref.date_primary}).`
 
   switch (ref.ref_type_id) {
     case 1: // Journal
