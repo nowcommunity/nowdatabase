@@ -39,8 +39,9 @@ export const localityPage = (
     detailView={<LocalityDetails />}
     viewName="locality"
     idFieldName="lid"
-    createTitle={(loc: LocalityDetailsType) =>
-      `${loc.lid} ${loc.loc_name}, ${loc.country} \n${loc.dms_lat}, ${loc.dms_long}\n${loc.max_age} Ma (${loc.bfa_max}) – ${loc.min_age} Ma (${loc.bfa_min})`
+    createTitle={(loc: LocalityDetailsType) => `${loc.lid} ${loc.loc_name}, ${loc.country}`}
+    createSubtitle={(loc: LocalityDetailsType) =>
+      `${loc.dms_lat}, ${loc.dms_long}\n${loc.max_age} Ma (${loc.bfa_max}) – ${loc.min_age} Ma (${loc.bfa_min})`
     }
     getEditRights={(user: UserState, id: string | number) => {
       if ([Role.Admin, Role.EditUnrestricted].includes(user.role)) return fullRights
@@ -56,7 +57,10 @@ export const crossSearchPage = (
     detailView={<LocalityDetails />}
     viewName="crosssearch"
     idFieldName="lid"
-    createTitle={(loc: LocalityDetailsType) => `${loc.loc_name}`}
+    createTitle={(loc: LocalityDetailsType) => `${loc.lid} ${loc.loc_name}, ${loc.country}`}
+    createSubtitle={(loc: LocalityDetailsType) =>
+      `${loc.dms_lat}, ${loc.dms_long}` + `\n${loc.max_age} Ma (${loc.bfa_max}) – ${loc.min_age} Ma (${loc.bfa_min})`
+    }
     getEditRights={(user: UserState, id: string | number) => {
       if ([Role.Admin, Role.EditUnrestricted].includes(user.role)) return fullRights
       if (user.role === Role.EditRestricted && user.localities.includes(id as number)) return limitedRights
@@ -72,9 +76,10 @@ export const speciesPage = (
     viewName="species"
     idFieldName="species_id"
     createTitle={(species: SpeciesDetailsType) =>
-      `${species.species_id} ${species.genus_name + ' ' + species.species_name}` +
-      `\n${species.unique_identifier}` +
-      `\nOrder ${species.order_name}` +
+      `${species.species_id} ${species.genus_name} ${species.species_name}` + `\n${species.unique_identifier}`
+    }
+    createSubtitle={(species: SpeciesDetailsType) =>
+      `Order ${species.order_name}` +
       `\nFamily ${species.family_name}` +
       `\nSubfamily or Tribe ${species.subfamily_name}`
     }
@@ -114,9 +119,9 @@ export const referencePage = (
     detailView={<ReferenceDetails />}
     viewName="reference"
     idFieldName="rid"
-    createTitle={(ref: ReferenceDetailsType) =>
-      `${ref.rid}` +
-      `\n${makeNameList(ref.ref_authors.map(author => author.author_surname))} (${ref.date_primary ? ref.date_primary : 'date missing'}).` +
+    createTitle={(ref: ReferenceDetailsType) => `${ref.rid}`}
+    createSubtitle={(ref: ReferenceDetailsType) =>
+      `${makeNameList(ref.ref_authors.map(author => author.author_surname))} (${ref.date_primary ? ref.date_primary : 'date missing'}).` +
       `\n${ref.title_primary ? ref.title_primary + '.' : ''}` +
       `\n${ref.ref_journal && ref.ref_type_id == 1 ? ref.ref_journal.journal_title + '. ' : ''}${ref.title_secondary ? ref.title_secondary + '. ' : ''}${ref.gen_notes ? ref.gen_notes : ''}` +
       `\n${ref.volume ? ref.volume + ' ' : ''} ${ref.start_page || ref.end_page ? 'pp: ' : ''}${ref.start_page ? ref.start_page + '-' : ''}${ref.end_page ? ref.end_page : ''} ${ref.publisher ? ref.publisher : ''}${ref.pub_place ? ', ' + ref.pub_place : ''}`
@@ -135,11 +140,9 @@ export const timeUnitPage = (
     detailView={<TimeUnitDetails />}
     viewName="time-unit"
     idFieldName="tu_name"
-    createTitle={(tu: TimeUnitDetailsType) =>
-      `(${tu.tu_name}) ${tu.tu_display_name} - ${tu.tu_comment}` +
-      `\n${tu.up_bnd} Ma – ${tu.low_bnd}` +
-      `\n${tu.sequence}` +
-      `\n${tu.rank}`
+    createTitle={(tu: TimeUnitDetailsType) => `(${tu.tu_name}) ${tu.tu_display_name} - ${tu.tu_comment}`}
+    createSubtitle={(tu: TimeUnitDetailsType) =>
+      `${tu.up_bnd} Ma – ${tu.low_bnd} Ma` + `\n${tu.sequence}` + `\n${tu.rank}`
     }
     getEditRights={(user: UserState) => {
       if ([Role.Admin, Role.EditUnrestricted].includes(user.role)) return fullRights
