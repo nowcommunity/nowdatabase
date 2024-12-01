@@ -91,17 +91,7 @@ export const speciesPage = (
   />
 )
 
-// Instead of "Cenozoic Geochronology", use
-// 30
-// Berggren et al. (1985). Cenozoic Geochronology. Geological Society of America Bulletin 96: 1407-1418.
-
-// uh miten saan noi et al. >:/ <-- updateTab / makenamelist
-
-// http://localhost:5173/reference/10031 ?? miksei tee mitään?? AHAA null, no vittu
-// 10031 nyt about toimii
-
-//tää on nyt TÄYSIN varastettu UpdateTabista, paitsi lisätty undefined
-
+// from UpdateTab
 const makeNameList = (names: Array<string | null | undefined>) => {
   if (names.length === 3) {
     return `${names[0]}, ${names[1]} & ${names[2]}`
@@ -118,9 +108,8 @@ const createReferenceSubtitle = (ref: ReferenceDetailsType) => {
   const editorsSurnames = ref.ref_authors.filter(author => author.field_id === 12).map(author => author.author_surname)
   const authorsPart = `${makeNameList(authorsSurnames)}`
   const editorsPart = `${makeNameList(editorsSurnames)} ${editorsSurnames.length > 1 ? '(eds)' : '(ed)'}`
-  const datePart = `(${ref.date_primary})`
 
-  let title = `${authorsPart} ${datePart}.`
+  let title = `${authorsPart} ${ref.date_primary}.`
 
   switch (ref.ref_type_id) {
     case 1: // Journal

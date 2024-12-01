@@ -18,7 +18,7 @@ export const DetailBrowser = <T extends object>() => {
     width: '50em',
     marginLeft: '0em',
     overflow: 'hidden',
-    whiteSpace: 'pre',
+    whiteSpace: 'pre-wrap',
     textOverflow: 'ellipsis',
     position: 'relative',
     textAlign: 'left',
