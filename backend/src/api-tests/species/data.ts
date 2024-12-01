@@ -1,6 +1,41 @@
-import { EditDataType, EditMetaData, Reference, SpeciesDetailsType } from '../../../../frontend/src/backendTypes'
+import { EditDataType, EditMetaData, SpeciesDetailsType } from '../../../../frontend/src/backendTypes'
 
-export const newSpeciesBasis: EditDataType<SpeciesDetailsType> = {
+const references = [
+  {
+    rid: 10039,
+    ref_journal: {
+      journal_title: 'Geology',
+    },
+    ref_authors: [
+      {
+        au_num: 1,
+        author_surname: 'Cande',
+        author_initials: 'S.C.',
+      },
+    ],
+    title_primary: 'A new geomagnetic polarity time scale for the Late Cretaceous and Cenozoic',
+    date_primary: 1992,
+    title_secondary: undefined,
+  },
+  {
+    rid: 21368,
+    ref_journal: {
+      journal_title: 'Geology',
+    },
+    ref_authors: [
+      {
+        au_num: 1,
+        author_surname: 'Ciochon',
+        author_initials: 'Russell.',
+      },
+    ],
+    title_primary: 'Dated co-occurrence of Homo erectus and Gigantopithecus from Tham Khuyen Cave, Vietnam',
+    date_primary: 1996,
+    title_secondary: undefined,
+  },
+]
+
+export const newSpeciesBasis: EditDataType<SpeciesDetailsType & EditMetaData> = {
   class_name: 'Mammalia',
   order_name: 'Eulipotyphla',
   family_name: 'Soricidae',
@@ -104,6 +139,7 @@ export const newSpeciesBasis: EditDataType<SpeciesDetailsType> = {
   ],
   now_sau: [],
   com_taxa_synonym: [],
+  references: references,
 }
 
 export const editedSpecies: EditDataType<SpeciesDetailsType & EditMetaData> = {
@@ -114,7 +150,7 @@ export const editedSpecies: EditDataType<SpeciesDetailsType & EditMetaData> = {
   com_taxa_synonym: [],
   now_sau: [],
   comment: 'species edit test',
-  references: [{ rid: 24188 } as Reference],
+  references: [references[0]],
 }
 
 export const newSpeciesWithoutRequiredFields: EditDataType<SpeciesDetailsType> = {

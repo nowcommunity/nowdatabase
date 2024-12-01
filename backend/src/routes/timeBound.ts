@@ -36,7 +36,7 @@ router.put(
   requireOneOf([Role.Admin, Role.EditUnrestricted]),
   async (req: Request<object, object, { timeBound: EditDataType<TimeBoundDetailsType> & EditMetaData }>, res) => {
     const { comment, references, ...editedTimeBound } = req.body.timeBound
-    const validationErrors = await validateEntireTimeBound(editedTimeBound)
+    const validationErrors = await validateEntireTimeBound({ ...editedTimeBound, references: references })
     if (validationErrors.length > 0) {
       return res.status(403).send(validationErrors)
     }
