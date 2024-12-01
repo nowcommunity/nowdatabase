@@ -51,7 +51,7 @@ Do concider other options before you try to alter the data by hand.
     Notes / gen_notes
     Language / printed_language
 
-Mandatory fields: title_primary, date_primary, authors_primary OR authors_secondary, journal
+Mandatory fields: title_primary OR title_secondary OR title_series OR gen_notes, date_primary, authors_primary OR authors_secondary, journal
 
 "ref_type_id": 2, "ref_type": "Book",
     Title / title_primary
@@ -71,7 +71,7 @@ Mandatory fields: title_primary, date_primary, authors_primary OR authors_second
     Notes / gen_notes
     Language / printed_language
 
-Mandatory fields: title_primary, date_primary, authors_primary OR authors_secondary OR authors_series
+Mandatory fields: title_primary OR title_series OR gen_notes, date_primary, authors_primary OR authors_secondary OR authors_series
 
 "ref_type_id": 3, "ref_type": Book Chapter'
     Title / title_primary
@@ -179,7 +179,7 @@ Mandatory fields: title_primary OR gen_notes, date_primary, authors_primary OR a
     Notes / gen_notes
     Language / printed_language
 
-Mandatory fields: title_primary OR title_secondary OR title_series OR gen_notes, date_primary, authors_primary OR authors_secondary
+Mandatory fields: title_primary OR title_secondary OR title_series OR gen_notes, date_primary, authors_primary OR authors_secondary OR authors_series
 
 "ref_type_id": 9, "ref_type": Unpublished Work'
     Title / title_primary
@@ -194,7 +194,7 @@ Mandatory fields: title_primary OR title_secondary OR title_series OR gen_notes,
     Notes / gen_notes
     Language / printed_language
 
-Mandatory fields: title_primary OR title_secondary OR title_series OR gen_notes, date_primary, authors_primary OR authors_secondary
+Mandatory fields: title_primary OR title_secondary OR title_series OR gen_notes, date_primary, authors_primary OR authors_secondary OR authors_series
 
 "ref_type_id": 10, "ref_type": Personal Communication'
     Authors / authors_primary
