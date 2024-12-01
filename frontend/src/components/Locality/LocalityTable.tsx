@@ -23,6 +23,7 @@ export const LocalityTable = ({ selectorFn }: { selectorFn?: (newObject: Localit
         accessorKey: 'lid',
         header: 'Locality Id',
         size: 20,
+        enableColumnFilterModes: false,
       },
       {
         accessorKey: 'loc_name',
@@ -63,6 +64,7 @@ export const LocalityTable = ({ selectorFn }: { selectorFn?: (newObject: Localit
         accessorKey: 'max_age',
         header: 'Max age',
         filterVariant: 'range',
+        enableColumnFilterModes: false,
         Cell: ({ cell }) => {
           const cellVal = cell.getValue() as number
           if (decimalCount(cellVal) > 3) {
@@ -75,6 +77,7 @@ export const LocalityTable = ({ selectorFn }: { selectorFn?: (newObject: Localit
         accessorKey: 'min_age',
         header: 'Min age',
         filterVariant: 'range',
+        enableColumnFilterModes: false,
         Cell: ({ cell }) => {
           const cellVal = cell.getValue() as number
           if (decimalCount(cellVal) > 3) {
@@ -86,10 +89,12 @@ export const LocalityTable = ({ selectorFn }: { selectorFn?: (newObject: Localit
       {
         accessorKey: 'frac_max',
         header: 'Frac max',
+        enableColumnFilterModes: false,
       },
       {
         accessorKey: 'frac_min',
         header: 'Frac min',
+        enableColumnFilterModes: false,
       },
       {
         id: 'chron',
@@ -112,32 +117,39 @@ export const LocalityTable = ({ selectorFn }: { selectorFn?: (newObject: Localit
       {
         accessorKey: 'dms_lat',
         header: 'DMS lat',
+        enableColumnFilterModes: false,
       },
       {
         accessorKey: 'dms_long',
         header: 'DMS long',
+        enableColumnFilterModes: false,
       },
       {
         accessorKey: 'dec_lat',
         header: 'Dec lat',
         filterVariant: 'range',
+        enableColumnFilterModes: false,
       },
       {
         accessorKey: 'dec_long',
         header: 'Dec long',
         filterVariant: 'range',
+        enableColumnFilterModes: false,
       },
       {
         accessorKey: 'altitude',
         header: 'Altitude',
+        enableColumnFilterModes: false,
       },
       {
         accessorKey: 'site_area',
         header: 'Site area',
+        enableColumnFilterModes: false,
       },
       {
         accessorKey: 'gen_loc',
         header: 'Gen locality',
+        enableColumnFilterModes: false,
       },
       {
         id: 'plate',

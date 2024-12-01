@@ -12,6 +12,7 @@ export const CrossSearchTable = ({ selectorFn }: { selectorFn?: (newObject: Cros
         accessorKey: 'lid',
         header: 'Locality Id',
         size: 20,
+        enableColumnFilterModes: false,
       },
       {
         accessorKey: 'loc_name',
@@ -52,21 +53,25 @@ export const CrossSearchTable = ({ selectorFn }: { selectorFn?: (newObject: Cros
         accessorKey: 'max_age',
         header: 'Max age',
         filterVariant: 'range',
+        enableColumnFilterModes: false,
         Cell: ({ cell }) => (cell.getValue() as number).toFixed(3),
       },
       {
         accessorKey: 'min_age',
         header: 'Min age',
         filterVariant: 'range',
+        enableColumnFilterModes: false,
         Cell: ({ cell }) => (cell.getValue() as number).toFixed(3),
       },
       {
         accessorKey: 'frac_max',
         header: 'Frac max',
+        enableColumnFilterModes: false,
       },
       {
         accessorKey: 'frac_min',
         header: 'Frac min',
+        enableColumnFilterModes: false,
       },
       {
         id: 'chron',
@@ -89,32 +94,39 @@ export const CrossSearchTable = ({ selectorFn }: { selectorFn?: (newObject: Cros
       {
         accessorKey: 'dms_lat',
         header: 'DMS lat',
+        enableColumnFilterModes: false,
       },
       {
         accessorKey: 'dms_long',
         header: 'DMS long',
+        enableColumnFilterModes: false,
       },
       {
         accessorKey: 'dec_lat',
         header: 'Dec lat',
         filterVariant: 'range',
+        enableColumnFilterModes: false,
       },
       {
         accessorKey: 'dec_long',
         header: 'Dec long',
         filterVariant: 'range',
+        enableColumnFilterModes: false,
       },
       {
         accessorKey: 'altitude',
         header: 'Altitude',
+        enableColumnFilterModes: false,
       },
       {
         accessorKey: 'site_area',
         header: 'Site area',
+        enableColumnFilterModes: false,
       },
       {
         accessorKey: 'gen_loc',
         header: 'Gen locality',
+        enableColumnFilterModes: false,
       },
       {
         id: 'plate',
@@ -142,6 +154,7 @@ export const CrossSearchTable = ({ selectorFn }: { selectorFn?: (newObject: Cros
         accessorKey: 'species_id',
         header: 'Id',
         size: 20,
+        enableColumnFilterModes: false,
       },
       {
         id: 'subclass_or_superorder_name',
@@ -236,6 +249,7 @@ export const CrossSearchTable = ({ selectorFn }: { selectorFn?: (newObject: Cros
         header: 'Body Mass',
         size: 20,
         filterVariant: 'range',
+        enableColumnFilterModes: false,
       },
       {
         id: 'brain_mass',
@@ -243,6 +257,7 @@ export const CrossSearchTable = ({ selectorFn }: { selectorFn?: (newObject: Cros
         header: 'Brain Mass',
         size: 20,
         filterVariant: 'range',
+        enableColumnFilterModes: false,
       },
     ],
     []

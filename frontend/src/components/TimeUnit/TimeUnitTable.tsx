@@ -12,6 +12,7 @@ export const TimeUnitTable = ({ selectorFn }: { selectorFn?: (newTimeUnit: TimeU
         accessorKey: 'tu_name',
         header: 'Time Unit Id',
         size: 20,
+        enableColumnFilterModes: false,
       },
       {
         accessorKey: 'tu_display_name',
@@ -23,11 +24,13 @@ export const TimeUnitTable = ({ selectorFn }: { selectorFn?: (newTimeUnit: TimeU
         accessorKey: 'low_bound',
         header: 'Lower Bound',
         filterVariant: 'range',
+        enableColumnFilterModes: false,
       },
       {
         accessorKey: 'up_bound',
         header: 'Upper Bound',
         filterVariant: 'range',
+        enableColumnFilterModes: false,
       },
       {
         accessorKey: 'seq_name',

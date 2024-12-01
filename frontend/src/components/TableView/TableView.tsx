@@ -116,6 +116,8 @@ export const TableView = <T extends MRT_RowData>({
     },
     enableDensityToggle: false,
     enableGlobalFilter: false,
+    enableColumnFilterModes: true,
+    columnFilterModeOptions: ['fuzzy', 'contains', 'startsWith', 'endsWith', 'equals'],
     enableColumnActions: false,
     enableHiding: true,
     renderToolbarInternalActions:

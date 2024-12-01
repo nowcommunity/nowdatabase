@@ -12,6 +12,7 @@ export const SpeciesTable = ({ selectorFn }: { selectorFn?: (id: Species) => voi
         accessorKey: 'species_id',
         header: 'Id',
         size: 20,
+        enableColumnFilterModes: false,
       },
       {
         id: 'subclass_or_superorder_name',
@@ -106,6 +107,7 @@ export const SpeciesTable = ({ selectorFn }: { selectorFn?: (id: Species) => voi
         header: 'Body Mass',
         size: 20,
         filterVariant: 'range',
+        enableColumnFilterModes: false,
       },
       {
         id: 'brain_mass',
@@ -113,6 +115,7 @@ export const SpeciesTable = ({ selectorFn }: { selectorFn?: (id: Species) => voi
         header: 'Brain Mass',
         size: 20,
         filterVariant: 'range',
+        enableColumnFilterModes: false,
       },
     ],
     []

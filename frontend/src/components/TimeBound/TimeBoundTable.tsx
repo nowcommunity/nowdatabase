@@ -18,6 +18,7 @@ export const TimeBoundTable = ({
         accessorKey: 'bid',
         header: 'Time Bound Id',
         size: 20,
+        enableColumnFilterModes: false,
       },
       {
         accessorKey: 'b_name',
@@ -29,6 +30,7 @@ export const TimeBoundTable = ({
         accessorKey: 'age',
         header: 'Age',
         filterVariant: 'range',
+        enableColumnFilterModes: false,
       },
       {
         accessorKey: 'b_comment',
