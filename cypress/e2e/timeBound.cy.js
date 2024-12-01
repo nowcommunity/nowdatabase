@@ -2,6 +2,7 @@ describe('Editing time bound', () => {
   beforeEach('Login as admin', () => {
     cy.login('testSu')
   })
+
   beforeEach('Reset database', () => {
     cy.request(Cypress.env('databaseResetUrl'))
   })
