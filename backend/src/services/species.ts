@@ -1,6 +1,6 @@
-import { EditDataType, SpeciesDetailsType } from '../../../frontend/src/backendTypes'
+import { EditDataType, EditMetaData, SpeciesDetailsType } from '../../../frontend/src/backendTypes'
 import { validateSpecies } from '../../../frontend/src/validators/species'
-import { ValidationObject } from '../../../frontend/src/validators/validator'
+import { ValidationObject, referenceValidator } from '../../../frontend/src/validators/validator'
 import Prisma from '../../prisma/generated/now_test_client'
 import { fixBigInt } from '../utils/common'
 import { logDb, nowDb } from '../utils/db'
@@ -73,12 +73,17 @@ export const getSpeciesDetails = async (id: number) => {
   return JSON.parse(fixBigInt({ ...result, com_taxa_synonym: synonyms || [] })!) as SpeciesDetailsType
 }
 
-export const validateEntireSpecies = (editedFields: EditDataType<Prisma.com_species>) => {
+export const validateEntireSpecies = (editedFields: EditDataType<Prisma.com_species> & EditMetaData) => {
   const keys = Object.keys(editedFields)
   const errors: ValidationObject[] = []
   for (const key of keys) {
     const error = validateSpecies(editedFields as EditDataType<SpeciesDetailsType>, key as keyof SpeciesDetailsType)
     if (error.error) errors.push(error)
   }
+  const error =
+    'references' in editedFields && editedFields.references
+      ? referenceValidator(editedFields.references)
+      : 'references-key is undefined in the data'
+  if (error) errors.push({ name: 'references', error: error })
   return errors
 }

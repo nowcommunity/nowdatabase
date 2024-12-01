@@ -1,5 +1,3 @@
-import { Editable, Reference } from '@/backendTypes'
-
 export type ValidationError = string | null | undefined
 export type ValidationObject = { name: string; error: ValidationError }
 
@@ -70,6 +68,29 @@ export const validator = <T>(
   const validationError = validate(fieldValidator, fieldValidator.useEditData ? editData : editData[fieldName])
   return { name: fieldValidator.name, error: validationError }
 }
+//Copied types over from BackendTypes since cannot import to this file since it's used by both backend & frontend
+//Fix if extra time
+type Reference = {
+  ref_authors: {
+    au_num: number
+    author_surname: string
+    author_initials: string
+  }[]
+  ref_journal: {
+    journal_title: string
+  }
+  ref_ref_type: {
+    ref_type: string
+  }
+  rid: number
+  title_primary: string
+  date_primary: number
+  title_secondary: string
+}
+
+type Editable<T> = T & { rowState?: RowState }
+
+type RowState = 'new' | 'removed' | 'cancelled' | 'clean'
 
 export const referenceValidator: (references: Editable<Reference>[]) => ValidationError = (
   references: Editable<Reference>[]
@@ -80,18 +101,8 @@ export const referenceValidator: (references: Editable<Reference>[]) => Validati
 
   // new references have rowState = 'new', old ones don't have a rowState and references that will be deleted have rowstate='removed'
   // so checking the update has at least one reference that's not queued for removal
-  let nonRemovedReference = false
-  for (const reference of references) {
-    if (reference.rowState && reference.rowState !== 'removed') {
-      nonRemovedReference = true
-      break
-    }
-    if (!reference.rowState) {
-      nonRemovedReference = true
-      break
-    }
-  }
-  if (!nonRemovedReference) {
+  const nonRemovedReferences = references.some(ref => !ref.rowState || ref.rowState !== 'removed')
+  if (!nonRemovedReferences) {
     return 'There must be at least one reference'
   }
   return null

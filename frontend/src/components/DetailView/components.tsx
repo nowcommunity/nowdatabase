@@ -1,10 +1,11 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { useNavigate } from 'react-router-dom'
 import { Button, Box, Typography, CircularProgress, Divider, alpha, List, ListItemText } from '@mui/material'
 import ArrowBackIcon from '@mui/icons-material/ArrowBack'
 import SaveIcon from '@mui/icons-material/Save'
 import { usePageContext } from '../Page'
 import { useDetailContext } from './Context/DetailContext'
-import { EditDataType } from '@/backendTypes'
+import { EditDataType, Editable, Reference } from '@/backendTypes'
 import { useState, useEffect, Fragment } from 'react'
 import { referenceValidator } from '@/validators/validator'
 
@@ -47,16 +48,37 @@ export const WriteButton = <T,>({
         }
       }
     }
-    if (mode.staging === true) {
-      let error: string | null | undefined = null
-      error = referenceValidator(editData.references)
-      if (error && !fieldsWithErrors.includes('references')) {
-        setFieldsWithErrors(prevErrors => [...prevErrors, 'references'])
-      } else if (!error && fieldsWithErrors.includes('references')) {
-        setFieldsWithErrors(prevErrors => prevErrors.filter(err => err !== 'references'))
+    if (mode.staging == true) {
+      const error =
+        typeof editData === 'object' && editData !== null && 'references' in editData
+          ? referenceValidator(editData.references as Editable<Reference>[])
+          : 'References key is undefined in the data'
+      if (error && !('mandatoryReference' in fieldsWithErrors)) {
+        setFieldsWithErrors(prevFieldsWithErrors => {
+          const newFieldsWithErrors = {
+            ...prevFieldsWithErrors,
+            mandatoryReference: { name: 'references', error: error },
+          }
+          return newFieldsWithErrors
+        })
+      } else if (!error && 'mandatoryReference' in fieldsWithErrors) {
+        setFieldsWithErrors(prevFieldsWithErrors => {
+          const newFieldsWithErrors = { ...prevFieldsWithErrors }
+          delete newFieldsWithErrors['mandatoryReference']
+          return newFieldsWithErrors
+        })
       }
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    if (!mode.staging) {
+      if ('mandatoryReference' in fieldsWithErrors) {
+        setFieldsWithErrors(prevFieldsWithErrors => {
+          const newFieldsWithErrors = { ...prevFieldsWithErrors }
+          delete newFieldsWithErrors['mandatoryReference']
+          return newFieldsWithErrors
+        })
+      }
+    }
+    // @ts-expect-error Reason: Typescript doesn't recognise that references do exist. Unable to find a way around it. Fix if extra time
   }, [mode, editData.references])
 
   return (

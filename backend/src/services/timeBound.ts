@@ -1,8 +1,8 @@
 import { logDb, nowDb } from '../utils/db'
 import { validateTimeBound } from '../../../frontend/src/validators/timeBound'
-import { TimeBoundDetailsType, EditDataType } from '../../../frontend/src/backendTypes'
+import { TimeBoundDetailsType, EditDataType, EditMetaData } from '../../../frontend/src/backendTypes'
 import Prisma from '../../prisma/generated/now_test_client'
-import { ValidationObject } from '../../../frontend/src/validators/validator'
+import { ValidationObject, referenceValidator } from '../../../frontend/src/validators/validator'
 
 export const getAllTimeBounds = async () => {
   const result = await nowDb.now_tu_bound.findMany({
@@ -60,7 +60,7 @@ export const getTimeBoundTimeUnits = async (id: number) => {
   return result
 }
 
-export const validateEntireTimeBound = (editedFields: EditDataType<Prisma.now_bau>) => {
+export const validateEntireTimeBound = (editedFields: EditDataType<Prisma.now_bau> & EditMetaData) => {
   const keys = Object.keys(editedFields)
   const errors: ValidationObject[] = []
   for (const key of keys) {
@@ -70,5 +70,10 @@ export const validateEntireTimeBound = (editedFields: EditDataType<Prisma.now_ba
     )
     if (error.error) errors.push(error)
   }
+  const error =
+    'references' in editedFields && editedFields.references
+      ? referenceValidator(editedFields.references)
+      : 'references-key is undefined in the data'
+  if (error) errors.push({ name: 'references', error: error })
   return errors
 }

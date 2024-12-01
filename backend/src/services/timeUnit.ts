@@ -1,6 +1,6 @@
 import { logDb, nowDb } from '../utils/db'
-import { EditDataType, TimeUnitDetailsType } from '../../../frontend/src/backendTypes'
-import { ValidationObject } from '../../../frontend/src/validators/validator'
+import { EditDataType, TimeUnitDetailsType, EditMetaData } from '../../../frontend/src/backendTypes'
+import { ValidationObject, referenceValidator } from '../../../frontend/src/validators/validator'
 import { validateTimeUnit } from '../../../frontend/src/validators/timeUnit'
 
 export const getAllTimeUnits = async () => {
@@ -89,12 +89,17 @@ export const getTimeUnitLocalities = async (id: string) => {
   return result
 }
 
-export const validateEntireTimeUnit = (editedFields: EditDataType<TimeUnitDetailsType>) => {
+export const validateEntireTimeUnit = (editedFields: EditDataType<TimeUnitDetailsType> & EditMetaData) => {
   const keys = Object.keys(editedFields)
   const messages: ValidationObject[] = []
   for (const key of keys) {
     const error = validateTimeUnit(editedFields, key as keyof TimeUnitDetailsType)
     if (error.error) messages.push(error)
   }
+  const error =
+    'references' in editedFields && editedFields.references
+      ? referenceValidator(editedFields.references)
+      : 'references-key is undefined in the data'
+  if (error) messages.push({ name: 'references', error: error })
   return messages
 }
