@@ -25,7 +25,7 @@ router.put(
   requireOneOf([Role.Admin, Role.EditUnrestricted]),
   async (req: Request<object, object, { species: SpeciesDetailsType & EditMetaData }>, res) => {
     const { comment, references, ...editedSpecies } = req.body.species
-    const validationErrors = validateEntireSpecies(editedSpecies)
+    const validationErrors = await validateEntireSpecies(editedSpecies)
     if (validationErrors.length > 0) {
       return res.status(403).send(validationErrors)
     }

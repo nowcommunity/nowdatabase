@@ -25,7 +25,7 @@ router.put(
   requireOneOf([Role.Admin, Role.EditUnrestricted]),
   async (req: Request<object, object, { locality: EditDataType<LocalityDetailsType> & EditMetaData }>, res) => {
     const { comment, references, ...editedLocality } = req.body.locality
-    const validationErrors = validateEntireLocality(editedLocality)
+    const validationErrors = await validateEntireLocality(editedLocality)
     if (validationErrors.length > 0) {
       return res.status(403).send(validationErrors)
     }

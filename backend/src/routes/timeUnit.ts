@@ -52,7 +52,7 @@ router.put(
     if (editedTimeUnit.low_bnd) {
       validationLowBound = (await getTimeBoundDetails(editedTimeUnit.low_bnd)) ?? undefined
     }
-    const validationErrors = validateEntireTimeUnit({
+    const validationErrors = await validateEntireTimeUnit({
       ...editedTimeUnit,
       up_bound: validationUpBound,
       low_bound: validationLowBound,
