@@ -113,6 +113,106 @@ const makeNameList = (names: Array<string | null | undefined>) => {
   return names[0] ?? ''
 }
 
+const createReferenceSubtitle = (ref: ReferenceDetailsType) => {
+  const authorsSurnames = ref.ref_authors.filter(author => author.field_id === 2).map(author => author.author_surname)
+  const editorsSurnames = ref.ref_authors.filter(author => author.field_id === 12).map(author => author.author_surname)
+  const authorsPart = `${makeNameList(authorsSurnames)}`
+  const editorsPart = `${makeNameList(editorsSurnames)} ${editorsSurnames.length > 1 ? '(eds)' : '(ed)'}`
+  const datePart = `(${ref.date_primary})`
+
+  let title = `${authorsPart} ${datePart}.`
+
+  switch (ref.ref_type_id) {
+    case 1: // Journal
+      title += ` ${ref.title_primary}. ${ref.ref_journal.journal_title}`
+      if (ref.volume) {
+        title += ` ${ref.volume}`
+      }
+      if (ref.issue) {
+        title += ` (${ref.issue})`
+      }
+      if (ref.start_page || ref.end_page) {
+        title += `: `
+      }
+      if (ref.start_page) {
+        title += `${ref.start_page}-`
+      }
+      if (ref.end_page) {
+        title += `${ref.end_page}`
+      }
+      if (ref.volume || ref.issue || ref.start_page || ref.end_page) {
+        title += `.`
+      }
+      return title
+    case 2: // Book
+      title += ` ${ref.title_primary}.`
+      if (ref.publisher || ref.pub_place) {
+        title += ` `
+      }
+      if (ref.publisher) {
+        title += `${ref.publisher}`
+      }
+      if (ref.publisher && ref.pub_place) {
+        title += `, `
+      }
+      if (ref.pub_place) {
+        title += `${ref.pub_place}`
+      }
+      if (ref.publisher || ref.pub_place) {
+        title += `.`
+      }
+      return title
+    case 3: // Book Chapter
+      title += ` ${ref.title_primary}. IN: ${editorsPart} ${ref.title_secondary}.`
+
+      if (ref.start_page || ref.end_page) {
+        title += ` pp.`
+      }
+      if (ref.start_page) {
+        title += `${ref.start_page}`
+      }
+      if (ref.start_page && ref.end_page) {
+        title += `-`
+      }
+      if (ref.end_page) {
+        title += `${ref.end_page}`
+      }
+      if (ref.start_page || ref.end_page) {
+        title += `.`
+      }
+      if (ref.publisher || ref.pub_place) {
+        title += ` `
+      }
+      if (ref.publisher) {
+        title += `${ref.publisher}`
+      }
+      if (ref.publisher && ref.pub_place) {
+        title += `, `
+      }
+      if (ref.pub_place) {
+        title += `${ref.pub_place}`
+      }
+      if (ref.publisher || ref.pub_place) {
+        title += `.`
+      }
+      return title
+    default:
+      if (ref.title_primary) {
+        title += ` ${ref.title_primary}.`
+      }
+      if (ref.title_secondary) {
+        title += ` ${ref.title_secondary}.`
+      }
+      if (ref.title_series) {
+        title += ` ${ref.title_series}.`
+      }
+      if (ref.gen_notes) {
+        title += ` ${ref.gen_notes}.`
+      }
+      return title
+  }
+}
+
 export const referencePage = (
   <Page
     tableView={<ReferenceTable />}
@@ -120,12 +220,7 @@ export const referencePage = (
     viewName="reference"
     idFieldName="rid"
     createTitle={(ref: ReferenceDetailsType) => `${ref.rid}`}
-    createSubtitle={(ref: ReferenceDetailsType) =>
-      `${makeNameList(ref.ref_authors.map(author => author.author_surname))} (${ref.date_primary ? ref.date_primary : 'date missing'}).` +
-      `\n${ref.title_primary ? ref.title_primary + '.' : ''}` +
-      `\n${ref.ref_journal && ref.ref_type_id == 1 ? ref.ref_journal.journal_title + '. ' : ''}${ref.title_secondary ? ref.title_secondary + '. ' : ''}${ref.gen_notes ? ref.gen_notes : ''}` +
-      `\n${ref.volume ? ref.volume + ' ' : ''} ${ref.start_page || ref.end_page ? 'pp: ' : ''}${ref.start_page ? ref.start_page + '-' : ''}${ref.end_page ? ref.end_page : ''} ${ref.publisher ? ref.publisher : ''}${ref.pub_place ? ', ' + ref.pub_place : ''}`
-    }
+    createSubtitle={createReferenceSubtitle}
     getEditRights={(user: UserState) => {
       if ([Role.Admin, Role.EditUnrestricted].includes(user.role)) return fullRights
       if (user.role === Role.EditRestricted) return { new: true }
