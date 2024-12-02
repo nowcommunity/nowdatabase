@@ -1,4 +1,39 @@
-import { Reference, SpeciesDetailsType } from '../../../../frontend/src/backendTypes'
+import { SpeciesDetailsType } from '../../../../frontend/src/backendTypes'
+
+const references = [
+  {
+    rid: 10039,
+    ref_journal: {
+      journal_title: 'Geology',
+    },
+    ref_authors: [
+      {
+        au_num: 1,
+        author_surname: 'Cande',
+        author_initials: 'S.C.',
+      },
+    ],
+    title_primary: 'A new geomagnetic polarity time scale for the Late Cretaceous and Cenozoic',
+    date_primary: 1992,
+    title_secondary: undefined,
+  },
+  {
+    rid: 21368,
+    ref_journal: {
+      journal_title: 'Geology',
+    },
+    ref_authors: [
+      {
+        au_num: 1,
+        author_surname: 'Ciochon',
+        author_initials: 'Russell.',
+      },
+    ],
+    title_primary: 'Dated co-occurrence of Homo erectus and Gigantopithecus from Tham Khuyen Cave, Vietnam',
+    date_primary: 1996,
+    title_secondary: undefined,
+  },
+]
 
 export const newLocalityBasis = {
   bfa_max: 'bahean',
@@ -176,6 +211,7 @@ export const newLocalityBasis = {
     },
   ],
   comment: 'new locality test update',
+  references: references,
 }
 
 export const editedLocality = {
@@ -203,5 +239,5 @@ export const editedLocality = {
   now_lau: [],
   now_syn_loc: [],
   comment: 'Test update',
-  references: [{ rid: 24188 } as Reference],
+  references: [references[0]],
 }

@@ -41,6 +41,10 @@ export const getReferenceDetails = async (id: number) => {
     include: { ref_authors: true, ref_journal: true },
   })
 
+  if (!result) {
+    return null
+  }
+
   //changing exact_date to yyyy-mm-dd string since frontend uses that + we don't want to display ISO string in frontend
   if (result && result.exact_date) {
     const date = new Date(result.exact_date)

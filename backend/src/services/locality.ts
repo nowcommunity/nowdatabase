@@ -1,12 +1,13 @@
-import { EditDataType, LocalityDetailsType, User } from '../../../frontend/src/backendTypes'
+import { EditDataType, EditMetaData, LocalityDetailsType, User } from '../../../frontend/src/backendTypes'
 import { Role } from '../../../frontend/src/types'
 import { validateLocality } from '../../../frontend/src/validators/locality'
-import { ValidationObject } from '../../../frontend/src/validators/validator'
+import { ValidationObject, referenceValidator } from '../../../frontend/src/validators/validator'
 import Prisma from '../../prisma/generated/now_test_client'
 import { AccessError } from '../middlewares/authorizer'
 import { fixBigInt } from '../utils/common'
 import { logDb, nowDb } from '../utils/db'
 import { logger } from '../utils/logger'
+import { getReferenceDetails } from './reference'
 
 const getIdsOfUsersProjects = async (user: User) => {
   const usersProjects = await nowDb.now_proj_people.findMany({
@@ -166,13 +167,31 @@ export const getLocalityDetails = async (id: number, user: User | undefined) => 
   return JSON.parse(fixBigInt(result)!) as LocalityDetailsType
 }
 
-export const validateEntireLocality = (editedFields: EditDataType<Prisma.now_loc>) => {
+export const validateEntireLocality = async (editedFields: EditDataType<Prisma.now_loc> & EditMetaData) => {
   const keys = Object.keys(editedFields)
   const errors: ValidationObject[] = []
   for (const key of keys) {
     const error = validateLocality(editedFields as EditDataType<LocalityDetailsType>, key as keyof LocalityDetailsType)
     if (error.error) errors.push(error)
   }
+  let error = null
+  if ('references' in editedFields && editedFields.references) {
+    error = referenceValidator(editedFields.references)
+    const invalidReferences: number[] = []
+    for (const reference of editedFields.references) {
+      const result = await getReferenceDetails(reference.rid)
+      if (!result) {
+        invalidReferences.push(reference.rid)
+      }
+    }
+    if (invalidReferences.length > 0) {
+      error = `References with ID(s) ${invalidReferences.join(', ')} do not exist`
+    }
+  } else {
+    error = 'references-key is undefined in the data'
+  }
+
+  if (error) errors.push({ name: 'references', error: error })
   return errors
 }
 

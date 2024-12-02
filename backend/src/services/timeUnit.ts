@@ -1,7 +1,8 @@
 import { logDb, nowDb } from '../utils/db'
-import { EditDataType, TimeUnitDetailsType } from '../../../frontend/src/backendTypes'
-import { ValidationObject } from '../../../frontend/src/validators/validator'
+import { EditDataType, TimeUnitDetailsType, EditMetaData } from '../../../frontend/src/backendTypes'
+import { ValidationObject, referenceValidator } from '../../../frontend/src/validators/validator'
 import { validateTimeUnit } from '../../../frontend/src/validators/timeUnit'
+import { getReferenceDetails } from './reference'
 
 export const getAllTimeUnits = async () => {
   const result = await nowDb.now_time_unit.findMany({
@@ -89,12 +90,30 @@ export const getTimeUnitLocalities = async (id: string) => {
   return result
 }
 
-export const validateEntireTimeUnit = (editedFields: EditDataType<TimeUnitDetailsType>) => {
+export const validateEntireTimeUnit = async (editedFields: EditDataType<TimeUnitDetailsType> & EditMetaData) => {
   const keys = Object.keys(editedFields)
   const messages: ValidationObject[] = []
   for (const key of keys) {
     const error = validateTimeUnit(editedFields, key as keyof TimeUnitDetailsType)
     if (error.error) messages.push(error)
   }
+  let error = null
+  if ('references' in editedFields && editedFields.references) {
+    error = referenceValidator(editedFields.references)
+    const invalidReferences: number[] = []
+    for (const reference of editedFields.references) {
+      const result = await getReferenceDetails(reference.rid)
+      if (!result) {
+        invalidReferences.push(reference.rid)
+      }
+    }
+    if (invalidReferences.length > 0) {
+      error = `References with ID(s) ${invalidReferences.join(', ')} do not exist`
+    }
+  } else {
+    error = 'references-key is undefined in the data'
+  }
+
+  if (error) messages.push({ name: 'references', error: error })
   return messages
 }

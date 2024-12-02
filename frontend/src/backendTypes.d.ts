@@ -214,7 +214,7 @@ export type TimeUnit = {
   rank: string
 }
 
-export type EditMetaData = { comment?: string; references?: Reference[] }
+export type EditMetaData = { comment?: string; references?: Editable<Reference>[] }
 
 /* Reference */
 export type ReferenceDetailsType = Omit<Prisma.ref_ref, 'exact_date'> & {

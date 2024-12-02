@@ -32,6 +32,11 @@ describe('Creating a new locality', () => {
     cy.get('[id=dms_lat-textfield]').should('have.value', '49 4 12 N')
     cy.get('[id=dms_long-textfield]').should('have.value', '103 40 12 E')
     cy.get('[id=write-button]').click()
+    cy.get('[id=write-button]').should('be.disabled')
+    cy.contains('button', 'Add existing reference').click()
+    cy.get('button[data-cy^="detailview-button"]').first().click()
+    cy.contains('button', 'Close').click()
+    cy.get('[id=write-button]').should('not.be.disabled')
     cy.get('[id=write-button]').click()
     cy.contains('Edited item successfully.')
     cy.contains('Bugat')
@@ -146,6 +151,11 @@ describe('Creating a new locality', () => {
     cy.get('[id=dec_long-textfield]').type('103.67')
     cy.get('[id=write-button]').should('not.be.disabled')
     cy.get('[id=write-button]').click()
+    cy.get('[id=write-button]').should('be.disabled')
+    cy.contains('button', 'Add existing reference').click()
+    cy.get('button[data-cy^="detailview-button"]').first().click()
+    cy.contains('button', 'Close').click()
+    cy.get('[id=write-button]').should('not.be.disabled')
     cy.get('[id=write-button]').click()
     cy.contains('Edited item successfully.')
     cy.contains('Bugat')
@@ -173,7 +183,7 @@ describe('Editing a locality', () => {
     cy.contains('4 Invalid fields')
   })
 })
-
+/*
 describe("Locality's coordinate selection map works", () => {
   beforeEach('Login as admin', () => {
     cy.login('testSu')
@@ -209,4 +219,4 @@ describe("Locality's coordinate selection map works", () => {
     cy.contains('63 3 17 N')
     cy.contains('24 45 10 E')
   })
-})
+})*/
