@@ -54,6 +54,7 @@ describe('Broadly test what different user rights see', () => {
       cy.contains('Send email')
     })
   })
+
   describe('Test unlogged visibility', () => {
     beforeEach('Ensure logout', () => {
       cy.clearAllLocalStorage()

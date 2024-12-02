@@ -15,7 +15,6 @@ describe('Creating a new locality', () => {
     // test clearing of age fields
     cy.get('[name=dating-method][value=time_unit]').click()
     cy.contains('other_absolute').should('not.exist')
-
     cy.get('[name=dating-method][value=absolute]').click()
     cy.get('[id="Min Basis for age (absolute)-multiselect"]').click()
     cy.get('[data-value=other_absolute]').click()
@@ -189,7 +188,7 @@ describe("Locality's coordinate selection map works", () => {
     cy.login('testSu')
   })
 
-  it.only('Map view and location search work', () => {
+  it('Map view and location search work', () => {
     cy.visit(`/locality/20920?tab=1`)
     cy.get('[id=edit-button]').click()
     cy.contains('Get Coordinates').click()
