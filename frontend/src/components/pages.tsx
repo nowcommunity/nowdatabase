@@ -39,7 +39,10 @@ export const localityPage = (
     detailView={<LocalityDetails />}
     viewName="locality"
     idFieldName="lid"
-    createTitle={(loc: LocalityDetailsType) => `${loc.loc_name}`}
+    createTitle={(loc: LocalityDetailsType) => `${loc.lid} ${loc.loc_name}, ${loc.country}`}
+    createSubtitle={(loc: LocalityDetailsType) =>
+      `${loc.dms_lat}, ${loc.dms_long}\n${loc.max_age} Ma (${loc.bfa_max}) – ${loc.min_age} Ma (${loc.bfa_min})`
+    }
     getEditRights={(user: UserState, id: string | number) => {
       if ([Role.Admin, Role.EditUnrestricted].includes(user.role)) return fullRights
       if (user.role === Role.EditRestricted && user.localities.includes(id as number)) return limitedRights
@@ -54,7 +57,10 @@ export const crossSearchPage = (
     detailView={<LocalityDetails />}
     viewName="crosssearch"
     idFieldName="lid"
-    createTitle={(loc: LocalityDetailsType) => `${loc.loc_name}`}
+    createTitle={(loc: LocalityDetailsType) => `${loc.lid} ${loc.loc_name}, ${loc.country}`}
+    createSubtitle={(loc: LocalityDetailsType) =>
+      `${loc.dms_lat}, ${loc.dms_long}` + `\n${loc.max_age} Ma (${loc.bfa_max}) – ${loc.min_age} Ma (${loc.bfa_min})`
+    }
     getEditRights={(user: UserState, id: string | number) => {
       if ([Role.Admin, Role.EditUnrestricted].includes(user.role)) return fullRights
       if (user.role === Role.EditRestricted && user.localities.includes(id as number)) return limitedRights
@@ -69,7 +75,14 @@ export const speciesPage = (
     detailView={<SpeciesDetails />}
     viewName="species"
     idFieldName="species_id"
-    createTitle={(species: SpeciesDetailsType) => `${species.genus_name + ' ' + species.species_name}`}
+    createTitle={(species: SpeciesDetailsType) =>
+      `${species.species_id} ${species.genus_name} ${species.species_name}` + `\n${species.unique_identifier}`
+    }
+    createSubtitle={(species: SpeciesDetailsType) =>
+      `Order ${species.order_name}` +
+      `\nFamily ${species.family_name}` +
+      `\nSubfamily or Tribe ${species.subfamily_name}`
+    }
     getEditRights={(user: UserState) => {
       if ([Role.Admin, Role.EditUnrestricted].includes(user.role)) return fullRights
       if (user.role === Role.EditRestricted) return limitedRights
@@ -78,13 +91,125 @@ export const speciesPage = (
   />
 )
 
+// from UpdateTab
+const makeNameList = (names: Array<string | null | undefined>) => {
+  if (names.length === 3) {
+    return `${names[0]}, ${names[1]} & ${names[2]}`
+  } else if (names.length >= 4) {
+    return `${names[0]} et al.`
+  } else if (names.length === 2) {
+    return `${names[0]} & ${names[1]}`
+  }
+  return names[0] ?? ''
+}
+
+const createReferenceSubtitle = (ref: ReferenceDetailsType) => {
+  const authorsSurnames = ref.ref_authors.filter(author => author.field_id === 2).map(author => author.author_surname)
+  const editorsSurnames = ref.ref_authors.filter(author => author.field_id === 12).map(author => author.author_surname)
+  const authorsPart = `${makeNameList(authorsSurnames)}`
+  const editorsPart = `${makeNameList(editorsSurnames)} ${editorsSurnames.length > 1 ? '(eds)' : '(ed)'}`
+
+  let title = `${authorsPart} (${ref.date_primary}).`
+
+  switch (ref.ref_type_id) {
+    case 1: // Journal
+      title += ` ${ref.title_primary}. ${ref.ref_journal.journal_title}`
+      if (ref.volume) {
+        title += ` ${ref.volume}`
+      }
+      if (ref.issue) {
+        title += ` (${ref.issue})`
+      }
+      if (ref.start_page || ref.end_page) {
+        title += `: `
+      }
+      if (ref.start_page) {
+        title += `${ref.start_page}-`
+      }
+      if (ref.end_page) {
+        title += `${ref.end_page}`
+      }
+      if (ref.volume || ref.issue || ref.start_page || ref.end_page) {
+        title += `.`
+      }
+      return title
+    case 2: // Book
+      title += ` ${ref.title_primary}.`
+      if (ref.publisher || ref.pub_place) {
+        title += ` `
+      }
+      if (ref.publisher) {
+        title += `${ref.publisher}`
+      }
+      if (ref.publisher && ref.pub_place) {
+        title += `, `
+      }
+      if (ref.pub_place) {
+        title += `${ref.pub_place}`
+      }
+      if (ref.publisher || ref.pub_place) {
+        title += `.`
+      }
+      return title
+    case 3: // Book Chapter
+      title += ` ${ref.title_primary}. IN: ${editorsPart} ${ref.title_secondary}.`
+
+      if (ref.start_page || ref.end_page) {
+        title += ` pp.`
+      }
+      if (ref.start_page) {
+        title += `${ref.start_page}`
+      }
+      if (ref.start_page && ref.end_page) {
+        title += `-`
+      }
+      if (ref.end_page) {
+        title += `${ref.end_page}`
+      }
+      if (ref.start_page || ref.end_page) {
+        title += `.`
+      }
+      if (ref.publisher || ref.pub_place) {
+        title += ` `
+      }
+      if (ref.publisher) {
+        title += `${ref.publisher}`
+      }
+      if (ref.publisher && ref.pub_place) {
+        title += `, `
+      }
+      if (ref.pub_place) {
+        title += `${ref.pub_place}`
+      }
+      if (ref.publisher || ref.pub_place) {
+        title += `.`
+      }
+      return title
+    default:
+      if (ref.title_primary) {
+        title += ` ${ref.title_primary}.`
+      }
+      if (ref.title_secondary) {
+        title += ` ${ref.title_secondary}.`
+      }
+      if (ref.title_series) {
+        title += ` ${ref.title_series}.`
+      }
+      if (ref.gen_notes) {
+        title += ` ${ref.gen_notes}.`
+      }
+      return title
+  }
+}
+
 export const referencePage = (
   <Page
     tableView={<ReferenceTable />}
     detailView={<ReferenceDetails />}
     viewName="reference"
     idFieldName="rid"
-    createTitle={(ref: ReferenceDetailsType) => `${ref.title_primary}`}
+    createTitle={(ref: ReferenceDetailsType) => `${ref.rid}`}
+    createSubtitle={createReferenceSubtitle}
     getEditRights={(user: UserState) => {
       if ([Role.Admin, Role.EditUnrestricted].includes(user.role)) return fullRights
       if (user.role === Role.EditRestricted) return { new: true }
@@ -99,7 +224,10 @@ export const timeUnitPage = (
     detailView={<TimeUnitDetails />}
     viewName="time-unit"
     idFieldName="tu_name"
-    createTitle={(tu: TimeUnitDetailsType) => `${tu.tu_display_name}`}
+    createTitle={(tu: TimeUnitDetailsType) => `(${tu.tu_name}) ${tu.tu_display_name} - ${tu.tu_comment}`}
+    createSubtitle={(tu: TimeUnitDetailsType) =>
+      `${tu.up_bnd} Ma – ${tu.low_bnd} Ma` + `\n${tu.sequence}` + `\n${tu.rank}`
+    }
     getEditRights={(user: UserState) => {
       if ([Role.Admin, Role.EditUnrestricted].includes(user.role)) return fullRights
       return noRights
@@ -114,7 +242,7 @@ export const timeBoundPage = (
     detailView={<TimeBoundDetails />}
     viewName="time-bound"
     idFieldName="bid"
-    createTitle={(tb: TimeBoundDetailsType) => `${tb.b_name}`}
+    createTitle={(tb: TimeBoundDetailsType) => `${tb.bid} ${tb.b_name}`}
     getEditRights={(user: UserState) => {
       if ([Role.Admin, Role.EditUnrestricted].includes(user.role)) return fullRights
       return noRights

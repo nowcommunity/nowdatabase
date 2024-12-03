@@ -15,6 +15,7 @@ export type PageContextType<T> = {
   tableUrl: string
   setTableUrl: (newUrl: string) => void
   createTitle: (data: T) => string
+  createSubtitle: (data: T) => string
   editRights: EditRights
 }
 
@@ -25,12 +26,14 @@ export const PageContextProvider = <T extends object>({
   idFieldName,
   viewName,
   createTitle,
+  createSubtitle,
   editRights,
 }: {
   children: ReactNode | ReactNode[]
   idFieldName: string
   viewName: string
   createTitle: (data: T) => string
+  createSubtitle: (data: T) => string
   editRights: EditRights
 }) => {
   const [idList, setIdList] = useState<string[]>([])
@@ -47,6 +50,7 @@ export const PageContextProvider = <T extends object>({
         tableUrl,
         setTableUrl: (newUrl: string) => setTableUrl(newUrl),
         createTitle: (data: unknown) => createTitle(data as T),
+        createSubtitle: (data: unknown) => createSubtitle(data as T),
       }}
     >
       {children}
@@ -68,6 +72,7 @@ export const Page = <T extends Record<string, unknown>>({
   idFieldName,
   viewName,
   createTitle,
+  createSubtitle,
   allowedRoles,
   getEditRights,
 }: {
@@ -76,6 +81,7 @@ export const Page = <T extends Record<string, unknown>>({
   idFieldName: keyof T
   viewName: string
   createTitle: (data: T) => string
+  createSubtitle?: (data: T) => string
   allowedRoles?: Role[]
   getEditRights: (user: UserState, id: string | number) => EditRights
 }) => {
@@ -90,6 +96,7 @@ export const Page = <T extends Record<string, unknown>>({
       idFieldName={idFieldName as string}
       viewName={viewName}
       createTitle={createTitle}
+      createSubtitle={createSubtitle ? createSubtitle : () => ''}
     >
       {id ? detailView : tableView}
     </PageContextProvider>
