@@ -38,6 +38,7 @@ export const TableView = <T extends MRT_RowData>({
   title,
   combinedExport,
   exportIsLoading,
+  enableColumnFilterModes,
 }: {
   title?: string
   data: T[] | undefined
@@ -49,6 +50,7 @@ export const TableView = <T extends MRT_RowData>({
   url?: string
   combinedExport?: (lids: number[]) => Promise<void>
   exportIsLoading?: boolean
+  enableColumnFilterModes?: boolean
 }) => {
   const location = useLocation()
   const { editRights } = usePageContext()
@@ -116,6 +118,8 @@ export const TableView = <T extends MRT_RowData>({
     },
     enableDensityToggle: false,
     enableGlobalFilter: false,
+    enableColumnFilterModes: enableColumnFilterModes,
+    columnFilterModeOptions: ['fuzzy', 'contains', 'startsWith', 'endsWith', 'equals'],
     enableColumnActions: false,
     enableHiding: true,
     renderToolbarInternalActions:

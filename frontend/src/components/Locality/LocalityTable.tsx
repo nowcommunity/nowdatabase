@@ -23,39 +23,42 @@ export const LocalityTable = ({ selectorFn }: { selectorFn?: (newObject: Localit
         accessorKey: 'lid',
         header: 'Locality Id',
         size: 20,
+        enableColumnFilterModes: false,
       },
       {
-        accessorKey: 'loc_name',
+        id: 'loc_name',
+        accessorFn: row => row.loc_name || '',
         header: 'Name',
         enableHiding: false,
         filterFn: 'contains',
       },
       {
-        accessorKey: 'country',
+        id: 'country',
+        accessorFn: row => row.country || '',
         header: 'Country',
         filterFn: 'contains',
       },
       {
         id: 'state',
-        accessorFn: row => row.state || 'N/A',
+        accessorFn: row => row.state || '',
         header: 'State',
         filterFn: 'contains',
       },
       {
         id: 'county',
-        accessorFn: row => row.county || 'N/A',
+        accessorFn: row => row.county || '',
         header: 'County',
         filterFn: 'contains',
       },
       {
         id: 'bfa_max',
-        accessorFn: row => row.bfa_max || 'N/A',
+        accessorFn: row => row.bfa_max || '',
         header: 'BFA max',
         filterFn: 'contains',
       },
       {
         id: 'bfa_min',
-        accessorFn: row => row.bfa_min || 'N/A',
+        accessorFn: row => row.bfa_min || '',
         header: 'BFA min',
         filterFn: 'contains',
       },
@@ -63,6 +66,7 @@ export const LocalityTable = ({ selectorFn }: { selectorFn?: (newObject: Localit
         accessorKey: 'max_age',
         header: 'Max age',
         filterVariant: 'range',
+        enableColumnFilterModes: false,
         Cell: ({ cell }) => {
           const cellVal = cell.getValue() as number
           if (decimalCount(cellVal) > 3) {
@@ -75,6 +79,7 @@ export const LocalityTable = ({ selectorFn }: { selectorFn?: (newObject: Localit
         accessorKey: 'min_age',
         header: 'Min age',
         filterVariant: 'range',
+        enableColumnFilterModes: false,
         Cell: ({ cell }) => {
           const cellVal = cell.getValue() as number
           if (decimalCount(cellVal) > 3) {
@@ -86,79 +91,89 @@ export const LocalityTable = ({ selectorFn }: { selectorFn?: (newObject: Localit
       {
         accessorKey: 'frac_max',
         header: 'Frac max',
+        enableColumnFilterModes: false,
       },
       {
         accessorKey: 'frac_min',
         header: 'Frac min',
+        enableColumnFilterModes: false,
       },
       {
         id: 'chron',
-        accessorFn: row => row.chron || 'N/A',
+        accessorFn: row => row.chron || '',
         header: 'Chron',
         filterFn: 'contains',
       },
       {
         id: 'basin',
-        accessorFn: row => row.basin || 'N/A',
+        accessorFn: row => row.basin || '',
         header: 'Basin',
         filterFn: 'contains',
       },
       {
         id: 'subbasin',
-        accessorFn: row => row.subbasin || 'N/A',
+        accessorFn: row => row.subbasin || '',
         header: 'Subbasin',
         filterFn: 'contains',
       },
       {
         accessorKey: 'dms_lat',
         header: 'DMS lat',
+        enableColumnFilterModes: false,
       },
       {
         accessorKey: 'dms_long',
         header: 'DMS long',
+        enableColumnFilterModes: false,
       },
       {
         accessorKey: 'dec_lat',
         header: 'Dec lat',
         filterVariant: 'range',
+        enableColumnFilterModes: false,
       },
       {
         accessorKey: 'dec_long',
         header: 'Dec long',
         filterVariant: 'range',
+        enableColumnFilterModes: false,
       },
       {
         accessorKey: 'altitude',
         header: 'Altitude',
+        enableColumnFilterModes: false,
       },
       {
         accessorKey: 'site_area',
         header: 'Site area',
+        enableColumnFilterModes: false,
       },
       {
         accessorKey: 'gen_loc',
         header: 'Gen locality',
+        enableColumnFilterModes: false,
       },
       {
         id: 'plate',
-        accessorFn: row => row.plate || 'N/A',
+        accessorFn: row => row.plate || '',
         header: 'Plate',
         filterFn: 'contains',
       },
       {
         id: 'formation',
-        accessorFn: row => row.formation || 'N/A',
+        accessorFn: row => row.formation || '',
         header: 'Formation',
         filterFn: 'contains',
       },
       {
         id: 'member',
-        accessorFn: row => row.member || 'N/A',
+        accessorFn: row => row.member || '',
         header: 'Member',
         filterFn: 'contains',
       },
       {
-        accessorKey: 'bed',
+        id: 'bed',
+        accessorFn: row => row.bed || '',
         header: 'Bed',
       },
     ],
@@ -228,6 +243,7 @@ export const LocalityTable = ({ selectorFn }: { selectorFn?: (newObject: Localit
       url="locality"
       combinedExport={combinedExport}
       exportIsLoading={isLoading}
+      enableColumnFilterModes={true}
     />
   )
 }

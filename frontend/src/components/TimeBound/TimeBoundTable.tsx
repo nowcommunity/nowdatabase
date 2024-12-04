@@ -18,9 +18,11 @@ export const TimeBoundTable = ({
         accessorKey: 'bid',
         header: 'Time Bound Id',
         size: 20,
+        enableColumnFilterModes: false,
       },
       {
-        accessorKey: 'b_name',
+        id: 'b_name',
+        accessorFn: row => row.b_name || '',
         header: 'Name',
         enableHiding: false,
         filterFn: 'contains',
@@ -29,9 +31,11 @@ export const TimeBoundTable = ({
         accessorKey: 'age',
         header: 'Age',
         filterVariant: 'range',
+        enableColumnFilterModes: false,
       },
       {
-        accessorKey: 'b_comment',
+        id: 'b_comment',
+        accessorFn: row => row.b_comment || '',
         header: 'Comment',
         filterFn: 'contains',
       },
@@ -52,6 +56,7 @@ export const TimeBoundTable = ({
       visibleColumns={visibleColumns}
       data={time_boundQuery.data}
       url="time-bound"
+      enableColumnFilterModes={true}
     />
   )
 }

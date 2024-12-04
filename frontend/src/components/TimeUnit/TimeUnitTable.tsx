@@ -12,9 +12,11 @@ export const TimeUnitTable = ({ selectorFn }: { selectorFn?: (newTimeUnit: TimeU
         accessorKey: 'tu_name',
         header: 'Time Unit Id',
         size: 20,
+        enableColumnFilterModes: false,
       },
       {
-        accessorKey: 'tu_display_name',
+        id: 'tu_display_name',
+        accessorFn: row => row.tu_display_name || '',
         header: 'Time Unit',
         enableHiding: false,
         filterFn: 'contains',
@@ -23,19 +25,23 @@ export const TimeUnitTable = ({ selectorFn }: { selectorFn?: (newTimeUnit: TimeU
         accessorKey: 'low_bound',
         header: 'Lower Bound',
         filterVariant: 'range',
+        enableColumnFilterModes: false,
       },
       {
         accessorKey: 'up_bound',
         header: 'Upper Bound',
         filterVariant: 'range',
+        enableColumnFilterModes: false,
       },
       {
-        accessorKey: 'seq_name',
+        id: 'seq_name',
+        accessorFn: row => row.seq_name || '',
         header: 'Sequence',
         filterFn: 'contains',
       },
       {
-        accessorKey: 'rank',
+        id: 'rank',
+        accessorFn: row => row.rank || '',
         header: 'Rank',
       },
     ],
@@ -55,6 +61,7 @@ export const TimeUnitTable = ({ selectorFn }: { selectorFn?: (newTimeUnit: TimeU
       visibleColumns={visibleColumns}
       data={time_unitQuery.data}
       url="time-unit"
+      enableColumnFilterModes={true}
     />
   )
 }
