@@ -15,13 +15,15 @@ export const CrossSearchTable = ({ selectorFn }: { selectorFn?: (newObject: Cros
         enableColumnFilterModes: false,
       },
       {
-        accessorKey: 'loc_name',
+        id: 'loc_name',
+        accessorFn: row => row.loc_name || '',
         header: 'Locality name',
         enableHiding: false,
         filterFn: 'contains',
       },
       {
-        accessorKey: 'country',
+        id: 'country',
+        accessorFn: row => row.country || '',
         header: 'Country',
         filterFn: 'contains',
       },
@@ -147,7 +149,8 @@ export const CrossSearchTable = ({ selectorFn }: { selectorFn?: (newObject: Cros
         filterFn: 'contains',
       },
       {
-        accessorKey: 'bed',
+        id: 'bed',
+        accessorFn: row => row.bed || '',
         header: 'Bed',
       },
       {
@@ -164,7 +167,8 @@ export const CrossSearchTable = ({ selectorFn }: { selectorFn?: (newObject: Cros
         filterFn: 'contains',
       },
       {
-        accessorKey: 'order_name',
+        id: 'order_name',
+        accessorFn: row => row.order_name || '',
         header: 'Order',
         size: 20,
         filterFn: 'contains',
@@ -191,21 +195,24 @@ export const CrossSearchTable = ({ selectorFn }: { selectorFn?: (newObject: Cros
         filterFn: 'contains',
       },
       {
-        accessorKey: 'genus_name',
+        id: 'genus_name',
+        accessorFn: row => row.genus_name || '',
         header: 'Genus',
         size: 20,
         enableHiding: false,
         filterFn: 'contains',
       },
       {
-        accessorKey: 'species_name',
+        id: 'species_name',
+        accessorFn: row => row.species_name || '',
         header: 'Species',
         size: 20,
         enableHiding: false,
         filterFn: 'contains',
       },
       {
-        accessorKey: 'unique_identifier',
+        id: 'unique_identifier',
+        accessorFn: row => row.unique_identifier || '',
         header: 'Unique Identifier',
         size: 20,
         filterFn: 'contains',
@@ -239,7 +246,8 @@ export const CrossSearchTable = ({ selectorFn }: { selectorFn?: (newObject: Cros
         filterFn: 'contains',
       },
       {
-        accessorKey: 'gene',
+        id: 'gene',
+        accessorFn: row => row.gene || '',
         header: 'Gene',
         size: 20,
       },
@@ -319,6 +327,7 @@ export const CrossSearchTable = ({ selectorFn }: { selectorFn?: (newObject: Cros
       visibleColumns={visibleColumns}
       data={crossSearchQuery.data}
       url="crosssearch"
+      enableColumnFilterModes={true}
     />
   )
 }

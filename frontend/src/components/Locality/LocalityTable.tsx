@@ -26,13 +26,15 @@ export const LocalityTable = ({ selectorFn }: { selectorFn?: (newObject: Localit
         enableColumnFilterModes: false,
       },
       {
-        accessorKey: 'loc_name',
+        id: 'loc_name',
+        accessorFn: row => row.loc_name || '',
         header: 'Name',
         enableHiding: false,
         filterFn: 'contains',
       },
       {
-        accessorKey: 'country',
+        id: 'country',
+        accessorFn: row => row.country || '',
         header: 'Country',
         filterFn: 'contains',
       },
@@ -170,7 +172,8 @@ export const LocalityTable = ({ selectorFn }: { selectorFn?: (newObject: Localit
         filterFn: 'contains',
       },
       {
-        accessorKey: 'bed',
+        id: 'bed',
+        accessorFn: row => row.bed || '',
         header: 'Bed',
       },
     ],
@@ -240,6 +243,7 @@ export const LocalityTable = ({ selectorFn }: { selectorFn?: (newObject: Localit
       url="locality"
       combinedExport={combinedExport}
       exportIsLoading={isLoading}
+      enableColumnFilterModes={true}
     />
   )
 }

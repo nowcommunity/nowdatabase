@@ -18,7 +18,6 @@ Following things are needed to create a new page with a table (examples are all 
 - Table view:
   The [TableView](../../frontend/src/components/TableView/TableView.tsx) is defined via variables columns and visibleColumns. Columns in the most simple form only require an accessorKey and a header. If an accessorFn is used, a separate id is required as well. The accessorkey functions as a key to fetch data as well as an id to reference the column as well. The variable visibleColumns takes in accessorKeys or ids for columns, set to false, to be hidden by default.
   - Non-default filtering (eg filterVariant 'range' for numbers or filterFn 'contains' for text substrings) require no null values in the data for given column. It is needed to use accessorFn to map nulls to an empty string for example.
-  - All columns have a filter mode selection menu enabled by default. To disable filter mode selection for a column, set its prop `enableColumnFilterModes` to `false`
 - non-hideable columns can be set by setting parameter `enableHiding: false`
 
 More info can be found from official [MRT docs](https://www.material-react-table.com/)
