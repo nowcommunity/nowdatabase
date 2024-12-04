@@ -162,7 +162,17 @@ export const TableView = <T extends MRT_RowData>({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [table, columnFilters, sorting])
 
-  if (!data) return <CircularProgress />
+  if (!data) {
+    return (
+      <>
+        <CircularProgress />
+        <br></br>
+        {title === 'Locality-Species-Cross-Search'
+          ? 'Loading data, this might take a few seconds...'
+          : 'Loading data...'}
+      </>
+    )
+  }
 
   return (
     <Paper elevation={5} style={{ paddingTop: '0.1rem' }}>
