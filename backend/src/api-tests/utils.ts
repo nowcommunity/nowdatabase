@@ -1,7 +1,7 @@
 import request from 'supertest'
 import app from '../app'
 import { expect } from '@jest/globals'
-import { UpdateLog } from '../../../frontend/src/shared/types/dbTypes'
+import { UpdateLog } from '../../../frontend/src/shared/types'
 import { LogRow } from '../services/write/writeOperations/types'
 
 let token: string | null = null

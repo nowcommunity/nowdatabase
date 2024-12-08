@@ -1,4 +1,4 @@
-import { EditDataType, ReferenceDetailsType, ReferenceAuthorType, ReferenceJournalType } from '../types/dbTypes'
+import { EditDataType, ReferenceDetailsType, ReferenceAuthorType, ReferenceJournalType } from '../types'
 import { Validators, validator, ValidationError } from './validator'
 
 const authorCheck: (data: ReferenceAuthorType[]) => ValidationError = (data: ReferenceAuthorType[]) => {

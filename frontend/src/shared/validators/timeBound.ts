@@ -1,4 +1,4 @@
-import { EditDataType, TimeBoundDetailsType } from '../types/dbTypes'
+import { EditDataType, TimeBoundDetailsType } from '../types'
 import { Validators, validator } from './validator'
 
 export const validateTimeBound = (

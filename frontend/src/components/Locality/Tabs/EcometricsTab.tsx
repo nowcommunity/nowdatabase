@@ -1,7 +1,7 @@
 import { LocalityDetailsType } from '@/shared/types'
 import { ArrayFrame } from '../../DetailView/common/tabLayoutHelpers'
 import { useDetailContext } from '@/components/DetailView/Context/DetailContext'
-import { calculateMeanHypsodonty } from '@/types'
+import { calculateMeanHypsodonty } from '@/shared/calculations'
 
 export const EcometricsTab = () => {
   const { textField, data } = useDetailContext<LocalityDetailsType>()

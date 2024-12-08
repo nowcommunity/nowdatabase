@@ -1,4 +1,4 @@
-import { EditDataType, LocalityDetailsType, User } from '../../../frontend/src/shared/types/dbTypes'
+import { EditDataType, LocalityDetailsType, User } from '../../../frontend/src/shared/types'
 import { Role } from '../../../frontend/src/shared/types'
 import { validateLocality } from '../../../frontend/src/shared/validators/locality'
 import { ValidationObject } from '../../../frontend/src/shared/validators/validator'

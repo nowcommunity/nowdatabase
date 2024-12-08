@@ -1,4 +1,4 @@
-import { EditDataType, FixBigInt, ReferenceJournalType } from '../../../../frontend/src/shared/types/dbTypes'
+import { EditDataType, FixBigInt, ReferenceJournalType } from '../../../../frontend/src/shared/types'
 import { getFieldsOfTables, nowDb } from '../../utils/db'
 import { filterAllowedKeys } from './writeOperations/utils'
 import Prisma from '../../../prisma/generated/now_test_client'

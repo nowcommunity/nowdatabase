@@ -2,7 +2,7 @@ import { Middleware } from '../types'
 import { SECRET } from '../utils/config'
 import jwt, { Secret, TokenExpiredError } from 'jsonwebtoken'
 import { nowDb } from '../utils/db'
-import { User } from '../../../frontend/src/shared/types/dbTypes'
+import { User } from '../../../frontend/src/shared/types'
 import { Role } from '../../../frontend/src/shared/types'
 
 /*

@@ -1,4 +1,4 @@
-import { EditDataType, FixBigInt, ReferenceDetailsType } from '../../../../frontend/src/shared/types/dbTypes'
+import { EditDataType, FixBigInt, ReferenceDetailsType } from '../../../../frontend/src/shared/types'
 import { getFieldsOfTables, nowDb } from '../../utils/db'
 import { getReferenceDetails } from '../reference'
 import { filterAllowedKeys, convertToPrismaDate } from './writeOperations/utils'

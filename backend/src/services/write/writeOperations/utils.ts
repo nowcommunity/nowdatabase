@@ -1,4 +1,4 @@
-import { Editable } from '../../../../../frontend/src/shared/types/dbTypes'
+import { Editable } from '../../../../../frontend/src/shared/types'
 import { DbWriteItem } from './databaseHandler'
 import { DbValue } from './types'
 

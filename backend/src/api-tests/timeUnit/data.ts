@@ -1,4 +1,4 @@
-import { EditDataType, EditMetaData, Reference, TimeUnitDetailsType } from '../../../../frontend/src/shared/types/dbTypes'
+import { EditDataType, EditMetaData, Reference, TimeUnitDetailsType } from '../../../../frontend/src/shared/types'
 
 export const newTimeUnitBasis: EditDataType<TimeUnitDetailsType & EditMetaData> = {
   tu_display_name: 'Bahean Test',

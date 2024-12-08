@@ -1,4 +1,4 @@
-import { EditDataType, SpeciesDetailsType } from '../types/dbTypes'
+import { EditDataType, SpeciesDetailsType } from '../types'
 import { Validators, validator } from './validator'
 
 export const validateSpecies = (

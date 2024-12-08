@@ -1,5 +1,5 @@
 import { beforeEach, beforeAll, afterAll, describe, it, expect } from '@jest/globals'
-import { LocalityDetailsType, SpeciesDetailsType } from '../../../../frontend/src/shared/types/dbTypes'
+import { LocalityDetailsType, SpeciesDetailsType } from '../../../../frontend/src/shared/types'
 import { LogRow } from '../../services/write/writeOperations/types'
 import { newSpeciesBasis, newSpeciesWithoutRequiredFields } from './data'
 import { login, logout, resetDatabase, send, testLogRows, resetDatabaseTimeout, noPermError } from '../utils'

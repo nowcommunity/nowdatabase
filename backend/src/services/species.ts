@@ -1,4 +1,4 @@
-import { EditDataType, SpeciesDetailsType } from '../../../frontend/src/shared/types/dbTypes'
+import { EditDataType, SpeciesDetailsType } from '../../../frontend/src/shared/types'
 import { validateSpecies } from '../../../frontend/src/shared/validators/species'
 import { ValidationObject } from '../../../frontend/src/shared/validators/validator'
 import Prisma from '../../prisma/generated/now_test_client'
