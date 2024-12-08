@@ -1,3 +1,5 @@
+import { Editable, Reference } from '../types'
+
 export type ValidationError = string | null | undefined
 export type ValidationObject = { name: string; error: ValidationError }
 
@@ -68,29 +70,6 @@ export const validator = <T>(
   const validationError = validate(fieldValidator, fieldValidator.useEditData ? editData : editData[fieldName])
   return { name: fieldValidator.name, error: validationError }
 }
-//Copied types over from BackendTypes since cannot import to this file since it's used by both backend & frontend
-//Fix if extra time
-type Reference = {
-  ref_authors: {
-    au_num: number
-    author_surname: string
-    author_initials: string
-  }[]
-  ref_journal: {
-    journal_title: string
-  }
-  ref_ref_type: {
-    ref_type: string
-  }
-  rid: number
-  title_primary: string
-  date_primary: number
-  title_secondary: string
-}
-
-type Editable<T> = T & { rowState?: RowState }
-
-type RowState = 'new' | 'removed' | 'cancelled' | 'clean'
 
 export const referenceValidator: (references: Editable<Reference>[]) => ValidationError = (
   references: Editable<Reference>[]
