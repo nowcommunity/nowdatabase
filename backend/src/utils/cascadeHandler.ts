@@ -1,4 +1,4 @@
-import { EditDataType, TimeUnitDetailsType, TimeBoundDetailsType } from '../../../frontend/src/shared/types'
+import { EditDataType, TimeUnitDetailsType, TimeBoundDetailsType } from '../../../frontend/src/shared/types/dbTypes'
 import { nowDb } from './db'
 import { calculateLocalityMaxAge, calculateLocalityMinAge } from './ageCalculator'
 

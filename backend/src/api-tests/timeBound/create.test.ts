@@ -2,7 +2,7 @@ import { beforeEach, beforeAll, afterAll, describe, it, expect } from '@jest/glo
 import { LogRow } from '../../services/write/writeOperations/types'
 import { login, logout, resetDatabase, send, testLogRows, resetDatabaseTimeout, noPermError } from '../utils'
 import { newTimeBoundBasis } from './data'
-import { TimeBoundDetailsType } from '../../../../frontend/src/shared/types'
+import { TimeBoundDetailsType } from '../../../../frontend/src/shared/types/dbTypes'
 import { pool } from '../../utils/db'
 
 let createdTimeBound: TimeBoundDetailsType | null = null

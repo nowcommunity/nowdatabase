@@ -1,5 +1,5 @@
-import { User, CrossSearch } from '../../../frontend/src//shared/types'
-import { Role } from '../../../frontend/src/types'
+import { User, CrossSearch } from '../../../frontend/src/shared/types/dbTypes'
+import { Role } from '../../../frontend/src/shared/types'
 import { nowDb } from '../utils/db'
 import {
   generateFilteredCrossSearchSql,

@@ -1,5 +1,5 @@
 import { logDb, nowDb } from '../utils/db'
-import { EditDataType, TimeUnitDetailsType } from '../../../frontend/src/shared/types'
+import { EditDataType, TimeUnitDetailsType } from '../../../frontend/src/shared/types/dbTypes'
 import { ValidationObject } from '../../../frontend/src/shared/validators/validator'
 import { validateTimeUnit } from '../../../frontend/src/shared/validators/timeUnit'
 

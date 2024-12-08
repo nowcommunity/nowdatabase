@@ -1,4 +1,4 @@
-import { Reference } from '../../../../../../frontend/src/shared/types'
+import { Reference } from '../../../../../../frontend/src/shared/types/dbTypes'
 import { COORDINATOR } from '../../../../utils/config'
 import { AllowedTables, ActionType, Item, LogRow, PrimaryTables, WriteItem, UpdateEntry } from '../types'
 import { WriteHandler } from '../writeHandler'

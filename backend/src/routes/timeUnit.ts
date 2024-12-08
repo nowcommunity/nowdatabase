@@ -1,6 +1,6 @@
 import { Request, Router } from 'express'
-import { EditDataType, EditMetaData, TimeUnitDetailsType } from '../../../frontend/src/shared/types'
-import { Role } from '../../../frontend/src/types'
+import { EditDataType, EditMetaData, TimeUnitDetailsType } from '../../../frontend/src/shared/types/dbTypes'
+import { Role } from '../../../frontend/src/shared/types'
 import { requireOneOf } from '../middlewares/authorizer'
 import { getAllSequences } from '../services/sequence'
 import {

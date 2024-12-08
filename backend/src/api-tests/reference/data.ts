@@ -1,4 +1,4 @@
-import { EditDataType, /*EditMetaData, Reference,*/ ReferenceDetailsType } from '../../../../frontend/src/shared/types'
+import { EditDataType, /*EditMetaData, Reference,*/ ReferenceDetailsType } from '../../../../frontend/src/shared/types/dbTypes'
 
 /*
 "ref_type_id": 1, "ref_type": "Journal"'

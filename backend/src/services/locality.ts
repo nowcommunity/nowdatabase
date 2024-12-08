@@ -1,5 +1,5 @@
-import { EditDataType, LocalityDetailsType, User } from '../../../frontend/src/shared/types'
-import { Role } from '../../../frontend/src/types'
+import { EditDataType, LocalityDetailsType, User } from '../../../frontend/src/shared/types/dbTypes'
+import { Role } from '../../../frontend/src/shared/types'
 import { validateLocality } from '../../../frontend/src/shared/validators/locality'
 import { ValidationObject } from '../../../frontend/src/shared/validators/validator'
 import Prisma from '../../prisma/generated/now_test_client'

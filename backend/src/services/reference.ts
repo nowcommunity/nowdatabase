@@ -1,5 +1,5 @@
 import { nowDb } from '../utils/db'
-import { EditDataType, ReferenceDetailsType } from '../../../frontend/src/shared/types'
+import { EditDataType, ReferenceDetailsType } from '../../../frontend/src/shared/types/dbTypes'
 import { ValidationObject } from '../../../frontend/src/shared/validators/validator'
 import { validateReference } from '../../../frontend/src/shared/validators/reference'
 import Prisma from '../../prisma/generated/now_test_client'

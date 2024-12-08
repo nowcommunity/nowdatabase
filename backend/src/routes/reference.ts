@@ -10,8 +10,8 @@ import {
   getJournalById,
 } from '../services/reference'
 import { requireOneOf } from '../middlewares/authorizer'
-import { Role } from '../../../frontend/src/types'
-import { EditMetaData, ReferenceDetailsType, EditDataType } from '../../../frontend/src/shared/types'
+import { Role } from '../../../frontend/src/shared/types'
+import { EditMetaData, ReferenceDetailsType, EditDataType } from '../../../frontend/src/shared/types/dbTypes'
 import { deleteReference, writeReference } from '../services/write/reference'
 
 const router = Router()

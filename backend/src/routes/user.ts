@@ -6,7 +6,7 @@ import * as bcrypt from 'bcrypt'
 import { nowDb } from '../utils/db'
 import { getRole } from '../middlewares/authenticator'
 import { AccessError } from '../middlewares/authorizer'
-import { Role } from '../../../frontend/src/types'
+import { Role } from '../../../frontend/src/shared/types'
 import md5 from 'md5'
 
 const router = Router()

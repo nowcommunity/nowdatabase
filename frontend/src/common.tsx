@@ -1,5 +1,5 @@
 import { MRT_ColumnDef } from 'material-react-table'
-import { Reference } from './shared/types'
+import { Reference } from './shared/types/dbTypes'
 import { Cell } from './components/commonComponents'
 
 export const formatLastLoginDate = (date: Date) => {

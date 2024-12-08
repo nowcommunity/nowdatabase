@@ -1,4 +1,4 @@
-import { EditDataType, EditMetaData, Reference, TimeBoundDetailsType } from '../../../../frontend/src/shared/types'
+import { EditDataType, EditMetaData, Reference, TimeBoundDetailsType } from '../../../../frontend/src/shared/types/dbTypes'
 
 export const newTimeBoundBasis: EditDataType<TimeBoundDetailsType & EditMetaData> = {
   b_name: 'C2N-y',
