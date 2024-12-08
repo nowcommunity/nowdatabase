@@ -1,3 +1,5 @@
+/* For types that describe data */
+
 import * as Prisma from '../../../../backend/prisma/generated/now_test_client/default'
 import * as LogPrisma from '../../../../backend/prisma/generated/now_log_test_client/default'
 import { Editable, FixBigInt, RowState } from './util'

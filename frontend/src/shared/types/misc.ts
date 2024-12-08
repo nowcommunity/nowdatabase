@@ -1,3 +1,5 @@
+/* Misc types that are more miscellaneous or general than data-folder */
+
 export enum Role {
   Admin = 1,
   EditUnrestricted = 2,

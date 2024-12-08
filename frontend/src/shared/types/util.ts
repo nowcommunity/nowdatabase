@@ -1,3 +1,5 @@
+/* Util-types - generics or otherwise used for type-technical things */
+
 /* This makes all fields optional, except for array-type fields.
   Also wraps the objects inside arrays as Editable, adding rowState-field in them.
   Applies itself recursively to all nested objects even inside arrays. */
