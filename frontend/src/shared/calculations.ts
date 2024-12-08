@@ -1,4 +1,4 @@
-import { EditDataType, LocalityDetailsType } from './shared/types'
+import { EditDataType, LocalityDetailsType } from './types'
 
 export const calculateMeanHypsodonty = (locality: LocalityDetailsType) => {
   // Mean hypsodonty calculation has been made based on html/include/database.php line 2567 onwards

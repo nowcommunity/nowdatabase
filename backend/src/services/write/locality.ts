@@ -1,5 +1,5 @@
 import { EditDataType, LocalityDetailsType, Reference, User } from '../../../../frontend/src/shared/types'
-import { getHomininSkeletalRemains } from '../../../../frontend/src/types'
+import { getHomininSkeletalRemains } from '../../../../frontend/src/shared/calculations'
 import { NOW_DB_NAME } from '../../utils/config'
 import { WriteHandler } from './writeOperations/writeHandler'
 import { getFieldsOfTables } from '../../utils/db'
