@@ -7,6 +7,7 @@ import {
   PersonDetailsType,
   ProjectDetailsType,
   RegionDetails as RegionDetailsType,
+  Role,
 } from '@/shared/types'
 import { CrossSearchTable } from './CrossSearch/CrossSearchTable'
 import { LocalityDetails } from './Locality/LocalityDetails'
@@ -26,7 +27,6 @@ import { ProjectTable } from './Project/ProjectTable'
 import { ProjectDetails } from './Project/ProjectDetails'
 import { RegionTable } from './Region/RegionTable'
 import { RegionDetails } from './Region/RegionDetails'
-import { Role } from '@/types'
 import { UserState } from '@/redux/userReducer'
 
 const noRights: EditRights = {}

@@ -1,10 +1,9 @@
 import { Request, Router } from 'express'
 import { getAllSpecies, getSpeciesDetails, validateEntireSpecies } from '../services/species'
 import { fixBigInt } from '../utils/common'
-import { EditMetaData, SpeciesDetailsType } from '../../../frontend/src/shared/types'
+import { EditMetaData, SpeciesDetailsType, Role } from '../../../frontend/src/shared/types'
 import { deleteSpecies, writeSpecies } from '../services/write/species'
 import { requireOneOf } from '../middlewares/authorizer'
-import { Role } from '../../../frontend/src/shared/types'
 
 const router = Router()
 

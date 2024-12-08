@@ -1,6 +1,6 @@
 import { useUser } from '@/hooks/user'
 import { useEmailMutation } from '@/redux/emailReducer'
-import { Role } from '@/types'
+import { Role } from '@/shared/types'
 import { Box, Button, Divider, Stack, TextField, Typography } from '@mui/material'
 import { useState } from 'react'
 

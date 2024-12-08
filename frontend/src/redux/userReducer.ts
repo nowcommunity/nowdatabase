@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { api } from '@/redux/api'
-import { Role } from '@/types'
+import { Role } from '@/shared/types'
 
 export type LoginResponse = {
   token: string

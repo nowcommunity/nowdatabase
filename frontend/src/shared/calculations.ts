@@ -1,4 +1,3 @@
-
 import { EditDataType, LocalityDetailsType } from './types'
 
 export const calculateMeanHypsodonty = (locality: LocalityDetailsType) => {

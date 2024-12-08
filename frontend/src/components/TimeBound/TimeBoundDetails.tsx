@@ -1,4 +1,4 @@
-import { EditDataType, TimeBoundDetailsType, ValidationErrors } from '@/shared/calculations.js'
+import { EditDataType, TimeBoundDetailsType, ValidationErrors } from '@/shared/types'
 import { useNotify } from '@/hooks/notification.ts'
 import { CircularProgress } from '@mui/material'
 import { useEffect } from 'react'

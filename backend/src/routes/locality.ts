@@ -1,9 +1,8 @@
 import { Request, Router } from 'express'
 import { getAllLocalities, getLocalityDetails, validateEntireLocality } from '../services/locality'
 import { fixBigInt } from '../utils/common'
-import { EditDataType, EditMetaData, LocalityDetailsType } from '../../../frontend/src/shared/types'
+import { EditDataType, EditMetaData, LocalityDetailsType, Role } from '../../../frontend/src/shared/types'
 import { requireOneOf } from '../middlewares/authorizer'
-import { Role } from '../../../frontend/src/shared/types'
 import { deleteLocality, writeLocality } from '../services/write/locality'
 
 const router = Router()
