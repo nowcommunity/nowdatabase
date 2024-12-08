@@ -3,7 +3,7 @@ import { useParams } from 'react-router-dom'
 import { ReactNode, createContext, useContext, useState, Context } from 'react'
 import { useUser } from '@/hooks/user'
 import { Box } from '@mui/material'
-import { Role } from '@/types'
+import { Role } from '@/shared/types'
 import { UserState } from '@/redux/userReducer'
 import { ENABLE_WRITE } from '@/util/config'
 

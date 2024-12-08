@@ -1,7 +1,6 @@
 import { PoolConnection } from 'mariadb'
-import { User } from '../../../frontend/src/shared/types'
+import { User, Role } from '../../../frontend/src/shared/types'
 import { NOW_DB_NAME } from '../utils/config'
-import { Role } from '../../../frontend/src/types'
 import { pool } from '../utils/db'
 
 const getExportList = async (

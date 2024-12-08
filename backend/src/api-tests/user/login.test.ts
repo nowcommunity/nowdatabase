@@ -16,7 +16,7 @@ describe('Logging in', () => {
 
     expect(result.status).toEqual(200)
     expect(result.body.username).toEqual('testSu')
-    expect(result.body.role).toEqual(1) // frontend/src/types: Role enum
+    expect(result.body.role).toEqual(1) // frontend/src/shared/types: Role enum
     expect(result.body.isFirstLogin).toEqual(undefined)
   })
 

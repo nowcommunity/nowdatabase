@@ -24,7 +24,7 @@ import { ENABLE_WRITE, RUNNING_ENV } from './utils/config'
 import { tokenExtractor, userExtractor } from './middlewares/authenticator'
 import { errorHandler } from './middlewares/errorHandler'
 import { requireOneOf } from './middlewares/authorizer'
-import { Role } from './../../frontend/src/types'
+import { Role } from './../../frontend/src/shared/types'
 import { blockWriteRequests } from './middlewares/misc'
 import testRouter from './routes/test'
 

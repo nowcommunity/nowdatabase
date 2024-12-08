@@ -1,7 +1,7 @@
 import { Router } from 'express'
 import { getAllRegions, getRegionDetails } from '../services/region'
 import { requireOneOf } from '../middlewares/authorizer'
-import { Role } from '../../../frontend/src/types'
+import { Role } from '../../../frontend/src/shared/types'
 
 const router = Router()
 
