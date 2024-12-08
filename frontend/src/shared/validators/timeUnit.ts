@@ -1,4 +1,4 @@
-import { EditDataType, TimeUnitDetailsType } from '../shared/types'
+import { EditDataType, TimeUnitDetailsType } from '../types'
 import { Validators, validator } from './validator'
 
 export const validateTimeUnit = (editData: EditDataType<TimeUnitDetailsType>, fieldName: keyof TimeUnitDetailsType) => {

@@ -10,7 +10,7 @@ import { emptyOption } from '@/components/DetailView/common/misc'
 import { CoordinateSelectionMap } from '@/components/Map/CoordinateSelectionMap'
 import { useState } from 'react'
 import { convertDmsToDec, convertDecToDms } from '@/util/coordinateConversion'
-import { validCountries } from '@/validators/countryList'
+import { validCountries } from '@/shared/validators/countryList'
 
 export const LocalityTab = () => {
   const { textField, radioSelection, dropdown, dropdownWithSearch, mode, bigTextField } =

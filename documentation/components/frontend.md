@@ -67,4 +67,4 @@ This ensures that when multiple components try to update the state at the same t
 
 **Documentation for validators**
 
-[Validators](../../frontend/src/validators/README.md)
+[Validators](../../frontend/src/shared/validators/README.md)

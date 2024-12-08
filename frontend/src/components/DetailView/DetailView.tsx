@@ -14,7 +14,7 @@ import {
 import { DetailBrowser } from './DetailBrowser'
 import { StagingView } from './StagingView'
 import { ErrorBox, ReturnButton, WriteButton } from './components'
-import { ValidationObject } from '@/validators/validator'
+import { ValidationObject } from '@/shared/validators/validator'
 import { EditDataType } from '@/shared/types'
 import { usePageContext } from '../Page'
 
