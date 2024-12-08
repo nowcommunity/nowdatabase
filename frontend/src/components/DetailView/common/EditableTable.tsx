@@ -1,4 +1,4 @@
-import { EditDataType, RowState } from '@/backendTypes'
+import { EditDataType, RowState } from '@/shared/types'
 import { CircularProgress, Box, Button } from '@mui/material'
 import {
   type MRT_ColumnDef,

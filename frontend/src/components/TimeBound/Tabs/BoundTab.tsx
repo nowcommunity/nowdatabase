@@ -1,4 +1,4 @@
-import { TimeBoundDetailsType } from '@/backendTypes'
+import { TimeBoundDetailsType } from '@/shared/types'
 import { ArrayFrame } from '@/components/DetailView/common/tabLayoutHelpers'
 import { useDetailContext } from '@/components/DetailView/Context/DetailContext'
 

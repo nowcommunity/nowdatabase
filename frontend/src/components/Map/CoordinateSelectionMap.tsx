@@ -5,7 +5,7 @@ import 'leaflet/dist/leaflet.css'
 import markerIconPng from 'leaflet/dist/images/marker-icon.png'
 import { Icon } from 'leaflet'
 import { useLazyGetGeonamesQuery } from '../../redux/geonamesReducer'
-import { ParsedGeoname } from '../../backendTypes'
+import { ParsedGeoname } from '../../shared/types'
 
 type Coordinate = {
   lat: number

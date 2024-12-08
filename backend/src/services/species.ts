@@ -1,4 +1,4 @@
-import { EditDataType, EditMetaData, SpeciesDetailsType } from '../../../frontend/src/backendTypes'
+import { EditDataType, EditMetaData, SpeciesDetailsType } from '../../../frontend/src/shared/types'
 import { validateSpecies } from '../../../frontend/src/validators/species'
 import { ValidationObject, referenceValidator } from '../../../frontend/src/validators/validator'
 import Prisma from '../../prisma/generated/now_test_client'

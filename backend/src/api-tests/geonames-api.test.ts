@@ -1,5 +1,5 @@
 import { afterAll, describe, it, expect } from '@jest/globals'
-import type { ParsedGeoname } from '../../../frontend/src/backendTypes'
+import type { ParsedGeoname } from '../../../frontend/src/shared/types'
 import { send } from './utils'
 import { pool } from '../utils/db'
 

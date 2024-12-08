@@ -1,4 +1,4 @@
-import type { CrossSearch } from '../../../../frontend/src/backendTypes'
+import type { CrossSearch } from '../../../../frontend/src/shared/types'
 import { beforeAll, afterAll, describe, it, expect } from '@jest/globals'
 import { resetDatabase, send, resetDatabaseTimeout, login, logout } from '../utils'
 import { pool } from '../../utils/db'

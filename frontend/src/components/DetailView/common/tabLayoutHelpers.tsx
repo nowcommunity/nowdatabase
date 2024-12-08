@@ -1,7 +1,7 @@
 import { Card, Typography, Box, Grid, Divider } from '@mui/material'
 import { ReactNode } from 'react'
 import { useDetailContext } from '../Context/DetailContext'
-import { EditDataType } from '@/backendTypes'
+import { EditDataType } from '@/shared/types'
 
 export const ArrayToTable = ({ array, half }: { array: Array<Array<ReactNode>>; half?: boolean }) => {
   const maxRowLength = Math.max(...array.map(row => row.length))

@@ -3,7 +3,7 @@ import { ReactNode, createContext, useState, JSX, useEffect, Context, useContext
 import { DropdownOption } from '../common/editingComponents'
 import { cloneDeep } from 'lodash-es'
 import { ValidationObject } from '@/validators/validator'
-import { EditDataType } from '@/backendTypes'
+import { EditDataType } from '@/shared/types'
 import {
   TextFieldOptions,
   OptionalRadioSelectionProps,

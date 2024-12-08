@@ -8,7 +8,7 @@ export enum Role {
   ReadOnly = 7,
 }
 
-import { EditDataType, LocalityDetailsType } from '../src/backendTypes'
+import { EditDataType, LocalityDetailsType } from './shared/types'
 
 export const calculateMeanHypsodonty = (locality: LocalityDetailsType) => {
   // Mean hypsodonty calculation has been made based on html/include/database.php line 2567 onwards

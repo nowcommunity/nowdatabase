@@ -1,4 +1,4 @@
-import { ProjectDetailsType, ProjectPeople } from '@/backendTypes'
+import { ProjectDetailsType, ProjectPeople } from '@/shared/types'
 import { useDetailContext } from '@/components/DetailView/Context/DetailContext'
 import { ArrayFrame, Grouped } from '@/components/DetailView/common/tabLayoutHelpers'
 import { MRT_ColumnDef } from 'material-react-table'

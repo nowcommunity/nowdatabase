@@ -7,7 +7,7 @@ import {
   useGetReferenceDetailsQuery,
   useDeleteReferenceMutation,
 } from '@/redux/referenceReducer'
-import { EditDataType, ReferenceDetailsType, ValidationErrors } from '@/backendTypes'
+import { EditDataType, ReferenceDetailsType, ValidationErrors } from '@/shared/types'
 import { emptyReference } from '../DetailView/common/defaultValues'
 import { validateReference } from '@/validators/reference'
 import { useNotify } from '@/hooks/notification'

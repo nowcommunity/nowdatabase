@@ -5,7 +5,7 @@ import {
   LocalityDetailsType,
   TimeUnitDetailsType,
   User,
-} from '../../../../frontend/src/backendTypes'
+} from '../../../../frontend/src/shared/types'
 import { NOW_DB_NAME } from '../../utils/config'
 import { WriteHandler } from './writeOperations/writeHandler'
 import { getFieldsOfTables } from '../../utils/db'

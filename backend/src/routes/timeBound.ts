@@ -1,5 +1,5 @@
 import { Request, Router } from 'express'
-import { EditDataType, EditMetaData, TimeBoundDetailsType } from '../../../frontend/src/backendTypes'
+import { EditDataType, EditMetaData, TimeBoundDetailsType } from '../../../frontend/src/shared/types'
 import { Role } from '../../../frontend/src/types'
 import { requireOneOf } from '../middlewares/authorizer'
 import {

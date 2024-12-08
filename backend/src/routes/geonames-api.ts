@@ -1,7 +1,7 @@
 import { Router, Request } from 'express'
 import { GEONAMES_USERNAME } from '../utils/config'
 import { logger } from '../utils/logger'
-import { GeonamesJSON, ParsedGeoname } from '../../../frontend/src/backendTypes'
+import { GeonamesJSON, ParsedGeoname } from '../../../frontend/src/shared/types'
 
 const router = Router()
 

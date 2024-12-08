@@ -4,13 +4,11 @@ ENV TZ="Europe/Helsinki"
 
 RUN  npm i -g npm
 WORKDIR /usr/src/app
-RUN mkdir -p /usr/src/app/frontend/src/validators
 
 USER node
 
-COPY --chown=node frontend/src/backendTypes.d.ts /usr/src/app/frontend/src/backendTypes.d.ts
+COPY --chown=node frontend/src/shared /usr/src/app/frontend/src/shared/
 COPY --chown=node frontend/src/types.ts /usr/src/app/frontend/src/types.ts
-COPY --chown=node frontend/src/validators /usr/src/app/frontend/src/validators
 COPY --chown=node backend/package.json backend/
 COPY --chown=node backend/package-lock.json backend/
 COPY --chown=node backend/prisma/schema.prisma backend
@@ -41,7 +39,7 @@ RUN chown node:node /usr/src/app -R
 WORKDIR /usr/src/app
 USER node
 
-COPY --from=backend-build --chown=node /usr/src/app/frontend/src/backendTypes.d.ts ../frontend/src/backendTypes.d.ts
+COPY --from=backend-build --chown=node /usr/src/app/frontend/src/shared/types.d.ts ../frontend/src/shared/types.d.ts
 COPY --from=backend-build --chown=node /usr/src/app/frontend/src/types.ts ../frontend/src/types.ts
 COPY --from=backend-build --chown=node /usr/src/app/backend/build .
 COPY --from=backend-build --chown=node /usr/src/app/backend/node_modules ./backend/node_modules

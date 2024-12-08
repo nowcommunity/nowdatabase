@@ -1,5 +1,5 @@
 import { useGetAllReferencesQuery } from '../../redux/referenceReducer'
-import { Reference } from '@/backendTypes'
+import { Reference } from '@/shared/types'
 import { TableView } from '../TableView/TableView'
 import { referenceTableColumns } from '@/common'
 

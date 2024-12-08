@@ -1,4 +1,4 @@
-import { EditDataType, TimeUnitDetailsType, ValidationErrors } from '@/backendTypes'
+import { EditDataType, TimeUnitDetailsType, ValidationErrors } from '@/shared/types'
 import { useNotify } from '@/hooks/notification'
 import { CircularProgress } from '@mui/material'
 import { useEffect } from 'react'

@@ -1,4 +1,4 @@
-import { EditDataType, LocalityDetailsType } from '../backendTypes'
+import { EditDataType, LocalityDetailsType } from '../shared/types'
 import { Validators, validator } from './validator'
 import { validCountries } from './countryList'
 

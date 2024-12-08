@@ -1,6 +1,6 @@
 import { logDb, nowDb } from '../utils/db'
 import { validateTimeBound } from '../../../frontend/src/validators/timeBound'
-import { TimeBoundDetailsType, EditDataType, EditMetaData } from '../../../frontend/src/backendTypes'
+import { TimeBoundDetailsType, EditDataType, EditMetaData } from '../../../frontend/src/shared/types'
 import Prisma from '../../prisma/generated/now_test_client'
 import { ValidationObject, referenceValidator } from '../../../frontend/src/validators/validator'
 import { getReferenceDetails } from './reference'

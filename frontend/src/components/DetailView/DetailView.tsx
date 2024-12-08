@@ -15,7 +15,7 @@ import { DetailBrowser } from './DetailBrowser'
 import { StagingView } from './StagingView'
 import { ErrorBox, ReturnButton, WriteButton } from './components'
 import { ValidationObject } from '@/validators/validator'
-import { EditDataType } from '@/backendTypes'
+import { EditDataType } from '@/shared/types'
 import { usePageContext } from '../Page'
 
 export type TabType = {

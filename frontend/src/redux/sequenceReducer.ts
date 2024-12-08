@@ -1,5 +1,5 @@
 import { api } from './api'
-import { Sequence, SequenceDetailsType } from '@/backendTypes'
+import { Sequence, SequenceDetailsType } from '@/shared/types'
 
 const sequencesApi = api.injectEndpoints({
   endpoints: builder => ({

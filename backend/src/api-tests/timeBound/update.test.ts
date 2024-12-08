@@ -1,7 +1,7 @@
 import { describe, it, beforeAll, afterAll, beforeEach, expect } from '@jest/globals'
 import { editedTimeBound, newTimeBoundBasis } from './data'
 import { send, resetDatabase, login, resetDatabaseTimeout, testLogRows } from '../utils'
-import { TimeBoundDetailsType } from '../../../../frontend/src/backendTypes'
+import { TimeBoundDetailsType } from '../../../../frontend/src/shared/types'
 import { LogRow } from '../../services/write/writeOperations/types'
 import { pool } from '../../utils/db'
 

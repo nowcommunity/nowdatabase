@@ -1,5 +1,5 @@
 import { api } from './api'
-import { Region, RegionDetails } from '@/backendTypes'
+import { Region, RegionDetails } from '@/shared/types'
 
 const regionsApi = api.injectEndpoints({
   endpoints: builder => ({

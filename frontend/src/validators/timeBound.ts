@@ -1,4 +1,4 @@
-import { EditDataType, TimeBoundDetailsType } from '../backendTypes'
+import { EditDataType, TimeBoundDetailsType } from '../shared/types'
 import { Validators, validator } from './validator'
 
 export const validateTimeBound = (

@@ -1,4 +1,4 @@
-import { Editable, LocalityDetailsType, SedimentaryStructure, SedimentaryStructureValues } from '@/backendTypes'
+import { Editable, LocalityDetailsType, SedimentaryStructure, SedimentaryStructureValues } from '@/shared/types'
 import { EditableTable } from '@/components/DetailView/common/EditableTable'
 import { emptyOption } from '@/components/DetailView/common/misc'
 import { SelectingTable } from '@/components/DetailView/common/SelectingTable'

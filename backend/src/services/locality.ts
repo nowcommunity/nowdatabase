@@ -1,4 +1,4 @@
-import { EditDataType, EditMetaData, LocalityDetailsType, User } from '../../../frontend/src/backendTypes'
+import { EditDataType, EditMetaData, LocalityDetailsType, User } from '../../../frontend/src/shared/types'
 import { Role } from '../../../frontend/src/types'
 import { validateLocality } from '../../../frontend/src/validators/locality'
 import { ValidationObject, referenceValidator } from '../../../frontend/src/validators/validator'

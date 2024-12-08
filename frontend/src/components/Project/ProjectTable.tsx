@@ -1,7 +1,7 @@
 import { useMemo } from 'react'
 import { type MRT_ColumnDef } from 'material-react-table'
 import { useGetAllProjectsQuery } from '../../redux/projectReducer'
-import { Project } from '@/backendTypes'
+import { Project } from '@/shared/types'
 import { TableView } from '../TableView/TableView'
 
 export const ProjectTable = ({ selectorFn }: { selectorFn?: (id: Project) => void }) => {

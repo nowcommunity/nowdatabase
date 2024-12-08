@@ -1,4 +1,4 @@
-import { Editable, LocalityDetailsType, Project } from '@/backendTypes'
+import { Editable, LocalityDetailsType, Project } from '@/shared/types'
 import { EditableTable } from '@/components/DetailView/common/EditableTable'
 import { Grouped } from '@/components/DetailView/common/tabLayoutHelpers'
 import { SelectingTable } from '@/components/DetailView/common/SelectingTable'

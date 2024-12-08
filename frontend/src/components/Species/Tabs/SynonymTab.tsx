@@ -1,4 +1,4 @@
-import { Editable, EditDataType, Species, SpeciesDetailsType, SpeciesSynonym } from '@/backendTypes'
+import { Editable, EditDataType, Species, SpeciesDetailsType, SpeciesSynonym } from '@/shared/types'
 import { useDetailContext } from '@/components/DetailView/Context/DetailContext'
 import { Grouped } from '@/components/DetailView/common/tabLayoutHelpers'
 import { MRT_ColumnDef } from 'material-react-table'

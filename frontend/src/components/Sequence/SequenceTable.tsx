@@ -1,7 +1,7 @@
 import { useMemo } from 'react'
 import { type MRT_ColumnDef } from 'material-react-table'
 import { useGetSequencesQuery } from '../../redux/timeUnitReducer'
-import { Sequence } from '@/backendTypes'
+import { Sequence } from '@/shared/types'
 import { TableView } from '../TableView/TableView'
 
 export const SequenceTable = ({ selectorFn }: { selectorFn?: (id: Sequence) => void }) => {

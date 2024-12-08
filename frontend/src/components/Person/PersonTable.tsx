@@ -1,7 +1,7 @@
 import { useMemo } from 'react'
 import { type MRT_ColumnDef } from 'material-react-table'
 import { useGetAllPersonsQuery } from '../../redux/personReducer'
-import { PersonDetailsType } from '@/backendTypes'
+import { PersonDetailsType } from '@/shared/types'
 import { TableView } from '../TableView/TableView'
 import { formatLastLoginDate } from '@/common'
 

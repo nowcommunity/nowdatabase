@@ -1,4 +1,4 @@
-import { LocalityDetailsType } from '@/backendTypes'
+import { LocalityDetailsType } from '@/shared/types'
 import { ArrayFrame } from '../../DetailView/common/tabLayoutHelpers'
 import { useDetailContext } from '@/components/DetailView/Context/DetailContext'
 import { calculateMeanHypsodonty } from '@/types'

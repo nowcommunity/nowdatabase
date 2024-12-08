@@ -1,5 +1,5 @@
 import { beforeEach, beforeAll, afterAll, describe, it, expect } from '@jest/globals'
-import { LocalityDetailsType } from '../../../../frontend/src/backendTypes'
+import { LocalityDetailsType } from '../../../../frontend/src/shared/types'
 import { editedLocality, newLocalityBasis } from './data'
 import { login, resetDatabase, send, resetDatabaseTimeout } from '../utils'
 import { pool } from '../../utils/db'

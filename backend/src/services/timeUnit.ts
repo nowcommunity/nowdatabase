@@ -1,5 +1,5 @@
 import { logDb, nowDb } from '../utils/db'
-import { EditDataType, TimeUnitDetailsType, EditMetaData } from '../../../frontend/src/backendTypes'
+import { EditDataType, TimeUnitDetailsType, EditMetaData } from '../../../frontend/src/shared/types'
 import { ValidationObject, referenceValidator } from '../../../frontend/src/validators/validator'
 import { validateTimeUnit } from '../../../frontend/src/validators/timeUnit'
 import { getReferenceDetails } from './reference'

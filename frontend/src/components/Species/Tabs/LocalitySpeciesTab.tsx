@@ -1,4 +1,4 @@
-import { Editable, SpeciesDetailsType, SpeciesLocality } from '@/backendTypes'
+import { Editable, SpeciesDetailsType, SpeciesLocality } from '@/shared/types'
 import { EditableTable } from '@/components/DetailView/common/EditableTable'
 import { EditingModal } from '@/components/DetailView/common/EditingModal'
 import { Grouped } from '@/components/DetailView/common/tabLayoutHelpers'

@@ -4,7 +4,7 @@ import { CircularProgress } from '@mui/material'
 import { DetailView, TabType } from '../DetailView/DetailView'
 import { PersonTab } from './Tabs/PersonTab'
 import { useUser } from '@/hooks/user'
-import { EditDataType, PersonDetailsType } from '@/backendTypes'
+import { EditDataType, PersonDetailsType } from '@/shared/types'
 
 export const PersonDetails = () => {
   const { id: idFromUrl } = useParams()

@@ -1,5 +1,5 @@
 import { describe, it, beforeEach, beforeAll, afterAll, expect } from '@jest/globals'
-import { TimeUnitDetailsType, EditDataType, EditMetaData } from '../../../../frontend/src/backendTypes'
+import { TimeUnitDetailsType, EditDataType, EditMetaData } from '../../../../frontend/src/shared/types'
 import { login, resetDatabase, send, resetDatabaseTimeout, testLogRows } from '../utils'
 import { editedTimeUnit, newTimeUnitBasis, conflictingTimeUnit } from './data'
 import { pool } from '../../utils/db'

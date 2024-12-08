@@ -1,7 +1,7 @@
 import { useMemo } from 'react'
 import { type MRT_ColumnDef } from 'material-react-table'
 import { useGetAllRegionsQuery } from '../../redux/regionReducer'
-import { Region } from '@/backendTypes'
+import { Region } from '@/shared/types'
 import { TableView } from '../TableView/TableView'
 
 export const RegionTable = ({ selectorFn }: { selectorFn?: (id: Region) => void }) => {

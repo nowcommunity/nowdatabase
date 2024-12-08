@@ -1,4 +1,4 @@
-import { Editable, LocalityDetailsType, LocalitySynonym } from '@/backendTypes'
+import { Editable, LocalityDetailsType, LocalitySynonym } from '@/shared/types'
 import { useDetailContext } from '@/components/DetailView/Context/DetailContext'
 import { Grouped, ArrayFrame, HalfFrames } from '@/components/DetailView/common/tabLayoutHelpers'
 import { Box, TextField } from '@mui/material'

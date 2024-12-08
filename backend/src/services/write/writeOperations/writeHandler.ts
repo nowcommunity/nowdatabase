@@ -1,4 +1,4 @@
-import { Reference, RowState } from '../../../../../frontend/src/backendTypes'
+import { Reference, RowState } from '../../../../../frontend/src/shared/types'
 import { logger } from '../../../utils/logger'
 import { logAllUpdates } from './updateLogger/prepareUpdates'
 import { DatabaseHandler, DbWriteItem } from './databaseHandler'

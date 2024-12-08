@@ -1,6 +1,6 @@
-import * as Prisma from '../../backend/prisma/generated/now_test_client/default'
-import * as LogPrisma from '../../backend/prisma/generated/now_log_test_client/default'
-import { Role } from './types'
+import * as Prisma from '../../../backend/prisma/generated/now_test_client/default'
+import * as LogPrisma from '../../../backend/prisma/generated/now_log_test_client/default'
+import { Role } from '../types'
 
 export type User = {
   username: string
@@ -12,7 +12,7 @@ export type User = {
 /* This makes all fields optional, except for array-type fields.
   Also wraps the objects inside arrays as Editable, adding rowState-field in them.
   Applies itself recursively to all nested objects even inside arrays. */
-type EditDataType<T> = T extends object
+export type EditDataType<T> = T extends object
   ? T extends readonly unknown[]
     ? { [I in keyof T]: Editable<EditDataType<T[I]>> }
     : { [K in keyof T as T[K] extends readonly unknown[] ? K : never]: EditDataType<T[K]> } & {

@@ -1,4 +1,4 @@
-import { Reference } from '../../../../../../frontend/src/backendTypes'
+import { Reference } from '../../../../../../frontend/src/shared/types'
 import { LOG_DB_NAME } from '../../../../utils/config'
 import { LogRow, ActionType, AllowedTables, UpdateEntry } from '../types'
 import { WriteHandler } from '../writeHandler'
