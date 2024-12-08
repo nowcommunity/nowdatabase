@@ -1,5 +1,5 @@
 import { api } from './api'
-import { EditDataType, Locality, LocalityDetailsType } from '@/backendTypes'
+import { EditDataType, Locality, LocalityDetailsType } from '@/shared/types'
 
 const localitiesApi = api.injectEndpoints({
   endpoints: builder => ({

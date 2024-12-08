@@ -2,8 +2,7 @@ import { Middleware } from '../types'
 import { SECRET } from '../utils/config'
 import jwt, { Secret, TokenExpiredError } from 'jsonwebtoken'
 import { nowDb } from '../utils/db'
-import { User } from '../../../frontend/src/backendTypes'
-import { Role } from '../../../frontend/src/types'
+import { User, Role } from '../../../frontend/src/shared/types'
 
 /*
   This allows extractors to add user and token to request

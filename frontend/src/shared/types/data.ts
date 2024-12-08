@@ -1,44 +1,10 @@
-import * as Prisma from '../../backend/prisma/generated/now_test_client/default'
-import * as LogPrisma from '../../backend/prisma/generated/now_log_test_client/default'
-import { Role } from './types'
+/* For types that describe data */
 
-export type User = {
-  username: string
-  role: Role
-  userId: number
-  initials: string
-}
-
-/* This makes all fields optional, except for array-type fields.
-  Also wraps the objects inside arrays as Editable, adding rowState-field in them.
-  Applies itself recursively to all nested objects even inside arrays. */
-type EditDataType<T> = T extends object
-  ? T extends readonly unknown[]
-    ? { [I in keyof T]: Editable<EditDataType<T[I]>> }
-    : { [K in keyof T as T[K] extends readonly unknown[] ? K : never]: EditDataType<T[K]> } & {
-          [K in keyof T as T[K] extends readonly unknown[] ? never : K]?: EditDataType<T[K]>
-        } extends infer U
-      ? { [K in keyof U]: U[K] }
-      : never
-  : T
-
-// Changes all bigints to number type including in nested objects
-export type FixBigInt<T> = {
-  [K in keyof T]: T[K] extends bigint | null
-    ? number | null
-    : T[K] extends (infer U)[]
-      ? FixBigInt<U>[]
-      : T[K] extends object
-        ? FixBigInt<T[K]>
-        : T[K]
-}
+import * as Prisma from '../../../../backend/prisma/generated/now_test_client/default'
+import * as LogPrisma from '../../../../backend/prisma/generated/now_log_test_client/default'
+import { Editable, FixBigInt, RowState } from './util'
 
 export type SpeciesType = FixBigInt<Prisma.com_species>
-export type RowState = 'new' | 'removed' | 'cancelled' | 'clean'
-
-// Use this for fields that include array that has to be edited by EditableTable.
-// For example see LocalityDetails: museums field
-export type Editable<T> = T & { rowState?: RowState }
 export type SedimentaryStructureValues = Prisma.now_ss_values
 export type CollectingMethod = Prisma.now_coll_meth
 export type LocalityProject = Prisma.now_plr & { now_proj: Prisma.now_proj }
@@ -289,16 +255,6 @@ export type ReferenceAuthorType = {
   field_id?: number
   rowState?: RowState
   data_id?: number
-}
-
-export type ValidationErrors = {
-  status: string
-  data: ValidationErrorItem[]
-}
-
-type ValidationErrorItem = {
-  name: string
-  error: string
 }
 
 type Geoname = {

@@ -19,7 +19,7 @@ import { RegisterOptions, FieldValues, UseFormRegisterReturn, FieldErrors } from
 import { useDetailContext } from '../Context/DetailContext'
 import { DataValue } from './tabLayoutHelpers'
 import { modalStyle } from './misc'
-import { EditDataType } from '@/backendTypes'
+import { EditDataType } from '@/shared/types'
 import { calculateLocalityMinAge, calculateLocalityMaxAge } from '@/util/ageCalculator'
 import { checkFieldErrors } from './checkFieldErrors'
 

@@ -1,4 +1,4 @@
-import { TimeUnitDetailsType } from '@/backendTypes'
+import { TimeUnitDetailsType } from '@/shared/types'
 import { useGetTimeUnitLocalitiesQuery } from '@/redux/timeUnitReducer'
 import { CircularProgress } from '@mui/material'
 import { useDetailContext } from '@/components/DetailView/Context/DetailContext'

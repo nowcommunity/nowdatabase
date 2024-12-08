@@ -1,7 +1,7 @@
 import { nowDb } from '../utils/db'
-import { EditDataType, ReferenceDetailsType } from '../../../frontend/src/backendTypes'
-import { ValidationObject } from '../../../frontend/src/validators/validator'
-import { validateReference } from '../../../frontend/src/validators/reference'
+import { EditDataType, ReferenceDetailsType } from '../../../frontend/src/shared/types'
+import { ValidationObject } from '../../../frontend/src/shared/validators/validator'
+import { validateReference } from '../../../frontend/src/shared/validators/reference'
 import Prisma from '../../prisma/generated/now_test_client'
 
 export const getAllReferences = async () => {

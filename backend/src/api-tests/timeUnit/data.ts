@@ -1,4 +1,4 @@
-import { EditDataType, EditMetaData, TimeUnitDetailsType } from '../../../../frontend/src/backendTypes'
+import { EditDataType, EditMetaData, TimeUnitDetailsType } from '../../../../frontend/src/shared/types'
 
 const references = [
   {

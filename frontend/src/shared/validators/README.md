@@ -33,10 +33,3 @@ To know if user is creating a new entry or editing existing one, check if the id
 At the moment you can only create validators for existing and defined fields of editData. This is limiting in some cases and creating validators that check multiple fields (as is necessary in references) requires some trickery. Similarly you cannot create multiple validators for the same field.
 
 Validators are only run if the data is defined! If the value of a key of editData == undefined, the data is not checked even if it is set as required in the validator. Similarly if a key does not exist in editData, it will not be checked even if the data would be required. This is also the case in backend. This may lead to mistakes getting into the db if some data must be set but it is not defined at all.
-
-The files in this folder, and also backendTypes.d.ts, cannot
-
-- Use path aliases in imports
-- Import files from elsewhere in frontend
-
-Because these files are used also by backend, and backend container only gets access to these files in frontend.

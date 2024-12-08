@@ -1,5 +1,5 @@
 import { api } from './api'
-import { CrossSearch } from '@/backendTypes'
+import { CrossSearch } from '@/shared/types'
 
 const crossSearchApi = api.injectEndpoints({
   endpoints: builder => ({

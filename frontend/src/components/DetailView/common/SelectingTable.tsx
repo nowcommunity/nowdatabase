@@ -4,7 +4,7 @@ import { TableView } from '@/components/TableView/TableView'
 import { useDetailContext } from '../Context/DetailContext'
 import { useMemo } from 'react'
 import { Box, CircularProgress } from '@mui/material'
-import { EditDataType } from '@/backendTypes'
+import { EditDataType } from '@/shared/types'
 
 /*
 If editabletable has different type than selectingtable rows,

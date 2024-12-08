@@ -1,6 +1,5 @@
 import { Request, Router } from 'express'
-import { EditDataType, EditMetaData, TimeBoundDetailsType } from '../../../frontend/src/backendTypes'
-import { Role } from '../../../frontend/src/types'
+import { EditDataType, EditMetaData, TimeBoundDetailsType, Role } from '../../../frontend/src/shared/types'
 import { requireOneOf } from '../middlewares/authorizer'
 import {
   getAllTimeBounds,

@@ -1,7 +1,7 @@
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from '@jest/globals'
 import { pool } from '../../utils/db'
 import { login, logout, resetDatabase, resetDatabaseTimeout, send } from '../utils'
-import { ReferenceDetailsType } from '../../../../frontend/src/backendTypes'
+import { ReferenceDetailsType } from '../../../../frontend/src/shared/types'
 import Prisma from '../../../prisma/generated/now_test_client'
 import { newReferenceBasis } from './data'
 

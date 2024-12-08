@@ -1,5 +1,5 @@
 import { beforeEach, beforeAll, afterAll, describe, it, expect } from '@jest/globals'
-import { EditMetaData, SpeciesDetailsType } from '../../../../frontend/src/backendTypes'
+import { EditMetaData, SpeciesDetailsType } from '../../../../frontend/src/shared/types'
 import { LogRow } from '../../services/write/writeOperations/types'
 import { login, resetDatabase, send, testLogRows, resetDatabaseTimeout } from '../utils'
 import { editedSpecies } from './data'

@@ -1,5 +1,5 @@
 import { beforeEach, beforeAll, afterAll, describe, it, expect } from '@jest/globals'
-import { TimeUnitDetailsType } from '../../../../frontend/src/backendTypes'
+import { TimeUnitDetailsType } from '../../../../frontend/src/shared/types'
 import { LogRow } from '../../services/write/writeOperations/types'
 import { login, logout, resetDatabase, send, testLogRows, resetDatabaseTimeout, noPermError } from '../utils'
 import { newTimeUnitBasis } from './data'

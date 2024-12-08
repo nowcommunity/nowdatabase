@@ -1,7 +1,7 @@
 import { logDb, nowDb } from '../utils/db'
-import { EditDataType, TimeUnitDetailsType, EditMetaData } from '../../../frontend/src/backendTypes'
-import { ValidationObject, referenceValidator } from '../../../frontend/src/validators/validator'
-import { validateTimeUnit } from '../../../frontend/src/validators/timeUnit'
+import { EditDataType, TimeUnitDetailsType, EditMetaData } from '../../../frontend/src/shared/types'
+import { ValidationObject, referenceValidator } from '../../../frontend/src/shared/validators/validator'
+import { validateTimeUnit } from '../../../frontend/src/shared/validators/timeUnit'
 import { getReferenceDetails } from './reference'
 
 export const getAllTimeUnits = async () => {

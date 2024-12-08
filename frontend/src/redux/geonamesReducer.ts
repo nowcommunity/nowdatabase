@@ -1,5 +1,5 @@
 import { api } from './api'
-import { ParsedGeoname } from '../backendTypes'
+import { ParsedGeoname } from '../shared/types'
 
 const geonamesApi = api.injectEndpoints({
   endpoints: builder => ({

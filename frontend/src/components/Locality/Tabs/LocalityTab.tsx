@@ -1,4 +1,4 @@
-import { Editable, LocalityDetailsType, LocalitySynonym } from '@/backendTypes'
+import { Editable, LocalityDetailsType, LocalitySynonym } from '@/shared/types'
 import { useDetailContext } from '@/components/DetailView/Context/DetailContext'
 import { Grouped, ArrayFrame, HalfFrames } from '@/components/DetailView/common/tabLayoutHelpers'
 import { Box, TextField } from '@mui/material'
@@ -10,7 +10,7 @@ import { emptyOption } from '@/components/DetailView/common/misc'
 import { CoordinateSelectionMap } from '@/components/Map/CoordinateSelectionMap'
 import { useState } from 'react'
 import { convertDmsToDec, convertDecToDms } from '@/util/coordinateConversion'
-import { validCountries } from '@/validators/countryList'
+import { validCountries } from '@/shared/validators/countryList'
 
 export const LocalityTab = () => {
   const { textField, radioSelection, dropdown, dropdownWithSearch, mode, bigTextField } =

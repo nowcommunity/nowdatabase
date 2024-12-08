@@ -1,4 +1,4 @@
-import { SpeciesDetailsType } from '@/backendTypes'
+import { SpeciesDetailsType } from '@/shared/types'
 import { emptyOption } from '@/components/DetailView/common/misc'
 import { ArrayFrame } from '@/components/DetailView/common/tabLayoutHelpers'
 import { useDetailContext } from '@/components/DetailView/Context/DetailContext'

@@ -1,4 +1,4 @@
-import { ValidationObject } from '@/validators/validator'
+import { ValidationObject } from '@/shared/validators/validator'
 import { FieldsWithErrorsType, SetFieldsWithErrorsType } from '../DetailView'
 
 export const checkFieldErrors = (

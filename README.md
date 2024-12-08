@@ -94,7 +94,7 @@ Docker:
 
 :memo: [Frontend](documentation/components/frontend.md) Explanation of the frontend logic and how to add views
 
-:mag_right: [Validators](frontend/src/validators/) The [readme](frontend/src/validators/README.md) explains how validators are written
+:mag_right: [Validators](frontend/src/shared/validators/) The [readme](frontend/src/shared/validators/README.md) explains how validators are written
 
 :mag_right: [Class diagram](documentation/class_diagram.md) See the relations of relevant tables. Notice that it omits some unimportant tables and does not show most columns.
 

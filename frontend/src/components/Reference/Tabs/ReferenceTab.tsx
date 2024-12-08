@@ -1,4 +1,4 @@
-import { ReferenceDetailsType } from '@/backendTypes'
+import { ReferenceDetailsType } from '@/shared/types'
 import { useDetailContext } from '@/components/DetailView/Context/DetailContext'
 import { ArrayFrame } from '@/components/DetailView/common/tabLayoutHelpers'
 import { useGetReferenceTypesQuery } from '@/redux/referenceReducer'

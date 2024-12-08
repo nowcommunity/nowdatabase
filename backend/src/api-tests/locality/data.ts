@@ -1,4 +1,4 @@
-import { SpeciesDetailsType } from '../../../../frontend/src/backendTypes'
+import { SpeciesDetailsType } from '../../../../frontend/src/shared/types'
 
 const references = [
   {

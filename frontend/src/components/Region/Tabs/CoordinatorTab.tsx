@@ -1,4 +1,4 @@
-import { RegionDetails, RegionCoordinator, RegionCountry } from '@/backendTypes'
+import { RegionDetails, RegionCoordinator, RegionCountry } from '@/shared/types'
 import { useDetailContext } from '@/components/DetailView/Context/DetailContext'
 import { Grouped } from '@/components/DetailView/common/tabLayoutHelpers'
 import { MRT_ColumnDef } from 'material-react-table'

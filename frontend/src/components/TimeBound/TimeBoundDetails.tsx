@@ -1,4 +1,4 @@
-import { EditDataType, TimeBoundDetailsType, ValidationErrors } from '@/backendTypes.js'
+import { EditDataType, TimeBoundDetailsType, ValidationErrors } from '@/shared/types'
 import { useNotify } from '@/hooks/notification.ts'
 import { CircularProgress } from '@mui/material'
 import { useEffect } from 'react'
@@ -8,12 +8,12 @@ import {
   useEditTimeBoundMutation,
   useGetTimeBoundDetailsQuery,
 } from '../../redux/timeBoundReducer'
-import { emptyTimeBound } from '../DetailView/common/defaultValues.ts'
-import { UpdateTab } from '../DetailView/common/UpdateTab.tsx'
+import { emptyTimeBound } from '../DetailView/common/defaultValues'
+import { UpdateTab } from '../DetailView/common/UpdateTab'
 import { DetailView, TabType } from '../DetailView/DetailView'
 import { BoundTab } from './Tabs/BoundTab'
 import { TimeUnitTab } from './Tabs/TimeUnitTab.tsx'
-import { validateTimeBound } from '@/validators/timeBound.ts'
+import { validateTimeBound } from '@/shared/validators/timeBound'
 
 export const TimeBoundDetails = () => {
   const { id } = useParams()
@@ -97,7 +97,7 @@ export const TimeBoundDetails = () => {
   ]
 
   return (
-    <DetailView
+    <DetailView<TimeBoundDetailsType>
       tabs={tabs}
       data={isNew ? emptyTimeBound : data!}
       hasStagingMode

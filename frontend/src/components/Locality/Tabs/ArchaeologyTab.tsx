@@ -1,8 +1,8 @@
-import { LocalityDetailsType } from '@/backendTypes'
+import { LocalityDetailsType } from '@/shared/types'
 import { emptyOption } from '@/components/DetailView/common/misc'
 import { ArrayFrame } from '@/components/DetailView/common/tabLayoutHelpers'
 import { useDetailContext } from '@/components/DetailView/Context/DetailContext'
-import { getHomininSkeletalRemains } from '@/types'
+import { getHomininSkeletalRemains } from '@/shared/calculations'
 
 export const ArchaeologyTab = () => {
   const { dropdown, radioSelection, data } = useDetailContext<LocalityDetailsType>()

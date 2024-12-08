@@ -1,5 +1,5 @@
 import { api } from './api'
-import { EditDataType, Locality, Sequence, TimeUnit, TimeUnitDetailsType } from '@/backendTypes'
+import { EditDataType, Locality, Sequence, TimeUnit, TimeUnitDetailsType } from '@/shared/types'
 
 const timeunitsApi = api.injectEndpoints({
   endpoints: builder => ({
