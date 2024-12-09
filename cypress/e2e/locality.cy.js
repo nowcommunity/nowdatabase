@@ -182,7 +182,9 @@ describe('Editing a locality', () => {
     cy.contains('4 Invalid fields')
   })
 })
-/*
+
+// This test needs GEONAMES_USERNAME to be set in .anon.env!
+
 describe("Locality's coordinate selection map works", () => {
   beforeEach('Login as admin', () => {
     cy.login('testSu')
@@ -218,4 +220,4 @@ describe("Locality's coordinate selection map works", () => {
     cy.contains('63 3 17 N')
     cy.contains('24 45 10 E')
   })
-})*/
+})
