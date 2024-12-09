@@ -15,8 +15,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Copy .anon.env
-        run: cp .template.env .anon.env
+      - name: Create env-files
+        env:
+          GEONAMES_USERNAME: ${{ secrets.GEONAMES_USERNAME }}
+        run: GEONAMES_USERNAME=$GEONAMES_USERNAME npm run config
 
       - name: Setup node
         uses: actions/setup-node@v4
@@ -25,6 +27,9 @@ jobs:
 
       - name: 'Install dependencies'
         run: npm run setup
+
+      - name: Run backend unit-tests
+        run: npm run test:unit:backend
 
       - name: Run frontend unit-tests
         run: npm run test:unit:frontend

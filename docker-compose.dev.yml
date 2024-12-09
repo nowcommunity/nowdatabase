@@ -16,6 +16,7 @@ services:
     build:
       context: .
       dockerfile: ./backend/dev.Dockerfile
+      target: dev
     volumes:
       - ./backend/src:/usr/src/app/backend/src
       - ./frontend/src/:/usr/src/app/frontend/src/
@@ -30,7 +31,7 @@ services:
     env_file: .dev.env
     volumes:
       - ./data/:/docker-entrypoint-initdb.d
-      - nowdb-db:/var/lib/mysql/data
+      - nowdb-db-dev:/var/lib/mysql/data
     ports:
       - 127.0.0.1:3306:3306
 
@@ -46,4 +47,4 @@ services:
       - "9090:443"
 
 volumes:
-  nowdb-db:
+  nowdb-db-dev:

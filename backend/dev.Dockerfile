@@ -1,4 +1,4 @@
-FROM node:22-alpine3.20
+FROM node:22-alpine3.20 as dev
 
 ENV TZ="Europe/Helsinki"
 
@@ -10,6 +10,7 @@ WORKDIR /usr/src/app
 
 RUN mkdir -p /usr/src/app/frontend/src/shared/validators
 
+COPY --chown=node frontend/src/shared /usr/src/app/frontend/src/shared/
 COPY --chown=node ./backend/package.json backend/
 COPY --chown=node ./backend/package-lock.json backend/
 COPY --chown=node ./backend/prisma/schema.prisma backend
@@ -26,3 +27,8 @@ COPY --chown=node ./backend .
 RUN npm run prisma
 
 CMD ["npm", "run", "dev"]
+
+
+FROM dev as api-tests
+
+CMD ["npm", "run", "test:api"]
