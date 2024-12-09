@@ -49,16 +49,3 @@ EXPOSE 4000
 ENV NODE_ENV=production
 
 CMD ["node", "src/index.js"]
-
-
-FROM node:22-alpine3.20 AS api-tests
-
-USER node
-COPY --chown=node --from=backend-build /usr/src/app /usr/src/app
-
-WORKDIR /usr/src/app/backend
-
-RUN npm ci
-RUN npm run prisma
-
-CMD ["npm", "run", "test:api"]

@@ -12,7 +12,7 @@
     "start": "node build/index.js",
     "lint": "eslint --report-unused-disable-directives --max-warnings 0",
     "prisma": "prisma generate --schema prisma/schema.prisma && prisma generate --schema prisma/schema_log.prisma",
-    "clean": "rm -rf node_modules && rm -rf prisma/generated && rm -rf build"
+    "clean": "rm -rf node_modules && rm -rf prisma/generated && rm -rf build && rm -rf coverage"
   },
   "author": "",
   "devDependencies": {

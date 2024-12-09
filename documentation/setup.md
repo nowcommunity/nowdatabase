@@ -10,7 +10,7 @@ See [technical explanations](./guides/technical_explanations.md) for how this wo
 
 **Init the project** :rocket:
 
-Requirements: Some modern installation of Docker engine with Docker compose.
+Requirements: npm and some modern installation of Docker engine with Docker compose.
 
 1. `npm run setup` in project root to install all node modules, generate prisma-client and create all required config files (doesn't overwrite previous ones!).
 2. If you wish to use the staging database, you need to copy the dump files into `data/sqlfiles/` directory. See example of how anonymized test data is in `test_data/sqlfiles/`
@@ -18,6 +18,16 @@ Requirements: Some modern installation of Docker engine with Docker compose.
 4. Check if it worked: The docker logs should have a line saying database connection works. Open `localhost:5173` in browser to check if frontend works and shows data.
 
 **Errors while setting up**
+
+Before any other debugging steps:
+1. Make sure main branch is up to date
+2. Make sure again, you didn't actually check did you...
+3. Re-setup your environment with `npm run setup`
+4. Remove existing containers and volumes `npm run <environment>:down`
+5. Force rebuild it with `-- --build` flag: `npm run <environment> -- --build`
+6. If problems persist, scream for help and hope someone hears you
+7. Continue with other debugging steps
+8. Repeat
 
 ***Database***
 If the database fails to start with an error message `Cannot open directory /docker-entrypoint-initdb.d/. Permission denied`, the problem is most likely permissions. `dev` uses `data` directory and `anon` + `test` uses `test_data`.
@@ -31,7 +41,7 @@ Both directories and the files inside need the permissions `read` and `execute`.
     - The command gives permissions `read` and `execute` for directories and `read` for files inside `backend/src`.
     - NOTE: This gives `write` for all files and directories for current user. You can disable this by changing the first number to match the others.
 
-* `Cannot find module ../../../frontend/src/types`
+* `Cannot find module ../../../frontend/src/shared/types`
     - Permission error with `frontend/src`
     - Fixed by running `find frontend/src -type d -exec chmod 755 {} \; && find frontend/src -type f -exec chmod 644 {} \;` (on Linux).
     - The command gives permissions `read` and `execute` for directories and `read` for files inside `frontend/src`.

@@ -22,6 +22,7 @@ services:
     build:
       context: .
       dockerfile: ./backend/dev.Dockerfile
+      target: dev
     volumes:
       - ./backend/src:/usr/src/app/backend/src
       - ./frontend/src/:/usr/src/app/frontend/src/
