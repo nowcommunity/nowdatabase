@@ -12,7 +12,7 @@ RUN mkdir -p /usr/src/app/frontend/src/shared/validators
 
 COPY --chown=node ./frontend/src/backendTypes.d.ts /usr/src/app/frontend/src/backendTypes.d.ts
 COPY --chown=node ./frontend/src/types.ts /usr/src/app/frontend/src/types.ts
-COPY --chown=node ./frontend/src/validators /usr/src/app/frontend/src/validators
+COPY --chown=node ./frontend/src/shared/validators /usr/src/app/frontend/src/shared/validators
 
 COPY --chown=node ./backend/package.json backend/
 COPY --chown=node ./backend/package-lock.json backend/
