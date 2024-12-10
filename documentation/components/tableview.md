@@ -1,5 +1,0 @@
-# TableView
-
-[TableView](../../frontend/src/components/TableView/TableView.tsx) is a generic component that takes in column definitions, data, and renders a [material-react-table (click for docs)](https://www.material-react-table.com/). It also handles the tables state management: for example saving column filters into url, and restoring them on first render.
-
-The table itself is constructed with the useMaterialReactTable-hook. The toolbar at the top is defined in the [helpers](../../frontend/src/components/TableView/helpers.tsx) file and rendered using the `renderToolbarInternalActions` option, and it contains buttons for showing/hiding columns and showing the table in fullscreen mode, as well as exporting the content of the table. If the toolbar needs to be changed in the future (e.g. adding more rows to it) checkout the documentation for rendering a custom toolbar [here](https://www.material-react-table.com/docs/guides/toolbar-customization#override-with-custom-toolbar-components) since the current method doesn't really allow any major changes to its layout.

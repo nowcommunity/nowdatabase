@@ -2,9 +2,9 @@
 
 **Data tables**
 
-- [TableView](../../frontend/src/components/TableView/TableView.tsx) is a generic component that takes in column definitions, data, and renders a [material-react-table (click for docs)](https://www.material-react-table.com/). It also handles the tables state management: for example saving column filters into url, and restoring them on first render. See [creating a new tableview](../guides/creating_new_tableview.md) for more details, and check out the [TableView](./tableview.md) documentation too.
+- [TableView](../../frontend/src/components/TableView/TableView.tsx) is a generic component that takes in column definitions, data, and renders a [material-react-table (click for docs)](https://www.material-react-table.com/). It also handles the tables state management: for example saving column filters into url, and restoring them on first render. See [TableView docs](./components/TableView.md) for more details.
 
-- [DetailView](../../frontend/src/components/DetailView/)-folder has components that are used by the detailed view: The view which allows looking at and editing a single data item, for example a locality. The DetailView-component is generic, allowing different data types to use it.
+- [DetailView](../../frontend/src/components/DetailView)-folder has components that are used by the detailed view: The view which allows looking at and editing a single data item, for example a locality. The DetailView-component is generic, allowing different data types to use it.
 
 **Example of a detail view rendering tree**
 
@@ -59,11 +59,11 @@ This ensures that when multiple components try to update the state at the same t
 
 **Detailed documentation for editingComponents**
 
-- [RadioSelector](../editingComponents/RadioSelector.md)
-- [DropDownSelector](../editingComponents/DropDownSelector.md)
-- [FieldWithTableSelection](../editingComponents/FieldWithTableSelection.md)
-- [TimeBoundSelection](../editingComponents/TimeBoundSelection.md)
-- [EditableTextField](../editingComponents/EditableTextField.md)
+- [RadioSelector](./components/editingComponents/RadioSelector.md)
+- [DropDownSelector](./components/editingComponents/DropdownSelector.md)
+- [FieldWithTableSelection](./components/editingComponents/FieldWithTableSelection.md)
+- [TimeBoundSelection](./components/editingComponents/TimeBoundSelection.md)
+- [EditableTextField](./components/editingComponents/EditableTextField.md)
 
 **Documentation for validators**
 
