@@ -15,6 +15,4 @@ The values that the RadioSelector supports are strings, numbers, and booleans as
 
 If a `defaultValue` is not given, the RadioSelector will choose the first option's value as the default value. This means that a RadioSelector always has a value. The selector will also immediately add this default value to the editData.
 
-The `handleSetEditData` function is used to set the editData state using setEditData, instead of the default handling. This is useful if you want changing the radio selector to have an effect on some other input field, e.g. another component. An example use is `handleDateMethChange` in [AgeTab](../../frontend/src/components/Locality/Tabs/AgeTab.tsx)
-
-
+The `handleSetEditData` function is used to set the editData state using setEditData, instead of the default handling. This is useful if you want changing the radio selector to have an effect on some other input field, e.g. another component. An example use is `handleDateMethChange` in [AgeTab](../../../../frontend/src/components/Locality/Tabs/AgeTab.tsx)
