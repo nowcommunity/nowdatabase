@@ -41,4 +41,4 @@ The new version is not deployed yet.
 
 :mag_right: [Class diagram](documentation/class_diagram.md) See the relations of relevant tables. Notice that it omits some unimportant tables and does not show most columns.
 
-:earth_africa: [Map features](documentation/frontend/components/maps/map_features.md) Maps' functionality and development notes
+:earth_africa: [Map features](documentation/frontend/components/maps/README.md) Maps' functionality and development notes
