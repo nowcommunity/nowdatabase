@@ -18,6 +18,6 @@ If `disabled` is set to true, the EditableTextField cannot be clicked.
 
 If `readonly` is set to true, the user can't change the value of the input field directly.
 
-The `handleSetEditData` function is used to set the editData state using setEditData, instead of the default handling. This is useful if you want changing the text field to have an effect on some other input field, e.g. another component. An example use is `handleDmsLatChange` (and three similar functions) in [LocalityTab](../../frontend/src/components/Locality/Tabs/LocalityTab.tsx)
+The `handleSetEditData` function is used to set the editData state using setEditData, instead of the default handling. This is useful if you want changing the text field to have an effect on some other input field, e.g. another component. An example use is `handleDmsLatChange` (and three similar functions) in [LocalityTab](../../../../frontend/src/components/Locality/Tabs/LocalityTab.tsx)
 
 If the selected value is invalid, the EditableTextField will show a red text underneath it explaining the issue. This is done by getting the validator from the current context (if one exists), and then passing it the current `editData` (also from context) and the `field` value. The validator will check if the value in editData corresponding to `field` is valid.
