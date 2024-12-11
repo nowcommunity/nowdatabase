@@ -31,11 +31,9 @@ The new version is not deployed yet.
 
 :keyboard: [List of all commands](documentation/devops/commands.md) A comprehensive list of all of the most important commands
 
-:wrench: [Technical explanations](documentation/devops/technical_explanations.md) Explanations of how things work, and guides for some more rare tasks like updating database-schema
-
 :raised_hands: [Contributing & integration flow](documentation/contributing.md) Where to commit? Where are tests run? How is the code deployed?
 
-:memo: [Frontend](documentation/frontend/components/frontend.md) Explanation of the frontend logic and how to add views
+:memo: [Frontend](documentation/frontend/frontend.md) Explanation of the frontend logic and how to add views
 
 :mag_right: [Validators](frontend/src/shared/validators/) The [readme](frontend/src/shared/validators/README.md) explains how validators are written
 
