@@ -57,6 +57,7 @@ describe('Creating new time unit', () => {
       testLogRows(logRows, expectedLogRows, 7)
     })
   })
+
   it('Creation fails without permissions', async () => {
     logout()
     const resultNoPerm = await send('time-unit', 'PUT', {
@@ -72,6 +73,18 @@ describe('Creating new time unit', () => {
     })
     expect(resultEr.body).toEqual(noPermError)
     expect(resultEr.status).toEqual(403)
+  })
+
+  it('Creation fails without reference', async () => {
+    const resultNoRef = await send('time-unit', 'PUT', {
+      timeUnit: { ...newTimeUnitBasis, tu_display_name: 'Bahean Test 2', references: [] },
+    })
+    expect(resultNoRef.status).toEqual(403) // can't create one without a reference
+
+    const resultWithRef = await send('time-unit', 'PUT', {
+      timeUnit: { ...newTimeUnitBasis, tu_display_name: 'Bahean Test 2' },
+    })
+    expect(resultWithRef.status).toEqual(200)
   })
 
   describe('Creating is NOT successful with invalid bounds', () => {

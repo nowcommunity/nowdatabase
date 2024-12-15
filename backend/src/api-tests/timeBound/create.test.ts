@@ -39,6 +39,18 @@ describe('Creating new time bound works', () => {
     expect(b_comment).toEqual(newTimeBoundBasis.b_comment) // 'Comment differs'
   })
 
+  it('Creation fails without reference', async () => {
+    const resultNoRef = await send('time-bound', 'PUT', {
+      timeBound: { ...newTimeBoundBasis, references: [] },
+    })
+    expect(resultNoRef.status).toEqual(403) // can't create one without a reference
+
+    const resultWithRef = await send('time-bound', 'PUT', {
+      timeBound: { ...newTimeBoundBasis },
+    })
+    expect(resultWithRef.status).toEqual(200)
+  })
+
   it('Creation fails without permissions', async () => {
     logout()
     const resultNoPerm = await send('time-bound', 'PUT', {

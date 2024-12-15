@@ -59,6 +59,18 @@ describe('Creating new locality works', () => {
     expect(resultEr.status).toEqual(403)
   })
 
+  it('Creation fails without reference', async () => {
+    const resultNoRef = await send('locality', 'PUT', {
+      locality: { ...newLocalityBasis, references: [] },
+    })
+    expect(resultNoRef.status).toEqual(403) // can't create one without a reference
+
+    const resultWithRef = await send('locality', 'PUT', {
+      locality: { ...newLocalityBasis },
+    })
+    expect(resultWithRef.status).toEqual(200)
+  })
+
   it('Species update also logged correctly', async () => {
     const speciesId = createdLocality!.now_ls.find(ls => ls.com_species.species_name === 'Newspecies')?.species_id
     const speciesResult = await send<SpeciesDetailsType>(`species/${speciesId}`, 'GET')
