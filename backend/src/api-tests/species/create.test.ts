@@ -63,6 +63,18 @@ describe('Creating new species works', () => {
     expect(res.status).toEqual(403)
   })
 
+  it('Creation fails without reference', async () => {
+    const resultNoRef = await send('species', 'PUT', {
+      species: { ...newSpeciesBasis, references: [] },
+    })
+    expect(resultNoRef.status).toEqual(403) // can't create one without a reference
+
+    const resultWithRef = await send('species', 'PUT', {
+      species: { ...newSpeciesBasis },
+    })
+    expect(resultWithRef.status).toEqual(200)
+  })
+
   it('Creation fails without permissions', async () => {
     logout()
 
