@@ -480,7 +480,10 @@ export const BasisForAgeSelection = <T extends object, ParentType extends object
   const errorObject = validator(editData, targetField as keyof EditDataType<ParentType>)
   const { error } = errorObject
   const [open, setOpen] = useState(false)
+  const [currentBasisForAge, setCurrentBasisForAge] = useState<T | undefined>(undefined)
+
   const selectorFn = (selected: T) => {
+    setCurrentBasisForAge(selected)
     if (targetField === 'bfa_min') {
       setEditData({
         ...editData,
@@ -506,6 +509,29 @@ export const BasisForAgeSelection = <T extends object, ParentType extends object
     }
     setOpen(false)
   }
+
+  useEffect(() => {
+    if (targetField === 'bfa_min' && currentBasisForAge) {
+      setEditData({
+        ...editData,
+        min_age: calculateLocalityMinAge(
+          Number(currentBasisForAge[upBoundField]),
+          Number(currentBasisForAge[lowBoundField]),
+          String(fraction)
+        ),
+      })
+    } else if (targetField === 'bfa_max' && currentBasisForAge) {
+      setEditData({
+        ...editData,
+        max_age: calculateLocalityMaxAge(
+          Number(currentBasisForAge[upBoundField]),
+          Number(currentBasisForAge[lowBoundField]),
+          String(fraction)
+        ),
+      })
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [fraction])
 
   useEffect(() => {
     checkFieldErrors(String(targetField), errorObject, fieldsWithErrors, setFieldsWithErrors)
