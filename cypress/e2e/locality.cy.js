@@ -158,7 +158,7 @@ describe('Creating a new locality', () => {
     cy.contains('button', 'Close').click()
     cy.get('[id=write-button]').should('not.be.disabled')
     cy.get('[id=write-button]').click()
-    
+
     cy.contains('Edited item successfully.')
     cy.contains('Bugat')
     cy.contains('8.676')
