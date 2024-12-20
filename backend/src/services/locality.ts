@@ -110,7 +110,7 @@ export const getAllLocalities = async (user?: User) => {
       cultural_stage_3: true,
       regional_culture_1: true,
       regional_culture_2: true,
-      regional_culture_3: true,      
+      regional_culture_3: true,
       now_plr: {
         select: { pid: true },
       },

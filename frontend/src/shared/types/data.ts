@@ -3,6 +3,7 @@
 import * as Prisma from '../../../../backend/prisma/generated/now_test_client/default'
 import * as LogPrisma from '../../../../backend/prisma/generated/now_log_test_client/default'
 import { Editable, FixBigInt, RowState } from './util'
+import { Decimal } from '../../../../backend/prisma/generated/now_test_client/runtime/library'
 
 export type SpeciesType = FixBigInt<Prisma.com_species>
 export type SedimentaryStructureValues = Prisma.now_ss_values
@@ -69,16 +70,16 @@ export type Locality = {
   bed: string | null
   loc_status: boolean | null
   estimate_precip: number | null
-  estimate_temp: number | null
+  estimate_temp: Decimal | null
   estimate_npp: number | null
   pers_woody_cover: number | null
   pers_pollen_ap: number | null
   pers_pollen_nap: number | null
   pers_pollen_other: number | null
-  hominin_skeletal_remains: boolean | null
-  bipedal_footprints: boolean | null
-  stone_tool_cut_marks_on_bones: boolean | null
-  stone_tool_technology: boolean | null
+  hominin_skeletal_remains: boolean
+  bipedal_footprints: boolean
+  stone_tool_cut_marks_on_bones: boolean
+  stone_tool_technology: boolean
   technological_mode_1: number | null
   technological_mode_2: number | null
   technological_mode_3: number | null
