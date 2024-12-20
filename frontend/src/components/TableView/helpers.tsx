@@ -15,12 +15,17 @@ const exportRows = <T extends MRT_RowData>(table: MRT_TableInstance<T>) => {
     fieldSeparator: ',',
     decimalSeparator: '.',
     useKeysAsHeaders: true,
+    quoteStrings: true, // If true, will wrap all values in double quotes
   })
   const rowData = table.getPrePaginationRowModel().rows.map(row => {
     const r = {} as Record<string, AcceptedData>
     row.getVisibleCells().map(cell => {
       const columnHeader = table.getColumn(cell.column.id).columnDef.header
-      const value = cell.getValue() as AcceptedData
+      let value = cell.getValue() as AcceptedData
+      if (typeof value === 'string') {
+        value = value.replace(/[\r\n]+/g, ' ') // Replace line feeds with spaces
+      }
+      //      const value = cell.getValue() as AcceptedData
       // Action row has no header; skipping it. Will cause trouble if some actual column's header is empty
       if (columnHeader !== '') r[columnHeader] = value !== null ? value : ''
     })

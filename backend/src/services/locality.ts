@@ -29,6 +29,7 @@ type LocalityPreFilter = {
   frac_max: string | null
   frac_min: string | null
   chron: string | null
+  age_comm: string | null
   basin: string | null
   subbasin: string | null
   dms_lat: string | null
@@ -71,6 +72,7 @@ export const getAllLocalities = async (user?: User) => {
       frac_max: true,
       frac_min: true,
       chron: true,
+      age_comm: true,
       basin: true,
       subbasin: true,
       dms_lat: true,
@@ -81,6 +83,7 @@ export const getAllLocalities = async (user?: User) => {
       country: true,
       state: true,
       county: true,
+      appr_num_spm: true,
       site_area: true,
       gen_loc: true,
       plate: true,
@@ -88,6 +91,26 @@ export const getAllLocalities = async (user?: User) => {
       member: true,
       bed: true,
       loc_status: true,
+      estimate_precip: true,
+      estimate_temp: true,
+      estimate_npp: true,
+      pers_woody_cover: true,
+      pers_pollen_ap: true,
+      pers_pollen_nap: true,
+      pers_pollen_other: true,
+      hominin_skeletal_remains: true,
+      bipedal_footprints: true,
+      stone_tool_cut_marks_on_bones: true,
+      stone_tool_technology: true,
+      technological_mode_1: true,
+      technological_mode_2: true,
+      technological_mode_3: true,
+      cultural_stage_1: true,
+      cultural_stage_2: true,
+      cultural_stage_3: true,
+      regional_culture_1: true,
+      regional_culture_2: true,
+      regional_culture_3: true,
       now_plr: {
         select: { pid: true },
       },

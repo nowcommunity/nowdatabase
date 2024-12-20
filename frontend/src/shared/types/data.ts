@@ -3,6 +3,7 @@
 import * as Prisma from '../../../../backend/prisma/generated/now_test_client/default'
 import * as LogPrisma from '../../../../backend/prisma/generated/now_log_test_client/default'
 import { Editable, FixBigInt, RowState } from './util'
+import { Decimal } from '../../../../backend/prisma/generated/now_test_client/runtime/library'
 
 export type SpeciesType = FixBigInt<Prisma.com_species>
 export type SedimentaryStructureValues = Prisma.now_ss_values
@@ -49,6 +50,7 @@ export type Locality = {
   frac_max: string | null
   frac_min: string | null
   chron: string | null
+  age_comm: string | null
   basin: string | null
   subbasin: string | null
   dms_lat: string | null
@@ -59,6 +61,7 @@ export type Locality = {
   country: string
   state: string | null
   county: string | null
+  appr_num_spm: number
   site_area: string | null
   gen_loc: string | null
   plate: string | null
@@ -66,6 +69,26 @@ export type Locality = {
   member: string | null
   bed: string | null
   loc_status: boolean | null
+  estimate_precip: number | null
+  estimate_temp: Decimal | null
+  estimate_npp: number | null
+  pers_woody_cover: number | null
+  pers_pollen_ap: number | null
+  pers_pollen_nap: number | null
+  pers_pollen_other: number | null
+  hominin_skeletal_remains: boolean
+  bipedal_footprints: boolean
+  stone_tool_cut_marks_on_bones: boolean
+  stone_tool_technology: boolean
+  technological_mode_1: number | null
+  technological_mode_2: number | null
+  technological_mode_3: number | null
+  cultural_stage_1: string | null
+  cultural_stage_2: string | null
+  cultural_stage_3: string | null
+  regional_culture_1: string | null
+  regional_culture_2: string | null
+  regional_culture_3: string | null
 }
 export type CrossSearch = {
   lid: number
