@@ -21,11 +21,11 @@ const exportRows = <T extends MRT_RowData>(table: MRT_TableInstance<T>) => {
     const r = {} as Record<string, AcceptedData>
     row.getVisibleCells().map(cell => {
       const columnHeader = table.getColumn(cell.column.id).columnDef.header
-      let value = cell.getValue() as AcceptedData;
+      let value = cell.getValue() as AcceptedData
       if (typeof value === 'string') {
-        value = value.replace(/[\r\n]+/g, ' '); // Replace line feeds with spaces
+        value = value.replace(/[\r\n]+/g, ' ') // Replace line feeds with spaces
       }
-//      const value = cell.getValue() as AcceptedData
+      //      const value = cell.getValue() as AcceptedData
       // Action row has no header; skipping it. Will cause trouble if some actual column's header is empty
       if (columnHeader !== '') r[columnHeader] = value !== null ? value : ''
     })
