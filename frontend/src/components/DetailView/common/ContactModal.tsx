@@ -1,20 +1,23 @@
 import { Box, Button, Modal } from '@mui/material'
-import { useState } from 'react'
+import { ReactNode, useState } from 'react'
 import { modalStyle } from './misc'
+import { useUser } from '@/hooks/user'
 
 export const ContactModal = ({
   buttonText,
   onSend,
-  subject,
+  children,
 }: {
   buttonText: string
-  onSend: () => void
-  subject: string
+  onSend: () => Promise<false | undefined>
+  children: ReactNode
 }) => {
   const [open, setOpen] = useState(false)
 
   const closeWithSend = async () => {
-    // TODO
+    const close = await onSend()
+    if (!close) return
+    setOpen(false)
   }
 
   return (
@@ -25,14 +28,14 @@ export const ContactModal = ({
       <Modal open={open} aria-labelledby={`modal-${buttonText}`} aria-describedby={`modal-${buttonText}`}>
         <Box sx={{ ...modalStyle }}>
           <Box marginBottom="2em" marginTop="1em">
-            Subject:
-            {subject}
+            {' '}
+            {children}
           </Box>
-          <Button variant="contained" onClick={() => setOpen(false)}>
-            Cancel
-          </Button>
           <Button sx={{ marginRight: '0.5em' }} variant="contained" onClick={() => void closeWithSend()}>
-            Send
+            Save
+          </Button>
+          <Button variant="contained" onClick={() => setOpen(false)}>
+            {'Cancel'}
           </Button>
         </Box>
       </Modal>
