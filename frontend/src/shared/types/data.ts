@@ -147,22 +147,47 @@ export type SpeciesDetailsType = Prisma.com_species & { now_ls: Array<SpeciesLoc
 
 export type Species = {
   species_id: number
-  order_name: string
-  family_name: string
+  order_name: string | null
+  family_name: string | null
+  genus_name: string | null
+  species_name: string | null
   subclass_or_superorder_name: string | null
   suborder_or_superfamily_name: string | null
   subfamily_name: string | null
-  genus_name: string
-  species_name: string
-  unique_identifier: string
-  taxonomic_status: string
-  common_name: string | null
-  sp_author: string | null
-  strain: string | null
-  gene: string | null
-  body_mass: number | null
-  brain_mass: number | null
-  sp_status: boolean | null
+  unique_identifier: string | null
+  taxonomic_status: string | null
+  sv_length: string | null
+  body_mass: number
+  sd_size: string | null
+  sd_display: string | null
+  tshm: string | null
+  tht: string | null
+  horizodonty: string | null
+  crowntype: string | null
+  cusp_shape: string | null
+  cusp_count_buccal: string | null
+  cusp_count_lingual: string | null
+  loph_count_lon: string | null
+  loph_count_trs: string | null
+  fct_al: string | null
+  fct_ol: string | null
+  fct_sf: string | null
+  fct_ot: string | null
+  fct_cm: string | null
+  microwear: string | null
+  mesowear: string | null
+  mw_or_high: number
+  mw_or_low: number
+  mw_cs_sharp: number
+  mw_cs_round: number
+  mw_cs_blunt: number
+  diet1: string | null
+  diet2: string | null
+  diet3: string | null
+  locomo1: string | null
+  locomo2: string | null
+  locomo3: string | null
+  sp_comment: string | null
 }
 
 export type RegionDetails = Prisma.now_reg_coord & { now_reg_coord_people: Array<RegionCoordinator> } & {
