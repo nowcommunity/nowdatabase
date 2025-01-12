@@ -107,7 +107,7 @@ export const SpeciesTab = () => {
                   {
                     lid: editData.lid,
                     species_id: newSpecies.species_id,
-                    com_species: { ...(newSpecies as SpeciesDetailsType) },
+                    com_species: { ...(newSpecies as unknown as SpeciesDetailsType) },
                     rowState: 'new',
                   },
                 ],
@@ -129,7 +129,7 @@ export const SpeciesTab = () => {
                   {
                     lid: editData.lid,
                     species_id: newSpecies.species_id,
-                    com_species: { ...(newSpecies as SpeciesDetailsType) },
+                    com_species: { ...(newSpecies as unknown as SpeciesDetailsType) },
                     rowState: 'new',
                   },
                 ],
