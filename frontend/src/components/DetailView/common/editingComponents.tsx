@@ -19,7 +19,7 @@ import { RegisterOptions, FieldValues, UseFormRegisterReturn, FieldErrors } from
 import { useDetailContext } from '../Context/DetailContext'
 import { DataValue } from './tabLayoutHelpers'
 import { modalStyle } from './misc'
-import { EditDataType } from '@/shared/types'
+import { EditDataType, TimeUnitDetailsType, LocalityDetailsType, TimeUnit } from '@/shared/types'
 import { calculateLocalityMinAge, calculateLocalityMaxAge } from '@/util/ageCalculator'
 import { checkFieldErrors } from './checkFieldErrors'
 
@@ -459,53 +459,55 @@ export const TimeBoundSelection = <T extends object, ParentType extends object>(
   return <DataValue<ParentType> field={targetField as keyof EditDataType<ParentType>} EditElement={editingComponent} />
 }
 
-export const BasisForAgeSelection = <T extends object, ParentType extends object>({
+export const BasisForAgeSelection = ({
   targetField,
-  sourceField,
-  lowBoundField,
-  upBoundField,
   fraction,
+  timeUnit,
   selectorTable,
   disabled,
 }: {
-  targetField: keyof ParentType
-  sourceField: keyof T
-  selectorTable: ReactElement
-  lowBoundField: keyof T
-  upBoundField: keyof T
+  targetField: keyof LocalityDetailsType
   fraction: string | null | undefined
+  timeUnit?: TimeUnitDetailsType
+  selectorTable: ReactElement
   disabled?: boolean
 }) => {
-  const { editData, setEditData, validator, fieldsWithErrors, setFieldsWithErrors } = useDetailContext<ParentType>()
-  const errorObject = validator(editData, targetField as keyof EditDataType<ParentType>)
+  const { editData, setEditData, validator, fieldsWithErrors, setFieldsWithErrors } =
+    useDetailContext<LocalityDetailsType>()
+  const errorObject = validator(editData, targetField)
   const { error } = errorObject
   const [open, setOpen] = useState(false)
-  const [currentBasisForAge, setCurrentBasisForAge] = useState<T | undefined>(undefined)
+  const [currentBasisForAge, setCurrentBasisForAge] = useState<TimeUnit>()
 
-  const selectorFn = (selected: T) => {
+  if (timeUnit && !currentBasisForAge) {
+    // this converts the time unit from TimeUnitDetailsType to TimeUnit, so it can be used properly
+    const fixedTimeUnit: TimeUnit = {
+      low_bound: timeUnit.low_bound.age!,
+      up_bound: timeUnit.up_bound.age!,
+      seq_name: timeUnit.sequence,
+      tu_name: timeUnit.tu_name,
+      tu_display_name: timeUnit.tu_display_name,
+      rank: timeUnit.rank ?? '',
+    }
+    setCurrentBasisForAge(fixedTimeUnit)
+  }
+
+  const selectorFn = (selected: TimeUnit) => {
     setCurrentBasisForAge(selected)
     if (targetField === 'bfa_min') {
       setEditData({
         ...editData,
-        min_age: calculateLocalityMinAge(
-          Number(selected[upBoundField]),
-          Number(selected[lowBoundField]),
-          String(fraction)
-        ),
-        [targetField]: selected[sourceField],
+        min_age: calculateLocalityMinAge(Number(selected['up_bound']), Number(selected['low_bound']), String(fraction)),
+        [targetField]: selected['tu_name'],
       })
     } else if (targetField === 'bfa_max') {
       setEditData({
         ...editData,
-        max_age: calculateLocalityMaxAge(
-          Number(selected[upBoundField]),
-          Number(selected[lowBoundField]),
-          String(fraction)
-        ),
-        [targetField]: selected[sourceField],
+        max_age: calculateLocalityMaxAge(Number(selected['up_bound']), Number(selected['low_bound']), String(fraction)),
+        [targetField]: selected['tu_name'],
       })
     } else {
-      setEditData({ ...editData, [targetField]: selected[sourceField] })
+      setEditData({ ...editData, [targetField]: selected['tu_name'] })
     }
     setOpen(false)
   }
@@ -515,8 +517,8 @@ export const BasisForAgeSelection = <T extends object, ParentType extends object
       setEditData({
         ...editData,
         min_age: calculateLocalityMinAge(
-          Number(currentBasisForAge[upBoundField]),
-          Number(currentBasisForAge[lowBoundField]),
+          Number(currentBasisForAge['up_bound']),
+          Number(currentBasisForAge['low_bound']),
           String(fraction)
         ),
       })
@@ -524,8 +526,8 @@ export const BasisForAgeSelection = <T extends object, ParentType extends object
       setEditData({
         ...editData,
         max_age: calculateLocalityMaxAge(
-          Number(currentBasisForAge[upBoundField]),
-          Number(currentBasisForAge[lowBoundField]),
+          Number(currentBasisForAge['up_bound']),
+          Number(currentBasisForAge['low_bound']),
           String(fraction)
         ),
       })
@@ -542,11 +544,7 @@ export const BasisForAgeSelection = <T extends object, ParentType extends object
   if (open)
     return (
       <Box>
-        <Modal
-          open={open}
-          aria-labelledby={`modal-${targetField as string}`}
-          aria-describedby={`modal-${targetField as string}`}
-        >
+        <Modal open={open} aria-labelledby={`modal-${targetField}`} aria-describedby={`modal-${targetField}`}>
           <Box sx={{ ...modalStyle }}>
             <Box marginBottom="2em" marginTop="1em">
               {selectorTableWithFn}
@@ -563,12 +561,12 @@ export const BasisForAgeSelection = <T extends object, ParentType extends object
       size="small"
       error={!!error}
       helperText={error ?? ''}
-      value={editData[targetField as keyof EditDataType<ParentType>]}
+      value={editData[targetField]}
       onClick={() => setOpen(true)}
       disabled={disabled}
       sx={{ backgroundColor: disabled ? 'grey' : '' }}
       inputProps={{ readOnly: true }}
     />
   )
-  return <DataValue<ParentType> field={targetField as keyof EditDataType<ParentType>} EditElement={editingComponent} />
+  return <DataValue<LocalityDetailsType> field={targetField} EditElement={editingComponent} />
 }

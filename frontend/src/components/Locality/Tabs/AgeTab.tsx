@@ -1,13 +1,19 @@
-import { LocalityDetailsType, TimeUnitDetailsType } from '@/shared/types'
+import { LocalityDetailsType } from '@/shared/types'
 import { BasisForAgeSelection } from '@/components/DetailView/common/editingComponents'
 import { emptyOption } from '@/components/DetailView/common/misc'
 import { ArrayFrame, HalfFrames } from '@/components/DetailView/common/tabLayoutHelpers'
 import { useDetailContext } from '@/components/DetailView/Context/DetailContext'
 import { TimeUnitTable } from '@/components/TimeUnit/TimeUnitTable'
+import { useGetTimeUnitDetailsQuery } from '@/redux/timeUnitReducer'
 
 export const AgeTab = () => {
   const { textField, radioSelection, dropdown, bigTextField, editData, setEditData } =
     useDetailContext<LocalityDetailsType>()
+
+  // if there's no bfa_min or bfa_max in the editData, these will throw a 404 error.
+  // Since hooks cannot be called conditionally it seems this cannot be avoided
+  const bfaMinDetailsQuery = useGetTimeUnitDetailsQuery(editData.bfa_min || '')
+  const bfaMaxDetailsQuery = useGetTimeUnitDetailsQuery(editData.bfa_max || '')
 
   const fracOptions = [
     emptyOption,
@@ -93,13 +99,11 @@ export const AgeTab = () => {
       'Minimum age',
       textField('min_age', { type: 'number', round: 3, readonly: minAgeAbsoluteDisabled }),
       dropdown('bfa_min_abs', bfa_abs_options, 'Min Basis for age (absolute)', minAgeAbsoluteDisabled),
-      <BasisForAgeSelection<TimeUnitDetailsType, LocalityDetailsType>
+      <BasisForAgeSelection
         key="bfa_min"
-        sourceField="tu_name"
         targetField="bfa_min"
-        lowBoundField="low_bound"
-        upBoundField="up_bound"
         fraction={editData.frac_min}
+        timeUnit={bfaMinDetailsQuery.data}
         selectorTable={<TimeUnitTable />}
         disabled={minAgeTimeUnitDisabled}
       />,
@@ -109,13 +113,11 @@ export const AgeTab = () => {
       'Maximum age',
       textField('max_age', { type: 'number', round: 3, readonly: maxAgeAbsoluteDisabled }),
       dropdown('bfa_max_abs', bfa_abs_options, 'Max Basis for age (absolute)', maxAgeAbsoluteDisabled),
-      <BasisForAgeSelection<TimeUnitDetailsType, LocalityDetailsType>
+      <BasisForAgeSelection
         key="bfa_max"
-        sourceField="tu_name"
         targetField="bfa_max"
-        lowBoundField="low_bound"
-        upBoundField="up_bound"
         fraction={editData.frac_max}
+        timeUnit={bfaMaxDetailsQuery.data}
         selectorTable={<TimeUnitTable />}
         disabled={maxAgeTimeUnitDisabled}
       />,
