@@ -32,8 +32,6 @@ Changing the value of the Dating Method selector clears all existing values from
 
 ## Fractions
 
-NOTE: There is currently a bug in the fraction selection, when you select a fraction you have to select the time unit again for the change to take effect!
-
 Selecting a fraction modifies the min/max age set by a time unit. Here's an example:
 
 - Select a time unit that has 56 as its Lower Bound and 48.6 as its Upper Bound. The minimum age is now 48.6 and the maximum age is 56.
