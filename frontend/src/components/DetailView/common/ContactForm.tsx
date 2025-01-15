@@ -2,17 +2,34 @@ import { ContactModal } from './ContactModal'
 import { useDetailContext } from '../Context/DetailContext'
 import { usePageContext } from '@/components/Page'
 import { useEmailMutation } from '@/redux/emailReducer'
-import { useForm } from 'react-hook-form'
-import { Box, TextField } from '@mui/material'
+import { useForm, Controller } from 'react-hook-form'
+import { Box, TextField, FormGroup, FormControlLabel, Switch } from '@mui/material'
 import { useUser } from '@/hooks/user'
 import { useEffect } from 'react'
 import { useNotify } from '@/hooks/notification'
 
+const formatContactEmail = (values: ContactFormValues) => {
+  return `
+  Subject: ${values.subject}\n
+  Name: ${values.username}\n
+  Email: ${values.email}\n
+  Comments: ${values.comments}\n
+  Fast Reply Requested: ${values.fast_reply_requested ? 'Yes' : 'No'}
+  `
+}
+
+type ContactFormValues = {
+  subject: string
+  comments: string
+  username: string
+  email: string
+  fast_reply_requested: boolean
+}
 export const ContactForm = <T extends object>({ buttonText }: { buttonText: string }) => {
   const { data } = useDetailContext<T>()
   const { createTitle } = usePageContext<T>()
   const [sendEmailMutation, { isSuccess, isError }] = useEmailMutation()
-  const { register, trigger, getValues, formState } = useForm()
+  const { register, trigger, getValues, control, formState } = useForm<ContactFormValues>()
   const { errors } = formState
   const notify = useNotify()
   const user = useUser()
@@ -20,10 +37,11 @@ export const ContactForm = <T extends object>({ buttonText }: { buttonText: stri
   const onSend = async () => {
     const result = await trigger()
     if (!result) return false
-    const { subject, comments, name, email } = getValues()
+    const values = getValues()
     const recipients = ['test_recipient@something.com']
-    const title = `Regarding ${subject}`
-    const message = `Name: ${name}\n Email: ${email}\nComments: ${comments}`
+    const title = `Contact request: ${subject}`
+    const message = formatContactEmail(values)
+
     const confirm = window.confirm(`Send email?`)
     if (!confirm) return false
     void sendEmailMutation({ recipients, title, message })
@@ -88,6 +106,17 @@ export const ContactForm = <T extends object>({ buttonText }: { buttonText: stri
         defaultValue=""
         {...register('email', { required: true })}
         error={!!errors['email']}
+      />
+      <Controller
+        control={control}
+        name="fast_reply_requested"
+        defaultValue={false}
+        render={({ field: { onChange, value } }) => (
+          <FormControlLabel
+            control={<Switch checked={value} onChange={onChange} />}
+            label="Please contact me as soon as possible."
+          />
+        )}
       />
     </Box>
   )
@@ -156,12 +185,12 @@ export const ContactFormTableView = ({ buttonText }: { buttonText: string }) => 
       <br></br>
       <TextField
         sx={{ width: '25em' }}
-        key="name"
+        key="username"
         label="Name"
         defaultValue={user && user.username ? user.username : ''}
         fullWidth
-        {...register('name', { required: true })}
-        error={!!errors['name']}
+        {...register('username', { required: true })}
+        error={!!errors['username']}
       />
       <br></br>
       <TextField
