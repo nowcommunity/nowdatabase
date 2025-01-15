@@ -15,6 +15,7 @@ import { renderCustomToolbar, renderCustomToolbarModalVersion } from './helpers'
 import { ActionComponent } from './ActionComponent'
 import { usePageContext } from '../Page'
 import { useUser } from '@/hooks/user'
+import { ContactFormTableView } from '../DetailView/common/ContactForm'
 
 type TableStateInUrl = 'sorting' | 'columnfilters' | 'pagination'
 
@@ -186,6 +187,9 @@ export const TableView = <T extends MRT_RowData>({
           <Divider sx={{ marginTop: '1rem' }} />
         </>
       )}
+      <Box sx={{ display: 'flex', gap: '0.4em', justifyContent: 'flex-end', margin: '0.5em', marginTop: '1em' }}>
+        <ContactFormTableView buttonText="Contact" />
+      </Box>
       {editRights.new && title != 'Locality-Species-Cross-Search' && (
         <Box sx={{ display: 'flex', gap: '0.4em', justifyContent: 'flex-end', margin: '0.5em', marginTop: '1em' }}>
           <Button variant="contained" component={Link} to="new">
