@@ -1,7 +1,6 @@
 import { Box, Button, Modal } from '@mui/material'
 import { ReactNode, useState } from 'react'
 import { modalStyle } from './misc'
-import { useUser } from '@/hooks/user'
 
 export const ContactModal = ({
   buttonText,
@@ -9,7 +8,7 @@ export const ContactModal = ({
   children,
 }: {
   buttonText: string
-  onSend: () => Promise<false | undefined>
+  onSend: () => Promise<boolean>
   children: ReactNode
 }) => {
   const [open, setOpen] = useState(false)
@@ -22,7 +21,7 @@ export const ContactModal = ({
 
   return (
     <Box>
-      <Button onClick={() => setOpen(true)} variant="contained" sx={{ marginBottom: '1em' }}>
+      <Button onClick={() => setOpen(true)} variant="contained">
         {buttonText}
       </Button>
       <Modal open={open} aria-labelledby={`modal-${buttonText}`} aria-describedby={`modal-${buttonText}`}>
@@ -32,7 +31,7 @@ export const ContactModal = ({
             {children}
           </Box>
           <Button sx={{ marginRight: '0.5em' }} variant="contained" onClick={() => void closeWithSend()}>
-            Save
+            Send Email
           </Button>
           <Button variant="contained" onClick={() => setOpen(false)}>
             {'Cancel'}
