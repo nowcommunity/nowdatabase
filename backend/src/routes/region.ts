@@ -22,13 +22,13 @@ router.put(
   '/',
   requireOneOf([Role.Admin, Role.EditUnrestricted]),
   async (req: Request<object, object, { region: EditDataType<RegionDetails> & EditMetaData }>, res) => {
-    const { comment, references, ...editedRegion } = req.body.region
-    const validationErrors = await validateEntireRegion({ ...editedRegion, references: references })
+    const { ...editedRegion } = req.body.region
+    const validationErrors = validateEntireRegion({ ...editedRegion })
     if (validationErrors.length > 0) {
       return res.status(403).send(validationErrors)
     }
-    const result = await writeRegion(editedRegion)
-    return res.status(200).send({ id: result })
+    const reg_coord_id = await writeRegion(editedRegion)
+    return res.status(200).send({ reg_coord_id })
   }
 )
 
