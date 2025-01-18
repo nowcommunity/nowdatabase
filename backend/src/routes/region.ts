@@ -14,7 +14,6 @@ router.get('/all', async (_req, res) => {
 router.get('/:id', requireOneOf([Role.Admin]), async (req, res) => {
   const id = parseInt(req.params.id)
   const region = await getRegionDetails(id)
-  console.log(region)
   if (!region) return res.status(404).send()
   return res.status(200).send(region)
 })
@@ -28,7 +27,7 @@ router.put(
     if (validationErrors.length > 0) {
       return res.status(403).send(validationErrors)
     }
-    const result = await writeRegion(editedRegion, comment, references, req.user)
+    const result = await writeRegion(editedRegion)
     return res.status(200).send({ id: result })
   }
 )

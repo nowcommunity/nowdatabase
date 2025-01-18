@@ -26,32 +26,12 @@ export const getRegionDetails = async (id: number) => {
   return result
 }
 
-export const validateEntireRegion = async (editedFields: EditDataType<Prisma.now_reg_coord> & EditMetaData) => {
+export const validateEntireRegion = (editedFields: EditDataType<Prisma.now_reg_coord> & EditMetaData) => {
   const keys = Object.keys(editedFields)
   const errors: ValidationObject[] = []
   for (const key of keys) {
     const error = validateRegion(editedFields as EditDataType<RegionDetails>, key as keyof RegionDetails)
     if (error.error) errors.push(error)
   }
-  /*
-  let error = null
-  if ('references' in editedFields && editedFields.references) {
-    error = referenceValidator(editedFields.references)
-    const invalidReferences: number[] = []
-    for (const reference of editedFields.references) {
-      const result = await getReferenceDetails(reference.rid)
-      if (!result) {
-        invalidReferences.push(reference.rid)
-      }
-    }
-    if (invalidReferences.length > 0) {
-      error = `References with ID(s) ${invalidReferences.join(', ')} do not exist`
-    }
-  } else {
-    error = 'references-key is undefined in the data'
-  }
-
-  if (error) errors.push({ name: 'references', error: error })
-  */
   return errors
 }
