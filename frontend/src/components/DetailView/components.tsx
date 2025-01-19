@@ -27,24 +27,23 @@ export const WriteButton = <T,>({
   /*  validates all fields when entering new/editing mode
       to disable write button when unvisited tabs have
       validation errors (e.g. missing required fields) */
-
   useEffect(() => {
     if (mode.option === 'edit' || mode.option === 'new') {
       for (const field in editData) {
         const fieldAsString = String(field)
-        const errorObject = validator(editData, field)
-        if (errorObject.error) {
-          if (!(fieldAsString in fieldsWithErrors)) {
-            setFieldsWithErrors(prevFieldsWithErrors => {
-              return { ...prevFieldsWithErrors, [fieldAsString]: errorObject }
-            })
-          }
-        } else if (!errorObject.error && fieldAsString in fieldsWithErrors) {
+        const errors = validator(editData, field)
+        if (errors.length === 0 && fieldAsString in fieldsWithErrors) {
           setFieldsWithErrors(prevFieldsWithErrors => {
             const newFieldsWithErrors = { ...prevFieldsWithErrors }
             delete newFieldsWithErrors[fieldAsString]
             return newFieldsWithErrors
           })
+        } else if (errors.length > 0) {
+          if (!(fieldAsString in fieldsWithErrors)) {
+            setFieldsWithErrors(prevFieldsWithErrors => {
+              return { ...prevFieldsWithErrors, [fieldAsString]: errors[0] }
+            })
+          }
         }
       }
     }

@@ -37,13 +37,5 @@ export const PersonDetails = () => {
     },
   ]
 
-  return (
-    <DetailView
-      onWrite={onWrite}
-      isUserPage={isUserPage}
-      tabs={tabs}
-      data={data}
-      validator={() => ({ name: '', error: null })}
-    />
-  )
+  return <DetailView onWrite={onWrite} isUserPage={isUserPage} tabs={tabs} data={data} validator={() => []} />
 }

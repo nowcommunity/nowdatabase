@@ -4,7 +4,7 @@ import { validCountries } from './countryList'
 
 export const validateLocality = (
   editData: EditDataType<LocalityDetailsType>,
-  fieldName: keyof EditDataType<LocalityDetailsType>
+  fieldName?: keyof EditDataType<LocalityDetailsType>
 ) => {
   const compositeDatingMethodNoBases =
     editData.date_meth === 'composite' &&

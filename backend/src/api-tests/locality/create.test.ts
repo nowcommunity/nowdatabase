@@ -7,7 +7,7 @@ import { pool } from '../../utils/db'
 
 let createdLocality: LocalityDetailsType | null = null
 
-describe('Creating new locality works', () => {
+describe.only('Creating new locality works', () => {
   beforeAll(async () => {
     await resetDatabase()
   }, resetDatabaseTimeout)
@@ -110,5 +110,56 @@ describe('Creating new locality works', () => {
       },
     ]
     testLogRows(logRows, expectedLogRows, 4)
+  })
+
+  it('Sends multiple validation errors', async () => {
+    const result = await send<{ id: number }>('locality', 'PUT', {
+      locality: {
+        bfa_max: 'bahean',
+        bfa_min: 'bahean',
+        loc_name: 'Lantian-Shuijiazui',
+        date_meth: 'time_unit',
+        max_age: 5,
+        min_age: 8,
+        bfa_max_abs: null,
+        bfa_min_abs: null,
+        frac_max: null,
+        frac_min: null,
+        comment: '',
+        references: [],
+      },
+    })
+    expect(result.status === 403)
+    const body = result.body
+    expect(Array.isArray(body))
+    const expectedErrors = [
+      {
+        name: 'Country',
+        error: 'This field is required',
+      },
+      {
+        name: 'Latitude (dms)',
+        error: 'This field is required',
+      },
+      {
+        name: 'Latitude (dec)',
+        error: 'This field is required',
+      },
+      {
+        name: 'Longitude (dms)',
+        error: 'This field is required',
+      },
+      {
+        name: 'Longitude (dec)',
+        error: 'This field is required',
+      },
+      {
+        name: 'references',
+        error: 'There must be at least one reference',
+      },
+    ]
+    for (const expectedError of expectedErrors) {
+      expect(body).toEqual(expect.arrayContaining([expect.objectContaining(expectedError)]))
+    }
   })
 })

@@ -56,19 +56,49 @@ const validate: (validator: Validator, value: unknown) => ValidationError = (val
   return null
 }
 
-export const validator = <T>(
+export type ValidatorFunction = <T>(
   validators: Validators<Partial<T>>,
   editData: Partial<T>,
-  fieldName: keyof T
-): ValidationObject => {
-  const fieldValidator = validators[fieldName]
+  fieldName?: keyof T
+) => ValidationObject[]
 
-  if (!fieldValidator || (fieldValidator.condition && !fieldValidator.condition(editData))) {
-    return { name: fieldName as string, error: null }
+/**
+ * If fieldName is defined, this runs only that validator.
+ * In that case result is either an array with single ValidationObject, or empty array.
+ * If fieldName is undefined, this runs all validators,
+ * checking fields that are defined in editData and complains if a required field is missing.
+ * Then, returns an array of found errors (ValidationObjects).
+ */
+export const validator: ValidatorFunction = (validators, editData, fieldName) => {
+  const validateSingleField = (field: keyof typeof editData) => {
+    const fieldValidator = validators[field]
+
+    if (!fieldValidator || (fieldValidator.condition && !fieldValidator.condition(editData))) {
+      return null
+    }
+
+    const validationError = validate(fieldValidator, fieldValidator.useEditData ? editData : editData[field])
+    if (!validationError) return null
+    return { name: fieldValidator.name, error: validationError }
   }
 
-  const validationError = validate(fieldValidator, fieldValidator.useEditData ? editData : editData[fieldName])
-  return { name: fieldValidator.name, error: validationError }
+  const errorList: ValidationObject[] = []
+
+  // Validate only one field
+  if (fieldName) {
+    const error = validateSingleField(fieldName)
+    if (error) {
+      errorList.push(error)
+    }
+    return errorList
+  }
+
+  // Run all validators
+  for (const field of Object.keys(validators) as Array<keyof typeof editData>) {
+    const error = validateSingleField(field)
+    if (error?.error) errorList.push(error)
+  }
+  return errorList
 }
 
 export const referenceValidator: (references: Editable<Reference>[]) => ValidationError = (

@@ -21,7 +21,7 @@ import { DataValue } from './tabLayoutHelpers'
 import { modalStyle } from './misc'
 import { EditDataType } from '@/shared/types'
 import { calculateLocalityMinAge, calculateLocalityMaxAge } from '@/util/ageCalculator'
-import { checkFieldErrors } from './checkFieldErrors'
+import { useGetAndUpdateFieldErrors } from './useGetAndUpdateFieldErrors'
 
 const fieldWidth = '14em'
 
@@ -53,14 +53,8 @@ export const DropdownSelector = <T extends object>({
   field: keyof EditDataType<T>
   disabled?: boolean
 }) => {
-  const { setEditData, editData, validator, fieldsWithErrors, setFieldsWithErrors } = useDetailContext<T>()
-  const errorObject = validator(editData, field)
-  const { error } = errorObject
-
-  useEffect(() => {
-    checkFieldErrors(String(field), errorObject, fieldsWithErrors, setFieldsWithErrors)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [errorObject])
+  const { setEditData, editData } = useDetailContext<T>()
+  const error = useGetAndUpdateFieldErrors(field as string)
 
   const editingComponent = (
     <FormControl size="small" error={!!error}>
@@ -103,14 +97,8 @@ export const DropdownSelectorWithSearch = <T extends object>({
   field: keyof EditDataType<T>
   disabled?: boolean
 }) => {
-  const { setEditData, editData, validator, fieldsWithErrors, setFieldsWithErrors } = useDetailContext<T>()
-  const errorObject = validator(editData, field)
-  const { error } = errorObject
-
-  useEffect(() => {
-    checkFieldErrors(String(field), errorObject, fieldsWithErrors, setFieldsWithErrors)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [errorObject])
+  const { setEditData, editData } = useDetailContext<T>()
+  const error = useGetAndUpdateFieldErrors(field as string)
 
   //current state of the search, not the selected option that is set into editData
   const [inputValue, setInputValue] = useState('')
@@ -202,13 +190,8 @@ export const RadioSelector = <T extends object>({
   defaultValue?: DropdownOptionValue
   handleSetEditData?: (value: number | string | boolean) => void
 }) => {
-  const { setEditData, editData, validator, fieldsWithErrors, setFieldsWithErrors } = useDetailContext<T>()
-  const errorObject = validator(editData, field)
-
-  useEffect(() => {
-    checkFieldErrors(String(field), errorObject, fieldsWithErrors, setFieldsWithErrors)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [errorObject])
+  const { setEditData, editData } = useDetailContext<T>()
+  useGetAndUpdateFieldErrors(field as string)
 
   if (defaultValue === undefined) {
     defaultValue = getValue(options[0])
@@ -286,14 +269,8 @@ export const EditableTextField = <T extends object>({
   readonly?: boolean
   handleSetEditData?: (value: number | string) => void
 }) => {
-  const { setEditData, editData, validator, fieldsWithErrors, setFieldsWithErrors } = useDetailContext<T>()
-  const errorObject = validator(editData, field)
-  const { error } = errorObject
-
-  useEffect(() => {
-    checkFieldErrors(String(field), errorObject, fieldsWithErrors, setFieldsWithErrors)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [errorObject])
+  const { setEditData, editData } = useDetailContext<T>()
+  const error = useGetAndUpdateFieldErrors(field as string)
 
   const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
     const value = event?.currentTarget?.value
@@ -342,19 +319,14 @@ export const FieldWithTableSelection = <T extends object, ParentType extends obj
   selectorTable: ReactElement
   disabled?: boolean
 }) => {
-  const { editData, setEditData, validator, fieldsWithErrors, setFieldsWithErrors } = useDetailContext<ParentType>()
-  const errorObject = validator(editData, targetField as keyof EditDataType<ParentType>)
-  const { error } = errorObject
+  const { editData, setEditData } = useDetailContext<ParentType>()
+  const error = useGetAndUpdateFieldErrors(targetField as string)
+
   const [open, setOpen] = useState(false)
   const selectorFn = (selected: T) => {
     setEditData({ ...editData, [targetField]: selected[sourceField] })
     setOpen(false)
   }
-
-  useEffect(() => {
-    checkFieldErrors(String(targetField), errorObject, fieldsWithErrors, setFieldsWithErrors)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [errorObject])
 
   const selectorTableWithFn = cloneElement(selectorTable, { selectorFn })
   if (open)
@@ -402,12 +374,10 @@ export const TimeBoundSelection = <T extends object, ParentType extends object>(
   selectorTable: ReactElement
   disabled?: boolean
 }) => {
-  const { editData, setEditData, validator, fieldsWithErrors, setFieldsWithErrors } = useDetailContext<ParentType>()
-  const errorObject = validator(
-    editData,
-    (targetField === 'up_bnd' ? 'up_bound' : 'low_bound') as keyof EditDataType<ParentType>
-  )
-  const { error } = errorObject
+  const { editData, setEditData } = useDetailContext<ParentType>()
+
+  const error = useGetAndUpdateFieldErrors(targetField === 'up_bnd' ? 'up_bound' : 'low_bound')
+
   const [open, setOpen] = useState(false)
 
   const selectorFn = (selected: T) => {
@@ -418,11 +388,6 @@ export const TimeBoundSelection = <T extends object, ParentType extends object>(
     }
     setOpen(false)
   }
-
-  useEffect(() => {
-    checkFieldErrors(String(targetField), errorObject, fieldsWithErrors, setFieldsWithErrors)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [errorObject])
 
   const selectorTableWithFn = cloneElement(selectorTable, { selectorFn })
   if (open)
@@ -476,9 +441,8 @@ export const BasisForAgeSelection = <T extends object, ParentType extends object
   fraction: string | null | undefined
   disabled?: boolean
 }) => {
-  const { editData, setEditData, validator, fieldsWithErrors, setFieldsWithErrors } = useDetailContext<ParentType>()
-  const errorObject = validator(editData, targetField as keyof EditDataType<ParentType>)
-  const { error } = errorObject
+  const { editData, setEditData } = useDetailContext<ParentType>()
+  const error = useGetAndUpdateFieldErrors(targetField as string)
   const [open, setOpen] = useState(false)
   const [currentBasisForAge, setCurrentBasisForAge] = useState<T | undefined>(undefined)
 
@@ -532,11 +496,6 @@ export const BasisForAgeSelection = <T extends object, ParentType extends object
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [fraction])
-
-  useEffect(() => {
-    checkFieldErrors(String(targetField), errorObject, fieldsWithErrors, setFieldsWithErrors)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [errorObject])
 
   const selectorTableWithFn = cloneElement(selectorTable, { selectorFn })
   if (open)

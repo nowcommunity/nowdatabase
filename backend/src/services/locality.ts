@@ -190,12 +190,8 @@ export const getLocalityDetails = async (id: number, user: User | undefined) => 
 }
 
 export const validateEntireLocality = async (editedFields: EditDataType<Prisma.now_loc> & EditMetaData) => {
-  const keys = Object.keys(editedFields)
-  const errors: ValidationObject[] = []
-  for (const key of keys) {
-    const error = validateLocality(editedFields as EditDataType<LocalityDetailsType>, key as keyof LocalityDetailsType)
-    if (error.error) errors.push(error)
-  }
+  const errors: ValidationObject[] = validateLocality(editedFields as EditDataType<LocalityDetailsType>)
+
   let error = null
   if ('references' in editedFields && editedFields.references) {
     error = referenceValidator(editedFields.references)
