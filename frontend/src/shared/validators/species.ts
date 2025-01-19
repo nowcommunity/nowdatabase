@@ -3,7 +3,7 @@ import { Validators, validator } from './validator'
 
 export const validateSpecies = (
   editData: EditDataType<SpeciesDetailsType>,
-  fieldName: keyof EditDataType<SpeciesDetailsType>
+  fieldName?: keyof EditDataType<SpeciesDetailsType>
 ) => {
   const validators: Validators<Partial<EditDataType<SpeciesDetailsType>>> = {
     // const isNew = editData.lid === undefined

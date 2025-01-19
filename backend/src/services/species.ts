@@ -100,12 +100,8 @@ export const getSpeciesDetails = async (id: number) => {
 }
 
 export const validateEntireSpecies = async (editedFields: EditDataType<Prisma.com_species> & EditMetaData) => {
-  const keys = Object.keys(editedFields)
-  const errors: ValidationObject[] = []
-  for (const key of keys) {
-    const error = validateSpecies(editedFields as EditDataType<SpeciesDetailsType>, key as keyof SpeciesDetailsType)
-    if (error.error) errors.push(error)
-  }
+  const errors: ValidationObject[] = validateSpecies(editedFields as EditDataType<SpeciesDetailsType>)
+
   let error = null
   if ('references' in editedFields && editedFields.references) {
     error = referenceValidator(editedFields.references)

@@ -21,5 +21,5 @@ export const RegionDetails = () => {
     },
   ]
 
-  return <DetailView tabs={tabs} data={data} validator={() => ({ name: '', error: null })} />
+  return <DetailView tabs={tabs} data={data} validator={() => []} />
 }

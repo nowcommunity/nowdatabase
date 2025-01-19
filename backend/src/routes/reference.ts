@@ -5,13 +5,13 @@ import {
   getReferenceTypes,
   getReferenceAuthors,
   getReferenceJournals,
-  validateEntireReference,
   getAuthorsOfReference,
   getJournalById,
 } from '../services/reference'
 import { requireOneOf } from '../middlewares/authorizer'
 import { Role, EditMetaData, ReferenceDetailsType, EditDataType } from '../../../frontend/src/shared/types'
 import { deleteReference, writeReference } from '../services/write/reference'
+import { validateReference } from '../../../frontend/src/shared/validators/reference'
 
 const router = Router()
 
@@ -62,7 +62,7 @@ router.put(
   requireOneOf([Role.Admin, Role.EditUnrestricted]),
   async (req: Request<object, object, { reference: EditDataType<ReferenceDetailsType> & EditMetaData }>, res) => {
     const { ...editedReference } = req.body.reference
-    const validationErrors = validateEntireReference(editedReference)
+    const validationErrors = validateReference(editedReference as EditDataType<ReferenceDetailsType>)
     if (validationErrors.length > 0) {
       return res.status(403).send(validationErrors)
     }

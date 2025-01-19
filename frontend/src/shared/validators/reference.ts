@@ -125,7 +125,7 @@ const orCheck = (
 
 export const validateReference = (
   editData: EditDataType<ReferenceDetailsType>,
-  fieldName: keyof EditDataType<ReferenceDetailsType>
+  fieldName?: keyof EditDataType<ReferenceDetailsType>
 ) => {
   const validators: Validators<Partial<EditDataType<ReferenceDetailsType>>> = {
     title_primary: {

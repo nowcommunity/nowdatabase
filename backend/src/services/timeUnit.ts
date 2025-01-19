@@ -91,12 +91,8 @@ export const getTimeUnitLocalities = async (id: string) => {
 }
 
 export const validateEntireTimeUnit = async (editedFields: EditDataType<TimeUnitDetailsType> & EditMetaData) => {
-  const keys = Object.keys(editedFields)
-  const messages: ValidationObject[] = []
-  for (const key of keys) {
-    const error = validateTimeUnit(editedFields, key as keyof TimeUnitDetailsType)
-    if (error.error) messages.push(error)
-  }
+  const errors: ValidationObject[] = validateTimeUnit(editedFields as EditDataType<TimeUnitDetailsType>)
+
   let error = null
   if ('references' in editedFields && editedFields.references) {
     error = referenceValidator(editedFields.references)
@@ -114,6 +110,6 @@ export const validateEntireTimeUnit = async (editedFields: EditDataType<TimeUnit
     error = 'references-key is undefined in the data'
   }
 
-  if (error) messages.push({ name: 'references', error: error })
-  return messages
+  if (error) errors.push({ name: 'references', error: error })
+  return errors
 }

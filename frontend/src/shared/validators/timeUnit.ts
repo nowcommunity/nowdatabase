@@ -1,7 +1,10 @@
 import { EditDataType, TimeUnitDetailsType } from '../types'
 import { Validators, validator } from './validator'
 
-export const validateTimeUnit = (editData: EditDataType<TimeUnitDetailsType>, fieldName: keyof TimeUnitDetailsType) => {
+export const validateTimeUnit = (
+  editData: EditDataType<TimeUnitDetailsType>,
+  fieldName?: keyof TimeUnitDetailsType
+) => {
   const validators: Validators<EditDataType<Partial<TimeUnitDetailsType>>> = {
     tu_display_name: {
       name: 'Name',
