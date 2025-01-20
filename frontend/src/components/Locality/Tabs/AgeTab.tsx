@@ -5,15 +5,17 @@ import { ArrayFrame, HalfFrames } from '@/components/DetailView/common/tabLayout
 import { useDetailContext } from '@/components/DetailView/Context/DetailContext'
 import { TimeUnitTable } from '@/components/TimeUnit/TimeUnitTable'
 import { useGetTimeUnitDetailsQuery } from '@/redux/timeUnitReducer'
+import { skipToken } from '@reduxjs/toolkit/query'
+import { CircularProgress } from '@mui/material'
 
 export const AgeTab = () => {
   const { textField, radioSelection, dropdown, bigTextField, editData, setEditData } =
     useDetailContext<LocalityDetailsType>()
 
-  // if there's no bfa_min or bfa_max in the editData, these will throw a 404 error.
-  // Since hooks cannot be called conditionally it seems this cannot be avoided
-  const bfaMinDetailsQuery = useGetTimeUnitDetailsQuery(editData.bfa_min || '')
-  const bfaMaxDetailsQuery = useGetTimeUnitDetailsQuery(editData.bfa_max || '')
+  const { data: bfaMinData, isFetching: bfaMinFetching } = useGetTimeUnitDetailsQuery(editData.bfa_min || skipToken)
+  const { data: bfaMaxData, isFetching: bfaMaxFetching } = useGetTimeUnitDetailsQuery(editData.bfa_max || skipToken)
+
+  if (bfaMinFetching || bfaMaxFetching) return <CircularProgress />
 
   const fracOptions = [
     emptyOption,
@@ -103,7 +105,7 @@ export const AgeTab = () => {
         key="bfa_min"
         targetField="bfa_min"
         fraction={editData.frac_min}
-        timeUnit={bfaMinDetailsQuery.data}
+        timeUnit={bfaMinData}
         selectorTable={<TimeUnitTable />}
         disabled={minAgeTimeUnitDisabled}
       />,
@@ -117,7 +119,7 @@ export const AgeTab = () => {
         key="bfa_max"
         targetField="bfa_max"
         fraction={editData.frac_max}
-        timeUnit={bfaMaxDetailsQuery.data}
+        timeUnit={bfaMaxData}
         selectorTable={<TimeUnitTable />}
         disabled={maxAgeTimeUnitDisabled}
       />,
