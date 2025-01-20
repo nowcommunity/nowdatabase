@@ -519,7 +519,7 @@ export const BasisForAgeSelection = ({
         min_age: calculateLocalityMinAge(
           Number(currentBasisForAge['up_bound']),
           Number(currentBasisForAge['low_bound']),
-          String(fraction)
+          fraction ?? null
         ),
       })
     } else if (targetField === 'bfa_max' && currentBasisForAge) {
@@ -528,7 +528,7 @@ export const BasisForAgeSelection = ({
         max_age: calculateLocalityMaxAge(
           Number(currentBasisForAge['up_bound']),
           Number(currentBasisForAge['low_bound']),
-          String(fraction)
+          fraction ?? null
         ),
       })
     }
