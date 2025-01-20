@@ -5,6 +5,7 @@ import {
   CONTACT_FROM_NAME,
   CONTACT_SMTP_HOST,
   CONTACT_SMTP_PORT,
+  EMAIL_RECIPIENT_ADDRESS,
   RUNNING_ENV,
 } from '../utils/config'
 import { logger } from '../utils/logger'
@@ -87,7 +88,7 @@ router.post(
     for (const recipient of recipients) {
       await transport.sendMail({
         from: { name: 'test_from_name', address: 'test_from_address@something.com' },
-        to: recipient,
+        to: EMAIL_RECIPIENT_ADDRESS,
         subject: title,
         text: message,
       })
