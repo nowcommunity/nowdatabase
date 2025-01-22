@@ -62,6 +62,8 @@ export const api = createApi({
     'timeunit',
     'timebound',
     'timebounds',
+    'region',
+    'regions',
     'author',
     'geoname',
   ],
