@@ -5,8 +5,8 @@ export const validateSpecies = (
   editData: EditDataType<SpeciesDetailsType>,
   fieldName?: keyof EditDataType<SpeciesDetailsType>
 ) => {
+  const isNew = editData.species_id === undefined
   const validators: Validators<Partial<EditDataType<SpeciesDetailsType>>> = {
-    // const isNew = editData.lid === undefined
     order_name: {
       name: 'Order',
       required: true,
@@ -29,5 +29,5 @@ export const validateSpecies = (
     },
   }
 
-  return validator<EditDataType<SpeciesDetailsType>>(validators, editData, fieldName)
+  return validator<EditDataType<SpeciesDetailsType>>(validators, editData, isNew, fieldName)
 }

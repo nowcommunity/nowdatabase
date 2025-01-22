@@ -59,17 +59,11 @@ const validate: (validator: Validator, value: unknown) => ValidationError = (val
 export type ValidatorFunction = <T>(
   validators: Validators<Partial<T>>,
   editData: Partial<T>,
+  isNew: boolean,
   fieldName?: keyof T
 ) => ValidationObject[]
 
-/**
- * If fieldName is defined, this runs only that validator.
- * In that case result is either an array with single ValidationObject, or empty array.
- * If fieldName is undefined, this runs all validators,
- * checking fields that are defined in editData and complains if a required field is missing.
- * Then, returns an array of found errors (ValidationObjects).
- */
-export const validator: ValidatorFunction = (validators, editData, fieldName) => {
+export const validator: ValidatorFunction = (validators, editData, isNew, fieldName) => {
   const validateSingleField = (field: keyof typeof editData) => {
     const fieldValidator = validators[field]
 
@@ -85,7 +79,7 @@ export const validator: ValidatorFunction = (validators, editData, fieldName) =>
   const errorList: ValidationObject[] = []
 
   // Validate only one field
-  if (fieldName) {
+  if (fieldName !== undefined) {
     const error = validateSingleField(fieldName)
     if (error) {
       errorList.push(error)
@@ -93,8 +87,17 @@ export const validator: ValidatorFunction = (validators, editData, fieldName) =>
     return errorList
   }
 
-  // Run all validators
-  for (const field of Object.keys(validators) as Array<keyof typeof editData>) {
+  /* This part is run if we are validating multiple fields.
+  However, we want it to act differently on create or update:
+
+  Updating doesn't require all fields to exist in the sent object, 
+  only the edited fields.
+
+  For create, we want to check that all required fields exist,
+  so we validate every field for which we have a validator. */
+  const fieldsToValidate = isNew ? Object.keys(validators) : Object.keys(editData)
+
+  for (const field of fieldsToValidate as Array<keyof typeof editData>) {
     const error = validateSingleField(field)
     if (error?.error) errorList.push(error)
   }

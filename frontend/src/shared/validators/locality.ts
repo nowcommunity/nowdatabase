@@ -15,8 +15,9 @@ export const validateLocality = (
 
   const compositeDatingMethodRequiredText = 'One age row must follow the rules for Absolute, the other for Time Unit'
 
+  const isNew = editData.lid === undefined
+
   const validators: Validators<Partial<EditDataType<LocalityDetailsType>>> = {
-    // const isNew = editData.lid === undefined
     date_meth: {
       name: 'Dating method',
       required: true,
@@ -123,5 +124,5 @@ export const validateLocality = (
     },
   }
 
-  return validator<EditDataType<LocalityDetailsType>>(validators, editData, fieldName)
+  return validator<EditDataType<LocalityDetailsType>>(validators, editData, isNew, fieldName)
 }

@@ -127,6 +127,7 @@ export const validateReference = (
   editData: EditDataType<ReferenceDetailsType>,
   fieldName?: keyof EditDataType<ReferenceDetailsType>
 ) => {
+  const isNew = editData.rid === undefined
   const validators: Validators<Partial<EditDataType<ReferenceDetailsType>>> = {
     title_primary: {
       name: 'title_primary',
@@ -214,5 +215,5 @@ export const validateReference = (
     },
   }
 
-  return validator<EditDataType<ReferenceDetailsType>>(validators, editData, fieldName)
+  return validator<EditDataType<ReferenceDetailsType>>(validators, editData, isNew, fieldName)
 }

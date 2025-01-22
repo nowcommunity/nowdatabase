@@ -21,6 +21,7 @@ router.get('/:id', async (req, res) => {
 
 router.put(
   '/',
+  requireOneOf([Role.Admin, Role.EditUnrestricted]),
   async (req: Request<object, object, { locality: EditDataType<LocalityDetailsType> & EditMetaData }>, res) => {
     const { comment, references, ...editedLocality } = req.body.locality
     const validationErrors = await validateEntireLocality({ ...editedLocality, references: references })

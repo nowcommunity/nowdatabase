@@ -5,6 +5,7 @@ export const validateTimeUnit = (
   editData: EditDataType<TimeUnitDetailsType>,
   fieldName?: keyof TimeUnitDetailsType
 ) => {
+  const isNew = editData.tu_name === undefined
   const validators: Validators<EditDataType<Partial<TimeUnitDetailsType>>> = {
     tu_display_name: {
       name: 'Name',
@@ -57,5 +58,5 @@ export const validateTimeUnit = (
       },
     },
   }
-  return validator<EditDataType<TimeUnitDetailsType>>(validators, editData, fieldName)
+  return validator<EditDataType<TimeUnitDetailsType>>(validators, editData, isNew, fieldName)
 }

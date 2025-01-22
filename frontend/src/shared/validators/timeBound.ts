@@ -5,6 +5,7 @@ export const validateTimeBound = (
   editData: EditDataType<TimeBoundDetailsType>,
   fieldName?: keyof TimeBoundDetailsType
 ) => {
+  const isNew = editData.bid === undefined
   const validators: Validators<EditDataType<Partial<TimeBoundDetailsType>>> = {
     b_name: {
       name: 'Name',
@@ -20,5 +21,5 @@ export const validateTimeBound = (
     },
   }
 
-  return validator<EditDataType<TimeBoundDetailsType>>(validators, editData, fieldName)
+  return validator<EditDataType<TimeBoundDetailsType>>(validators, editData, isNew, fieldName)
 }
