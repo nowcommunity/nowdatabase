@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "npx tsx watch --clear-screen=false src/index.ts",
     "build": "tsc",
-    "test:api": "jest src/api-tests/locality --runInBand --coverage --config jest-config.js --detectOpenHandles --forceExit --silent",
+    "test:api": "jest src/api-tests --runInBand --coverage --config jest-config.js --detectOpenHandles --forceExit --silent",
     "test:unit": "jest src/unit-tests --coverage --config jest-config.js --detectOpenHandles --forceExit --silent",
     "test:api:local": "DOTENV_CONFIG_PATH=../.test.env npm run test:api -- --setupFiles dotenv/config",
     "start": "node build/index.js",

@@ -100,7 +100,7 @@ export class DatabaseHandler {
         idValues
       )
     )[0]
-    console.log({ returnValue })
+
     return JSON.parse(fixBigInt(returnValue as object)!) as T
   }
 
