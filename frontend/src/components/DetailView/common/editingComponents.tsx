@@ -374,10 +374,15 @@ export const TimeBoundSelection = <T extends object, ParentType extends object>(
   selectorTable: ReactElement
   disabled?: boolean
 }) => {
-  const { editData, setEditData } = useDetailContext<ParentType>()
+  const { editData, setEditData, validator } = useDetailContext<ParentType>()
 
-  const error = useGetAndUpdateFieldErrors(targetField === 'up_bnd' ? 'up_bound' : 'low_bound')
-
+  // This component is special, we want to update the error but in the field display error from different validator
+  useGetAndUpdateFieldErrors(targetField as string)
+  const errorObject = validator(
+    editData,
+    (targetField === 'low_bnd' ? 'low_bound' : 'upper_bound') as keyof EditDataType<ParentType>
+  )
+  const error = errorObject[0]?.error
   const [open, setOpen] = useState(false)
 
   const selectorFn = (selected: T) => {
