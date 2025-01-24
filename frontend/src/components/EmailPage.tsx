@@ -8,23 +8,15 @@ export const EmailPage = () => {
   const user = useUser()
   const [title, setTitle] = useState('')
   const [message, setMessage] = useState('')
-  const [recipients, setRecipients] = useState<string>('')
   const [sendEmailMutation, { isSuccess, isLoading, isError }] = useEmailMutation()
   if (user.role !== Role.Admin) return <Box>Your user is not authorized to view this page.</Box>
 
   document.title = 'Send Email'
 
-  const parseRecipients = () => {
-    return recipients.replace(' ', '').replace('\n', ',').replace(',', '\n').split(';')
-  }
-
   const handleSend = () => {
-    const parsedRecipients = parseRecipients()
-    const confirm = window.confirm(
-      `Send email to: ${parsedRecipients.length} recipients? Full list:\n${parsedRecipients.join('\n')}`
-    )
+    const confirm = window.confirm(`Send email?`)
     if (!confirm) return
-    void sendEmailMutation({ recipients: parsedRecipients, title, message })
+    void sendEmailMutation({ title, message })
   }
 
   return (
@@ -32,13 +24,6 @@ export const EmailPage = () => {
       <Stack gap={2} sx={{ maxWidth: '40em', margin: 'auto' }}>
         <Typography variant="h4">Send email</Typography>
         <Divider />
-        <Typography variant="h5">Recipients</Typography>
-        <TextField
-          rows={2}
-          multiline={true}
-          onChange={event => setRecipients(event.currentTarget.value)}
-          title="Recipients"
-        />
         <Typography variant="h5">Title</Typography>
         <TextField onChange={event => setTitle(event.currentTarget.value)} title="Title" />
         <Typography variant="h5">Message</Typography>

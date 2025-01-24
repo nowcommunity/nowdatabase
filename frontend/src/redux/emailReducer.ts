@@ -2,7 +2,7 @@ import { api } from './api'
 
 const emailApi = api.injectEndpoints({
   endpoints: builder => ({
-    email: builder.mutation<void, { recipients: string[]; message: string; title: string }>({
+    email: builder.mutation<void, { message: string; title: string }>({
       query: body => ({
         url: `/email`,
         method: 'POST',
