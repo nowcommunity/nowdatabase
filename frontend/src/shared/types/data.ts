@@ -194,6 +194,13 @@ export type RegionDetails = Prisma.now_reg_coord & { now_reg_coord_people: Array
   now_reg_coord_country: Array<RegionCountry>
 }
 
+// used in Region's CoordinatorTab to allow adding com_people field to the editData manually
+export type RegionDetailsWithComPeople = Prisma.now_reg_coord & {
+  now_reg_coord_people: Array<RegionCoordinator & { com_people?: Prisma.com_people }>
+} & {
+  now_reg_coord_country: Array<RegionCountry>
+}
+
 export type TimeBound = {
   bid: number
   b_name: string
