@@ -6,7 +6,7 @@ import { writeRegion } from '../services/write/region'
 
 const router = Router()
 
-router.get('/all', async (_req, res) => {
+router.get('/all', requireOneOf([Role.Admin]), async (_req, res) => {
   const regions = await getAllRegions()
   return res.status(200).send(regions)
 })
@@ -20,7 +20,7 @@ router.get('/:id', requireOneOf([Role.Admin]), async (req, res) => {
 
 router.put(
   '/',
-  requireOneOf([Role.Admin, Role.EditUnrestricted]),
+  requireOneOf([Role.Admin]),
   async (req: Request<object, object, { region: EditDataType<RegionDetails> & EditMetaData }>, res) => {
     const { ...editedRegion } = req.body.region
     const validationErrors = validateEntireRegion({ ...editedRegion })

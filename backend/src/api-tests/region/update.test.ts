@@ -118,5 +118,12 @@ describe('Updating region works', () => {
     })
     expect(resultBodyEr).toEqual(noPermError)
     expect(resultStatusEr).toEqual(403)
+
+    await login('testEu')
+    const { body: resultBodyEu, status: resultStatusEu } = await send('region/', 'PUT', {
+      region: { reg_coord_id: 1, region: 'Updated Region 4' },
+    })
+    expect(resultBodyEu).toEqual(noPermError)
+    expect(resultStatusEu).toEqual(403)
   })
 })
