@@ -58,5 +58,12 @@ describe('Creating new region works', () => {
     })
     expect(resultBodyEr).toEqual(noPermError)
     expect(resultStatusEr).toEqual(403)
+
+    await login('testEu')
+    const { body: resultBodyEu, status: resultStatusEu } = await send('region/', 'PUT', {
+      region: { region: 'Test Region 2' },
+    })
+    expect(resultBodyEu).toEqual(noPermError)
+    expect(resultStatusEu).toEqual(403)
   })
 })

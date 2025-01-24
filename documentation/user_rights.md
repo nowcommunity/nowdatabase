@@ -92,6 +92,8 @@ Viewing a list of all regions requires the **Admin** role.
 
 Getting a spesific region using an id requires the **Admin** role.
 
+Editing a region requires the **Admin** role.
+
 ## Person
 
 Getting a list of every person requires the **Admin** role.
