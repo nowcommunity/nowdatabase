@@ -8,6 +8,7 @@ import { useDetailContext } from './Context/DetailContext'
 import { EditDataType, Editable, Reference } from '@/shared/types'
 import { useState, useEffect, Fragment } from 'react'
 import { referenceValidator } from '@/shared/validators/validator'
+import { FieldsWithErrorsType } from './DetailView'
 
 export const WriteButton = <T,>({
   onWrite,
@@ -29,23 +30,8 @@ export const WriteButton = <T,>({
       validation errors (e.g. missing required fields) */
   useEffect(() => {
     if (mode.option === 'edit' || mode.option === 'new') {
-      for (const field in editData) {
-        const fieldAsString = String(field)
-        const errors = validator(editData, field)
-        if (errors.length === 0 && fieldAsString in fieldsWithErrors) {
-          setFieldsWithErrors(prevFieldsWithErrors => {
-            const newFieldsWithErrors = { ...prevFieldsWithErrors }
-            delete newFieldsWithErrors[fieldAsString]
-            return newFieldsWithErrors
-          })
-        } else if (errors.length > 0) {
-          if (!(fieldAsString in fieldsWithErrors)) {
-            setFieldsWithErrors(prevFieldsWithErrors => {
-              return { ...prevFieldsWithErrors, [fieldAsString]: errors[0] }
-            })
-          }
-        }
-      }
+      const errors = validator(editData)
+      setFieldsWithErrors(() => errors.reduce<FieldsWithErrorsType>((obj, cur) => ({ ...obj, [cur.name]: cur }), {}))
     }
     if (mode.staging == true) {
       const error =
