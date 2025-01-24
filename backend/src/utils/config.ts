@@ -33,6 +33,7 @@ export const CONTACT_SMTP_HOST = process.env.CONTACT_SMTP_HOST
 export const CONTACT_FROM_NAME = process.env.CONTACT_FROM_NAME
 export const CONTACT_FROM_EMAIL = process.env.CONTACT_FROM_EMAIL
 export const CONTACT_SMTP_PORT = process.env.CONTACT_SMTP_PORT
+export const CONTACT_RECIPIENT = process.env.CONTACT_RECIPIENT
 
 const requiredEnvs = {
   MARIADB_HOST,
