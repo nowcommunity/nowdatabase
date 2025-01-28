@@ -3,7 +3,7 @@ import { useDetailContext } from '../Context/DetailContext'
 import { usePageContext } from '@/components/Page'
 import { useEmailMutation } from '@/redux/emailReducer'
 import { useForm, Controller } from 'react-hook-form'
-import { Box, TextField, FormGroup, FormControlLabel, Switch } from '@mui/material'
+import { Box, TextField, FormControlLabel, Switch } from '@mui/material'
 import { useUser } from '@/hooks/user'
 import { useEffect } from 'react'
 import { useNotify } from '@/hooks/notification'
@@ -38,13 +38,12 @@ export const ContactForm = <T extends object>({ buttonText }: { buttonText: stri
     const result = await trigger()
     if (!result) return false
     const values = getValues()
-    const recipients = ['test_recipient@something.com']
-    const title = `Contact request: ${subject}`
+    const title = values.subject
     const message = formatContactEmail(values)
 
     const confirm = window.confirm(`Send email?`)
     if (!confirm) return false
-    void sendEmailMutation({ recipients, title, message })
+    void sendEmailMutation({ title, message })
     return true
   }
 
@@ -61,7 +60,7 @@ export const ContactForm = <T extends object>({ buttonText }: { buttonText: stri
 
   const form = (
     <Box sx={{ display: 'flex', flexDirection: 'column', gap: '1em' }}>
-      All fields need to be filled for the email to get sent. Note: currently sends emails to a testing account.
+      All fields need to be filled.
       <br></br>
       Enter your comments here
       <br></br>
@@ -127,7 +126,7 @@ export const ContactForm = <T extends object>({ buttonText }: { buttonText: stri
 // This is the same as ContactForm but it doesn't have context hooks, since table views do not have a context
 export const ContactFormTableView = ({ buttonText }: { buttonText: string }) => {
   const [sendEmailMutation, { isSuccess, isError }] = useEmailMutation()
-  const { register, trigger, getValues, formState } = useForm()
+  const { register, trigger, getValues, control, formState } = useForm<ContactFormValues>()
   const { errors } = formState
   const notify = useNotify()
   const user = useUser()
@@ -135,13 +134,13 @@ export const ContactFormTableView = ({ buttonText }: { buttonText: string }) => 
   const onSend = async () => {
     const result = await trigger()
     if (!result) return false
-    const { subject, comments, name, email } = getValues()
-    const recipients = ['test_recipient@something.com']
-    const title = `Regarding ${subject}`
-    const message = `Name: ${name}\n Email: ${email}\nComments: ${comments}`
+    const values = getValues()
+    const title = values.subject
+    const message = formatContactEmail(values)
+
     const confirm = window.confirm(`Send email?`)
     if (!confirm) return false
-    void sendEmailMutation({ recipients, title, message })
+    void sendEmailMutation({ title, message })
     return true
   }
 
@@ -200,6 +199,17 @@ export const ContactFormTableView = ({ buttonText }: { buttonText: string }) => 
         defaultValue=""
         {...register('email', { required: true })}
         error={!!errors['email']}
+      />
+      <Controller
+        control={control}
+        name="fast_reply_requested"
+        defaultValue={false}
+        render={({ field: { onChange, value } }) => (
+          <FormControlLabel
+            control={<Switch checked={value} onChange={onChange} />}
+            label="Please contact me as soon as possible."
+          />
+        )}
       />
     </Box>
   )
