@@ -25,7 +25,7 @@ const transport =
 
 router.post('/', async (req: Request<object, object, { title: string; message: string }>, res) => {
   const { title, message } = req.body
-  if (message.length === 0 || title.length === 0) {
+  if (message?.length === 0 || title?.length === 0) {
     return res.status(400).json({ message: 'Please define title and message.' })
   }
   if (!transport) {
@@ -33,7 +33,7 @@ router.post('/', async (req: Request<object, object, { title: string; message: s
     return res.status(200).json()
   }
   if (emailSent && new Date().getTime() - emailSent.getTime() < 60000) {
-    return res.status(400).json({ message: 'Emails already sent in last minute.' })
+    return res.status(400).json({ message: 'Email already sent in last minute.' })
   }
   emailSent = new Date()
   if (!CONTACT_FROM_NAME || !CONTACT_FROM_EMAIL || !CONTACT_SMTP_HOST || !CONTACT_SMTP_PORT || !CONTACT_RECIPIENT) {
