@@ -124,7 +124,7 @@ export const ContactForm = <T extends object>({
     </Box>
   )
 
-  if (noContext) return <ContactFormTableView buttonText={buttonText} form={form} onSend={onSend} />
+  if (noContext) return <ContactModal {...{ buttonText, onSend }}>{form}</ContactModal>
   return <ContactFormDetailView<T> buttonText={buttonText} form={form} setValue={setValue} onSend={onSend} />
 }
 
@@ -149,17 +149,5 @@ const ContactFormDetailView = <T extends object>({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  return <ContactModal {...{ buttonText, onSend }}>{form}</ContactModal>
-}
-
-const ContactFormTableView = ({
-  buttonText,
-  form,
-  onSend,
-}: {
-  buttonText: string
-  form: JSX.Element
-  onSend: () => Promise<boolean>
-}) => {
   return <ContactModal {...{ buttonText, onSend }}>{form}</ContactModal>
 }
