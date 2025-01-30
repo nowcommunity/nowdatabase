@@ -11,6 +11,7 @@ export const PersonTable = ({ selectorFn }: { selectorFn?: (id: PersonDetailsTyp
     () => [
       {
         accessorKey: 'initials',
+        id: 'person_id',
         header: 'Person Id',
       },
       {
