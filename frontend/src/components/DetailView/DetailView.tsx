@@ -17,6 +17,7 @@ import { ErrorBox, ReturnButton, WriteButton } from './components'
 import { ValidationObject } from '@/shared/validators/validator'
 import { EditDataType } from '@/shared/types'
 import { usePageContext } from '../Page'
+import { ContactForm } from './common/ContactForm'
 
 export type TabType = {
   title: string
@@ -192,6 +193,7 @@ export const DetailView = <T extends object>({
             {!isUserPage && <ReturnButton />}
           </Box>
           <Box sx={{ display: 'flex' }} gap={1}>
+            <ContactForm<T> buttonText="Contact" />
             {editRights.edit && !mode.staging && !initialState.mode.new && (
               <Button
                 id="edit-button"
