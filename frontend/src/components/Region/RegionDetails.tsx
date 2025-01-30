@@ -16,9 +16,8 @@ export const RegionDetails = () => {
 
   if (isError) return <div>Error loading data</div>
   if (isLoading || !data || mutationLoading) return <CircularProgress />
-  if (data) {
-    document.title = `${data.region}`
-  }
+
+  document.title = data.region
 
   const onWrite = async (editData: EditDataType<RegionDetailsType>) => {
     try {
