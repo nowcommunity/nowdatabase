@@ -17,15 +17,11 @@ import { useGetAllPersonsQuery } from '@/redux/personReducer'
 import { skipToken } from '@reduxjs/toolkit/query'
 import { useEffect, useMemo } from 'react'
 import { formatLastLoginDate } from '@/common'
-import Prisma from '../../../../../backend/prisma/generated/now_test_client'
+import { CircularProgress, Box } from '@mui/material'
 
 export const CoordinatorTab = () => {
   const { mode, editData, setEditData } = useDetailContext<RegionDetailsWithComPeople>()
-  const { data: personsData, isError } = useGetAllPersonsQuery(mode.read ? skipToken : undefined)
-
-  useEffect(() => {
-    console.log(personsData)
-  })
+  const { data: personsData, isLoading, isError } = useGetAllPersonsQuery(mode.read ? skipToken : undefined)
 
   const personColumns = useMemo<MRT_ColumnDef<PersonDetailsType>[]>(
     () => [
@@ -103,7 +99,13 @@ export const CoordinatorTab = () => {
     },
   ]
 
+  if (isLoading) return <CircularProgress />
+
   console.log(editData)
+
+  const formFields: { name: string; label: string; required?: boolean }[] = [
+    { name: 'country', label: 'Country', required: true },
+  ]
 
   // TODO: Selecting existing User or Country
   return (
@@ -142,6 +144,27 @@ export const CoordinatorTab = () => {
         />
       </Grouped>
       <Grouped title="Countries">
+        {!mode.read && (
+          <Box display="flex" gap={1}>
+            <EditingForm<RegionCountry, RegionDetails>
+              buttonText="Add new Country"
+              formFields={formFields}
+              editAction={(newCountry: RegionCountry) => {
+                setEditData({
+                  ...editData,
+                  now_reg_coord_country: [
+                    ...editData.now_reg_coord_country,
+                    {
+                      reg_coord_id: editData.reg_coord_id,
+                      country: newCountry.country,
+                      rowState: 'new',
+                    },
+                  ],
+                })
+              }}
+            />
+          </Box>
+        )}
         <EditableTable<RegionCountry, RegionDetails>
           columns={country}
           editTableData={editData.now_reg_coord_country}
