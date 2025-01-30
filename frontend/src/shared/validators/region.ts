@@ -7,6 +7,8 @@ const countryCheck = (countries: EditDataType<RegionCountry[]>) => {
       return 'Invalid or missing country field in region countries'
     }
   }
+  const uniqueCountries = new Set(countries.map(country => country.country!))
+  if (uniqueCountries.size !== countries.length) return 'Duplicate country name in region countries'
   return null as ValidationError
 }
 

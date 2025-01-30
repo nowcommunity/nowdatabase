@@ -66,7 +66,7 @@ export const writeRegion = async (region: EditDataType<RegionDetails>) => {
   }
 
   if (region.now_reg_coord_people) {
-    const coordinatorsToWrite = region.now_reg_coord_people
+    const coordinatorsToWrite = region.now_reg_coord_people.filter(coordinator => coordinator.rowState !== 'removed')
     await writeRegionCoordinators(regionId, coordinatorsToWrite)
   }
 
