@@ -2,8 +2,6 @@ import {
   RegionDetails,
   RegionCoordinator,
   RegionCountry,
-  Region,
-  User,
   PersonDetailsType,
   RegionDetailsWithComPeople,
 } from '@/shared/types'
@@ -15,7 +13,7 @@ import { SelectingTable } from '@/components/DetailView/common/SelectingTable'
 import { EditingForm } from '@/components/DetailView/common/EditingForm'
 import { useGetAllPersonsQuery } from '@/redux/personReducer'
 import { skipToken } from '@reduxjs/toolkit/query'
-import { useEffect, useMemo } from 'react'
+import { useMemo } from 'react'
 import { formatLastLoginDate } from '@/common'
 import { CircularProgress, Box } from '@mui/material'
 
@@ -27,6 +25,7 @@ export const CoordinatorTab = () => {
     () => [
       {
         accessorKey: 'initials',
+        id: 'person_id',
         header: 'Person Id',
       },
       {
@@ -100,8 +99,6 @@ export const CoordinatorTab = () => {
   ]
 
   if (isLoading) return <CircularProgress />
-
-  console.log(editData)
 
   const formFields: { name: string; label: string; required?: boolean }[] = [
     { name: 'country', label: 'Country', required: true },
