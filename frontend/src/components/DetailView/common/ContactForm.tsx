@@ -75,6 +75,7 @@ export const ContactForm = <T extends object>({
         defaultValue=""
         fullWidth
         {...register('subject', { required: true, validate: value => !!value.trim() })}
+        disabled={!noContext}
         error={!!errors['subject']}
       />
       <br></br>
