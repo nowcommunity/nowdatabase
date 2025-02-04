@@ -104,7 +104,6 @@ export const CoordinatorTab = () => {
     { name: 'country', label: 'Country', required: true },
   ]
 
-  // TODO: Selecting existing User or Country
   return (
     <>
       <Grouped title="Regional Coordinators">
