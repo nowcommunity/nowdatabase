@@ -1,24 +1,34 @@
 import { useNavigate, useParams } from 'react-router-dom'
-import { useEditRegionMutation, useGetRegionDetailsQuery } from '../../redux/regionReducer'
+import { useEditRegionMutation, useGetRegionDetailsQuery, useDeleteRegionMutation } from '../../redux/regionReducer'
 import { CircularProgress } from '@mui/material'
 import { DetailView, TabType } from '../DetailView/DetailView'
 import { CoordinatorTab } from './Tabs/CoordinatorTab'
 import { EditDataType, RegionDetails as RegionDetailsType, ValidationErrors } from '@/shared/types'
 import { useNotify } from '@/hooks/notification'
 import { validateRegion } from '@/shared/validators/region'
+import { useEffect } from 'react'
 
 export const RegionDetails = () => {
   const { id } = useParams()
   const { isLoading, isError, data } = useGetRegionDetailsQuery(id!)
   const [editRegionRequest, { isLoading: mutationLoading }] = useEditRegionMutation()
+  const [deleteMutation, { isSuccess: deleteSuccess, isError: deleteError }] = useDeleteRegionMutation()
   const notify = useNotify()
   const navigate = useNavigate()
 
+  useEffect(() => {
+    if (deleteSuccess) {
+      notify('Deleted item successfully.')
+      navigate('/region')
+    } else if (deleteError) {
+      notify('Could not delete item. Error happened.', 'error')
+    }
+  }, [deleteSuccess, deleteError, notify, navigate])
+
   if (isError) return <div>Error loading data</div>
   if (isLoading || !data || mutationLoading) return <CircularProgress />
-  if (data) {
-    document.title = `${data.region}`
-  }
+
+  document.title = data.region
 
   const onWrite = async (editData: EditDataType<RegionDetailsType>) => {
     try {
@@ -31,6 +41,10 @@ export const RegionDetails = () => {
     }
   }
 
+  const deleteFunction = async () => {
+    await deleteMutation(parseInt(id!)).unwrap()
+  }
+
   const tabs: TabType[] = [
     {
       title: 'Regional',
@@ -38,5 +52,7 @@ export const RegionDetails = () => {
     },
   ]
 
-  return <DetailView tabs={tabs} data={data} onWrite={onWrite} validator={validateRegion} />
+  return (
+    <DetailView tabs={tabs} data={data} onWrite={onWrite} validator={validateRegion} deleteFunction={deleteFunction} />
+  )
 }
