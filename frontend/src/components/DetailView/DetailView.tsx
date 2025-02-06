@@ -59,6 +59,7 @@ export const DetailView = <T extends object>({
   validator,
   isNew = false,
   isUserPage = false,
+  isPersonPage = false,
   hasStagingMode = false,
   deleteFunction,
 }: {
@@ -68,6 +69,7 @@ export const DetailView = <T extends object>({
   validator: (editData: EditDataType<T>, field: keyof EditDataType<T>) => ValidationObject
   isNew?: boolean
   isUserPage?: boolean
+  isPersonPage?: boolean
   hasStagingMode?: boolean
   deleteFunction?: () => Promise<void>
 }) => {
@@ -193,7 +195,7 @@ export const DetailView = <T extends object>({
             {!isUserPage && <ReturnButton />}
           </Box>
           <Box sx={{ display: 'flex' }} gap={1}>
-            <ContactForm<T> buttonText="Contact" />
+            {!isPersonPage && !isNew && <ContactForm<T> buttonText="Contact" />}
             {editRights.edit && !mode.staging && !initialState.mode.new && (
               <Button
                 id="edit-button"
