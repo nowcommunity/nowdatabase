@@ -10,16 +10,67 @@ import { Grouped } from '@/components/DetailView/common/tabLayoutHelpers'
 import { MRT_ColumnDef } from 'material-react-table'
 import { EditableTable } from '@/components/DetailView/common/EditableTable'
 import { SelectingTable } from '@/components/DetailView/common/SelectingTable'
-import { EditingForm } from '@/components/DetailView/common/EditingForm'
 import { useGetAllPersonsQuery } from '@/redux/personReducer'
 import { skipToken } from '@reduxjs/toolkit/query'
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 import { formatLastLoginDate } from '@/common'
-import { CircularProgress, Box } from '@mui/material'
+import { CircularProgress, Box, FormControl, Autocomplete, Button, TextField, FormHelperText } from '@mui/material'
+import { validCountries } from '@/shared/validators/countryList'
 
 export const CoordinatorTab = () => {
-  const { mode, editData, setEditData } = useDetailContext<RegionDetailsWithComPeople>()
+  const { mode, editData, setEditData, validator } = useDetailContext<RegionDetailsWithComPeople>()
   const { data: personsData, isLoading, isError } = useGetAllPersonsQuery(mode.read ? skipToken : undefined)
+  const [dropdownValue, setDropdownValue] = useState('')
+
+  const countryError = validator(editData, 'now_reg_coord_country').error
+
+  const onSave = () => {
+    if (countryError || dropdownValue === '') return false
+    setEditData({
+      ...editData,
+      now_reg_coord_country: [
+        ...editData.now_reg_coord_country,
+        {
+          reg_coord_id: editData.reg_coord_id,
+          country: dropdownValue,
+          rowState: 'new',
+        },
+      ],
+    })
+    setDropdownValue('')
+    return true
+  }
+
+  const NewCountryForm = () => {
+    return (
+      <Box sx={{ display: 'flex', flexDirection: 'row', gap: '1em', marginBottom: '1em' }}>
+        <FormControl size="small" error={!!countryError}>
+          <Autocomplete
+            sx={{ minWidth: '15em' }}
+            id={'country-multiselect'}
+            options={validCountries}
+            autoHighlight={true}
+            value={dropdownValue}
+            onChange={(_, newValue) => {
+              setDropdownValue(newValue ?? '')
+            }}
+            renderInput={params => <TextField {...params} label="Add a new country" error={!!countryError} />}
+          />
+
+          {countryError && <FormHelperText>{countryError}</FormHelperText>}
+        </FormControl>
+        <Button
+          id={'country-add-button'}
+          sx={{ maxHeight: '4em' }}
+          variant="contained"
+          disabled={!!countryError}
+          onClick={() => void onSave()}
+        >
+          Save
+        </Button>
+      </Box>
+    )
+  }
 
   const personColumns = useMemo<MRT_ColumnDef<PersonDetailsType>[]>(
     () => [
@@ -100,10 +151,6 @@ export const CoordinatorTab = () => {
 
   if (isLoading) return <CircularProgress />
 
-  const formFields: { name: string; label: string; required?: boolean }[] = [
-    { name: 'country', label: 'Country', required: true },
-  ]
-
   return (
     <>
       <Grouped title="Regional Coordinators">
@@ -140,27 +187,7 @@ export const CoordinatorTab = () => {
         />
       </Grouped>
       <Grouped title="Countries">
-        {!mode.read && (
-          <Box display="flex" gap={1}>
-            <EditingForm<RegionCountry, RegionDetails>
-              buttonText="Add new Country"
-              formFields={formFields}
-              editAction={(newCountry: RegionCountry) => {
-                setEditData({
-                  ...editData,
-                  now_reg_coord_country: [
-                    ...editData.now_reg_coord_country,
-                    {
-                      reg_coord_id: editData.reg_coord_id,
-                      country: newCountry.country,
-                      rowState: 'new',
-                    },
-                  ],
-                })
-              }}
-            />
-          </Box>
-        )}
+        {!mode.read && <NewCountryForm />}
         <EditableTable<RegionCountry, RegionDetails>
           columns={country}
           editTableData={editData.now_reg_coord_country}
