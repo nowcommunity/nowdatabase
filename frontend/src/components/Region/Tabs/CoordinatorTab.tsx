@@ -63,7 +63,7 @@ export const CoordinatorTab = () => {
           id={'country-add-button'}
           sx={{ maxHeight: '4em' }}
           variant="contained"
-          disabled={!!countryError}
+          disabled={!!countryError || !dropdownValue}
           onClick={() => void onSave()}
         >
           Save
