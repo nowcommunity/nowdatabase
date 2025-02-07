@@ -47,12 +47,15 @@ describe('Editing a region', () => {
     cy.get('[data-cy=detailview-button-AD]').click()
     cy.contains('Close').click()
     cy.contains('ads')
-    //cy.get('Add new Country').click()
+    cy.get('[id=country-multiselect]').click()
+    cy.contains('Algeria').click()
+    cy.get('[id=country-add-button]').click()
     cy.get('[id=write-button]').click()
     cy.contains('prs')
     cy.contains('ads')
     cy.contains('France')
     cy.contains('Spain')
+    cy.contains('Algeria')
   })
 
   it('without any regional coordinators or countries works', () => {
@@ -73,11 +76,23 @@ describe('Editing a region', () => {
     cy.contains('Spain')
     cy.get('[id=edit-button]').click()
     cy.get('[data-testid=RemoveCircleOutlineIcon]').first().click()
-    cy.get('[data-testid=RemoveCircleOutlineIcon]').first().click() // the two countries
+    cy.get('[data-testid=RemoveCircleOutlineIcon]').first().click()
+    cy.get('[data-testid=RemoveCircleOutlineIcon]').first().click() // the three countries
     cy.get('[id=write-button]').click()
     cy.contains('prs').should('not.exist')
     cy.contains('ads').should('not.exist')
+    cy.contains('Algeria').should('not.exist')
     cy.contains('France').should('not.exist')
     cy.contains('Spain').should('not.exist')
+  })
+
+  it('add country button is disabled for invalid or empty countries', () => {
+    cy.visit(`/region/1?tab=0`)
+    cy.contains('region 4452477e')
+    cy.get('[id=edit-button]').click()
+    cy.get('[id=country-multiselect]').type('Invalid Country')
+    cy.get('[id=country-add-button]').should('be.disabled')
+    cy.get('[id=country-multiselect]').clear()
+    cy.get('[id=country-add-button]').should('be.disabled')
   })
 })
