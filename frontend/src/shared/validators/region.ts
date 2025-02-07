@@ -3,12 +3,12 @@ import { Validators, validator, ValidationError } from './validator'
 
 const countryCheck = (countries: EditDataType<RegionCountry[]>) => {
   for (const country of countries) {
-    if (!('country' in country) || typeof country.country !== 'string') {
+    if (!('country' in country) || typeof country.country !== 'string' || country.country === '') {
       return 'Invalid or missing country field in region countries'
     }
   }
   const uniqueCountries = new Set(countries.map(country => country.country!))
-  if (uniqueCountries.size !== countries.length) return 'Duplicate country name in region countries'
+  if (uniqueCountries.size !== countries.length) return 'Duplicate country in country list'
   return null as ValidationError
 }
 
