@@ -24,7 +24,14 @@ const regionsApi = api.injectEndpoints({
       invalidatesTags: (result, _error, { reg_coord_id }) =>
         result ? [{ type: 'region', id: reg_coord_id }, 'regions'] : [],
     }),
+    deleteRegion: builder.mutation<void, number>({
+      query: id => ({
+        url: `/region/${id}`,
+        method: 'DELETE',
+      }),
+    }),
   }),
 })
 
-export const { useGetAllRegionsQuery, useGetRegionDetailsQuery, useEditRegionMutation } = regionsApi
+export const { useGetAllRegionsQuery, useGetRegionDetailsQuery, useEditRegionMutation, useDeleteRegionMutation } =
+  regionsApi
