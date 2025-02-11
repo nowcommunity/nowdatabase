@@ -6,7 +6,7 @@ import {
   RegionDetailsWithComPeople,
 } from '@/shared/types'
 import { useDetailContext } from '@/components/DetailView/Context/DetailContext'
-import { Grouped } from '@/components/DetailView/common/tabLayoutHelpers'
+import { ArrayFrame, Grouped, HalfFrames } from '@/components/DetailView/common/tabLayoutHelpers'
 import { MRT_ColumnDef } from 'material-react-table'
 import { EditableTable } from '@/components/DetailView/common/EditableTable'
 import { SelectingTable } from '@/components/DetailView/common/SelectingTable'
@@ -18,7 +18,7 @@ import { CircularProgress, Box, FormControl, Autocomplete, Button, TextField, Fo
 import { validCountries } from '@/shared/validators/countryList'
 
 export const CoordinatorTab = () => {
-  const { mode, editData, setEditData, validator } = useDetailContext<RegionDetailsWithComPeople>()
+  const { mode, editData, setEditData, validator, textField } = useDetailContext<RegionDetailsWithComPeople>()
   const { data: personsData, isLoading, isError } = useGetAllPersonsQuery(mode.read ? skipToken : undefined)
   const [dropdownValue, setDropdownValue] = useState('')
 
@@ -149,10 +149,13 @@ export const CoordinatorTab = () => {
     },
   ]
 
+  const regionName = [['Name', textField('region')]]
+
   if (isLoading) return <CircularProgress />
 
   return (
     <>
+      <ArrayFrame half array={regionName} title="Region" />
       <Grouped title="Regional Coordinators">
         {!mode.read && (
           <SelectingTable<PersonDetailsType, RegionDetails>

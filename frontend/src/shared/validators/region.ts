@@ -30,6 +30,9 @@ export const validateRegion = (editData: EditDataType<RegionDetails>, fieldName:
     region: {
       name: 'Region',
       required: true,
+      asString: value => {
+        if (value.trim().length === 0) return 'Region name must not be empty'
+      },
     },
     now_reg_coord_country: {
       name: 'Countries',
