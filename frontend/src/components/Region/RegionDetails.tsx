@@ -6,18 +6,20 @@ import { CoordinatorTab } from './Tabs/CoordinatorTab'
 import { EditDataType, RegionDetails as RegionDetailsType, ValidationErrors } from '@/shared/types'
 import { useNotify } from '@/hooks/notification'
 import { validateRegion } from '@/shared/validators/region'
+import { emptyRegion } from '../DetailView/common/defaultValues'
 
 export const RegionDetails = () => {
   const { id } = useParams()
-  const { isLoading, isError, data } = useGetRegionDetailsQuery(id!)
+  const isNew = id === 'new'
+  const { isLoading, isError, data } = useGetRegionDetailsQuery(id!, { skip: isNew })
   const [editRegionRequest, { isLoading: mutationLoading }] = useEditRegionMutation()
   const notify = useNotify()
   const navigate = useNavigate()
 
   if (isError) return <div>Error loading data</div>
-  if (isLoading || !data || mutationLoading) return <CircularProgress />
+  if (isLoading || (!data && !isNew) || mutationLoading) return <CircularProgress />
 
-  document.title = data.region
+  document.title = isNew ? 'New region' : data!.region
 
   const onWrite = async (editData: EditDataType<RegionDetailsType>) => {
     try {
@@ -37,5 +39,13 @@ export const RegionDetails = () => {
     },
   ]
 
-  return <DetailView tabs={tabs} data={data} onWrite={onWrite} validator={validateRegion} />
+  return (
+    <DetailView
+      tabs={tabs}
+      isNew={isNew}
+      data={isNew ? emptyRegion : data!}
+      onWrite={onWrite}
+      validator={validateRegion}
+    />
+  )
 }

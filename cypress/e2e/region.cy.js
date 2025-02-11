@@ -7,28 +7,19 @@ describe('Creating a region', () => {
     cy.login('testSu')
   })
 
-  it.skip('with valid data works', () => {
+  it('with valid data works', () => {
     cy.visit('/region/new')
-    cy.get('[id=order_name-textfield]').type('testOrder')
-    cy.get('[id=family_name-textfield]').type('testFamily')
-    cy.get('[id=genus_name-textfield]').type('testGenus')
-    cy.get('[id=species_name-textfield]').type('testSpecies')
+    cy.contains('Creating new region')
+    cy.contains('Region: This field is required')
+    cy.get('[id=write-button]').should('be.disabled')
+    cy.get('[id=region-textfield]').type('Test Region')
+    cy.contains('Region: This field is required').should('not.exist')
     cy.get('[id=write-button]').should('not.be.disabled')
     cy.get('[id=write-button]').click()
-    cy.get('[id=write-button]').should('be.disabled')
-    cy.contains('button', 'Add existing reference').click()
-    cy.get('button[data-cy^="detailview-button"]').first().click()
-    cy.contains('button', 'Close').click()
-    cy.get('[id=write-button]').should('not.be.disabled')
-    cy.get('[id=write-button]').click()
-    cy.contains('testOrder')
-  })
-
-  it.skip('with missing required fields does not work', () => {
-    cy.visit('/species/new')
-    cy.contains('This field is required')
-    cy.get('[id=write-button]').should('be.disabled')
-    cy.contains('4 Invalid fields')
+    cy.contains('Test Region')
+    cy.get('[id=delete-button]').should('exist')
+    cy.visit('/region/')
+    cy.contains('Test Region')
   })
 })
 
@@ -67,7 +58,7 @@ describe('Editing a region', () => {
     cy.contains('Spain')
     cy.get('[id=edit-button]').click()
     cy.get('[data-testid=RemoveCircleOutlineIcon]').first().click()
-    cy.get('[data-testid=RemoveCircleOutlineIcon]').first().click() // the two regional coordinators
+    cy.get('[data-testid=RemoveCircleOutlineIcon]').first().click() // removes the two regional coordinators
     cy.get('[id=write-button]').click()
     cy.contains('region 4452477e')
     cy.contains('prs').should('not.exist')
@@ -77,13 +68,36 @@ describe('Editing a region', () => {
     cy.get('[id=edit-button]').click()
     cy.get('[data-testid=RemoveCircleOutlineIcon]').first().click()
     cy.get('[data-testid=RemoveCircleOutlineIcon]').first().click()
-    cy.get('[data-testid=RemoveCircleOutlineIcon]').first().click() // the three countries
+    cy.get('[data-testid=RemoveCircleOutlineIcon]').first().click() // removes the three countries
     cy.get('[id=write-button]').click()
     cy.contains('prs').should('not.exist')
     cy.contains('ads').should('not.exist')
     cy.contains('Algeria').should('not.exist')
     cy.contains('France').should('not.exist')
     cy.contains('Spain').should('not.exist')
+  })
+
+  it('with duplicate countries does not work', () => {
+    cy.visit(`/region/1?tab=0`)
+    cy.contains('region 4452477e')
+    cy.get('[id=edit-button]').click()
+    cy.get('[id=country-multiselect]').click()
+    cy.contains('Algeria').click()
+    cy.get('[id=country-add-button]').click()
+    cy.get('[id=country-multiselect]').click()
+    cy.contains('.MuiAutocomplete-option', 'Algeria').click() // this finds the Algeria inside the Autocomplete component
+    cy.get('[id=country-add-button]').click()
+    cy.contains('Countries: Duplicate country in country list')
+    cy.get('[id=write-button]').should('be.disabled')
+  })
+
+  it('with no region name does not work', () => {
+    cy.visit(`/region/1?tab=0`)
+    cy.contains('region 4452477e')
+    cy.get('[id=edit-button]').click()
+    cy.get('[id=region-textfield]').clear()
+    cy.contains('Region: This field is required')
+    cy.get('[id=write-button]').should('be.disabled')
   })
 
   it('add country button is disabled for invalid or empty countries', () => {
