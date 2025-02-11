@@ -102,6 +102,7 @@ export type CrossSearch = {
   frac_max: string | null
   frac_min: string | null
   chron: string | null
+  age_comm: string | null
   basin: string | null
   subbasin: string | null
   dms_lat: string | null
@@ -118,7 +119,28 @@ export type CrossSearch = {
   formation: string | null
   member: string | null
   bed: string | null
+  appr_num_spm: number
   loc_status: boolean | null
+  estimate_precip: number | null
+  estimate_temp: Decimal | null
+  estimate_npp: number | null
+  pers_woody_cover: number | null
+  pers_pollen_ap: number | null
+  pers_pollen_nap: number | null
+  pers_pollen_other: number | null
+  hominin_skeletal_remains: boolean
+  bipedal_footprints: boolean
+  stone_tool_cut_marks_on_bones: boolean
+  stone_tool_technology: boolean
+  technological_mode_1: number | null
+  technological_mode_2: number | null
+  technological_mode_3: number | null
+  cultural_stage_1: string | null
+  cultural_stage_2: string | null
+  cultural_stage_3: string | null
+  regional_culture_1: string | null
+  regional_culture_2: string | null
+  regional_culture_3: string | null
   species_id: number
   order_name: string
   family_name: string
@@ -129,13 +151,44 @@ export type CrossSearch = {
   species_name: string
   unique_identifier: string
   taxonomic_status: string
+  sp_status: boolean | null
   common_name: string | null
   sp_author: string | null
   strain: string | null
   gene: string | null
+  sv_length: string | null
   body_mass: number | null
   brain_mass: number | null
-  sp_status: boolean | null
+  sd_size: boolean | null
+  sd_display: boolean | null
+  tshm: string | null
+  tht: string | null
+  horizodonty: string | null
+  crowntype: string | null
+  cusp_shape: string | null
+  cusp_count_buccal: string | null
+  cusp_count_lingual: string | null
+  loph_count_lon: string | null
+  loph_count_trs: string | null
+  fct_al: string | null
+  fct_ol: string | null
+  fct_sf: string | null
+  fct_ot: string | null
+  fct_cm: string | null
+  microwear: string | null
+  mesowear: string | null
+  mw_or_high: number | null
+  mw_or_low: number | null
+  mw_cs_sharp: number | null
+  mw_cs_round: number | null
+  mw_cs_blunt: number | null
+  diet1: string | null
+  diet2: string | null
+  diet3: string | null
+  locomo1: string | null
+  locomo2: string | null
+  locomo3: string | null
+  sp_comment: string
 }
 
 export type Sequence = Prisma.now_tu_sequence
