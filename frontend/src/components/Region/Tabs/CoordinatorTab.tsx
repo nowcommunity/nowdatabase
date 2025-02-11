@@ -6,7 +6,7 @@ import {
   RegionDetailsWithComPeople,
 } from '@/shared/types'
 import { useDetailContext } from '@/components/DetailView/Context/DetailContext'
-import { ArrayFrame, Grouped, HalfFrames } from '@/components/DetailView/common/tabLayoutHelpers'
+import { ArrayFrame, Grouped } from '@/components/DetailView/common/tabLayoutHelpers'
 import { MRT_ColumnDef } from 'material-react-table'
 import { EditableTable } from '@/components/DetailView/common/EditableTable'
 import { SelectingTable } from '@/components/DetailView/common/SelectingTable'
