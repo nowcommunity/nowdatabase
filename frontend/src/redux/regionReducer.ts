@@ -29,6 +29,7 @@ const regionsApi = api.injectEndpoints({
         url: `/region/${id}`,
         method: 'DELETE',
       }),
+      invalidatesTags: ['regions'],
     }),
   }),
 })
