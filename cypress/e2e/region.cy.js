@@ -6,7 +6,7 @@ describe('Creating a region', () => {
   beforeEach('Login as admin', () => {
     cy.login('testSu')
   })
-  
+
   it('with valid data works', () => {
     cy.visit('/region/new')
     cy.contains('Creating new region')
@@ -108,12 +108,14 @@ describe('Editing a region', () => {
     cy.get('[id=country-add-button]').should('be.disabled')
     cy.get('[id=country-multiselect]').clear()
     cy.get('[id=country-add-button]').should('be.disabled')
-    
+  })
+})
+
 describe('Deleting a region', () => {
   beforeEach('Login as admin', () => {
     cy.login('testSu')
   })
-  
+
   it('works and returns user to table view', () => {
     cy.visit('/region/1')
     cy.get('[id=delete-button]').should('exist').click()

@@ -62,7 +62,7 @@ export const RegionDetails = () => {
       data={isNew ? emptyRegion : data!}
       onWrite={onWrite}
       validator={validateRegion}
-      deleteFunction={deleteFunction} 
+      deleteFunction={deleteFunction}
     />
   )
 }
