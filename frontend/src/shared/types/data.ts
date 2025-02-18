@@ -90,106 +90,185 @@ export type Locality = {
   regional_culture_2: string | null
   regional_culture_3: string | null
 }
+
 export type CrossSearch = {
-  lid: number
-  loc_name: string
-  bfa_max: string | null
-  bfa_min: string | null
-  max_age: number
-  min_age: number
-  bfa_max_abs: string | null
-  bfa_min_abs: string | null
-  frac_max: string | null
-  frac_min: string | null
-  chron: string | null
-  age_comm: string | null
-  basin: string | null
-  subbasin: string | null
-  dms_lat: string | null
-  dms_long: string | null
-  dec_lat: number
-  dec_long: number
-  altitude: number
-  country: string
-  state: string | null
-  county: string | null
-  site_area: string | null
-  gen_loc: string | null
-  plate: string | null
-  formation: string | null
-  member: string | null
-  bed: string | null
+  // com_species fields
+  species_id_com_species: number;
+  // class_name: string | null;
+  order_name: string | null;
+  family_name: string | null;
+  subclass_or_superorder_name: string | null;
+  suborder_or_superfamily_name: string | null;
+  subfamily_name: string | null;
+  genus_name: string | null;
+  species_name: string | null;
+  unique_identifier: string | null;
+  taxonomic_status: string | null;
+  // common_name: string | null;
+  // sp_author: string | null;
+  // strain: string | null;
+  // gene: string | null;
+  // taxon_status: string | null;
+  diet1: string | null;
+  diet2: string | null;
+  diet3: string | null;
+  // diet_description: string | null;
+  // rel_fib: number | null;
+  // selectivity: string | null;
+  // digestion: string | null;
+  // feedinghab1: string | null;
+  // feedinghab2: string | null;
+  // shelterhab1: string | null;
+  // shelterhab2: string | null;
+  locomo1: string | null;
+  locomo2: string | null;
+  locomo3: string | null;
+  // hunt_forage: string | null;
+  body_mass_com_species: number | null;
+  // brain_mass: number | null;
+  sv_length: number | null;
+  // activity: string | null;
+  sd_size: string | null;
+  sd_display: string | null;
+  tshm: string | null;
+  // symph_mob: string | null;
+  // relative_blade_length: number | null;
+  tht: string | null;
+  crowntype: string | null;
+  microwear_com_species: string | null;
+  horizodonty: string | null;
+  cusp_shape: string | null;
+  cusp_count_buccal: number | null;
+  cusp_count_lingual: number | null;
+  loph_count_lon: number | null;
+  loph_count_trs: number | null;
+  fct_al: string | null;
+  fct_ol: string | null;
+  fct_sf: string | null;
+  fct_ot: string | null;
+  fct_cm: string | null;
+  mesowear_com_species: string | null;
+  mw_or_high_com_species: string | null;
+  mw_or_low_com_species: string | null;
+  mw_cs_sharp_com_species: string | null;
+  mw_cs_round_com_species: string | null;
+  mw_cs_blunt_com_species: string | null;
+  // mw_scale_min_com_species: number | null;
+  // mw_scale_max_com_species: number | null;
+  // mw_value_com_species: number | null;
+  // pop_struc: string | null;
+  // sp_status: string | null;
+  // used_morph: string | null;
+  // used_now: string | null;
+  // used_gene: string | null;
+  sp_comment: string | null;
+
+  // now_ls fields
+  // lid_now_ls: number;
+  // species_id_now_ls: number;
+  // nis: number | null;
+  // pct: number | null;
+  // quad: number | null;
+  // mni: number | null;
+  // qua: number | null;
+  id_status: string | null;
+  orig_entry: string | null;
+  source_name: string | null;
+  // body_mass_now_ls: number | null;
+  mesowear_now_ls: string | null;
+  mw_or_high_now_ls: string | null;
+  mw_or_low_now_ls: string | null;
+  mw_cs_sharp_now_ls: string | null;
+  mw_cs_round_now_ls: string | null;
+  mw_cs_blunt_now_ls: string | null;
+  // mw_scale_min_now_ls: number | null;
+  // mw_scale_max_now_ls: number | null;
+  // mw_value_now_ls: number | null;
+  microwear_now_ls: string | null;
+  // dc13_mean: number | null;
+  // dc13_n: number | null;
+  // dc13_max: number | null;
+  // dc13_min: number | null;
+  // dc13_stdev: number | null;
+  // do18_mean: number | null;
+  // do18_n: number | null;
+  // do18_max: number | null;
+  // do18_min: number | null;
+  // do18_stdev: number | null;
+
+  // now_loc fields
+  lid_now_loc: number;
+  bfa_max: number | null;
+  bfa_min: number | null;
+  loc_name: string | null;
+  // date_meth: string | null;
+  max_age: number | null;
+  min_age: number | null;
+  bfa_max_abs: number | null;
+  bfa_min_abs: number | null;
+  frac_max: number | null;
+  frac_min: number | null;
+  chron: string | null;
+  age_comm: string | null;
+  basin: string | null;
+  subbasin: string | null;
+  dms_lat: string | null;
+  dms_long: string | null;
+  dec_lat: number | null;
+  dec_long: number | null;
+  // approx_coord: string | null;
+  altitude: number | null;
+  country: string | null;
+  state: string | null;
+  county: string | null;
   appr_num_spm: number
-  loc_status: boolean | null
-  estimate_precip: number | null
-  estimate_temp: Decimal | null
-  estimate_npp: number | null
-  pers_woody_cover: number | null
+  // site_area: string | null;
+  gen_loc: string | null;
+  plate: string | null;
+  // loc_detail: string | null;
+  // lgroup: string | null;
+  formation: string | null;
+  member: string | null;
+  bed: string | null;
+  loc_status: boolean | null;
+  // datum_plane: string | null;
+  // tos: string | null;
+  // bos: string | null;
+  // rock_type: string | null;
+  // rt_adj: string | null;
+  // lith_comm: string | null;
+  // depo_context1: string | null;
+  // depo_context2: string | null;
+  // depo_context3: string | null;
+  // depo_context4: string | null;
+  // depo_comm: string | null;
+  // sed_env_1: string | null;
+  // sed_env_2: string | null;
+  // event_circum: string | null;
+  // se_comm: string | null;
+  // climate_type: string | null;
+  // biome: string | null;
+  estimate_precip: number | null;
+  estimate_temp: number | null;
+  estimate_npp: number | null;
+  pers_woody_cover: number | null;
   pers_pollen_ap: number | null
   pers_pollen_nap: number | null
   pers_pollen_other: number | null
-  hominin_skeletal_remains: boolean
-  bipedal_footprints: boolean
-  stone_tool_cut_marks_on_bones: boolean
-  stone_tool_technology: boolean
-  technological_mode_1: number | null
-  technological_mode_2: number | null
-  technological_mode_3: number | null
-  cultural_stage_1: string | null
-  cultural_stage_2: string | null
-  cultural_stage_3: string | null
-  regional_culture_1: string | null
-  regional_culture_2: string | null
-  regional_culture_3: string | null
-  species_id: number
-  order_name: string
-  family_name: string
-  subclass_or_superorder_name: string | null
-  suborder_or_superfamily_name: string | null
-  subfamily_name: string | null
-  genus_name: string
-  species_name: string
-  unique_identifier: string
-  taxonomic_status: string
-  sp_status: boolean | null
-  common_name: string | null
-  sp_author: string | null
-  strain: string | null
-  gene: string | null
-  sv_length: string | null
-  body_mass: number | null
-  brain_mass: number | null
-  sd_size: boolean | null
-  sd_display: boolean | null
-  tshm: string | null
-  tht: string | null
-  horizodonty: string | null
-  crowntype: string | null
-  cusp_shape: string | null
-  cusp_count_buccal: string | null
-  cusp_count_lingual: string | null
-  loph_count_lon: string | null
-  loph_count_trs: string | null
-  fct_al: string | null
-  fct_ol: string | null
-  fct_sf: string | null
-  fct_ot: string | null
-  fct_cm: string | null
-  microwear: string | null
-  mesowear: string | null
-  mw_or_high: number | null
-  mw_or_low: number | null
-  mw_cs_sharp: number | null
-  mw_cs_round: number | null
-  mw_cs_blunt: number | null
-  diet1: string | null
-  diet2: string | null
-  diet3: string | null
-  locomo1: string | null
-  locomo2: string | null
-  locomo3: string | null
-  sp_comment: string
-}
+  hominin_skeletal_remains: boolean | null;
+  bipedal_footprints: boolean | null;
+  stone_tool_technology: boolean | null;
+  stone_tool_cut_marks_on_bones: boolean | null;
+  technological_mode_1: boolean | null;
+  technological_mode_2: boolean | null;
+  technological_mode_3: boolean | null;
+  cultural_stage_1: boolean | null;
+  cultural_stage_2: boolean | null;
+  cultural_stage_3: boolean | null;
+  regional_culture_1: boolean | null;
+  regional_culture_2: boolean | null;
+  regional_culture_3: boolean | null;
+};
 
 export type Sequence = Prisma.now_tu_sequence
 export type SequenceDetailsType = Prisma.now_tu_sequence
