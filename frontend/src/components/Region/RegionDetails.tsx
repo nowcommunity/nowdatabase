@@ -7,10 +7,12 @@ import { EditDataType, RegionDetails as RegionDetailsType, ValidationErrors } fr
 import { useNotify } from '@/hooks/notification'
 import { validateRegion } from '@/shared/validators/region'
 import { useEffect } from 'react'
+import { emptyRegion } from '../DetailView/common/defaultValues'
 
 export const RegionDetails = () => {
   const { id } = useParams()
-  const { isLoading, isError, data } = useGetRegionDetailsQuery(id!)
+  const isNew = id === 'new'
+  const { isLoading, isError, data } = useGetRegionDetailsQuery(id!, { skip: isNew })
   const [editRegionRequest, { isLoading: mutationLoading }] = useEditRegionMutation()
   const [deleteMutation, { isSuccess: deleteSuccess, isError: deleteError }] = useDeleteRegionMutation()
   const notify = useNotify()
@@ -26,9 +28,10 @@ export const RegionDetails = () => {
   }, [deleteSuccess, deleteError, notify, navigate])
 
   if (isError) return <div>Error loading data</div>
-  if (isLoading || !data || mutationLoading) return <CircularProgress />
 
-  document.title = data.region
+  if (isLoading || (!data && !isNew) || mutationLoading) return <CircularProgress />
+
+  document.title = isNew ? 'New region' : data!.region
 
   const onWrite = async (editData: EditDataType<RegionDetailsType>) => {
     try {
@@ -53,6 +56,13 @@ export const RegionDetails = () => {
   ]
 
   return (
-    <DetailView tabs={tabs} data={data} onWrite={onWrite} validator={validateRegion} deleteFunction={deleteFunction} />
+    <DetailView
+      tabs={tabs}
+      isNew={isNew}
+      data={isNew ? emptyRegion : data!}
+      onWrite={onWrite}
+      validator={validateRegion}
+      deleteFunction={deleteFunction} 
+    />
   )
 }

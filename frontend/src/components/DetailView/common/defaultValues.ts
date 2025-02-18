@@ -1,6 +1,7 @@
 import {
   LocalityDetailsType,
   ReferenceDetailsType,
+  RegionDetails,
   SpeciesDetailsType,
   TimeBoundDetailsType,
   TimeUnitDetailsType,
@@ -237,3 +238,9 @@ export const emptyReference = {
   ref_journal: null,
   visible_ref_authors: [],
 } as unknown as ReferenceDetailsType
+
+export const emptyRegion = {
+  region: '',
+  now_reg_coord_people: [],
+  now_reg_coord_country: [],
+} as unknown as RegionDetails
