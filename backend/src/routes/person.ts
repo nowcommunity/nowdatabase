@@ -1,7 +1,8 @@
-import { Router } from 'express'
-import { getAllPersons, getPersonDetails } from '../services/person'
-import { Role } from '../../../frontend/src/shared/types'
+import { Router, Request } from 'express'
+import { getAllPersons, getPersonDetails, validateEntirePerson } from '../services/person'
+import { Role, PersonDetailsType, EditDataType, EditMetaData } from '../../../frontend/src/shared/types'
 import { requireOneOf } from '../middlewares/authorizer'
+import { writePerson } from '../services/write/person'
 
 const router = Router()
 
@@ -21,5 +22,19 @@ router.get('/:id', async (req, res) => {
   if (!person) return res.status(404).send()
   return res.status(200).send(person)
 })
+
+router.put(
+  '/',
+  requireOneOf([Role.Admin]),
+  async (req: Request<object, object, { person: EditDataType<PersonDetailsType> & EditMetaData }>, res) => {
+    const { ...editedPerson } = req.body.person
+    const validationErrors = validateEntirePerson({ ...editedPerson })
+    if (validationErrors.length > 0) {
+      return res.status(403).send(validationErrors)
+    }
+    const initials = await writePerson(editedPerson)
+    return res.status(200).send({ initials })
+  }
+)
 
 export default router
