@@ -1,6 +1,7 @@
 import { EditDataType, RegionCountry, RegionDetails, RegionCoordinator } from '../../../../frontend/src/shared/types'
 import Prisma from '../../../prisma/generated/now_test_client'
 import { nowDb, getFieldsOfTables } from '../../utils/db'
+import { getRegionDetails } from '../region'
 import { filterAllowedKeys } from './writeOperations/utils'
 
 export const writeRegionCountries = async (regionId: number, countries: EditDataType<RegionCountry[]>) => {
@@ -71,4 +72,28 @@ export const writeRegion = async (region: EditDataType<RegionDetails>) => {
   }
 
   return regionId
+}
+
+export const deleteRegion = async (regionId: number) => {
+  const region = await getRegionDetails(regionId)
+
+  if (!region) throw new Error('Region not found')
+
+  await nowDb.$transaction(async prisma => {
+    await prisma.now_reg_coord_country.deleteMany({
+      where: { reg_coord_id: regionId },
+    })
+
+    await prisma.now_reg_coord_people.deleteMany({
+      where: { reg_coord_id: regionId },
+    })
+
+    try {
+      await prisma.now_reg_coord.delete({
+        where: { reg_coord_id: regionId },
+      })
+    } catch (error) {
+      throw new Error('Failed to delete the region')
+    }
+  })
 }
