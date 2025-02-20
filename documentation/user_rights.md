@@ -90,9 +90,11 @@ NOTE: Users with the **EditRestricted** role should be able to get a list of tim
 
 Viewing a list of all regions requires the **Admin** role.
 
-Getting a spesific region using an id requires the **Admin** role.
+Viewing the details of a region requires the **Admin** role.
 
-Editing a region requires the **Admin** role.
+Creating or updating a region requires the **Admin** role.
+
+Deleting a region requires the **Admin** role.
 
 ## Person
 
