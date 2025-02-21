@@ -27,6 +27,7 @@ import { requireOneOf } from './middlewares/authorizer'
 import { Role } from './../../frontend/src/shared/types'
 import { blockWriteRequests } from './middlewares/misc'
 import testRouter from './routes/test'
+import { rateLimit } from 'express-rate-limit'
 
 const app = express()
 
@@ -44,6 +45,16 @@ app.use(refreshTokenRouter)
 
 app.use(tokenExtractor)
 app.use(userExtractor)
+
+const limiter = rateLimit({
+  windowMs: 15 * 1000,
+  limit: 1,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { message: 'You have sent an email recently, please try again in a few seconds.' },
+})
+
+app.use('/email', limiter)
 
 app.use('/user', userRouter)
 app.use('/crosssearch', crossSearchRouter)
