@@ -75,27 +75,41 @@ describe('Updating person works', () => {
     expect(resultBody5.length).toEqual(1) //There should be 1 validation error
   })
 
-  it('Updating fails without permissions', async () => {
-    // TODO: modify this once the route is allowed for other users than admin too
+  it('Updating other people fails without permissions', async () => {
     logout()
     const { body: resultBodyNoPerm, status: resultStatusNoPerm } = await send('person/', 'PUT', {
       person: { initials: 'AD', first_name: 'Test first name 2' },
     })
     expect(resultBodyNoPerm).toEqual(noPermError)
-    expect(resultStatusNoPerm).toEqual(403)
+    expect(resultStatusNoPerm).toEqual(401)
 
     await login('testEr')
     const { body: resultBodyEr, status: resultStatusEr } = await send('person/', 'PUT', {
       person: { initials: 'AD', first_name: 'Test first name 2' },
     })
     expect(resultBodyEr).toEqual(noPermError)
-    expect(resultStatusEr).toEqual(403)
+    expect(resultStatusEr).toEqual(401)
 
     await login('testEu')
     const { body: resultBodyEu, status: resultStatusEu } = await send('person/', 'PUT', {
       person: { initials: 'AD', first_name: 'Test first name 2' },
     })
     expect(resultBodyEu).toEqual(noPermError)
-    expect(resultStatusEu).toEqual(403)
+    expect(resultStatusEu).toEqual(401)
+  })
+
+  it('Non-admin user updating their own information succeeds', async () => {
+    await login('testEr')
+    const { body: resultBodyEr, status: resultStatusEr } = await send<{ initials: string }>('person/', 'PUT', {
+      person: { initials: 'TEST-ER', first_name: 'Test first name 3' },
+    })
+    const { initials: resultId } = resultBodyEr
+
+    expect(typeof resultId).toEqual('string')
+    expect(resultStatusEr).toEqual(200)
+
+    const { body, status: getReqStat } = await send<PersonDetailsType>(`person/${resultId}`, 'GET')
+    expect(getReqStat).toEqual(200)
+    expect(body.first_name).toEqual('Test first name 3')
   })
 })

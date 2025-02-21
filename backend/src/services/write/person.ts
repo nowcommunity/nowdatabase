@@ -9,8 +9,7 @@ export const writePerson = async (person: EditDataType<PersonDetailsType>) => {
   let personId: string
 
   if (!filteredPerson.initials) {
-    console.log('no new person creation at the moment')
-    return 'not yet'
+    throw new Error('Missing initials, creating new persons is not yet implemented')
   } else {
     await nowDb.com_people.update({
       where: { initials: person.initials },
