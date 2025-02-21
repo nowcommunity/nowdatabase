@@ -31,14 +31,16 @@ describe('Updating person works', () => {
     updatedPerson = body
   })
 
-  it('Contains correct data', () => {
-    const { initials, first_name, surname, email, organization, country } = updatedPerson!
+  it('Contains correct data and full name is automatically updated', () => {
+    const { initials, first_name, surname, full_name, email, organization, country } = updatedPerson!
     expect(initials).toEqual(existingPerson.initials)
     expect(first_name).toEqual(editedPerson.first_name)
     expect(surname).toEqual(editedPerson.surname)
     expect(email).toEqual(editedPerson.email)
     expect(organization).toEqual(editedPerson.organization)
     expect(country).toEqual(editedPerson.country)
+
+    expect(full_name).toEqual(`${editedPerson.first_name} ${editedPerson.surname}`)
   })
 
   it('Updating fails if any person field is empty', async () => {

@@ -14,7 +14,7 @@ export const writePerson = async (person: EditDataType<PersonDetailsType>) => {
   } else {
     await nowDb.com_people.update({
       where: { initials: person.initials },
-      data: filteredPerson,
+      data: { ...filteredPerson, full_name: `${filteredPerson.first_name} ${filteredPerson.surname}` },
     })
     personId = filteredPerson.initials
   }
