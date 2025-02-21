@@ -1,11 +1,12 @@
 import { useNavigate, useParams } from 'react-router-dom'
-import { useEditRegionMutation, useGetRegionDetailsQuery } from '../../redux/regionReducer'
+import { useEditRegionMutation, useGetRegionDetailsQuery, useDeleteRegionMutation } from '../../redux/regionReducer'
 import { CircularProgress } from '@mui/material'
 import { DetailView, TabType } from '../DetailView/DetailView'
 import { CoordinatorTab } from './Tabs/CoordinatorTab'
 import { EditDataType, RegionDetails as RegionDetailsType, ValidationErrors } from '@/shared/types'
 import { useNotify } from '@/hooks/notification'
 import { validateRegion } from '@/shared/validators/region'
+import { useEffect } from 'react'
 import { emptyRegion } from '../DetailView/common/defaultValues'
 
 export const RegionDetails = () => {
@@ -13,10 +14,21 @@ export const RegionDetails = () => {
   const isNew = id === 'new'
   const { isLoading, isError, data } = useGetRegionDetailsQuery(id!, { skip: isNew })
   const [editRegionRequest, { isLoading: mutationLoading }] = useEditRegionMutation()
+  const [deleteMutation, { isSuccess: deleteSuccess, isError: deleteError }] = useDeleteRegionMutation()
   const notify = useNotify()
   const navigate = useNavigate()
 
+  useEffect(() => {
+    if (deleteSuccess) {
+      notify('Deleted item successfully.')
+      navigate('/region')
+    } else if (deleteError) {
+      notify('Could not delete item. Error happened.', 'error')
+    }
+  }, [deleteSuccess, deleteError, notify, navigate])
+
   if (isError) return <div>Error loading data</div>
+
   if (isLoading || (!data && !isNew) || mutationLoading) return <CircularProgress />
 
   document.title = isNew ? 'New region' : data!.region
@@ -30,6 +42,10 @@ export const RegionDetails = () => {
       const error = e as ValidationErrors
       notify('Following validators failed: ' + error.data.map(e => e.name).join(', '), 'error')
     }
+  }
+
+  const deleteFunction = async () => {
+    await deleteMutation(parseInt(id!)).unwrap()
   }
 
   const tabs: TabType[] = [
@@ -46,6 +62,7 @@ export const RegionDetails = () => {
       data={isNew ? emptyRegion : data!}
       onWrite={onWrite}
       validator={validateRegion}
+      deleteFunction={deleteFunction}
     />
   )
 }
