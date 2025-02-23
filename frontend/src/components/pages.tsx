@@ -262,7 +262,7 @@ export const personPage = (
     createTitle={(person: PersonDetailsType) => `${person.surname}`}
     getEditRights={(user: UserState, id: number | string) => {
       if (user.role === Role.Admin) return fullRights
-      if (user.initials === id) return { edit: true }
+      if (user.initials === id || id === 'user-page') return { edit: true }
       return noRights
     }}
   />
