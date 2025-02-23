@@ -15,8 +15,14 @@ router.get('/:id', async (req, res) => {
   const id = req.params.id
 
   /* Access checking happens differently for this route, since we want to allow the route to return the user's own data for any user */
-  if (!req.user) return res.status(401).send()
-  if (req.user.role !== Role.Admin && req.user.initials !== id) return res.status(401).send()
+  if (!req.user)
+    return res.status(401).send({
+      message: 'User is not logged in',
+    })
+  if (req.user.role !== Role.Admin && req.user.initials !== id)
+    return res.status(401).send({
+      message: 'User not authorized for the requested resource or action',
+    })
 
   const person = await getPersonDetails(id)
   if (!person) return res.status(404).send()
