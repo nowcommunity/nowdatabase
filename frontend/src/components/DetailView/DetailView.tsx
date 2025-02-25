@@ -217,7 +217,7 @@ export const DetailView = <T extends object>({
                 Delete
               </Button>
             )}
-            {Object.keys(fieldsWithErrors).length > 0 && <ErrorBox />}
+            {!mode.read && Object.keys(fieldsWithErrors).length > 0 && <ErrorBox />}
             {(!mode.read || initialState.mode.new) && onWrite && (
               <WriteButton onWrite={onWrite} hasStagingMode={hasStagingMode} />
             )}
