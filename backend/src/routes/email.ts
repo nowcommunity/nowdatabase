@@ -10,6 +10,15 @@ import {
 } from '../utils/config'
 import { logger } from '../utils/logger'
 import { sleep } from '../utils/common'
+import { rateLimit } from 'express-rate-limit'
+
+export const emailLimiter = rateLimit({
+  windowMs: 15 * 1000,
+  limit: 1,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { message: 'You have sent an email recently, please try again in a few seconds.' },
+})
 
 const router = Router()
 

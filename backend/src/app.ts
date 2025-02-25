@@ -15,7 +15,7 @@ import refreshTokenRouter from './routes/refresh'
 import timeBoundRouter from './routes/timeBound'
 import timeUnitRouter from './routes/timeUnit'
 import userRouter from './routes/user'
-import emailRouter from './routes/email'
+import emailRouter, { emailLimiter } from './routes/email'
 import versionRouter from './routes/version'
 import geonamesRouter from './routes/geonames-api'
 import { responseLogger } from './middlewares/requestLogger'
@@ -27,7 +27,6 @@ import { requireOneOf } from './middlewares/authorizer'
 import { Role } from './../../frontend/src/shared/types'
 import { blockWriteRequests } from './middlewares/misc'
 import testRouter from './routes/test'
-import { rateLimit } from 'express-rate-limit'
 
 const app = express()
 
@@ -46,15 +45,7 @@ app.use(refreshTokenRouter)
 app.use(tokenExtractor)
 app.use(userExtractor)
 
-const limiter = rateLimit({
-  windowMs: 15 * 1000,
-  limit: 1,
-  standardHeaders: true,
-  legacyHeaders: false,
-  message: { message: 'You have sent an email recently, please try again in a few seconds.' },
-})
-
-app.use('/email', limiter)
+app.use('/email', emailLimiter)
 
 app.use('/user', userRouter)
 app.use('/crosssearch', crossSearchRouter)
