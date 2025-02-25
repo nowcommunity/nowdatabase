@@ -83,7 +83,7 @@ export const personTableColumns: MRT_ColumnDef<PersonDetailsType>[] = [
   },
   {
     id: 'user_id',
-    accessorFn: person => person.user?.user_id ?? 'Not an user',
+    accessorFn: person => person.user?.user_id ?? 'Not a user',
     header: 'User Id',
     size: 20,
   },
