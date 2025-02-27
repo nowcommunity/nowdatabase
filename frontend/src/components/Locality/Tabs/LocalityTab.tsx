@@ -17,11 +17,6 @@ export const LocalityTab = () => {
     useDetailContext<LocalityDetailsType>()
   const { editData, setEditData } = useDetailContext<LocalityDetailsType>()
 
-  const approximateCoordinatesOptions = [
-    emptyOption,
-    { display: 'No', value: 'false' },
-    { display: 'Yes', value: 'true' },
-  ]
   const generalLocalityOptions = [emptyOption, { display: 'No', value: 'n' }, { display: 'Yes', value: 'y' }]
 
   const siteAreaOptions = [
@@ -43,7 +38,7 @@ export const LocalityTab = () => {
         'loc_status',
         [
           { value: 'false', display: 'Public' },
-          { value: 'true', display: 'Draft' },
+          { value: 'true', display: 'Private' },
         ],
         'Status'
       ),
@@ -113,7 +108,17 @@ export const LocalityTab = () => {
         handleSetEditData: value => handleCoordinateChange(value, 'dec', 'longitude'),
       }),
     ],
-    ['Approximate Coordinates', dropdown('approx_coord', approximateCoordinatesOptions, 'Approximate Coordinates')],
+    [
+      'Approximate Coordinates',
+      radioSelection(
+        'approx_coord',
+        [
+          { value: 'false', display: 'No' },
+          { value: 'true', display: 'Yes' },
+        ],
+        'Approximate Coordinates'
+      ),
+    ],
     ['Altitude (m)', textField('altitude')],
   ]
 

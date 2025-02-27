@@ -139,8 +139,8 @@ export const AgeTab = () => {
 
   const sampleUnit = [
     ['Datum Plane', textField('datum_plane')],
-    ['Top of Sample Unit (m)', textField('tos')],
-    ['Bottom of Sample Unit (m)', textField('bos')],
+    ['Top of Sample Unit (m)', textField('tos', { type: 'number' })],
+    ['Bottom of Sample Unit (m)', textField('bos', { type: 'number' })],
   ]
 
   const basinInformation = [
