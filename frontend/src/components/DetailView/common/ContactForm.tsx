@@ -28,6 +28,11 @@ type ContactFormValues = {
   comments: string
 }
 
+type RateLimitError = {
+  status: string
+  data: { message: string }
+}
+
 export const ContactForm = <T extends object>({
   buttonText,
   noContext,
@@ -35,7 +40,7 @@ export const ContactForm = <T extends object>({
   buttonText: string
   noContext?: boolean
 }) => {
-  const [sendEmailMutation, { isSuccess, isError }] = useEmailMutation()
+  const [sendEmailMutation] = useEmailMutation()
   const { trigger, getValues, register, setValue, control, formState } = useForm<ContactFormValues>()
   const { errors } = formState
   const notify = useNotify()
@@ -51,18 +56,16 @@ export const ContactForm = <T extends object>({
 
     const confirm = window.confirm(`Send email?`)
     if (!confirm) return false
-    void sendEmailMutation({ title, message })
+    try {
+      await sendEmailMutation({ title, message }).unwrap()
+      notify('Email sent.')
+    } catch (e) {
+      const error = e as RateLimitError
+      notify(error.data.message, 'error')
+      return false
+    }
     return true
   }
-
-  useEffect(() => {
-    if (isSuccess) {
-      notify('Email sent.')
-    } else if (isError) {
-      notify('Could not send email. Error happened.', 'error')
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isSuccess, isError])
 
   if (personQueryloading) return <CircularProgress />
 
