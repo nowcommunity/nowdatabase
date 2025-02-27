@@ -116,7 +116,7 @@ export const TaphonomyTab = () => {
     ['Vertebrate Preservation', dropdown('vert_pres', vertebratePreservationOptions, 'Vertebrate Preservation')],
     ['Approx. Number of Specimens', textField('appr_num_spm', { type: 'number' })],
     ['Exact Number of Specimens', textField('num_spm', { type: 'number' })],
-    ['Number of Quadrats', textField('num_quad')],
+    ['Number of Quadrats', textField('num_quad', { type: 'number' })],
     ['Unbiased Collecting', dropdown('true_quant', unbiasedCollectingOptions, 'Unbiased Collecting')],
     ['Species List Complete', dropdown('complete', speciesListCompleteOptions, 'Species List Complete')],
   ]
