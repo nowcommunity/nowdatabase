@@ -20,7 +20,7 @@ export const PersonTab = () => {
   }, [currentUser, notify])
 
   const person = [
-    ['Initials', textField('initials')],
+    ['Initials', textField('initials', { type: 'text', disabled: true })],
     ['First Name', textField('first_name')],
     ['Surname', textField('surname')],
     ['Email', textField('email')],
