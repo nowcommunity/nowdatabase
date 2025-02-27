@@ -15,7 +15,7 @@ import refreshTokenRouter from './routes/refresh'
 import timeBoundRouter from './routes/timeBound'
 import timeUnitRouter from './routes/timeUnit'
 import userRouter from './routes/user'
-import emailRouter from './routes/email'
+import emailRouter, { emailLimiter } from './routes/email'
 import versionRouter from './routes/version'
 import geonamesRouter from './routes/geonames-api'
 import { responseLogger } from './middlewares/requestLogger'
@@ -44,6 +44,8 @@ app.use(refreshTokenRouter)
 
 app.use(tokenExtractor)
 app.use(userExtractor)
+
+app.use('/email', emailLimiter)
 
 app.use('/user', userRouter)
 app.use('/crosssearch', crossSearchRouter)

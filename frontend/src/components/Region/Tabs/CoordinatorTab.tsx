@@ -12,8 +12,8 @@ import { EditableTable } from '@/components/DetailView/common/EditableTable'
 import { SelectingTable } from '@/components/DetailView/common/SelectingTable'
 import { useGetAllPersonsQuery } from '@/redux/personReducer'
 import { skipToken } from '@reduxjs/toolkit/query'
-import { useMemo, useState } from 'react'
-import { formatLastLoginDate } from '@/common'
+import { useState } from 'react'
+import { personTableColumns } from '@/common'
 import { CircularProgress, Box, FormControl, Autocomplete, Button, TextField, FormHelperText } from '@mui/material'
 import { validCountries } from '@/shared/validators/countryList'
 
@@ -72,61 +72,6 @@ export const CoordinatorTab = () => {
     )
   }
 
-  const personColumns = useMemo<MRT_ColumnDef<PersonDetailsType>[]>(
-    () => [
-      {
-        accessorKey: 'initials',
-        id: 'person_id',
-        header: 'Person Id',
-      },
-      {
-        accessorKey: 'first_name',
-        header: 'First name',
-      },
-      {
-        accessorKey: 'surname',
-        header: 'Surname',
-      },
-      {
-        accessorKey: 'email',
-        header: 'Email',
-      },
-      {
-        accessorKey: 'organization',
-        header: 'Organisation',
-      },
-      {
-        accessorKey: 'country',
-        header: 'Country',
-      },
-      {
-        id: 'user_id',
-        accessorKey: 'user.user_id',
-        header: 'User Id',
-        size: 20,
-      },
-      {
-        accessorKey: 'user.user_name',
-        header: 'User name',
-      },
-      {
-        accessorFn: (person: PersonDetailsType) =>
-          person.user?.last_login ? formatLastLoginDate(person.user?.last_login) : 'None',
-        header: 'Last login',
-      },
-      {
-        accessorKey: 'initials',
-        header: 'Initials',
-      },
-
-      {
-        accessorKey: 'user.now_user_group',
-        header: 'User role',
-      },
-    ],
-    []
-  )
-
   const coordinator: MRT_ColumnDef<RegionCoordinator>[] = [
     {
       accessorKey: 'com_people.surname',
@@ -162,7 +107,7 @@ export const CoordinatorTab = () => {
             buttonText="Select Coordinator"
             data={personsData}
             isError={isError}
-            columns={personColumns}
+            columns={personTableColumns}
             fieldName="now_reg_coord_people"
             idFieldName="initials"
             editingAction={(newCoordinator: PersonDetailsType) => {

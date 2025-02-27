@@ -10,10 +10,17 @@ import {
 } from '../utils/config'
 import { logger } from '../utils/logger'
 import { sleep } from '../utils/common'
+import { rateLimit } from 'express-rate-limit'
+
+export const emailLimiter = rateLimit({
+  windowMs: 15 * 1000,
+  limit: 1,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { message: 'You have sent an email recently, please try again in a few seconds.' },
+})
 
 const router = Router()
-
-let emailSent: Date | null = null
 
 const transport =
   RUNNING_ENV === 'prod'
@@ -32,10 +39,6 @@ router.post('/', async (req: Request<object, object, { title: string; message: s
     logger.info(`Would have sent email with following data: \n${JSON.stringify({ title, message }, null, 2)}`)
     return res.status(200).json()
   }
-  if (emailSent && new Date().getTime() - emailSent.getTime() < 60000) {
-    return res.status(400).json({ message: 'Email already sent in last minute.' })
-  }
-  emailSent = new Date()
   if (!CONTACT_FROM_NAME || !CONTACT_FROM_EMAIL || !CONTACT_SMTP_HOST || !CONTACT_SMTP_PORT || !CONTACT_RECIPIENT) {
     return res.status(500).json({ message: 'Server is missing configurations for sending emails.' })
   }
