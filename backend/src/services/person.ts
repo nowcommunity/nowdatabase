@@ -1,4 +1,8 @@
 import { nowDb } from '../utils/db'
+import { EditDataType, PersonDetailsType } from '../../../frontend/src/shared/types'
+import Prisma from '../../prisma/generated/now_test_client'
+import { ValidationObject } from '../../../frontend/src/shared/validators/validator'
+import { validatePerson } from '../../../frontend/src/shared/validators/person'
 
 export const getAllPersons = async () => {
   const persons = await nowDb.com_people.findMany({})
@@ -24,4 +28,14 @@ export const getPersonDetails = async (id: string) => {
   })
 
   return { ...person, user }
+}
+
+export const validateEntirePerson = (editedFields: EditDataType<Prisma.com_people>) => {
+  const keys = Object.keys(editedFields)
+  const errors: ValidationObject[] = []
+  for (const key of keys) {
+    const error = validatePerson(editedFields, key as keyof PersonDetailsType)
+    if (error.error) errors.push(error)
+  }
+  return errors
 }
