@@ -1,5 +1,5 @@
 import { MRT_ColumnDef } from 'material-react-table'
-import { Reference } from './shared/types'
+import { Reference, PersonDetailsType } from './shared/types'
 import { Cell } from './components/commonComponents'
 
 export const formatLastLoginDate = (date: Date) => {
@@ -52,6 +52,57 @@ export const referenceTableColumns: MRT_ColumnDef<Reference>[] = [
     accessorKey: 'ref_ref_type.ref_type',
     header: 'Type',
     maxSize: 60,
+  },
+]
+
+export const personTableColumns: MRT_ColumnDef<PersonDetailsType>[] = [
+  {
+    accessorKey: 'initials',
+    id: 'person_id',
+    header: 'Person Id',
+  },
+  {
+    accessorKey: 'first_name',
+    header: 'First name',
+  },
+  {
+    accessorKey: 'surname',
+    header: 'Surname',
+  },
+  {
+    accessorKey: 'email',
+    header: 'Email',
+  },
+  {
+    accessorKey: 'organization',
+    header: 'Organisation',
+  },
+  {
+    accessorKey: 'country',
+    header: 'Country',
+  },
+  {
+    id: 'user_id',
+    accessorFn: person => person.user?.user_id ?? 'Not a user',
+    header: 'User Id',
+    size: 20,
+  },
+  {
+    accessorFn: person => person.user?.user_name ?? 'None',
+    header: 'User name',
+  },
+  {
+    accessorFn: (person: PersonDetailsType) =>
+      person.user?.last_login ? formatLastLoginDate(person.user?.last_login) : 'None',
+    header: 'Last login',
+  },
+  {
+    accessorKey: 'initials',
+    header: 'Initials',
+  },
+  {
+    accessorFn: person => person.user?.now_user_group ?? 'None',
+    header: 'User role',
   },
 ]
 
