@@ -40,6 +40,7 @@ export const TableView = <T extends MRT_RowData>({
   combinedExport,
   exportIsLoading,
   enableColumnFilterModes,
+  isFetching,
 }: {
   title?: string
   data: T[] | undefined
@@ -52,9 +53,10 @@ export const TableView = <T extends MRT_RowData>({
   combinedExport?: (lids: number[]) => Promise<void>
   exportIsLoading?: boolean
   enableColumnFilterModes?: boolean
+  isFetching: boolean
 }) => {
   const location = useLocation()
-  const { editRights } = usePageContext()
+  const { editRights, setSqlLimit, setSqlOffset } = usePageContext()
   const [columnFilters, setColumnFilters] = useState<MRT_ColumnFiltersState>([])
   const [sorting, setSorting] = useState<MRT_SortingState>([])
   const navigate = useNavigate()
@@ -63,6 +65,13 @@ export const TableView = <T extends MRT_RowData>({
   )
   const user = useUser()
   const { setIdList, setTableUrl } = usePageContext<T>()
+
+  useEffect(() => {
+    setSqlLimit(pagination.pageSize)
+    setSqlOffset(pagination.pageIndex * pagination.pageSize)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pagination])
+
   const loadStateFromUrl = (state: TableStateInUrl, defaultState: [] | MRT_PaginationState) => {
     const searchParams = new URLSearchParams(location.search)
     const stateFromUrl = searchParams.get(state)
@@ -93,6 +102,7 @@ export const TableView = <T extends MRT_RowData>({
     state: {
       columnFilters,
       showColumnFilters: true,
+      isLoading: isFetching,
       sorting,
       pagination,
       density: 'compact',
@@ -106,6 +116,8 @@ export const TableView = <T extends MRT_RowData>({
     enableRowActions: true,
     onSortingChange: setSorting,
     onPaginationChange: setPagination,
+    manualPagination: true,
+    rowCount: data ? data[0].full_count : 0,
     autoResetPageIndex: false,
     positionPagination: selectorFn ? 'top' : 'both',
     paginationDisplayMode: 'pages',

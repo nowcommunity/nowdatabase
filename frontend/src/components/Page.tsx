@@ -17,6 +17,10 @@ export type PageContextType<T> = {
   createTitle: (data: T) => string
   createSubtitle: (data: T) => string
   editRights: EditRights
+  sqlLimit: number
+  sqlOffset: number
+  setSqlLimit: (newSqlLimit: number) => void
+  setSqlOffset: (newSqlOffset: number) => void
 }
 
 export const PageContext = createContext<PageContextType<unknown>>(null!)
@@ -38,6 +42,9 @@ export const PageContextProvider = <T extends object>({
 }) => {
   const [idList, setIdList] = useState<string[]>([])
   const [tableUrl, setTableUrl] = useState<string>(`/${viewName}`)
+  // TODO: replace with some default values from variables
+  const [sqlLimit, setSqlLimit] = useState<number>(20)
+  const [sqlOffset, setSqlOffset] = useState<number>(0)
 
   return (
     <PageContext.Provider
@@ -51,6 +58,10 @@ export const PageContextProvider = <T extends object>({
         setTableUrl: (newUrl: string) => setTableUrl(newUrl),
         createTitle: (data: unknown) => createTitle(data as T),
         createSubtitle: (data: unknown) => createSubtitle(data as T),
+        sqlLimit,
+        sqlOffset,
+        setSqlLimit: (newSqlLimit: number) => setSqlLimit(newSqlLimit),
+        setSqlOffset: (newSqlOffset: number) => setSqlOffset(newSqlOffset),
       }}
     >
       {children}

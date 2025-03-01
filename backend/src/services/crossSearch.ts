@@ -15,10 +15,10 @@ const getIdsOfUsersProjects = async (user: User) => {
   return new Set(usersProjects.map(({ pid }) => pid))
 }
 
-export const getCrossSearchRawSql = async (user: User | undefined) => {
+export const getCrossSearchRawSql = async (user: User | undefined, limit: number, offset: number) => {
   const showAll = user && [Role.Admin, Role.EditUnrestricted].includes(user.role)
   if (!user) {
-    const sql = generateFilteredCrossSearchSqlWithNoUser()
+    const sql = generateFilteredCrossSearchSqlWithNoUser(limit, offset)
     const result: Partial<CrossSearch>[] = await nowDb.$queryRaw(sql)
     return result
   }
@@ -32,7 +32,7 @@ export const getCrossSearchRawSql = async (user: User | undefined) => {
   const usersProjects = await getIdsOfUsersProjects(user)
 
   if (!usersProjects.size) {
-    const sql = generateFilteredCrossSearchSqlWithNoUser()
+    const sql = generateFilteredCrossSearchSqlWithNoUser(limit, offset)
     const result: Partial<CrossSearch>[] = await nowDb.$queryRaw(sql)
     return result
   }

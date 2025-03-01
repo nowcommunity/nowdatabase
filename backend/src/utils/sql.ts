@@ -110,7 +110,7 @@ export const generateFilteredCrossSearchSql = (usersProjects: Set<number>) => {
   `
 }
 
-export const generateFilteredCrossSearchSqlWithNoUser = () => {
+export const generateFilteredCrossSearchSqlWithNoUser = (limit: number, offset: number) => {
   return Prisma.sql`
   SELECT 
       -- com_species fields
@@ -315,8 +315,8 @@ export const generateFilteredCrossSearchSqlWithNoUser = () => {
       now_loc.cultural_stage_3,
       now_loc.regional_culture_1,
       now_loc.regional_culture_2,
-      now_loc.regional_culture_3
-
+      now_loc.regional_culture_3,
+  COUNT(*) OVER() AS full_count
   FROM com_species
   INNER JOIN now_ls ON com_species.species_id = now_ls.species_id
   INNER JOIN now_loc ON now_ls.lid = now_loc.lid
@@ -324,6 +324,10 @@ export const generateFilteredCrossSearchSqlWithNoUser = () => {
     now_loc.loc_status = 0
   ORDER BY
     now_loc.lid
+  LIMIT
+    ${limit}
+  OFFSET
+    ${offset}
   `
 }
 

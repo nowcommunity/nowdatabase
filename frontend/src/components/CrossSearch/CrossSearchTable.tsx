@@ -3,9 +3,12 @@ import { type MRT_ColumnDef } from 'material-react-table'
 import { CrossSearch } from '@/shared/types'
 import { TableView } from '../TableView/TableView'
 import { useGetAllCrossSearchQuery } from '@/redux/crossSearchReducer'
+import { usePageContext } from '../Page'
+import { skipToken } from '@reduxjs/toolkit/query'
 
 export const CrossSearchTable = ({ selectorFn }: { selectorFn?: (newObject: CrossSearch) => void }) => {
-  const crossSearchQuery = useGetAllCrossSearchQuery()
+  const { sqlLimit, sqlOffset } = usePageContext()
+  const { data: crossSearchQueryResult, isFetching } = useGetAllCrossSearchQuery({ limit: sqlLimit, offset: sqlOffset })
 
   // Show/Hide columns in the following order
   const columns = useMemo<MRT_ColumnDef<CrossSearch>[]>(
@@ -799,8 +802,9 @@ export const CrossSearchTable = ({ selectorFn }: { selectorFn?: (newObject: Cros
       checkRowRestriction={checkRowRestriction}
       idFieldName="lid_now_loc"
       columns={columns}
+      isFetching={isFetching}
       visibleColumns={visibleColumns}
-      data={crossSearchQuery.data}
+      data={crossSearchQueryResult}
       url="crosssearch"
       enableColumnFilterModes={true}
     />
