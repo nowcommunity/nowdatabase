@@ -19,7 +19,7 @@ import { ContactForm } from '../DetailView/common/ContactForm'
 
 type TableStateInUrl = 'sorting' | 'columnfilters' | 'pagination'
 
-const defaultPagination: MRT_PaginationState = { pageIndex: 0, pageSize: 15 }
+const defaultPagination: MRT_PaginationState = { pageIndex: 0, pageSize: 50 }
 const defaultPaginationSmall: MRT_PaginationState = { pageIndex: 0, pageSize: 10 }
 
 /*
