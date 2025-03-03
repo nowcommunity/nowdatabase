@@ -110,7 +110,7 @@ export const generateFilteredCrossSearchSql = (usersProjects: Set<number>) => {
   `
 }
 
-export const generateFilteredCrossSearchSqlWithNoUser = (limit: number, offset: number) => {
+export const generateFilteredCrossSearchSqlWithNoUser = (limit: number | undefined, offset: number | undefined) => {
   return Prisma.sql`
   SELECT 
       -- com_species fields
@@ -324,10 +324,8 @@ export const generateFilteredCrossSearchSqlWithNoUser = (limit: number, offset: 
     now_loc.loc_status = 0
   ORDER BY
     now_loc.lid
-  LIMIT
-    ${limit}
-  OFFSET
-    ${offset}
+  ${limit ? Prisma.sql`LIMIT ${limit}` : Prisma.empty}
+  ${offset ? Prisma.sql`OFFSET ${offset}` : Prisma.empty}
   `
 }
 

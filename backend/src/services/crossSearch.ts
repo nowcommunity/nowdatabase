@@ -15,7 +15,7 @@ const getIdsOfUsersProjects = async (user: User) => {
   return new Set(usersProjects.map(({ pid }) => pid))
 }
 
-export const getCrossSearchRawSql = async (user: User | undefined, limit: number, offset: number) => {
+export const getCrossSearchRawSql = async (user: User | undefined, limit?: number, offset?: number) => {
   const showAll = user && [Role.Admin, Role.EditUnrestricted].includes(user.role)
   if (!user) {
     const sql = generateFilteredCrossSearchSqlWithNoUser(limit, offset)

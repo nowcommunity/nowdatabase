@@ -11,4 +11,9 @@ router.get(`/all/:limit/:offset`, async (req, res) => {
   return res.status(200).send(fixBigInt(result))
 })
 
+router.get(`/all`, async (req, res) => {
+  const result = await getCrossSearchRawSql(req.user)
+  return res.status(200).send(fixBigInt(result))
+})
+
 export default router
