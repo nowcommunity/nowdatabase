@@ -6,6 +6,7 @@ import { Box } from '@mui/material'
 import { Role } from '@/shared/types'
 import { UserState } from '@/redux/userReducer'
 import { ENABLE_WRITE } from '@/util/config'
+import { MRT_ColumnFiltersState } from 'material-react-table'
 
 export type PageContextType<T> = {
   idList: string[]
@@ -19,8 +20,10 @@ export type PageContextType<T> = {
   editRights: EditRights
   sqlLimit: number
   sqlOffset: number
+  sqlColumnFilters: MRT_ColumnFiltersState
   setSqlLimit: (newSqlLimit: number) => void
   setSqlOffset: (newSqlOffset: number) => void
+  setSqlColumnFilters: (newSqlColumnFilters: MRT_ColumnFiltersState) => void
 }
 
 export const PageContext = createContext<PageContextType<unknown>>(null!)
@@ -45,6 +48,7 @@ export const PageContextProvider = <T extends object>({
   // TODO: replace with some default values from variables
   const [sqlLimit, setSqlLimit] = useState<number>(20)
   const [sqlOffset, setSqlOffset] = useState<number>(0)
+  const [sqlColumnFilters, setSqlColumnFilters] = useState<MRT_ColumnFiltersState>([])
 
   return (
     <PageContext.Provider
@@ -60,8 +64,10 @@ export const PageContextProvider = <T extends object>({
         createSubtitle: (data: unknown) => createSubtitle(data as T),
         sqlLimit,
         sqlOffset,
+        sqlColumnFilters,
         setSqlLimit: (newSqlLimit: number) => setSqlLimit(newSqlLimit),
         setSqlOffset: (newSqlOffset: number) => setSqlOffset(newSqlOffset),
+        setSqlColumnFilters: (newSqlColumnFilters: MRT_ColumnFiltersState) => setSqlColumnFilters(newSqlColumnFilters),
       }}
     >
       {children}

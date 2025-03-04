@@ -4,11 +4,14 @@ import { CrossSearch } from '@/shared/types'
 import { TableView } from '../TableView/TableView'
 import { useGetAllCrossSearchQuery } from '@/redux/crossSearchReducer'
 import { usePageContext } from '../Page'
-import { skipToken } from '@reduxjs/toolkit/query'
 
 export const CrossSearchTable = ({ selectorFn }: { selectorFn?: (newObject: CrossSearch) => void }) => {
-  const { sqlLimit, sqlOffset } = usePageContext()
-  const { data: crossSearchQueryResult, isFetching } = useGetAllCrossSearchQuery({ limit: sqlLimit, offset: sqlOffset })
+  const { sqlLimit, sqlOffset, sqlColumnFilters } = usePageContext()
+  const { data: crossSearchQueryResult, isFetching } = useGetAllCrossSearchQuery({
+    limit: sqlLimit,
+    offset: sqlOffset,
+    columnFilters: sqlColumnFilters,
+  })
 
   // Show/Hide columns in the following order
   const columns = useMemo<MRT_ColumnDef<CrossSearch>[]>(

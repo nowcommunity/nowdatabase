@@ -1,13 +1,15 @@
 import { Router } from 'express'
 import { getCrossSearchRawSql } from '../services/crossSearch'
 import { fixBigInt } from '../utils/common'
+import { ColumnFilter } from '../utils/sql'
 
 const router = Router()
 
-router.get(`/all/:limit/:offset`, async (req, res) => {
+router.get(`/all/:limit/:offset/:columnfilters`, async (req, res) => {
   const limit = parseInt(req.params.limit)
   const offset = parseInt(req.params.offset)
-  const result = await getCrossSearchRawSql(req.user, limit, offset)
+  const columnFilters = JSON.parse(req.params.columnfilters) as ColumnFilter[]
+  const result = await getCrossSearchRawSql(req.user, limit, offset, columnFilters)
   return res.status(200).send(fixBigInt(result))
 })
 

@@ -1,6 +1,7 @@
 import { User, CrossSearch, Role } from '../../../frontend/src/shared/types'
 import { nowDb } from '../utils/db'
 import {
+  ColumnFilter,
   generateFilteredCrossSearchSql,
   generateFilteredCrossSearchSqlWithAdmin,
   generateFilteredCrossSearchSqlWithNoUser,
@@ -15,10 +16,15 @@ const getIdsOfUsersProjects = async (user: User) => {
   return new Set(usersProjects.map(({ pid }) => pid))
 }
 
-export const getCrossSearchRawSql = async (user: User | undefined, limit?: number, offset?: number) => {
+export const getCrossSearchRawSql = async (
+  user: User | undefined,
+  limit?: number,
+  offset?: number,
+  columnFilters?: ColumnFilter[]
+) => {
   const showAll = user && [Role.Admin, Role.EditUnrestricted].includes(user.role)
   if (!user) {
-    const sql = generateFilteredCrossSearchSqlWithNoUser(limit, offset)
+    const sql = generateFilteredCrossSearchSqlWithNoUser(limit, offset, columnFilters)
     const result: Partial<CrossSearch>[] = await nowDb.$queryRaw(sql)
     return result
   }
