@@ -1,5 +1,6 @@
 import { Prisma } from '../../prisma/generated/now_test_client'
-import { getCrossSearchFields, getFieldsOfTables } from './db'
+import { getCrossSearchFields } from './db'
+import { convertFilterIdToFieldName } from '../services/crossSearch'
 
 export const generateFilteredCrossSearchSql = (usersProjects: Set<number>) => {
   const projectsArray = Array.from(usersProjects)
@@ -112,52 +113,7 @@ export const generateFilteredCrossSearchSql = (usersProjects: Set<number>) => {
 }
 
 export type ColumnFilter = { id: string; value: string }
-
-const convertFilterIdToFieldName = (id: string) => {
-  const aliasToFieldName: { [key: string]: string } = {
-    species_id_com_species: 'com_species.species_id',
-    body_mass_com_species: 'com_species.body_mass',
-    microwear_com_species: 'com_species.microwear',
-    mesowear_com_species: 'com_species.mesowear',
-    mw_or_high_com_species: 'com_species.mw_or_high',
-    mw_or_low_com_species: 'com_species.mw_or_low',
-    mw_cs_sharp_com_species: 'com_species.mw_cs_sharp',
-    mw_cs_round_com_species: 'com_species.mw_cs_round',
-    mw_cs_blunt_com_species: 'com_species.mw_cs_blunt',
-    mw_scale_min_com_species: 'com_species.mw_scale_min',
-    mw_scale_max_com_species: 'com_species.mw_scale_max',
-    mw_value_com_species: 'com_species.mw_value',
-
-    lid_now_loc: 'now_loc.lid',
-    species_id_now_ls: 'now_ls.species_id',
-    microwear_now_ls: 'now_ls.microwear',
-    body_mass_now_ls: 'now_ls.body_mass',
-    mesowear_now_ls: 'now_ls.mesowear',
-    mw_or_high_now_ls: 'now_ls.mw_or_high',
-    mw_or_low_now_ls: 'now_ls.mw_or_low',
-    mw_cs_sharp_now_ls: 'now_ls.mw_cs_sharp',
-    mw_cs_round_now_ls: 'now_ls.mw_cs_round',
-    mw_cs_blunt_now_ls: 'now_ls.mw_cs_blunt',
-    mw_scale_min_now_ls: 'now_ls.mw_scale_min',
-    mw_scale_max_now_ls: 'now_ls.mw_scale_max',
-    mw_value_now_ls: 'now_ls.mw_value',
-  }
-
-  if (Object.keys(aliasToFieldName).includes(id)) {
-    return aliasToFieldName[id]
-  }
-
-  if (getFieldsOfTables(['com_species']).includes(id)) {
-    return `com_species.${id}`
-  }
-  if (getFieldsOfTables(['now_ls']).includes(id)) {
-    return `now_ls.${id}`
-  }
-  if (getFieldsOfTables(['now_loc']).includes(id)) {
-    return `now_loc.${id}`
-  }
-  return id
-}
+export type SortingState = { desc: string; id: string }
 
 const generateColumnFilterQuery = (columnFilters: ColumnFilter[] | undefined) => {
   if (!Array.isArray(columnFilters) || columnFilters.length === 0) return Prisma.empty
@@ -167,8 +123,10 @@ const generateColumnFilterQuery = (columnFilters: ColumnFilter[] | undefined) =>
 
   for (const filter of columnFilters) {
     const convertedId = convertFilterIdToFieldName(filter.id)
+    // this check should make SQL injection impossible since the list of database field names
+    //  has to include the user inputted string. But be careful with this!
     if (!allowedColumns.includes(convertedId)) throw new Error('INVALID COLUMN NAME!')
-    const newQuery = Prisma.sql`${Prisma.raw(convertedId)} = ${filter.value}` // possible SQL injection!!!!!
+    const newQuery = Prisma.sql`${Prisma.raw(convertedId)} = ${filter.value}`
     conditions.push(newQuery)
   }
 
@@ -180,7 +138,9 @@ const generateColumnFilterQuery = (columnFilters: ColumnFilter[] | undefined) =>
 export const generateFilteredCrossSearchSqlWithNoUser = (
   limit: number | undefined,
   offset: number | undefined,
-  columnFilters: ColumnFilter[] | undefined
+  columnFilters: ColumnFilter[] | undefined,
+  orderBy: string | undefined,
+  descendingOrder: boolean
 ) => {
   const columnFilterQuery = generateColumnFilterQuery(columnFilters)
   return Prisma.sql`
@@ -394,7 +354,7 @@ export const generateFilteredCrossSearchSqlWithNoUser = (
   INNER JOIN now_loc ON now_ls.lid = now_loc.lid
   WHERE now_loc.loc_status = 0 ${columnFilterQuery}
   ORDER BY
-    now_loc.lid
+    ${orderBy ? Prisma.raw(orderBy) : Prisma.sql`now_loc.lid`} ${descendingOrder ? Prisma.sql`DESC` : Prisma.empty}
   ${limit ? Prisma.sql`LIMIT ${limit}` : Prisma.empty}
   ${offset ? Prisma.sql`OFFSET ${offset}` : Prisma.empty}
   `

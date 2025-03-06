@@ -18,13 +18,75 @@ describe('Getting cross-search data works', () => {
   })
 
   it('Requesting get all with limit and offset has correct length and status code', async () => {
-    const response1 = await send(`crosssearch/all/10/0`, 'GET')
+    const response1 = await send(`crosssearch/all/10/0/[]/[]`, 'GET')
     expect(response1.status).toEqual(200)
     expect(response1.body.length).toEqual(10)
 
-    const response2 = await send(`crosssearch/all/10/5`, 'GET')
+    const response2 = await send(`crosssearch/all/10/5/[]/[]`, 'GET')
     expect(response2.status).toEqual(200)
     expect(response2.body.length).toEqual(10)
+  })
+
+  it('Requesting get all with column filters has correct data', async () => {
+    const { body: responseBody1, status: responseStatus1 } = await send(
+      `crosssearch/all/20/0/[{"id": "lid_now_loc", "value": "21050"}]/[]`,
+      'GET'
+    )
+    expect(responseStatus1).toEqual(200)
+    expect(responseBody1).toHaveLength(5)
+    const localityIds = responseBody1.map(row => row.lid_now_loc)
+    expect(localityIds).toEqual([21050, 21050, 21050, 21050, 21050])
+
+    const { body: responseBody2, status: responseStatus2 } = await send(
+      `crosssearch/all/20/0/[{"id": "country", "value": "Spain"}]/[]`,
+      'GET'
+    )
+    expect(responseStatus2).toEqual(200)
+    expect(responseBody2).toHaveLength(10)
+    const countries = responseBody2.map(row => row.country)
+    expect(countries).toEqual([
+      'Spain',
+      'Spain',
+      'Spain',
+      'Spain',
+      'Spain',
+      'Spain',
+      'Spain',
+      'Spain',
+      'Spain',
+      'Spain',
+    ])
+
+    const { body: responseBody3, status: responseStatus3 } = await send(
+      `crosssearch/all/20/0/[{"id": "lid_now_loc", "value": "invalid"}]/[]`,
+      'GET'
+    )
+    expect(responseStatus3).toEqual(200)
+    expect(responseBody3).toHaveLength(0)
+  })
+
+  it('Requesting get all with sorting has correct data', async () => {
+    const { body: responseBody1, status: responseStatus1 } = await send(
+      `crosssearch/all/20/0/[]/[{"id": "lid_now_loc", "desc": "true"}]`,
+      'GET'
+    )
+    expect(responseStatus1).toEqual(200)
+    expect(responseBody1).toHaveLength(20)
+    const firstLocalityIds = responseBody1.slice(0, 5).map(row => row.lid_now_loc)
+    expect(firstLocalityIds).toEqual([28518, 28518, 28518, 28518, 28518])
+    const nextLocalityIds = responseBody1.slice(5, 10).map(row => row.lid_now_loc)
+    expect(nextLocalityIds).toEqual([24797, 24797, 24797, 24797, 24797])
+
+    const { body: responseBody2, status: responseStatus2 } = await send(
+      `crosssearch/all/10/0/[]/[{"id": "loc_name", "desc": "false"}]`,
+      'GET'
+    )
+    expect(responseStatus2).toEqual(200)
+    expect(responseBody2).toHaveLength(10)
+    const firstCountries = responseBody2.slice(0, 5).map(row => row.country)
+    expect(firstCountries).toEqual(['Georgia', 'Georgia', 'Georgia', 'Georgia', 'Georgia'])
+    const lastCountries = responseBody2.slice(5, 10).map(row => row.country)
+    expect(lastCountries).toEqual(['Japan', 'Japan', 'Japan', 'Japan', 'Japan'])
   })
 
   it('Get all has some correct fields from locality and species', async () => {

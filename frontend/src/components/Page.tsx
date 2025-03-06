@@ -6,7 +6,7 @@ import { Box } from '@mui/material'
 import { Role } from '@/shared/types'
 import { UserState } from '@/redux/userReducer'
 import { ENABLE_WRITE } from '@/util/config'
-import { MRT_ColumnFiltersState } from 'material-react-table'
+import { MRT_ColumnFiltersState, MRT_SortingState } from 'material-react-table'
 
 export type PageContextType<T> = {
   idList: string[]
@@ -21,9 +21,11 @@ export type PageContextType<T> = {
   sqlLimit: number
   sqlOffset: number
   sqlColumnFilters: MRT_ColumnFiltersState
+  sqlOrderBy: MRT_SortingState
   setSqlLimit: (newSqlLimit: number) => void
   setSqlOffset: (newSqlOffset: number) => void
   setSqlColumnFilters: (newSqlColumnFilters: MRT_ColumnFiltersState) => void
+  setSqlOrderBy: (newSqlOrderBy: MRT_SortingState) => void
 }
 
 export const PageContext = createContext<PageContextType<unknown>>(null!)
@@ -49,6 +51,7 @@ export const PageContextProvider = <T extends object>({
   const [sqlLimit, setSqlLimit] = useState<number>(20)
   const [sqlOffset, setSqlOffset] = useState<number>(0)
   const [sqlColumnFilters, setSqlColumnFilters] = useState<MRT_ColumnFiltersState>([])
+  const [sqlOrderBy, setSqlOrderBy] = useState<MRT_SortingState>([])
 
   return (
     <PageContext.Provider
@@ -65,9 +68,11 @@ export const PageContextProvider = <T extends object>({
         sqlLimit,
         sqlOffset,
         sqlColumnFilters,
+        sqlOrderBy,
         setSqlLimit: (newSqlLimit: number) => setSqlLimit(newSqlLimit),
         setSqlOffset: (newSqlOffset: number) => setSqlOffset(newSqlOffset),
         setSqlColumnFilters: (newSqlColumnFilters: MRT_ColumnFiltersState) => setSqlColumnFilters(newSqlColumnFilters),
+        setSqlOrderBy: (newSqlOrderBy: MRT_SortingState) => setSqlOrderBy(newSqlOrderBy),
       }}
     >
       {children}

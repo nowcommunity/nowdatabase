@@ -26,3 +26,10 @@ type ValidationErrorItem = {
   name: string
   error: string
 }
+
+export type CrossSearchRouteParameters = {
+  limit: number
+  offset: number
+  columnFilters: unknown
+  sorting: unknown
+}

@@ -6,11 +6,12 @@ import { useGetAllCrossSearchQuery } from '@/redux/crossSearchReducer'
 import { usePageContext } from '../Page'
 
 export const CrossSearchTable = ({ selectorFn }: { selectorFn?: (newObject: CrossSearch) => void }) => {
-  const { sqlLimit, sqlOffset, sqlColumnFilters } = usePageContext()
+  const { sqlLimit, sqlOffset, sqlColumnFilters, sqlOrderBy } = usePageContext()
   const { data: crossSearchQueryResult, isFetching } = useGetAllCrossSearchQuery({
     limit: sqlLimit,
     offset: sqlOffset,
     columnFilters: sqlColumnFilters,
+    sorting: sqlOrderBy,
   })
 
   // Show/Hide columns in the following order
