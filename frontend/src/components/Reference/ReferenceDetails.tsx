@@ -2,6 +2,7 @@ import { useParams, useNavigate } from 'react-router-dom'
 import { CircularProgress } from '@mui/material'
 import { DetailView, TabType } from '../DetailView/DetailView'
 import { ReferenceTab } from './Tabs/ReferenceTab'
+import { LocalityTab } from './Tabs/LocalityTab'
 import {
   useEditReferenceMutation,
   useGetReferenceDetailsQuery,
@@ -59,6 +60,10 @@ export const ReferenceDetails = () => {
     {
       title: 'Reference',
       content: <ReferenceTab />,
+    },
+    {
+      title: 'Localities',
+      content: <LocalityTab />,
     },
   ]
 
