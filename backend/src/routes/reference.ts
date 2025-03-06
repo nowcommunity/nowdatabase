@@ -6,6 +6,7 @@ import {
   getReferenceAuthors,
   getReferenceJournals,
   getReferenceLocalities,
+  getReferenceSpecies,
   validateEntireReference,
   getAuthorsOfReference,
   getJournalById,
@@ -63,6 +64,12 @@ router.get('/localities/:id', async (req, res) => {
   const id = req.params.id
   const localities = await getReferenceLocalities(id)
   return res.status(200).send(fixBigInt(localities))
+})
+
+router.get('/species/:id', async (req, res) => {
+  const id = req.params.id
+  const species = await getReferenceSpecies(id)
+  return res.status(200).send(fixBigInt(species))
 })
 
 router.put(
