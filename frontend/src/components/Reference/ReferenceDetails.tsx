@@ -3,6 +3,7 @@ import { CircularProgress } from '@mui/material'
 import { DetailView, TabType } from '../DetailView/DetailView'
 import { ReferenceTab } from './Tabs/ReferenceTab'
 import { LocalityTab } from './Tabs/LocalityTab'
+import { SpeciesTab } from './Tabs/SpeciesTab'
 import {
   useEditReferenceMutation,
   useGetReferenceDetailsQuery,
@@ -64,6 +65,10 @@ export const ReferenceDetails = () => {
     {
       title: 'Localities',
       content: <LocalityTab />,
+    },
+    {
+      title: 'Species',
+      content: <SpeciesTab />,
     },
   ]
 

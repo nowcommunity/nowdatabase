@@ -9,7 +9,7 @@ export const SpeciesTab = () => {
   const { data: speciesData, isError } = useGetReferenceSpeciesQuery(encodeURIComponent(data.rid))
 
   if (isError) return 'Error loading Species.'
-  if (!SpeciesData) return <CircularProgress />
+  if (!speciesData) return <CircularProgress />
 
   const columns = [
     {
