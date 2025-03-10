@@ -125,14 +125,14 @@ router.put('/password', async (req, res) => {
     passwordMatches = !!foundUser && !!(await bcrypt.compare(oldPassword, foundUser.newpassword))
   }
 
-  if (!passwordMatches) return res.status(403).send()
+  if (!passwordMatches) return res.status(403).send({ error: 'Old password does not match your current password.' })
 
-  if (newPassword.length < 8) return res.status(400).send({ message: 'Password must be at least 8 characters long.' })
+  if (newPassword.length < 8) return res.status(400).send({ error: 'Password must be at least 8 characters long.' })
 
   if (!/^[0-9A-Za-z$%&~]+/.test(newPassword))
     return res
       .status(400)
-      .send({ message: 'Use only alphanumeric characters a-z, A-Z and 0-9 and symbols ^?$%&~ in the password' })
+      .send({ error: 'Use only alphanumeric characters a-z, A-Z and 0-9 and symbols ^?$%&~ in the password.' })
 
   const passwordHash = await createPasswordHash(newPassword)
 

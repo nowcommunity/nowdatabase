@@ -4,6 +4,8 @@ import { Button, Grid, TextField } from '@mui/material'
 import { useState } from 'react'
 import { useDispatch } from 'react-redux'
 
+type ChangePasswordError = { status: number; data: { error: string } }
+
 export const ChangePasswordForm = () => {
   const [oldPassword, setOldPassword] = useState('')
   const [newPassword, setNewPassword] = useState('')
@@ -15,11 +17,11 @@ export const ChangePasswordForm = () => {
 
   const changePassword = async () => {
     if (newPassword !== verifyPassword) {
-      notify('New password was not the same in both fields', 'error')
+      notify('New password was not the same in both fields.', 'error')
       return
     }
     if (newPassword.length === 0 || oldPassword.length === 0) {
-      notify('Please fill all fields', 'error')
+      notify('Please fill all fields.', 'error')
       return
     }
     try {
@@ -30,7 +32,8 @@ export const ChangePasswordForm = () => {
       setNewPassword('')
       setVerifyPassword('')
     } catch (e) {
-      if (e instanceof Error) notify(e.toString(), 'error')
+      const error = e as ChangePasswordError
+      notify(error.data.error, 'error')
     }
   }
 
