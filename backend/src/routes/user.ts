@@ -19,7 +19,14 @@ router.post('/login', async (req, res) => {
     where: {
       user_name: username,
     },
-    select: { user_name: true, password: true, newpassword: true, user_id: true, now_user_group: true },
+    select: {
+      user_name: true,
+      password: true,
+      newpassword: true,
+      user_id: true,
+      now_user_group: true,
+      last_login: true,
+    },
   })
 
   let isFirstLogin: true | undefined
@@ -32,6 +39,11 @@ router.post('/login', async (req, res) => {
   } else {
     const passwordMatches = foundUser && (await bcrypt.compare(password, foundUser.newpassword))
     if (!passwordMatches) throw new AccessError()
+  }
+
+  // if this is the user's first time logging in, prompt user to change their password.
+  if (!foundUser.last_login) {
+    isFirstLogin = true
   }
 
   const token = sign({ username: foundUser.user_name, id: foundUser.user_id }, SECRET, {
