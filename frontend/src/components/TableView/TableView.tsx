@@ -16,11 +16,9 @@ import { ActionComponent } from './ActionComponent'
 import { usePageContext } from '../Page'
 import { useUser } from '@/hooks/user'
 import { ContactForm } from '../DetailView/common/ContactForm'
+import { defaultPagination, defaultPaginationSmall } from '../DetailView/common/defaultValues'
 
 type TableStateInUrl = 'sorting' | 'columnfilters' | 'pagination'
-
-const defaultPagination: MRT_PaginationState = { pageIndex: 0, pageSize: 15 }
-const defaultPaginationSmall: MRT_PaginationState = { pageIndex: 0, pageSize: 10 }
 
 /*
   TableView takes in the data and columns of a table, and handles
