@@ -54,10 +54,12 @@ describe('Editing a person', () => {
     cy.get('[id=write-button]').should('be.disabled')
     cy.get('[id=organization-textfield]').type('test organization')
 
-    cy.get('[id=country-textfield]').clear()
+    cy.get('[id=Country-multiselect]').click()
+    cy.get('[data-testid=CloseIcon]').click() // clears the country dropdown
     cy.contains('Country: This field is required')
     cy.get('[id=write-button]').should('be.disabled')
-    cy.get('[id=country-textfield]').type('test country')
+    cy.get('[id=Country-multiselect]').type('Andorra')
+    cy.contains('.MuiAutocomplete-option', 'Andorra').click() // this finds the Andorra inside the Autocomplete component
 
     cy.get('[id=write-button]').click()
   })

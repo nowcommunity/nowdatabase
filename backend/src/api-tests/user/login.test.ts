@@ -17,7 +17,7 @@ describe('Logging in', () => {
     expect(result.status).toEqual(200)
     expect(result.body.username).toEqual('testSu')
     expect(result.body.role).toEqual(1) // frontend/src/shared/types: Role enum
-    expect(result.body.isFirstLogin).toEqual(undefined)
+    expect(result.body.isFirstLogin).toEqual(true)
   })
 
   it('is not successful with missing data', async () => {
