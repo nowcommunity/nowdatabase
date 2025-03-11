@@ -17,8 +17,9 @@ export const PersonTab = () => {
   useEffect(() => {
     if (!currentUser?.isFirstLogin) return
     window.scrollTo(0, document.body.scrollHeight)
-    notify('First login detected. Please change your password!', 'warning')
-  }, [currentUser, notify])
+    notify('First login detected. Please change your password!', 'warning', null)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentUser])
 
   const countryOptions = ['', ...validCountries]
 

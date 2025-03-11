@@ -26,7 +26,7 @@ export const ChangePasswordForm = () => {
     }
     try {
       await changePasswordMutation({ newPassword, oldPassword }).unwrap()
-      notify('Password changed successfully')
+      notify('Password changed successfully.')
       dispatch(removeFirstLogin())
       setOldPassword('')
       setNewPassword('')
@@ -43,23 +43,44 @@ export const ChangePasswordForm = () => {
         <Grid item sx={sx}>
           Old password:
         </Grid>
-        <TextField type="password" value={oldPassword} onChange={event => setOldPassword(event.target.value)} />
+        <TextField
+          id="old-password-textfield"
+          type="password"
+          value={oldPassword}
+          onChange={event => setOldPassword(event.target.value)}
+        />
       </Grid>
       <Grid container direction="row">
         <Grid item sx={sx}>
           New password:
         </Grid>
-        <TextField type="password" value={newPassword} onChange={event => setNewPassword(event.target.value)} />
+        <TextField
+          id="new-password-textfield"
+          type="password"
+          value={newPassword}
+          onChange={event => setNewPassword(event.target.value)}
+        />
       </Grid>
       <Grid container direction="row">
         <Grid item sx={sx}>
           New password again:
         </Grid>
-        <TextField type="password" value={verifyPassword} onChange={event => setVerifyPassword(event.target.value)} />
+        <TextField
+          id="new-password-verification-textfield"
+          type="password"
+          value={verifyPassword}
+          onChange={event => setVerifyPassword(event.target.value)}
+        />
       </Grid>
       <Grid container direction="row">
         <Grid item width="27em">
-          <Button fullWidth sx={{ height: '4em' }} variant="contained" onClick={() => void changePassword()}>
+          <Button
+            id="change-password-button"
+            fullWidth
+            sx={{ height: '4em' }}
+            variant="contained"
+            onClick={() => void changePassword()}
+          >
             Change password
           </Button>
         </Grid>
