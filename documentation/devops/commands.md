@@ -89,6 +89,7 @@
 
   - Add `-- --build` after for example `npm run start:anon` to force rebuilding all containers
   - Sometimes docker doesn't rebuild containers when needed and it leads to hard-to-find bugs
+  - Getting a "no space left on device" error? Try running `docker system prune` or `docker system prune --volumes` to remove unused containers and volumes
 
 - Difference between `cmd1 && cmd2` and `cmd1; cmd2`
   - `&&`: `cmd2` is executed only when `cmd1` returns 0 (=is succesful)
