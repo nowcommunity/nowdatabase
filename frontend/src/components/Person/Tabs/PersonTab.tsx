@@ -7,25 +7,29 @@ import { ChangePasswordForm } from './ChangePasswordForm'
 import { Box } from '@mui/material'
 import { useEffect } from 'react'
 import { useNotify } from '@/hooks/notification'
+import { validCountries } from '@/shared/validators/countryList'
 
 export const PersonTab = () => {
-  const { textField, data } = useDetailContext<PersonDetailsType>()
+  const { textField, dropdownWithSearch, data } = useDetailContext<PersonDetailsType>()
   const currentUser = useUser()
   const notify = useNotify()
 
   useEffect(() => {
     if (!currentUser?.isFirstLogin) return
     window.scrollTo(0, document.body.scrollHeight)
-    notify('First login detected. Please change your password!', 'warning')
-  }, [currentUser, notify])
+    notify('First login detected. Please change your password!', 'warning', null)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentUser])
+
+  const countryOptions = ['', ...validCountries]
 
   const person = [
-    ['Initials', textField('initials')],
+    ['Initials', textField('initials', { type: 'text', disabled: true })],
     ['First Name', textField('first_name')],
     ['Surname', textField('surname')],
     ['Email', textField('email')],
     ['Organization', textField('organization')],
-    ['Country', textField('country')],
+    ['Country', dropdownWithSearch('country', countryOptions, 'Country')],
   ]
   const lastLogin = data.user?.last_login
 
