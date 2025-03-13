@@ -40,6 +40,7 @@ export const TableView = <T extends MRT_RowData>({
   combinedExport,
   exportIsLoading,
   enableColumnFilterModes,
+  enableMultiSort,
   isFetching,
 }: {
   title?: string
@@ -53,6 +54,7 @@ export const TableView = <T extends MRT_RowData>({
   combinedExport?: (lids: number[]) => Promise<void>
   exportIsLoading?: boolean
   enableColumnFilterModes?: boolean
+  enableMultiSort?: boolean
   isFetching: boolean
 }) => {
   const location = useLocation()
@@ -116,6 +118,7 @@ export const TableView = <T extends MRT_RowData>({
     renderRowActions: ({ row }) => <ActionComponent {...{ selectorFn, url, checkRowRestriction, row, idFieldName }} />,
     displayColumnDefOptions: { 'mrt-row-actions': { size: 50, header: '' } },
     enableRowActions: true,
+    enableMultiSort: enableMultiSort,
     onSortingChange: setSorting,
     onPaginationChange: setPagination,
     manualPagination: true,
