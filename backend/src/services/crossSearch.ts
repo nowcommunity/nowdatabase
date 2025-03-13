@@ -88,7 +88,7 @@ export const getCrossSearchRawSql = async (
     orderBy = undefined
   } else {
     orderBy = sorting[0].id
-    descendingOrder = sorting[0].desc === 'true' ? true : false
+    descendingOrder = sorting[0].desc
   }
   if (orderBy) {
     orderBy = convertFilterIdToFieldName(orderBy)

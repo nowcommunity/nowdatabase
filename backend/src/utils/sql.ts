@@ -113,7 +113,7 @@ export const generateFilteredCrossSearchSql = (usersProjects: Set<number>) => {
 }
 
 export type ColumnFilter = { id: string; value: string }
-export type SortingState = { desc: string; id: string }
+export type SortingState = { desc: boolean; id: string }
 
 const generateColumnFilterQuery = (columnFilters: ColumnFilter[] | undefined) => {
   if (!Array.isArray(columnFilters) || columnFilters.length === 0) return Prisma.empty

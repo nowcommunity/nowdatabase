@@ -26,8 +26,8 @@ const sortingCheck = (sorting: unknown) => {
     if (!('desc' in sort)) {
       return `Invalid or missing desc field in sort object`
     }
-    if (sort.desc !== 'false' && sort.desc !== 'true') {
-      return 'desc field in must be either "true" or "false" (string)'
+    if (typeof sort.desc !== 'boolean') {
+      return 'desc field in sort object must be either true or false (boolean)'
     }
   }
   return null as ValidationError

@@ -67,7 +67,7 @@ describe('Getting cross-search data works', () => {
 
   it('Requesting get all with sorting has correct data', async () => {
     const { body: responseBody1, status: responseStatus1 } = await send(
-      `crosssearch/all/20/0/[]/[{"id": "lid_now_loc", "desc": "true"}]`,
+      `crosssearch/all/20/0/[]/[{"id": "lid_now_loc", "desc": true}]`,
       'GET'
     )
     expect(responseStatus1).toEqual(200)
@@ -78,7 +78,7 @@ describe('Getting cross-search data works', () => {
     expect(nextLocalityIds).toEqual([24797, 24797, 24797, 24797, 24797])
 
     const { body: responseBody2, status: responseStatus2 } = await send(
-      `crosssearch/all/10/0/[]/[{"id": "loc_name", "desc": "false"}]`,
+      `crosssearch/all/10/0/[]/[{"id": "loc_name", "desc": false}]`,
       'GET'
     )
     expect(responseStatus2).toEqual(200)
