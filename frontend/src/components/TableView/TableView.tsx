@@ -40,7 +40,7 @@ export const TableView = <T extends MRT_RowData>({
   combinedExport,
   exportIsLoading,
   enableColumnFilterModes,
-  enableMultiSort,
+  serverSidePagination,
   isFetching,
 }: {
   title?: string
@@ -54,7 +54,7 @@ export const TableView = <T extends MRT_RowData>({
   combinedExport?: (lids: number[]) => Promise<void>
   exportIsLoading?: boolean
   enableColumnFilterModes?: boolean
-  enableMultiSort?: boolean
+  serverSidePagination?: boolean
   isFetching: boolean
 }) => {
   const location = useLocation()
@@ -100,6 +100,12 @@ export const TableView = <T extends MRT_RowData>({
     document.title = `${title}`
   }
 
+  let rowCount = undefined
+  if (data) {
+    if (serverSidePagination) rowCount = data[0].full_count as number
+    else rowCount = data.length
+  }
+
   const table = useMaterialReactTable({
     columns: columns,
     data: data || [],
@@ -118,12 +124,12 @@ export const TableView = <T extends MRT_RowData>({
     renderRowActions: ({ row }) => <ActionComponent {...{ selectorFn, url, checkRowRestriction, row, idFieldName }} />,
     displayColumnDefOptions: { 'mrt-row-actions': { size: 50, header: '' } },
     enableRowActions: true,
-    enableMultiSort: enableMultiSort,
+    enableMultiSort: !serverSidePagination,
     onSortingChange: setSorting,
     onPaginationChange: setPagination,
-    manualPagination: true,
-    manualSorting: true,
-    rowCount: (data && data.length && (data[0].full_count as number)) ?? 0,
+    manualPagination: serverSidePagination,
+    manualSorting: serverSidePagination,
+    rowCount: rowCount,
     autoResetPageIndex: false,
     positionPagination: selectorFn ? 'top' : 'both',
     paginationDisplayMode: 'pages',
