@@ -7,7 +7,7 @@ import { usePageContext } from '../Page'
 
 export const CrossSearchTable = ({ selectorFn }: { selectorFn?: (newObject: CrossSearch) => void }) => {
   const { sqlLimit, sqlOffset, sqlColumnFilters, sqlOrderBy } = usePageContext()
-  const { data: crossSearchQueryResult, isFetching } = useGetAllCrossSearchQuery({
+  const { data: crossSearchQueryData, isFetching } = useGetAllCrossSearchQuery({
     limit: sqlLimit,
     offset: sqlOffset,
     columnFilters: sqlColumnFilters,
@@ -808,7 +808,7 @@ export const CrossSearchTable = ({ selectorFn }: { selectorFn?: (newObject: Cros
       columns={columns}
       isFetching={isFetching}
       visibleColumns={visibleColumns}
-      data={crossSearchQueryResult}
+      data={crossSearchQueryData}
       url="crosssearch"
       enableColumnFilterModes={true}
       serverSidePagination={true}
