@@ -1,6 +1,7 @@
 import { Prisma } from '../../prisma/generated/now_test_client'
 import { getCrossSearchFields } from './db'
 import { convertFilterIdToFieldName } from '../services/crossSearch'
+import { localities } from '../api-tests/geonames-api/data'
 
 export const generateFilteredCrossSearchSql = (usersProjects: Set<number>) => {
   const projectsArray = Array.from(usersProjects)
@@ -115,34 +116,56 @@ export const generateFilteredCrossSearchSql = (usersProjects: Set<number>) => {
 export type ColumnFilter = { id: string; value: string }
 export type SortingState = { desc: boolean; id: string }
 
-const generateColumnFilterQuery = (columnFilters: ColumnFilter[] | undefined) => {
-  if (!Array.isArray(columnFilters) || columnFilters.length === 0) return Prisma.empty
-  const conditions: Prisma.Sql[] = []
-
-  const allowedColumns = getCrossSearchFields()
-
-  for (const filter of columnFilters) {
-    const convertedId = convertFilterIdToFieldName(filter.id)
-    // this check should make SQL injection impossible since the list of database field names
-    //  has to include the user inputted string. But be careful with this!
-    if (!allowedColumns.includes(convertedId)) throw new Error('INVALID COLUMN NAME!')
-    const newQuery = Prisma.sql`${Prisma.raw(convertedId)} = ${filter.value}`
-    conditions.push(newQuery)
+const generateWhereClause = (
+  showAll: boolean,
+  allowedLocalitiesString: string,
+  columnFilters: ColumnFilter[] | undefined
+) => {
+  let userCheck
+  if (showAll) userCheck = Prisma.empty
+  else if (allowedLocalitiesString.length === 0) {
+    userCheck = Prisma.sql`loc_status = 0`
+  } else {
+    userCheck = Prisma.sql`loc_status = 0 OR now_loc.lid IN (${allowedLocalitiesString})`
   }
 
-  if (!conditions.length) throw new Error('NO CONDITIONS! this should never happen')
-  const joinedConditions = Prisma.sql`AND ${Prisma.join(conditions, ' AND ')}`
-  return joinedConditions
+  let columnFilterCheck
+  if (!Array.isArray(columnFilters) || columnFilters.length === 0) columnFilterCheck = Prisma.empty
+  else {
+    const conditions: Prisma.Sql[] = []
+
+    const allowedColumns = getCrossSearchFields()
+
+    for (const filter of columnFilters) {
+      const convertedId = convertFilterIdToFieldName(filter.id)
+      // this check should make SQL injection impossible since the list of database field names
+      //  has to include the user inputted string. But be careful with this!
+      if (!allowedColumns.includes(convertedId)) throw new Error('INVALID COLUMN NAME!')
+      const newQuery = Prisma.sql`${Prisma.raw(convertedId)} = ${filter.value}`
+      conditions.push(newQuery)
+    }
+
+    if (!conditions.length) throw new Error('NO CONDITIONS! this should never happen')
+    columnFilterCheck = Prisma.sql`AND ${Prisma.join(conditions, ' AND ')}`
+  }
+  const result = Prisma.sql`WHERE ${userCheck} ${columnFilterCheck}`
+  return result
 }
 
-export const generateFilteredCrossSearchSqlWithNoUser = (
+// change name
+export const generateFilteredCrossSearchSqlForAll = (
+  showAll: boolean,
+  allowedLocalitiesString: string,
   limit: number | undefined,
   offset: number | undefined,
   columnFilters: ColumnFilter[] | undefined,
   orderBy: string | undefined,
   descendingOrder: boolean
 ) => {
-  const columnFilterQuery = generateColumnFilterQuery(columnFilters)
+  const whereClause = generateWhereClause(showAll, allowedLocalitiesString, columnFilters)
+  console.log(whereClause.text)
+  console.log(whereClause.values)
+
   return Prisma.sql`
   SELECT 
       -- com_species fields
@@ -352,7 +375,7 @@ export const generateFilteredCrossSearchSqlWithNoUser = (
   FROM com_species
   INNER JOIN now_ls ON com_species.species_id = now_ls.species_id
   INNER JOIN now_loc ON now_ls.lid = now_loc.lid
-  WHERE now_loc.loc_status = 0 ${columnFilterQuery}
+  ${whereClause}
   ORDER BY
     ${orderBy ? Prisma.raw(orderBy) : Prisma.sql`now_loc.lid`} ${descendingOrder ? Prisma.sql`DESC` : Prisma.empty}
   ${limit ? Prisma.sql`LIMIT ${limit}` : Prisma.empty}
