@@ -1,141 +1,28 @@
 import { Prisma } from '../../prisma/generated/now_test_client'
 import { getCrossSearchFields } from './db'
 import { convertFilterIdToFieldName } from '../services/crossSearch'
-import { localities } from '../api-tests/geonames-api/data'
-
-export const generateFilteredCrossSearchSql = (usersProjects: Set<number>) => {
-  const projectsArray = Array.from(usersProjects)
-  const projectsArrayString = projectsArray.join(', ')
-
-  return Prisma.sql`
-  SELECT
-    now_loc.lid,
-    loc_name,
-    now_loc.bfa_max,
-    bfa_min,
-    max_age,
-    min_age,
-    bfa_max_abs,
-    bfa_min_abs,
-    frac_max,
-    frac_min,
-    chron,
-    basin,
-    subbasin,
-    dms_lat,
-    dms_long,
-    dec_lat,
-    dec_long,
-    altitude,
-    country,
-    state,
-    county,
-    site_area,
-    gen_loc,
-    plate,
-    formation,
-    member,
-    bed,
-    species_id,
-    subclass_or_superorder_name,
-    order_name,
-    suborder_or_superfamily_name,
-    family_name,
-    subfamily_name,
-    genus_name,
-    species_name,
-    unique_identifier,
-    taxonomic_status,
-    common_name,
-    sp_author,
-    strain,
-    gene,
-    sp_comment,
-    com_species.body_mass,
-    brain_mass,
-    now_loc.loc_status
-  FROM 
-    now_ls
-  LEFT JOIN
-    (SELECT
-      now_loc.lid,
-      loc_name,
-      now_loc.bfa_max,
-      bfa_min,
-      max_age,
-      min_age,
-      bfa_max_abs,
-      bfa_min_abs,
-      frac_max,
-      frac_min,
-      chron,
-      basin,
-      subbasin,
-      dms_lat,
-      dms_long,
-      dec_lat,
-      dec_long,
-      altitude,
-      country,
-      state,
-      county,
-      site_area,
-      gen_loc,
-      plate,
-      formation,
-      member,
-      bed,
-      loc_status
-    FROM
-      now_loc
-    LEFT JOIN
-      now_plr
-    ON
-      now_loc.lid = now_plr.lid
-    WHERE
-      loc_status = 0
-    OR
-      now_plr.pid IN (${projectsArrayString})
-    GROUP BY
-      now_loc.lid
-    ) as now_loc
-  ON
-    now_loc.lid = now_ls.lid
-  LEFT JOIN
-    com_species
-  ON
-    species_id = now_ls.species_id
-  WHERE
-    now_loc.lid IS NOT NULL
-  ORDER BY
-    now_loc.lid
-  LIMIT 4
-  `
-}
 
 export type ColumnFilter = { id: string; value: string }
 export type SortingState = { desc: boolean; id: string }
 
 const generateWhereClause = (
   showAll: boolean,
-  allowedLocalitiesString: string,
+  allowedLocalities: Array<number>,
   columnFilters: ColumnFilter[] | undefined
 ) => {
-  let userCheck
+  let userCheck: Prisma.Sql
   if (showAll) userCheck = Prisma.empty
-  else if (allowedLocalitiesString.length === 0) {
+  else if (allowedLocalities.length === 0) {
     userCheck = Prisma.sql`loc_status = 0`
   } else {
-    userCheck = Prisma.sql`loc_status = 0 OR now_loc.lid IN (${allowedLocalitiesString})`
+    userCheck = Prisma.sql`(loc_status = 0 OR now_loc.lid IN (${Prisma.join(allowedLocalities)}))`
   }
 
-  let columnFilterCheck
+  let columnFilterCheck: Prisma.Sql
   if (!Array.isArray(columnFilters) || columnFilters.length === 0) columnFilterCheck = Prisma.empty
   else {
     const conditions: Prisma.Sql[] = []
-
     const allowedColumns = getCrossSearchFields()
-
     for (const filter of columnFilters) {
       const convertedId = convertFilterIdToFieldName(filter.id)
       // this check should make SQL injection impossible since the list of database field names
@@ -146,16 +33,18 @@ const generateWhereClause = (
     }
 
     if (!conditions.length) throw new Error('NO CONDITIONS! this should never happen')
-    columnFilterCheck = Prisma.sql`AND ${Prisma.join(conditions, ' AND ')}`
+    columnFilterCheck = Prisma.sql`${Prisma.join(conditions, ' AND ')}`
   }
-  const result = Prisma.sql`WHERE ${userCheck} ${columnFilterCheck}`
-  return result
+  if (userCheck === Prisma.empty && columnFilterCheck == Prisma.empty) return Prisma.empty
+  else if (userCheck === Prisma.empty) return Prisma.sql`WHERE ${columnFilterCheck}`
+  else if (columnFilterCheck === Prisma.empty) return Prisma.sql`WHERE ${userCheck}`
+  else return Prisma.sql`WHERE ${userCheck} AND ${columnFilterCheck}`
 }
 
 // change name
 export const generateFilteredCrossSearchSqlForAll = (
   showAll: boolean,
-  allowedLocalitiesString: string,
+  allowedLocalitiesString: Array<number>,
   limit: number | undefined,
   offset: number | undefined,
   columnFilters: ColumnFilter[] | undefined,
@@ -163,8 +52,6 @@ export const generateFilteredCrossSearchSqlForAll = (
   descendingOrder: boolean
 ) => {
   const whereClause = generateWhereClause(showAll, allowedLocalitiesString, columnFilters)
-  console.log(whereClause.text)
-  console.log(whereClause.values)
 
   return Prisma.sql`
   SELECT 
@@ -381,132 +268,4 @@ export const generateFilteredCrossSearchSqlForAll = (
   ${limit ? Prisma.sql`LIMIT ${limit}` : Prisma.empty}
   ${offset ? Prisma.sql`OFFSET ${offset}` : Prisma.empty}
   `
-}
-
-export const originalGenerateFilteredCrossSearchSqlWithAdmin = (limit: number, offset: number) => {
-  return Prisma.sql`
-  SELECT 
-    now_loc.lid,
-    loc_name,
-    bfa_max,
-    bfa_min,
-    max_age,
-    min_age,
-    bfa_max_abs,
-    bfa_min_abs,
-    frac_max,
-    frac_min,
-    chron,
-    basin,
-    subbasin,
-    dms_lat,
-    dms_long,
-    dec_lat,
-    dec_long,
-    altitude,
-    country,
-    state,
-    county,
-    site_area,
-    gen_loc,
-    plate,
-    formation,
-    member,
-    bed,
-    species_id,
-    subclass_or_superorder_name,
-    order_name,
-    suborder_or_superfamily_name,
-    family_name,
-    subfamily_name,
-    genus_name,
-    species_name,
-    unique_identifier,
-    taxonomic_status,
-    common_name,
-    sp_author,
-    strain,
-    gene,
-    com_species.body_mass,
-    brain_mass,
-    loc_status
-  FROM
-    now_ls
-  LEFT JOIN
-    now_loc
-  ON
-    now_ls.lid = now_loc.lid
-  LEFT JOIN
-    com_species
-  ON
-    now_ls.species_id = species_id
-  ORDER BY
-    now_loc.lid
-  LIMIT 2
-  OFFSET
-    ${offset}
-  `
-  //     ${limit}
-}
-
-export const generateFilteredCrossSearchSqlWithAdmin = () => {
-  return Prisma.sql`
-  SELECT 
-    now_loc.lid,
-    loc_name,
-    bfa_max,
-    bfa_min,
-    max_age,
-    min_age,
-    bfa_max_abs,
-    bfa_min_abs,
-    frac_max,
-    frac_min,
-    chron,
-    basin,
-    subbasin,
-    dms_lat,
-    dms_long,
-    dec_lat,
-    dec_long,
-    altitude,
-    country,
-    state,
-    county,
-    site_area,
-    gen_loc,
-    plate,
-    formation,
-    member,
-    bed,
-    species_id,
-    subclass_or_superorder_name,
-    order_name,
-    suborder_or_superfamily_name,
-    family_name,
-    subfamily_name,
-    genus_name,
-    species_name,
-    unique_identifier,
-    taxonomic_status,
-    common_name,
-    sp_author,
-    strain,
-    gene,
-    com_species.body_mass,
-    brain_mass
-  FROM
-    now_ls
-  LEFT JOIN
-    now_loc
-  ON
-    now_ls.lid = now_loc.lid
-  LEFT JOIN
-    com_species
-  ON
-    now_ls.species_id = species_id
-  ORDER BY
-    now_loc.lid
-  LIMIT 3
-    `
 }

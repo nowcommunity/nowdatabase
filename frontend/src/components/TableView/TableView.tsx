@@ -101,7 +101,7 @@ export const TableView = <T extends MRT_RowData>({
   }
 
   let rowCount = undefined
-  if (data) {
+  if (data && data.length > 0) {
     if (serverSidePagination) rowCount = data[0].full_count as number
     else rowCount = data.length
   }

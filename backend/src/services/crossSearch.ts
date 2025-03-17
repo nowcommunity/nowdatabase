@@ -1,32 +1,26 @@
 import { User, CrossSearch, Role, CrossSearchRouteParameters } from '../../../frontend/src/shared/types'
 import { getCrossSearchFields, getFieldsOfTables, nowDb } from '../utils/db'
-import {
-  ColumnFilter,
-  generateFilteredCrossSearchSql,
-  generateFilteredCrossSearchSqlWithAdmin,
-  generateFilteredCrossSearchSqlForAll,
-  SortingState,
-} from '../utils/sql'
+import { ColumnFilter, generateFilteredCrossSearchSqlForAll, SortingState } from '../utils/sql'
 import { ValidationObject } from '../../../frontend/src/shared/validators/validator'
 import { validateCrossSearchRouteParams } from '../../../frontend/src/shared/validators/crossSearch'
 
-const getIdsOfUsersProjects = async (user: User) => {
+const getAllowedLocalities = async (user: User) => {
   const usersProjects = await nowDb.now_proj_people.findMany({
     where: { initials: user.initials },
     select: { pid: true },
   })
 
-  return new Set(usersProjects.map(({ pid }) => pid))
-}
+  const projectsSet = new Set(usersProjects.map(({ pid }) => pid))
+  const projectIDs = Array.from(projectsSet)
 
-// change name
-const getIdsOfLocalities = async (projectIDs: Array<number>) => {
   const localities = await nowDb.now_plr.findMany({
     where: { pid: { in: projectIDs } },
     select: { lid: true },
   })
 
-  return new Set(localities.map(({ lid }) => lid))
+  const localitiesSet = new Set(localities.map(({ lid }) => lid))
+  const localityIDs = Array.from(localitiesSet)
+  return localityIDs
 }
 
 export const convertFilterIdToFieldName = (id: string) => {
@@ -106,28 +100,17 @@ export const getCrossSearchRawSql = async (
   }
 
   const showAll = user ? [Role.Admin, Role.EditUnrestricted].includes(user.role) : false
-  let allowedLocalitiesString = ''
-  const usersProjects = user ? await getIdsOfUsersProjects(user) : new Set()
-  if (usersProjects.size) {
-    console.log('USERS PROJECTS!')
-    console.log(usersProjects)
-    const projectsArray = Array.from(usersProjects)
-    const localities = await getIdsOfLocalities(projectsArray)
-    const localitiesArray = Array.from(localities)
-    allowedLocalitiesString = localitiesArray.join(', ')
-  }
+  const allowedLocalities = user ? await getAllowedLocalities(user) : []
 
   const sql = generateFilteredCrossSearchSqlForAll(
     showAll,
-    allowedLocalitiesString,
+    allowedLocalities,
     limit,
     offset,
     columnFilters,
     orderBy,
     descendingOrder
   )
-  console.log(sql.text)
-  console.log(sql.values)
 
   const result: Partial<CrossSearch>[] = await nowDb.$queryRaw(sql)
   return result
