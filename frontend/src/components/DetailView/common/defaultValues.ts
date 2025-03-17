@@ -6,6 +6,7 @@ import {
   TimeBoundDetailsType,
   TimeUnitDetailsType,
 } from '@/shared/types'
+import { MRT_PaginationState } from 'material-react-table'
 
 export const emptyLocality = {
   bfa_max: '',
@@ -244,3 +245,6 @@ export const emptyRegion = {
   now_reg_coord_people: [],
   now_reg_coord_country: [],
 } as unknown as RegionDetails
+
+export const defaultPagination: MRT_PaginationState = { pageIndex: 0, pageSize: 15 }
+export const defaultPaginationSmall: MRT_PaginationState = { pageIndex: 0, pageSize: 10 }

@@ -5,6 +5,8 @@ import {
   getReferenceTypes,
   getReferenceAuthors,
   getReferenceJournals,
+  getReferenceLocalities,
+  getReferenceSpecies,
   validateEntireReference,
   getAuthorsOfReference,
   getJournalById,
@@ -12,6 +14,7 @@ import {
 import { requireOneOf } from '../middlewares/authorizer'
 import { Role, EditMetaData, ReferenceDetailsType, EditDataType } from '../../../frontend/src/shared/types'
 import { deleteReference, writeReference } from '../services/write/reference'
+import { fixBigInt } from '../utils/common'
 
 const router = Router()
 
@@ -55,6 +58,18 @@ router.get('/:id', async (req, res) => {
   const reference = await getReferenceDetails(id)
   if (!reference) return res.status(404).send()
   return res.status(200).send(reference)
+})
+
+router.get('/localities/:id', async (req, res) => {
+  const id = req.params.id
+  const localities = await getReferenceLocalities(id)
+  return res.status(200).send(fixBigInt(localities))
+})
+
+router.get('/species/:id', async (req, res) => {
+  const id = req.params.id
+  const species = await getReferenceSpecies(id)
+  return res.status(200).send(fixBigInt(species))
 })
 
 router.put(

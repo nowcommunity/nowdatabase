@@ -19,7 +19,14 @@ router.post('/login', async (req, res) => {
     where: {
       user_name: username,
     },
-    select: { user_name: true, password: true, newpassword: true, user_id: true, now_user_group: true },
+    select: {
+      user_name: true,
+      password: true,
+      newpassword: true,
+      user_id: true,
+      now_user_group: true,
+      last_login: true,
+    },
   })
 
   let isFirstLogin: true | undefined
@@ -32,6 +39,11 @@ router.post('/login', async (req, res) => {
   } else {
     const passwordMatches = foundUser && (await bcrypt.compare(password, foundUser.newpassword))
     if (!passwordMatches) throw new AccessError()
+  }
+
+  // if this is the user's first time logging in, prompt user to change their password.
+  if (!foundUser.last_login) {
+    isFirstLogin = true
   }
 
   const token = sign({ username: foundUser.user_name, id: foundUser.user_id }, SECRET, {
@@ -113,14 +125,14 @@ router.put('/password', async (req, res) => {
     passwordMatches = !!foundUser && !!(await bcrypt.compare(oldPassword, foundUser.newpassword))
   }
 
-  if (!passwordMatches) return res.status(403).send()
+  if (!passwordMatches) return res.status(403).send({ error: 'Old password does not match your current password.' })
 
-  if (newPassword.length < 8) return res.status(400).send({ message: 'Password must be at least 8 characters long.' })
+  if (newPassword.length < 8) return res.status(400).send({ error: 'New password must be at least 8 characters long.' })
 
   if (!/^[0-9A-Za-z$%&~]+/.test(newPassword))
     return res
       .status(400)
-      .send({ message: 'Use only alphanumeric characters a-z, A-Z and 0-9 and symbols ^?$%&~ in the password' })
+      .send({ error: 'Use only alphanumeric characters a-z, A-Z and 0-9 and symbols ^?$%&~ in the new password.' })
 
   const passwordHash = await createPasswordHash(newPassword)
 

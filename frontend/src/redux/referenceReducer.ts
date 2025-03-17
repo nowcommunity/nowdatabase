@@ -1,11 +1,13 @@
 import { api } from './api'
 import {
   EditDataType,
+  Locality,
   Reference,
   ReferenceAuthorType,
   ReferenceDetailsType,
   ReferenceJournalType,
   ReferenceType,
+  Species,
 } from '@/shared/types'
 
 const referencesApi = api.injectEndpoints({
@@ -21,6 +23,16 @@ const referencesApi = api.injectEndpoints({
         url: `/reference/${id}`,
       }),
       providesTags: result => (result ? [{ type: 'reference', id: result.rid }] : []),
+    }),
+    getReferenceLocalities: builder.query<Locality[], string>({
+      query: id => ({
+        url: `/reference/localities/${id}`,
+      }),
+    }),
+    getReferenceSpecies: builder.query<Species[], string>({
+      query: id => ({
+        url: `/reference/species/${id}`,
+      }),
     }),
     getReferenceTypes: builder.query<ReferenceType[], void>({
       query: () => ({
@@ -58,6 +70,8 @@ const referencesApi = api.injectEndpoints({
 export const {
   useGetAllReferencesQuery,
   useGetReferenceDetailsQuery,
+  useGetReferenceLocalitiesQuery,
+  useGetReferenceSpeciesQuery,
   useGetReferenceTypesQuery,
   useGetReferenceAuthorsQuery,
   useGetReferenceJournalsQuery,

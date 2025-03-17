@@ -56,6 +56,40 @@ export const getReferenceDetails = async (id: number) => {
   return result
 }
 
+// Fetch localities that have been updated by the given reference id
+export const getReferenceLocalities = async (id: string) => {
+  // TODO: Check if user has access
+  const result = await nowDb.now_loc.findMany({
+    where: {
+      now_lau: {
+        some: {
+          now_lr: {
+            some: { rid: parseInt(id) },
+          },
+        },
+      },
+    },
+  })
+  return result
+}
+
+// Fetch species that have been updated by the given reference id
+export const getReferenceSpecies = async (id: string) => {
+  // TODO: Check if user has access
+  const result = await nowDb.com_species.findMany({
+    where: {
+      now_sau: {
+        some: {
+          now_sr: {
+            some: { rid: parseInt(id) },
+          },
+        },
+      },
+    },
+  })
+  return result
+}
+
 export const getReferenceTypes = async () => {
   const referenceTypes = await nowDb.ref_ref_type.findMany({ include: { ref_field_name: true } })
   return referenceTypes
