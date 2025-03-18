@@ -114,33 +114,47 @@ describe('Getting cross-search data works', () => {
     const { body: getReqBody } = (await send(`crosssearch/all`, 'GET')) as { body: unknown } as {
       body: CrossSearch[]
     }
-    const specieslist = getReqBody.map(e => e.species_name)
-    expect(specieslist).not.toContain('legidensis')
+    const speciesNameList = getReqBody.map(e => e.species_name)
+    expect(speciesNameList).not.toContain('legidensis')
   })
 
   it("Get all doesn't have a locality that doesn't have species", async () => {
-    const { body: getReqBody } = (await send(`crosssearch/all`, 'GET')) as { body: unknown } as {
-      body: CrossSearch[]
-    }
-    const loclist = getReqBody.map(e => e.loc_name)
-    expect(loclist).not.toContain('not in cross search')
+    const { body: getReqBody } = await send(`crosssearch/all`, 'GET')
+    const locNameList = getReqBody.map(e => e.loc_name)
+    expect(locNameList).not.toContain('not in cross search')
   })
 
-  it.skip('Get all with admin has correct amount of data', async () => {
-    // logged-in query does not work properly yet
+  it('Get all with admin has correct amount of data', async () => {
     await login()
     const response = await send(`crosssearch/all`, 'GET')
     expect(response.status).toEqual(200)
     expect(response.body.length).toEqual(22)
+    const locNameList = response.body.map(e => e.loc_name)
+    expect(locNameList).toContain('draftLocality')
+    expect(locNameList).toContain('draftLocalityWithProject')
+
     logout()
   })
 
-  it.skip('Get all with some projects has correct amount of data', async () => {
-    // logged-in query does not work properly yet
+  it('Get all with user included in a project has correct data', async () => {
     await login('testPl', 'test')
     const response = await send(`crosssearch/all`, 'GET')
     expect(response.status).toEqual(200)
     expect(response.body.length).toEqual(21)
+    const locNameList = response.body.map(e => e.loc_name)
+    expect(locNameList).toContain('draftLocalityWithProject')
+    expect(locNameList).not.toContain('draftLocality')
+    logout()
+  })
+
+  it('Get all with anonymous user has correct data', async () => {
+    logout()
+    const response = await send(`crosssearch/all`, 'GET')
+    expect(response.status).toEqual(200)
+    expect(response.body.length).toEqual(20)
+    const locNameList = response.body.map(e => e.loc_name)
+    expect(locNameList).not.toContain('draftLocalityWithProject')
+    expect(locNameList).not.toContain('draftLocality')
     logout()
   })
 })

@@ -44,14 +44,14 @@ const generateWhereClause = (
 // change name
 export const generateFilteredCrossSearchSqlForAll = (
   showAll: boolean,
-  allowedLocalitiesString: Array<number>,
+  allowedLocalities: Array<number>,
   limit: number | undefined,
   offset: number | undefined,
   columnFilters: ColumnFilter[] | undefined,
   orderBy: string | undefined,
   descendingOrder: boolean
 ) => {
-  const whereClause = generateWhereClause(showAll, allowedLocalitiesString, columnFilters)
+  const whereClause = generateWhereClause(showAll, allowedLocalities, columnFilters)
 
   return Prisma.sql`
   SELECT 
