@@ -20,9 +20,6 @@ import { defaultPagination, defaultPaginationSmall } from '@/common'
 
 type TableStateInUrl = 'sorting' | 'columnfilters' | 'pagination'
 
-const defaultPagination: MRT_PaginationState = { pageIndex: 0, pageSize: 50 }
-const defaultPaginationSmall: MRT_PaginationState = { pageIndex: 0, pageSize: 10 }
-
 /*
   TableView takes in the data and columns of a table, and handles
   rendering the actual table and saving & loading its state via url.
