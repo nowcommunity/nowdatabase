@@ -1,7 +1,7 @@
 import { Router } from 'express'
 import { getCrossSearchRawSql, validateCrossSearchRouteParameters } from '../services/crossSearch'
 import { fixBigInt } from '../utils/common'
-import { ColumnFilter, SortingState } from '../utils/sql'
+import { ColumnFilter, SortingState } from '../services/queries/crossSearchQuery'
 
 const router = Router()
 

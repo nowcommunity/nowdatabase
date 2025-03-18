@@ -1,6 +1,6 @@
 import { User, CrossSearch, Role, CrossSearchRouteParameters } from '../../../frontend/src/shared/types'
 import { getCrossSearchFields, getFieldsOfTables, nowDb } from '../utils/db'
-import { ColumnFilter, generateFilteredCrossSearchSqlForAll, SortingState } from '../utils/sql'
+import { ColumnFilter, SortingState, generateCrossSearchSql } from './queries/crossSearchQuery'
 import { ValidationObject } from '../../../frontend/src/shared/validators/validator'
 import { validateCrossSearchRouteParams } from '../../../frontend/src/shared/validators/crossSearch'
 
@@ -69,16 +69,6 @@ export const convertFilterIdToFieldName = (id: string) => {
   return id
 }
 
-export const validateCrossSearchRouteParameters = (parameters: CrossSearchRouteParameters) => {
-  const keys = Object.keys(parameters)
-  const errors: ValidationObject[] = []
-  for (const key of keys) {
-    const error = validateCrossSearchRouteParams(parameters, key as keyof CrossSearchRouteParameters)
-    if (error.error) errors.push(error)
-  }
-  return errors
-}
-
 export const getCrossSearchRawSql = async (
   user: User | undefined,
   limit?: number,
@@ -102,16 +92,18 @@ export const getCrossSearchRawSql = async (
   const showAll = user ? [Role.Admin, Role.EditUnrestricted].includes(user.role) : false
   const allowedLocalities = user ? await getAllowedLocalities(user) : []
 
-  const sql = generateFilteredCrossSearchSqlForAll(
-    showAll,
-    allowedLocalities,
-    limit,
-    offset,
-    columnFilters,
-    orderBy,
-    descendingOrder
-  )
+  const sql = generateCrossSearchSql(showAll, allowedLocalities, limit, offset, columnFilters, orderBy, descendingOrder)
 
   const result: Partial<CrossSearch>[] = await nowDb.$queryRaw(sql)
   return result
+}
+
+export const validateCrossSearchRouteParameters = (parameters: CrossSearchRouteParameters) => {
+  const keys = Object.keys(parameters)
+  const errors: ValidationObject[] = []
+  for (const key of keys) {
+    const error = validateCrossSearchRouteParams(parameters, key as keyof CrossSearchRouteParameters)
+    if (error.error) errors.push(error)
+  }
+  return errors
 }

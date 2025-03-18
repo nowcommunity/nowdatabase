@@ -1,6 +1,6 @@
-import { Prisma } from '../../prisma/generated/now_test_client'
-import { getCrossSearchFields } from './db'
-import { convertFilterIdToFieldName } from '../services/crossSearch'
+import { Prisma } from '../../../prisma/generated/now_test_client'
+import { getCrossSearchFields } from '../../utils/db'
+import { convertFilterIdToFieldName } from '../crossSearch'
 
 export type ColumnFilter = { id: string; value: string }
 export type SortingState = { desc: boolean; id: string }
@@ -42,7 +42,7 @@ const generateWhereClause = (
 }
 
 // change name
-export const generateFilteredCrossSearchSqlForAll = (
+export const generateCrossSearchSql = (
   showAll: boolean,
   allowedLocalities: Array<number>,
   limit: number | undefined,
