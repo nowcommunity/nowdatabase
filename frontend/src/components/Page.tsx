@@ -7,6 +7,7 @@ import { Role } from '@/shared/types'
 import { UserState } from '@/redux/userReducer'
 import { ENABLE_WRITE } from '@/util/config'
 import { MRT_ColumnFiltersState, MRT_SortingState } from 'material-react-table'
+import { defaultPagination } from '@/common'
 
 export type PageContextType<T> = {
   idList: string[]
@@ -48,7 +49,7 @@ export const PageContextProvider = <T extends object>({
   const [idList, setIdList] = useState<string[]>([])
   const [tableUrl, setTableUrl] = useState<string>(`/${viewName}`)
   // TODO: replace with some default values from variables
-  const [sqlLimit, setSqlLimit] = useState<number>(20)
+  const [sqlLimit, setSqlLimit] = useState<number>(defaultPagination.pageSize)
   const [sqlOffset, setSqlOffset] = useState<number>(0)
   const [sqlColumnFilters, setSqlColumnFilters] = useState<MRT_ColumnFiltersState>([])
   const [sqlOrderBy, setSqlOrderBy] = useState<MRT_SortingState>([])

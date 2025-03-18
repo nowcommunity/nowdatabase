@@ -16,7 +16,7 @@ import { ActionComponent } from './ActionComponent'
 import { usePageContext } from '../Page'
 import { useUser } from '@/hooks/user'
 import { ContactForm } from '../DetailView/common/ContactForm'
-import { defaultPagination, defaultPaginationSmall } from '../DetailView/common/defaultValues'
+import { defaultPagination, defaultPaginationSmall } from '@/common'
 
 type TableStateInUrl = 'sorting' | 'columnfilters' | 'pagination'
 
