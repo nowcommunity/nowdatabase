@@ -124,6 +124,29 @@ describe('Getting cross-search data works', () => {
     expect(locNameList).not.toContain('not in cross search')
   })
 
+  it('Requesting get all with sorting does not allow invalid column names', async () => {
+    const { body: responseBody1, status: responseStatus1 } = await send(
+      `crosssearch/all/20/0/[]/[{"id": "invalid_column", "desc": true}]`,
+      'GET'
+    )
+    expect(responseStatus1).toEqual(403)
+    expect(responseBody1).toEqual({ error: 'orderBy was not a valid column id.' })
+
+    const { body: responseBody2, status: responseStatus2 } = await send(
+      `crosssearch/all/20/0/[]/[{"id": "10", "desc": true}]`,
+      'GET'
+    )
+    expect(responseStatus2).toEqual(403)
+    expect(responseBody2).toEqual({ error: 'orderBy was not a valid column id.' })
+
+    const { body: responseBody3, status: responseStatus3 } = await send(
+      `crosssearch/all/20/0/[]/[{"id": "lid_now_loc--", "desc": true}]`,
+      'GET'
+    )
+    expect(responseStatus3).toEqual(403)
+    expect(responseBody3).toEqual({ error: 'orderBy was not a valid column id.' })
+  })
+
   it('Get all with admin has correct amount of data', async () => {
     await login()
     const response = await send(`crosssearch/all`, 'GET')

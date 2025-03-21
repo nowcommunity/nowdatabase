@@ -1,15 +1,9 @@
 import { Prisma } from '../../../prisma/generated/now_test_client'
-import { getCrossSearchFields } from '../../utils/db'
-import { convertFilterIdToFieldName } from '../crossSearch'
 
 export type ColumnFilter = { id: string; value: string }
 export type SortingState = { desc: boolean; id: string }
 
-const generateWhereClause = (
-  showAll: boolean,
-  allowedLocalities: Array<number>,
-  columnFilters: ColumnFilter[] | undefined
-) => {
+const generateWhereClause = (showAll: boolean, allowedLocalities: Array<number>, columnFilters: ColumnFilter[]) => {
   let userCheck: Prisma.Sql
   if (showAll) userCheck = Prisma.empty
   else if (allowedLocalities.length === 0) {
@@ -19,16 +13,11 @@ const generateWhereClause = (
   }
 
   let columnFilterCheck: Prisma.Sql
-  if (!Array.isArray(columnFilters) || columnFilters.length === 0) columnFilterCheck = Prisma.empty
+  if (columnFilters.length === 0) columnFilterCheck = Prisma.empty
   else {
     const conditions: Prisma.Sql[] = []
-    const allowedColumns = getCrossSearchFields()
     for (const filter of columnFilters) {
-      const convertedId = convertFilterIdToFieldName(filter.id)
-      // this check should make SQL injection impossible since the list of database field names
-      //  has to include the user inputted string. But be careful with this!
-      if (!allowedColumns.includes(convertedId)) throw new Error('INVALID COLUMN NAME!')
-      const newQuery = Prisma.sql`${Prisma.raw(convertedId)} = ${filter.value}`
+      const newQuery = Prisma.sql`${Prisma.raw(filter.id)} = ${filter.value}`
       conditions.push(newQuery)
     }
 
@@ -47,7 +36,7 @@ export const generateCrossSearchSql = (
   allowedLocalities: Array<number>,
   limit: number | undefined,
   offset: number | undefined,
-  columnFilters: ColumnFilter[] | undefined,
+  columnFilters: ColumnFilter[],
   orderBy: string | undefined,
   descendingOrder: boolean
 ) => {

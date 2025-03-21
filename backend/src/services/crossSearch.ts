@@ -23,7 +23,7 @@ const getAllowedLocalities = async (user: User) => {
   return localityIDs
 }
 
-export const convertFilterIdToFieldName = (id: string) => {
+const convertFilterIdToFieldName = (id: string) => {
   const aliasToFieldName: { [key: string]: string } = {
     species_id_com_species: 'com_species.species_id',
     body_mass_com_species: 'com_species.body_mass',
@@ -84,15 +84,35 @@ export const getCrossSearchRawSql = async (
     orderBy = sorting[0].id
     descendingOrder = sorting[0].desc
   }
+
+  let convertedOrderBy = undefined
   if (orderBy) {
-    orderBy = convertFilterIdToFieldName(orderBy)
-    if (!getCrossSearchFields().includes(orderBy)) throw new Error('ORDER BY NOT A VALID FIELD!')
+    convertedOrderBy = convertFilterIdToFieldName(orderBy)
+    if (!getCrossSearchFields().includes(convertedOrderBy)) throw new Error('orderBy was not a valid column id.')
+  }
+
+  const convertedColumnFilters = []
+  if (columnFilters) {
+    const allowedColumns = getCrossSearchFields()
+    for (const filter of columnFilters) {
+      const convertedId = convertFilterIdToFieldName(filter.id)
+      if (!allowedColumns.includes(convertedId)) throw new Error('columnFilters has an invalid column id.')
+      convertedColumnFilters.push({ id: convertedId, value: filter.value })
+    }
   }
 
   const showAll = user ? [Role.Admin, Role.EditUnrestricted].includes(user.role) : false
   const allowedLocalities = user ? await getAllowedLocalities(user) : []
 
-  const sql = generateCrossSearchSql(showAll, allowedLocalities, limit, offset, columnFilters, orderBy, descendingOrder)
+  const sql = generateCrossSearchSql(
+    showAll,
+    allowedLocalities,
+    limit,
+    offset,
+    convertedColumnFilters,
+    convertedOrderBy,
+    descendingOrder
+  )
 
   const result: Partial<CrossSearch>[] = await nowDb.$queryRaw(sql)
   return result
@@ -101,6 +121,7 @@ export const getCrossSearchRawSql = async (
 export const validateCrossSearchRouteParameters = (parameters: CrossSearchRouteParameters) => {
   const keys = Object.keys(parameters)
   const errors: ValidationObject[] = []
+
   for (const key of keys) {
     const error = validateCrossSearchRouteParams(parameters, key as keyof CrossSearchRouteParameters)
     if (error.error) errors.push(error)

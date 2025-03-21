@@ -14,14 +14,18 @@ router.get(`/all/:limit/:offset/:columnfilters/:sorting`, async (req, res) => {
   if (validationErrors.length > 0) {
     return res.status(403).send(validationErrors)
   }
-  const result = await getCrossSearchRawSql(
-    req.user,
-    limit,
-    offset,
-    columnFilters as ColumnFilter[],
-    sorting as SortingState[]
-  )
-  return res.status(200).send(fixBigInt(result))
+  try {
+    const result = await getCrossSearchRawSql(
+      req.user,
+      limit,
+      offset,
+      columnFilters as ColumnFilter[],
+      sorting as SortingState[]
+    )
+    return res.status(200).send(fixBigInt(result))
+  } catch (error) {
+    return res.status(403).send({ error: error.message })
+  }
 })
 
 router.get(`/all`, async (req, res) => {
