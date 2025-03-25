@@ -12,9 +12,9 @@ describe('Creating a time unit', () => {
     cy.get('[id=tu_display_name-textfield]').type('Testing Time Unit Creation')
     cy.get('[id=sequence-tableselection]').first().click() // sequence field
     cy.get('[data-cy=detailview-button-ALMAAsianlandmammalage]').first().click()
-    cy.get('[id=up_bnd-tableselection]').first().click() // New Upper Bound Id field
+    cy.get('[id=up_bnd-tableselection]').first().click() // Select Upper Bound Button
     cy.get('[data-cy=detailview-button-11]').first().click()
-    cy.get('[id=low_bnd-tableselection]').first().click() // New Lower Bound Id field
+    cy.get('[id=low_bnd-tableselection]').first().click() // Select Lower Bound Button
     cy.get('[data-cy=detailview-button-14]').first().click()
     cy.get('[id=write-button]').click()
     cy.get('[id=write-button]').should('be.disabled')
@@ -54,8 +54,8 @@ describe('Creating a time unit', () => {
     cy.get('[id=tu_display_name-textfield]').should('not.be.disabled')
     cy.get('[id=tu_display_name-textfield]').should('have.value', 'Testing Time Unit Creation part 2')
     cy.get('[id=sequence-tableselection]').should('have.value', 'ALMAAsianlandmammalage')
-    cy.get('[id=up_bnd-tableselection]').should('have.value', '11')
-    cy.get('[id=low_bnd-tableselection]').should('have.value', '14')
+    cy.contains('11') // ID value of upper bound
+    cy.contains('14') // ID value of lower bound
     cy.get('[id=write-button]').click()
     cy.get('[id=write-button]').should('be.disabled')
     cy.contains('button', 'Add existing reference').click()
@@ -128,10 +128,15 @@ describe('Editing a time unit', () => {
     cy.get('[id=edit-button]').click()
     cy.get('[id=low_bnd-tableselection]').click()
     cy.get('[data-cy=detailview-button-11]').first().click()
-    cy.contains('​Upper bound age has to be lower than lower bound age')
+    cy.contains('Upper Bound: Upper bound age has to be lower than lower bound age')
     cy.contains('Lower bound age has to be higher than upper bound age')
     cy.get('[id=write-button]').should('be.disabled')
-    cy.contains('2 Invalid fields')
+
+    cy.get('[id=up_bnd-tableselection]').click()
+    cy.get('[data-cy=detailview-button-11]').first().click()
+    cy.contains('Upper Bound: Upper bound age cannot be the same as lower bound age')
+    cy.contains('Lower bound: Lower bound age cannot be the same as upper bound age')
+    cy.get('[id=write-button]').should('be.disabled')
   })
 
   it('but returning from staging view before saving works', () => {
@@ -148,8 +153,8 @@ describe('Editing a time unit', () => {
     cy.get('[id=tu_display_name-textfield]').should('be.disabled')
     cy.get('[id=tu_display_name-textfield]').should('have.value', 'Bahean')
     cy.get('[id=sequence-tableselection]').should('have.value', 'CalatayudTeruellocalbiozone')
-    cy.get('[id=up_bnd-tableselection]').should('have.value', '11')
-    cy.get('[id=low_bnd-tableselection]').should('have.value', '20213')
+    cy.contains('11') // ID value of upper bound
+    cy.contains('20213') // ID value of lower bound
     cy.get('[id=write-button]').click()
     cy.get('[id=write-button]').should('be.disabled')
     cy.contains('button', 'Add existing reference').click()
