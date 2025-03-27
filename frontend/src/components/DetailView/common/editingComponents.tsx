@@ -22,6 +22,7 @@ import { modalStyle } from './misc'
 import { EditDataType, TimeUnitDetailsType, LocalityDetailsType, TimeUnit, TimeBoundDetailsType } from '@/shared/types'
 import { calculateLocalityMinAge, calculateLocalityMaxAge } from '@/util/ageCalculator'
 import { checkFieldErrors } from './checkFieldErrors'
+import { TimeBoundTable } from '@/components/TimeBound/TimeBoundTable'
 
 const fieldWidth = '14em'
 
@@ -393,11 +394,9 @@ export const FieldWithTableSelection = <T extends object, ParentType extends obj
 
 export const TimeBoundSelection = ({
   targetField,
-  selectorTable,
   disabled,
 }: {
   targetField: keyof TimeUnitDetailsType
-  selectorTable: ReactElement
   disabled?: boolean
 }) => {
   const { editData, setEditData, validator, fieldsWithErrors, setFieldsWithErrors } =
@@ -422,7 +421,7 @@ export const TimeBoundSelection = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [errorObject])
 
-  const selectorTableWithFn = cloneElement(selectorTable, { selectorFn })
+  const selectorTableWithFn = cloneElement(<TimeBoundTable showBid />, { selectorFn })
   if (open)
     return (
       <Box>

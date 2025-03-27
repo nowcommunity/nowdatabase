@@ -74,7 +74,7 @@ export const TimeUnitTab = () => {
         <Grouped title="Upper Bound" error={'up_bnd' in fieldsWithErrors}>
           {!mode.read && (
             <Box display="flex" gap={1} marginBottom={'15px'}>
-              <TimeBoundSelection key="up_bnd" targetField="up_bnd" selectorTable={<TimeBoundTable showBid />} />
+              <TimeBoundSelection key="up_bnd" targetField="up_bnd" />
             </Box>
           )}
           <ArrayFrame array={upBound} title={'Selected Upper Bound'} />
@@ -82,7 +82,7 @@ export const TimeUnitTab = () => {
         <Grouped title="Lower Bound" error={'low_bnd' in fieldsWithErrors}>
           {!mode.read && (
             <Box display="flex" gap={1} marginBottom={'15px'}>
-              <TimeBoundSelection key="low_bnd" targetField="low_bnd" selectorTable={<TimeBoundTable showBid />} />
+              <TimeBoundSelection key="low_bnd" targetField="low_bnd" />
             </Box>
           )}
           <ArrayFrame array={lowBound} title={'Selected Lower Bound'} />
