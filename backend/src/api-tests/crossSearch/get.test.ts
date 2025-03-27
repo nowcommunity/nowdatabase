@@ -124,7 +124,51 @@ describe('Getting cross-search data works', () => {
     expect(locNameList).not.toContain('not in cross search')
   })
 
-  it('Requesting get all with sorting does not allow invalid column names', async () => {
+  it('Requesting get all with column filtering does not allow invalid arrays or column names', async () => {
+    const { body: responseBody1, status: responseStatus1 } = await send(
+      `crosssearch/all/20/0/[{"id": "invalid_column", "value": "21050"}]/[]`,
+      'GET'
+    )
+    expect(responseStatus1).toEqual(403)
+    expect(responseBody1).toEqual({ error: 'columnFilters has an invalid column id.' })
+
+    const { body: responseBody2, status: responseStatus2 } = await send(
+      `crosssearch/all/20/0/[{"id": "10", "value": "21050"}]/[]`,
+      'GET'
+    )
+    expect(responseStatus2).toEqual(403)
+    expect(responseBody2).toEqual({ error: 'columnFilters has an invalid column id.' })
+
+    const { body: responseBody3, status: responseStatus3 } = await send(
+      `crosssearch/all/20/0/[{"id": "lid_now_loc' --", "value": "21050"}]/[]`,
+      'GET'
+    )
+    expect(responseStatus3).toEqual(403)
+    expect(responseBody3).toEqual({ error: 'columnFilters has an invalid column id.' })
+
+    const { body: responseBody4, status: responseStatus4 } = await send(
+      `crosssearch/all/20/0/[{"id": "lid_now_loc' OR 1=1 --", "value": "21050"}]/[]`,
+      'GET'
+    )
+    expect(responseStatus4).toEqual(403)
+    expect(responseBody4).toEqual({ error: 'columnFilters has an invalid column id.' })
+
+    const { body: responseBody5, status: responseStatus5 } = await send(
+      `crosssearch/all/20/0/[{"id": 100, "value": "21050"}]/[]`,
+      'GET'
+    )
+    expect(responseStatus5).toEqual(403)
+    expect(responseBody5).toEqual([{ error: 'Invalid or missing id field in filter', name: 'Column Filters' }])
+
+    const { body: responseBody6, status: responseStatus6 } = await send(
+      `crosssearch/all/20/0/[{"value": "21050"}]/[]`,
+      'GET'
+    )
+    expect(responseStatus6).toEqual(403)
+    expect(responseBody6).toEqual([{ error: 'Invalid or missing id field in filter', name: 'Column Filters' }])
+  })
+
+  it('Requesting get all with sorting does not allow invalid arrays or column names', async () => {
     const { body: responseBody1, status: responseStatus1 } = await send(
       `crosssearch/all/20/0/[]/[{"id": "invalid_column", "desc": true}]`,
       'GET'
@@ -140,11 +184,25 @@ describe('Getting cross-search data works', () => {
     expect(responseBody2).toEqual({ error: 'orderBy was not a valid column id.' })
 
     const { body: responseBody3, status: responseStatus3 } = await send(
-      `crosssearch/all/20/0/[]/[{"id": "lid_now_loc--", "desc": true}]`,
+      `crosssearch/all/20/0/[]/[{"id": "lid_now_loc' --", "desc": true}]`,
       'GET'
     )
     expect(responseStatus3).toEqual(403)
     expect(responseBody3).toEqual({ error: 'orderBy was not a valid column id.' })
+
+    const { body: responseBody4, status: responseStatus4 } = await send(
+      `crosssearch/all/20/0/[]/[{"id": 100, "desc": true}]`,
+      'GET'
+    )
+    expect(responseStatus4).toEqual(403)
+    expect(responseBody4).toEqual([{ error: 'Invalid or missing id field in sort object', name: 'Sorting' }])
+
+    const { body: responseBody5, status: responseStatus5 } = await send(
+      `crosssearch/all/20/0/[]/[{"desc": true}]`,
+      'GET'
+    )
+    expect(responseStatus5).toEqual(403)
+    expect(responseBody5).toEqual([{ error: 'Invalid or missing id field in sort object', name: 'Sorting' }])
   })
 
   it('Get all with admin has correct amount of data', async () => {
