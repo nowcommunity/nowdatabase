@@ -3,8 +3,7 @@ import { Validators, validator, ValidationError } from './validator'
 
 const columnFilterCheck = (columnFilters: unknown) => {
   if (!Array.isArray(columnFilters)) return 'Column filters is not an array'
-  for (const filter of columnFilters) {
-    if (!(typeof filter === 'object' && !Array.isArray(filter) && filter !== null)) return 'Filters have to be objects'
+  for (const filter of columnFilters as Record<string, unknown>[]) {
     if (!('id' in filter) || typeof filter.id !== 'string' || filter.id === '') {
       return 'Invalid or missing id field in filter'
     }
@@ -17,9 +16,7 @@ const columnFilterCheck = (columnFilters: unknown) => {
 
 const sortingCheck = (sorting: unknown) => {
   if (!Array.isArray(sorting)) return 'Sorting is not an array'
-  for (const sort of sorting) {
-    if (!(typeof sort === 'object' && !Array.isArray(sort) && sort !== null))
-      return 'Items inside sorting list have to be objects'
+  for (const sort of sorting as Record<string, unknown>[]) {
     if (!('id' in sort) || typeof sort.id !== 'string' || sort.id === '') {
       return 'Invalid or missing id field in sort object'
     }

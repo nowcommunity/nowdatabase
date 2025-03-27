@@ -6,10 +6,18 @@ import { ColumnFilter, SortingState } from '../services/queries/crossSearchQuery
 const router = Router()
 
 router.get(`/all/:limit/:offset/:columnfilters/:sorting`, async (req, res) => {
-  const limit = parseInt(req.params.limit)
-  const offset = parseInt(req.params.offset)
-  const columnFilters = JSON.parse(req.params.columnfilters) as unknown
-  const sorting = JSON.parse(req.params.sorting) as unknown
+  let limit
+  let offset
+  let columnFilters
+  let sorting
+  try {
+    limit = parseInt(req.params.limit)
+    offset = parseInt(req.params.offset)
+    columnFilters = JSON.parse(req.params.columnfilters) as unknown
+    sorting = JSON.parse(req.params.sorting) as unknown
+  } catch (error) {
+    return res.status(403).send({ error: 'Parsing URL parameters failed' })
+  }
   const validationErrors = validateCrossSearchRouteParameters({ limit, offset, columnFilters, sorting })
   if (validationErrors.length > 0) {
     return res.status(403).send(validationErrors)
@@ -24,7 +32,8 @@ router.get(`/all/:limit/:offset/:columnfilters/:sorting`, async (req, res) => {
     )
     return res.status(200).send(fixBigInt(result))
   } catch (error) {
-    return res.status(403).send({ error: error.message })
+    if (error && typeof error === 'object' && 'message' in error) return res.status(403).send({ error: error.message })
+    return res.status(403).send('Unknown error')
   }
 })
 
