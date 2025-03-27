@@ -9,7 +9,11 @@ export const checkFieldErrors = (
 ) => {
   const fieldAsString = String(field)
   if (errorObject.error) {
-    if (!(fieldAsString in fieldsWithErrors)) {
+    if (
+      !(fieldAsString in fieldsWithErrors) ||
+      fieldsWithErrors[fieldAsString].name !== errorObject.name ||
+      fieldsWithErrors[fieldAsString].error !== errorObject.error
+    ) {
       setFieldsWithErrors(prevFieldsWithErrors => {
         return { ...prevFieldsWithErrors, [fieldAsString]: errorObject }
       })
