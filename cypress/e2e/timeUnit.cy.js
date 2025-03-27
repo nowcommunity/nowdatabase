@@ -27,6 +27,7 @@ describe('Creating a time unit', () => {
     cy.contains('ALMAAsianlandmammalage')
     cy.contains('C2N-o')
     cy.contains('C2N-y')
+    cy.contains('Creating new time-unit').should('not.exist')
   })
 
   it('without bounds does not work', () => {
@@ -34,14 +35,38 @@ describe('Creating a time unit', () => {
     cy.get('[id=tu_display_name-textfield]').type('Testing Time Unit Creation')
     cy.get('[id=sequence-tableselection]').first().click()
     cy.get('[data-cy=detailview-button-ALMAAsianlandmammalage]').first().click()
-    cy.contains('This field is required')
+    cy.contains('Upper Bound: This field is required')
+    cy.contains('Lower Bound: This field is required')
     cy.get('[id=write-button]').should('be.disabled')
-    cy.contains('2 Invalid fields')
+  })
+
+  it('with incorrect bounds does not work', () => {
+    cy.visit(`/time-unit/new`)
+    cy.get('[id=tu_display_name-textfield]').type('Testing Time Unit Creation')
+    cy.get('[id=sequence-tableselection]').first().click()
+    cy.get('[data-cy=detailview-button-ALMAAsianlandmammalage]').first().click()
+    cy.get('[id=up_bnd-tableselection]').click()
+    cy.get('[data-cy=detailview-button-14]').first().click()
+    cy.get('[id=low_bnd-tableselection]').click()
+    cy.get('[data-cy=detailview-button-11]').first().click()
+    cy.contains('Upper Bound: Upper bound age has to be lower than lower bound age')
+    cy.contains('Lower Bound: Lower bound age has to be higher than upper bound age')
+    cy.get('[id=write-button]').should('be.disabled')
+
+    cy.get('[id=up_bnd-tableselection]').click()
+    cy.get('[data-cy=detailview-button-11]').first().click()
+    cy.contains('Upper Bound: Upper bound age cannot be the same as lower bound age')
+    cy.contains('Lower Bound: Lower bound age cannot be the same as upper bound age')
+    cy.get('[id=write-button]').should('be.disabled')
+
+    cy.get('[id=low_bnd-tableselection]').click()
+    cy.get('[data-cy=detailview-button-14]').first().click()
+    cy.get('[id=write-button]').should('not.be.disabled')
   })
 
   it('but returning from staging view before saving works', () => {
     cy.visit(`/time-unit/new`)
-    cy.get('[id=tu_display_name-textfield]').type('Testing Time Unit Creation part 2')
+    cy.get('[id=tu_display_name-textfield]').type('Testing Time Unit Creation')
     cy.get('[id=sequence-tableselection]').first().click()
     cy.get('[data-cy=detailview-button-ALMAAsianlandmammalage]').first().click()
     cy.get('[id=up_bnd-tableselection]').first().click()
@@ -52,10 +77,10 @@ describe('Creating a time unit', () => {
     cy.get('[id=return-to-editing-button]').click()
     cy.contains('Creating new time-unit')
     cy.get('[id=tu_display_name-textfield]').should('not.be.disabled')
-    cy.get('[id=tu_display_name-textfield]').should('have.value', 'Testing Time Unit Creation part 2')
+    cy.get('[id=tu_display_name-textfield]').should('have.value', 'Testing Time Unit Creation')
     cy.get('[id=sequence-tableselection]').should('have.value', 'ALMAAsianlandmammalage')
-    cy.contains('11') // ID value of upper bound
-    cy.contains('14') // ID value of lower bound
+    cy.contains('C2N-o')
+    cy.contains('C2N-y')
     cy.get('[id=write-button]').click()
     cy.get('[id=write-button]').should('be.disabled')
     cy.contains('button', 'Add existing reference').click()
@@ -89,6 +114,8 @@ describe('Creating a time unit', () => {
     cy.get('[id=edit-button]').click()
     cy.get('[id=sequence-tableselection]').first().click()
     cy.get('[data-cy=detailview-button-CalatayudTeruellocalbiozone]').first().click()
+    cy.get('[id=low_bnd-tableselection]').first().click()
+    cy.get('[data-cy=detailview-button-49]').first().click()
     cy.get('[id=write-button]').click()
     cy.get('[id=write-button]').should('be.disabled')
     cy.contains('button', 'Add existing reference').click()
@@ -97,6 +124,7 @@ describe('Creating a time unit', () => {
     cy.get('[id=write-button]').should('not.be.disabled')
     cy.get('[id=write-button]').click()
     cy.contains('CalatayudTeruellocalbiozone')
+    cy.contains('Langhian/Serravallian')
   })
 })
 
@@ -129,14 +157,18 @@ describe('Editing a time unit', () => {
     cy.get('[id=low_bnd-tableselection]').click()
     cy.get('[data-cy=detailview-button-11]').first().click()
     cy.contains('Upper Bound: Upper bound age has to be lower than lower bound age')
-    cy.contains('Lower bound age has to be higher than upper bound age')
+    cy.contains('Lower Bound: Lower bound age has to be higher than upper bound age')
     cy.get('[id=write-button]').should('be.disabled')
 
     cy.get('[id=up_bnd-tableselection]').click()
     cy.get('[data-cy=detailview-button-11]').first().click()
     cy.contains('Upper Bound: Upper bound age cannot be the same as lower bound age')
-    cy.contains('Lower bound: Lower bound age cannot be the same as upper bound age')
+    cy.contains('Lower Bound: Lower bound age cannot be the same as upper bound age')
     cy.get('[id=write-button]').should('be.disabled')
+
+    cy.get('[id=low_bnd-tableselection]').click()
+    cy.get('[data-cy=detailview-button-14]').first().click()
+    cy.get('[id=write-button]').should('not.be.disabled')
   })
 
   it('but returning from staging view before saving works', () => {
@@ -153,8 +185,8 @@ describe('Editing a time unit', () => {
     cy.get('[id=tu_display_name-textfield]').should('be.disabled')
     cy.get('[id=tu_display_name-textfield]').should('have.value', 'Bahean')
     cy.get('[id=sequence-tableselection]').should('have.value', 'CalatayudTeruellocalbiozone')
-    cy.contains('11') // ID value of upper bound
-    cy.contains('20213') // ID value of lower bound
+    cy.contains('C2N-y')
+    cy.contains('MioceneLate-low')
     cy.get('[id=write-button]').click()
     cy.get('[id=write-button]').should('be.disabled')
     cy.contains('button', 'Add existing reference').click()
@@ -163,8 +195,8 @@ describe('Editing a time unit', () => {
     cy.get('[id=write-button]').should('not.be.disabled')
     cy.get('[id=write-button]').click()
     cy.contains('CalatayudTeruellocalbiozone')
-    cy.contains('MioceneLate-low')
     cy.contains('C2N-y')
+    cy.contains('MioceneLate-low')
   })
 
   it('and editing again after saving works', () => {
@@ -181,10 +213,13 @@ describe('Editing a time unit', () => {
     cy.get('[id=write-button]').should('not.be.disabled')
     cy.get('[id=write-button]').click()
     cy.contains('Bahean')
+    cy.contains('easternparatethys')
     cy.get('[id=edit-button]').click()
     cy.get('[id=tu_display_name-textfield]').should('be.disabled')
     cy.get('[id=sequence-tableselection]').first().click()
     cy.get('[data-cy=detailview-button-CalatayudTeruellocalbiozone]').first().click()
+    cy.get('[id=up_bnd-tableselection]').first().click()
+    cy.get('[data-cy=detailview-button-14]').first().click()
     cy.get('[id=write-button]').click()
     cy.get('[id=write-button]').should('be.disabled')
     cy.contains('button', 'Add existing reference').click()
@@ -192,7 +227,7 @@ describe('Editing a time unit', () => {
     cy.contains('button', 'Close').click()
     cy.get('[id=write-button]').should('not.be.disabled')
     cy.get('[id=write-button]').click()
-    cy.contains('Bahean')
     cy.contains('CalatayudTeruellocalbiozone')
+    cy.contains('C2N-o')
   })
 })
