@@ -4,7 +4,6 @@ import { emptyOption } from '@/components/DetailView/common/misc'
 import { ArrayFrame, Grouped } from '@/components/DetailView/common/tabLayoutHelpers'
 import { useDetailContext } from '@/components/DetailView/Context/DetailContext'
 import { SequenceTable } from '@/components/Sequence/SequenceTable'
-import { TimeBoundTable } from '@/components/TimeBound/TimeBoundTable'
 import { Box } from '@mui/material'
 
 export const TimeUnitTab = () => {
