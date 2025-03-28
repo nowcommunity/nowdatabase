@@ -167,7 +167,7 @@ export const TableView = <T extends MRT_RowData>({
         <CircularProgress />
         <br></br>
         {title === 'Locality-Species-Cross-Search'
-          ? 'Loading data, this might take a few seconds...'
+          ? 'Loading data, this might take up to a minute...'
           : 'Loading data...'}
       </>
     )
