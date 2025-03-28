@@ -100,8 +100,8 @@ describe('Getting cross-search data works', () => {
 
   it('Requesting get all has some correct fields', async () => {
     const { body: getReqBody } = await send<CrossSearch[]>(`crosssearch/all`, 'GET')
-    expect(getReqBody.map(e => e.lid)).toContain(24797)
-    expect(getReqBody.map(e => e.lid)).toContain(24750)
+    expect(getReqBody.map(e => e.lid_now_loc)).toContain(24797)
+    expect(getReqBody.map(e => e.lid_now_loc)).toContain(24750)
     expect(getReqBody.map(e => e.loc_name)).toContain('RomanyÃ  dEmpordÃ ')
     expect(getReqBody.map(e => e.loc_name)).toContain('Goishi')
     expect(getReqBody.map(e => e.species_name)).toContain('dubia')
