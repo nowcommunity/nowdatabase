@@ -393,13 +393,13 @@ export const LocalityTable = ({ selectorFn }: { selectorFn?: (newObject: Localit
       checkRowRestriction={checkRowRestriction}
       idFieldName="lid"
       columns={columns}
+      isFetching={localitiesQueryIsFetching}
       visibleColumns={visibleColumns}
       data={localitiesQueryData}
       url="locality"
       combinedExport={combinedExport}
       exportIsLoading={isLoading}
       enableColumnFilterModes={true}
-      isFetching={localitiesQueryIsFetching}
     />
   )
 }

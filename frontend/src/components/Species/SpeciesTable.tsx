@@ -372,11 +372,11 @@ export const SpeciesTable = ({ selectorFn }: { selectorFn?: (id: Species) => voi
       selectorFn={selectorFn}
       idFieldName="species_id"
       columns={columns}
+      isFetching={isFetching}
       visibleColumns={visibleColumns}
       data={speciesQueryData}
       url="species"
       enableColumnFilterModes={true}
-      isFetching={isFetching}
     />
   )
 }
