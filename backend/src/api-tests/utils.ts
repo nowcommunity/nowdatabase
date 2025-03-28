@@ -6,7 +6,7 @@ import { LogRow } from '../services/write/writeOperations/types'
 
 let token: string | null = null
 
-export const send = async <T extends Record<string, unknown>>(
+export const send = async <T extends Record<string, unknown> | Array<Record<string, unknown>>>(
   path: string,
   method: 'GET' | 'POST' | 'PUT' | 'DELETE',
   body?: object

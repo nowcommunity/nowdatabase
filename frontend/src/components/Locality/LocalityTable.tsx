@@ -14,7 +14,7 @@ const decimalCount = (num: number) => {
 }
 
 export const LocalityTable = ({ selectorFn }: { selectorFn?: (newObject: Locality) => void }) => {
-  const localitiesQuery = useGetAllLocalitiesQuery()
+  const { data: localitiesQueryData, isFetching: localitiesQueryIsFetching } = useGetAllLocalitiesQuery()
   const [getLocalitySpeciesList, { isLoading }] = useGetLocalitySpeciesListMutation()
   const notify = useNotify()
   const columns = useMemo<MRT_ColumnDef<Locality>[]>(
@@ -393,8 +393,9 @@ export const LocalityTable = ({ selectorFn }: { selectorFn?: (newObject: Localit
       checkRowRestriction={checkRowRestriction}
       idFieldName="lid"
       columns={columns}
+      isFetching={localitiesQueryIsFetching}
       visibleColumns={visibleColumns}
-      data={localitiesQuery.data}
+      data={localitiesQueryData}
       url="locality"
       combinedExport={combinedExport}
       exportIsLoading={isLoading}

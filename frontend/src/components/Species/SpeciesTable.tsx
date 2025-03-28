@@ -5,7 +5,7 @@ import { Species } from '@/shared/types'
 import { TableView } from '../TableView/TableView'
 
 export const SpeciesTable = ({ selectorFn }: { selectorFn?: (id: Species) => void }) => {
-  const speciesQuery = useGetAllSpeciesQuery()
+  const { data: speciesQueryData, isFetching } = useGetAllSpeciesQuery()
   const columns = useMemo<MRT_ColumnDef<Species>[]>(
     () => [
       {
@@ -372,8 +372,9 @@ export const SpeciesTable = ({ selectorFn }: { selectorFn?: (id: Species) => voi
       selectorFn={selectorFn}
       idFieldName="species_id"
       columns={columns}
+      isFetching={isFetching}
       visibleColumns={visibleColumns}
-      data={speciesQuery.data}
+      data={speciesQueryData}
       url="species"
       enableColumnFilterModes={true}
     />
