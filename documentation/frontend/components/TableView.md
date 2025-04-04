@@ -26,18 +26,17 @@ Following things are needed to create a new page with a table (examples are all 
   - Earlier we used prisma.findMany-function to fetch the data, but with cross search's 90k rows, the GET-call took approx 40s in staging environment. We found out that prisma.rawSQL with LEFT JOIN would reduce time of the call from 10s to 3s in dev environment. This reduced the call time for staging to approx 10s. Could possible be implemented for other tables also for better performance.
 
 - Frontend:
-  - Create necessary types in [shared types](../../../frontend/src/shared/types)
-  - Create a button for the component in [navigation bar](../../../frontend/src/components/NavBar.tsx)
-  - Create a relevant page-object for [Pages](../../../frontend/src/components/pages.tsx)
-  - Add a route for the component to [App](../../../frontend/src/App.tsx)
+  - Create necessary types in [shared types](../../../frontend/src/shared/types).
+  - Create a button for the component in [navigation bar](../../../frontend/src/components/NavBar.tsx).
+  - Create a relevant page-object for [Pages](../../../frontend/src/components/pages.tsx).
+  - Add a route for the component to [App](../../../frontend/src/App.tsx).
   - Create a [component](../../../frontend/src/components/CrossSearch/CrossSearchTable.tsx) (note that cross search borrows the detail parts from localities).
 - Table view:
+  - Set the required props as described above.
   - Non-default filtering (eg filterVariant 'range' for numbers or filterFn 'contains' for text substrings) require no null values in the data for given column. It is needed to use accessorFn to map nulls to an empty string for example.
   - non-hideable columns can be set by setting parameter `enableHiding: false`.
-  - to enable a filter mode selection menu for the columns of the table, set parameter `enableColumnFilterModes` to `true`
-  - you can pass an array of filter functions to be shown in the menu to the parameter `columnFilterModeOptions`
-  - it's a good idea to disable the filter mode menu for columns for which it doesn't make sense by setting the parameter `enableColumnFilterModes` to `false` for that column. See [LocalityTable](../../../frontend/src/components/Locality/LocalityTable.tsx) for an example
+  - to enable a filter mode selection menu for the columns of the table, set parameter `enableColumnFilterModes` to `true`.
+  - you can pass an array of filter functions to be shown in the menu to the parameter `columnFilterModeOptions`.
+  - it's a good idea to disable the filter mode menu for columns for which it doesn't make sense by setting the parameter `enableColumnFilterModes` to `false` for that column. See [LocalityTable](../../../frontend/src/components/Locality/LocalityTable.tsx) for an example. For more information, see [MRT docs filter mode section](https://www.material-react-table.com/docs/guides/column-filtering#filter-modes).
   - If the table you're creating is using server side pagination, remember to set the `serverSidePagination` prop to True so the TableView will set its pagination/sorting modes correctly. Forgetting to do this might make the table load indefinitely or crash the app.
-  - for more information, see [MRT docs filter mode section](https://www.material-react-table.com/docs/guides/column-filtering#filter-modes)
-
-More info can be found from official [MRT docs](https://www.material-react-table.com/)
+  - More info can be found from official [MRT docs](https://www.material-react-table.com/).
