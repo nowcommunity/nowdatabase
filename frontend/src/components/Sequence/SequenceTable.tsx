@@ -5,7 +5,7 @@ import { Sequence } from '@/shared/types'
 import { TableView } from '../TableView/TableView'
 
 export const SequenceTable = ({ selectorFn }: { selectorFn?: (id: Sequence) => void }) => {
-  const sequenceQuery = useGetSequencesQuery()
+  const { data: sequenceQueryData, isFetching } = useGetSequencesQuery()
   const columns = useMemo<MRT_ColumnDef<Sequence>[]>(
     () => [
       {
@@ -31,8 +31,9 @@ export const SequenceTable = ({ selectorFn }: { selectorFn?: (id: Sequence) => v
       selectorFn={selectorFn}
       idFieldName="sequence"
       columns={columns}
+      isFetching={isFetching}
       visibleColumns={visibleColumns}
-      data={sequenceQuery.data}
+      data={sequenceQueryData}
       url="sequence"
     />
   )

@@ -11,6 +11,23 @@ import { PathLike } from 'fs'
 export const logDb = new LogClient()
 export const nowDb = new NowClient()
 
+export const getCrossSearchFields = () => {
+  const nowLsKeys = Object.keys(
+    (nowDb['now_ls' as keyof object] as unknown as Record<string, { fields: object }>).fields as never
+  )
+  const nowLocKeys = Object.keys(
+    (nowDb['now_loc' as keyof object] as unknown as Record<string, { fields: object }>).fields as never
+  )
+  const comSpeciesKeys = Object.keys(
+    (nowDb['com_species' as keyof object] as unknown as Record<string, { fields: object }>).fields as never
+  )
+  return [
+    ...nowLsKeys.map(key => `now_ls.${key}`),
+    ...nowLocKeys.map(key => `now_loc.${key}`),
+    ...comSpeciesKeys.map(key => `com_species.${key}`),
+  ]
+}
+
 export const getFieldsOfTables = (tables: string[]) => {
   return [
     ...tables.flatMap(table =>

@@ -1,4 +1,4 @@
-import { MRT_ColumnDef } from 'material-react-table'
+import { MRT_ColumnDef, MRT_PaginationState } from 'material-react-table'
 import { Reference, PersonDetailsType } from './shared/types'
 import { Cell } from './components/commonComponents'
 
@@ -137,3 +137,6 @@ export const emptyLocalitySpeciesFields = {
   do18_min: null,
   do18_stdev: null,
 }
+
+export const defaultPagination: MRT_PaginationState = { pageIndex: 0, pageSize: 50 }
+export const defaultPaginationSmall: MRT_PaginationState = { pageIndex: 0, pageSize: 10 }

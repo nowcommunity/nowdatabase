@@ -11,7 +11,7 @@ export const TimeBoundTable = ({
   selectorFn?: (newTimeBound: TimeBound) => void
   showBid?: boolean
 }) => {
-  const time_boundQuery = useGetAllTimeBoundsQuery()
+  const { data: timeBoundQueryData, isFetching } = useGetAllTimeBoundsQuery()
   const columns = useMemo<MRT_ColumnDef<TimeBound>[]>(
     () => [
       {
@@ -53,8 +53,9 @@ export const TimeBoundTable = ({
       selectorFn={selectorFn}
       idFieldName="bid"
       columns={columns}
+      isFetching={isFetching}
       visibleColumns={visibleColumns}
-      data={time_boundQuery.data}
+      data={timeBoundQueryData}
       url="time-bound"
       enableColumnFilterModes={true}
     />

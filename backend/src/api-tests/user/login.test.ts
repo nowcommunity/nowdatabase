@@ -2,6 +2,7 @@ import { beforeAll, afterAll, describe, it, expect } from '@jest/globals'
 import { resetDatabase, send, resetDatabaseTimeout } from '../utils'
 import { pool } from '../../utils/db'
 import { testSu } from './data'
+import { Role } from '../../../../frontend/src/shared/types'
 
 describe('Logging in', () => {
   beforeAll(async () => {
@@ -12,7 +13,14 @@ describe('Logging in', () => {
   })
 
   it('is successful with test admin user', async () => {
-    const result = await send('user/login', 'POST', testSu)
+    const result = await send<{
+      token: string
+      username: string
+      role: Role
+      initials: string
+      localities: number[]
+      isFirstLogin: true | undefined
+    }>('user/login', 'POST', testSu)
 
     expect(result.status).toEqual(200)
     expect(result.body.username).toEqual('testSu')

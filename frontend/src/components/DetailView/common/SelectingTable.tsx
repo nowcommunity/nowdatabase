@@ -72,6 +72,7 @@ export const SelectingTable = <T extends MRT_RowData, ParentType extends object>
         <TableView<T>
           data={filteredData}
           columns={columns}
+          isFetching={false}
           visibleColumns={visibleColumns}
           selectorFn={editingAction ?? defaultEditingAction}
           idFieldName={idFieldName}

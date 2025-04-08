@@ -16,7 +16,7 @@ import { ActionComponent } from './ActionComponent'
 import { usePageContext } from '../Page'
 import { useUser } from '@/hooks/user'
 import { ContactForm } from '../DetailView/common/ContactForm'
-import { defaultPagination, defaultPaginationSmall } from '../DetailView/common/defaultValues'
+import { defaultPagination, defaultPaginationSmall } from '@/common'
 
 type TableStateInUrl = 'sorting' | 'columnfilters' | 'pagination'
 
@@ -38,6 +38,8 @@ export const TableView = <T extends MRT_RowData>({
   combinedExport,
   exportIsLoading,
   enableColumnFilterModes,
+  serverSidePagination,
+  isFetching,
 }: {
   title?: string
   data: T[] | undefined
@@ -50,9 +52,11 @@ export const TableView = <T extends MRT_RowData>({
   combinedExport?: (lids: number[]) => Promise<void>
   exportIsLoading?: boolean
   enableColumnFilterModes?: boolean
+  serverSidePagination?: boolean
+  isFetching: boolean
 }) => {
   const location = useLocation()
-  const { editRights } = usePageContext()
+  const { editRights, setSqlLimit, setSqlOffset, setSqlColumnFilters, setSqlOrderBy } = usePageContext()
   const [columnFilters, setColumnFilters] = useState<MRT_ColumnFiltersState>([])
   const [sorting, setSorting] = useState<MRT_SortingState>([])
   const navigate = useNavigate()
@@ -61,6 +65,15 @@ export const TableView = <T extends MRT_RowData>({
   )
   const user = useUser()
   const { setIdList, setTableUrl } = usePageContext<T>()
+
+  useEffect(() => {
+    setSqlLimit(pagination.pageSize)
+    setSqlOffset(pagination.pageIndex * pagination.pageSize)
+    setSqlColumnFilters(columnFilters)
+    setSqlOrderBy(sorting)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pagination, columnFilters, sorting])
+
   const loadStateFromUrl = (state: TableStateInUrl, defaultState: [] | MRT_PaginationState) => {
     const searchParams = new URLSearchParams(location.search)
     const stateFromUrl = searchParams.get(state)
@@ -85,12 +98,19 @@ export const TableView = <T extends MRT_RowData>({
     document.title = `${title}`
   }
 
+  let rowCount = undefined
+  if (data && data.length > 0) {
+    if (serverSidePagination) rowCount = data[0].full_count as number
+    else rowCount = data.length
+  }
+
   const table = useMaterialReactTable({
     columns: columns,
     data: data || [],
     state: {
       columnFilters,
       showColumnFilters: true,
+      isLoading: isFetching,
       sorting,
       pagination,
       density: 'compact',
@@ -102,8 +122,12 @@ export const TableView = <T extends MRT_RowData>({
     renderRowActions: ({ row }) => <ActionComponent {...{ selectorFn, url, checkRowRestriction, row, idFieldName }} />,
     displayColumnDefOptions: { 'mrt-row-actions': { size: 50, header: '' } },
     enableRowActions: true,
+    enableMultiSort: !serverSidePagination,
     onSortingChange: setSorting,
     onPaginationChange: setPagination,
+    manualPagination: serverSidePagination,
+    manualSorting: serverSidePagination,
+    rowCount: rowCount,
     autoResetPageIndex: false,
     positionPagination: selectorFn ? 'top' : 'both',
     paginationDisplayMode: 'pages',
@@ -117,7 +141,7 @@ export const TableView = <T extends MRT_RowData>({
     },
     enableDensityToggle: false,
     enableGlobalFilter: false,
-    enableColumnFilterModes: enableColumnFilterModes,
+    enableColumnFilterModes: enableColumnFilterModes && !serverSidePagination,
     columnFilterModeOptions: ['fuzzy', 'contains', 'startsWith', 'endsWith', 'equals'],
     enableColumnActions: false,
     enableHiding: true,

@@ -5,7 +5,7 @@ import { Project } from '@/shared/types'
 import { TableView } from '../TableView/TableView'
 
 export const ProjectTable = ({ selectorFn }: { selectorFn?: (id: Project) => void }) => {
-  const projectQuery = useGetAllProjectsQuery()
+  const { data: projectQueryData, isFetching } = useGetAllProjectsQuery()
   const columns = useMemo<MRT_ColumnDef<Project>[]>(
     () => [
       {
@@ -46,8 +46,9 @@ export const ProjectTable = ({ selectorFn }: { selectorFn?: (id: Project) => voi
       selectorFn={selectorFn}
       idFieldName="pid"
       columns={columns}
+      isFetching={isFetching}
       visibleColumns={visibleColumns}
-      data={projectQuery.data}
+      data={projectQueryData}
       url="project"
     />
   )

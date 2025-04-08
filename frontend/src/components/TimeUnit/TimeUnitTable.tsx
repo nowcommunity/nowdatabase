@@ -5,7 +5,7 @@ import { TimeUnit } from '@/shared/types'
 import { TableView } from '../TableView/TableView'
 
 export const TimeUnitTable = ({ selectorFn }: { selectorFn?: (newTimeUnit: TimeUnit) => void }) => {
-  const time_unitQuery = useGetAllTimeUnitsQuery()
+  const { data: timeUnitQueryData, isFetching } = useGetAllTimeUnitsQuery()
   const columns = useMemo<MRT_ColumnDef<TimeUnit>[]>(
     () => [
       {
@@ -58,8 +58,9 @@ export const TimeUnitTable = ({ selectorFn }: { selectorFn?: (newTimeUnit: TimeU
       selectorFn={selectorFn}
       idFieldName="tu_name"
       columns={columns}
+      isFetching={isFetching}
       visibleColumns={visibleColumns}
-      data={time_unitQuery.data}
+      data={timeUnitQueryData}
       url="time-unit"
       enableColumnFilterModes={true}
     />
