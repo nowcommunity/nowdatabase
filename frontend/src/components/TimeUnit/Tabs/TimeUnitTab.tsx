@@ -1,13 +1,13 @@
-import { SequenceDetailsType, TimeBoundDetailsType, TimeUnitDetailsType } from '@/shared/types'
+import { SequenceDetailsType, TimeUnitDetailsType } from '@/shared/types'
 import { FieldWithTableSelection, TimeBoundSelection } from '@/components/DetailView/common/editingComponents'
 import { emptyOption } from '@/components/DetailView/common/misc'
-import { ArrayFrame } from '@/components/DetailView/common/tabLayoutHelpers'
+import { ArrayFrame, Grouped } from '@/components/DetailView/common/tabLayoutHelpers'
 import { useDetailContext } from '@/components/DetailView/Context/DetailContext'
 import { SequenceTable } from '@/components/Sequence/SequenceTable'
-import { TimeBoundTable } from '@/components/TimeBound/TimeBoundTable'
+import { Box } from '@mui/material'
 
 export const TimeUnitTab = () => {
-  const { textField, dropdown, data, editData, mode } = useDetailContext<TimeUnitDetailsType>()
+  const { textField, dropdown, data, editData, fieldsWithErrors, mode } = useDetailContext<TimeUnitDetailsType>()
 
   const rankOptions = [
     'Age',
@@ -44,15 +44,6 @@ export const TimeUnitTab = () => {
   const up_bcomment = editData.up_bound ? editData.up_bound.b_comment : data.up_bound ? data.up_bound.b_comment : ''
 
   const upBound = [
-    [
-      'Select New Upper Bound',
-      <TimeBoundSelection<TimeBoundDetailsType, TimeUnitDetailsType>
-        key="up_bnd"
-        sourceField="bid"
-        targetField="up_bnd"
-        selectorTable={<TimeBoundTable showBid />}
-      />,
-    ],
     ['Id', up_id],
     ['Name', up_bname],
     ['Age', up_age],
@@ -69,48 +60,32 @@ export const TimeUnitTab = () => {
       : ''
 
   const lowBound = [
-    [
-      'Select New Lower Bound',
-      <TimeBoundSelection<TimeBoundDetailsType, TimeUnitDetailsType>
-        key="low_bnd"
-        sourceField="bid"
-        targetField="low_bnd"
-        selectorTable={<TimeBoundTable showBid />}
-      />,
-    ],
     ['Id', low_id],
     ['Name', low_bname],
     ['Age', low_age],
     ['Comment', low_bcomment],
   ]
 
-  let upperBoundTitle: string
-  let lowerBoundTitle: string
-  if (!editData.up_bound || !data.up_bound) {
-    upperBoundTitle = 'Upper bound'
-  } else {
-    upperBoundTitle = editData.up_bound.bid === data.up_bound.bid ? 'Upper bound' : 'Upper bound (edited)'
-  }
-  if (!editData.low_bound || !data.low_bound) {
-    lowerBoundTitle = 'Lower bound'
-  } else {
-    lowerBoundTitle = editData.low_bound.bid === data.low_bound.bid ? 'Lower bound' : 'Lower bound (edited)'
-  }
-
   return (
     <>
       <ArrayFrame array={timeUnit} title="Time Unit" />
       <>
-        <ArrayFrame
-          array={upBound}
-          title={upperBoundTitle}
-          warning={upperBoundTitle === 'Upper bound (edited)' ? true : false}
-        />
-        <ArrayFrame
-          array={lowBound}
-          title={lowerBoundTitle}
-          warning={lowerBoundTitle === 'Lower bound (edited)' ? true : false}
-        />
+        <Grouped title="Upper Bound" error={'up_bnd' in fieldsWithErrors}>
+          {!mode.read && (
+            <Box display="flex" gap={1} marginBottom={'15px'}>
+              <TimeBoundSelection key="up_bnd" targetField="up_bnd" />
+            </Box>
+          )}
+          <ArrayFrame array={upBound} title={'Selected Upper Bound'} />
+        </Grouped>
+        <Grouped title="Lower Bound" error={'low_bnd' in fieldsWithErrors}>
+          {!mode.read && (
+            <Box display="flex" gap={1} marginBottom={'15px'}>
+              <TimeBoundSelection key="low_bnd" targetField="low_bnd" />
+            </Box>
+          )}
+          <ArrayFrame array={lowBound} title={'Selected Lower Bound'} />
+        </Grouped>
       </>
     </>
   )

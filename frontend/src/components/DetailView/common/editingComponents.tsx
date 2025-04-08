@@ -19,9 +19,10 @@ import { RegisterOptions, FieldValues, UseFormRegisterReturn, FieldErrors } from
 import { useDetailContext } from '../Context/DetailContext'
 import { DataValue } from './tabLayoutHelpers'
 import { modalStyle } from './misc'
-import { EditDataType, TimeUnitDetailsType, LocalityDetailsType, TimeUnit } from '@/shared/types'
+import { EditDataType, TimeUnitDetailsType, LocalityDetailsType, TimeUnit, TimeBoundDetailsType } from '@/shared/types'
 import { calculateLocalityMinAge, calculateLocalityMaxAge } from '@/util/ageCalculator'
 import { checkFieldErrors } from './checkFieldErrors'
+import { TimeBoundTable } from '@/components/TimeBound/TimeBoundTable'
 
 const fieldWidth = '14em'
 
@@ -391,30 +392,26 @@ export const FieldWithTableSelection = <T extends object, ParentType extends obj
   return <DataValue<ParentType> field={targetField as keyof EditDataType<ParentType>} EditElement={editingComponent} />
 }
 
-export const TimeBoundSelection = <T extends object, ParentType extends object>({
+export const TimeBoundSelection = ({
   targetField,
-  sourceField,
-  selectorTable,
   disabled,
 }: {
-  targetField: keyof ParentType
-  sourceField: keyof T
-  selectorTable: ReactElement
+  targetField: keyof TimeUnitDetailsType
   disabled?: boolean
 }) => {
-  const { editData, setEditData, validator, fieldsWithErrors, setFieldsWithErrors } = useDetailContext<ParentType>()
+  const { editData, setEditData, validator, fieldsWithErrors, setFieldsWithErrors } =
+    useDetailContext<TimeUnitDetailsType>()
   const errorObject = validator(
     editData,
-    (targetField === 'up_bnd' ? 'up_bound' : 'low_bound') as keyof EditDataType<ParentType>
+    (targetField === 'up_bnd' ? 'up_bound' : 'low_bound') as keyof EditDataType<TimeUnitDetailsType>
   )
-  const { error } = errorObject
   const [open, setOpen] = useState(false)
 
-  const selectorFn = (selected: T) => {
+  const selectorFn = (selected: TimeBoundDetailsType) => {
     if (targetField === 'up_bnd') {
-      setEditData({ ...editData, [targetField]: selected[sourceField], ['up_bound']: selected })
+      setEditData({ ...editData, [targetField]: selected['bid'], ['up_bound']: selected })
     } else if (targetField === 'low_bnd') {
-      setEditData({ ...editData, [targetField]: selected[sourceField], ['low_bound']: selected })
+      setEditData({ ...editData, [targetField]: selected['bid'], ['low_bound']: selected })
     }
     setOpen(false)
   }
@@ -424,7 +421,7 @@ export const TimeBoundSelection = <T extends object, ParentType extends object>(
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [errorObject])
 
-  const selectorTableWithFn = cloneElement(selectorTable, { selectorFn })
+  const selectorTableWithFn = cloneElement(<TimeBoundTable showBid />, { selectorFn })
   if (open)
     return (
       <Box>
@@ -442,21 +439,16 @@ export const TimeBoundSelection = <T extends object, ParentType extends object>(
         </Modal>
       </Box>
     )
-  const editingComponent = (
-    <TextField
+  return (
+    <Button
       id={`${String(targetField)}-tableselection`}
-      variant="outlined"
-      size="small"
-      error={!!error}
-      helperText={error ?? ''}
-      value={editData[targetField as keyof EditDataType<ParentType>] ?? undefined}
       onClick={() => setOpen(true)}
+      variant="contained"
       disabled={disabled}
-      sx={{ backgroundColor: disabled ? 'grey' : '' }}
-      inputProps={{ readOnly: true }}
-    />
+    >
+      Select Time Bound
+    </Button>
   )
-  return <DataValue<ParentType> field={targetField as keyof EditDataType<ParentType>} EditElement={editingComponent} />
 }
 
 export const BasisForAgeSelection = ({
