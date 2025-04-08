@@ -1,4 +1,4 @@
-FROM node:22-alpine3.20 as dev
+FROM node:22-alpine3.20 AS dev
 
 ENV TZ="Europe/Helsinki"
 
@@ -29,6 +29,6 @@ RUN npm run prisma
 CMD ["npm", "run", "dev"]
 
 
-FROM dev as api-tests
+FROM dev AS api-tests
 
 CMD ["npm", "run", "test:api"]
