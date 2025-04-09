@@ -225,10 +225,10 @@ export const timeUnitPage = (
     viewName="time-unit"
     idFieldName="tu_name"
     createTitle={(tu: TimeUnitDetailsType) =>
-      `(${tu.tu_name}) ${tu.tu_display_name}${tu.tu_comment ? ` - ${tu.tu_comment}` : ''}`
+      `${tu.tu_display_name}${tu.tu_comment ? ` - ${tu.tu_comment}` : ''}`
     }
     createSubtitle={(tu: TimeUnitDetailsType) =>
-      `${tu.up_bnd} Ma \u2013 ${tu.low_bnd} Ma` + `\n${tu.sequence}` + `\n${tu.rank}`
+      `${tu.up_bound.age} Ma \u2013 ${tu.low_bound.age} Ma` + `\n${tu.now_tu_sequence.seq_name}` + ` (${tu.rank})`
     }
     getEditRights={(user: UserState) => {
       if ([Role.Admin, Role.EditUnrestricted].includes(user.role)) return fullRights
