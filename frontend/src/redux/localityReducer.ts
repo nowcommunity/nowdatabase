@@ -35,6 +35,8 @@ const localitiesApi = api.injectEndpoints({
         url: `/locality/${id}`,
         method: 'DELETE',
       }),
+      invalidatesTags: (result, _error, lid) =>
+        typeof result !== 'undefined' ? [{ type: 'locality', id: lid }, 'localities'] : [],
     }),
   }),
 })
