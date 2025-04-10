@@ -120,7 +120,7 @@ export const TeethTab = () => {
 
   const multicuspid = [
     ['Tooth Shape - Multicuspid', dropdown('tshm', toothShapeMulticuspidOptions, 'Tooth Shape - Multicuspid')],
-    ['Hypsodonty', dropdown('crowntype', hypsodontyOptions, 'Hypsodonty')],
+    ['Hypsodonty', dropdown('tht', hypsodontyOptions, 'Hypsodonty')],
     ['Horizodonty', dropdown('horizodonty', horizodontyOptions, 'Horizodonty')],
     ['Symphyseal Mobility', dropdown('symph_mob', symphysealMobilityOptions, 'Symphyseal Mobility')],
     ['Relative Blade Length of Lower Carnassial', textField('relative_blade_length', { type: 'number' })],
