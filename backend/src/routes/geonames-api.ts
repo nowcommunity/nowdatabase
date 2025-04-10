@@ -20,6 +20,8 @@ router.post('/', async (req: Request<object, object, { locationName: string }>, 
     const locations: ParsedGeoname[] = fetchResponse.geonames.map(geoname => ({
       name: geoname.name,
       countryName: geoname.countryName,
+      fclName: geoname.fclName,
+      adminName1: geoname.adminName1,
       lat: Number(geoname.lat),
       lng: Number(geoname.lng),
     }))
