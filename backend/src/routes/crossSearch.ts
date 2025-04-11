@@ -37,9 +37,4 @@ router.get(`/all/:limit/:offset/:columnfilters/:sorting`, async (req, res) => {
   }
 })
 
-router.get(`/all`, async (req, res) => {
-  const result = await getCrossSearchRawSql(req.user)
-  return res.status(200).send(fixBigInt(result))
-})
-
 export default router
