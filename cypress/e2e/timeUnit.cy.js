@@ -231,3 +231,12 @@ describe('Editing a time unit', () => {
     cy.contains('C2N-o')
   })
 })
+
+describe('Deleting a time unit', () => {
+  beforeEach('Login as admin', () => {
+    cy.login('testSu')
+  })
+
+  // TODO: Add test for deleting a time unit (this can be copy pasted from other e2e test files with minimal changes)
+  // Not done because time units that have linked localities cannot be deleted currently.
+})

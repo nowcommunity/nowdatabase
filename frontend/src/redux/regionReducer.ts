@@ -29,7 +29,8 @@ const regionsApi = api.injectEndpoints({
         url: `/region/${id}`,
         method: 'DELETE',
       }),
-      invalidatesTags: ['regions'],
+      invalidatesTags: (result, _error, reg_coord_id) =>
+        typeof result !== 'undefined' ? [{ type: 'region', id: reg_coord_id }, 'regions'] : [],
     }),
   }),
 })
