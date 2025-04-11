@@ -1,7 +1,13 @@
 import { useRef, useMemo, useState, KeyboardEvent, useEffect } from 'react'
 import { MapContainer, TileLayer, Marker, useMap } from 'react-leaflet'
 import {
-  TextField, List, ListItem, ListItemText, Box, Button, alpha,
+  TextField,
+  List,
+  ListItem,
+  ListItemText,
+  Box,
+  Button,
+  alpha,
   Table,
   TableBody,
   TableCell,
@@ -93,12 +99,24 @@ const ResultsList = ({
           <Table size="small" aria-label="location results table">
             <TableHead>
               <TableRow>
-                <TableCell><strong>Name</strong></TableCell>
-                <TableCell><strong>Region</strong></TableCell>
-                <TableCell><strong>Country</strong></TableCell>
-                <TableCell><strong>Feature Class</strong></TableCell>
-                <TableCell><strong>Latitude</strong></TableCell>
-                <TableCell><strong>Longitude</strong></TableCell>
+                <TableCell>
+                  <strong>Name</strong>
+                </TableCell>
+                <TableCell>
+                  <strong>Region</strong>
+                </TableCell>
+                <TableCell>
+                  <strong>Country</strong>
+                </TableCell>
+                <TableCell>
+                  <strong>Feature Class</strong>
+                </TableCell>
+                <TableCell>
+                  <strong>Latitude</strong>
+                </TableCell>
+                <TableCell>
+                  <strong>Longitude</strong>
+                </TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
