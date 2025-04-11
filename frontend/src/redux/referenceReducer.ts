@@ -63,6 +63,8 @@ const referencesApi = api.injectEndpoints({
         url: `/reference/${id}`,
         method: 'DELETE',
       }),
+      invalidatesTags: (result, _error, rid) =>
+        typeof result !== 'undefined' ? [{ type: 'reference', id: rid }, 'references'] : [],
     }),
   }),
 })

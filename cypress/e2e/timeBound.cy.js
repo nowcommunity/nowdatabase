@@ -33,3 +33,12 @@ describe('Editing time bound', () => {
     cy.contains('1 Invalid fields')
   })
 })
+
+describe('Deleting a time bound', () => {
+  beforeEach('Login as admin', () => {
+    cy.login('testSu')
+  })
+
+  // TODO: Add test for deleting a time bound (this can be copy pasted from other e2e test files with minimal changes)
+  // Not done because time bounds that have linked time units cannot be deleted currently.
+})
