@@ -1,6 +1,21 @@
 import { useRef, useMemo, useState, KeyboardEvent, useEffect } from 'react'
 import { MapContainer, TileLayer, Marker, useMap } from 'react-leaflet'
-import { TextField, List, ListItem, ListItemButton, ListItemText, Box, Button, Divider, alpha } from '@mui/material'
+import {
+  TextField,
+  List,
+  ListItem,
+  ListItemText,
+  Box,
+  Button,
+  alpha,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
+} from '@mui/material'
 import 'leaflet/dist/leaflet.css'
 import markerIconPng from 'leaflet/dist/images/marker-icon.png'
 import { Icon } from 'leaflet'
@@ -80,23 +95,52 @@ const ResultsList = ({
   if (queryStatus.isSuccess) {
     if (resultsList.length > 0) {
       return (
-        <List>
-          {resultsList.map((result, index) => (
-            <Box key={index}>
-              <ListItem>
-                <ListItemButton
+        <TableContainer component={Paper} elevation={0}>
+          <Table size="small" aria-label="location results table">
+            <TableHead>
+              <TableRow>
+                <TableCell>
+                  <strong>Name</strong>
+                </TableCell>
+                <TableCell>
+                  <strong>Region</strong>
+                </TableCell>
+                <TableCell>
+                  <strong>Country</strong>
+                </TableCell>
+                <TableCell>
+                  <strong>Feature Class</strong>
+                </TableCell>
+                <TableCell>
+                  <strong>Latitude</strong>
+                </TableCell>
+                <TableCell>
+                  <strong>Longitude</strong>
+                </TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {resultsList.map((result, index) => (
+                <TableRow
+                  key={index}
+                  hover
+                  sx={{ cursor: 'pointer' }}
                   onClick={() => {
                     setViewCoordinates({ lat: result.lat, lng: result.lng })
                     setMarkerCoordinates({ lat: result.lat, lng: result.lng })
                   }}
                 >
-                  <ListItemText primary={`${result.name}, ${result.countryName}`} />
-                </ListItemButton>
-              </ListItem>
-              <Divider component="li" />
-            </Box>
-          ))}
-        </List>
+                  <TableCell>{result.name || '-'}</TableCell>
+                  <TableCell>{result.adminName1 || '-'}</TableCell>
+                  <TableCell>{result.countryName || '-'}</TableCell>
+                  <TableCell>{result.fclName || '-'}</TableCell>
+                  <TableCell>{result.lat !== undefined ? result.lat : '-'}</TableCell>
+                  <TableCell>{result.lng !== undefined ? result.lng : '-'}</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
       )
     } else {
       return (

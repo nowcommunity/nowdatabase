@@ -470,4 +470,4 @@ export type GeonamesJSON = {
   geonames: Geoname[]
 }
 
-export type ParsedGeoname = Pick<Geoname, 'name' | 'countryName' | 'lat' | 'lng'>
+export type ParsedGeoname = Pick<Geoname, 'name' | 'countryName' | 'fclName' | 'adminName1' | 'lat' | 'lng'>

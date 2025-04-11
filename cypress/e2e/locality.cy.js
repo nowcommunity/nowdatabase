@@ -309,9 +309,8 @@ describe("Locality's coordinate selection map works", () => {
     cy.get('[id=geonames-search-textfield]').clear()
     cy.get('[id=geonames-search-textfield]').type('Kumpula')
     cy.get('[id=geonames-search-textfield]').type('{enter}')
-    cy.contains('Kumpula, Finland').first().click()
-    cy.contains('63.05484')
-    cy.contains('24.75291')
+    cy.contains('Central Finland').first().click() // first item on the list
+    cy.contains('Latitude: 63.05484, Longitude: 24.75291')
     cy.contains('Save').click()
     cy.contains('OpenStreetMap').should('not.exist')
     cy.contains('Finalize entry').click()
