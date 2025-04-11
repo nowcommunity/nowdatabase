@@ -39,7 +39,8 @@ const timeunitsApi = api.injectEndpoints({
         url: `/time-unit/${id}`,
         method: 'DELETE',
       }),
-      invalidatesTags: ['timeunits'],
+      invalidatesTags: (result, _error, tu_name) =>
+        typeof result !== 'undefined' ? [{ type: 'timeunit', id: tu_name }, 'timeunits'] : [],
     }),
   }),
 })

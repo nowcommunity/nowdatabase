@@ -326,3 +326,23 @@ describe("Locality's coordinate selection map works", () => {
     cy.contains('24 45 10 E')
   })
 })
+
+describe('Deleting a locality', () => {
+  beforeEach('Login as admin', () => {
+    cy.login('testSu')
+  })
+
+  it('works and returns user to table view', () => {
+    cy.visit(`/locality/20920`)
+    cy.contains('Lantian-Shuijiazui')
+    cy.get('[id=delete-button]').should('exist').click()
+    cy.on('window:confirm', str => {
+      expect(str).to.eq('Are you sure you want to delete this item? This operation cannot be undone.')
+      // this automatically clicks the OK button and returns to table view
+    })
+    cy.contains('Dmanisi') // check that table view has been navigated to
+    cy.contains('Lantian-Shuijiazui').should('not.exist')
+    cy.visit(`/locality/20920`)
+    cy.contains('Error loading data')
+  })
+})

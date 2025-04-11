@@ -12,13 +12,13 @@ describe('Getting cross-search data', () => {
   })
   describe('without server side pagination works', () => {
     it('Requesting get all has correct length and status code', async () => {
-      const response = await send<CrossSearch[]>(`crosssearch/all`, 'GET')
+      const response = await send<CrossSearch[]>(`crosssearch/all/999/0/[]/[]`, 'GET')
       expect(response.status).toEqual(200)
       expect(response.body.length).toEqual(20)
     })
 
     it('Get all has some correct fields from locality and species', async () => {
-      const { body: getReqBody } = await send<CrossSearch[]>(`crosssearch/all`, 'GET')
+      const { body: getReqBody } = await send<CrossSearch[]>(`crosssearch/all/999/0/[]/[]`, 'GET')
       expect(getReqBody[0]).toHaveProperty('lid')
       expect(getReqBody[0]).toHaveProperty('loc_name')
       expect(getReqBody[0]).toHaveProperty('subclass_or_superorder_name')
@@ -27,7 +27,7 @@ describe('Getting cross-search data', () => {
     })
 
     it('Requesting get all has some correct fields', async () => {
-      const { body: getReqBody } = await send<CrossSearch[]>(`crosssearch/all`, 'GET')
+      const { body: getReqBody } = await send<CrossSearch[]>(`crosssearch/all/999/0/[]/[]`, 'GET')
       expect(getReqBody.map(e => e.lid_now_loc)).toContain(24797)
       expect(getReqBody.map(e => e.lid_now_loc)).toContain(24750)
       expect(getReqBody.map(e => e.loc_name)).toContain('RomanyÃ  dEmpordÃ ')
@@ -37,7 +37,7 @@ describe('Getting cross-search data', () => {
     })
 
     it("Get all doesn't have a species that doesn't have locality", async () => {
-      const { body: getReqBody } = (await send(`crosssearch/all`, 'GET')) as { body: unknown } as {
+      const { body: getReqBody } = (await send(`crosssearch/all/999/0/[]/[]`, 'GET')) as { body: unknown } as {
         body: CrossSearch[]
       }
       const speciesNameList = getReqBody.map(e => e.species_name)
@@ -45,7 +45,7 @@ describe('Getting cross-search data', () => {
     })
 
     it("Get all doesn't have a locality that doesn't have species", async () => {
-      const { body: getReqBody } = await send<CrossSearch[]>(`crosssearch/all`, 'GET')
+      const { body: getReqBody } = await send<CrossSearch[]>(`crosssearch/all/999/0/[]/[]`, 'GET')
       const locNameList = getReqBody.map(e => e.loc_name)
       expect(locNameList).not.toContain('not in cross search')
     })
@@ -208,7 +208,7 @@ describe('Getting cross-search data', () => {
   describe('does not show drafts without proper user rights', () => {
     it('Get all with admin has correct amount of data', async () => {
       await login()
-      const response = await send<CrossSearch[]>(`crosssearch/all`, 'GET')
+      const response = await send<CrossSearch[]>(`crosssearch/all/999/0/[]/[]`, 'GET')
       expect(response.status).toEqual(200)
       expect(response.body.length).toEqual(22)
       const locNameList = response.body.map(e => e.loc_name)
@@ -220,7 +220,7 @@ describe('Getting cross-search data', () => {
 
     it('Get all with user included in a project has correct data', async () => {
       await login('testPl', 'test')
-      const response = await send<CrossSearch[]>(`crosssearch/all`, 'GET')
+      const response = await send<CrossSearch[]>(`crosssearch/all/999/0/[]/[]`, 'GET')
       expect(response.status).toEqual(200)
       expect(response.body.length).toEqual(21)
       const locNameList = response.body.map(e => e.loc_name)
@@ -231,7 +231,7 @@ describe('Getting cross-search data', () => {
 
     it('Get all with anonymous user has correct data', async () => {
       logout()
-      const response = await send<CrossSearch[]>(`crosssearch/all`, 'GET')
+      const response = await send<CrossSearch[]>(`crosssearch/all/999/0/[]/[]`, 'GET')
       expect(response.status).toEqual(200)
       expect(response.body.length).toEqual(20)
       const locNameList = response.body.map(e => e.loc_name)

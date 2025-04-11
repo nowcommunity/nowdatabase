@@ -206,7 +206,7 @@ export const DetailView = <T extends object>({
                 <EditIcon style={{ marginRight: '0.5em' }} /> {mode.read ? 'Edit' : 'Cancel edit'}
               </Button>
             )}
-            {editRights.delete && !isNew && (
+            {editRights.delete && !isNew && !isUserPage && (
               <Button
                 id="delete-button"
                 onClick={onDelete}
