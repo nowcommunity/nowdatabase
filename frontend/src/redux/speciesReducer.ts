@@ -29,6 +29,9 @@ const speciesApi = api.injectEndpoints({
         url: `/species/${id}`,
         method: 'DELETE',
       }),
+
+      invalidatesTags: (result, _error, species_id) =>
+        typeof result !== 'undefined' ? [{ type: 'species', id: species_id }, 'specieslist'] : [],
     }),
   }),
 })

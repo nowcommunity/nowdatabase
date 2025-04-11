@@ -27,3 +27,11 @@ describe('Creating a species', () => {
     cy.contains('4 Invalid fields')
   })
 })
+
+describe('Deleting a species', () => {
+  beforeEach('Login as admin', () => {
+    cy.login('testSu')
+  })
+  // TODO: Add test for deleting a species (this can be copy pasted from other e2e test files with minimal changes)
+  // Not done because species that have synonyms cannot be deleted currently.
+})

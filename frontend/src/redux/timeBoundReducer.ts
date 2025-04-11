@@ -33,6 +33,8 @@ const timeboundsApi = api.injectEndpoints({
         url: `/time-bound/${id}`,
         method: 'DELETE',
       }),
+      invalidatesTags: (result, _error, bid) =>
+        typeof result !== 'undefined' ? [{ type: 'timebound', id: bid }, 'timebounds'] : [],
     }),
   }),
 })
