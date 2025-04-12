@@ -2,6 +2,7 @@ import { Router } from 'express'
 import { getCrossSearchRawSql, validateCrossSearchRouteParameters } from '../services/crossSearch'
 import { fixBigInt } from '../utils/common'
 import { ColumnFilter, SortingState } from '../services/queries/crossSearchQuery'
+import { format } from '@fast-csv/format'
 
 const router = Router()
 
@@ -35,6 +36,25 @@ router.get(`/all/:limit/:offset/:columnfilters/:sorting`, async (req, res) => {
     if (error && typeof error === 'object' && 'message' in error) return res.status(403).send({ error: error.message })
     return res.status(403).send('Unknown error')
   }
+})
+
+router.get(`/export`, async (req, res) => {
+  const stream = format()
+  stream.pipe(res)
+  res.attachment('test.csv')
+
+  const result = await getCrossSearchRawSql(req.user)
+
+  const headers = []
+  for (const key of Object.keys(result[0])) {
+    headers.push(key)
+  }
+  stream.write(headers)
+
+  for (const row of result) {
+    stream.write(row)
+  }
+  stream.end()
 })
 
 export default router
