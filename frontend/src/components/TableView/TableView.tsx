@@ -17,6 +17,7 @@ import { usePageContext } from '../Page'
 import { useUser } from '@/hooks/user'
 import { ContactForm } from '../DetailView/common/ContactForm'
 import { defaultPagination, defaultPaginationSmall } from '@/common'
+import { BACKEND_URL } from '@/util/config'
 
 type TableStateInUrl = 'sorting' | 'columnfilters' | 'pagination'
 
@@ -26,6 +27,31 @@ type TableStateInUrl = 'sorting' | 'columnfilters' | 'pagination'
   
   selectorFn should only be defined if using this as a selecting table
 */
+
+const CrossSearchExportButton = () => {
+  // loading is set to false after a timeout because actually knowing
+  // once the file is downloaded is impossible when implemented this way
+  const [loading, setLoading] = useState(false)
+
+  return (
+    <Box>
+      <Button
+        href={`${BACKEND_URL}/crosssearch/export`}
+        onClick={() => {
+          setLoading(true)
+          setTimeout(() => {
+            setLoading(false)
+          }, 20000)
+        }}
+        variant="contained"
+        disabled={loading}
+      >
+        Export cross search table
+      </Button>
+      {loading && <CircularProgress />}
+    </Box>
+  )
+}
 export const TableView = <T extends MRT_RowData>({
   data,
   columns,
@@ -39,6 +65,7 @@ export const TableView = <T extends MRT_RowData>({
   exportIsLoading,
   enableColumnFilterModes,
   serverSidePagination,
+  isCrossSearchTable,
   isFetching,
 }: {
   title?: string
@@ -53,6 +80,7 @@ export const TableView = <T extends MRT_RowData>({
   exportIsLoading?: boolean
   enableColumnFilterModes?: boolean
   serverSidePagination?: boolean
+  isCrossSearchTable?: boolean
   isFetching: boolean
 }) => {
   const location = useLocation()
@@ -190,9 +218,7 @@ export const TableView = <T extends MRT_RowData>({
       <>
         <CircularProgress />
         <br></br>
-        {title === 'Locality-Species-Cross-Search'
-          ? 'Loading data, this might take a few seconds...'
-          : 'Loading data...'}
+        {'Loading data...'}
       </>
     )
   }
@@ -214,13 +240,14 @@ export const TableView = <T extends MRT_RowData>({
           <ContactForm<T> buttonText="Contact" noContext={true} />
         </Box>
       )}
-      {editRights.new && title != 'Locality-Species-Cross-Search' && (
+      {editRights.new && !isCrossSearchTable && (
         <Box sx={{ display: 'flex', gap: '0.4em', justifyContent: 'flex-end', margin: '0.5em', marginTop: '1em' }}>
           <Button variant="contained" component={Link} to="new">
             New
           </Button>
         </Box>
       )}
+      {isCrossSearchTable && <CrossSearchExportButton />}
       {combinedExport && (
         <Box sx={{ display: 'flex', gap: '0.4em', justifyContent: 'flex-end', margin: '0.5em', marginTop: '1em' }}>
           <Tooltip
