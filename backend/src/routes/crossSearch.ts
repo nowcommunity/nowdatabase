@@ -3,6 +3,8 @@ import { getCrossSearchRawSql, validateCrossSearchRouteParameters } from '../ser
 import { fixBigInt } from '../utils/common'
 import { ColumnFilter, SortingState } from '../services/queries/crossSearchQuery'
 import { format } from '@fast-csv/format'
+import { pipeline } from 'stream'
+import { logger } from '../utils/logger'
 
 const router = Router()
 
@@ -39,16 +41,21 @@ router.get(`/all/:limit/:offset/:columnfilters/:sorting`, async (req, res) => {
 })
 
 router.get(`/export`, async (req, res) => {
+  res.attachment('cross_search_export.csv')
+  res.on('finish', () => {
+    logger.info('Cross search export sent.')
+  })
+
   const stream = format()
-  stream.pipe(res)
-  res.attachment('test.csv')
+  pipeline(stream, res, err => {
+    if (err) {
+      logger.error(`Error in pipeline: ${err.message}`)
+    }
+  })
 
   const result = await getCrossSearchRawSql(req.user)
 
-  const headers = []
-  for (const key of Object.keys(result[0])) {
-    headers.push(key)
-  }
+  const headers = Object.keys(result[0])
   stream.write(headers)
 
   for (const row of result) {
