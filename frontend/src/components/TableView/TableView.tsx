@@ -29,6 +29,30 @@ type TableStateInUrl = 'sorting' | 'columnfilters' | 'pagination'
   selectorFn should only be defined if using this as a selecting table
 */
 
+const CrossSearchExportButton = () => {
+  // loading is set to false after a timeout because actually knowing
+  // once the file is downloaded is impossible when implemented this way
+  const [loading, setLoading] = useState(false)
+
+  return (
+    <Box>
+      <Button
+        href={`${BACKEND_URL}/crosssearch/export`}
+        onClick={() => {
+          setLoading(true)
+          setTimeout(() => {
+            setLoading(false)
+          }, 20000)
+        }}
+        variant="contained"
+        disabled={loading}
+      >
+        Export cross search table
+      </Button>
+      {loading && <CircularProgress />}
+    </Box>
+  )
+}
 export const TableView = <T extends MRT_RowData>({
   data,
   columns,
@@ -43,6 +67,7 @@ export const TableView = <T extends MRT_RowData>({
   exportIsLoading,
   enableColumnFilterModes,
   serverSidePagination,
+  isCrossSearchTable,
   isCrossSearchTable,
   isFetching,
 }: {
@@ -59,6 +84,7 @@ export const TableView = <T extends MRT_RowData>({
   exportIsLoading?: boolean
   enableColumnFilterModes?: boolean
   serverSidePagination?: boolean
+  isCrossSearchTable?: boolean
   isCrossSearchTable?: boolean
   isFetching: boolean
 }) => {
