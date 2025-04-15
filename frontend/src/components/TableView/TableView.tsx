@@ -11,13 +11,12 @@ import {
 } from 'material-react-table'
 import { Box, Button, CircularProgress, Divider, Paper, Tooltip, Typography } from '@mui/material'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
-import { renderCustomToolbar, renderCustomToolbarModalVersion } from './helpers'
+import { renderCustomToolbar, renderCustomToolbarCrossSearchVersion, renderCustomToolbarModalVersion } from './helpers'
 import { ActionComponent } from './ActionComponent'
 import { usePageContext } from '../Page'
 import { useUser } from '@/hooks/user'
 import { ContactForm } from '../DetailView/common/ContactForm'
 import { defaultPagination, defaultPaginationSmall } from '@/common'
-import { BACKEND_URL } from '@/util/config'
 
 type TableStateInUrl = 'sorting' | 'columnfilters' | 'pagination'
 
@@ -28,30 +27,6 @@ type TableStateInUrl = 'sorting' | 'columnfilters' | 'pagination'
   selectorFn should only be defined if using this as a selecting table
 */
 
-const CrossSearchExportButton = () => {
-  // loading is set to false after a timeout because actually knowing
-  // once the file is downloaded is impossible when implemented this way
-  const [loading, setLoading] = useState(false)
-
-  return (
-    <Box>
-      <Button
-        href={`${BACKEND_URL}/crosssearch/export`}
-        onClick={() => {
-          setLoading(true)
-          setTimeout(() => {
-            setLoading(false)
-          }, 20000)
-        }}
-        variant="contained"
-        disabled={loading}
-      >
-        Export cross search table
-      </Button>
-      {loading && <CircularProgress />}
-    </Box>
-  )
-}
 export const TableView = <T extends MRT_RowData>({
   data,
   columns,
@@ -132,6 +107,15 @@ export const TableView = <T extends MRT_RowData>({
     else rowCount = data.length
   }
 
+  let toolbar
+  if (isCrossSearchTable) {
+    toolbar = renderCustomToolbarCrossSearchVersion
+  } else if (selectorFn) {
+    toolbar = renderCustomToolbarModalVersion
+  } else {
+    toolbar = renderCustomToolbar
+  }
+
   const table = useMaterialReactTable({
     columns: columns,
     data: data || [],
@@ -173,12 +157,7 @@ export const TableView = <T extends MRT_RowData>({
     columnFilterModeOptions: ['fuzzy', 'contains', 'startsWith', 'endsWith', 'equals'],
     enableColumnActions: false,
     enableHiding: true,
-    renderToolbarInternalActions:
-      /*
-        To know what components you can render here if necessary, see the source code:
-        https://github.com/KevinVandy/material-react-table/blob/85b98f9aaa038df48aa1dd35123560abce78ee58/packages/material-react-table/src/components/toolbar/MRT_ToolbarInternalButtons.tsx#L45
-      */
-      selectorFn ? renderCustomToolbarModalVersion : renderCustomToolbar,
+    renderToolbarInternalActions: toolbar,
   })
 
   // Load state from url only on first render
@@ -247,7 +226,6 @@ export const TableView = <T extends MRT_RowData>({
           </Button>
         </Box>
       )}
-      {isCrossSearchTable && <CrossSearchExportButton />}
       {combinedExport && (
         <Box sx={{ display: 'flex', gap: '0.4em', justifyContent: 'flex-end', margin: '0.5em', marginTop: '1em' }}>
           <Tooltip
