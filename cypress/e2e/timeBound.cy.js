@@ -1,10 +1,35 @@
-describe('Editing time bound', () => {
+before('Reset database', () => {
+  cy.request(Cypress.env('databaseResetUrl'))
+})
+
+describe('Creating time bound', () => {
   beforeEach('Login as admin', () => {
     cy.login('testSu')
   })
 
-  beforeEach('Reset database', () => {
-    cy.request(Cypress.env('databaseResetUrl'))
+  it('with correct values works', () => {
+    cy.visit(`/time-bound/new/`)
+    cy.contains('Creating new time-bound')
+    cy.contains('Name: This field is required')
+    cy.contains('Age (Ma): This field is required')
+    cy.get('[id=b_name-textfield]').first().type('test bound')
+    cy.contains('Name: This field is required').should('not.exist')
+    cy.get('[id=write-button]').should('be.disabled')
+    cy.get('[id=age-textfield]').first().type('20')
+    cy.contains('Age (Ma): This field is required').should('not.exist')
+    cy.get('[id=write-button]').click()
+    cy.contains('button', 'Add existing reference').click()
+    cy.get('button[data-cy^="detailview-button"]').first().click()
+    cy.contains('button', 'Close').click()
+    cy.get('[id=write-button]').should('not.be.disabled')
+    cy.get('[id=write-button]').click()
+    cy.contains('Edited item successfully.')
+  })
+})
+
+describe('Editing time bound', () => {
+  beforeEach('Login as admin', () => {
+    cy.login('testSu')
   })
 
   it('with correct values works', () => {
@@ -20,6 +45,7 @@ describe('Editing time bound', () => {
     cy.contains('button', 'Close').click()
     cy.get('[id=write-button]').should('not.be.disabled')
     cy.get('[id=write-button]').click()
+    cy.contains('Edited item successfully.')
     cy.contains('1.5')
   })
 
