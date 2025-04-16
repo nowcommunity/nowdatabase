@@ -49,7 +49,7 @@ router.get(`/export`, async (req, res) => {
   const stream = format()
   pipeline(stream, res, err => {
     if (err) {
-      logger.error(`Error in pipeline: ${err.message}`)
+      logger.error(`Error in crosssearch/export pipeline: ${err.message}`)
     }
   })
 
