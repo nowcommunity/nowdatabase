@@ -2,16 +2,20 @@ import { useState } from 'react'
 import { useNotify } from '@/hooks/notification'
 import { BACKEND_URL } from '@/util/config'
 import { Box, Button, CircularProgress } from '@mui/material'
+import { useUser } from '@/hooks/user'
 
 export const CrossSearchExportButton = () => {
   const [loading, setLoading] = useState(false)
   const notify = useNotify()
 
+  const token = useUser().token
+  const headers = token ? { Authorization: `Bearer ${token}` } : {}
+
   const fetchCSVFile = () => {
     setLoading(true)
     notify('Download started, please wait...')
 
-    fetch(`${BACKEND_URL}/crosssearch/export`)
+    fetch(`${BACKEND_URL}/crosssearch/export`, { headers: headers })
       .then(response => {
         if (!response.ok) {
           throw new Error('Server response was not OK.')
@@ -36,9 +40,8 @@ export const CrossSearchExportButton = () => {
   return (
     <Box>
       <Button onClick={() => fetchCSVFile()} variant="contained" disabled={loading}>
-        Export table
+        Export table {loading && <CircularProgress />}
       </Button>
-      {loading && <CircularProgress />}
     </Box>
   )
 }
