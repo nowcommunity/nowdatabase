@@ -4,7 +4,10 @@ import { BACKEND_URL } from '@/util/config'
 import { Box, Button, CircularProgress } from '@mui/material'
 import { useUser } from '@/hooks/user'
 import { usePageContext } from '../Page'
+<<<<<<< HEAD
 import { currentDateAsString } from '@/shared/currentDateAsString'
+=======
+>>>>>>> 2dfd88b (added column filtering and sorting to export, and fixed bug with crosssearch/all route)
 
 export const CrossSearchExportButton = () => {
   const [loading, setLoading] = useState(false)
@@ -20,10 +23,16 @@ export const CrossSearchExportButton = () => {
     setLoading(true)
     notify('Downloading CSV file, please wait...', 'info', null)
 
+<<<<<<< HEAD
     fetch(
       `${BACKEND_URL}/crosssearch/export/${JSON.stringify(sqlColumnFilters)}/${JSON.stringify(sqlOrderBy)}`,
       fetchOptions
     )
+=======
+    fetch(`${BACKEND_URL}/crosssearch/export/${JSON.stringify(sqlColumnFilters)}/${JSON.stringify(sqlOrderBy)}`, {
+      headers: headers,
+    })
+>>>>>>> 2dfd88b (added column filtering and sorting to export, and fixed bug with crosssearch/all route)
       .then(response => {
         if (!response.ok) {
           throw new Error('Server response was not OK.')
