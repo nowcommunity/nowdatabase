@@ -15,7 +15,9 @@ router.get(`/all/:limit/:offset/:columnfilters/:sorting`, async (req, res) => {
   let sorting
   try {
     limit = parseInt(req.params.limit)
+    if (isNaN(limit)) throw new Error('Limit is not a number')
     offset = parseInt(req.params.offset)
+    if (isNaN(offset)) throw new Error('Offset is not a number')
     columnFilters = JSON.parse(req.params.columnfilters) as unknown
     sorting = JSON.parse(req.params.sorting) as unknown
   } catch (error) {
@@ -40,7 +42,37 @@ router.get(`/all/:limit/:offset/:columnfilters/:sorting`, async (req, res) => {
   }
 })
 
-router.get(`/export`, async (req, res) => {
+router.get(`/export/:columnfilters/:sorting`, async (req, res) => {
+  let columnFilters
+  let sorting
+  let data
+  try {
+    columnFilters = JSON.parse(req.params.columnfilters) as unknown
+    sorting = JSON.parse(req.params.sorting) as unknown
+  } catch (error) {
+    return res.status(403).send({ error: 'Parsing URL parameters failed' })
+  }
+  const validationErrors = validateCrossSearchRouteParameters({
+    columnFilters,
+    sorting,
+  })
+  if (validationErrors.length > 0) {
+    return res.status(403).send(validationErrors)
+  }
+
+  try {
+    data = await getCrossSearchRawSql(
+      req.user,
+      undefined,
+      undefined,
+      columnFilters as ColumnFilter[],
+      sorting as SortingState[]
+    )
+  } catch (error) {
+    if (error && typeof error === 'object' && 'message' in error) return res.status(403).send({ error: error.message })
+    return res.status(403).send('Unknown error')
+  }
+
   res.attachment('cross_search_export.csv')
   res.on('finish', () => {
     logger.info('Cross search export sent.')
@@ -53,15 +85,13 @@ router.get(`/export`, async (req, res) => {
     }
   })
 
-  const result = await getCrossSearchRawSql(req.user)
-
-  const headers = Object.keys(result[0])
+  const headers = Object.keys(data[0])
   stream.write(headers)
 
-  for (const row of result) {
+  for (const row of data) {
     stream.write(row)
   }
-  stream.end()
+  return stream.end()
 })
 
 export default router
