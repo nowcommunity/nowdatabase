@@ -37,11 +37,21 @@ export const validateCrossSearchRouteParams = (
   const validators: Validators<Partial<CrossSearchRouteParameters>> = {
     limit: {
       name: 'Limit',
-      required: true,
+      required: () => {
+        // TODO: change this and offset to not use the parameters object, might not be possible without changing the way validators work
+        if (typeof parameters.limit !== 'undefined' && typeof parameters.limit !== 'number')
+          return 'Limit must be undefined or a number'
+
+        return
+      },
     },
     offset: {
       name: 'Offset',
-      required: true,
+      required: () => {
+        if (typeof parameters.offset !== 'undefined' && typeof parameters.offset !== 'number')
+          return 'Offset must be undefined or a number'
+        return
+      },
     },
     columnFilters: {
       name: 'Column Filters',

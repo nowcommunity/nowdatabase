@@ -53,6 +53,8 @@ router.get(`/export/:columnfilters/:sorting`, async (req, res) => {
     return res.status(403).send({ error: 'Parsing URL parameters failed' })
   }
   const validationErrors = validateCrossSearchRouteParameters({
+    limit: undefined,
+    offset: undefined,
     columnFilters,
     sorting,
   })
