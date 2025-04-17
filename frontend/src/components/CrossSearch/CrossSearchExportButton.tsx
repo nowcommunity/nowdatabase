@@ -11,15 +11,16 @@ export const CrossSearchExportButton = () => {
   const notify = useNotify()
 
   const token = useUser().token
-  const headers = token ? { Authorization: `Bearer ${token}` } : {}
+  const fetchOptions = token ? { headers: { Authorization: `Bearer ${token}` } } : {}
 
   const fetchCSVFile = () => {
     setLoading(true)
-    notify('Download started, please wait...')
+    notify('Downloading CSV file, please wait...', 'info', null)
 
-    fetch(`${BACKEND_URL}/crosssearch/export/${JSON.stringify(sqlColumnFilters)}/${JSON.stringify(sqlOrderBy)}`, {
-      headers: headers,
-    })
+    fetch(
+      `${BACKEND_URL}/crosssearch/export/${JSON.stringify(sqlColumnFilters)}/${JSON.stringify(sqlOrderBy)}`,
+      fetchOptions
+    )
       .then(response => {
         if (!response.ok) {
           throw new Error('Server response was not OK.')
@@ -35,6 +36,7 @@ export const CrossSearchExportButton = () => {
         a.click()
         a.remove()
         window.URL.revokeObjectURL(url)
+        notify('Download finished.')
       })
       .catch(_ => {
         notify('Downloading cross-search export failed.', 'error')
@@ -44,7 +46,7 @@ export const CrossSearchExportButton = () => {
   return (
     <Box>
       <Button onClick={() => fetchCSVFile()} variant="contained" disabled={loading}>
-        Export table {loading && <CircularProgress />}
+        Export table {loading && <CircularProgress sx={{ marginLeft: '1em' }} size="1.5em" />}
       </Button>
     </Box>
   )

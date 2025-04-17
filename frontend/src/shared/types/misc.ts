@@ -28,8 +28,8 @@ type ValidationErrorItem = {
 }
 
 export type CrossSearchRouteParameters = {
-  limit?: number
-  offset?: number
+  limit: number | undefined
+  offset: number | undefined
   columnFilters: unknown
   sorting: unknown
 }
