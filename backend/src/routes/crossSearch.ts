@@ -78,15 +78,13 @@ router.get(`/export/:columnfilters/:sorting`, async (req, res) => {
     logger.info('Cross search export sent.')
   })
 
-  const stream = format()
+  // quoteColumns is needed to make sure linebreaks do not mess up the data
+  const stream = format({ headers: true, quoteColumns: true })
   pipeline(stream, res, err => {
     if (err) {
       logger.error(`Error in crosssearch/export pipeline: ${err.message}`)
     }
   })
-
-  const headers = Object.keys(data[0])
-  stream.write(headers)
 
   for (const row of data) {
     stream.write(row)
