@@ -1,4 +1,4 @@
-import { CrossSearchRouteParameters } from '../types'
+import { ParsedCrossSearchRouteParameters } from '../types'
 import { Validators, validator, ValidationError } from './validator'
 
 const columnFilterCheck = (columnFilters: unknown) => {
@@ -31,10 +31,10 @@ const sortingCheck = (sorting: unknown) => {
 }
 
 export const validateCrossSearchRouteParams = (
-  parameters: CrossSearchRouteParameters,
-  fieldName: keyof CrossSearchRouteParameters
+  parameters: ParsedCrossSearchRouteParameters,
+  fieldName: keyof ParsedCrossSearchRouteParameters
 ) => {
-  const validators: Validators<Partial<CrossSearchRouteParameters>> = {
+  const validators: Validators<Partial<ParsedCrossSearchRouteParameters>> = {
     limit: {
       name: 'Limit',
       required: () => {
@@ -63,5 +63,5 @@ export const validateCrossSearchRouteParams = (
     },
   }
 
-  return validator<CrossSearchRouteParameters>(validators, parameters, fieldName)
+  return validator<ParsedCrossSearchRouteParameters>(validators, parameters, fieldName)
 }

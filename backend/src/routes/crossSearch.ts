@@ -1,7 +1,6 @@
 import { Router } from 'express'
-import { getCrossSearchRawSql, validateCrossSearchRouteParameters } from '../services/crossSearch'
+import { getCrossSearchRawSql, parseAndValidateCrossSearchRouteParameters } from '../services/crossSearch'
 import { fixBigInt } from '../utils/common'
-import { ColumnFilter, SortingState } from '../services/queries/crossSearchQuery'
 import { format } from '@fast-csv/format'
 import { pipeline } from 'stream'
 import { logger } from '../utils/logger'
@@ -9,31 +8,28 @@ import { logger } from '../utils/logger'
 const router = Router()
 
 router.get(`/all/:limit/:offset/:columnfilters/:sorting`, async (req, res) => {
-  let limit
-  let offset
-  let columnFilters
-  let sorting
+  let validatedValues
   try {
-    limit = parseInt(req.params.limit)
-    if (isNaN(limit)) throw new Error('Limit is not a number')
-    offset = parseInt(req.params.offset)
-    if (isNaN(offset)) throw new Error('Offset is not a number')
-    columnFilters = JSON.parse(req.params.columnfilters) as unknown
-    sorting = JSON.parse(req.params.sorting) as unknown
+    const { validationErrors, ...values } = parseAndValidateCrossSearchRouteParameters({
+      limit: req.params.limit,
+      offset: req.params.offset,
+      columnFilters: req.params.columnfilters,
+      sorting: req.params.sorting,
+    })
+    validatedValues = values
+    if (validationErrors.length > 0) {
+      return res.status(403).send(validationErrors)
+    }
   } catch (error) {
-    return res.status(403).send({ error: 'Parsing URL parameters failed' })
-  }
-  const validationErrors = validateCrossSearchRouteParameters({ limit, offset, columnFilters, sorting })
-  if (validationErrors.length > 0) {
-    return res.status(403).send(validationErrors)
+    return res.status(403).send({ error: error })
   }
   try {
     const result = await getCrossSearchRawSql(
       req.user,
-      limit,
-      offset,
-      columnFilters as ColumnFilter[],
-      sorting as SortingState[]
+      validatedValues.validatedLimit,
+      validatedValues.validatedOffset,
+      validatedValues.validatedColumnFilters,
+      validatedValues.validatedSorting
     )
     return res.status(200).send(fixBigInt(result))
   } catch (error) {
@@ -43,32 +39,27 @@ router.get(`/all/:limit/:offset/:columnfilters/:sorting`, async (req, res) => {
 })
 
 router.get(`/export/:columnfilters/:sorting`, async (req, res) => {
-  let columnFilters
-  let sorting
+  let validatedValues
   let data
   try {
-    columnFilters = JSON.parse(req.params.columnfilters) as unknown
-    sorting = JSON.parse(req.params.sorting) as unknown
+    const { validationErrors, ...values } = parseAndValidateCrossSearchRouteParameters({
+      columnFilters: req.params.columnfilters,
+      sorting: req.params.sorting,
+    })
+    validatedValues = values
+    if (validationErrors.length > 0) {
+      return res.status(403).send(validationErrors)
+    }
   } catch (error) {
-    return res.status(403).send({ error: 'Parsing URL parameters failed' })
+    return res.status(403).send({ error: error })
   }
-  const validationErrors = validateCrossSearchRouteParameters({
-    limit: undefined,
-    offset: undefined,
-    columnFilters,
-    sorting,
-  })
-  if (validationErrors.length > 0) {
-    return res.status(403).send(validationErrors)
-  }
-
   try {
     data = await getCrossSearchRawSql(
       req.user,
       undefined,
       undefined,
-      columnFilters as ColumnFilter[],
-      sorting as SortingState[]
+      validatedValues.validatedColumnFilters,
+      validatedValues.validatedSorting
     )
   } catch (error) {
     if (error && typeof error === 'object' && 'message' in error) return res.status(403).send({ error: error.message })
