@@ -1,6 +1,14 @@
-import { User, CrossSearch, Role, CrossSearchRouteParameters } from '../../../frontend/src/shared/types'
+import {
+  User,
+  CrossSearch,
+  Role,
+  CrossSearchRouteParameters,
+  ParsedCrossSearchRouteParameters,
+  SortingState,
+  ColumnFilter,
+} from '../../../frontend/src/shared/types'
 import { getCrossSearchFields, getFieldsOfTables, nowDb } from '../utils/db'
-import { ColumnFilter, SortingState, generateCrossSearchSql } from './queries/crossSearchQuery'
+import { generateCrossSearchSql } from './queries/crossSearchQuery'
 import { ValidationObject } from '../../../frontend/src/shared/validators/validator'
 import { validateCrossSearchRouteParams } from '../../../frontend/src/shared/validators/crossSearch'
 
@@ -118,13 +126,47 @@ export const getCrossSearchRawSql = async (
   return result
 }
 
-export const validateCrossSearchRouteParameters = (parameters: CrossSearchRouteParameters) => {
-  const keys = Object.keys(parameters)
+export const parseAndValidateCrossSearchRouteParameters = (parameters: CrossSearchRouteParameters) => {
+  const { limit, offset, columnFilters, sorting } = parameters
+  let parsedLimit
+  let parsedOffset
+  let parsedColumnFilters
+  let parsedSorting
+  try {
+    if (limit) {
+      parsedLimit = parseInt(limit)
+      if (isNaN(parsedLimit)) throw new Error('Limit is not a number')
+    }
+    if (offset) {
+      parsedOffset = parseInt(offset)
+      if (isNaN(parsedOffset)) throw new Error('Offset is not a number')
+    }
+    parsedColumnFilters = JSON.parse(columnFilters) as unknown
+    parsedSorting = JSON.parse(sorting) as unknown
+  } catch (error) {
+    throw new Error('Parsing URL parameters failed')
+  }
+  const parsedParameters = {
+    limit: parsedLimit,
+    offset: parsedOffset,
+    columnFilters: parsedColumnFilters,
+    sorting: parsedSorting,
+  }
+  const keys = Object.keys(parsedParameters)
   const errors: ValidationObject[] = []
 
   for (const key of keys) {
-    const error = validateCrossSearchRouteParams(parameters, key as keyof CrossSearchRouteParameters)
+    const error = validateCrossSearchRouteParams(parsedParameters, key as keyof ParsedCrossSearchRouteParameters)
     if (error.error) errors.push(error)
   }
-  return errors
+  const validatedColumnFilters = parsedColumnFilters as ColumnFilter[]
+  const validatedSorting = parsedSorting as SortingState[]
+
+  return {
+    validatedLimit: parsedLimit,
+    validatedOffset: parsedOffset,
+    validatedColumnFilters,
+    validatedSorting,
+    validationErrors: errors,
+  }
 }
