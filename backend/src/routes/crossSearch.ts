@@ -1,40 +1,93 @@
 import { Router } from 'express'
-import { getCrossSearchRawSql, validateCrossSearchRouteParameters } from '../services/crossSearch'
+import { getCrossSearchRawSql, parseAndValidateCrossSearchRouteParameters } from '../services/crossSearch'
 import { fixBigInt } from '../utils/common'
-import { ColumnFilter, SortingState } from '../services/queries/crossSearchQuery'
+import { format } from '@fast-csv/format'
+import { pipeline } from 'stream'
+import { logger } from '../utils/logger'
+import { currentDateAsString } from '../../../frontend/src/shared/currentDateAsString'
 
 const router = Router()
 
 router.get(`/all/:limit/:offset/:columnfilters/:sorting`, async (req, res) => {
-  let limit
-  let offset
-  let columnFilters
-  let sorting
+  let validatedValues
   try {
-    limit = parseInt(req.params.limit)
-    offset = parseInt(req.params.offset)
-    columnFilters = JSON.parse(req.params.columnfilters) as unknown
-    sorting = JSON.parse(req.params.sorting) as unknown
+    const { validationErrors, ...values } = parseAndValidateCrossSearchRouteParameters({
+      limit: req.params.limit,
+      offset: req.params.offset,
+      columnFilters: req.params.columnfilters,
+      sorting: req.params.sorting,
+    })
+    validatedValues = values
+    if (validationErrors.length > 0) {
+      return res.status(403).send(validationErrors)
+    }
   } catch (error) {
-    return res.status(403).send({ error: 'Parsing URL parameters failed' })
+    if (error instanceof Error) return res.status(403).send({ error: error.message })
+    return res.status(403).send('Unknown error')
   }
-  const validationErrors = validateCrossSearchRouteParameters({ limit, offset, columnFilters, sorting })
-  if (validationErrors.length > 0) {
-    return res.status(403).send(validationErrors)
-  }
+
   try {
     const result = await getCrossSearchRawSql(
       req.user,
-      limit,
-      offset,
-      columnFilters as ColumnFilter[],
-      sorting as SortingState[]
+      validatedValues.validatedLimit,
+      validatedValues.validatedOffset,
+      validatedValues.validatedColumnFilters,
+      validatedValues.validatedSorting
     )
     return res.status(200).send(fixBigInt(result))
   } catch (error) {
-    if (error && typeof error === 'object' && 'message' in error) return res.status(403).send({ error: error.message })
+    if (error instanceof Error) return res.status(403).send({ error: error.message })
     return res.status(403).send('Unknown error')
   }
+})
+
+router.get(`/export/:columnfilters/:sorting`, async (req, res) => {
+  let validatedValues
+  try {
+    const { validationErrors, ...values } = parseAndValidateCrossSearchRouteParameters({
+      columnFilters: req.params.columnfilters,
+      sorting: req.params.sorting,
+    })
+    validatedValues = values
+    if (validationErrors.length > 0) {
+      return res.status(403).send(validationErrors)
+    }
+  } catch (error) {
+    if (error instanceof Error) return res.status(403).send({ error: error.message })
+    return res.status(403).send('Unknown error')
+  }
+
+  let data
+  try {
+    data = await getCrossSearchRawSql(
+      req.user,
+      undefined,
+      undefined,
+      validatedValues.validatedColumnFilters,
+      validatedValues.validatedSorting
+    )
+  } catch (error) {
+    if (error instanceof Error) return res.status(403).send({ error: error.message })
+    return res.status(403).send('Unknown error')
+  }
+
+  res.attachment(`cross_search${currentDateAsString()}.csv`) // filename will get overwritten in frontend when fetching data from this route
+  res.on('finish', () => {
+    logger.info('Cross search export sent.')
+  })
+
+  // quoteColumns is needed to make sure linebreaks do not mess up the data
+  const stream = format({ headers: true, quoteColumns: true })
+  pipeline(stream, res, err => {
+    if (err) {
+      logger.error(`Error in crosssearch/export pipeline: ${err.message}`)
+    }
+  })
+
+  for (const row of data) {
+    stream.write(row)
+  }
+  return stream.end()
 })
 
 export default router

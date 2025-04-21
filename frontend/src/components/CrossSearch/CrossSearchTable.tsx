@@ -812,6 +812,7 @@ export const CrossSearchTable = ({ selectorFn }: { selectorFn?: (newObject: Cros
       url="crosssearch"
       enableColumnFilterModes={true}
       serverSidePagination={true}
+      isCrossSearchTable={true}
     />
   )
 }
