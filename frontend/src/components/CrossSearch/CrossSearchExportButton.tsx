@@ -4,6 +4,7 @@ import { BACKEND_URL } from '@/util/config'
 import { Box, Button, CircularProgress } from '@mui/material'
 import { useUser } from '@/hooks/user'
 import { usePageContext } from '../Page'
+import { currentDateAsString } from '@/shared/currentDateAsString'
 
 export const CrossSearchExportButton = () => {
   const [loading, setLoading] = useState(false)
@@ -12,6 +13,8 @@ export const CrossSearchExportButton = () => {
 
   const token = useUser().token
   const fetchOptions = token ? { headers: { Authorization: `Bearer ${token}` } } : {}
+
+  const filename = `cross_search${currentDateAsString()}.csv`
 
   const fetchCSVFile = () => {
     setLoading(true)
@@ -28,14 +31,14 @@ export const CrossSearchExportButton = () => {
         return response.blob()
       })
       .then(blob => {
-        const url = window.URL.createObjectURL(blob)
-        const a = document.createElement('a')
-        a.href = url
-        a.download = 'cross_search_export.csv'
-        document.body.appendChild(a)
-        a.click()
-        a.remove()
-        window.URL.revokeObjectURL(url)
+        const blobUrl = window.URL.createObjectURL(blob)
+        const downloadLink = document.createElement('a')
+        downloadLink.href = blobUrl
+        downloadLink.download = filename
+        document.body.appendChild(downloadLink)
+        downloadLink.click()
+        downloadLink.remove()
+        window.URL.revokeObjectURL(blobUrl)
         notify('Download finished.')
       })
       .catch(_ => {

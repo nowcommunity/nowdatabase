@@ -4,6 +4,7 @@ import { fixBigInt } from '../utils/common'
 import { format } from '@fast-csv/format'
 import { pipeline } from 'stream'
 import { logger } from '../utils/logger'
+import { currentDateAsString } from '../../../frontend/src/shared/currentDateAsString'
 
 const router = Router()
 
@@ -70,7 +71,7 @@ router.get(`/export/:columnfilters/:sorting`, async (req, res) => {
     return res.status(403).send('Unknown error')
   }
 
-  res.attachment('cross_search_export.csv')
+  res.attachment(`cross_search${currentDateAsString()}.csv`) // filename will get overwritten in frontend when fetching data from this route
   res.on('finish', () => {
     logger.info('Cross search export sent.')
   })
