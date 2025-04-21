@@ -21,8 +21,10 @@ router.get(`/all/:limit/:offset/:columnfilters/:sorting`, async (req, res) => {
       return res.status(403).send(validationErrors)
     }
   } catch (error) {
-    return res.status(403).send({ error: error })
+    if (error instanceof Error) return res.status(403).send({ error: error.message })
+    return res.status(403).send('Unknown error')
   }
+
   try {
     const result = await getCrossSearchRawSql(
       req.user,
@@ -33,14 +35,13 @@ router.get(`/all/:limit/:offset/:columnfilters/:sorting`, async (req, res) => {
     )
     return res.status(200).send(fixBigInt(result))
   } catch (error) {
-    if (error && typeof error === 'object' && 'message' in error) return res.status(403).send({ error: error.message })
+    if (error instanceof Error) return res.status(403).send({ error: error.message })
     return res.status(403).send('Unknown error')
   }
 })
 
 router.get(`/export/:columnfilters/:sorting`, async (req, res) => {
   let validatedValues
-  let data
   try {
     const { validationErrors, ...values } = parseAndValidateCrossSearchRouteParameters({
       columnFilters: req.params.columnfilters,
@@ -51,8 +52,11 @@ router.get(`/export/:columnfilters/:sorting`, async (req, res) => {
       return res.status(403).send(validationErrors)
     }
   } catch (error) {
-    return res.status(403).send({ error: error })
+    if (error instanceof Error) return res.status(403).send({ error: error.message })
+    return res.status(403).send('Unknown error')
   }
+
+  let data
   try {
     data = await getCrossSearchRawSql(
       req.user,
@@ -62,7 +66,7 @@ router.get(`/export/:columnfilters/:sorting`, async (req, res) => {
       validatedValues.validatedSorting
     )
   } catch (error) {
-    if (error && typeof error === 'object' && 'message' in error) return res.status(403).send({ error: error.message })
+    if (error instanceof Error) return res.status(403).send({ error: error.message })
     return res.status(403).send('Unknown error')
   }
 

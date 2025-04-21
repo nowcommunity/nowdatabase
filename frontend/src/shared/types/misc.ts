@@ -40,8 +40,8 @@ export type CrossSearchRouteParameters = {
 export type ParsedCrossSearchRouteParameters = {
   limit?: number
   offset?: number
-  columnFilters: unknown
-  sorting: unknown
+  columnFilters: unknown[]
+  sorting: unknown[]
 }
 
 export type ValidatedCrossSearchRouteParameters = {
