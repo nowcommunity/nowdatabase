@@ -130,22 +130,19 @@ export const parseAndValidateCrossSearchRouteParameters = (parameters: CrossSear
   const { limit, offset, columnFilters, sorting } = parameters
   let parsedLimit
   let parsedOffset
-  let parsedColumnFilters
-  let parsedSorting
-  try {
-    if (limit) {
-      parsedLimit = parseInt(limit)
-      if (isNaN(parsedLimit)) throw new Error('Limit is not a number')
-    }
-    if (offset) {
-      parsedOffset = parseInt(offset)
-      if (isNaN(parsedOffset)) throw new Error('Offset is not a number')
-    }
-    parsedColumnFilters = JSON.parse(columnFilters) as unknown
-    parsedSorting = JSON.parse(sorting) as unknown
-  } catch (error) {
-    throw new Error('Parsing URL parameters failed')
+  if (limit) {
+    parsedLimit = parseInt(limit)
+    if (isNaN(parsedLimit)) throw new Error('Limit is not a number.')
   }
+  if (offset) {
+    parsedOffset = parseInt(offset)
+    if (isNaN(parsedOffset)) throw new Error('Offset is not a number.')
+  }
+  const parsedColumnFilters = JSON.parse(columnFilters) as unknown
+  if (!Array.isArray(parsedColumnFilters)) throw new Error('ColumnFilters is not an array.')
+  const parsedSorting = JSON.parse(sorting) as unknown
+  if (!Array.isArray(parsedSorting)) throw new Error('Sorting is not an array.')
+
   const parsedParameters = {
     limit: parsedLimit,
     offset: parsedOffset,
@@ -154,7 +151,6 @@ export const parseAndValidateCrossSearchRouteParameters = (parameters: CrossSear
   }
   const keys = Object.keys(parsedParameters)
   const errors: ValidationObject[] = []
-
   for (const key of keys) {
     const error = validateCrossSearchRouteParams(parsedParameters, key as keyof ParsedCrossSearchRouteParameters)
     if (error.error) errors.push(error)
