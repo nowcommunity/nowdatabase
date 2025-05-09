@@ -113,6 +113,8 @@ export const ErrorBox = <T,>() => {
   const { fieldsWithErrors } = useDetailContext<T>()
   const fields = Object.keys(fieldsWithErrors)
 
+  const title = fields.length > 1 ? `${fields.length} invalid fields` : '1 invalid field'
+
   return (
     <Box
       sx={{
@@ -126,7 +128,7 @@ export const ErrorBox = <T,>() => {
       }}
     >
       <Typography color="text.secondary" gutterBottom>
-        {`${fields.length} Invalid fields`}
+        {title}
       </Typography>
       <List sx={{ maxHeight: '5em', maxWidth: '30em', padding: '0em 0.8em 0em 0.8em', overflow: 'auto' }}>
         {fields.map(field => (
