@@ -28,7 +28,7 @@ describe('Creating a species', () => {
     cy.visit('/species/new')
     cy.contains('This field is required')
     cy.get('[id=write-button]').should('be.disabled')
-    cy.contains('4 Invalid fields')
+    cy.contains('4 invalid fields')
   })
 })
 
@@ -72,18 +72,18 @@ describe('Editing a species', () => {
     cy.get('[id=order_name-textfield]').clear()
     cy.contains('Order: This field is required')
     cy.get('[id=write-button]').should('be.disabled')
-    cy.contains('1 Invalid fields')
+    cy.contains('1 invalid field')
 
     cy.get('[id=family_name-textfield]').clear()
     cy.contains('Family: This field is required')
     cy.get('[id=write-button]').should('be.disabled')
-    cy.contains('2 Invalid fields')
+    cy.contains('2 invalid fields')
 
     cy.get('[id=order_name-textfield]').type('newOrder')
     cy.contains('Order: This field is required').should('not.exist')
     cy.contains('Family: This field is required')
     cy.get('[id=write-button]').should('be.disabled')
-    cy.contains('1 Invalid fields')
+    cy.contains('1 invalid field')
 
     cy.get('[id=family_name-textfield]').type('newFamily')
     cy.contains('Family: This field is required').should('not.exist')

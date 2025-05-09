@@ -10,7 +10,7 @@ describe('Creating a journal', () => {
   it('with valid data works', () => {
     cy.visit('/reference/new')
     cy.contains('Journal')
-    cy.contains('7 Invalid fields')
+    cy.contains('7 invalid fields')
 
     cy.get('[id=title_primary-textfield]').type('New test reference')
 
@@ -31,20 +31,20 @@ describe('Creating a journal', () => {
   it('with missing required fields does not work', () => {
     cy.visit('/reference/new')
     cy.contains('Journal')
-    cy.contains('7 Invalid fields')
+    cy.contains('7 invalid fields')
 
     cy.get('[id=title_primary-textfield]').type('New test reference 2')
-    cy.contains('3 Invalid fields')
+    cy.contains('3 invalid fields')
     cy.get('[id=write-button]').should('be.disabled')
 
     cy.get('[data-cy=Select\\ author-button]').click()
     cy.get('[data-cy=detailview-button-1]').click()
     cy.contains('Close').click()
-    cy.contains('2 Invalid fields')
+    cy.contains('2 invalid fields')
     cy.get('[id=write-button]').should('be.disabled')
 
     cy.get('[id=date_primary-textfield]').type('2025')
-    cy.contains('1 Invalid fields')
+    cy.contains('1 invalid field')
     cy.get('[id=write-button]').should('be.disabled')
 
     cy.get('[data-cy=Select\\ Journal-button]').click()
@@ -63,31 +63,31 @@ describe('Creating a journal', () => {
   it('combined check with different types of titles and gen notes works', () => {
     cy.visit('/reference/new')
     cy.contains('Journal')
-    cy.contains('7 Invalid fields')
+    cy.contains('7 invalid fields')
     cy.get('[id=write-button]').should('be.disabled')
 
     cy.get('[id=title_primary-textfield]').type('Title Primary')
-    cy.contains('3 Invalid fields')
+    cy.contains('3 invalid fields')
     cy.get('[id=title_primary-textfield]').clear()
-    cy.contains('7 Invalid fields')
+    cy.contains('7 invalid fields')
     cy.get('[id=write-button]').should('be.disabled')
 
     cy.get('[id=title_secondary-textfield]').type('Title Secondary')
-    cy.contains('3 Invalid fields')
+    cy.contains('3 invalid fields')
     cy.get('[id=title_secondary-textfield]').clear()
-    cy.contains('7 Invalid fields')
+    cy.contains('7 invalid fields')
     cy.get('[id=write-button]').should('be.disabled')
 
     cy.get('[id=title_series-textfield]').type('Title Series')
-    cy.contains('3 Invalid fields')
+    cy.contains('3 invalid fields')
     cy.get('[id=title_series-textfield]').clear()
-    cy.contains('7 Invalid fields')
+    cy.contains('7 invalid fields')
     cy.get('[id=write-button]').should('be.disabled')
 
     cy.get('[id=gen_notes-textfield]').type('Gen Notes')
-    cy.contains('3 Invalid fields')
+    cy.contains('3 invalid fields')
     cy.get('[id=gen_notes-textfield]').clear()
-    cy.contains('7 Invalid fields')
+    cy.contains('7 invalid fields')
     cy.get('[id=write-button]').should('be.disabled')
   })
 })
@@ -122,13 +122,13 @@ describe('Editing a journal', () => {
     cy.contains('New primary title.')
     cy.get('[id=edit-button]').click()
     cy.get('[id=title_primary-textfield]').clear()
-    cy.contains('4 Invalid fields')
+    cy.contains('4 invalid fields')
     cy.get('[id=write-button]').should('be.disabled')
     cy.get('[id=title_primary-textfield]').type('New primary title.')
 
     cy.get('[data-testid=RemoveCircleOutlineIcon]').first().click()
     cy.get('[data-testid=RemoveCircleOutlineIcon]').first().click() // removes the selected authors
-    cy.contains('1 Invalid fields')
+    cy.contains('1 invalid field')
     cy.get('[id=write-button]').should('be.disabled')
     cy.get('[data-cy=Select\\ author-button]').click()
     cy.get('[data-cy=detailview-button-1]').click()
