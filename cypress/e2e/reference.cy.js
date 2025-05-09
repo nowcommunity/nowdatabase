@@ -64,26 +64,31 @@ describe('Creating a journal', () => {
     cy.visit('/reference/new')
     cy.contains('Journal')
     cy.contains('7 Invalid fields')
+    cy.get('[id=write-button]').should('be.disabled')
 
     cy.get('[id=title_primary-textfield]').type('Title Primary')
     cy.contains('3 Invalid fields')
     cy.get('[id=title_primary-textfield]').clear()
     cy.contains('7 Invalid fields')
+    cy.get('[id=write-button]').should('be.disabled')
 
     cy.get('[id=title_secondary-textfield]').type('Title Secondary')
     cy.contains('3 Invalid fields')
     cy.get('[id=title_secondary-textfield]').clear()
     cy.contains('7 Invalid fields')
+    cy.get('[id=write-button]').should('be.disabled')
 
     cy.get('[id=title_series-textfield]').type('Title Series')
     cy.contains('3 Invalid fields')
     cy.get('[id=title_series-textfield]').clear()
     cy.contains('7 Invalid fields')
+    cy.get('[id=write-button]').should('be.disabled')
 
     cy.get('[id=gen_notes-textfield]').type('Gen Notes')
     cy.contains('3 Invalid fields')
     cy.get('[id=gen_notes-textfield]').clear()
     cy.contains('7 Invalid fields')
+    cy.get('[id=write-button]').should('be.disabled')
   })
 })
 
@@ -94,9 +99,42 @@ describe('Editing a journal', () => {
     cy.login('testSu')
   })
 
-  it.skip('with valid data works', () => {})
+  it('with valid data works', () => {
+    cy.visit('reference/10039')
+    cy.contains('A new geomagnetic polarity time scale for the Late Cretaceous and Cenozoic.')
+    cy.get('[id=edit-button]').click()
+    cy.get('[id=title_primary-textfield]').clear()
+    cy.get('[id=title_primary-textfield]').type('New primary title.')
 
-  it.skip('with missing required fields does not work', () => {})
+    cy.get('[data-cy=Select\\ author-button]').click()
+    cy.get('[data-cy=detailview-button-2]').click()
+    cy.contains('Close').click()
+
+    cy.get('[id=write-button]').click()
+    cy.contains('Saved reference successfully.')
+    cy.contains('New primary title.')
+    cy.contains('Cande') // Author 1
+    cy.contains('Ciochon') // Author 2
+  })
+
+  it('with missing required fields does not work', () => {
+    cy.visit('reference/10039')
+    cy.contains('New primary title.')
+    cy.get('[id=edit-button]').click()
+    cy.get('[id=title_primary-textfield]').clear()
+    cy.contains('4 Invalid fields')
+    cy.get('[id=write-button]').should('be.disabled')
+    cy.get('[id=title_primary-textfield]').type('New primary title.')
+
+    cy.get('[data-testid=RemoveCircleOutlineIcon]').first().click()
+    cy.get('[data-testid=RemoveCircleOutlineIcon]').first().click() // removes the selected authors
+    cy.contains('1 Invalid fields')
+    cy.get('[id=write-button]').should('be.disabled')
+    cy.get('[data-cy=Select\\ author-button]').click()
+    cy.get('[data-cy=detailview-button-1]').click()
+    cy.contains('Close').click()
+    cy.get('[id=write-button]').should('not.be.disabled')
+  })
 })
 
 // TODO: add more tests for different types of references
@@ -106,8 +144,7 @@ describe('Deleting a reference', () => {
     cy.login('testSu')
   })
 
-  // REMOVE SKIP
-  it.skip('that is not linked to anything works and returns user to table view', () => {
+  it('that is not linked to anything works and returns user to table view', () => {
     cy.visit('/reference/25000')
     cy.get('[id=delete-button]').should('exist').click()
     cy.on('window:confirm', str => {
