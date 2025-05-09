@@ -28,6 +28,41 @@ describe('Creating a species', () => {
   })
 })
 
+describe('Using an existing species as a template works', () => {
+  beforeEach('Login as admin', () => {
+    cy.login('testSu')
+  })
+
+  it('Using the copy button fills taxonomy fields with data', () => {
+    cy.visit('/species/new')
+    // this is here to make sure cypress waits until the button has loaded
+    cy.get('[id=copy_existing_taxonomy_button]').contains('Copy existing taxonomy')
+    cy.get('[id=copy_existing_taxonomy_button]').click()
+    cy.get('[data-cy=detailview-button-21052]').click()
+    cy.contains('Close').click()
+    cy.get('[id=subclass_or_superorder_name-textfield]').should('have.value', 'Eutheria')
+    cy.get('[id=order_name-textfield]').should('have.value', 'Rodentia')
+    cy.get('[id=suborder_or_superfamily_name-textfield]').should('have.value', '')
+    cy.get('[id=family_name-textfield]').should('have.value', 'Gliridae')
+    cy.get('[id=subfamily_name-textfield]').should('have.value', '')
+    cy.get('[id=genus_name-textfield]').should('have.value', 'Simplomys')
+    cy.get('[id=species_name-textfield]').should('have.value', 'simplicidens')
+    cy.get('[id=write-button]').should('not.be.disabled')
+
+    cy.get('[id=copy_existing_taxonomy_button]').click()
+    cy.get('[data-cy=detailview-button-84357]').click()
+    cy.contains('Close').click()
+    cy.get('[id=subclass_or_superorder_name-textfield]').should('have.value', 'Eutheria')
+    cy.get('[id=order_name-textfield]').should('have.value', 'Carnivora')
+    cy.get('[id=suborder_or_superfamily_name-textfield]').should('have.value', 'Pinnipedia')
+    cy.get('[id=family_name-textfield]').should('have.value', 'Odobenidae')
+    cy.get('[id=subfamily_name-textfield]').should('have.value', '')
+    cy.get('[id=genus_name-textfield]').should('have.value', 'Prototaria')
+    cy.get('[id=species_name-textfield]').should('have.value', 'planicephala')
+    cy.get('[id=write-button]').should('not.be.disabled')
+  })
+})
+
 describe('Deleting a species', () => {
   beforeEach('Login as admin', () => {
     cy.login('testSu')
