@@ -2,79 +2,40 @@ import { SpeciesDetailsType, Species } from '@/shared/types'
 import { ArrayFrame, HalfFrames } from '@/components/DetailView/common/tabLayoutHelpers'
 import { useDetailContext } from '@/components/DetailView/Context/DetailContext'
 import { emptyOption } from '@/components/DetailView/common/misc'
-import { Box, Tooltip } from '@mui/material'
+import { Box } from '@mui/material'
 import { SelectingTable } from '@/components/DetailView/common/SelectingTable'
 import { useGetAllSpeciesQuery } from '@/redux/speciesReducer'
-import { MRT_ColumnDef } from 'material-react-table'
+import { smallSpeciesTableColumns } from '@/common'
+
 export const TaxonomyTab = () => {
   const { textField, dropdown, bigTextField, editData, setEditData, mode } = useDetailContext<SpeciesDetailsType>()
   const { data: speciesQueryData, isError } = useGetAllSpeciesQuery()
 
-  const selectingTableColumns: MRT_ColumnDef<Species>[] = [
-    {
-      accessorKey: 'subclass_or_superorder_name',
-      header: 'Subclass or Superorder',
-    },
-    {
-      accessorKey: 'order_name',
-      header: 'Order',
-    },
-    {
-      accessorKey: 'suborder_or_superfamily_name',
-      header: 'Suborder or Superfamily',
-    },
-    {
-      accessorKey: 'family_name',
-      header: 'Family',
-    },
-    {
-      accessorKey: 'subfamily_name',
-      header: 'Subfamily or Tribe',
-    },
-    {
-      accessorKey: 'genus_name',
-      header: 'Genus',
-    },
-    {
-      accessorKey: 'species_name',
-      header: 'Species',
-    },
-    {
-      accessorKey: 'unique_identifier',
-      header: 'Unique Identifier',
-    },
-    {
-      accessorKey: 'taxonomic_status',
-      header: 'Taxon status',
-    },
-  ]
-
   const copyTaxonomyButton = (
-    <Tooltip title="Use an existing species' taxonomy as a base for this species." key="copy_button_tooltip">
-      <Box id="copy_existing_taxonomy_button">
-        <SelectingTable<Species, Species>
-          buttonText="Copy existing taxonomy"
-          data={speciesQueryData}
-          isError={isError}
-          columns={selectingTableColumns}
-          fieldName="order_name" // this doesn't do anything here but is required
-          idFieldName="species_id"
-          useObject={true}
-          editingAction={(selectedSpecies: Species) => {
-            setEditData({
-              ...editData,
-              subclass_or_superorder_name: selectedSpecies.subclass_or_superorder_name ?? '',
-              order_name: selectedSpecies.order_name ?? '',
-              suborder_or_superfamily_name: selectedSpecies.suborder_or_superfamily_name ?? '',
-              family_name: selectedSpecies.family_name ?? '',
-              subfamily_name: selectedSpecies.subfamily_name ?? '',
-              genus_name: selectedSpecies.genus_name ?? '',
-              species_name: selectedSpecies.species_name ?? '',
-            })
-          }}
-        />
-      </Box>
-    </Tooltip>
+    <Box key="copy_existing_taxonomy_button" id="copy_existing_taxonomy_button">
+      <SelectingTable<Species, Species>
+        buttonText="Copy existing taxonomy"
+        buttonTooltip="Use an existing species' taxonomy as a base for this species."
+        data={speciesQueryData}
+        isError={isError}
+        columns={smallSpeciesTableColumns}
+        fieldName="order_name" // this doesn't do anything here but is required
+        idFieldName="species_id"
+        useObject={true}
+        editingAction={(selectedSpecies: Species) => {
+          setEditData({
+            ...editData,
+            subclass_or_superorder_name: selectedSpecies.subclass_or_superorder_name ?? '',
+            order_name: selectedSpecies.order_name ?? '',
+            suborder_or_superfamily_name: selectedSpecies.suborder_or_superfamily_name ?? '',
+            family_name: selectedSpecies.family_name ?? '',
+            subfamily_name: selectedSpecies.subfamily_name ?? '',
+            genus_name: selectedSpecies.genus_name ?? '',
+            species_name: selectedSpecies.species_name ?? '',
+          })
+        }}
+      />
+    </Box>
   )
 
   const taxonStatusOptions = [
