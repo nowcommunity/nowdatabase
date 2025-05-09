@@ -2,7 +2,94 @@ before('Reset database', () => {
   cy.request(Cypress.env('databaseResetUrl'))
 })
 
-describe('Creating a reference', () => {
+describe('Creating a journal', () => {
+  beforeEach('Login as admin', () => {
+    cy.login('testSu')
+  })
+
+  it('with valid data works', () => {
+    cy.visit('/reference/new')
+    cy.contains('Journal')
+    cy.contains('7 Invalid fields')
+
+    cy.get('[id=title_primary-textfield]').type('New test reference')
+
+    cy.get('[data-cy=Select\\ author-button]').click()
+    cy.get('[data-cy=detailview-button-1]').click()
+    cy.contains('Close').click()
+
+    cy.get('[id=date_primary-textfield]').type('2025')
+
+    cy.get('[data-cy=Select\\ Journal-button]').click()
+    cy.get('[data-cy=detailview-button-100]').click()
+    cy.contains('Close').click()
+
+    cy.get('[id=write-button]').click()
+    cy.contains('Saved reference successfully.')
+  })
+
+  it('with missing required fields does not work', () => {
+    cy.visit('/reference/new')
+    cy.contains('Journal')
+    cy.contains('7 Invalid fields')
+
+    cy.get('[id=title_primary-textfield]').type('New test reference 2')
+    cy.contains('3 Invalid fields')
+    cy.get('[id=write-button]').should('be.disabled')
+
+    cy.get('[data-cy=Select\\ author-button]').click()
+    cy.get('[data-cy=detailview-button-1]').click()
+    cy.contains('Close').click()
+    cy.contains('2 Invalid fields')
+    cy.get('[id=write-button]').should('be.disabled')
+
+    cy.get('[id=date_primary-textfield]').type('2025')
+    cy.contains('1 Invalid fields')
+    cy.get('[id=write-button]').should('be.disabled')
+
+    cy.get('[data-cy=Select\\ Journal-button]').click()
+    cy.get('[data-cy=detailview-button-100]').click()
+    cy.contains('Close').click()
+    cy.get('[id=write-button]').should('not.be.disabled')
+
+    cy.get('[data-testid=RemoveCircleOutlineIcon]').first().click() // removes the selected author
+    cy.get('[id=write-button]').should('be.disabled')
+    cy.get('[data-cy=Select\\ author-button]').click()
+    cy.get('[data-cy=detailview-button-1]').click()
+    cy.contains('Close').click()
+    cy.get('[id=write-button]').should('not.be.disabled')
+  })
+
+  it('combined check with different types of titles and gen notes works', () => {
+    cy.visit('/reference/new')
+    cy.contains('Journal')
+    cy.contains('7 Invalid fields')
+
+    cy.get('[id=title_primary-textfield]').type('Title Primary')
+    cy.contains('3 Invalid fields')
+    cy.get('[id=title_primary-textfield]').clear()
+    cy.contains('7 Invalid fields')
+
+    cy.get('[id=title_secondary-textfield]').type('Title Secondary')
+    cy.contains('3 Invalid fields')
+    cy.get('[id=title_secondary-textfield]').clear()
+    cy.contains('7 Invalid fields')
+
+    cy.get('[id=title_series-textfield]').type('Title Series')
+    cy.contains('3 Invalid fields')
+    cy.get('[id=title_series-textfield]').clear()
+    cy.contains('7 Invalid fields')
+
+    cy.get('[id=gen_notes-textfield]').type('Gen Notes')
+    cy.contains('3 Invalid fields')
+    cy.get('[id=gen_notes-textfield]').clear()
+    cy.contains('7 Invalid fields')
+  })
+})
+
+// TODO: add more tests for different types of references
+
+describe('Editing a journal', () => {
   beforeEach('Login as admin', () => {
     cy.login('testSu')
   })
@@ -10,28 +97,17 @@ describe('Creating a reference', () => {
   it.skip('with valid data works', () => {})
 
   it.skip('with missing required fields does not work', () => {})
-
-  // TODO: add more tests for different types of references etc.
 })
 
-describe('Editing a reference', () => {
-  beforeEach('Login as admin', () => {
-    cy.login('testSu')
-  })
-
-  it.skip('with valid data works', () => {})
-
-  it.skip('with missing required fields does not work', () => {})
-
-  // TODO: add more tests for different types of references etc.
-})
+// TODO: add more tests for different types of references
 
 describe('Deleting a reference', () => {
   beforeEach('Login as admin', () => {
     cy.login('testSu')
   })
 
-  it('that is not linked to anything works and returns user to table view', () => {
+  // REMOVE SKIP
+  it.skip('that is not linked to anything works and returns user to table view', () => {
     cy.visit('/reference/25000')
     cy.get('[id=delete-button]').should('exist').click()
     cy.on('window:confirm', str => {
