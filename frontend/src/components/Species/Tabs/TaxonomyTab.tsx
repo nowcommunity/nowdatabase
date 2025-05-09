@@ -51,7 +51,7 @@ export const TaxonomyTab = () => {
 
   const copyTaxonomyButton = (
     <Tooltip title="Use an existing species' taxonomy as a base for this species." key="copy_button_tooltip">
-      <Box>
+      <Box id="copy_existing_taxonomy_button">
         <SelectingTable<Species, Species>
           buttonText="Copy existing taxonomy"
           data={speciesQueryData}
