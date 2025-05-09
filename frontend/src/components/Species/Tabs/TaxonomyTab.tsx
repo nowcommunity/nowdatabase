@@ -50,14 +50,14 @@ export const TaxonomyTab = () => {
   ]
 
   const copyTaxonomyButton = (
-    <Tooltip title="Use an existing species' taxonomy as a base for this species." key="copy_button">
+    <Tooltip title="Use an existing species' taxonomy as a base for this species." key="copy_button_tooltip">
       <Box>
         <SelectingTable<Species, Species>
           buttonText="Copy existing taxonomy"
           data={speciesQueryData}
           isError={isError}
           columns={selectingTableColumns}
-          fieldName="order_name" // this doesn't do anything but is required
+          fieldName="order_name" // this doesn't do anything here but is required
           idFieldName="species_id"
           useObject={true}
           editingAction={(selectedSpecies: Species) => {
@@ -96,7 +96,7 @@ export const TaxonomyTab = () => {
     ['Taxonomic Status', dropdown('taxonomic_status', taxonStatusOptions, 'Taxonomic Status')],
   ]
 
-  if (!mode.read) classification.unshift([copyTaxonomyButton]) // adds copy button to the start of the array
+  if (mode.new) classification.unshift([copyTaxonomyButton]) // adds copy button to the start of the array
 
   const comment = [['Comment', bigTextField('sp_comment')]]
 
