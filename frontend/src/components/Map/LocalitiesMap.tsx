@@ -1,21 +1,31 @@
-import { useRef } from 'react'
-import { MapContainer, TileLayer } from 'react-leaflet'
+import { useEffect, useRef } from 'react'
 import 'leaflet/dist/leaflet.css'
+import L, { LatLngExpression } from 'leaflet'
 
 export const LocalitiesMap = () => {
-  const mapRef = useRef(null)
-  const latitude = 30
-  const longitude = -5
+  const mapRef = useRef<HTMLDivElement | null>(null)
+
+  useEffect(() => {
+    if (!mapRef.current) return
+
+    var map = L.map(mapRef.current)
+    const coords: LatLngExpression = [60.204637, 24.962123]
+
+    map.setView(coords, 4)
+
+    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution:
+        '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+    }).addTo(map)
+
+    L.marker(coords).addTo(map).bindPopup('You are here').openPopup()
+
+    return () => {
+      map.remove()
+    }
+  }, [])
+
   document.title = 'Map'
 
-  return (
-    <div>
-      <MapContainer center={[latitude, longitude]} zoom={2} ref={mapRef} style={{ height: '50vh', width: '50vw' }}>
-        <TileLayer
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-        />
-      </MapContainer>
-    </div>
-  )
+  return <div ref={mapRef} style={{ height: '500px' }}></div>
 }
