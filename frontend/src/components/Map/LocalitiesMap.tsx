@@ -8,7 +8,7 @@ export const LocalitiesMap = () => {
   useEffect(() => {
     if (!mapRef.current) return
 
-    var map = L.map(mapRef.current)
+    const map = L.map(mapRef.current)
     const coords: LatLngExpression = [60.204637, 24.962123]
 
     map.setView(coords, 4)
