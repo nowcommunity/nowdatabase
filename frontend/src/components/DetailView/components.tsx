@@ -93,14 +93,15 @@ export const WriteButton = <T,>({
     if (mode.new && taxonomy) {
       const { data: speciesData } = await getSpeciesData(undefined, true)
       if (!speciesData) {
-        notify('Could not fetch species to check taxonomy data.')
+        notify('Could not fetch species to check taxonomy data.', 'error')
         setLoading(false)
         return
       }
       const errors = checkTaxonomy(editData as EditDataType<Species>, speciesData)
       if (errors.size > 0) {
         setLoading(false)
-        console.log(errors)
+        const errorMessage = [...errors].reduce((acc, currentError) => acc + `\n${currentError}`)
+        notify(errorMessage, 'error')
         return
       }
     }
