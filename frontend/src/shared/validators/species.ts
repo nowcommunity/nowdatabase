@@ -10,14 +10,28 @@ export const validateSpecies = (
     order_name: {
       name: 'Order',
       required: true,
+      asString: (orderName: string) => {
+        if (orderName !== 'incertae sedis' && orderName.indexOf(' ') !== -1) return 'Order must not contain any spaces.'
+      },
     },
     family_name: {
       name: 'Family',
       required: true,
+      asString: (familyName: string) => {
+        if (familyName !== 'incertae sedis' && familyName.indexOf(' ') !== -1)
+          return 'Family must not contain any spaces.'
+      },
     },
     genus_name: {
       name: 'Genus',
       required: true,
+      asString: (genusName: string) => {
+        if (genusName.indexOf(' ') !== -1) return 'Genus must not contain any spaces.'
+        if (genusName === 'indet.' && editData.species_name !== 'indet.')
+          return 'when the Genus is indet., Species must also be indet.'
+        if (genusName === 'gen.' && editData.species_name !== 'sp.')
+          return 'when the Genus is gen., Species must be sp.'
+      },
     },
     species_name: {
       name: 'Species',
