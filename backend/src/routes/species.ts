@@ -1,5 +1,5 @@
 import { Request, Router } from 'express'
-import { getAllSpecies, getSpeciesDetails, validateEntireSpecies } from '../services/species'
+import { getAllSpecies, getAllSpeciesGSU, getSpeciesDetails, validateEntireSpecies } from '../services/species'
 import { fixBigInt } from '../utils/common'
 import { EditMetaData, SpeciesDetailsType, Role } from '../../../frontend/src/shared/types'
 import { deleteSpecies, writeSpecies } from '../services/write/species'
@@ -10,6 +10,12 @@ const router = Router()
 router.get('/all', async (_req, res) => {
   const species = await getAllSpecies()
   return res.status(200).send(fixBigInt(species))
+})
+
+router.get('/GSU', async (_req, res) => {
+  const species = await getAllSpeciesGSU()
+  if (!species) return res.status(404).send()
+  return res.status(200).send(species)
 })
 
 router.get('/:id', async (req, res) => {
