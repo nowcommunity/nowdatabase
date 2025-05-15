@@ -23,8 +23,6 @@ export const LocalitiesMap = () => {
     localitiesQueryData?.forEach(locality =>
       L.marker([locality.dec_lat, locality.dec_long]).addTo(map).bindPopup(locality.loc_name)
     )
-    console.log(localitiesQueryData)
-
     return () => {
       map.remove()
     }
