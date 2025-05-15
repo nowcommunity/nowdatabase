@@ -22,7 +22,6 @@ export const checkTaxonomy = (editData: EditDataType<Species>, speciesData: Spec
       return new Set(['The taxon already exists in the database.'])
     }
 
-    // different family
     if (genus_name === species.genus_name && family_name !== species.family_name) {
       errors.add(`Genus ${genus_name} belongs to family ${species.family_name}, not ${family_name}.`)
     }
