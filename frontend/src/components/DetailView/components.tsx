@@ -8,7 +8,7 @@ import { useDetailContext } from './Context/DetailContext'
 import { EditDataType, Editable, Reference, Species } from '@/shared/types'
 import { useState, useEffect, Fragment } from 'react'
 import { referenceValidator } from '@/shared/validators/validator'
-import { checkTaxonomy } from '../Species/checkTaxonomy'
+import { checkTaxonomy, convertTaxonomyFields } from '../Species/taxonomyFunctions'
 import { useLazyGetAllSpeciesQuery } from '@/redux/speciesReducer'
 import { useNotify } from '@/hooks/notification'
 
@@ -90,6 +90,7 @@ export const WriteButton = <T,>({
 
   const handleWriteButtonClick = async () => {
     setLoading(true)
+    let speciesEditData: EditDataType<Species> = {}
     if (mode.new && taxonomy) {
       const { data: speciesData } = await getSpeciesData(undefined, true)
       if (!speciesData) {
@@ -97,7 +98,9 @@ export const WriteButton = <T,>({
         setLoading(false)
         return
       }
-      const errors = checkTaxonomy(editData as EditDataType<Species>, speciesData)
+      // converts taxonomy fields to capitalized/lowercased
+      speciesEditData = convertTaxonomyFields(editData as EditDataType<Species>)
+      const errors = checkTaxonomy(speciesEditData, speciesData)
       if (errors.size > 0) {
         setLoading(false)
         const errorMessage = [...errors].reduce((acc, currentError) => acc + `\n${currentError}`)
@@ -111,7 +114,7 @@ export const WriteButton = <T,>({
       return
     }
 
-    void onWrite(editData, setEditData).then(() => {
+    void onWrite(taxonomy ? (speciesEditData as EditDataType<T>) : editData, setEditData).then(() => {
       setLoading(false)
       setMode('read')
     })

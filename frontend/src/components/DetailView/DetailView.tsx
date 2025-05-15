@@ -27,6 +27,7 @@ export type TabType = {
 export type TextFieldOptions = (
   | {
       type: 'text'
+      trim?: boolean
     }
   | {
       type: 'number'
