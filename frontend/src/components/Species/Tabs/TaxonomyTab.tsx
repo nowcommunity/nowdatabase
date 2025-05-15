@@ -1,4 +1,4 @@
-import { SpeciesDetailsType, Species } from '@/shared/types'
+import { SpeciesDetailsType, Species, EditDataType } from '@/shared/types'
 import { ArrayFrame, HalfFrames } from '@/components/DetailView/common/tabLayoutHelpers'
 import { useDetailContext } from '@/components/DetailView/Context/DetailContext'
 import { emptyOption } from '@/components/DetailView/common/misc'
@@ -6,6 +6,34 @@ import { Box } from '@mui/material'
 import { SelectingTable } from '@/components/DetailView/common/SelectingTable'
 import { useGetAllSpeciesQuery } from '@/redux/speciesReducer'
 import { smallSpeciesTableColumns } from '@/common'
+
+export const checkTaxonomy = (
+  editData: EditDataType<Species>,
+  GSUData: Pick<Species, 'genus_name' | 'species_name' | 'unique_identifier'>[]
+) => {
+  const {
+    subclass_or_superorder_name,
+    order_name,
+    suborder_or_superfamily_name,
+    family_name,
+    subfamily_name,
+    genus_name,
+    species_name,
+    unique_identifier,
+  } = editData
+  const errors = []
+
+  for (const GSU of GSUData) {
+    if (
+      genus_name === GSU.genus_name &&
+      species_name === GSU.species_name &&
+      unique_identifier === GSU.unique_identifier
+    )
+      return ['The taxon already exists in the database']
+  }
+
+  return []
+}
 
 export const TaxonomyTab = () => {
   const { textField, dropdown, bigTextField, editData, setEditData, mode } = useDetailContext<SpeciesDetailsType>()
