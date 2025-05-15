@@ -18,6 +18,7 @@ describe('Creating a species', () => {
     cy.get('[id=write-button]').should('not.be.disabled')
     cy.get('[id=write-button]').click()
     cy.contains('testOrder')
+    // TODO: check that all fields are properly capitalised or lowercased after creating species
   })
 
   it('with missing required fields does not work', () => {
@@ -26,6 +27,12 @@ describe('Creating a species', () => {
     cy.get('[id=write-button]').should('be.disabled')
     cy.contains('4 Invalid fields')
   })
+
+  it.skip('that already exists in database does not work')
+  it.skip('with invalid order/family pair does not work')
+  it.skip('with invalid family/genus pair does not work')
+  it.skip('when genus is indet. and species is not indet. does not work')
+  it.skip('when genus is gen. and species is not sp. does not work')
 })
 
 describe('Using an existing species as a template works', () => {
