@@ -9,12 +9,6 @@ const speciesApi = api.injectEndpoints({
       }),
       providesTags: result => (result ? [{ type: 'specieslist' }] : []),
     }),
-    getAllSpeciesGSU: builder.query<Species[], void>({
-      query: () => ({
-        url: `/species/GSU`,
-      }),
-      providesTags: result => (result ? [{ type: 'GSU' }] : []),
-    }),
     getSpeciesDetails: builder.query<SpeciesDetailsType, string>({
       query: id => ({
         url: `/species/${id}`,
@@ -45,7 +39,6 @@ const speciesApi = api.injectEndpoints({
 export const {
   useGetAllSpeciesQuery,
   useLazyGetAllSpeciesQuery,
-  useLazyGetAllSpeciesGSUQuery,
   useGetSpeciesDetailsQuery,
   useEditSpeciesMutation,
   useDeleteSpeciesMutation,

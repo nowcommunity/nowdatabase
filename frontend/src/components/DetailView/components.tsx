@@ -8,8 +8,8 @@ import { useDetailContext } from './Context/DetailContext'
 import { EditDataType, Editable, Reference, Species } from '@/shared/types'
 import { useState, useEffect, Fragment } from 'react'
 import { referenceValidator } from '@/shared/validators/validator'
-import { checkTaxonomy } from '../Species/Tabs/TaxonomyTab'
-import { useLazyGetAllSpeciesGSUQuery } from '@/redux/speciesReducer'
+import { checkTaxonomy } from '../Species/checkTaxonomy'
+import { useLazyGetAllSpeciesQuery } from '@/redux/speciesReducer'
 import { useNotify } from '@/hooks/notification'
 
 export const WriteButton = <T,>({
@@ -25,7 +25,7 @@ export const WriteButton = <T,>({
     useDetailContext<T>()
   const [loading, setLoading] = useState(false)
   const notify = useNotify()
-  const [getGSUData] = useLazyGetAllSpeciesGSUQuery()
+  const [getSpeciesData] = useLazyGetAllSpeciesQuery()
   const getButtonText = () => {
     if (!mode.staging) return hasStagingMode ? 'Finalize entry' : 'Save changes'
     return 'Complete and save'
@@ -91,15 +91,16 @@ export const WriteButton = <T,>({
   const handleWriteButtonClick = async () => {
     setLoading(true)
     if (mode.new && taxonomy) {
-      const { data: GSUData } = await getGSUData(undefined, true)
-      if (!GSUData) {
+      const { data: speciesData } = await getSpeciesData(undefined, true)
+      if (!speciesData) {
         notify('Could not fetch species to check taxonomy data.')
         setLoading(false)
         return
       }
-      const errors = checkTaxonomy(editData as EditDataType<Species>, GSUData)
-      if (errors.length > 0) {
+      const errors = checkTaxonomy(editData as EditDataType<Species>, speciesData)
+      if (errors.size > 0) {
         setLoading(false)
+        console.log(errors)
         return
       }
     }
