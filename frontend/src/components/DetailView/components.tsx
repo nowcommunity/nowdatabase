@@ -5,20 +5,27 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack'
 import SaveIcon from '@mui/icons-material/Save'
 import { usePageContext } from '../Page'
 import { useDetailContext } from './Context/DetailContext'
-import { EditDataType, Editable, Reference } from '@/shared/types'
+import { EditDataType, Editable, Reference, Species } from '@/shared/types'
 import { useState, useEffect, Fragment } from 'react'
 import { referenceValidator } from '@/shared/validators/validator'
+import { checkTaxonomy } from '../Species/Tabs/TaxonomyTab'
+import { useLazyGetAllSpeciesGSUQuery } from '@/redux/speciesReducer'
+import { useNotify } from '@/hooks/notification'
 
 export const WriteButton = <T,>({
   onWrite,
+  taxonomy,
   hasStagingMode = false,
 }: {
   onWrite: (editData: EditDataType<T>, setEditData: (editData: EditDataType<T>) => void) => Promise<void>
+  taxonomy?: boolean
   hasStagingMode?: boolean
 }) => {
   const { editData, setEditData, mode, setMode, validator, fieldsWithErrors, setFieldsWithErrors } =
     useDetailContext<T>()
   const [loading, setLoading] = useState(false)
+  const notify = useNotify()
+  const [getGSUData] = useLazyGetAllSpeciesGSUQuery()
   const getButtonText = () => {
     if (!mode.staging) return hasStagingMode ? 'Finalize entry' : 'Save changes'
     return 'Complete and save'
@@ -81,22 +88,39 @@ export const WriteButton = <T,>({
     // @ts-expect-error Reason: Typescript doesn't recognise that references do exist. Unable to find a way around it. Fix if extra time
   }, [mode, editData.references])
 
+  const handleWriteButtonClick = async () => {
+    setLoading(true)
+    if (mode.new && taxonomy) {
+      const { data: GSUData } = await getGSUData(undefined, true)
+      if (!GSUData) {
+        notify('Could not fetch species to check taxonomy data.')
+        setLoading(false)
+        return
+      }
+      const errors = checkTaxonomy(editData as EditDataType<Species>, GSUData)
+      if (errors.length > 0) {
+        setLoading(false)
+        return
+      }
+    }
+    if (!mode.staging && hasStagingMode) {
+      setMode(mode.new ? 'staging-new' : 'staging-edit')
+      setLoading(false)
+      return
+    }
+
+    void onWrite(editData, setEditData).then(() => {
+      setLoading(false)
+      setMode('read')
+    })
+  }
+
   return (
     <Button
       disabled={Object.keys(fieldsWithErrors).length > 0}
       id="write-button"
       sx={{ width: '20em' }}
-      onClick={() => {
-        if (!mode.staging && hasStagingMode) {
-          setMode(mode.new ? 'staging-new' : 'staging-edit')
-          return
-        }
-        setLoading(true)
-        void onWrite(editData, setEditData).then(() => {
-          setLoading(false)
-          setMode('read')
-        })
-      }}
+      onClick={handleWriteButtonClick}
       variant="contained"
     >
       {loading ? (

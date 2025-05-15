@@ -57,6 +57,18 @@ export const getAllSpecies = async () => {
   return result
 }
 
+export const getAllSpeciesGSU = async () => {
+  const result = await nowDb.com_species.findMany({
+    select: {
+      genus_name: true,
+      species_name: true,
+      unique_identifier: true,
+    },
+  })
+
+  return result
+}
+
 export const getSpeciesDetails = async (id: number) => {
   const result = await nowDb.com_species.findUnique({
     where: { species_id: id },
