@@ -4,12 +4,23 @@ import { fixBigInt } from '../utils/common'
 import { EditDataType, EditMetaData, LocalityDetailsType, Role } from '../../../frontend/src/shared/types'
 import { requireOneOf } from '../middlewares/authorizer'
 import { deleteLocality, writeLocality } from '../services/write/locality'
+import { Placemark, generateKLM } from '../utils/klm'
 
 const router = Router()
 
 router.get('/all', async (req, res) => {
   const localities = await getAllLocalities(req.user)
   return res.status(200).send(fixBigInt(localities))
+})
+
+router.get('/kml', async (req, res) => {
+  const localities = await getAllLocalities(req.user)
+  const kml = generateKLM(
+    localities.map(loc => {
+      return { name: loc.loc_name, lat: loc.dec_lat, long: loc.dec_long } as Placemark
+    })
+  )
+  return res.status(200).send(kml)
 })
 
 router.get('/:id', async (req, res) => {
