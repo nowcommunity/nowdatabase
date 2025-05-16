@@ -14,7 +14,7 @@ describe('Creating a species', () => {
     cy.get('[id=suborder_or_superfamily_name-textfield]').type('testSuperFamily')
     cy.get('[id=family_name-textfield]').type('testFamily')
     cy.get('[id=subfamily_name-textfield]').type('testSubFamily')
-    cy.get('[id=genus_name-textfield]').type('testGenus with spaces')
+    cy.get('[id=genus_name-textfield]').type('testGenus')
     cy.get('[id=species_name-textfield]').type('testSpecies')
     cy.get('[id=unique_identifier-textfield]').type('{backspace}testUniqueIdentifier')
     cy.get('[id=write-button]').should('not.be.disabled')
@@ -32,12 +32,12 @@ describe('Creating a species', () => {
     cy.contains('TestSuperFamily')
     cy.contains('TestFamily')
     cy.contains('TestSubFamily')
-    cy.contains('TestGenuswithspaces')
+    cy.contains('TestGenus')
     cy.contains('testspecies')
     cy.contains('testUniqueIdentifier')
   })
 
-  it('with missing required fields does not work', () => {
+  it('with missing or invalid fields does not work', () => {
     cy.visit('/species/new')
     cy.contains('This field is required')
     cy.get('[id=write-button]').should('be.disabled')
@@ -154,6 +154,24 @@ describe('Taxonomy checks work', () => {
     cy.get('[id=species_name-textfield]').clear()
     cy.get('[id=species_name-textfield]').type('sp.')
     cy.get('[id=write-button]').should('not.be.disabled')
+  })
+
+  it('Order and Family must not contains spaces, unless they are incertae sedis', () => {
+    cy.visit('/species/new')
+    cy.get('[id=order_name-textfield]').type('test Order')
+    cy.contains('​Order must not contain any spaces, unless the value is "incertae sedis".')
+    cy.get('[id=write-button]').should('be.disabled')
+    cy.get('[id=order_name-textfield]').clear()
+    cy.get('[id=order_name-textfield]').type('incertae sedis')
+
+    cy.get('[id=family_name-textfield]').type('test Family')
+    cy.contains('Family must not contain any spaces, unless the value is "incertae sedis".')
+    cy.get('[id=write-button]').should('be.disabled')
+    cy.get('[id=family_name-textfield]').clear()
+    cy.get('[id=family_name-textfield]').type('incertae sedis')
+
+    cy.get('[id=genus_name-textfield]').type('testGenus')
+    cy.get('[id=species_name-textfield]').type('testSpecies')
   })
 })
 
