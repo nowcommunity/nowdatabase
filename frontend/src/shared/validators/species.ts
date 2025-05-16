@@ -36,6 +36,12 @@ export const validateSpecies = (
     species_name: {
       name: 'Species',
       required: true,
+      asString: (speciesName: string) => {
+        if (speciesName !== 'indet.' && editData.genus_name === 'indet.')
+          return 'when the Genus is indet., Species must also be indet.'
+        if (speciesName !== 'sp.' && editData.genus_name === 'gen.')
+          return 'when the Genus is gen., Species must be sp.'
+      },
     },
     unique_identifier: {
       name: 'Unique Identifier',

@@ -9,10 +9,14 @@ describe('Creating a species', () => {
 
   it('with valid data works', () => {
     cy.visit('/species/new')
+    cy.get('[id=subclass_or_superorder_name-textfield]').type('testSuperOrder')
     cy.get('[id=order_name-textfield]').type('testOrder')
+    cy.get('[id=suborder_or_superfamily_name-textfield]').type('testSuperFamily')
     cy.get('[id=family_name-textfield]').type('testFamily')
-    cy.get('[id=genus_name-textfield]').type('testGenus')
+    cy.get('[id=subfamily_name-textfield]').type('testSubFamily')
+    cy.get('[id=genus_name-textfield]').type('testGenus with spaces')
     cy.get('[id=species_name-textfield]').type('testSpecies')
+    cy.get('[id=unique_identifier-textfield]').type('{backspace}testUniqueIdentifier')
     cy.get('[id=write-button]').should('not.be.disabled')
     cy.get('[id=write-button]').click()
     cy.get('[id=write-button]').should('be.disabled')
@@ -21,8 +25,16 @@ describe('Creating a species', () => {
     cy.contains('button', 'Close').click()
     cy.get('[id=write-button]').should('not.be.disabled')
     cy.get('[id=write-button]').click()
-    cy.contains('testOrder')
-    // TODO: check that all fields are properly capitalised or lowercased after creating species
+
+    // tests that values are capitalised properly
+    cy.contains('TestSuperOrder')
+    cy.contains('TestOrder')
+    cy.contains('TestSuperFamily')
+    cy.contains('TestFamily')
+    cy.contains('TestSubFamily')
+    cy.contains('TestGenuswithspaces')
+    cy.contains('testspecies')
+    cy.contains('testUniqueIdentifier')
   })
 
   it('with missing required fields does not work', () => {
@@ -31,12 +43,6 @@ describe('Creating a species', () => {
     cy.get('[id=write-button]').should('be.disabled')
     cy.contains('4 invalid fields')
   })
-
-  it.skip('that already exists in database does not work')
-  it.skip('with invalid order/family pair does not work')
-  it.skip('with invalid family/genus pair does not work')
-  it.skip('when genus is indet. and species is not indet. does not work')
-  it.skip('when genus is gen. and species is not sp. does not work')
 })
 
 describe('Editing a species', () => {
@@ -107,6 +113,83 @@ describe('Editing a species', () => {
     cy.contains('newFamily')
     cy.contains('modifiedGenus')
     cy.contains('Subfamily or Tribe heimo')
+  })
+})
+
+describe('Taxonomy checks work', () => {
+  beforeEach('Login as admin', () => {
+    cy.login('testSu')
+  })
+
+  it('Creating a species that already exists in database does not work', () => {
+    cy.visit('/species/new')
+    cy.get('[id=copy_existing_taxonomy_button]').contains('Copy existing taxonomy')
+    cy.get('[id=copy_existing_taxonomy_button]').click()
+    cy.get('[data-cy=detailview-button-21052]').click()
+    cy.contains('Close').click()
+    cy.get('[id=write-button]').click()
+    cy.contains('The taxon already exists in the database.')
+  })
+
+  it('Invalid order/family pair does not work', () => {
+    cy.visit('/species/new')
+    cy.get('[id=copy_existing_taxonomy_button]').contains('Copy existing taxonomy')
+    cy.get('[id=copy_existing_taxonomy_button]').click()
+    cy.get('[data-cy=detailview-button-21052]').click()
+    cy.contains('Close').click()
+    cy.get('[id=unique_identifier-textfield]').type('{backspace}new identifier') // change identifier so it's not a duplicate species
+    cy.get('[id=order_name-textfield]').should('have.value', 'Rodentia')
+    cy.get('[id=order_name-textfield]').clear()
+    cy.get('[id=order_name-textfield]').type('Carnivora')
+    cy.get('[id=write-button]').click()
+    cy.contains('Family Gliridae belongs to order Rodentia, not Carnivora.')
+  })
+
+  it('Invalid family/genus pair does not work', () => {
+    cy.visit('/species/new')
+    cy.get('[id=copy_existing_taxonomy_button]').contains('Copy existing taxonomy')
+    cy.get('[id=copy_existing_taxonomy_button]').click()
+    cy.get('[data-cy=detailview-button-21052]').click()
+    cy.contains('Close').click()
+    cy.get('[id=unique_identifier-textfield]').type('{backspace}new identifier')
+    cy.get('[id=family_name-textfield]').should('have.value', 'Gliridae')
+    cy.get('[id=family_name-textfield]').clear()
+    cy.get('[id=family_name-textfield]').type('Soricidae')
+    cy.get('[id=write-button]').click()
+    cy.contains('Family Soricidae belongs to order Eulipotyphla, not Rodentia.')
+    cy.contains('Genus Simplomys belongs to family Gliridae, not Soricidae.')
+  })
+
+  it('When genus is indet. species has to be indet.', () => {
+    cy.visit('/species/new')
+    cy.get('[id=copy_existing_taxonomy_button]').contains('Copy existing taxonomy')
+    cy.get('[id=copy_existing_taxonomy_button]').click()
+    cy.get('[data-cy=detailview-button-21052]').click()
+    cy.contains('Close').click()
+    cy.get('[id=unique_identifier-textfield]').type('{backspace}new identifier')
+    cy.get('[id=genus_name-textfield]').clear()
+    cy.get('[id=genus_name-textfield]').type('indet.')
+    cy.contains('when the Genus is indet., Species must also be indet.')
+    cy.get('[id=write-button]').should('be.disabled')
+    cy.get('[id=species_name-textfield]').clear()
+    cy.get('[id=species_name-textfield]').type('indet.')
+    cy.get('[id=write-button]').should('not.be.disabled')
+  })
+
+  it('When genus is gen. species has to be sp.', () => {
+    cy.visit('/species/new')
+    cy.get('[id=copy_existing_taxonomy_button]').contains('Copy existing taxonomy')
+    cy.get('[id=copy_existing_taxonomy_button]').click()
+    cy.get('[data-cy=detailview-button-21052]').click()
+    cy.contains('Close').click()
+    cy.get('[id=unique_identifier-textfield]').type('{backspace}new identifier')
+    cy.get('[id=genus_name-textfield]').clear()
+    cy.get('[id=genus_name-textfield]').type('gen.')
+    cy.contains('when the Genus is gen., Species must be sp.')
+    cy.get('[id=write-button]').should('be.disabled')
+    cy.get('[id=species_name-textfield]').clear()
+    cy.get('[id=species_name-textfield]').type('sp.')
+    cy.get('[id=write-button]').should('not.be.disabled')
   })
 })
 
