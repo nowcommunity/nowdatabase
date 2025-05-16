@@ -6,12 +6,12 @@ export const validateSpecies = (
   fieldName: keyof EditDataType<SpeciesDetailsType>
 ) => {
   const validators: Validators<Partial<EditDataType<SpeciesDetailsType>>> = {
-    // const isNew = editData.lid === undefined
     order_name: {
       name: 'Order',
       required: true,
       asString: (orderName: string) => {
-        if (orderName !== 'incertae sedis' && orderName.indexOf(' ') !== -1) return 'Order must not contain any spaces.'
+        if (orderName !== 'incertae sedis' && orderName.indexOf(' ') !== -1)
+          return 'Order must not contain any spaces, unless the value is "incertae sedis".'
       },
     },
     family_name: {
@@ -19,7 +19,7 @@ export const validateSpecies = (
       required: true,
       asString: (familyName: string) => {
         if (familyName !== 'incertae sedis' && familyName.indexOf(' ') !== -1)
-          return 'Family must not contain any spaces.'
+          return 'Family must not contain any spaces, unless the value is "incertae sedis".'
       },
     },
     genus_name: {
