@@ -1,16 +1,7 @@
 import { EditDataType, Species } from '@/shared/types'
 
 export const checkTaxonomy = (editData: EditDataType<Species>, speciesData: Species[]) => {
-  const {
-    subclass_or_superorder_name,
-    order_name,
-    suborder_or_superfamily_name,
-    family_name,
-    subfamily_name,
-    genus_name,
-    species_name,
-    unique_identifier,
-  } = editData
+  const { order_name, family_name, genus_name, species_name, unique_identifier } = editData
   const errors = new Set<string>()
 
   for (const species of speciesData) {
@@ -19,7 +10,8 @@ export const checkTaxonomy = (editData: EditDataType<Species>, speciesData: Spec
       species_name === species.species_name &&
       unique_identifier === species.unique_identifier
     ) {
-      return new Set(['The taxon already exists in the database.'])
+      errors.add('The taxon already exists in the database.')
+      return errors
     }
 
     if (genus_name === species.genus_name && family_name !== species.family_name) {
