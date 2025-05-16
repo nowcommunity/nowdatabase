@@ -104,6 +104,7 @@ export const SpeciesDetails = () => {
       data={isNew ? emptySpecies : data!}
       onWrite={onWrite}
       isNew={isNew}
+      taxonomy={true}
       hasStagingMode
       validator={validateSpecies}
       deleteFunction={deleteFunction}

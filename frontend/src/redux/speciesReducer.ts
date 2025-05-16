@@ -36,5 +36,10 @@ const speciesApi = api.injectEndpoints({
   }),
 })
 
-export const { useGetAllSpeciesQuery, useGetSpeciesDetailsQuery, useEditSpeciesMutation, useDeleteSpeciesMutation } =
-  speciesApi
+export const {
+  useGetAllSpeciesQuery,
+  useLazyGetAllSpeciesQuery,
+  useGetSpeciesDetailsQuery,
+  useEditSpeciesMutation,
+  useDeleteSpeciesMutation,
+} = speciesApi

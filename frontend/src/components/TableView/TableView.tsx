@@ -214,7 +214,7 @@ export const TableView = <T extends MRT_RowData>({
           <ContactForm<T> buttonText="Contact" noContext={true} />
         </Box>
       )}
-      {editRights.new && title != 'Locality-Species-Cross-Search' && (
+      {!selectorFn && editRights.new && title != 'Locality-Species-Cross-Search' && (
         <Box sx={{ display: 'flex', gap: '0.4em', justifyContent: 'flex-end', margin: '0.5em', marginTop: '1em' }}>
           <Button variant="contained" component={Link} to="new">
             New
