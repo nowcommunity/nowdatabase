@@ -1,14 +1,24 @@
 .table-tool-bar {
   display: flex;
   align-items: center;
-  padding: 0.6em;
   flex: 1;
   justify-content: space-between;
 }
 
-.table-tool-bar .contact-button {
-  margin-left: 0.6em;
+.table-tool-bar .icon-buttons {
+  padding: 0.6em;
+}
 
+.table-tool-bar .button {
   color: #2e7fab;
   border-color: #2e7fab;
+}
+
+.table-tool-bar .left-buttons {
+  display: flex;
+  align-items: center;
+  padding: 0;
+  padding-left: 0.7em;
+  margin: 0;
+  gap: 0.4em;
 }

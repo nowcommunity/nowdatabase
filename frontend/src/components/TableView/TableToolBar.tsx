@@ -1,21 +1,25 @@
-import { Box, CircularProgress, IconButton, Menu, MenuItem, Tooltip } from '@mui/material'
+import { Box, Button, CircularProgress, IconButton, Menu, MenuItem, Tooltip } from '@mui/material'
 import { MRT_RowData, MRT_ShowHideColumnsButton, MRT_TableInstance } from 'material-react-table'
 import { exportRows } from './helpers'
 import { ContactForm } from '../DetailView/common/ContactForm'
 import FileDownloadIcon from '@mui/icons-material/FileDownload'
 import '../../styles/TableToolBar.css'
 import { useState } from 'react'
+import { Link } from 'react-router-dom'
+import AddCircleIcon from '@mui/icons-material/AddCircle'
 
 export const TableToolBar = <T extends MRT_RowData>({
   table,
   combinedExport,
   exportIsLoading,
   selectorFn,
+  showNewButton,
 }: {
   table: MRT_TableInstance<T>
   combinedExport?: (lids: number[]) => Promise<void>
   exportIsLoading?: boolean
   selectorFn?: (id: T) => void
+  showNewButton?: boolean
 }) => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
   const open = Boolean(anchorEl)
@@ -30,21 +34,29 @@ export const TableToolBar = <T extends MRT_RowData>({
   return (
     <div className="table-tool-bar">
       {!selectorFn && (
-        <Box>
+        <Box className="left-buttons">
           <ContactForm<T> buttonText="Contact" noContext={true} />
+
+          {showNewButton && (
+            <Button variant="outlined" component={Link} to="new" className="button" startIcon={<AddCircleIcon />}>
+              New
+            </Button>
+          )}
         </Box>
       )}
       <Box className="icon-buttons">
         <MRT_ShowHideColumnsButton table={table} />
-        <IconButton
-          id="export-button"
-          aria-controls={open ? 'export-menu' : undefined}
-          aria-haspopup="true"
-          aria-expanded={open ? 'true' : undefined}
-          onClick={handleClick}
-        >
-          <FileDownloadIcon />
-        </IconButton>
+        <Tooltip title="Export">
+          <IconButton
+            id="export-button"
+            aria-controls={open ? 'export-menu' : undefined}
+            aria-haspopup="true"
+            aria-expanded={open ? 'true' : undefined}
+            onClick={handleClick}
+          >
+            <FileDownloadIcon />
+          </IconButton>
+        </Tooltip>
         <Menu
           id="export-menu"
           anchorEl={anchorEl}
@@ -70,8 +82,7 @@ export const TableToolBar = <T extends MRT_RowData>({
                   <span style={{ fontSize: 18 }}>
                     Export&lsquo;s all localities filtered in the table below with all their species. The export is
                     sorted by name. This may take up to a minute, so please wait without closing the browser or
-                    switching page. To export only localities use the &lsquo;export&lsquo; button in the top-right
-                    corner of the table.
+                    switching page. To export only localities use the &lsquo;Export table&lsquo; option above.
                   </span>
                 }
               >

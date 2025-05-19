@@ -25,6 +25,9 @@
   border-radius: 0.25rem;
   padding: 0.4em 1em 0.3em 0.5em;
   gap: 0.8em;
+  text-decoration: none;
+  color: white;
+  font-weight: 500;
 }
 
 #main-navbar .menu-list {
@@ -41,9 +44,14 @@
   padding-top: 0.1em;
 }
 
+#main-navbar .logout-link {
+  padding: 0.44em 1em;
+}
+
 #main-navbar .menu-item,
 #main-navbar .logout-link,
-#main-navbar .login-link {
+#main-navbar .login-link,
+#main-navbar .username-box {
   transition: background 0.1s ease-out;
   background-color: transparent;
   border-radius: 0.25rem;
@@ -51,6 +59,7 @@
 
 #main-navbar .menu-item:hover,
 #main-navbar .logout-link:hover,
-#main-navbar .login-link:hover {
+#main-navbar .login-link:hover,
+#main-navbar .username-box:hover {
   background-color: var(--color-hl);
 }

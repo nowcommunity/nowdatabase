@@ -57,7 +57,7 @@ export const NavBar = () => {
     { title: 'Map', url: '/map' },
   ]
 
-  if (user.username) pages.push({ title: 'User', url: '/person/user-page' })
+  // if (user.username) pages.push({ title: 'User', url: '/person/user-page' })
 
   const logout = () => {
     dispatch(clearUser())
@@ -153,10 +153,10 @@ export const NavBar = () => {
         <Box alignContent="center" className="user-controls">
           {user.username ? (
             <Stack className="logged-in-controls">
-              <div className="username-box">
+              <a className="username-box" href="/person/user-page">
                 <PersonIcon />
                 <span>{user.username}</span>
-              </div>
+              </a>
               {logoutButton}
             </Stack>
           ) : (

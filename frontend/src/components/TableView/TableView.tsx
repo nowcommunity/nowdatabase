@@ -9,15 +9,14 @@ import {
   MaterialReactTable,
   MRT_VisibilityState,
 } from 'material-react-table'
-import { Box, Button, CircularProgress, Paper } from '@mui/material'
-import { Link, useLocation, useNavigate } from 'react-router-dom'
+import { Box, CircularProgress, Paper } from '@mui/material'
+import { useLocation, useNavigate } from 'react-router-dom'
 import { ActionComponent } from './ActionComponent'
 import { usePageContext } from '../Page'
 import { useUser } from '@/hooks/user'
 import { defaultPagination, defaultPaginationSmall } from '@/common'
 import '../../styles/TableView.css'
 import { TableToolBar } from './TableToolBar'
-import { renderCustomToolbar, renderCustomToolbarModalVersion } from './helpers'
 
 type TableStateInUrl = 'sorting' | 'columnfilters' | 'pagination'
 
@@ -197,18 +196,15 @@ export const TableView = <T extends MRT_RowData>({
 
   return (
     <Paper elevation={5}>
-      {editRights.new && title != 'Locality-Species-Cross-Search' && (
-        <Box sx={{ display: 'flex', gap: '0.4em', justifyContent: 'flex-end', margin: '0.5em', marginTop: '1em' }}>
-          <Button variant="contained" component={Link} to="new">
-            New
-          </Button>
-        </Box>
-      )}
-
       {user && (
         <div className="table-top-row">
           <Box className="title">{title ?? ''}</Box>
-          <TableToolBar<T> table={table} combinedExport={combinedExport} exportIsLoading={exportIsLoading} />
+          <TableToolBar<T>
+            table={table}
+            combinedExport={combinedExport}
+            exportIsLoading={exportIsLoading}
+            showNewButton={editRights.new && title != 'Locality-Species-Cross-Search'}
+          />
         </div>
       )}
 

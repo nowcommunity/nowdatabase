@@ -22,7 +22,7 @@ export const ContactModal = ({
 
   return (
     <Box>
-      <Button onClick={() => setOpen(true)} variant="outlined" startIcon={<EmailIcon />} className="contact-button">
+      <Button onClick={() => setOpen(true)} variant="outlined" startIcon={<EmailIcon />} className="button">
         {buttonText}
       </Button>
       <Modal open={open} aria-labelledby={`modal-${buttonText}`} aria-describedby={`modal-${buttonText}`}>
