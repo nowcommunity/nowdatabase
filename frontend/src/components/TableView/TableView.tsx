@@ -9,14 +9,15 @@ import {
   MaterialReactTable,
   MRT_VisibilityState,
 } from 'material-react-table'
-import { Box, Button, CircularProgress, Divider, Paper, Tooltip, Typography } from '@mui/material'
+import { Box, Button, CircularProgress, Paper } from '@mui/material'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
-import { renderCustomToolbar, renderCustomToolbarModalVersion } from './helpers'
 import { ActionComponent } from './ActionComponent'
 import { usePageContext } from '../Page'
 import { useUser } from '@/hooks/user'
-import { ContactForm } from '../DetailView/common/ContactForm'
 import { defaultPagination, defaultPaginationSmall } from '@/common'
+import '../../styles/TableView.css'
+import { TableToolBar } from './TableToolBar'
+import { renderCustomToolbar, renderCustomToolbarModalVersion } from './helpers'
 
 type TableStateInUrl = 'sorting' | 'columnfilters' | 'pagination'
 
@@ -145,12 +146,9 @@ export const TableView = <T extends MRT_RowData>({
     columnFilterModeOptions: ['fuzzy', 'contains', 'startsWith', 'endsWith', 'equals'],
     enableColumnActions: false,
     enableHiding: true,
-    renderToolbarInternalActions:
-      /*
-        To know what components you can render here if necessary, see the source code:
-        https://github.com/KevinVandy/material-react-table/blob/85b98f9aaa038df48aa1dd35123560abce78ee58/packages/material-react-table/src/components/toolbar/MRT_ToolbarInternalButtons.tsx#L45
-      */
-      selectorFn ? renderCustomToolbarModalVersion : renderCustomToolbar,
+    enableTopToolbar: false,
+    renderToolbarInternalActions: () => <></>,
+    // renderToolbarInternalActions: selectorFn ? renderCustomToolbarModalVersion : renderCustomToolbar,
   })
 
   // Load state from url only on first render
@@ -198,22 +196,7 @@ export const TableView = <T extends MRT_RowData>({
   }
 
   return (
-    <Paper elevation={5} style={{ paddingTop: '0.1rem' }}>
-      {!selectorFn && user && (
-        <>
-          <Box sx={{ display: 'flex', flexGap: '2', marginTop: '1rem', justifyContent: 'center', maxHeight: '3.2em' }}>
-            <Typography sx={{ margin: '0.4rem' }} variant="h4">
-              {title ?? ''}
-            </Typography>
-          </Box>
-          <Divider sx={{ marginTop: '1rem' }} />
-        </>
-      )}
-      {!selectorFn && (
-        <Box sx={{ display: 'flex', gap: '0.4em', justifyContent: 'flex-end', margin: '0.5em', marginTop: '1em' }}>
-          <ContactForm<T> buttonText="Contact" noContext={true} />
-        </Box>
-      )}
+    <Paper elevation={5}>
       {editRights.new && title != 'Locality-Species-Cross-Search' && (
         <Box sx={{ display: 'flex', gap: '0.4em', justifyContent: 'flex-end', margin: '0.5em', marginTop: '1em' }}>
           <Button variant="contained" component={Link} to="new">
@@ -221,30 +204,14 @@ export const TableView = <T extends MRT_RowData>({
           </Button>
         </Box>
       )}
-      {combinedExport && (
-        <Box sx={{ display: 'flex', gap: '0.4em', justifyContent: 'flex-end', margin: '0.5em', marginTop: '1em' }}>
-          <Tooltip
-            title={
-              <span style={{ fontSize: 18 }}>
-                Export&lsquo;s all localities filtered in the table below with all their species. The export is sorted
-                by name. This may take up to a minute, so please wait without closing the browser or switching page. To
-                export only localities use the &lsquo;export&lsquo; button in the top-right corner of the table.
-              </span>
-            }
-          >
-            <span>
-              <Button
-                variant="contained"
-                disabled={exportIsLoading}
-                onClick={() => void combinedExport(table.getSortedRowModel().rows.map(d => d.original.lid as number))}
-              >
-                Export localities with their species
-              </Button>
-            </span>
-          </Tooltip>{' '}
-          {exportIsLoading && <CircularProgress />}
-        </Box>
+
+      {user && (
+        <div className="table-top-row">
+          <Box className="title">{title ?? ''}</Box>
+          <TableToolBar<T> table={table} combinedExport={combinedExport} exportIsLoading={exportIsLoading} />
+        </div>
       )}
+
       <MaterialReactTable table={table} />
     </Paper>
   )

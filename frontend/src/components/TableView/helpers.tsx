@@ -1,4 +1,4 @@
-import { Box, Button } from '@mui/material'
+import { Box } from '@mui/material'
 import {
   MRT_RowData,
   MRT_ShowHideColumnsButton,
@@ -10,7 +10,7 @@ import { AcceptedData } from 'node_modules/export-to-csv/output/lib/types'
 
 export type ExportFn<T> = (data: T) => { [k: string]: AcceptedData }
 
-const exportRows = <T extends MRT_RowData>(table: MRT_TableInstance<T>) => {
+export const exportRows = <T extends MRT_RowData>(table: MRT_TableInstance<T>) => {
   const csvConfig = mkConfig({
     fieldSeparator: ',',
     decimalSeparator: '.',
@@ -35,22 +35,15 @@ const exportRows = <T extends MRT_RowData>(table: MRT_TableInstance<T>) => {
   download(csvConfig)(csv)
 }
 
-export const renderCustomToolbarModalVersion = <T extends MRT_RowData>({ table }: { table: MRT_TableInstance<T> }) => (
+export const renderCustomToolbar = <T extends MRT_RowData>({ table }: { table: MRT_TableInstance<T> }) => (
   <Box>
+    <MRT_ToggleFullScreenButton table={table} />
     <MRT_ShowHideColumnsButton table={table} />
   </Box>
 )
 
-export const renderCustomToolbar = <T extends MRT_RowData>({ table }: { table: MRT_TableInstance<T> }) => (
-  <>
-    <Box>
-      <MRT_ShowHideColumnsButton table={table} />
-      <MRT_ToggleFullScreenButton table={table} />
-    </Box>
-    <Box>
-      <Button onClick={() => exportRows(table)} variant="contained">
-        Export table
-      </Button>
-    </Box>
-  </>
+export const renderCustomToolbarModalVersion = <T extends MRT_RowData>({ table }: { table: MRT_TableInstance<T> }) => (
+  <Box>
+    <MRT_ShowHideColumnsButton table={table} />
+  </Box>
 )

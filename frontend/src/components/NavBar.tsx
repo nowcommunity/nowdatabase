@@ -8,6 +8,9 @@ import { Role } from '@/shared/types'
 import { useUser } from '@/hooks/user'
 import { ENV } from '@/util/config'
 import { useNotify } from '@/hooks/notification'
+import PersonIcon from '@mui/icons-material/Person'
+import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown'
+import '../styles/NavBar.css'
 
 type LinkDefinition = { title: string; url: string; children?: LinkDefinition[]; allowedRoles?: Role[] }
 
@@ -27,10 +30,16 @@ export const NavBar = () => {
   }
   const linkFontSize = 18
   const pages: LinkDefinition[] = [
-    { title: 'Front Page', url: '/' },
-    { title: 'Localities', url: '/locality' },
-    { title: 'Species', url: '/species' },
-    { title: 'Cross-Search', url: '/crosssearch' },
+    // { title: 'Front Page', url: '/' },
+    {
+      title: 'Search',
+      url: '',
+      children: [
+        { title: 'Localities', url: '/locality' },
+        { title: 'Species', url: '/species' },
+        { title: 'Cross-Search', url: '/crosssearch' },
+      ],
+    },
     { title: 'References', url: '/reference' },
     { title: 'Time Units', url: '/time-unit' },
     { title: 'Time Bounds', url: '/time-bound', allowedRoles: [Role.Admin, Role.EditUnrestricted] },
@@ -60,7 +69,7 @@ export const NavBar = () => {
   }
 
   const logoutButton = (
-    <MenuItem onClick={logout} style={{ display: 'inline-block' }}>
+    <MenuItem onClick={logout} style={{ display: 'inline-block' }} className="logout-link">
       <Typography textAlign="center">Logout</Typography>
     </MenuItem>
   )
@@ -69,7 +78,7 @@ export const NavBar = () => {
     if (ENV !== 'dev' && link.title == 'Map') return null
     if (link.children) {
       return (
-        <MenuItem key={`${link.url}-menuitem`} style={{ display: 'inline-block', padding: 0 }}>
+        <MenuItem key={`${link.url}-menuitem`} style={{ display: 'inline-block', padding: 0 }} className="menu-item">
           <Box
             id={`${link.url}-menu-button`}
             aria-controls={open ? `${link.url}-menuitem` : undefined}
@@ -77,10 +86,12 @@ export const NavBar = () => {
             aria-expanded={open ? 'true' : undefined}
             onClick={handleClick}
             sx={{ color: 'white', paddingTop: '6px', paddingBottom: '6px', paddingLeft: '16px', paddingRight: '16px' }}
+            className="dropdown-link"
           >
             <Typography textAlign="center" fontSize={linkFontSize}>
               {link.title}
             </Typography>
+            <ArrowDropDownIcon />
           </Box>
           <Menu
             id={`${link.url}-menu`}
@@ -109,7 +120,13 @@ export const NavBar = () => {
       )
     }
     return (
-      <MenuItem key={`${link.url}-menuitem`} component={Link} to={link.url} style={{ display: 'inline-block' }}>
+      <MenuItem
+        key={`${link.url}-menuitem`}
+        component={Link}
+        to={link.url}
+        style={{ display: 'inline-block' }}
+        className="menu-item"
+      >
         <Typography textAlign="center" fontSize={linkFontSize}>
           {link.title}
         </Typography>
@@ -123,32 +140,27 @@ export const NavBar = () => {
     return ''
   }
   return (
-    <AppBar position="static">
-      <Stack spacing={10} direction="row" marginLeft={2} justifyContent="space-between">
+    <AppBar position="static" id="main-navbar">
+      <Stack spacing={10} direction="row" marginLeft={2} justifyContent="flex-start">
         <MenuItem component={Link} to="/">
-          <Typography fontSize={'2.2em'}>NOW Database {getModeText()}</Typography>
+          <Typography fontSize={'1.4em'}>NOW Database {getModeText()}</Typography>
         </MenuItem>
-        <MenuList style={{ alignContent: 'center' }}>
+        <MenuList className="menu-list" style={{ alignContent: 'center' }}>
           {pages
             .filter(childLink => !childLink.allowedRoles || childLink.allowedRoles.includes(user.role))
             .map(page => renderLink(page))}
         </MenuList>
-        <Box
-          alignContent="center"
-          style={{ marginTop: 'auto', marginBottom: 'auto' }}
-          paddingRight="1em"
-          paddingTop="0.5em"
-        >
+        <Box alignContent="center" className="user-controls">
           {user.username ? (
-            <Stack>
-              <div>
-                Logged in as <b>{user.username}</b>
+            <Stack className="logged-in-controls">
+              <div className="username-box">
+                <PersonIcon />
+                <span>{user.username}</span>
               </div>
               {logoutButton}
             </Stack>
           ) : (
-            <Stack>
-              <div>Guest user</div>
+            <Stack alignContent="center" className="login-link">
               {renderLink({ title: 'Login', url: 'login' })}
             </Stack>
           )}

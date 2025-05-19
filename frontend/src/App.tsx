@@ -26,9 +26,7 @@ const App = () => {
         <Notification />
         <Grid container>
           <Grid item xs={12}>
-            <Container maxWidth="xl">
-              <NavBar />
-            </Container>
+            <NavBar />
           </Grid>
           <Container maxWidth="xl" fixed style={{ marginTop: '2em', marginBottom: '2em' }}>
             <Grid item>

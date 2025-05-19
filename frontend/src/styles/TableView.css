@@ -1,0 +1,16 @@
+.table-top-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 2em;
+}
+
+.table-top-row .title {
+  font-size: 1.5rem;
+  font-weight: 400;
+  padding: 0.4em 0.6em;
+  background-color: #2e7fab;
+  width: fit-content;
+  color: white;
+  border-radius: 0.25rem 0 0.25rem 0;
+}
