@@ -21,5 +21,5 @@ export const generateKLM = (placemarks: Placemark[]) => {
     `<Folder><name>Luomus localities</name>`
   const end = `</Folder></Document></kml>`
 
-  return `${start}${placemarks.map(toPlacemarkString)}${end}`
+  return `${start}${placemarks.map(toPlacemarkString).join('')}${end}`
 }

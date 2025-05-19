@@ -1,14 +1,17 @@
-import { useGetAllLocalitiesQuery } from '../../redux/localityReducer'
 import { useEffect, useRef } from 'react'
 import 'leaflet/dist/leaflet.css'
 import L, { LatLngExpression } from 'leaflet'
+import { Locality } from '@/shared/types'
 
-export const LocalitiesMap = () => {
+interface Props {
+  localities: Locality[]
+}
+
+export const LocalitiesMap = ({ localities }: Props) => {
   const mapRef = useRef<HTMLDivElement | null>(null)
-  const { data: localitiesQueryData, isFetching: localitiesQueryIsFetching } = useGetAllLocalitiesQuery()
 
   useEffect(() => {
-    if (!mapRef.current || localitiesQueryIsFetching) return
+    if (!mapRef.current) return
 
     const map = L.map(mapRef.current)
     const coords: LatLngExpression = [60.204637, 24.962123]
@@ -20,13 +23,13 @@ export const LocalitiesMap = () => {
       noWrap: true,
     }).addTo(map)
 
-    localitiesQueryData?.forEach(locality =>
+    localities.forEach(locality =>
       L.marker([locality.dec_lat, locality.dec_long]).addTo(map).bindPopup(locality.loc_name)
     )
     return () => {
       map.remove()
     }
-  }, [localitiesQueryData, localitiesQueryIsFetching])
+  }, [localities])
 
   document.title = 'Map'
 
