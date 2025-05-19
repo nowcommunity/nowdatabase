@@ -30,7 +30,6 @@ export const NavBar = () => {
   }
   const linkFontSize = 18
   const pages: LinkDefinition[] = [
-    // { title: 'Front Page', url: '/' },
     {
       title: 'Search',
       url: '',
