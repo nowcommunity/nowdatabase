@@ -1,10 +1,5 @@
 import { Box, CircularProgress, IconButton, Menu, MenuItem, Tooltip } from '@mui/material'
-import {
-  MRT_RowData,
-  MRT_ShowHideColumnsButton,
-  MRT_TableInstance,
-  MRT_ToggleFullScreenButton,
-} from 'material-react-table'
+import { MRT_RowData, MRT_ShowHideColumnsButton, MRT_TableInstance } from 'material-react-table'
 import { exportRows } from './helpers'
 import { ContactForm } from '../DetailView/common/ContactForm'
 import FileDownloadIcon from '@mui/icons-material/FileDownload'
@@ -39,10 +34,8 @@ export const TableToolBar = <T extends MRT_RowData>({
           <ContactForm<T> buttonText="Contact" noContext={true} />
         </Box>
       )}
-      <Box>
+      <Box className="icon-buttons">
         <MRT_ShowHideColumnsButton table={table} />
-      </Box>
-      <Box>
         <IconButton
           id="export-button"
           aria-controls={open ? 'export-menu' : undefined}

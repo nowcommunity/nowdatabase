@@ -2,9 +2,13 @@
   display: flex;
   align-items: center;
   padding: 0.6em;
-  /* gap: 0.4em; */
+  flex: 1;
+  justify-content: space-between;
 }
 
-.table-tool-bar div:first-child {
-  margin-right: 0.6em;
+.table-tool-bar .contact-button {
+  margin-left: 0.6em;
+
+  color: #2e7fab;
+  border-color: #2e7fab;
 }
