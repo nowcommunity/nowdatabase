@@ -1,6 +1,9 @@
 #main-navbar {
   background-color: #2e7fab;
   --color-hl: #3896c9;
+}
+
+#main-navbar > * {
   flex-wrap: wrap;
 }
 
@@ -9,7 +12,8 @@
   display: flex;
   justify-content: flex-end;
   align-items: center;
-  padding-right: 0.8em;
+  padding: 0.8em;
+  padding-left: 0;
 }
 
 #main-navbar .user-controls .logged-in-controls {
@@ -32,6 +36,9 @@
 
 #main-navbar .menu-list {
   margin-left: 1.4em;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
 }
 
 #main-navbar .dropdown-link {
@@ -46,6 +53,13 @@
 
 #main-navbar .logout-link {
   padding: 0.44em 1em;
+}
+
+#main-navbar .menu-item * {
+  text-align: center;
+  display: flex;
+  align-items: center;
+  height: fit-content;
 }
 
 #main-navbar .menu-item,
