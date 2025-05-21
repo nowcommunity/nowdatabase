@@ -30,6 +30,7 @@ export default [
       '**/vite-env.d.ts',
       '**/jest.config.ts',
       '**/coverage',
+      'src/components/Map/*.js',
     ],
   },
   ...fixupConfigRules(
