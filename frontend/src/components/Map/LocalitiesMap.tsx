@@ -2,6 +2,11 @@ import { useGetAllLocalitiesQuery } from '../../redux/localityReducer'
 import { useEffect, useRef } from 'react'
 import 'leaflet/dist/leaflet.css'
 import L, { LatLngExpression } from 'leaflet'
+import { borders } from './country_borders_WGS84'
+
+
+console.log(borders)
+
 
 export const LocalitiesMap = () => {
   const mapRef = useRef<HTMLDivElement | null>(null)
