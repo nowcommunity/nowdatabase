@@ -81,10 +81,10 @@ export const NavBar = () => {
         <Box className="user-controls">
           {user.username ? (
             <Stack className="logged-in-controls">
-              <a className="username-box" href="/person/user-page">
+              <Link className="username-box" to="/person/user-page">
                 <PersonIcon />
                 <span>{user.username}</span>
-              </a>
+              </Link>
               {logoutButton}
             </Stack>
           ) : (
