@@ -2,7 +2,7 @@ import { beforeAll, afterAll, describe, it, expect, beforeEach } from '@jest/glo
 import { login, logout, resetDatabase, send, resetDatabaseTimeout } from '../utils'
 import { pool } from '../../utils/db'
 
-describe('Deleting a region works', () => {
+describe('Getting region data works', () => {
   beforeAll(async () => {
     await resetDatabase()
   }, resetDatabaseTimeout)
