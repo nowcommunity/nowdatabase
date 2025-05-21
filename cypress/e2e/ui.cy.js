@@ -11,17 +11,18 @@ describe('Button Tests', () => {
   it('Buttons for Localities, Species, References, Cross-Search, Map & Time Units are visible', () => {
     cy.visit('/')
     cy.contains('Welcome').should('be.visible')
-    cy.contains('Front Page').should('be.visible')
-    cy.contains('Localities').should('be.visible')
-    cy.contains('Species').should('be.visible')
     cy.contains('References').should('be.visible')
     cy.contains('Time Units').should('be.visible')
+
+    cy.contains('Search').click()
     cy.contains('Cross-Search').should('be.visible')
-    cy.contains('Map').should('be.visible')
+    cy.contains('Localities').should('be.visible')
+    cy.contains('Species').should('be.visible')
   })
 
   it('Localities button works', () => {
     cy.visit('/')
+    cy.contains('Search').click()
     cy.contains('Localities').click()
     cy.url().should('include', '/locality')
     cy.contains('Name').should('be.visible')
@@ -30,21 +31,9 @@ describe('Button Tests', () => {
     cy.contains('Min age').should('be.visible')
   })
 
-  it('Front Page button works', () => {
-    cy.visit('/locality')
-    cy.contains('Front Page').click()
-    cy.contains('Welcome').should('be.visible')
-    cy.contains('Front Page').should('be.visible')
-    cy.contains('Localities').should('be.visible')
-    cy.contains('Species').should('be.visible')
-    cy.contains('References').should('be.visible')
-    cy.contains('Time Units').should('be.visible')
-    cy.contains('Cross-Search').should('be.visible')
-    cy.contains('Map').should('be.visible')
-  })
-
   it('Species button works', () => {
     cy.visit('/')
+    cy.contains('Search').click()
     cy.contains('Species').click()
     cy.url().should('include', '/species')
     cy.contains('Order').should('be.visible')
@@ -63,6 +52,7 @@ describe('Button Tests', () => {
 
   it('Cross Search button works', () => {
     cy.visit('/')
+    cy.contains('Search').click()
     cy.contains('Cross-Search').click()
     cy.url().should('include', '/crosssearch')
     cy.contains('Locality name').should('be.visible')

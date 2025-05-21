@@ -59,7 +59,7 @@ describe('Broadly test what different user rights see', () => {
     beforeEach('Ensure logout', () => {
       cy.clearAllLocalStorage()
       cy.visit('/')
-      cy.contains('Guest user')
+      cy.contains('Login')
     })
 
     it('Does not see admin button in navbar', () => {

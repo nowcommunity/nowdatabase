@@ -1,0 +1,22 @@
+.table-tool-bar {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  flex: 1;
+  justify-content: space-between;
+  padding: 0.6em;
+}
+
+.table-tool-bar .button {
+  color: #2e7fab;
+  border-color: #2e7fab;
+}
+
+.table-tool-bar .left-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  padding-left: 0.7em;
+  margin: 0;
+  gap: 0.4em;
+}

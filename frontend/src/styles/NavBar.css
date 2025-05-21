@@ -1,0 +1,79 @@
+#main-navbar {
+  background-color: #2e7fab;
+  --color-hl: #3896c9;
+}
+
+#main-navbar > * {
+  flex-wrap: wrap;
+}
+
+#main-navbar .user-controls {
+  flex: 1;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  padding: 0.8em;
+  padding-left: 0;
+}
+
+#main-navbar .user-controls .logged-in-controls {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.4em;
+}
+
+#main-navbar .username-box {
+  display: flex;
+  border: 2px solid var(--color-hl);
+  border-radius: 0.25rem;
+  padding: 0.4em 1em 0.3em 0.5em;
+  gap: 0.8em;
+  text-decoration: none;
+  color: white;
+  font-weight: 500;
+}
+
+#main-navbar .menu-list {
+  margin-left: 1.4em;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+#main-navbar .dropdown-link {
+  display: flex;
+  align-items: center;
+  gap: 0.6em;
+}
+
+#main-navbar .dropdown-link svg {
+  padding-top: 0.1em;
+}
+
+#main-navbar .logout-link {
+  padding: 0.44em 1em;
+}
+
+#main-navbar .menu-item * {
+  text-align: center;
+  display: flex;
+  align-items: center;
+  height: fit-content;
+}
+
+#main-navbar .menu-item,
+#main-navbar .logout-link,
+#main-navbar .login-link,
+#main-navbar .username-box {
+  transition: background 0.1s ease-out;
+  background-color: transparent;
+  border-radius: 0.25rem;
+}
+
+#main-navbar .menu-item:hover,
+#main-navbar .logout-link:hover,
+#main-navbar .login-link:hover,
+#main-navbar .username-box:hover {
+  background-color: var(--color-hl);
+}
