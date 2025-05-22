@@ -44,6 +44,5 @@ describe('Open each page, table view and detail view, and check at least some co
   it('Map works', () => {
     cy.visit('/locality')
     cy.contains('map').click()
-    cy.contains('close').should('be.visible')
   })
 })

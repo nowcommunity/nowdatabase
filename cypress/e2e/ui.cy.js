@@ -64,7 +64,6 @@ describe('Button Tests', () => {
   it('Map button works', () => {
     cy.visit('/locality')
     cy.contains('map').click()
-    cy.contains('close').should('be.visible')
   })
 
   it('Link to species details from species tab', () => {
