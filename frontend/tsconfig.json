@@ -31,7 +31,7 @@
     }
   },
   "include": ["src"],
-  "exclude": ["../backend/**/*"],
+  "exclude": ["../backend/**/*", "./src/components/Map/country_borders_WGS84.ts"],
 
   "references": [{ "path": "./tsconfig.node.json" }]
 }
