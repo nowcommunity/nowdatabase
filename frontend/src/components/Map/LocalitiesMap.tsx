@@ -2,12 +2,14 @@ import { useEffect, useRef, useState } from 'react'
 
 import { Button } from '@mui/material'
 import MapIcon from '@mui/icons-material/Map'
-import L, { LatLngExpression } from 'leaflet'
+import L, { LatLngExpression, Icon } from 'leaflet'
 import { Locality } from '@/shared/types/data.js'
 
 import './leaflet.markercluster.js'
 import './MarkerCluster.css'
 import './MarkerCluster.Default.css'
+
+import markerIconPng from 'leaflet/dist/images/marker-icon.png'
 
 import '../../styles/LocalityMap.css'
 
@@ -36,7 +38,13 @@ export const LocalitiesMap = ({ localitiesQueryData, localitiesQueryIsFetching }
     // with no module exports that extends 'L' when imported.
     const markers: Layer = L.markerClusterGroup()
 
-    localitiesQueryData?.forEach(locality => markers.addLayer(L.marker([locality.dec_lat, locality.dec_long])))
+    localitiesQueryData?.forEach(locality =>
+      markers.addLayer(
+        L.marker([locality.dec_lat, locality.dec_long], {
+          icon: new Icon({ iconUrl: markerIconPng, iconSize: [25, 41], iconAnchor: [12, 41] }),
+        })
+      )
+    )
 
     markers.addTo(map)
 
