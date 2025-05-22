@@ -30,7 +30,6 @@ export const TableToolBar = <T extends MRT_RowData>({
     setAnchorEl(null)
   }
 
-  // <MRT_ToggleFullScreenButton table={table} />
   return (
     <div className="table-tool-bar">
       {!selectorFn && (

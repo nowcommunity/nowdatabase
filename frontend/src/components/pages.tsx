@@ -28,7 +28,6 @@ import { ProjectDetails } from './Project/ProjectDetails'
 import { RegionTable } from './Region/RegionTable'
 import { RegionDetails } from './Region/RegionDetails'
 import { UserState } from '@/redux/userReducer'
-import { LocalitiesMap } from './Map/LocalitiesMap'
 
 const noRights: EditRights = {}
 const fullRights: EditRights = { new: true, edit: true, delete: true }
@@ -51,8 +50,6 @@ export const localityPage = (
     }}
   />
 )
-
-export const mapPage = <LocalitiesMap />
 
 export const crossSearchPage = (
   <Page

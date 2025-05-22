@@ -4,6 +4,7 @@ import { useGetAllLocalitiesQuery, useGetLocalitySpeciesListMutation } from '../
 import { Locality } from '@/shared/types'
 import { TableView } from '../TableView/TableView'
 import { useNotify } from '@/hooks/notification'
+import { LocalitiesMap } from '../Map/LocalitiesMap'
 
 const decimalCount = (num: number) => {
   const numAsString = num.toString()
@@ -387,19 +388,22 @@ export const LocalityTable = ({ selectorFn }: { selectorFn?: (newObject: Localit
   }
 
   return (
-    <TableView<Locality>
-      title="Localities"
-      selectorFn={selectorFn}
-      checkRowRestriction={checkRowRestriction}
-      idFieldName="lid"
-      columns={columns}
-      isFetching={localitiesQueryIsFetching}
-      visibleColumns={visibleColumns}
-      data={localitiesQueryData}
-      url="locality"
-      combinedExport={combinedExport}
-      exportIsLoading={isLoading}
-      enableColumnFilterModes={true}
-    />
+    <>
+      <LocalitiesMap localitiesQueryData={localitiesQueryData} localitiesQueryIsFetching={localitiesQueryIsFetching} />
+      <TableView<Locality>
+        title="Localities"
+        selectorFn={selectorFn}
+        checkRowRestriction={checkRowRestriction}
+        idFieldName="lid"
+        columns={columns}
+        isFetching={localitiesQueryIsFetching}
+        visibleColumns={visibleColumns}
+        data={localitiesQueryData}
+        url="locality"
+        combinedExport={combinedExport}
+        exportIsLoading={isLoading}
+        enableColumnFilterModes={true}
+      />
+    </>
   )
 }

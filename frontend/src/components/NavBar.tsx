@@ -40,7 +40,6 @@ export const NavBar = () => {
         { title: 'Email', url: '/email' },
       ],
     },
-    { title: 'Map', url: '/map' },
   ]
 
   const logout = () => {

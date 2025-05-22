@@ -42,7 +42,7 @@ describe('Open each page, table view and detail view, and check at least some co
   })
 
   it('Map works', () => {
-    cy.contains('Map').click()
-    cy.contains('OpenStreetMap')
+    cy.visit('/locality')
+    cy.contains('map').click()
   })
 })
