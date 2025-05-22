@@ -1,4 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
+import 'leaflet/dist/leaflet.css'
+import { borders } from './country_borders_WGS84'
 
 import { Button } from '@mui/material'
 import MapIcon from '@mui/icons-material/Map'
@@ -28,7 +30,7 @@ export const LocalitiesMap = ({ localitiesQueryData, localitiesQueryIsFetching }
     if (!mapRef.current || localitiesQueryIsFetching) return
 
     const map = L.map(mapRef.current, { maxZoom: 16 })
-    const coords: LatLngExpression = [60.204637, 24.962123]
+    const coords: LatLngExpression = [15, 13]
 
     // To prevent eslint from complaining about that 'markers' variable below:
     /* eslint-disable @typescript-eslint/no-unsafe-assignment */
@@ -52,10 +54,34 @@ export const LocalitiesMap = ({ localitiesQueryData, localitiesQueryIsFetching }
 
     map.setView(coords, 2)
 
-    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+    // BASE MAPS
+    //// OpenTopoMap
+    const topomap = L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', {
+      attribution: 'Map data: © <a href="https://opentopomap.org">OpenTopoMap</a> (CC-BY-SA)',
       noWrap: true,
     }).addTo(map)
+
+    //// OpenStreetMap
+    const osm = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+      noWrap: true,
+    })
+
+    const baseMaps = {
+      OpenTopoMap: topomap,
+      OpenStreetMap: osm,
+    }
+
+    // LAYERS ON TOP OF BASE MAPS
+    //// Add borders to the map
+    borders.forEach(poly => {
+      L.polygon(poly as LatLngExpression[], { color: 'gray', weight: 1 }).addTo(map)
+    })
+
+    // Add a scale bar to the map
+    L.control.scale({ position: 'bottomright' }).addTo(map)
+    // Add a layer control to the map
+    L.control.layers(baseMaps, {}, { position: 'topright' }).addTo(map)
 
     return () => {
       map.remove()
