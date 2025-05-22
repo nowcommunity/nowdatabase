@@ -10,19 +10,6 @@ const localitiesApi = api.injectEndpoints({
       }),
       providesTags: result => (result ? [{ type: 'localities' }] : []),
     }),
-    /*
-    Tähän voi lisätä haettavat parametrit: sorting, filterit. 
-    Tämä kutsu menee backend/src/routes/locality.ts
-    */
-    getFilteredLocalities: builder.query<
-      Locality[],
-      { columnFilters: MRT_ColumnFiltersState; sorting: MRT_SortingState }
-    >({
-      query: ({ columnFilters, sorting }) => ({
-        url: `/locality/all/${JSON.stringify(columnFilters)}/${JSON.stringify(sorting)}`,
-      }),
-      providesTags: result => (result ? [{ type: 'localities' }] : []),
-    }),
     getLocalityDetails: builder.query<LocalityDetailsType, string>({
       query: id => ({
         url: `/locality/${id}`,
@@ -60,5 +47,5 @@ export const {
   useGetLocalityDetailsQuery,
   useEditLocalityMutation,
   useGetLocalitySpeciesListMutation,
-  useDeleteLocalityMutation,
+  useDeleteLocalityMutation
 } = localitiesApi
