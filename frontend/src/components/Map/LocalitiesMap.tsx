@@ -39,7 +39,7 @@ export const LocalitiesMap = ({ localitiesQueryData, localitiesQueryIsFetching }
     /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 
     // @ts-expect-error The marker cluster library is a plain javascript library
-    // with no module exports that extends 'L' when imported.
+    // with no module exports that extends 'L' when imported
     const markers: Layer = L.markerClusterGroup()
 
     localitiesQueryData?.forEach(locality =>
