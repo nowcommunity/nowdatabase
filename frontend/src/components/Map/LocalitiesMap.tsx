@@ -21,6 +21,7 @@ export const LocalitiesMap = () => {
     //// OpenTopoMap
     const topomap = L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', {
       attribution: 'Map data: © <a href="https://opentopomap.org">OpenTopoMap</a> (CC-BY-SA)',
+      noWrap: true,
     }).addTo(map);
 
     //// OpenStreetMap
