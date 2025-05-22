@@ -18,27 +18,39 @@ export const LocalitiesMap = () => {
     map.setView(coords, 2)
     
     // BASE MAPS  
-    // OpenStreetMap
-    const osm = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-      noWrap: true,
-    }).addTo(map)
-
-    // OpenTopoMap
+    //// OpenTopoMap
     const topomap = L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', {
       attribution: 'Map data: © <a href="https://opentopomap.org">OpenTopoMap</a> (CC-BY-SA)',
     }).addTo(map);
 
+    //// OpenStreetMap
+    const osm = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+      noWrap: true,
+    })
+
+    const baseMaps = {
+      'OpenTopoMap': topomap,
+      'OpenStreetMap': osm,
+    };
+
     // LAYERS ON TOP OF BASE MAPS
-    // Add borders to the map
+    //// Add borders to the map
     const countryBorders = borders.forEach(poly => {
         L.polygon(poly, {color: 'gray', weight: 1,}).addTo(map);
     });
 
-    // Localities marker layer
+    //// Localities marker layer
     localitiesQueryData?.forEach(locality =>
       L.marker([locality.dec_lat, locality.dec_long]).addTo(map).bindPopup(locality.loc_name)
     )
+
+    // Add a scale bar to the map
+    L.control.scale({ position: 'bottomright' }).addTo(map)
+    // Add a layer control to the map
+    L.control.layers(baseMaps, {}, { position: 'topright' }).addTo(map)
+
+
     return () => {
       map.remove()
     }
