@@ -11,7 +11,13 @@ router.get('/all', async (req, res) => {
   const localities = await getAllLocalities(req.user)
   return res.status(200).send(fixBigInt(localities))
 })
-
+//Tähän pitää lisätä hakuparametrit: sorting ja columnFilters
+/*
+router.get('/all/:columnFilters/:sorting', async (req, res) => {
+  const localities = await getAllLocalities(req.user)
+  return res.status(200).send(fixBigInt(localities))
+})
+*/
 router.get('/:id', async (req, res) => {
   const id = parseInt(req.params.id)
   const locality = await getLocalityDetails(id, req.user)
