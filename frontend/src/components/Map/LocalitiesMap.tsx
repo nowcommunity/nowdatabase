@@ -4,6 +4,7 @@ import { Button } from '@mui/material'
 import MapIcon from '@mui/icons-material/Map'
 import L, { LatLngExpression } from 'leaflet'
 import { Locality } from '@/shared/types/data.js'
+import { usePageContext } from '../Page'
 
 import './leaflet.markercluster.js'
 import './MarkerCluster.css'
@@ -19,6 +20,7 @@ interface Props {
 export const LocalitiesMap = ({ localitiesQueryData, localitiesQueryIsFetching }: Props) => {
   const mapRef = useRef<HTMLDivElement | null>(null)
   const [isOpen, setIsOpen] = useState(false)
+  const columnFilters = usePageContext()
 
   useEffect(() => {
     if (!mapRef.current || localitiesQueryIsFetching) return
@@ -36,7 +38,9 @@ export const LocalitiesMap = ({ localitiesQueryData, localitiesQueryIsFetching }
     // with no module exports that extends 'L' when imported.
     const markers: Layer = L.markerClusterGroup()
 
-    localitiesQueryData?.forEach(locality => markers.addLayer(L.marker([locality.dec_lat, locality.dec_long])))
+    const localityIds = columnFilters.idList as unknown as number[]
+    const filteredLocalities = localitiesQueryData?.filter(locality => localityIds.includes(locality.lid))
+    filteredLocalities?.forEach(locality => markers.addLayer(L.marker([locality.dec_lat, locality.dec_long])))
 
     markers.addTo(map)
 
@@ -50,7 +54,7 @@ export const LocalitiesMap = ({ localitiesQueryData, localitiesQueryIsFetching }
     return () => {
       map.remove()
     }
-  }, [localitiesQueryData, localitiesQueryIsFetching])
+  }, [localitiesQueryData, localitiesQueryIsFetching, columnFilters])
 
   document.title = 'Map'
 

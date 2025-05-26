@@ -1,6 +1,5 @@
 import { api } from './api'
 import { EditDataType, Locality, LocalityDetailsType } from '@/shared/types'
-import { MRT_ColumnFiltersState, MRT_SortingState } from 'material-react-table'
 
 const localitiesApi = api.injectEndpoints({
   endpoints: builder => ({
@@ -47,5 +46,5 @@ export const {
   useGetLocalityDetailsQuery,
   useEditLocalityMutation,
   useGetLocalitySpeciesListMutation,
-  useDeleteLocalityMutation
+  useDeleteLocalityMutation,
 } = localitiesApi
