@@ -11,12 +11,14 @@ import AddCircleIcon from '@mui/icons-material/AddCircle'
 export const TableToolBar = <T extends MRT_RowData>({
   table,
   combinedExport,
+  kmlExport,
   exportIsLoading,
   selectorFn,
   showNewButton,
 }: {
   table: MRT_TableInstance<T>
   combinedExport?: (lids: number[]) => Promise<void>
+  kmlExport?: (table: MRT_TableInstance<T>) => void
   exportIsLoading?: boolean
   selectorFn?: (id: T) => void
   showNewButton?: boolean
@@ -73,7 +75,16 @@ export const TableToolBar = <T extends MRT_RowData>({
           >
             Export table
           </MenuItem>
-
+          {kmlExport && (
+            <MenuItem
+              onClick={() => {
+                kmlExport(table)
+                handleClose()
+              }}
+            >
+              Export KML
+            </MenuItem>
+          )}
           {combinedExport && (
             <Box>
               <Tooltip
