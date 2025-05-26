@@ -67,5 +67,42 @@ export const LocalitiesMap = () => {
 
   document.title = 'Map'
 
-  return <div ref={mapRef} style={{ height: '500px' }}></div>
+  return (
+    <div style={{ display: 'flex', height: '500px' }}>
+      <div ref={mapRef} style={{ flex: 1 }} />
+
+      <div style={{ width: '300px', padding: '1rem', borderLeft: '1px solid #ccc', overflowY: 'auto' }}>
+        {detailsLoading ? (
+          <p>Loading...</p>
+        ) : error ? (
+          <p>Error loading locality details</p>
+        ) : localityDetailsQueryData ? (
+          <div>
+            <h2>{localityDetailsQueryData.loc_name}</h2>
+            <p>
+              <strong>ID:</strong> {localityDetailsQueryData.lid}
+            </p>
+            <p>
+              <strong>Country:</strong> {localityDetailsQueryData.country}
+            </p>
+            <p>
+              <strong>Age:</strong>
+              {`${localityDetailsQueryData.max_age}, ${localityDetailsQueryData.min_age}`}
+            </p>
+            <p>
+              <strong>Latitude & Longitude:</strong>{' '}
+              {`${localityDetailsQueryData.dec_lat}, ${localityDetailsQueryData.dec_long} (DEC?)`}
+            </p>
+            <p>
+              <strong>Taxa:</strong>
+            </p>
+            <p></p>
+            <p></p>
+          </div>
+        ) : (
+          <p>Select a marker to view details.</p>
+        )}
+      </div>
+    </div>
+  )
 }
