@@ -5,7 +5,7 @@ import { Locality } from '@/shared/types'
 import { TableView } from '../TableView/TableView'
 import { useNotify } from '@/hooks/notification'
 import { LocalitiesMap } from '../Map/LocalitiesMap'
-import { Placemark, generateKml } from '@/util/kml'
+import { generateKml } from '@/util/kml'
 
 const decimalCount = (num: number) => {
   const numAsString = num.toString()
