@@ -25,10 +25,7 @@ const markerIcon =
 type CustomMarkerOptions = L.MarkerOptions & { localityId: number }
 type CustomMarker = L.Marker & { options: CustomMarkerOptions }
 
-// changes compared to old: loc. query data given in props
 export const LocalitiesMap = ({ localitiesQueryData, localitiesQueryIsFetching }: Props) => {
-  // my
-
   const [selectedLocality, setSelectedLocality] = useState<number>(0)
   const leafletMapRef = useRef<L.Map | null>(null)
 
@@ -58,18 +55,9 @@ export const LocalitiesMap = ({ localitiesQueryData, localitiesQueryIsFetching }
     // with no module exports that extends 'L' when imported
     const markers: Layer = L.markerClusterGroup()
 
-    // Onko ongelma filtteröidä ja valita Stateen marker samassa efektissä?
-    //
-    // Markerien klikattavuus ongelma, koska klusterit eivät markkereita?
-
-    // 1. filtteröinti
-    //
-    // filtteröinti tapahtuu kolumnien perusteella, sen jälkeen
-    // lokaliteetit lisätään kartalle
     const localityIds = columnFilters.idList as unknown as number[]
     const filteredLocalities = localitiesQueryData?.filter(locality => localityIds.includes(locality.lid))
 
-    // error: marker.getLatLng() on null markercluster-kirjastossa.
     filteredLocalities?.forEach(locality => {
       const options: CustomMarkerOptions = {
         icon: new Icon({ iconUrl: markerIcon, iconSize: [25, 41], iconAnchor: [12, 41] }),
@@ -77,19 +65,6 @@ export const LocalitiesMap = ({ localitiesQueryData, localitiesQueryIsFetching }
         localityId: locality.lid,
       }
 
-      // // lokaali
-      // const marker = L.marker([locality.dec_lat, locality.dec_long], options) as CustomMarker
-      // marker.addTo(leafletMapRef.current!).bindPopup(locality.loc_name)
-
-      // // main
-      // markers.addLayer(
-      //   L.marker([locality.dec_lat, locality.dec_long], {
-      //     icon: new Icon({ iconUrl: markerIcon, iconSize: [25, 41], iconAnchor: [12, 41] }),
-      //   })
-      // )
-
-      // marker needs to be stored in a variable for attaching
-      // click handlers
       const marker = L.marker([locality.dec_lat, locality.dec_long], options) as CustomMarker
 
       marker.on('click', () => {
@@ -98,12 +73,9 @@ export const LocalitiesMap = ({ localitiesQueryData, localitiesQueryIsFetching }
         console.log('State updated with locality ID:', selectedLocality)
       })
 
-      // // remote
-      // markers.addLayer(
-      //   L.marker([locality.dec_lat, locality.dec_long], options) as CustomMarker)
-
       markers.addLayer(marker)
     })
+
     // remote add to map
     markers.addTo(map)
 
@@ -144,34 +116,6 @@ export const LocalitiesMap = ({ localitiesQueryData, localitiesQueryIsFetching }
       leafletMapRef.current = null
     }
   }, [localitiesQueryData, localitiesQueryIsFetching, columnFilters])
-
-  // useEffect(() => {
-  //   if (!leafletMapRef.current || !localitiesQueryData || localitiesQueryIsFetching) return
-
-  //   // Artun
-  //   // @ts-expect-error The marker cluster library is a plain javascript library
-  //   // with no module exports that extends 'L' when imported
-  //   const markers: Layer = L.markerClusterGroup()
-  //   const localityIds = columnFilters.idList as unknown as number[]
-  //   const filteredLocalities = localitiesQueryData?.filter(locality => localityIds.includes(locality.lid))
-
-  //   localitiesQueryData.forEach(locality => {
-  //     const options: CustomMarkerOptions = {
-  //       title: locality.loc_name,
-  //       localityId: locality.lid,
-  //     }
-
-  //     const marker = L.marker([locality.dec_lat, locality.dec_long], options) as CustomMarker
-  //     marker.addTo(leafletMapRef.current!).bindPopup(locality.loc_name)
-
-  //     marker.on('click', () => {
-  //       setSelectedLocality(marker.options.localityId)
-  //       console.log('Clicked marker with ID:', marker.options.localityId)
-  //       console.log('State updated with locality ID:', selectedLocality)
-  //     })
-  //   })
-
-  // }, [localitiesQueryData, localitiesQueryIsFetching, selectedLocality])
 
   // useEffect(() => {
   //   if (localityDetailsQueryData) {
