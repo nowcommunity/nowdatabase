@@ -29,6 +29,7 @@ type TableStateInUrl = 'sorting' | 'columnfilters' | 'pagination'
   selectorFn should only be defined if using this as a selecting table
 */
 
+
 export const TableView = <T extends MRT_RowData>({
   data,
   columns,
@@ -43,7 +44,6 @@ export const TableView = <T extends MRT_RowData>({
   exportIsLoading,
   enableColumnFilterModes,
   serverSidePagination,
-  isCrossSearchTable,
   isCrossSearchTable,
   isFetching,
 }: {
@@ -60,7 +60,6 @@ export const TableView = <T extends MRT_RowData>({
   exportIsLoading?: boolean
   enableColumnFilterModes?: boolean
   serverSidePagination?: boolean
-  isCrossSearchTable?: boolean
   isCrossSearchTable?: boolean
   isFetching: boolean
 }) => {
