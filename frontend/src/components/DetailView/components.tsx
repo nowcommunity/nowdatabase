@@ -88,33 +88,46 @@ export const WriteButton = <T,>({
     // @ts-expect-error Reason: Typescript doesn't recognise that references do exist. Unable to find a way around it. Fix if extra time
   }, [mode, editData.references])
 
-  const handleWriteButtonClick = async () => {
+  const writeWithTaxonomyCheck = async () => {
     setLoading(true)
-    let speciesEditData: EditDataType<Species> = {}
-    if (mode.new && taxonomy) {
-      const { data: speciesData } = await getSpeciesData(undefined, true)
-      if (!speciesData) {
-        notify('Could not fetch species to check taxonomy data.', 'error')
-        setLoading(false)
-        return
-      }
-      // converts taxonomy fields to capitalized/lowercased
-      speciesEditData = convertTaxonomyFields(editData as EditDataType<Species>)
-      const errors = checkTaxonomy(speciesEditData, speciesData)
-      if (errors.size > 0) {
-        setLoading(false)
-        const errorMessage = [...errors].reduce((acc, currentError) => acc + `\n${currentError}`)
-        notify(errorMessage, 'error')
-        return
-      }
+    const { data: speciesData } = await getSpeciesData(undefined, true)
+    if (!speciesData) {
+      notify('Could not fetch species to check taxonomy data.', 'error')
+      return
+    }
+    // converts taxonomy fields to capitalized/lowercased
+    const speciesEditData = convertTaxonomyFields(editData as EditDataType<Species>)
+    const errors = checkTaxonomy(speciesEditData, speciesData)
+    if (errors.size > 0) {
+      const errorMessage = [...errors].reduce((acc, currentError) => acc + `\n${currentError}`)
+      notify(errorMessage, 'error')
+      return
     }
     if (!mode.staging && hasStagingMode) {
       setMode(mode.new ? 'staging-new' : 'staging-edit')
+      return
+    }
+
+    void onWrite(speciesEditData as EditDataType<T>, setEditData).then(() => {
+      setMode('read')
+      return
+    })
+  }
+
+  const handleWriteButtonClick = () => {
+    if (mode.new && taxonomy) {
+      void writeWithTaxonomyCheck()
       setLoading(false)
       return
     }
 
-    void onWrite(taxonomy ? (speciesEditData as EditDataType<T>) : editData, setEditData).then(() => {
+    if (!mode.staging && hasStagingMode) {
+      setMode(mode.new ? 'staging-new' : 'staging-edit')
+      return
+    }
+
+    setLoading(true)
+    void onWrite(editData, setEditData).then(() => {
       setLoading(false)
       setMode('read')
     })
