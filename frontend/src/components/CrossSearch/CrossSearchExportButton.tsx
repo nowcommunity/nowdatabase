@@ -1,12 +1,12 @@
 import { useState } from 'react'
 import { useNotify } from '@/hooks/notification'
 import { BACKEND_URL } from '@/util/config'
-import { Box, Button, CircularProgress } from '@mui/material'
+import { MenuItem } from '@mui/material'
 import { useUser } from '@/hooks/user'
 import { usePageContext } from '../Page'
 import { currentDateAsString } from '@/shared/currentDateAsString'
 
-export const CrossSearchExportButton = () => {
+export const CrossSearchExportMenuItem = ({ handleClose }: { handleClose: () => void }) => {
   const [loading, setLoading] = useState(false)
   const { sqlColumnFilters, sqlOrderBy } = usePageContext()
   const notify = useNotify()
@@ -47,10 +47,14 @@ export const CrossSearchExportButton = () => {
       .finally(() => setLoading(false))
   }
   return (
-    <Box>
-      <Button onClick={() => fetchCSVFile()} variant="contained" disabled={loading}>
-        Export table {loading && <CircularProgress sx={{ marginLeft: '1em' }} size="1.5em" />}
-      </Button>
-    </Box>
+    <MenuItem
+      onClick={() => {
+        fetchCSVFile()
+        handleClose()
+      }}
+      disabled={loading}
+    >
+      Export table
+    </MenuItem>
   )
 }

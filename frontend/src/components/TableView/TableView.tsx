@@ -40,6 +40,7 @@ export const TableView = <T extends MRT_RowData>({
   combinedExport,
   kmlExport,
   exportIsLoading,
+  isCrossSearchTable,
   enableColumnFilterModes,
   serverSidePagination,
   isFetching,
@@ -55,6 +56,7 @@ export const TableView = <T extends MRT_RowData>({
   combinedExport?: (lids: number[]) => Promise<void>
   kmlExport?: (table: MRT_TableInstance<T>) => void
   exportIsLoading?: boolean
+  isCrossSearchTable?: boolean
   enableColumnFilterModes?: boolean
   serverSidePagination?: boolean
   isFetching: boolean
@@ -206,6 +208,7 @@ export const TableView = <T extends MRT_RowData>({
             combinedExport={combinedExport}
             kmlExport={kmlExport}
             exportIsLoading={exportIsLoading}
+            isCrossSearchTable={isCrossSearchTable}
             showNewButton={editRights.new && title != 'Locality-Species-Cross-Search'}
           />
         </div>
