@@ -6,7 +6,6 @@ import { Login } from './components/Login'
 import {
   crossSearchPage,
   localityPage,
-  mapPage,
   personPage,
   projectPage,
   referencePage,
@@ -17,7 +16,6 @@ import {
 } from './components/pages'
 import { Notification, NotificationContextProvider } from './components/Notification'
 import { EmailPage } from './components/EmailPage'
-import { ENV } from './util/config'
 
 const App = () => {
   return (
@@ -26,9 +24,7 @@ const App = () => {
         <Notification />
         <Grid container>
           <Grid item xs={12}>
-            <Container maxWidth="xl">
-              <NavBar />
-            </Container>
+            <NavBar />
           </Grid>
           <Container maxWidth="xl" fixed style={{ marginTop: '2em', marginBottom: '2em' }}>
             <Grid item>
@@ -45,7 +41,6 @@ const App = () => {
                 <Route element={<EmailPage />} path="/email/" />
                 <Route element={<Login />} path="/login" />
                 <Route element={<FrontPage />} path="/" />
-                {ENV == 'dev' && <Route element={mapPage} path="/map" />}
                 <Route element={<div>Page not found.</div>} path="*" />
               </Routes>
             </Grid>

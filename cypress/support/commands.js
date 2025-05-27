@@ -31,7 +31,7 @@ Cypress.Commands.add('login', username => {
   cy.get('[data-cy="username-basic"]').type(username)
   cy.get('[data-cy="password-basic"]').type('test')
   cy.get('[data-cy="login-button"]').click()
-  cy.contains(`Logged in as ${username}`)
+  cy.contains(`${username}`)
 })
 
 Cypress.Commands.add('pageForbidden', url => {

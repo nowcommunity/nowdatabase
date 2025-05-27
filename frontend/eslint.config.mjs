@@ -30,6 +30,8 @@ export default [
       '**/vite-env.d.ts',
       '**/jest.config.ts',
       '**/coverage',
+      'src/components/Map/*.js',
+      'src/components/Map/country_borders_WGS84.ts',
     ],
   },
   ...fixupConfigRules(
