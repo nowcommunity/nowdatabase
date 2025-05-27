@@ -1,10 +1,11 @@
 import { useMemo } from 'react'
-import { type MRT_ColumnDef } from 'material-react-table'
+import { MRT_TableInstance, type MRT_ColumnDef, MRT_RowData } from 'material-react-table'
 import { useGetAllLocalitiesQuery, useGetLocalitySpeciesListMutation } from '../../redux/localityReducer'
 import { Locality } from '@/shared/types'
 import { TableView } from '../TableView/TableView'
 import { useNotify } from '@/hooks/notification'
 import { LocalitiesMap } from '../Map/LocalitiesMap'
+import { generateKml } from '@/util/kml'
 
 const decimalCount = (num: number) => {
   const numAsString = num.toString()
@@ -383,6 +384,19 @@ export const LocalityTable = ({ selectorFn }: { selectorFn?: (newObject: Localit
     a.click()
   }
 
+  // Downloads a KML file of filtered localities.
+  const kmlExport = <T extends MRT_RowData>(table: MRT_TableInstance<T>) => {
+    const rowData: Locality[] = table.getPrePaginationRowModel().rows.map(row => row.original as unknown as Locality)
+
+    const dataString = generateKml(rowData)
+    const blob = new Blob([dataString], { type: 'text/kml' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = 'localities.kml'
+    a.click()
+  }
+
   const checkRowRestriction = (row: Locality) => {
     return !!row.loc_status
   }
@@ -401,6 +415,7 @@ export const LocalityTable = ({ selectorFn }: { selectorFn?: (newObject: Localit
         data={localitiesQueryData}
         url="locality"
         combinedExport={combinedExport}
+        kmlExport={kmlExport}
         exportIsLoading={isLoading}
         enableColumnFilterModes={true}
       />
