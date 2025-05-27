@@ -18,7 +18,6 @@ import { useUser } from '@/hooks/user'
 import { defaultPagination, defaultPaginationSmall } from '@/common'
 import '../../styles/TableView.css'
 import { TableToolBar } from './TableToolBar'
-import { BACKEND_URL } from '@/util/config'
 
 type TableStateInUrl = 'sorting' | 'columnfilters' | 'pagination'
 
@@ -43,8 +42,6 @@ export const TableView = <T extends MRT_RowData>({
   exportIsLoading,
   enableColumnFilterModes,
   serverSidePagination,
-  isCrossSearchTable,
-  isCrossSearchTable,
   isFetching,
 }: {
   title?: string
@@ -60,8 +57,6 @@ export const TableView = <T extends MRT_RowData>({
   exportIsLoading?: boolean
   enableColumnFilterModes?: boolean
   serverSidePagination?: boolean
-  isCrossSearchTable?: boolean
-  isCrossSearchTable?: boolean
   isFetching: boolean
 }) => {
   const location = useLocation()
@@ -111,15 +106,6 @@ export const TableView = <T extends MRT_RowData>({
   if (data && data.length > 0) {
     if (serverSidePagination) rowCount = data[0].full_count as number
     else rowCount = data.length
-  }
-
-  let toolbar
-  if (isCrossSearchTable) {
-    toolbar = renderCustomToolbarCrossSearchVersion
-  } else if (selectorFn) {
-    toolbar = renderCustomToolbarModalVersion
-  } else {
-    toolbar = renderCustomToolbar
   }
 
   const table = useMaterialReactTable({
