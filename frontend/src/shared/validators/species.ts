@@ -12,6 +12,7 @@ export const validateSpecies = (
       asString: (orderName: string) => {
         if (orderName !== 'incertae sedis' && orderName.indexOf(' ') !== -1)
           return 'Order must not contain any spaces, unless the value is "incertae sedis".'
+        return
       },
     },
     family_name: {
@@ -20,6 +21,7 @@ export const validateSpecies = (
       asString: (familyName: string) => {
         if (familyName !== 'incertae sedis' && familyName.indexOf(' ') !== -1)
           return 'Family must not contain any spaces, unless the value is "incertae sedis".'
+        return
       },
     },
     genus_name: {
@@ -31,6 +33,7 @@ export const validateSpecies = (
           return 'when the Genus is indet., Species must also be indet.'
         if (genusName === 'gen.' && editData.species_name !== 'sp.')
           return 'when the Genus is gen., Species must be sp.'
+        return
       },
     },
     species_name: {
@@ -41,6 +44,7 @@ export const validateSpecies = (
           return 'when the Genus is indet., Species must also be indet.'
         if (speciesName !== 'sp.' && editData.genus_name === 'gen.')
           return 'when the Genus is gen., Species must be sp.'
+        return
       },
     },
     unique_identifier: {
