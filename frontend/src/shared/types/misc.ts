@@ -27,9 +27,26 @@ type ValidationErrorItem = {
   error: string
 }
 
+export type ColumnFilter = { id: string; value: string }
+export type SortingState = { desc: boolean; id: string }
+
 export type CrossSearchRouteParameters = {
-  limit: number
-  offset: number
-  columnFilters: unknown
-  sorting: unknown
+  limit?: string
+  offset?: string
+  columnFilters: string
+  sorting: string
+}
+
+export type ParsedCrossSearchRouteParameters = {
+  limit?: number
+  offset?: number
+  columnFilters: unknown[]
+  sorting: unknown[]
+}
+
+export type ValidatedCrossSearchRouteParameters = {
+  limit?: number
+  offset?: number
+  columnFilters: ColumnFilter[]
+  sorting: SortingState[]
 }
