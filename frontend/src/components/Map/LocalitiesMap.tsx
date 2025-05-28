@@ -78,16 +78,28 @@ export const LocalitiesMap = ({ localitiesQueryData, localitiesQueryIsFetching }
       noWrap: true,
     })
 
-    const baseMaps = {
-      OpenTopoMap: topomap,
-      OpenStreetMap: osm,
-    }
-
     // LAYERS ON TOP OF BASE MAPS
     //// Add borders to the map
     borders.forEach(poly => {
       L.polygon(poly as LatLngExpression[], { color: 'gray', weight: 1 }).addTo(map)
     })
+
+    // create a polygon layer for the country borders that is in layer control panel
+    const borderLayer = L.layerGroup()
+    borders.forEach(country_border => {
+      const polygon = L.polygon(country_border as LatLngExpression[], {
+        color: '#136f94',
+        fillOpacity: 0.3,
+        weight: 1,
+      })
+      borderLayer.addLayer(polygon)
+    })
+
+    const baseMaps = {
+      OpenTopoMap: topomap,
+      OpenStreetMap: osm,
+      Countries: borderLayer,
+    }
 
     // Add a scale bar to the map
     L.control.scale({ position: 'bottomright' }).addTo(map)
