@@ -1,6 +1,11 @@
 import { EditDataType, SpeciesDetailsType } from '../types'
 import { Validators, validator } from './validator'
 
+const isEmptyUniqIdentifier = (unique_identifier: string) => {
+  if (unique_identifier === '' || unique_identifier === '-') return true
+  return false
+}
+
 export const validateSpecies = (
   editData: EditDataType<SpeciesDetailsType>,
   fieldName: keyof EditDataType<SpeciesDetailsType>
@@ -44,12 +49,18 @@ export const validateSpecies = (
           return 'when the Genus is indet., Species must also be indet.'
         if (speciesName !== 'sp.' && editData.genus_name === 'gen.')
           return 'when the Genus is gen., Species must be sp.'
+        if (speciesName === 'sp.' && isEmptyUniqIdentifier(editData.unique_identifier ?? ''))
+          return 'when the species is sp., Unique Identifier must have a value.'
         return
       },
     },
     unique_identifier: {
       name: 'Unique Identifier',
       required: true,
+      asString: (uniqueIdentifier: string) => {
+        if (editData.species_name === 'sp.' && isEmptyUniqIdentifier(uniqueIdentifier ?? ''))
+          return 'when the species is sp., Unique Identifier must have a value.'
+      },
     },
   }
 
