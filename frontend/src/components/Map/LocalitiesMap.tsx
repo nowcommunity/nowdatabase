@@ -45,12 +45,13 @@ export const LocalitiesMap = ({ localitiesQueryData, localitiesQueryIsFetching }
     const markers: Layer = L.markerClusterGroup()
 
     const localityIds = columnFilters.idList as unknown as number[]
+    const filterApplied = localityIds.length > 0 && localityIds.every(id => id === null)
+
     const validIds = localityIds.filter(id => typeof id === 'number')
 
-    const filteredLocalities =
-      validIds.length > 0
-        ? localitiesQueryData?.filter(locality => localityIds.includes(locality.lid))
-        : localitiesQueryData
+    const filteredLocalities = !filterApplied
+      ? localitiesQueryData?.filter(locality => validIds.includes(locality.lid))
+      : localitiesQueryData
 
     filteredLocalities?.forEach(locality =>
       markers.addLayer(
