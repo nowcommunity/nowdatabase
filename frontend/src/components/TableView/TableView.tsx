@@ -8,6 +8,7 @@ import {
   useMaterialReactTable,
   MaterialReactTable,
   MRT_VisibilityState,
+  MRT_TableInstance,
 } from 'material-react-table'
 import { Box, CircularProgress, Paper } from '@mui/material'
 import { useLocation, useNavigate } from 'react-router-dom'
@@ -36,6 +37,7 @@ export const TableView = <T extends MRT_RowData>({
   url,
   title,
   combinedExport,
+  kmlExport,
   exportIsLoading,
   enableColumnFilterModes,
   serverSidePagination,
@@ -50,6 +52,7 @@ export const TableView = <T extends MRT_RowData>({
   selectorFn?: (id: T) => void
   url?: string
   combinedExport?: (lids: number[]) => Promise<void>
+  kmlExport?: (table: MRT_TableInstance<T>) => void
   exportIsLoading?: boolean
   enableColumnFilterModes?: boolean
   serverSidePagination?: boolean
@@ -202,6 +205,7 @@ export const TableView = <T extends MRT_RowData>({
           <TableToolBar<T>
             table={table}
             combinedExport={combinedExport}
+            kmlExport={kmlExport}
             exportIsLoading={exportIsLoading}
             showNewButton={editRights.new && title != 'Locality-Species-Cross-Search'}
           />
