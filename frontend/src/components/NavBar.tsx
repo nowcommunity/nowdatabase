@@ -17,15 +17,9 @@ export const NavBar = () => {
   const dispatch = useDispatch()
   const notify = useNotify()
   const pages: LinkDefinition[] = [
-    {
-      title: 'Search',
-      url: '',
-      children: [
-        { title: 'Localities', url: '/locality' },
-        { title: 'Species', url: '/species' },
-        { title: 'Cross-Search', url: '/crosssearch' },
-      ],
-    },
+    { title: 'Localities', url: '/locality' },
+    { title: 'Species', url: '/species' },
+    { title: 'Cross-Search', url: '/crosssearch' },
     { title: 'References', url: '/reference' },
     { title: 'Time Units', url: '/time-unit' },
     { title: 'Time Bounds', url: '/time-bound', allowedRoles: [Role.Admin, Role.EditUnrestricted] },
