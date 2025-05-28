@@ -90,7 +90,7 @@ export const LocalitiesMap = ({ localitiesQueryData, localitiesQueryIsFetching }
     return () => {
       map.remove()
     }
-  }, [localitiesQueryData, localitiesQueryIsFetching, columnFilters])
+  }, [localitiesQueryData, localitiesQueryIsFetching, columnFilters?.idList])
 
   document.title = 'Map'
 
