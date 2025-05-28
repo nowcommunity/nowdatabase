@@ -93,7 +93,7 @@ export const LocalitiesMap = ({ localitiesQueryData, localitiesQueryIsFetching }
     const baseMaps = {
       OpenTopoMap: topomap,
       OpenStreetMap: osm,
-      Countries: borderLayer
+      Countries: borderLayer,
     }
 
     // Add a scale bar to the map
