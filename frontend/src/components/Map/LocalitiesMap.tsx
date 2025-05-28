@@ -80,7 +80,7 @@ export const LocalitiesMap = ({ localitiesQueryData, localitiesQueryIsFetching }
     // create a polygon layer for the country borders that is in layer control panel
     const borderLayer = L.layerGroup()
     borders.forEach(country_border => {
-      const polygon = L.polygon(country_border, {
+      const polygon = L.polygon(country_border as LatLngExpression[], {
         color: '#136f94',
         fillOpacity: 0.3,
         weight: 1,
