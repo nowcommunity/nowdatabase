@@ -45,7 +45,14 @@ export const LocalitiesMap = ({ localitiesQueryData, localitiesQueryIsFetching }
     const markers: Layer = L.markerClusterGroup()
 
     const localityIds = columnFilters.idList as unknown as number[]
-    const filteredLocalities = localitiesQueryData?.filter(locality => localityIds.includes(locality.lid))
+    const filterApplied = localityIds.length > 0 && localityIds.every(id => id === null)
+
+    const validIds = localityIds.filter(id => typeof id === 'number')
+
+    const filteredLocalities = !filterApplied
+      ? localitiesQueryData?.filter(locality => validIds.includes(locality.lid))
+      : localitiesQueryData
+
     filteredLocalities?.forEach(locality =>
       markers.addLayer(
         L.marker([locality.dec_lat, locality.dec_long], {
@@ -102,7 +109,7 @@ export const LocalitiesMap = ({ localitiesQueryData, localitiesQueryIsFetching }
     return () => {
       map.remove()
     }
-  }, [localitiesQueryData, localitiesQueryIsFetching, columnFilters?.idList])
+  }, [localitiesQueryData, localitiesQueryIsFetching, columnFilters])
 
   document.title = 'Map'
 
