@@ -5,20 +5,27 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack'
 import SaveIcon from '@mui/icons-material/Save'
 import { usePageContext } from '../Page'
 import { useDetailContext } from './Context/DetailContext'
-import { EditDataType, Editable, Reference } from '@/shared/types'
+import { EditDataType, Editable, Reference, Species } from '@/shared/types'
 import { useState, useEffect, Fragment } from 'react'
 import { referenceValidator } from '@/shared/validators/validator'
+import { checkTaxonomy, convertTaxonomyFields } from '../Species/taxonomyFunctions'
+import { useLazyGetAllSpeciesQuery } from '@/redux/speciesReducer'
+import { useNotify } from '@/hooks/notification'
 
 export const WriteButton = <T,>({
   onWrite,
+  taxonomy,
   hasStagingMode = false,
 }: {
   onWrite: (editData: EditDataType<T>, setEditData: (editData: EditDataType<T>) => void) => Promise<void>
+  taxonomy?: boolean
   hasStagingMode?: boolean
 }) => {
   const { editData, setEditData, mode, setMode, validator, fieldsWithErrors, setFieldsWithErrors } =
     useDetailContext<T>()
   const [loading, setLoading] = useState(false)
+  const notify = useNotify()
+  const [getSpeciesData] = useLazyGetAllSpeciesQuery()
   const getButtonText = () => {
     if (!mode.staging) return hasStagingMode ? 'Finalize entry' : 'Save changes'
     return 'Complete and save'
@@ -81,22 +88,57 @@ export const WriteButton = <T,>({
     // @ts-expect-error Reason: Typescript doesn't recognise that references do exist. Unable to find a way around it. Fix if extra time
   }, [mode, editData.references])
 
+  const writeWithTaxonomyCheck = async () => {
+    setLoading(true)
+    const { data: speciesData } = await getSpeciesData(undefined, true)
+    if (!speciesData) {
+      notify('Could not fetch species to check taxonomy data.', 'error')
+      return
+    }
+    // converts taxonomy fields to capitalized/lowercased
+    const speciesEditData = convertTaxonomyFields(editData as EditDataType<Species>)
+    const errors = checkTaxonomy(speciesEditData, speciesData)
+    if (errors.size > 0) {
+      const errorMessage = [...errors].reduce((acc, currentError) => acc + `\n${currentError}`)
+      notify(errorMessage, 'error')
+      return
+    }
+    if (!mode.staging && hasStagingMode) {
+      setMode(mode.new ? 'staging-new' : 'staging-edit')
+      return
+    }
+
+    void onWrite(speciesEditData as EditDataType<T>, setEditData).then(() => {
+      setMode('read')
+      return
+    })
+  }
+
+  const handleWriteButtonClick = () => {
+    if (mode.new && taxonomy) {
+      void writeWithTaxonomyCheck()
+      setLoading(false)
+      return
+    }
+
+    if (!mode.staging && hasStagingMode) {
+      setMode(mode.new ? 'staging-new' : 'staging-edit')
+      return
+    }
+
+    setLoading(true)
+    void onWrite(editData, setEditData).then(() => {
+      setLoading(false)
+      setMode('read')
+    })
+  }
+
   return (
     <Button
       disabled={Object.keys(fieldsWithErrors).length > 0}
       id="write-button"
       sx={{ width: '20em' }}
-      onClick={() => {
-        if (!mode.staging && hasStagingMode) {
-          setMode(mode.new ? 'staging-new' : 'staging-edit')
-          return
-        }
-        setLoading(true)
-        void onWrite(editData, setEditData).then(() => {
-          setLoading(false)
-          setMode('read')
-        })
-      }}
+      onClick={handleWriteButtonClick}
       variant="contained"
     >
       {loading ? (

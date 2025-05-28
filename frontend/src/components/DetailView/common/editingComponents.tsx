@@ -274,6 +274,7 @@ export const EditableTextField = <T extends object>({
   field,
   type = 'text',
   round,
+  trim = false,
   big = false,
   disabled = false,
   readonly = false,
@@ -282,6 +283,7 @@ export const EditableTextField = <T extends object>({
   field: keyof EditDataType<T>
   type?: React.HTMLInputTypeAttribute
   round?: number
+  trim?: boolean
   big?: boolean
   disabled?: boolean
   readonly?: boolean
@@ -297,7 +299,7 @@ export const EditableTextField = <T extends object>({
   }, [errorObject])
 
   const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
-    const value = event?.currentTarget?.value
+    let value = event?.currentTarget?.value
     if (handleSetEditData) {
       handleSetEditData(value)
     } else {
@@ -305,6 +307,7 @@ export const EditableTextField = <T extends object>({
         // For date fields, ensure the value is stored as a string in the format 'YYYY-MM-DD'
         setEditData({ ...editData, [field]: value })
       } else if (type === 'text' || value === '') {
+        if (trim) value = value.trim()
         setEditData({ ...editData, [field]: value })
       } else {
         setEditData({ ...editData, [field]: parseFloat(value) })
