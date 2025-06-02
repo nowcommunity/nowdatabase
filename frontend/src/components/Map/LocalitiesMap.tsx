@@ -7,6 +7,7 @@ import { Button } from '@mui/material'
 import MapIcon from '@mui/icons-material/Map'
 import { Locality } from '@/shared/types/data.js'
 import { usePageContext } from '../Page'
+import { skipToken } from '@reduxjs/toolkit/query'
 import './leaflet.markercluster.js'
 import './MarkerCluster.css'
 import './MarkerCluster.Default.css'
@@ -26,18 +27,16 @@ type CustomMarkerOptions = L.MarkerOptions & { localityId: number }
 type CustomMarker = L.Marker & { options: CustomMarkerOptions }
 
 export const LocalitiesMap = ({ localitiesQueryData, localitiesQueryIsFetching }: Props) => {
-  const [selectedLocality, setSelectedLocality] = useState<number>(0)
+  const [selectedLocality, setSelectedLocality] = useState<string | null>(null)
   const leafletMapRef = useRef<L.Map | null>(null)
-
   const mapRef = useRef<HTMLDivElement | null>(null)
   const [isOpen, setIsOpen] = useState(false)
   const columnFilters = usePageContext()
-
   const {
     data: localityDetailsQueryData,
     isFetching: detailsLoading,
     error,
-  } = useGetLocalityDetailsQuery(selectedLocality?.toString(), { skip: !selectedLocality })
+  } = useGetLocalityDetailsQuery(selectedLocality ?? skipToken) // use skipToken to skip query when state is null
 
   useEffect(() => {
     if (!mapRef.current || leafletMapRef.current) return
@@ -74,9 +73,7 @@ export const LocalitiesMap = ({ localitiesQueryData, localitiesQueryIsFetching }
       const marker = L.marker([locality.dec_lat, locality.dec_long], options) as CustomMarker
 
       marker.on('click', () => {
-        setSelectedLocality(marker.options.localityId)
-        console.log('Clicked marker with ID:', marker.options.localityId)
-        console.log('State updated with locality ID:', selectedLocality)
+        setSelectedLocality(marker.options.localityId.toString())
       })
 
       markers.addLayer(marker)
@@ -135,6 +132,21 @@ export const LocalitiesMap = ({ localitiesQueryData, localitiesQueryIsFetching }
     }
   }, [localitiesQueryData, localitiesQueryIsFetching, columnFilters])
 
+  useEffect(() => {
+    if (!leafletMapRef.current) return
+    const map = leafletMapRef.current
+
+    const handleMapClick = () => {
+      setSelectedLocality(null)
+    }
+
+    map.on('click', handleMapClick)
+
+    return () => {
+      map.off('click', handleMapClick)
+    }
+  }, [])
+
   // useEffect(() => {
   //   if (localityDetailsQueryData) {
   //     console.log('Fetched locality details:', localityDetailsQueryData)
@@ -143,8 +155,6 @@ export const LocalitiesMap = ({ localitiesQueryData, localitiesQueryIsFetching }
   // }, [localitiesQueryData, localitiesQueryIsFetching, columnFilters])
 
   document.title = 'Map'
-
-  // Poistettu: style={{ display: 'flex', height: '500px' }}
 
   return (
     <article id="localities-map">
@@ -163,7 +173,7 @@ export const LocalitiesMap = ({ localitiesQueryData, localitiesQueryIsFetching }
             <p>Loading...</p>
           ) : error ? (
             <p>Error loading locality details</p>
-          ) : localityDetailsQueryData ? (
+          ) : selectedLocality && localityDetailsQueryData ? (
             <div>
               <h2>{localityDetailsQueryData.loc_name}</h2>
               <p>
