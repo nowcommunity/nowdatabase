@@ -60,6 +60,7 @@ export const validateSpecies = (
       asString: (uniqueIdentifier: string) => {
         if (editData.species_name === 'sp.' && isEmptyUniqIdentifier(uniqueIdentifier ?? ''))
           return 'when the species is sp., Unique Identifier must have a value.'
+        return
       },
     },
   }

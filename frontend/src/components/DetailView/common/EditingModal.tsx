@@ -1,4 +1,4 @@
-import { Box, Button, Modal } from '@mui/material'
+import { Box, Button, Modal, Tooltip } from '@mui/material'
 import { ReactNode, useState } from 'react'
 import { modalStyle } from './misc'
 
@@ -11,11 +11,13 @@ import { modalStyle } from './misc'
 */
 export const EditingModal = ({
   buttonText,
+  buttonTooltip,
   children,
   onSave,
   dataCy,
 }: {
   buttonText: string
+  buttonTooltip?: string
   children: ReactNode | ReactNode[]
   onSave?: () => Promise<boolean>
   dataCy?: string
@@ -28,11 +30,25 @@ export const EditingModal = ({
     setOpen(false)
   }
 
-  return (
-    <Box>
+  const OpenModalButton = () => {
+    if (buttonTooltip)
+      return (
+        <Tooltip title={buttonTooltip}>
+          <Button data-cy={dataCy} onClick={() => setOpen(true)} variant="contained" sx={{ marginBottom: '1em' }}>
+            {buttonText}
+          </Button>
+        </Tooltip>
+      )
+    return (
       <Button data-cy={dataCy} onClick={() => setOpen(true)} variant="contained" sx={{ marginBottom: '1em' }}>
         {buttonText}
       </Button>
+    )
+  }
+
+  return (
+    <Box>
+      <OpenModalButton />
       <Modal open={open} aria-labelledby={`modal-${buttonText}`} aria-describedby={`modal-${buttonText}`}>
         <Box sx={{ ...modalStyle }}>
           <Box marginBottom="2em" marginTop="1em">
