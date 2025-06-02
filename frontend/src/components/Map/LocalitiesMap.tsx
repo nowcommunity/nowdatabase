@@ -25,52 +25,26 @@ const markerIcon =
 
 export const LocalitiesMap = ({ localitiesQueryData, localitiesQueryIsFetching }: Props) => {
   const mapRef = useRef<HTMLDivElement | null>(null)
+  const markersRef = useRef<L.Layer | null>(null)
+  const [map, setMap] = useState<L.Map | null>(null)
   const [isOpen, setIsOpen] = useState(false)
   const columnFilters = usePageContext()
 
   useEffect(() => {
-    if (!mapRef.current || localitiesQueryIsFetching) return
+    if (!mapRef.current) return
 
-    const map = L.map(mapRef.current, { maxZoom: 16 })
+    const mapInstance = L.map(mapRef.current, { maxZoom: 16 })
+    setMap(mapInstance)
+
     const coords: LatLngExpression = [15, 13]
-
-    // To prevent eslint from complaining about that 'markers' variable below:
-    /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-    /* eslint-disable @typescript-eslint/no-unsafe-call */
-    /* eslint-disable @typescript-eslint/no-unsafe-return */
-    /* eslint-disable @typescript-eslint/no-unsafe-member-access */
-
-    // @ts-expect-error The marker cluster library is a plain javascript library
-    // with no module exports that extends 'L' when imported
-    const markers: Layer = L.markerClusterGroup()
-
-    const localityIds = columnFilters.idList as unknown as number[]
-    const filterApplied = localityIds.length > 0 && localityIds.every(id => id === null)
-
-    const validIds = localityIds.filter(id => typeof id === 'number')
-
-    const filteredLocalities = !filterApplied
-      ? localitiesQueryData?.filter(locality => validIds.includes(locality.lid))
-      : localitiesQueryData
-
-    filteredLocalities?.forEach(locality =>
-      markers.addLayer(
-        L.marker([locality.dec_lat, locality.dec_long], {
-          icon: new Icon({ iconUrl: markerIcon, iconSize: [25, 41], iconAnchor: [12, 41] }),
-        })
-      )
-    )
-
-    markers.addTo(map)
-
-    map.setView(coords, 2)
+    mapInstance.setView(coords, 2)
 
     // BASE MAPS
     //// OpenTopoMap
     const topomap = L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', {
       attribution: 'Map data: © <a href="https://opentopomap.org">OpenTopoMap</a> (CC-BY-SA)',
       noWrap: true,
-    }).addTo(map)
+    }).addTo(mapInstance)
 
     //// OpenStreetMap
     const osm = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -81,7 +55,7 @@ export const LocalitiesMap = ({ localitiesQueryData, localitiesQueryIsFetching }
     // LAYERS ON TOP OF BASE MAPS
     //// Add borders to the map
     borders.forEach(poly => {
-      L.polygon(poly as LatLngExpression[], { color: 'gray', weight: 1 }).addTo(map)
+      L.polygon(poly as LatLngExpression[], { color: 'gray', weight: 1 }).addTo(mapInstance)
     })
 
     // create a polygon layer for the country borders that is in layer control panel
@@ -102,14 +76,52 @@ export const LocalitiesMap = ({ localitiesQueryData, localitiesQueryIsFetching }
     }
 
     // Add a scale bar to the map
-    L.control.scale({ position: 'bottomright' }).addTo(map)
+    L.control.scale({ position: 'bottomright' }).addTo(mapInstance)
     // Add a layer control to the map
-    L.control.layers(baseMaps, {}, { position: 'topright' }).addTo(map)
+    L.control.layers(baseMaps, {}, { position: 'topright' }).addTo(mapInstance)
 
     return () => {
-      map.remove()
+      mapInstance.remove()
     }
-  }, [localitiesQueryData, localitiesQueryIsFetching, columnFilters])
+  }, [])
+
+  useEffect(() => {
+    if (!map || localitiesQueryIsFetching) return
+
+    if (markersRef.current) {
+      map.removeLayer(markersRef.current)
+      markersRef.current = null
+    }
+    // To prevent eslint from complaining about that 'markers' variable below:
+    /* eslint-disable @typescript-eslint/no-unsafe-assignment */
+    /* eslint-disable @typescript-eslint/no-unsafe-call */
+    /* eslint-disable @typescript-eslint/no-unsafe-return */
+    /* eslint-disable @typescript-eslint/no-unsafe-member-access */
+
+    // @ts-expect-error The marker cluster library is a plain javascript library
+    // with no module exports that extends 'L' when imported
+    const newMarkers: Layer = L.markerClusterGroup()
+
+    const localityIds = columnFilters.idList as unknown as number[]
+    const filterApplied = localityIds.length > 0 && localityIds.every(id => id === null)
+
+    const validIds = localityIds.filter(id => typeof id === 'number')
+
+    const filteredLocalities = !filterApplied
+      ? localitiesQueryData?.filter(locality => validIds.includes(locality.lid))
+      : localitiesQueryData
+
+    filteredLocalities?.forEach(locality =>
+      newMarkers.addLayer(
+        L.marker([locality.dec_lat, locality.dec_long], {
+          icon: new Icon({ iconUrl: markerIcon, iconSize: [25, 41], iconAnchor: [12, 41] }),
+        })
+      )
+    )
+
+    newMarkers.addTo(map)
+    markersRef.current = newMarkers
+  }, [localitiesQueryData, localitiesQueryIsFetching, columnFilters, map])
 
   document.title = 'Map'
 
