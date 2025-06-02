@@ -7,12 +7,14 @@ import '../../styles/TableToolBar.css'
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import AddCircleIcon from '@mui/icons-material/AddCircle'
+import { CrossSearchExportMenuItem } from '../CrossSearch/CrossSearchExportMenuItem'
 
 export const TableToolBar = <T extends MRT_RowData>({
   table,
   combinedExport,
   kmlExport,
   exportIsLoading,
+  isCrossSearchTable,
   selectorFn,
   showNewButton,
 }: {
@@ -20,6 +22,7 @@ export const TableToolBar = <T extends MRT_RowData>({
   combinedExport?: (lids: number[]) => Promise<void>
   kmlExport?: (table: MRT_TableInstance<T>) => void
   exportIsLoading?: boolean
+  isCrossSearchTable?: boolean
   selectorFn?: (id: T) => void
   showNewButton?: boolean
 }) => {
@@ -67,14 +70,19 @@ export const TableToolBar = <T extends MRT_RowData>({
             'aria-labelledby': 'export-button',
           }}
         >
-          <MenuItem
-            onClick={() => {
-              exportRows(table)
-              handleClose()
-            }}
-          >
-            Export table
-          </MenuItem>
+          {isCrossSearchTable ? (
+            <CrossSearchExportMenuItem handleClose={handleClose} />
+          ) : (
+            <MenuItem
+              onClick={() => {
+                exportRows(table)
+                handleClose()
+              }}
+            >
+              Export table
+            </MenuItem>
+          )}
+
           {kmlExport && (
             <MenuItem
               onClick={() => {

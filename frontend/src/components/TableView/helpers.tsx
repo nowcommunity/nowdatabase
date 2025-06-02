@@ -1,10 +1,4 @@
-import { Box } from '@mui/material'
-import {
-  MRT_RowData,
-  MRT_ShowHideColumnsButton,
-  MRT_TableInstance,
-  MRT_ToggleFullScreenButton,
-} from 'material-react-table'
+import { MRT_RowData, MRT_TableInstance } from 'material-react-table'
 import { mkConfig, generateCsv, download } from 'export-to-csv'
 import { AcceptedData } from 'node_modules/export-to-csv/output/lib/types'
 
@@ -34,16 +28,3 @@ export const exportRows = <T extends MRT_RowData>(table: MRT_TableInstance<T>) =
   const csv = generateCsv(csvConfig)(rowData)
   download(csvConfig)(csv)
 }
-
-export const renderCustomToolbar = <T extends MRT_RowData>({ table }: { table: MRT_TableInstance<T> }) => (
-  <Box>
-    <MRT_ToggleFullScreenButton table={table} />
-    <MRT_ShowHideColumnsButton table={table} />
-  </Box>
-)
-
-export const renderCustomToolbarModalVersion = <T extends MRT_RowData>({ table }: { table: MRT_TableInstance<T> }) => (
-  <Box>
-    <MRT_ShowHideColumnsButton table={table} />
-  </Box>
-)
