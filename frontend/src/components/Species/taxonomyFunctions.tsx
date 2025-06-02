@@ -87,7 +87,7 @@ export const convertTaxonomyFields = (speciesEditData: EditDataType<Species>) =>
   let capitalizedGenus = ''
   if (genus) {
     if (genus !== 'indet.') {
-      capitalizedGenus = genus ? genus[0].toUpperCase() + genus.slice(1) : ''
+      capitalizedGenus = genus[0].toUpperCase() + genus.slice(1)
     } else {
       capitalizedGenus = genus
     }
@@ -97,7 +97,7 @@ export const convertTaxonomyFields = (speciesEditData: EditDataType<Species>) =>
   let lowercasedSpecies = ''
   if (species) {
     if (species !== 'indet.') {
-      lowercasedSpecies = species ? species[0].toUpperCase() + species.slice(1) : ''
+      lowercasedSpecies = species.toLowerCase()
     } else {
       lowercasedSpecies = species
     }
