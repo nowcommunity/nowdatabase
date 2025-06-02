@@ -28,6 +28,8 @@ type CustomMarker = L.Marker & { options: CustomMarkerOptions }
 
 export const LocalitiesMap = ({ localitiesQueryData, localitiesQueryIsFetching }: Props) => {
   const [selectedLocality, setSelectedLocality] = useState<string | null>(null)
+  // Map instance tracked in state for attaching event listeners
+  const [mapInstance, setMapInstance] = useState<L.Map | null>(null)
   const leafletMapRef = useRef<L.Map | null>(null)
   const mapRef = useRef<HTMLDivElement | null>(null)
   const [isOpen, setIsOpen] = useState(false)
@@ -42,6 +44,7 @@ export const LocalitiesMap = ({ localitiesQueryData, localitiesQueryIsFetching }
     if (!mapRef.current || leafletMapRef.current) return
 
     const map = L.map(mapRef.current, { maxZoom: 16 })
+    setMapInstance(map)
     const coords: LatLngExpression = [15, 13]
 
     // To prevent eslint from complaining about that 'markers' variable below:
@@ -129,23 +132,23 @@ export const LocalitiesMap = ({ localitiesQueryData, localitiesQueryIsFetching }
     return () => {
       map.remove()
       leafletMapRef.current = null
+      setMapInstance(null)
     }
   }, [localitiesQueryData, localitiesQueryIsFetching, columnFilters])
 
   useEffect(() => {
-    if (!leafletMapRef.current) return
-    const map = leafletMapRef.current
+    if (!mapInstance) return
+    const map = mapInstance
 
     const handleMapClick = () => {
       setSelectedLocality(null)
     }
-
     map.on('click', handleMapClick)
 
     return () => {
       map.off('click', handleMapClick)
     }
-  }, [])
+  }, [mapInstance])
 
   // useEffect(() => {
   //   if (localityDetailsQueryData) {
