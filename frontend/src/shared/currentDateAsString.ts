@@ -1,5 +1,5 @@
 export const currentDateAsString = () => {
-  // returns current datetime in YYYYMMDDHHSS format, currently used for filenames
+  // returns current datetime in YYYY-MM-DD-HH-mm format, currently used for filenames
   const today = new Date()
   const year = today.getFullYear()
   const month = String(today.getMonth() + 1).padStart(2, '0')

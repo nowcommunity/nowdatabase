@@ -7,7 +7,7 @@ import '../../styles/TableToolBar.css'
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import AddCircleIcon from '@mui/icons-material/AddCircle'
-import { CrossSearchExportMenuItem } from '../CrossSearch/CrossSearchExportButton'
+import { CrossSearchExportMenuItem } from '../CrossSearch/CrossSearchExportMenuItem'
 
 export const TableToolBar = <T extends MRT_RowData>({
   table,

@@ -19,11 +19,10 @@ export const CrossSearchExportMenuItem = ({ handleClose }: { handleClose: () => 
   const fetchCSVFile = () => {
     setLoading(true)
     notify('Downloading CSV file, please wait...', 'info', null)
+    const URIColumnFilters = encodeURIComponent(JSON.stringify(sqlColumnFilters))
+    const URIOrderBy = encodeURIComponent(JSON.stringify(sqlOrderBy))
 
-    fetch(
-      `${BACKEND_URL}/crosssearch/export/${JSON.stringify(sqlColumnFilters)}/${JSON.stringify(sqlOrderBy)}`,
-      fetchOptions
-    )
+    fetch(`${BACKEND_URL}/crosssearch/export/${URIColumnFilters}/${URIOrderBy}`, fetchOptions)
       .then(response => {
         if (!response.ok) {
           throw new Error('Server response was not OK.')
