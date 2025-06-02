@@ -90,32 +90,38 @@ export const WriteButton = <T,>({
 
   const writeWithTaxonomyCheck = async () => {
     setLoading(true)
-    const { data: speciesData } = await getSpeciesData(undefined, true)
-    if (!speciesData) {
-      notify('Could not fetch species to check taxonomy data.', 'error')
-      return
-    }
-    // converts taxonomy fields to capitalized/lowercased
-    const speciesEditData = convertTaxonomyFields(editData as EditDataType<Species>)
-    const errors = checkTaxonomy(speciesEditData, speciesData)
-    if (errors.size > 0) {
-      const errorMessage = [...errors].reduce((acc, currentError) => acc + `\n${currentError}`)
-      notify(errorMessage, 'error')
-      return
-    }
-    if (!mode.staging && hasStagingMode) {
-      setMode(mode.new ? 'staging-new' : 'staging-edit')
-      return
+    let speciesEditData: EditDataType<Species> | undefined = undefined
+
+    if (!mode.staging) {
+      const { data: speciesData } = await getSpeciesData(undefined, true)
+      if (!speciesData) {
+        notify('Could not fetch species to check taxonomy data.', 'error')
+        return
+      }
+      // converts taxonomy fields to capitalized/lowercased
+      speciesEditData = convertTaxonomyFields(editData as EditDataType<Species>)
+      const errors = checkTaxonomy(speciesEditData, speciesData)
+      if (errors.size > 0) {
+        const errorMessage = [...errors].reduce((acc, currentError) => acc + `\n${currentError}`)
+        notify(errorMessage, 'error')
+        return
+      }
+      setEditData(speciesEditData as EditDataType<T>)
+
+      if (hasStagingMode) {
+        setMode(mode.new ? 'staging-new' : 'staging-edit')
+        return
+      }
     }
 
-    void onWrite(speciesEditData as EditDataType<T>, setEditData).then(() => {
+    void onWrite((speciesEditData as EditDataType<T>) ?? editData, setEditData).then(() => {
       setMode('read')
       return
     })
   }
 
   const handleWriteButtonClick = () => {
-    if (mode.new && taxonomy) {
+    if (taxonomy) {
       void writeWithTaxonomyCheck()
       setLoading(false)
       return
