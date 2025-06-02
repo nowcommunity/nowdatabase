@@ -2,6 +2,7 @@ import { Box, Button, Modal } from '@mui/material'
 import { ReactNode, useState } from 'react'
 import { modalStyle } from './misc'
 import EmailIcon from '@mui/icons-material/Email'
+import '../../../styles/modal.css'
 
 export const ContactModal = ({
   buttonText,
@@ -25,8 +26,13 @@ export const ContactModal = ({
       <Button onClick={() => setOpen(true)} variant="outlined" startIcon={<EmailIcon />} className="button">
         {buttonText}
       </Button>
-      <Modal open={open} aria-labelledby={`modal-${buttonText}`} aria-describedby={`modal-${buttonText}`}>
-        <Box sx={{ ...modalStyle }}>
+      <Modal
+        open={open}
+        aria-labelledby={`modal-${buttonText}`}
+        aria-describedby={`modal-${buttonText}`}
+        className="modal"
+      >
+        <Box sx={{ ...modalStyle }} className="modal-content">
           <Box marginBottom="2em" marginTop="1em">
             {' '}
             {children}
