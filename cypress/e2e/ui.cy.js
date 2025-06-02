@@ -14,7 +14,6 @@ describe('Button Tests', () => {
     cy.contains('References').should('be.visible')
     cy.contains('Time Units').should('be.visible')
 
-    cy.contains('Search').click()
     cy.contains('Cross-Search').should('be.visible')
     cy.contains('Localities').should('be.visible')
     cy.contains('Species').should('be.visible')
@@ -22,7 +21,6 @@ describe('Button Tests', () => {
 
   it('Localities button works', () => {
     cy.visit('/')
-    cy.contains('Search').click()
     cy.contains('Localities').click()
     cy.url().should('include', '/locality')
     cy.contains('Name').should('be.visible')
@@ -33,7 +31,6 @@ describe('Button Tests', () => {
 
   it('Species button works', () => {
     cy.visit('/')
-    cy.contains('Search').click()
     cy.contains('Species').click()
     cy.url().should('include', '/species')
     cy.contains('Order').should('be.visible')
@@ -52,7 +49,6 @@ describe('Button Tests', () => {
 
   it('Cross Search button works', () => {
     cy.visit('/')
-    cy.contains('Search').click()
     cy.contains('Cross-Search').click()
     cy.url().should('include', '/crosssearch')
     cy.contains('Locality name').should('be.visible')
