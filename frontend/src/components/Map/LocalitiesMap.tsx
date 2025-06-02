@@ -144,9 +144,11 @@ export const LocalitiesMap = ({ localitiesQueryData, localitiesQueryIsFetching }
 
   document.title = 'Map'
 
+  // Poistettu: style={{ display: 'flex', height: '500px' }}
+
   return (
     <article id="localities-map">
-      <div id="map-container" className={isOpen ? 'open' : ''} style={{ display: 'flex', height: '500px' }}>
+      <div id="map-container" className={isOpen ? 'open' : ''}>
         <div ref={mapRef} style={{ flex: 1 }} />
 
         <div
