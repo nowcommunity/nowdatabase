@@ -6,7 +6,7 @@ See [LocalitiesMap](../../../../frontend/src/components/Map/LocalitiesMap.tsx).
 A map component that takes in an array of `Locality` objects, along with an 'is loading' boolean value.
 The component will display each of these localities as a marker, that the user is able to click in order to view details related to that locality (locality details, fossils associated with that locality).
 
-The component uses the [`leaflet.js`](../../../../frontend/src/components/Map/leaflet.js) plain JavaScript library (not `react-leaflet` like in the [CoordinateSelectionMap](CoordinateSelectionMap.md) component).
+The component uses the `leaflet.js` plain JavaScript library (not `react-leaflet` like in the [CoordinateSelectionMap](CoordinateSelectionMap.md) component).
 This is in order to make certain features simpler to implement as we are not limited by the features that `react-leaflet` wraps.
 
 Whenever the component is rendered, it will load the map but remain hidden to the user.
