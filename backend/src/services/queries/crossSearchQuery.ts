@@ -1,7 +1,5 @@
 import { Prisma } from '../../../prisma/generated/now_test_client'
-
-export type ColumnFilter = { id: string; value: string }
-export type SortingState = { desc: boolean; id: string }
+import { ColumnFilter } from '../../../../frontend/src/shared/types'
 
 const generateWhereClause = (showAll: boolean, allowedLocalities: Array<number>, columnFilters: ColumnFilter[]) => {
   let userCheck: Prisma.Sql

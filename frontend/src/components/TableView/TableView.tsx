@@ -27,6 +27,7 @@ type TableStateInUrl = 'sorting' | 'columnfilters' | 'pagination'
   
   selectorFn should only be defined if using this as a selecting table
 */
+
 export const TableView = <T extends MRT_RowData>({
   data,
   columns,
@@ -39,6 +40,7 @@ export const TableView = <T extends MRT_RowData>({
   combinedExport,
   kmlExport,
   exportIsLoading,
+  isCrossSearchTable,
   enableColumnFilterModes,
   serverSidePagination,
   isFetching,
@@ -54,6 +56,7 @@ export const TableView = <T extends MRT_RowData>({
   combinedExport?: (lids: number[]) => Promise<void>
   kmlExport?: (table: MRT_TableInstance<T>) => void
   exportIsLoading?: boolean
+  isCrossSearchTable?: boolean
   enableColumnFilterModes?: boolean
   serverSidePagination?: boolean
   isFetching: boolean
@@ -190,9 +193,7 @@ export const TableView = <T extends MRT_RowData>({
       <>
         <CircularProgress />
         <br></br>
-        {title === 'Locality-Species-Cross-Search'
-          ? 'Loading data, this might take a few seconds...'
-          : 'Loading data...'}
+        {'Loading data...'}
       </>
     )
   }
@@ -207,6 +208,7 @@ export const TableView = <T extends MRT_RowData>({
             combinedExport={combinedExport}
             kmlExport={kmlExport}
             exportIsLoading={exportIsLoading}
+            isCrossSearchTable={isCrossSearchTable}
             showNewButton={editRights.new && title != 'Locality-Species-Cross-Search'}
           />
         </div>

@@ -60,7 +60,7 @@ describe('Creating a new locality', () => {
     cy.get('[id=dms_lat-textfield]').should('have.value', '48 40 48 N')
     cy.contains('This field is required')
     cy.get('[id=write-button]').should('be.disabled')
-    cy.contains('4 Invalid fields')
+    cy.contains('4 invalid fields')
   })
 
   it("and filling, then erasing needed data doesn't work", () => {
@@ -95,12 +95,12 @@ describe('Creating a new locality', () => {
     cy.get('[id=min_age-textfield]').type('{backspace}{backspace}{backspace}{backspace}{backspace}')
     cy.contains('This field is required')
     cy.get('[id=write-button]').should('be.disabled')
-    cy.contains('1 Invalid fields')
+    cy.contains('1 invalid field')
 
     // make sure errors in other tabs disable the write button
     cy.get('[role=tablist]').contains('Locality').click()
     cy.get('[id=write-button]').should('be.disabled')
-    cy.contains('1 Invalid fields')
+    cy.contains('1 invalid field')
   })
 
   it('write button is disabled if unvisited tab has validation errors', () => {
@@ -116,12 +116,12 @@ describe('Creating a new locality', () => {
 
     // Age tab has no errors, but Locality tab has unfilled mandatory fields
     cy.get('[id=write-button]').should('be.disabled')
-    cy.contains('6 Invalid fields')
+    cy.contains('6 invalid fields')
     cy.get('[id=min_age-textfield-helper-text]').should('not.exist')
     cy.get('[id=max_age-textfield-helper-text]').should('not.exist')
     cy.get('[role=tablist]').contains('Locality').click()
     cy.get('[id=write-button]').should('be.disabled')
-    cy.contains('6 Invalid fields')
+    cy.contains('6 invalid fields')
   })
 
   it('composite dating method works', () => {
@@ -233,7 +233,7 @@ describe('Editing a locality', () => {
     cy.get('[id=max_age-textfield]').type('{backspace}{backspace}{backspace}{backspace}{backspace}9')
     cy.contains('Min value cannot be higher than max')
     cy.get('[id=write-button]').should('be.disabled')
-    cy.contains('4 Invalid fields')
+    cy.contains('4 invalid fields')
   })
 
   it('changing fractions and basis for age updates the age correctly', () => {
