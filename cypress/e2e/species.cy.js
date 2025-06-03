@@ -55,10 +55,6 @@ describe('Editing a species', () => {
     cy.contains('21052 Simplomys simplicidens')
     cy.get('[id=edit-button]').click()
 
-    cy.get('[id=order_name-textfield]').clear()
-    cy.get('[id=order_name-textfield]').type('modifiedOrder')
-    cy.get('[id=family_name-textfield]').clear()
-    cy.get('[id=family_name-textfield]').type('modifiedFamily')
     cy.get('[id=genus_name-textfield]').clear()
     cy.get('[id=genus_name-textfield]').type('modifiedGenus')
     cy.get('[id=species_name-textfield]').clear()
@@ -73,8 +69,9 @@ describe('Editing a species', () => {
     cy.get('[id=write-button]').should('not.be.disabled')
     cy.get('[id=write-button]').click()
     cy.contains('Saved species entry successfully.')
-    cy.contains('modifiedOrder')
-    cy.contains('Subfamily or Tribe heimo')
+    cy.contains('ModifiedGenus')
+    cy.contains('modifiedspecies')
+    cy.contains('Subfamily or Tribe Heimo')
   })
 
   it('with missing required fields does not work', () => {
@@ -82,24 +79,24 @@ describe('Editing a species', () => {
     cy.contains('21052')
     cy.get('[id=edit-button]').click()
 
-    cy.get('[id=order_name-textfield]').clear()
-    cy.contains('Order: This field is required')
+    cy.get('[id=genus_name-textfield]').clear()
+    cy.contains('Genus: This field is required')
     cy.get('[id=write-button]').should('be.disabled')
     cy.contains('1 invalid field')
 
-    cy.get('[id=family_name-textfield]').clear()
-    cy.contains('Family: This field is required')
+    cy.get('[id=species_name-textfield]').clear()
+    cy.contains('Species: This field is required')
     cy.get('[id=write-button]').should('be.disabled')
     cy.contains('2 invalid fields')
 
-    cy.get('[id=order_name-textfield]').type('newOrder')
-    cy.contains('Order: This field is required').should('not.exist')
-    cy.contains('Family: This field is required')
+    cy.get('[id=genus_name-textfield]').type('newGenus')
+    cy.contains('Genus: This field is required').should('not.exist')
+    cy.contains('Species: This field is required')
     cy.get('[id=write-button]').should('be.disabled')
     cy.contains('1 invalid field')
 
-    cy.get('[id=family_name-textfield]').type('newFamily')
-    cy.contains('Family: This field is required').should('not.exist')
+    cy.get('[id=species_name-textfield]').type('newSpecies')
+    cy.contains('Species: This field is required').should('not.exist')
     cy.get('[id=write-button]').click()
 
     cy.contains('button', 'Add existing reference').click()
@@ -109,14 +106,16 @@ describe('Editing a species', () => {
     cy.get('[id=write-button]').click()
 
     cy.contains('Saved species entry successfully.')
-    cy.contains('newOrder')
-    cy.contains('newFamily')
-    cy.contains('modifiedGenus')
-    cy.contains('Subfamily or Tribe heimo')
+    cy.contains('NewGenus')
+    cy.contains('newspecies')
   })
 })
 
 describe('Taxonomy checks work', () => {
+  before('Reset database', () => {
+    cy.request(Cypress.env('databaseResetUrl'))
+  })
+
   beforeEach('Login as admin', () => {
     cy.login('testSu')
   })

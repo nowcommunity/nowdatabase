@@ -16,7 +16,6 @@ export const checkTaxonomy = (editData: EditDataType<Species>, speciesData: Spec
 
   for (const species of speciesData) {
     if (
-      species_id &&
       species_id !== species.species_id &&
       genus === species.genus_name &&
       speciesName === species.species_name &&
@@ -97,7 +96,6 @@ export const convertTaxonomyFields = (speciesEditData: EditDataType<Species>) =>
   }
 
   const species = speciesEditData.species_name
-  console.log(species)
   let lowercasedSpecies = ''
   if (species) {
     if (species !== 'indet.') {
@@ -106,7 +104,7 @@ export const convertTaxonomyFields = (speciesEditData: EditDataType<Species>) =>
       lowercasedSpecies = species
     }
   }
-  console.log(lowercasedSpecies)
+
   return {
     ...speciesEditData,
     subclass_or_superorder_name: capitalizedSubClass,
