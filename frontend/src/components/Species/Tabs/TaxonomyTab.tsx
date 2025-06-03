@@ -49,11 +49,31 @@ export const TaxonomyTab = () => {
   ]
 
   const classification = [
-    ['Class', 'Mammalia', 'Subclass or Superorder', textField('subclass_or_superorder_name')],
-    ['Order', textField('order_name'), 'Suborder or Superfamily', textField('suborder_or_superfamily_name')],
-    ['Family', textField('family_name'), 'Subfamily or Tribe', textField('subfamily_name')],
-    ['Genus', textField('genus_name')],
-    ['Species', textField('species_name'), 'Unique Identifier', textField('unique_identifier')],
+    [
+      'Class',
+      'Mammalia',
+      'Subclass or Superorder',
+      textField('subclass_or_superorder_name', { type: 'text', trim: true }),
+    ],
+    [
+      'Order',
+      textField('order_name', { type: 'text', trim: true }),
+      'Suborder or Superfamily',
+      textField('suborder_or_superfamily_name', { type: 'text', trim: true }),
+    ],
+    [
+      'Family',
+      textField('family_name', { type: 'text', trim: true }),
+      'Subfamily or Tribe',
+      textField('subfamily_name', { type: 'text', trim: true }),
+    ],
+    ['Genus', textField('genus_name', { type: 'text', trim: true })],
+    [
+      'Species',
+      textField('species_name', { type: 'text', trim: true }),
+      'Unique Identifier',
+      textField('unique_identifier', { type: 'text', trim: true }),
+    ],
     ['Taxonomic Status', dropdown('taxonomic_status', taxonStatusOptions, 'Taxonomic Status')],
   ]
 

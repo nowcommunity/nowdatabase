@@ -299,7 +299,7 @@ export const EditableTextField = <T extends object>({
   }, [errorObject])
 
   const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
-    let value = event?.currentTarget?.value
+    const value = event?.currentTarget?.value
     if (handleSetEditData) {
       handleSetEditData(value)
     } else {
@@ -307,12 +307,16 @@ export const EditableTextField = <T extends object>({
         // For date fields, ensure the value is stored as a string in the format 'YYYY-MM-DD'
         setEditData({ ...editData, [field]: value })
       } else if (type === 'text' || value === '') {
-        if (trim) value = value.trim()
         setEditData({ ...editData, [field]: value })
       } else {
         setEditData({ ...editData, [field]: parseFloat(value) })
       }
     }
+  }
+
+  // if trim is set to true, this is called whenever the component loses focus
+  const trimValue = () => {
+    setEditData({ ...editData, [field]: (editData[field] as string).trim() })
   }
 
   const editingComponent = (
@@ -328,6 +332,7 @@ export const EditableTextField = <T extends object>({
       type={type}
       multiline={big}
       disabled={disabled}
+      onBlur={() => trim && trimValue()}
       InputProps={readonly ? { readOnly: true } : { readOnly: false }}
     />
   )

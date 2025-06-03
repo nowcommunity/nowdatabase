@@ -9,9 +9,9 @@ describe('Creating a species', () => {
 
   it('with valid data works', () => {
     cy.visit('/species/new')
-    cy.get('[id=subclass_or_superorder_name-textfield]').type('testSuperOrder')
-    cy.get('[id=order_name-textfield]').type('testOrder')
-    cy.get('[id=suborder_or_superfamily_name-textfield]').type('testSuperFamily')
+    cy.get('[id=subclass_or_superorder_name-textfield]').type('   testSuperOrder')
+    cy.get('[id=order_name-textfield]').type('testOrder   ')
+    cy.get('[id=suborder_or_superfamily_name-textfield]').type('test Super Family')
     cy.get('[id=family_name-textfield]').type('testFamily')
     cy.get('[id=subfamily_name-textfield]').type('testSubFamily')
     cy.get('[id=genus_name-textfield]').type('testGenus')
@@ -26,10 +26,10 @@ describe('Creating a species', () => {
     cy.get('[id=write-button]').should('not.be.disabled')
     cy.get('[id=write-button]').click()
 
-    // tests that values are capitalised properly
+    // tests that values are capitalised and trimmed properly
     cy.contains('TestSuperOrder')
     cy.contains('TestOrder')
-    cy.contains('TestSuperFamily')
+    cy.contains('Test Super Family')
     cy.contains('TestFamily')
     cy.contains('TestSubFamily')
     cy.contains('TestGenus')
