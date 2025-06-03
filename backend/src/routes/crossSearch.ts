@@ -130,7 +130,7 @@ router.get(`/export/:columnfilters/:sorting`, async (req, res) => {
 
   pipeline(stream, res, err => {
     if (err) {
-      logger.error(`Error in crosssearch/export pipeline: ${err}`)
+      logger.error(`Error in crosssearch/export pipeline: ${err.message}`)
     }
   })
 
