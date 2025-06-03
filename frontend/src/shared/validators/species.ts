@@ -26,6 +26,9 @@ export const validateSpecies = (
       asString: (familyName: string) => {
         if (familyName !== 'incertae sedis' && familyName.indexOf(' ') !== -1)
           return 'Family must not contain any spaces, unless the value is "incertae sedis".'
+        if (familyName === 'fam.' && editData.genus_name !== 'gen.')
+          return 'when the Family is fam., Genus must be gen.'
+        return
         return
       },
     },
@@ -38,6 +41,8 @@ export const validateSpecies = (
           return 'when the Genus is indet., Species must also be indet.'
         if (genusName === 'gen.' && editData.species_name !== 'sp.')
           return 'when the Genus is gen., Species must be sp.'
+        if (genusName !== 'gen.' && editData.family_name === 'fam.')
+          return 'when the Family is fam., Genus must be gen.'
         return
       },
     },
@@ -50,7 +55,7 @@ export const validateSpecies = (
         if (speciesName !== 'sp.' && editData.genus_name === 'gen.')
           return 'when the Genus is gen., Species must be sp.'
         if (speciesName === 'sp.' && isEmptyUniqIdentifier(editData.unique_identifier ?? ''))
-          return 'when the species is sp., Unique Identifier must have a value.'
+          return 'when the Species is sp., Unique Identifier must have a value.'
         return
       },
     },

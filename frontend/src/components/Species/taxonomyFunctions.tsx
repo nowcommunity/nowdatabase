@@ -80,7 +80,14 @@ export const convertTaxonomyFields = (speciesEditData: EditDataType<Species>) =>
   const capitalizedSubOrder = subOrder ? subOrder[0].toUpperCase() + subOrder.slice(1) : ''
 
   const family = speciesEditData.family_name
-  const capitalizedFamily = family ? family[0].toUpperCase() + family.slice(1) : ''
+  let capitalizedFamily = ''
+  if (family) {
+    if (family !== 'fam.' && family !== 'indet.') {
+      capitalizedFamily = family[0].toUpperCase() + family.slice(1)
+    } else {
+      capitalizedFamily = family
+    }
+  }
 
   const subFamily = speciesEditData.subfamily_name
   const capitalizedSubfamily = subFamily ? subFamily[0].toUpperCase() + subFamily.slice(1) : ''
@@ -88,7 +95,7 @@ export const convertTaxonomyFields = (speciesEditData: EditDataType<Species>) =>
   const genus = speciesEditData.genus_name
   let capitalizedGenus = ''
   if (genus) {
-    if (genus !== 'indet.') {
+    if (genus !== 'gen.' && genus !== 'indet.') {
       capitalizedGenus = genus[0].toUpperCase() + genus.slice(1)
     } else {
       capitalizedGenus = genus
