@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import 'leaflet/dist/leaflet.css'
 import { borders } from './country_borders_WGS84'
 
-import { Button } from '@mui/material'
+import { Button, SvgIcon } from '@mui/material'
 import MapIcon from '@mui/icons-material/Map'
 import L, { LatLngExpression, Icon } from 'leaflet'
 import { Locality } from '@/shared/types/data.js'
@@ -13,6 +13,7 @@ import './MarkerCluster.css'
 import './MarkerCluster.Default.css'
 
 import '../../styles/LocalityMap.css'
+import northarrow from './images/north-arrow.png'
 
 interface Props {
   localitiesQueryData?: Locality[]
@@ -84,6 +85,25 @@ export const LocalitiesMap = ({ localitiesQueryData, localitiesQueryIsFetching }
 
     // Add a scale bar to the map
     L.control.scale({ position: 'bottomright' }).addTo(map)
+
+    //Add north-arrow to the map
+    const imageurl = northarrow 
+
+    L.Control.NorthArrow = L.Control.extend({
+      onAdd: function (map) {
+        var img = L.DomUtil.create('img');
+        img.src = imageurl;
+        img.style.width = '40px';
+        return img;
+      },
+    });
+
+    L.control.northArrow = function(opts){
+      return new L.Control.NorthArrow(opts);
+    }
+    L.control.northArrow({ position: 'bottomright' }).addTo(map);
+
+    
     // Add a layer control to the map
     L.control.layers(baseMaps, {}, { position: 'topright' }).addTo(map)
 
