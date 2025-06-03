@@ -5,12 +5,27 @@ import {
   parseAndValidateCrossSearchRouteParameters,
 } from '../services/crossSearch'
 import { fixBigInt } from '../utils/common'
-import { format } from '@fast-csv/format'
+import { format, FormatterRow, FormatterRowTransformFunction } from 'fast-csv'
 import { pipeline } from 'stream'
 import { logger } from '../utils/logger'
 import { currentDateAsString } from '../../../frontend/src/shared/currentDateAsString'
+import { CrossSearch } from '../../../frontend/src/shared/types'
 
 const router = Router()
+
+const transformFunction = (row: CrossSearch) => {
+  const transformedRow: { [key: string]: string | number | boolean | null } = {}
+  const keys = Object.keys(row) as Array<keyof CrossSearch>
+  for (const key of keys) {
+    const value = row[key]
+    if (typeof value === 'string') {
+      transformedRow[key] = value.replace(/[\r\n]+/g, ' ')
+    } else {
+      transformedRow[key] = row[key]
+    }
+  }
+  return transformedRow
+}
 
 router.get(`/all/:limit/:offset/:columnfilters/:sorting`, async (req, res) => {
   let validatedValues
@@ -108,12 +123,14 @@ router.get(`/export/:columnfilters/:sorting`, async (req, res) => {
   res.on('finish', () => {
     logger.info('Cross search export sent.')
   })
-
   // quoteColumns is needed to make sure linebreaks do not mess up the data
-  const stream = format({ headers: true, quoteColumns: true })
+  const stream = format({ headers: true, quoteColumns: true }).transform(
+    transformFunction as FormatterRowTransformFunction<FormatterRow, FormatterRow>
+  )
+
   pipeline(stream, res, err => {
     if (err) {
-      logger.error(`Error in crosssearch/export pipeline: ${err.message}`)
+      logger.error(`Error in crosssearch/export pipeline: ${err}`)
     }
   })
 
