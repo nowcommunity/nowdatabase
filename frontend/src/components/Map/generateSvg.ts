@@ -29,7 +29,6 @@ export const generateSvg = (
   markerFillColor = '#ffffff',
   transparent = true
 ) => {
-  // Generate picture
   const draw = SVG()
 
   const width = 2048
