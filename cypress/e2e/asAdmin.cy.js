@@ -8,7 +8,6 @@ describe('Open each page, table view and detail view, and check at least some co
   })
 
   it('Locality works', () => {
-    cy.contains('Search').click()
     cy.contains('Localities').click()
     cy.contains('Dmanisi')
     cy.get('[data-cy="detailview-button-21050"]').click()
@@ -17,7 +16,6 @@ describe('Open each page, table view and detail view, and check at least some co
   })
 
   it('Species works', () => {
-    cy.contains('Search').click()
     cy.contains('Species').click()
     cy.contains('Rodentia')
     cy.get('[data-cy="detailview-button-21052"]').first().click()

@@ -8,6 +8,7 @@ import {
   useMaterialReactTable,
   MaterialReactTable,
   MRT_VisibilityState,
+  MRT_TableInstance,
 } from 'material-react-table'
 import { Box, CircularProgress, Paper } from '@mui/material'
 import { useLocation, useNavigate } from 'react-router-dom'
@@ -26,6 +27,7 @@ type TableStateInUrl = 'sorting' | 'columnfilters' | 'pagination'
   
   selectorFn should only be defined if using this as a selecting table
 */
+
 export const TableView = <T extends MRT_RowData>({
   data,
   columns,
@@ -36,7 +38,9 @@ export const TableView = <T extends MRT_RowData>({
   url,
   title,
   combinedExport,
+  kmlExport,
   exportIsLoading,
+  isCrossSearchTable,
   enableColumnFilterModes,
   serverSidePagination,
   isFetching,
@@ -50,7 +54,9 @@ export const TableView = <T extends MRT_RowData>({
   selectorFn?: (id: T) => void
   url?: string
   combinedExport?: (lids: number[]) => Promise<void>
+  kmlExport?: (table: MRT_TableInstance<T>) => void
   exportIsLoading?: boolean
+  isCrossSearchTable?: boolean
   enableColumnFilterModes?: boolean
   serverSidePagination?: boolean
   isFetching: boolean
@@ -187,9 +193,7 @@ export const TableView = <T extends MRT_RowData>({
       <>
         <CircularProgress />
         <br></br>
-        {title === 'Locality-Species-Cross-Search'
-          ? 'Loading data, this might take a few seconds...'
-          : 'Loading data...'}
+        {'Loading data...'}
       </>
     )
   }
@@ -202,7 +206,9 @@ export const TableView = <T extends MRT_RowData>({
           <TableToolBar<T>
             table={table}
             combinedExport={combinedExport}
+            kmlExport={kmlExport}
             exportIsLoading={exportIsLoading}
+            isCrossSearchTable={isCrossSearchTable}
             showNewButton={editRights.new && title != 'Locality-Species-Cross-Search'}
           />
         </div>

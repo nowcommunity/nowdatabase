@@ -26,15 +26,90 @@ const markerIcon =
 
 export const LocalitiesMap = ({ localitiesQueryData, localitiesQueryIsFetching }: Props) => {
   const mapRef = useRef<HTMLDivElement | null>(null)
+  const markersRef = useRef<L.Layer | null>(null)
+  const [map, setMap] = useState<L.Map | null>(null)
   const [isOpen, setIsOpen] = useState(false)
   const columnFilters = usePageContext()
 
   useEffect(() => {
-    if (!mapRef.current || localitiesQueryIsFetching) return
+    if (!mapRef.current) return
 
-    const map = L.map(mapRef.current, { maxZoom: 16 })
+    const mapInstance = L.map(mapRef.current, { maxZoom: 16 })
+    setMap(mapInstance)
+
     const coords: LatLngExpression = [15, 13]
+    mapInstance.setView(coords, 2)
 
+    // BASE MAPS
+    //// OpenTopoMap
+    const topomap = L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', {
+      attribution: 'Map data: © <a href="https://opentopomap.org">OpenTopoMap</a> (CC-BY-SA)',
+      noWrap: true,
+    }).addTo(mapInstance)
+
+    //// OpenStreetMap
+    const osm = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+      noWrap: true,
+    })
+
+    // LAYERS ON TOP OF BASE MAPS
+    //// Add borders to the map
+    borders.forEach(poly => {
+      L.polygon(poly as LatLngExpression[], { color: 'gray', weight: 1 }).addTo(mapInstance)
+    })
+
+    // create a polygon layer for the country borders that is in layer control panel
+    const borderLayer = L.layerGroup()
+    borders.forEach(country_border => {
+      const polygon = L.polygon(country_border as LatLngExpression[], {
+        color: '#136f94',
+        fillOpacity: 0.3,
+        weight: 1,
+      })
+      borderLayer.addLayer(polygon)
+    })
+
+    const baseMaps = {
+      OpenTopoMap: topomap,
+      OpenStreetMap: osm,
+      Countries: borderLayer,
+    }
+
+    // Add a scale bar to the map
+    L.control.scale({ position: 'bottomright' }).addTo(mapInstance)
+
+  
+
+    //Add a layer control to the map
+    L.control.layers(baseMaps, {}, { position: 'topright' }).addTo(mapInstance)
+
+    // Add north-arrow to the map
+
+    const northArrowControl = L.Control.extend({
+      onAdd: function () {
+        var img = L.DomUtil.create('img');
+        img.src = northarrow;
+        img.style.width = '40px';
+        return img;
+      },
+    });
+
+    const northArrow = new northArrowControl({position: 'bottomright'})
+    northArrow.addTo(mapInstance)
+
+    return () => {
+      mapInstance.remove()
+    }
+  }, [])
+
+  useEffect(() => {
+    if (!map || localitiesQueryIsFetching) return
+
+    if (markersRef.current) {
+      map.removeLayer(markersRef.current)
+      markersRef.current = null
+    }
     // To prevent eslint from complaining about that 'markers' variable below:
     /* eslint-disable @typescript-eslint/no-unsafe-assignment */
     /* eslint-disable @typescript-eslint/no-unsafe-call */
@@ -43,74 +118,28 @@ export const LocalitiesMap = ({ localitiesQueryData, localitiesQueryIsFetching }
 
     // @ts-expect-error The marker cluster library is a plain javascript library
     // with no module exports that extends 'L' when imported
-    const markers: Layer = L.markerClusterGroup()
+    const newMarkers: Layer = L.markerClusterGroup()
 
     const localityIds = columnFilters.idList as unknown as number[]
-    const filteredLocalities = localitiesQueryData?.filter(locality => localityIds.includes(locality.lid))
+    const filterApplied = localityIds.length > 0 && localityIds.every(id => id === null)
+
+    const validIds = localityIds.filter(id => typeof id === 'number')
+
+    const filteredLocalities = !filterApplied
+      ? localitiesQueryData?.filter(locality => validIds.includes(locality.lid))
+      : localitiesQueryData
+
     filteredLocalities?.forEach(locality =>
-      markers.addLayer(
+      newMarkers.addLayer(
         L.marker([locality.dec_lat, locality.dec_long], {
           icon: new Icon({ iconUrl: markerIcon, iconSize: [25, 41], iconAnchor: [12, 41] }),
         })
       )
     )
+    newMarkers.addTo(map)
+    markersRef.current = newMarkers
+  }, [localitiesQueryData, localitiesQueryIsFetching, columnFilters, map])
 
-    markers.addTo(map)
-
-    map.setView(coords, 2)
-
-    // BASE MAPS
-    //// OpenTopoMap
-    const topomap = L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', {
-      attribution: 'Map data: © <a href="https://opentopomap.org">OpenTopoMap</a> (CC-BY-SA)',
-      noWrap: true,
-    }).addTo(map)
-
-    //// OpenStreetMap
-    const osm = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-      noWrap: true,
-    })
-
-    const baseMaps = {
-      OpenTopoMap: topomap,
-      OpenStreetMap: osm,
-    }
-
-    // LAYERS ON TOP OF BASE MAPS
-    //// Add borders to the map
-    borders.forEach(poly => {
-      L.polygon(poly as LatLngExpression[], { color: 'gray', weight: 1 }).addTo(map)
-    })
-
-    // Add a scale bar to the map
-    L.control.scale({ position: 'bottomright' }).addTo(map)
-
-    //Add north-arrow to the map
-    const imageurl = northarrow 
-
-    L.Control.NorthArrow = L.Control.extend({
-      onAdd: function (map) {
-        var img = L.DomUtil.create('img');
-        img.src = imageurl;
-        img.style.width = '40px';
-        return img;
-      },
-    });
-
-    L.control.northArrow = function(opts){
-      return new L.Control.NorthArrow(opts);
-    }
-    L.control.northArrow({ position: 'bottomright' }).addTo(map);
-
-    
-    // Add a layer control to the map
-    L.control.layers(baseMaps, {}, { position: 'topright' }).addTo(map)
-
-    return () => {
-      map.remove()
-    }
-  }, [localitiesQueryData, localitiesQueryIsFetching, columnFilters])
 
   document.title = 'Map'
 
