@@ -11,11 +11,20 @@ import { CoordinateSelectionMap } from '@/components/Map/CoordinateSelectionMap'
 import { useState } from 'react'
 import { convertDmsToDec, convertDecToDms } from '@/util/coordinateConversion'
 import { validCountries } from '@/shared/validators/countryList'
+import { LocalitiesMap } from '@/components/Map/LocalitiesMap'
+import { Locality } from '@/shared/types'
+
+interface Props {
+  localitiesQueryData?: Locality[]
+  localitiesQueryIsFetching: boolean
+}
 
 export const LocalityTab = () => {
   const { textField, radioSelection, dropdown, dropdownWithSearch, mode, bigTextField } =
     useDetailContext<LocalityDetailsType>()
   const { editData, setEditData } = useDetailContext<LocalityDetailsType>()
+
+  const locality: Locality[] = [editData as Locality]
 
   const generalLocalityOptions = [emptyOption, { display: 'No', value: 'n' }, { display: 'Yes', value: 'y' }]
 
@@ -180,7 +189,12 @@ export const LocalityTab = () => {
       </HalfFrames>
 
       <Grouped>
-        <ArrayFrame array={latlong} title="Latitude & Longitude" />
+        <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'flex-start', gap: 2 }}>
+          <ArrayFrame array={latlong} title="Latitude & Longitude" />
+          <Box sx={{ minWidth: 250, minHeight: 250 }}>
+            <LocalitiesMap localitiesQueryData={locality} localitiesQueryIsFetching={false} />
+          </Box>
+        </Box>
         {!mode.read && coordinateButton}
       </Grouped>
 
