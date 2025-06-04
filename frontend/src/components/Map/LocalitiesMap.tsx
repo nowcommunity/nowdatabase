@@ -19,10 +19,6 @@ interface Props {
   localitiesQueryIsFetching: boolean
 }
 
-//  TODO: Don't do this
-// const markerIcon =
-//   'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFAQMAAAC3obSmAAAAAXNSR0IB2cksfwAAAAlwSFlzAAALEwAACxMBAJqcGAAAAANQTFRFOEva+Ikk9gAAAAxJREFUeJxjZGCEQgAAKAAGsbdqHQAAAA5lWElmTU0AKgAAAAgAAAAAAAAA0lOTAAAAAElFTkSuQmCC'
-
 export const LocalitiesMap = ({ localitiesQueryData, localitiesQueryIsFetching }: Props) => {
   const mapRef = useRef<HTMLDivElement | null>(null)
   const markersRef = useRef<L.Layer | null>(null)
