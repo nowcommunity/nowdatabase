@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import 'leaflet/dist/leaflet.css'
 import { borders } from './country_borders_WGS84'
 
-import { Button, SvgIcon } from '@mui/material'
+import { Button } from '@mui/material'
 import MapIcon from '@mui/icons-material/Map'
 import L, { LatLngExpression, Icon } from 'leaflet'
 import { Locality } from '@/shared/types/data.js'
