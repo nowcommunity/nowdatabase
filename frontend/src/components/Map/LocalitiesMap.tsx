@@ -1,5 +1,9 @@
-import { useGetAllLocalitiesQuery, useGetLocalityDetailsQuery } from '../../redux/localityReducer'
-import { useState, useEffect, useRef } from 'react'
+import {
+  useGetAllLocalitiesQuery,
+  useGetLocalityDetailsQuery,
+  useGetLocalitySpeciesListMutation,
+} from '../../redux/localityReducer'
+import { useState, useEffect, useRef, Fragment } from 'react'
 import 'leaflet/dist/leaflet.css'
 import L, { LatLngExpression, Marker, Icon } from 'leaflet'
 import { borders } from './country_borders_WGS84'
@@ -11,6 +15,8 @@ import { skipToken } from '@reduxjs/toolkit/query'
 import './leaflet.markercluster.js'
 import './MarkerCluster.css'
 import './MarkerCluster.Default.css'
+import { SlidingModal } from './SlidingModal.tsx'
+import { LocalityInfo } from './LocalityDetailsPanel.tsx'
 
 import '../../styles/LocalityMap.css'
 
@@ -33,12 +39,19 @@ export const LocalitiesMap = ({ localitiesQueryData, localitiesQueryIsFetching }
   const markersRef = useRef<L.Layer | null>(null)
   const [map, setMap] = useState<L.Map | null>(null)
   const [isOpen, setIsOpen] = useState(false)
+  const [localityDetailsIsOpen, setLocalityDetailsIsOpen] = useState(false)
   const columnFilters = usePageContext()
   const {
     data: localityDetailsQueryData,
     isFetching: detailsLoading,
-    error,
+    error: detailsError,
   } = useGetLocalityDetailsQuery(selectedLocality ?? skipToken) // use skipToken to skip query when state is null
+
+  // const {
+  //   data: fossilsQueryData,
+  //   isFetching: fossilsLoading,
+  //   error: fossilsError,
+  // } = useGetLocalitySpeciesListMutation([selectedLocality] ?? skipToken) // use skipToken to skip query when state is null
 
   useEffect(() => {
     if (!mapRef.current) return
@@ -133,6 +146,7 @@ export const LocalitiesMap = ({ localitiesQueryData, localitiesQueryIsFetching }
       const marker = L.marker([locality.dec_lat, locality.dec_long], options) as CustomMarker
       marker.on('click', () => {
         setSelectedLocality(marker.options.localityId.toString())
+        setLocalityDetailsIsOpen(true)
       })
 
       newMarkers.addLayer(marker)
@@ -148,6 +162,7 @@ export const LocalitiesMap = ({ localitiesQueryData, localitiesQueryIsFetching }
 
     const handleMapClick = () => {
       setSelectedLocality(null)
+      setLocalityDetailsIsOpen(false)
     }
     mapInstance.on('click', handleMapClick)
 
@@ -159,57 +174,27 @@ export const LocalitiesMap = ({ localitiesQueryData, localitiesQueryIsFetching }
   document.title = 'Map'
 
   return (
-    <article id="localities-map">
-      <div id="map-container" className={isOpen ? 'open' : ''}>
-        <div ref={mapRef} style={{ flex: 1 }} />
-
-        <div
-          style={{
-            width: '300px',
-            padding: '1rem',
-            borderLeft: '1px solid #ccc',
-            overflowY: 'auto',
-          }}
-        >
-          {detailsLoading ? (
-            <p>Loading...</p>
-          ) : error ? (
-            <p>Error loading locality details</p>
-          ) : selectedLocality && localityDetailsQueryData ? (
-            <div>
-              <h2>{localityDetailsQueryData.loc_name}</h2>
-              <p>
-                <strong>ID:</strong> {localityDetailsQueryData.lid}
-              </p>
-              <p>
-                <strong>Country:</strong> {localityDetailsQueryData.country}
-              </p>
-              <p>
-                <strong>Age:</strong> {`${localityDetailsQueryData.max_age}, ${localityDetailsQueryData.min_age}`}
-              </p>
-              <p>
-                <strong>Latitude & Longitude:</strong>{' '}
-                {`${localityDetailsQueryData.dec_lat}, ${localityDetailsQueryData.dec_long}`}
-              </p>
-              <p>
-                <strong>Taxa:</strong>
-              </p>
-              <p></p>
-              <p></p>
-            </div>
-          ) : (
-            <p>Select a marker to view details.</p>
-          )}
+    <>
+      <article id="localities-map">
+        <div id="map-container" className={isOpen ? 'open' : ''}>
+          <div ref={mapRef} style={{ flex: 1 }} />
         </div>
-      </div>
-
-      {!localitiesQueryIsFetching && (
-        <div className="button-row">
-          <Button variant="contained" startIcon={<MapIcon />} onClick={() => setIsOpen(v => !v)}>
-            {isOpen ? 'Close' : 'Open'} map
-          </Button>
-        </div>
-      )}
-    </article>
+        {!localitiesQueryIsFetching && (
+          <div className="button-row">
+            <Button variant="contained" startIcon={<MapIcon />} onClick={() => setIsOpen(v => !v)}>
+              {isOpen ? 'Close' : 'Open'} map
+            </Button>
+          </div>
+        )}
+      </article>
+      <LocalityInfo
+        localityDetailsQueryData={localityDetailsQueryData}
+        detailsLoading={detailsLoading}
+        isOpen={localityDetailsIsOpen}
+        onClose={() => {
+          setLocalityDetailsIsOpen(false)
+        }}
+      />
+    </>
   )
 }
