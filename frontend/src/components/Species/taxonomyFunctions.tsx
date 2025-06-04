@@ -1,6 +1,16 @@
 import { EditDataType, Species } from '@/shared/types'
 
 export const checkTaxonomy = (editData: EditDataType<Species>, speciesData: Species[]) => {
+  const checkFamily = (order: string | null | undefined, family: string | null | undefined) => {
+    return order !== 'indet.' && family !== 'incertae sedis' && family !== 'indet.'
+  }
+  const checkGenus = (
+    order: string | null | undefined,
+    family: string | null | undefined,
+    genus: string | null | undefined
+  ) => {
+    return order !== 'indet.' && family !== 'indet.' && genus !== 'indet.'
+  }
   const {
     subclass_or_superorder_name: subClass,
     order_name: order,
@@ -26,43 +36,45 @@ export const checkTaxonomy = (editData: EditDataType<Species>, speciesData: Spec
       return errors
     }
 
-    if (genus !== 'indet.' && speciesName !== 'indet.') {
-      if (subClass !== '' && species.subclass_or_superorder_name) {
-        if (order === species.order_name && subClass !== species.subclass_or_superorder_name) {
-          errors.add(`Order ${order} belongs to subclass ${species.subclass_or_superorder_name}, not ${subClass}.`)
-        }
+    if (subClass !== '' && species.subclass_or_superorder_name) {
+      if (order === species.order_name && subClass !== species.subclass_or_superorder_name) {
+        errors.add(`Order ${order} belongs to subclass ${species.subclass_or_superorder_name}, not ${subClass}.`)
       }
+    }
 
-      if (subOrder !== '' && species.suborder_or_superfamily_name) {
-        if (subOrder === species.suborder_or_superfamily_name && order !== species.order_name) {
-          errors.add(`Suborder ${subOrder} belongs to order ${species.order_name}, not ${order}.`)
-        }
+    if (subOrder !== '' && species.suborder_or_superfamily_name) {
+      if (subOrder === species.suborder_or_superfamily_name && order !== species.order_name) {
+        errors.add(`Suborder ${subOrder} belongs to order ${species.order_name}, not ${order}.`)
       }
+    }
 
+    if (checkFamily(family, order)) {
       if (family === species.family_name && order !== species.order_name) {
         errors.add(`Family ${family} belongs to order ${species.order_name}, not ${order}.`)
       }
+    }
 
-      if (subOrder !== '' && species.suborder_or_superfamily_name) {
-        if (family === species.family_name && subOrder !== species.suborder_or_superfamily_name) {
-          errors.add(`Family ${family} belongs to suborder ${species.suborder_or_superfamily_name}, not ${subOrder}.`)
-        }
+    if (subOrder !== '' && species.suborder_or_superfamily_name) {
+      if (family === species.family_name && subOrder !== species.suborder_or_superfamily_name) {
+        errors.add(`Family ${family} belongs to suborder ${species.suborder_or_superfamily_name}, not ${subOrder}.`)
       }
+    }
 
-      if (subfamily !== '' && species.subfamily_name) {
-        if (subfamily === species.subfamily_name && family !== species.family_name) {
-          errors.add(`Subfamily ${subfamily} belongs to family ${species.family_name}, not ${family}.`)
-        }
+    if (subfamily !== '' && species.subfamily_name) {
+      if (subfamily === species.subfamily_name && family !== species.family_name) {
+        errors.add(`Subfamily ${subfamily} belongs to family ${species.family_name}, not ${family}.`)
       }
+    }
 
+    if (checkGenus(order, family, genus)) {
       if (genus === species.genus_name && family !== species.family_name) {
         errors.add(`Genus ${genus} belongs to family ${species.family_name}, not ${family}.`)
       }
+    }
 
-      if (subfamily !== '' && species.subfamily_name) {
-        if (genus === species.genus_name && subfamily !== species.subfamily_name) {
-          errors.add(`Genus ${genus} belongs to subfamily ${species.subfamily_name}, not ${subfamily}.`)
-        }
+    if (subfamily !== '' && species.subfamily_name) {
+      if (genus === species.genus_name && subfamily !== species.subfamily_name) {
+        errors.add(`Genus ${genus} belongs to subfamily ${species.subfamily_name}, not ${subfamily}.`)
       }
     }
   }
@@ -71,32 +83,32 @@ export const checkTaxonomy = (editData: EditDataType<Species>, speciesData: Spec
 
 export const convertTaxonomyFields = (speciesEditData: EditDataType<Species>) => {
   const subClass = speciesEditData.subclass_or_superorder_name
-  const capitalizedSubClass = subClass ? subClass[0].toUpperCase() + subClass.slice(1) : ''
+  const capitalizedSubClass = subClass ? subClass[0].toUpperCase() + subClass.slice(1).toLowerCase() : ''
 
   const order = speciesEditData.order_name
-  const capitalizedOrder = order ? order[0].toUpperCase() + order.slice(1) : ''
+  const capitalizedOrder = order ? order[0].toUpperCase() + order.slice(1).toLowerCase() : ''
 
   const subOrder = speciesEditData.suborder_or_superfamily_name
-  const capitalizedSubOrder = subOrder ? subOrder[0].toUpperCase() + subOrder.slice(1) : ''
+  const capitalizedSubOrder = subOrder ? subOrder[0].toUpperCase() + subOrder.slice(1).toLowerCase() : ''
 
   const family = speciesEditData.family_name
   let capitalizedFamily = ''
   if (family) {
     if (family !== 'fam.' && family !== 'indet.') {
-      capitalizedFamily = family[0].toUpperCase() + family.slice(1)
+      capitalizedFamily = family[0].toUpperCase() + family.slice(1).toLowerCase()
     } else {
       capitalizedFamily = family
     }
   }
 
   const subFamily = speciesEditData.subfamily_name
-  const capitalizedSubfamily = subFamily ? subFamily[0].toUpperCase() + subFamily.slice(1) : ''
+  const capitalizedSubfamily = subFamily ? subFamily[0].toUpperCase() + subFamily.slice(1).toLowerCase() : ''
 
   const genus = speciesEditData.genus_name
   let capitalizedGenus = ''
   if (genus) {
     if (genus !== 'gen.' && genus !== 'indet.') {
-      capitalizedGenus = genus[0].toUpperCase() + genus.slice(1)
+      capitalizedGenus = genus[0].toUpperCase() + genus.slice(1).toLowerCase()
     } else {
       capitalizedGenus = genus
     }

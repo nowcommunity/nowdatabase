@@ -29,7 +29,6 @@ export const validateSpecies = (
         if (familyName === 'fam.' && editData.genus_name !== 'gen.')
           return 'when the Family is fam., Genus must be gen.'
         return
-        return
       },
     },
     genus_name: {
