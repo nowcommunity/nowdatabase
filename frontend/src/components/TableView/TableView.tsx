@@ -207,7 +207,7 @@ export const TableView = <T extends MRT_RowData>({
             combinedExport={combinedExport}
             kmlExport={kmlExport}
             exportIsLoading={exportIsLoading}
-            showNewButton={editRights.new && title != 'Locality-Species-Cross-Search'}
+            showNewButton={editRights.new && !selectorFn && title != 'Locality-Species-Cross-Search'}
           />
         </div>
       )}

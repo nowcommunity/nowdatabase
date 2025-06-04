@@ -89,7 +89,6 @@ export const WriteButton = <T,>({
   }, [mode, editData.references])
 
   const writeWithTaxonomyCheck = async () => {
-    setLoading(true)
     let speciesEditData: EditDataType<Species> | undefined = undefined
 
     if (!mode.staging) {
@@ -120,9 +119,10 @@ export const WriteButton = <T,>({
     })
   }
 
-  const handleWriteButtonClick = () => {
+  const handleWriteButtonClick = async () => {
     if (taxonomy) {
-      void writeWithTaxonomyCheck()
+      setLoading(true)
+      await writeWithTaxonomyCheck()
       setLoading(false)
       return
     }
@@ -144,7 +144,7 @@ export const WriteButton = <T,>({
       disabled={Object.keys(fieldsWithErrors).length > 0}
       id="write-button"
       sx={{ width: '20em' }}
-      onClick={handleWriteButtonClick}
+      onClick={() => void handleWriteButtonClick()}
       variant="contained"
     >
       {loading ? (
