@@ -1,16 +1,16 @@
 import { Locality, LocalityDetailsType } from '@/shared/types/data.js'
-import { SlidingModal } from './SlidingModal'
+import { SpeciesTable } from './SpeciesTable'
 
 interface Props {
   localityDetailsQueryData: LocalityDetailsType | undefined
   detailsLoading: boolean
-  isOpen: boolean
-  onClose: () => void
 }
 
-export const LocalityInfo = ({ localityDetailsQueryData, detailsLoading, isOpen, onClose }: Props) => {
+export const LocalityInfo = ({ localityDetailsQueryData, detailsLoading }: Props) => {
+  const test = 'data...'
+
   return (
-    <SlidingModal isOpen={isOpen} onClose={onClose}>
+    <>
       <div
         style={{
           width: '300px',
@@ -43,6 +43,7 @@ export const LocalityInfo = ({ localityDetailsQueryData, detailsLoading, isOpen,
           </div>
         )}
       </div>
-    </SlidingModal>
+      <SpeciesTable data={test} />
+    </>
   )
 }

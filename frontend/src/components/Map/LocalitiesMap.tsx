@@ -47,12 +47,6 @@ export const LocalitiesMap = ({ localitiesQueryData, localitiesQueryIsFetching }
     error: detailsError,
   } = useGetLocalityDetailsQuery(selectedLocality ?? skipToken) // use skipToken to skip query when state is null
 
-  // const {
-  //   data: fossilsQueryData,
-  //   isFetching: fossilsLoading,
-  //   error: fossilsError,
-  // } = useGetLocalitySpeciesListMutation([selectedLocality] ?? skipToken) // use skipToken to skip query when state is null
-
   useEffect(() => {
     if (!mapRef.current) return
 
@@ -187,14 +181,9 @@ export const LocalitiesMap = ({ localitiesQueryData, localitiesQueryIsFetching }
           </div>
         )}
       </article>
-      <LocalityInfo
-        localityDetailsQueryData={localityDetailsQueryData}
-        detailsLoading={detailsLoading}
-        isOpen={localityDetailsIsOpen}
-        onClose={() => {
-          setLocalityDetailsIsOpen(false)
-        }}
-      />
+      <SlidingModal isOpen={localityDetailsIsOpen} onClose={() => setLocalityDetailsIsOpen(false)}>
+        <LocalityInfo localityDetailsQueryData={localityDetailsQueryData} detailsLoading={detailsLoading} />
+      </SlidingModal>
     </>
   )
 }
