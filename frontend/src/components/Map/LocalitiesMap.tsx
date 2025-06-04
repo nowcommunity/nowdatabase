@@ -13,6 +13,7 @@ import './MarkerCluster.css'
 import './MarkerCluster.Default.css'
 
 import '../../styles/LocalityMap.css'
+import northarrow from './images/north-arrow.png'
 
 interface Props {
   localitiesQueryData?: Locality[]
@@ -77,8 +78,23 @@ export const LocalitiesMap = ({ localitiesQueryData, localitiesQueryIsFetching }
 
     // Add a scale bar to the map
     L.control.scale({ position: 'bottomright' }).addTo(mapInstance)
-    // Add a layer control to the map
+
+    //Add a layer control to the map
     L.control.layers(baseMaps, {}, { position: 'topright' }).addTo(mapInstance)
+
+    // Add north-arrow to the map
+
+    const northArrowControl = L.Control.extend({
+      onAdd: function () {
+        const img = L.DomUtil.create('img')
+        img.src = northarrow
+        img.style.width = '40px'
+        return img
+      },
+    })
+
+    const northArrow = new northArrowControl({ position: 'bottomright' })
+    northArrow.addTo(mapInstance)
 
     return () => {
       mapInstance.remove()
@@ -118,7 +134,6 @@ export const LocalitiesMap = ({ localitiesQueryData, localitiesQueryIsFetching }
         })
       )
     )
-
     newMarkers.addTo(map)
     markersRef.current = newMarkers
   }, [localitiesQueryData, localitiesQueryIsFetching, columnFilters, map])
