@@ -131,7 +131,7 @@ export const LocalitiesMap = ({ localitiesQueryData, localitiesQueryIsFetching }
       newMarkers.addLayer(
         L.marker([locality.dec_lat, locality.dec_long], {
           icon: new Icon({ iconUrl: markerIcon, iconSize: [25, 41], iconAnchor: [12, 41] }),
-        })
+        }).bindTooltip(locality.loc_name)
       )
     )
     newMarkers.addTo(map)
