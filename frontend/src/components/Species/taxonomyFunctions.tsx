@@ -1,16 +1,6 @@
 import { EditDataType, Species } from '@/shared/types'
 
 export const checkTaxonomy = (editData: EditDataType<Species>, speciesData: Species[]) => {
-  const checkFamily = (order: string | null | undefined, family: string | null | undefined) => {
-    return order !== 'indet.' && family !== 'incertae sedis' && family !== 'indet.'
-  }
-  const checkGenus = (
-    order: string | null | undefined,
-    family: string | null | undefined,
-    genus: string | null | undefined
-  ) => {
-    return order !== 'indet.' && family !== 'indet.' && genus !== 'indet.'
-  }
   const {
     subclass_or_superorder_name: subClass,
     order_name: order,
@@ -22,6 +12,26 @@ export const checkTaxonomy = (editData: EditDataType<Species>, speciesData: Spec
     unique_identifier,
     species_id,
   } = editData
+
+  const checkSubClass = () => {
+    return subClass && subClass !== 'indet.'
+  }
+  const checkOrder = () => {
+    return order !== 'indet.' && order !== 'incertae sedis'
+  }
+  const checkSubOrder = () => {
+    return checkOrder() && subOrder && subOrder !== 'indet.'
+  }
+  const checkFamily = () => {
+    return checkOrder() && family !== 'indet.' && family !== 'incertae sedis'
+  }
+  const checkSubfamily = () => {
+    return checkFamily() && subfamily && subfamily !== 'indet.'
+  }
+  const checkGenus = () => {
+    return checkFamily() && genus !== 'indet.'
+  }
+
   const errors = new Set<string>()
 
   for (const species of speciesData) {
@@ -36,44 +46,53 @@ export const checkTaxonomy = (editData: EditDataType<Species>, speciesData: Spec
       return errors
     }
 
-    if (subClass !== '' && species.subclass_or_superorder_name) {
-      if (order === species.order_name && subClass !== species.subclass_or_superorder_name) {
+    if (checkOrder()) {
+      if (
+        checkSubClass() &&
+        species.subclass_or_superorder_name &&
+        order === species.order_name &&
+        subClass !== species.subclass_or_superorder_name
+      ) {
         errors.add(`Order ${order} belongs to subclass ${species.subclass_or_superorder_name}, not ${subClass}.`)
       }
     }
 
-    if (subOrder !== '' && species.suborder_or_superfamily_name) {
+    if (checkSubOrder()) {
       if (subOrder === species.suborder_or_superfamily_name && order !== species.order_name) {
         errors.add(`Suborder ${subOrder} belongs to order ${species.order_name}, not ${order}.`)
       }
     }
 
-    if (checkFamily(family, order)) {
+    if (checkFamily()) {
       if (family === species.family_name && order !== species.order_name) {
         errors.add(`Family ${family} belongs to order ${species.order_name}, not ${order}.`)
       }
-    }
-
-    if (subOrder !== '' && species.suborder_or_superfamily_name) {
-      if (family === species.family_name && subOrder !== species.suborder_or_superfamily_name) {
+      if (
+        checkSubOrder() &&
+        species.suborder_or_superfamily_name &&
+        family === species.family_name &&
+        subOrder !== species.suborder_or_superfamily_name
+      ) {
         errors.add(`Family ${family} belongs to suborder ${species.suborder_or_superfamily_name}, not ${subOrder}.`)
       }
     }
 
-    if (subfamily !== '' && species.subfamily_name) {
+    if (checkSubfamily()) {
       if (subfamily === species.subfamily_name && family !== species.family_name) {
         errors.add(`Subfamily ${subfamily} belongs to family ${species.family_name}, not ${family}.`)
       }
     }
 
-    if (checkGenus(order, family, genus)) {
+    if (checkGenus()) {
       if (genus === species.genus_name && family !== species.family_name) {
         errors.add(`Genus ${genus} belongs to family ${species.family_name}, not ${family}.`)
       }
-    }
-
-    if (subfamily !== '' && species.subfamily_name) {
-      if (genus === species.genus_name && subfamily !== species.subfamily_name) {
+      if (
+        checkSubfamily() &&
+        species.subfamily_name &&
+        genus === species.genus_name &&
+        subfamily !== species.subfamily_name
+      ) {
         errors.add(`Genus ${genus} belongs to subfamily ${species.subfamily_name}, not ${subfamily}.`)
       }
     }
