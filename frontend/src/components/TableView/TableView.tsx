@@ -39,6 +39,7 @@ export const TableView = <T extends MRT_RowData>({
   title,
   combinedExport,
   kmlExport,
+  svgExport,
   exportIsLoading,
   isCrossSearchTable,
   enableColumnFilterModes,
@@ -55,6 +56,7 @@ export const TableView = <T extends MRT_RowData>({
   url?: string
   combinedExport?: (lids: number[]) => Promise<void>
   kmlExport?: (table: MRT_TableInstance<T>) => void
+  svgExport?: (table: MRT_TableInstance<T>) => void
   exportIsLoading?: boolean
   isCrossSearchTable?: boolean
   enableColumnFilterModes?: boolean
@@ -207,6 +209,7 @@ export const TableView = <T extends MRT_RowData>({
             table={table}
             combinedExport={combinedExport}
             kmlExport={kmlExport}
+            svgExport={svgExport}
             exportIsLoading={exportIsLoading}
             isCrossSearchTable={isCrossSearchTable}
             showNewButton={editRights.new && title != 'Locality-Species-Cross-Search'}
