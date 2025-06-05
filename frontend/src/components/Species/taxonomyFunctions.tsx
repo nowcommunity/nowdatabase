@@ -1,6 +1,27 @@
-import { EditDataType, Species } from '@/shared/types'
+import { EditDataType, Species, SpeciesSynonym } from '@/shared/types'
 
-export const checkTaxonomy = (editData: EditDataType<Species>, speciesData: Species[]) => {
+const isDuplicateTaxon = (newSpecies: EditDataType<Species>, existingSpecies: Species, synonyms: SpeciesSynonym[]) => {
+  console.log(synonyms)
+  if (
+    newSpecies.species_id !== existingSpecies.species_id &&
+    newSpecies.genus_name === existingSpecies.genus_name &&
+    newSpecies.species_name === existingSpecies.species_name &&
+    newSpecies.unique_identifier === existingSpecies.unique_identifier &&
+    !(newSpecies.genus_name === 'indet.' || newSpecies.species_name === 'indet.')
+  ) {
+    return true
+  }
+
+  for (const synonym of synonyms) {
+    if (synonym.syn_genus_name === newSpecies.genus_name || synonym.syn_species_name === newSpecies.species_name) {
+      return true
+    }
+  }
+
+  return false
+}
+
+export const checkTaxonomy = (editData: EditDataType<Species>, speciesData: Species[], synonyms: SpeciesSynonym[]) => {
   const {
     subclass_or_superorder_name: subClass,
     order_name: order,
@@ -35,13 +56,8 @@ export const checkTaxonomy = (editData: EditDataType<Species>, speciesData: Spec
   const errors = new Set<string>()
 
   for (const species of speciesData) {
-    if (
-      species_id !== species.species_id &&
-      genus === species.genus_name &&
-      speciesName === species.species_name &&
-      unique_identifier === species.unique_identifier &&
-      !(genus === 'indet.' || speciesName === 'indet.')
-    ) {
+    const relatedSynonyms = synonyms.filter(syn => syn.species_id === species.species_id)
+    if (isDuplicateTaxon(editData, species, relatedSynonyms)) {
       errors.add('The taxon already exists in the database.')
       return errors
     }

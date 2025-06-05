@@ -99,6 +99,11 @@ export const getSpeciesDetails = async (id: number) => {
   return JSON.parse(fixBigInt({ ...result, com_taxa_synonym: synonyms || [] })!) as SpeciesDetailsType
 }
 
+export const getAllSynonyms = async () => {
+  const result = await nowDb.com_taxa_synonym.findMany({})
+  return result
+}
+
 export const validateEntireSpecies = async (editedFields: EditDataType<Prisma.com_species> & EditMetaData) => {
   const keys = Object.keys(editedFields)
   const errors: ValidationObject[] = []

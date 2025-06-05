@@ -9,7 +9,7 @@ import { EditDataType, Editable, Reference, Species } from '@/shared/types'
 import { useState, useEffect, Fragment } from 'react'
 import { referenceValidator } from '@/shared/validators/validator'
 import { checkTaxonomy, convertTaxonomyFields } from '../Species/taxonomyFunctions'
-import { useLazyGetAllSpeciesQuery } from '@/redux/speciesReducer'
+import { useLazyGetAllSpeciesQuery, useLazyGetAllSynonymsQuery } from '@/redux/speciesReducer'
 import { useNotify } from '@/hooks/notification'
 
 export const WriteButton = <T,>({
@@ -26,6 +26,7 @@ export const WriteButton = <T,>({
   const [loading, setLoading] = useState(false)
   const notify = useNotify()
   const [getSpeciesData] = useLazyGetAllSpeciesQuery()
+  const [getSynonyms] = useLazyGetAllSynonymsQuery()
   const getButtonText = () => {
     if (!mode.staging) return hasStagingMode ? 'Finalize entry' : 'Save changes'
     return 'Complete and save'
@@ -93,13 +94,18 @@ export const WriteButton = <T,>({
 
     if (!mode.staging) {
       const { data: speciesData } = await getSpeciesData(undefined, true)
+      const { data: synonyms } = await getSynonyms(undefined, true)
       if (!speciesData) {
         notify('Could not fetch species to check taxonomy data.', 'error')
         return
       }
+      if (!synonyms) {
+        notify('Could not fetch synonyms to check taxonomy data.', 'error')
+        return
+      }
       // converts taxonomy fields to capitalized/lowercased
       speciesEditData = convertTaxonomyFields(editData as EditDataType<Species>)
-      const errors = checkTaxonomy(speciesEditData, speciesData)
+      const errors = checkTaxonomy(speciesEditData, speciesData, synonyms)
       if (errors.size > 0) {
         const errorMessage = [...errors].reduce((acc, currentError) => acc + `\n${currentError}`)
         notify(errorMessage, 'error')
