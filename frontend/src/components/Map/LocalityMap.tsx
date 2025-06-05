@@ -107,7 +107,7 @@ export const LocalityMap = ({ dec_lat, dec_long }: Props) => {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
       map.removeLayer(newMarker)
     }
-  }, [map])
+  }, [map, dec_lat, dec_long])
 
   document.title = 'Map'
 
