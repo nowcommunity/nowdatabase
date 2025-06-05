@@ -26,7 +26,6 @@ type CustomCircleMarker = L.CircleMarker & { options: CustomCircleMarkerOptions 
 
 export const LocalitiesMap = ({ localitiesQueryData, localitiesQueryIsFetching }: Props) => {
   const [selectedLocality, setSelectedLocality] = useState<string | null>(null)
-  const leafletMapRef = useRef<L.Map | null>(null)
   const mapRef = useRef<HTMLDivElement | null>(null)
   const [map, setMap] = useState<L.Map | null>(null)
   const [isOpen, setIsOpen] = useState(false)
@@ -54,7 +53,6 @@ export const LocalitiesMap = ({ localitiesQueryData, localitiesQueryIsFetching }
       noWrap: true,
     }).addTo(mapInstance)
 
-    leafletMapRef.current = map
     //// OpenStreetMap
     const osm = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
@@ -104,7 +102,6 @@ export const LocalitiesMap = ({ localitiesQueryData, localitiesQueryIsFetching }
     northArrow.addTo(mapInstance)
 
     return () => {
-      leafletMapRef.current = null
       mapInstance.remove()
     }
   }, [])
