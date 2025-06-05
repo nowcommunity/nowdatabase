@@ -32,3 +32,16 @@
   display: flex;
   justify-content: flex-end;
 }
+
+#localities-map .cluster-btn {
+  background-color: #f0f5fa;
+  height: 30px;
+  width: 70px;
+  position: absolute;
+  z-index: 1000;
+  margin-left: 57px;
+  margin-top: 12px;
+  border-radius: 2px;
+  border: 'none';
+  box-shadow: '1px 1px 1px 1px grey';
+}

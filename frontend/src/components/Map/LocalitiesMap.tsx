@@ -22,7 +22,6 @@ interface Props {
 
 export const LocalitiesMap = ({ localitiesQueryData, localitiesQueryIsFetching }: Props) => {
   const mapRef = useRef<HTMLDivElement | null>(null)
-  const markersRef = useRef<L.Layer | null>(null)
   const [map, setMap] = useState<L.Map | null>(null)
   const [isOpen, setIsOpen] = useState(false)
   const columnFilters = usePageContext()
@@ -56,7 +55,7 @@ export const LocalitiesMap = ({ localitiesQueryData, localitiesQueryIsFetching }
       L.polygon(poly as LatLngExpression[], { color: 'gray', weight: 1 }).addTo(mapInstance)
     })
 
-    // create a polygon layer for the country borders that is in layer control panel
+    // create a polygon layer for the country borders that is in layer control panel..
     const borderLayer = L.layerGroup()
     borders.forEach(country_border => {
       const polygon = L.polygon(country_border as LatLngExpression[], {
@@ -80,7 +79,6 @@ export const LocalitiesMap = ({ localitiesQueryData, localitiesQueryIsFetching }
     L.control.layers(baseMaps, {}, { position: 'topright' }).addTo(mapInstance)
 
     // Add north-arrow to the map
-
     const northArrowControl = L.Control.extend({
       onAdd: function () {
         const img = L.DomUtil.create('img')
@@ -101,10 +99,6 @@ export const LocalitiesMap = ({ localitiesQueryData, localitiesQueryIsFetching }
   useEffect(() => {
     if (!map || localitiesQueryIsFetching) return
 
-    if (markersRef.current) {
-      map.removeLayer(markersRef.current)
-    }
-    markersRef.current = null
     // To prevent eslint from complaining about that 'markers' variable below:
     /* eslint-disable @typescript-eslint/no-unsafe-assignment */
     /* eslint-disable @typescript-eslint/no-unsafe-call */
@@ -133,8 +127,18 @@ export const LocalitiesMap = ({ localitiesQueryData, localitiesQueryIsFetching }
         }).bindTooltip(locality.loc_name)
       )
     )
-    newMarkers.addTo(map)
-    markersRef.current = newMarkers
+
+    // hot reload fix
+    try {
+      newMarkers.addTo(map)
+    } catch (e) {
+      return () => {}
+    }
+
+    return () => {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+      map.removeLayer(newMarkers)
+    }
   }, [localitiesQueryData, localitiesQueryIsFetching, columnFilters, map, cluster])
 
   document.title = 'Map'
@@ -142,9 +146,11 @@ export const LocalitiesMap = ({ localitiesQueryData, localitiesQueryIsFetching }
   return (
     <article id="localities-map">
       <div id="map-container" className={isOpen ? 'open' : ''}>
-        <Button variant="contained" onClick={() => setCluster(cluster => !cluster)}>
-          {cluster ? 'Individual' : 'Cluster'}
-        </Button>
+        {isOpen && (
+          <button className="cluster-btn" onClick={() => setCluster(cluster => !cluster)}>
+            {cluster ? 'Individual' : 'Cluster'}
+          </button>
+        )}
         <div ref={mapRef}></div>
       </div>
 
