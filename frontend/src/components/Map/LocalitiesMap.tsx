@@ -1,11 +1,7 @@
-import {
-  useGetAllLocalitiesQuery,
-  useGetLocalityDetailsQuery,
-  useGetLocalitySpeciesListMutation,
-} from '../../redux/localityReducer'
-import { useState, useEffect, useRef, Fragment } from 'react'
+import { useGetLocalityDetailsQuery } from '../../redux/localityReducer'
+import { useState, useEffect, useRef } from 'react'
 import 'leaflet/dist/leaflet.css'
-import L, { LatLngExpression, Marker, Icon } from 'leaflet'
+import L, { LatLngExpression } from 'leaflet'
 import { borders } from './country_borders_WGS84'
 import { Button } from '@mui/material'
 import MapIcon from '@mui/icons-material/Map'
@@ -38,11 +34,9 @@ export const LocalitiesMap = ({ localitiesQueryData, localitiesQueryIsFetching }
   const columnFilters = usePageContext()
   const [cluster, setCluster] = useState(true)
 
-  const {
-    data: localityDetailsQueryData,
-    isFetching: detailsLoading,
-    error: detailsError,
-  } = useGetLocalityDetailsQuery(selectedLocality ?? skipToken) // use skipToken to skip query when state is null
+  const { data: localityDetailsQueryData, isFetching: detailsLoading } = useGetLocalityDetailsQuery(
+    selectedLocality ?? skipToken
+  ) // use skipToken to skip query when state is null
 
   useEffect(() => {
     if (!mapRef.current) return

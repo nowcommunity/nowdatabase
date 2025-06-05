@@ -1,6 +1,6 @@
 import { useGetLocalitySpeciesListMutation } from '../../redux/localityReducer'
-import { useState, useEffect, useRef, Fragment } from 'react'
-import { Locality, LocalityDetailsType } from '@/shared/types/data.js'
+import { useState, useEffect } from 'react'
+import { LocalityDetailsType } from '@/shared/types/data.js'
 import { SpeciesTable } from './SpeciesTable'
 import '../../styles/LocalityDetailsPanel.css'
 
@@ -13,7 +13,6 @@ interface Props {
 export const LocalityInfo = ({ localityDetailsQueryData, selectedLocality, detailsLoading }: Props) => {
   const [getLocalitySpeciesList, { data, isLoading, isError }] = useGetLocalitySpeciesListMutation()
   const [fossils, setFossils] = useState<string[][] | null>(null)
-  const [fossilData, setFossilData] = useState<string[] | null>(null)
 
   useEffect(() => {
     if (selectedLocality) {
@@ -26,19 +25,6 @@ export const LocalityInfo = ({ localityDetailsQueryData, selectedLocality, detai
       setFossils(data)
     }
   }, [data])
-
-  // old
-  //   useEffect(() => {
-  //   getLocalitySpeciesList([Number(selectedLocality)])
-  //     .unwrap() //
-  //     .then(response => {
-  //       console.log('from fossils mutation', response)
-  //       setFossilData(response)
-  //     })
-  //     .catch(error => {
-  //       console.error(error)
-  //     })
-  // }, [selectedLocality, getLocalitySpeciesList])
 
   if (isLoading) return <p>Loading...</p>
   if (isError) return <p>Error loading species data</p>
@@ -66,12 +52,12 @@ export const LocalityInfo = ({ localityDetailsQueryData, selectedLocality, detai
               {`${localityDetailsQueryData.dec_lat}, ${localityDetailsQueryData.dec_long}`}
             </p>
             <p>
-              <strong>Taxa:</strong>  {data.length-1}
+              <strong>Taxa:</strong> {data.length - 1}
             </p>
           </div>
         )}
       </div>
-      {data ? <SpeciesTable data={data} /> : isLoading ? <div>Loading...</div> : <div>No data</div>}
+      {data ? <SpeciesTable data={fossils} /> : isLoading ? <div>Loading...</div> : <div>No data</div>}
     </>
   )
 }
