@@ -11,13 +11,9 @@ import { CoordinateSelectionMap } from '@/components/Map/CoordinateSelectionMap'
 import { useState } from 'react'
 import { convertDmsToDec, convertDecToDms } from '@/util/coordinateConversion'
 import { validCountries } from '@/shared/validators/countryList'
-import { LocalitiesMap } from '@/components/Map/LocalitiesMap'
+import { LocalityMap } from '@/components/Map/LocalityMap'
 import { Locality } from '@/shared/types'
-
-interface Props {
-  localitiesQueryData?: Locality[]
-  localitiesQueryIsFetching: boolean
-}
+import { createEntityAdapter } from '@reduxjs/toolkit'
 
 export const LocalityTab = () => {
   const { textField, radioSelection, dropdown, dropdownWithSearch, mode, bigTextField } =
@@ -25,6 +21,9 @@ export const LocalityTab = () => {
   const { editData, setEditData } = useDetailContext<LocalityDetailsType>()
 
   const locality: Locality[] = [editData as Locality]
+
+  console.log('lat', editData.dec_lat)
+  console.log('long', editData.dec_long)
 
   const generalLocalityOptions = [emptyOption, { display: 'No', value: 'n' }, { display: 'Yes', value: 'y' }]
 
@@ -189,10 +188,10 @@ export const LocalityTab = () => {
       </HalfFrames>
 
       <Grouped>
-        <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'flex-start', gap: 2 }}>
+        <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'flex-start', gap: 2, justifyContent: 'center' }}>
           <ArrayFrame array={latlong} title="Latitude & Longitude" />
           <Box sx={{ minWidth: 250, minHeight: 250 }}>
-            <LocalitiesMap localitiesQueryData={locality} localitiesQueryIsFetching={false} />
+            {locality && <LocalityMap dec_lat={editData.dec_lat} dec_long={editData.dec_long} />}
           </Box>
         </Box>
         {!mode.read && coordinateButton}

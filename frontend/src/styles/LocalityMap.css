@@ -45,3 +45,9 @@
   border: 'none';
   box-shadow: '1px 1px 1px 1px grey';
 }
+
+.map-locality-container > div {
+  height: 30vh;
+  margin-top: 2rem;
+  border-radius: 0.25em;
+}
