@@ -81,7 +81,7 @@ export const LocalityMap = ({ dec_lat, dec_long }: Props) => {
     return () => {
       mapInstance.remove()
     }
-  }, [])
+  }, [dec_lat, dec_long])
 
   useEffect(() => {
     if (!map || !dec_lat || !dec_long) return
