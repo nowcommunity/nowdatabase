@@ -1,7 +1,6 @@
 import { EditDataType, Species, SpeciesSynonym } from '@/shared/types'
 
 const isDuplicateTaxon = (newSpecies: EditDataType<Species>, existingSpecies: Species, synonyms: SpeciesSynonym[]) => {
-  console.log(synonyms)
   if (
     newSpecies.species_id !== existingSpecies.species_id &&
     newSpecies.genus_name === existingSpecies.genus_name &&
@@ -13,7 +12,8 @@ const isDuplicateTaxon = (newSpecies: EditDataType<Species>, existingSpecies: Sp
   }
 
   for (const synonym of synonyms) {
-    if (synonym.syn_genus_name === newSpecies.genus_name || synonym.syn_species_name === newSpecies.species_name) {
+    if (synonym.syn_genus_name === newSpecies.genus_name && synonym.syn_species_name === newSpecies.species_name) {
+      console.log(synonym)
       return true
     }
   }
