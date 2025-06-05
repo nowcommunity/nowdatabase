@@ -1,0 +1,42 @@
+.modal {
+  position: fixed;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border: none;
+}
+
+.modal > .modal-content {
+  border: none;
+  box-sizing: border-box;
+  background-color: white;
+  padding: 2em 2em;
+  width: calc(100% - 4em);
+  height: calc(100% - 2em);
+  max-width: 50em;
+  max-height: fit-content;
+  border-radius: 0.25rem;
+  overflow-y: auto;
+}
+
+.modal.big > .modal-content {
+  width: calc(100% - 4em);
+  height: calc(100% - 2em);
+  max-width: 70em;
+  max-height: fit-content;
+}
+
+.modal .map {
+  width: 100%;
+  height: 50vh;
+}
+
+.modal .MuiFormControl-root {
+  max-width: 100%;
+}
+
+@media screen and (max-width: 750px) {
+  .modal > .modal-content {
+    width: calc(100% - 2em) !important;
+  }
+}
