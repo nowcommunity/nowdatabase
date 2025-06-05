@@ -11,12 +11,26 @@ export const validateSpecies = (
   fieldName: keyof EditDataType<SpeciesDetailsType>
 ) => {
   const validators: Validators<Partial<EditDataType<SpeciesDetailsType>>> = {
+    subclass_or_superorder_name: {
+      name: 'Subclass or Superorder',
+      asString: (subClassName: string) => {
+        if (subClassName.indexOf(' ') !== -1) return 'Subclass must not contain any spaces.'
+        return
+      },
+    },
     order_name: {
       name: 'Order',
       required: true,
       asString: (orderName: string) => {
         if (orderName !== 'incertae sedis' && orderName.indexOf(' ') !== -1)
           return 'Order must not contain any spaces, unless the value is "incertae sedis".'
+        return
+      },
+    },
+    suborder_or_superfamily_name: {
+      name: 'Suborder or Superfamily',
+      asString: (subOrderName: string) => {
+        if (subOrderName.indexOf(' ') !== -1) return 'Suborder must not contain any spaces.'
         return
       },
     },
@@ -28,6 +42,13 @@ export const validateSpecies = (
           return 'Family must not contain any spaces, unless the value is "incertae sedis".'
         if (familyName === 'fam.' && editData.genus_name !== 'gen.')
           return 'when the Family is fam., Genus must be gen.'
+        return
+      },
+    },
+    subfamily_name: {
+      name: 'Subfamily or Tribe',
+      asString: (subFamilyName: string) => {
+        if (subFamilyName.indexOf(' ') !== -1) return 'Subfamily must not contain any spaces.'
         return
       },
     },

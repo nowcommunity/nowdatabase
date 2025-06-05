@@ -9,10 +9,11 @@ describe('Creating a species', () => {
 
   it('with valid data works', () => {
     cy.visit('/species/new')
+    // spaces should be automatically removed
     cy.get('[id=subclass_or_superorder_name-textfield]').type('   testSuperOrder')
     cy.get('[id=order_name-textfield]').type('testOrder   ')
-    cy.get('[id=suborder_or_superfamily_name-textfield]').type('test Super Family')
-    cy.get('[id=family_name-textfield]').type('testFamily')
+    cy.get('[id=suborder_or_superfamily_name-textfield]').type('testSuperFamily')
+    cy.get('[id=family_name-textfield]').type('incertae sedis')
     cy.get('[id=subfamily_name-textfield]').type('testSubFamily')
     cy.get('[id=genus_name-textfield]').type('testGenus')
     cy.get('[id=species_name-textfield]').type('testSpecies')
@@ -27,12 +28,12 @@ describe('Creating a species', () => {
     cy.get('[id=write-button]').click()
 
     // tests that values are capitalised and trimmed properly
-    cy.contains('TestSuperOrder')
-    cy.contains('TestOrder')
-    cy.contains('Test Super Family')
-    cy.contains('TestFamily')
-    cy.contains('TestSubFamily')
-    cy.contains('TestGenus')
+    cy.contains('Testsuperorder')
+    cy.contains('Testorder')
+    cy.contains('Testsuperfamily')
+    cy.contains('incertae sedis')
+    cy.contains('Testsubfamily')
+    cy.contains('Testgenus')
     cy.contains('testspecies')
     cy.contains('testUniqueIdentifier')
   })
@@ -43,6 +44,9 @@ describe('Creating a species', () => {
     cy.get('[id=write-button]').should('be.disabled')
     cy.contains('4 invalid fields')
   })
+
+  // TODO
+  it.skip('with mistyped incertae sedis, indet. etc.')
 })
 
 describe('Editing a species', () => {
@@ -54,6 +58,8 @@ describe('Editing a species', () => {
     cy.visit('/species/21052/')
     cy.contains('21052 Simplomys simplicidens')
     cy.get('[id=edit-button]').click()
+
+    cy.get('[id=suborder_or_superfamily_name-textfield]').type(' ') // remove this once the issue with null values in taxonomy fields is fixed
 
     cy.get('[id=genus_name-textfield]').clear()
     cy.get('[id=genus_name-textfield]').type('modifiedGenus')
@@ -69,7 +75,7 @@ describe('Editing a species', () => {
     cy.get('[id=write-button]').should('not.be.disabled')
     cy.get('[id=write-button]').click()
     cy.contains('Saved species entry successfully.')
-    cy.contains('ModifiedGenus')
+    cy.contains('Modifiedgenus')
     cy.contains('modifiedspecies')
     cy.contains('Subfamily or Tribe Heimo')
   })
@@ -78,6 +84,8 @@ describe('Editing a species', () => {
     cy.visit('/species/21052/')
     cy.contains('21052')
     cy.get('[id=edit-button]').click()
+
+    cy.get('[id=suborder_or_superfamily_name-textfield]').type(' ') // remove this once the issue with null values in taxonomy fields is fixed
 
     cy.get('[id=genus_name-textfield]').clear()
     cy.contains('Genus: This field is required')
@@ -106,7 +114,7 @@ describe('Editing a species', () => {
     cy.get('[id=write-button]').click()
 
     cy.contains('Saved species entry successfully.')
-    cy.contains('NewGenus')
+    cy.contains('Newgenus')
     cy.contains('newspecies')
   })
 })
@@ -160,8 +168,34 @@ describe('Taxonomy checks work', () => {
   })
 
   // TODO: these tests
-  it.skip('Invalid superorder/order pair does not work')
-  it.skip('Invalid order/suborder pair does not work')
+  it('Invalid superorder/order pair does not work', () => {
+    cy.visit('/species/new')
+    cy.get('[id=copy_existing_taxonomy_button]').contains('Copy existing taxonomy')
+    cy.get('[id=copy_existing_taxonomy_button]').click()
+    cy.get('[data-cy=detailview-button-21052]').click()
+    cy.contains('Close').click()
+    cy.get('[id=unique_identifier-textfield]').type('{backspace}new identifier')
+    cy.get('[id=subclass_or_superorder_name-textfield]').should('have.value', 'Eutheria')
+    cy.get('[id=subclass_or_superorder_name-textfield]').clear()
+    cy.get('[id=subclass_or_superorder_name-textfield]').type('somethingelse')
+    cy.get('[id=write-button]').click()
+    cy.contains('Order Rodentia belongs to subclass Eutheria, not Somethingelse.')
+  })
+
+  it('Invalid order/suborder pair does not work', () => {
+    cy.visit('/species/new')
+    cy.get('[id=copy_existing_taxonomy_button]').contains('Copy existing taxonomy')
+    cy.get('[id=copy_existing_taxonomy_button]').click()
+    cy.get('[data-cy=detailview-button-84357]').click()
+    cy.contains('Close').click()
+    cy.get('[id=unique_identifier-textfield]').type('{backspace}new identifier')
+    cy.get('[id=order_name-textfield]').should('have.value', 'Carnivora')
+    cy.get('[id=order_name-textfield]').clear()
+    cy.get('[id=order_name-textfield]').type('Rodentia')
+    cy.get('[id=write-button]').click()
+    cy.contains('Suborder Pinnipedia belongs to order Carnivora, not Rodentia.')
+    cy.contains('Family Odobenidae belongs to order Carnivora, not Rodentia.')
+  })
   it.skip('Invalid suborder/family pair does not work')
   it.skip('Invalid family/subfamily pair does not work')
   it.skip('Invalid subfamily/genus pair does not work')
@@ -205,15 +239,14 @@ describe('Taxonomy checks work', () => {
     cy.get('[id=write-button]').should('be.disabled')
     cy.get('[id=order_name-textfield]').clear()
     cy.get('[id=order_name-textfield]').type('incertae sedis')
+    cy.get('[id=write-button]').should('not.be.disabled')
 
     cy.get('[id=family_name-textfield]').type('test Family')
     cy.contains('Family must not contain any spaces, unless the value is "incertae sedis".')
     cy.get('[id=write-button]').should('be.disabled')
     cy.get('[id=family_name-textfield]').clear()
     cy.get('[id=family_name-textfield]').type('incertae sedis')
-
-    cy.get('[id=genus_name-textfield]').type('testGenus')
-    cy.get('[id=species_name-textfield]').type('testSpecies')
+    cy.get('[id=write-button]').should('not.be.disabled')
   })
 })
 
