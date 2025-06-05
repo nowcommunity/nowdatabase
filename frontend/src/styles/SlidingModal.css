@@ -17,8 +17,9 @@
   transition: background-color 0.2s ease-out;
 }
 
+/* width was 40em*/
 .sliding-modal-container .content {
-  --max-width: 40em;
+  --max-width: calc(100vw - 6em); 
   background-color: white;
   position: absolute;
   top: 0;
@@ -27,7 +28,13 @@
   transform: translateX(var(--max-width));
   transition: transform 0.2s ease-out;
   max-width: var(--max-width);
+  overflow-y: auto;
 }
+
+@media screen and (max-width: 600px) {
+  .sliding-modal-container .content {
+  --max-width: calc(100vw - 3em); 
+}}
 
 .sliding-modal-container.open .content  {
   transform: translateX(0);

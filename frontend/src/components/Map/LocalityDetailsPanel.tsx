@@ -1,24 +1,52 @@
+import { useGetLocalitySpeciesListMutation } from '../../redux/localityReducer'
+import { useState, useEffect, useRef, Fragment } from 'react'
 import { Locality, LocalityDetailsType } from '@/shared/types/data.js'
 import { SpeciesTable } from './SpeciesTable'
+import '../../styles/LocalityDetailsPanel.css'
 
 interface Props {
   localityDetailsQueryData: LocalityDetailsType | undefined
+  selectedLocality: string | null
   detailsLoading: boolean
 }
 
-export const LocalityInfo = ({ localityDetailsQueryData, detailsLoading }: Props) => {
-  const test = 'data...'
+export const LocalityInfo = ({ localityDetailsQueryData, selectedLocality, detailsLoading }: Props) => {
+  const [getLocalitySpeciesList, { data, isLoading, isError }] = useGetLocalitySpeciesListMutation()
+  const [fossils, setFossils] = useState<string[][] | null>(null)
+  const [fossilData, setFossilData] = useState<string[] | null>(null)
+
+  useEffect(() => {
+    if (selectedLocality) {
+      void getLocalitySpeciesList([Number(selectedLocality)])
+    }
+  }, [selectedLocality, getLocalitySpeciesList])
+
+  useEffect(() => {
+    if (data) {
+      setFossils(data)
+    }
+  }, [data])
+
+  // old
+  //   useEffect(() => {
+  //   getLocalitySpeciesList([Number(selectedLocality)])
+  //     .unwrap() //
+  //     .then(response => {
+  //       console.log('from fossils mutation', response)
+  //       setFossilData(response)
+  //     })
+  //     .catch(error => {
+  //       console.error(error)
+  //     })
+  // }, [selectedLocality, getLocalitySpeciesList])
+
+  if (isLoading) return <p>Loading...</p>
+  if (isError) return <p>Error loading species data</p>
+  if (!data) return null
 
   return (
     <>
-      <div
-        style={{
-          width: '300px',
-          padding: '1rem',
-          borderLeft: '1px solid #ccc',
-          overflowY: 'auto',
-        }}
-      >
+      <div className="locality-details-panel">
         {detailsLoading || !localityDetailsQueryData ? (
           <p>Loading...</p>
         ) : (
@@ -43,7 +71,7 @@ export const LocalityInfo = ({ localityDetailsQueryData, detailsLoading }: Props
           </div>
         )}
       </div>
-      <SpeciesTable data={test} />
+      {data ? <SpeciesTable data={data} /> : isLoading ? <div>Loading...</div> : <div>No data</div>}
     </>
   )
 }

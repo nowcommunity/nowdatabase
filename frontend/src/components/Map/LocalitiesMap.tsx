@@ -41,6 +41,7 @@ export const LocalitiesMap = ({ localitiesQueryData, localitiesQueryIsFetching }
   const [isOpen, setIsOpen] = useState(false)
   const [localityDetailsIsOpen, setLocalityDetailsIsOpen] = useState(false)
   const columnFilters = usePageContext()
+
   const {
     data: localityDetailsQueryData,
     isFetching: detailsLoading,
@@ -182,7 +183,11 @@ export const LocalitiesMap = ({ localitiesQueryData, localitiesQueryIsFetching }
         )}
       </article>
       <SlidingModal isOpen={localityDetailsIsOpen} onClose={() => setLocalityDetailsIsOpen(false)}>
-        <LocalityInfo localityDetailsQueryData={localityDetailsQueryData} detailsLoading={detailsLoading} />
+        <LocalityInfo
+          localityDetailsQueryData={localityDetailsQueryData}
+          detailsLoading={detailsLoading}
+          selectedLocality={selectedLocality}
+        />
       </SlidingModal>
     </>
   )
