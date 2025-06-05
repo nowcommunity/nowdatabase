@@ -13,7 +13,6 @@ import { convertDmsToDec, convertDecToDms } from '@/util/coordinateConversion'
 import { validCountries } from '@/shared/validators/countryList'
 import { LocalityMap } from '@/components/Map/LocalityMap'
 import { Locality } from '@/shared/types'
-import { createEntityAdapter } from '@reduxjs/toolkit'
 
 export const LocalityTab = () => {
   const { textField, radioSelection, dropdown, dropdownWithSearch, mode, bigTextField } =
@@ -21,9 +20,6 @@ export const LocalityTab = () => {
   const { editData, setEditData } = useDetailContext<LocalityDetailsType>()
 
   const locality: Locality[] = [editData as Locality]
-
-  console.log('lat', editData.dec_lat)
-  console.log('long', editData.dec_long)
 
   const generalLocalityOptions = [emptyOption, { display: 'No', value: 'n' }, { display: 'Yes', value: 'y' }]
 
