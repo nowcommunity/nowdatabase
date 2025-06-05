@@ -1,4 +1,4 @@
-import { CrossSearchRouteParameters } from '../types'
+import { ParsedCrossSearchRouteParameters } from '../types'
 import { Validators, validator, ValidationError } from './validator'
 
 const columnFilterCheck = (columnFilters: unknown) => {
@@ -31,17 +31,27 @@ const sortingCheck = (sorting: unknown) => {
 }
 
 export const validateCrossSearchRouteParams = (
-  parameters: CrossSearchRouteParameters,
-  fieldName: keyof CrossSearchRouteParameters
+  parameters: ParsedCrossSearchRouteParameters,
+  fieldName: keyof ParsedCrossSearchRouteParameters
 ) => {
-  const validators: Validators<Partial<CrossSearchRouteParameters>> = {
+  const validators: Validators<Partial<ParsedCrossSearchRouteParameters>> = {
     limit: {
       name: 'Limit',
-      required: true,
+      required: () => {
+        // TODO: change this and offset to not use the parameters object, might not be possible without changing the way validators work
+        if (typeof parameters.limit !== 'undefined' && typeof parameters.limit !== 'number')
+          return 'Limit must be undefined or a number'
+
+        return
+      },
     },
     offset: {
       name: 'Offset',
-      required: true,
+      required: () => {
+        if (typeof parameters.offset !== 'undefined' && typeof parameters.offset !== 'number')
+          return 'Offset must be undefined or a number'
+        return
+      },
     },
     columnFilters: {
       name: 'Column Filters',
@@ -53,5 +63,5 @@ export const validateCrossSearchRouteParams = (
     },
   }
 
-  return validator<CrossSearchRouteParameters>(validators, parameters, fieldName)
+  return validator<ParsedCrossSearchRouteParameters>(validators, parameters, fieldName)
 }
