@@ -66,7 +66,7 @@ export const LocalityInfo = ({ localityDetailsQueryData, selectedLocality, detai
               {`${localityDetailsQueryData.dec_lat}, ${localityDetailsQueryData.dec_long}`}
             </p>
             <p>
-              <strong>Taxa:</strong>
+              <strong>Taxa:</strong>  {data.length-1}
             </p>
           </div>
         )}
