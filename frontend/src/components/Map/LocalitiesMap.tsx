@@ -148,7 +148,7 @@ export const LocalitiesMap = ({ localitiesQueryData, localitiesQueryIsFetching }
         <div ref={mapRef}></div>
       </div>
 
-      {!localitiesQueryIsFetching && (
+      {!localitiesQueryIsFetching && localitiesQueryData && (
         <div className="button-row">
           <Button variant="contained" startIcon={<MapIcon />} onClick={() => setIsOpen(v => !v)}>
             {isOpen ? 'Close' : 'Open'} map

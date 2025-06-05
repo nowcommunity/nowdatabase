@@ -13,6 +13,7 @@ export const TableToolBar = <T extends MRT_RowData>({
   table,
   combinedExport,
   kmlExport,
+  svgExport,
   exportIsLoading,
   isCrossSearchTable,
   selectorFn,
@@ -21,6 +22,7 @@ export const TableToolBar = <T extends MRT_RowData>({
   table: MRT_TableInstance<T>
   combinedExport?: (lids: number[]) => Promise<void>
   kmlExport?: (table: MRT_TableInstance<T>) => void
+  svgExport?: (table: MRT_TableInstance<T>) => void
   exportIsLoading?: boolean
   isCrossSearchTable?: boolean
   selectorFn?: (id: T) => void
@@ -93,6 +95,18 @@ export const TableToolBar = <T extends MRT_RowData>({
               Export KML
             </MenuItem>
           )}
+
+          {svgExport && (
+            <MenuItem
+              onClick={() => {
+                svgExport(table)
+                handleClose()
+              }}
+            >
+              Export SVG map
+            </MenuItem>
+          )}
+
           {combinedExport && (
             <Box>
               <Tooltip
