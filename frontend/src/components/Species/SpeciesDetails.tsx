@@ -40,8 +40,18 @@ export const SpeciesDetails = () => {
 
   if (isError) return <div>Error loading data</div>
   if (isFetching || (!data && !isNew) || mutationLoading) return <CircularProgress />
+
+  // changes subclass, suborder, and subfamily from null to empty string to make validators work
+  // this should be removed if validators are improved in the future
+  let modifiedData = data
   if (data) {
     document.title = `Species - ${data.species_name}`
+    modifiedData = {
+      ...data,
+      subclass_or_superorder_name: data.subclass_or_superorder_name ?? '',
+      suborder_or_superfamily_name: data.suborder_or_superfamily_name ?? '',
+      subfamily_name: data.subfamily_name ?? '',
+    }
   }
 
   const deleteFunction = async () => {
@@ -101,7 +111,7 @@ export const SpeciesDetails = () => {
   return (
     <DetailView
       tabs={tabs}
-      data={isNew ? emptySpecies : data!}
+      data={isNew ? emptySpecies : modifiedData!}
       onWrite={onWrite}
       isNew={isNew}
       taxonomy={true}
