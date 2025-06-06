@@ -13,6 +13,7 @@ that already exist in editdata
 */
 export const SelectingTable = <T extends MRT_RowData, ParentType extends object>({
   buttonText,
+  buttonTooltip,
   data,
   columns,
   editingAction,
@@ -23,6 +24,7 @@ export const SelectingTable = <T extends MRT_RowData, ParentType extends object>
   useObject,
 }: {
   buttonText: string
+  buttonTooltip?: string
   data: T[] | undefined
   columns: MRT_ColumnDef<T>[]
   editingAction?: (object: T) => void
@@ -67,7 +69,7 @@ export const SelectingTable = <T extends MRT_RowData, ParentType extends object>
   if (isError) return <Box>Error fetching data for the selecting table.</Box>
   if (!data) return <CircularProgress />
   return (
-    <EditingModal dataCy={`${buttonText}-button`} buttonText={buttonText}>
+    <EditingModal buttonText={buttonText} buttonTooltip={buttonTooltip}>
       {data ? (
         <TableView<T>
           data={filteredData}

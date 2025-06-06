@@ -274,6 +274,7 @@ export const EditableTextField = <T extends object>({
   field,
   type = 'text',
   round,
+  trim = false,
   big = false,
   disabled = false,
   readonly = false,
@@ -282,6 +283,7 @@ export const EditableTextField = <T extends object>({
   field: keyof EditDataType<T>
   type?: React.HTMLInputTypeAttribute
   round?: number
+  trim?: boolean
   big?: boolean
   disabled?: boolean
   readonly?: boolean
@@ -312,6 +314,11 @@ export const EditableTextField = <T extends object>({
     }
   }
 
+  // if trim is set to true, this is called whenever the component loses focus
+  const trimValue = () => {
+    setEditData({ ...editData, [field]: (editData[field] as string).trim() })
+  }
+
   const editingComponent = (
     <TextField
       sx={{ width: fieldWidth, backgroundColor: disabled ? 'grey' : '' }}
@@ -325,6 +332,7 @@ export const EditableTextField = <T extends object>({
       type={type}
       multiline={big}
       disabled={disabled}
+      onBlur={() => trim && trimValue()}
       InputProps={readonly ? { readOnly: true } : { readOnly: false }}
     />
   )
