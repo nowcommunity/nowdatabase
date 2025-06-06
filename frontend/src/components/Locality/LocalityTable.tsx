@@ -6,6 +6,7 @@ import { TableView } from '../TableView/TableView'
 import { useNotify } from '@/hooks/notification'
 import { LocalitiesMap } from '../Map/LocalitiesMap'
 import { generateKml } from '@/util/kml'
+import { generateSvg } from '../Map/generateSvg'
 
 const decimalCount = (num: number) => {
   const numAsString = num.toString()
@@ -397,6 +398,17 @@ export const LocalityTable = ({ selectorFn }: { selectorFn?: (newObject: Localit
     a.click()
   }
 
+  const svgExport = <T extends MRT_RowData>(table: MRT_TableInstance<T>) => {
+    const rowData: Locality[] = table.getPrePaginationRowModel().rows.map(row => row.original as unknown as Locality)
+    const dataString = generateSvg(rowData)
+    const blob = new Blob([dataString], { type: 'image/svg+xml' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = 'map.svg'
+    a.click()
+  }
+
   const checkRowRestriction = (row: Locality) => {
     return !!row.loc_status
   }
@@ -416,6 +428,7 @@ export const LocalityTable = ({ selectorFn }: { selectorFn?: (newObject: Localit
         url="locality"
         combinedExport={combinedExport}
         kmlExport={kmlExport}
+        svgExport={svgExport}
         exportIsLoading={isLoading}
         enableColumnFilterModes={true}
       />
