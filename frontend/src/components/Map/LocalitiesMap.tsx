@@ -1,18 +1,17 @@
-import { useGetLocalityDetailsQuery } from '../../redux/localityReducer'
-import { useState, useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import 'leaflet/dist/leaflet.css'
-import L, { LatLngExpression } from 'leaflet'
 import { borders } from './country_borders_WGS84'
+
 import { Button } from '@mui/material'
 import MapIcon from '@mui/icons-material/Map'
+import L, { LatLngExpression } from 'leaflet'
 import { Locality } from '@/shared/types/data.js'
 import { usePageContext } from '../Page'
-import { skipToken } from '@reduxjs/toolkit/query'
+
 import './leaflet.markercluster.js'
 import './MarkerCluster.css'
 import './MarkerCluster.Default.css'
-import { SlidingModal } from './SlidingModal.tsx'
-import { LocalityInfo } from './LocalityDetailsPanel.tsx'
+
 import '../../styles/LocalityMap.css'
 import northarrow from './images/north-arrow.png'
 
@@ -21,21 +20,12 @@ interface Props {
   localitiesQueryIsFetching: boolean
 }
 
-type CustomCircleMarkerOptions = L.CircleMarkerOptions & { localityId: number }
-type CustomCircleMarker = L.CircleMarker & { options: CustomCircleMarkerOptions }
-
 export const LocalitiesMap = ({ localitiesQueryData, localitiesQueryIsFetching }: Props) => {
-  const [selectedLocality, setSelectedLocality] = useState<string | null>(null)
   const mapRef = useRef<HTMLDivElement | null>(null)
   const [map, setMap] = useState<L.Map | null>(null)
   const [isOpen, setIsOpen] = useState(false)
-  const [localityDetailsIsOpen, setLocalityDetailsIsOpen] = useState(false)
   const columnFilters = usePageContext()
   const [cluster, setCluster] = useState(true)
-
-  const { data: localityDetailsQueryData, isFetching: detailsLoading } = useGetLocalityDetailsQuery(
-    selectedLocality ?? skipToken
-  ) // use skipToken to skip query when state is null
 
   useEffect(() => {
     if (!mapRef.current) return
@@ -112,7 +102,7 @@ export const LocalitiesMap = ({ localitiesQueryData, localitiesQueryIsFetching }
     // To prevent eslint from complaining about that 'markers' variable below:
     /* eslint-disable @typescript-eslint/no-unsafe-assignment */
     /* eslint-disable @typescript-eslint/no-unsafe-call */
-
+    /* eslint-disable @typescript-eslint/no-unsafe-return */
     /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 
     // @ts-expect-error The marker cluster library is a plain javascript library
@@ -128,25 +118,15 @@ export const LocalitiesMap = ({ localitiesQueryData, localitiesQueryIsFetching }
       ? localitiesQueryData?.filter(locality => validIds.includes(locality.lid))
       : localitiesQueryData
 
-    filteredLocalities?.forEach(locality => {
-      const options: CustomCircleMarkerOptions = {
-        localityId: locality.lid,
-        radius: 4,
-        color: '#db2c2c',
-        fillColor: '#d95050',
-      }
-
-      const marker = L.circleMarker([locality.dec_lat, locality.dec_long], options) as CustomCircleMarker
-
-      marker
-        .on('click', () => {
-          setSelectedLocality(marker.options.localityId.toString())
-          setLocalityDetailsIsOpen(true)
-        })
-        .bindTooltip(locality.loc_name)
-
-      newMarkers.addLayer(marker)
-    })
+    filteredLocalities?.forEach(locality =>
+      newMarkers.addLayer(
+        L.circleMarker([locality.dec_lat, locality.dec_long], {
+          radius: 4,
+          color: '#db2c2c',
+          fillColor: '#d95050',
+        }).bindTooltip(locality.loc_name)
+      )
+    )
 
     // hot reload fix
     try {
@@ -164,31 +144,23 @@ export const LocalitiesMap = ({ localitiesQueryData, localitiesQueryIsFetching }
   document.title = 'Map'
 
   return (
-    <>
-      <article id="localities-map">
-        <div id="map-container" className={isOpen ? 'open' : ''}>
-          <div ref={mapRef} style={{ flex: 1 }} />
-          {isOpen && (
-            <button className="cluster-btn" onClick={() => setCluster(cluster => !cluster)}>
-              {cluster ? 'Individual' : 'Cluster'}
-            </button>
-          )}
-        </div>
-        {!localitiesQueryIsFetching && localitiesQueryData && (
-          <div className="button-row">
-            <Button variant="contained" startIcon={<MapIcon />} onClick={() => setIsOpen(v => !v)}>
-              {isOpen ? 'Close' : 'Open'} map
-            </Button>
-          </div>
+    <article id="localities-map">
+      <div id="map-container" className={isOpen ? 'open' : ''}>
+        {isOpen && (
+          <button className="cluster-btn" onClick={() => setCluster(cluster => !cluster)}>
+            {cluster ? 'Individual' : 'Cluster'}
+          </button>
         )}
-      </article>
-      <SlidingModal isOpen={localityDetailsIsOpen} onClose={() => setLocalityDetailsIsOpen(false)}>
-        <LocalityInfo
-          localityDetailsQueryData={localityDetailsQueryData}
-          detailsLoading={detailsLoading}
-          selectedLocality={selectedLocality}
-        />
-      </SlidingModal>
-    </>
+        <div ref={mapRef}></div>
+      </div>
+
+      {!localitiesQueryIsFetching && localitiesQueryData && (
+        <div className="button-row">
+          <Button variant="contained" startIcon={<MapIcon />} onClick={() => setIsOpen(v => !v)}>
+            {isOpen ? 'Close' : 'Open'} map
+          </Button>
+        </div>
+      )}
+    </article>
   )
 }
