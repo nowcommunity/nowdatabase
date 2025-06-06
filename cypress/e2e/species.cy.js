@@ -45,8 +45,8 @@ describe('Creating a species', () => {
     cy.contains('4 invalid fields')
   })
 
-  // TODO
-  it.skip('with mistyped incertae sedis, indet. etc.')
+  // TODO: check that validators for mistyped special values work, once they are implemented
+  // e.g. typing "incertaesedis" in a taxonomy field should prompt the user to input "incertae sedis" instead
 })
 
 describe('Editing a species', () => {
