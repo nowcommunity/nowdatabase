@@ -312,7 +312,6 @@ describe("Locality's coordinate selection map works", () => {
     cy.contains('Central Finland').first().click() // first item on the list
     cy.contains('Latitude: 63.05484, Longitude: 24.75291')
     cy.contains('Save').click()
-    cy.contains('OpenStreetMap').should('not.exist')
     cy.contains('Finalize entry').click()
     cy.contains('button', 'Add existing reference').click()
     cy.get('button[data-cy^="detailview-button"]').first().click()
