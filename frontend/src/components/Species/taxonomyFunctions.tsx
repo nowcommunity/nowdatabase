@@ -1,6 +1,6 @@
 import { EditDataType, Species, SpeciesSynonym } from '@/shared/types'
 
-const isDuplicateTaxon = (newSpecies: EditDataType<Species>, existingSpecies: Species, synonyms: SpeciesSynonym[]) => {
+const isDuplicateTaxon = (newSpecies: EditDataType<Species>, existingSpecies: Species) => {
   if (
     newSpecies.species_id !== existingSpecies.species_id &&
     newSpecies.genus_name === existingSpecies.genus_name &&
@@ -11,14 +11,15 @@ const isDuplicateTaxon = (newSpecies: EditDataType<Species>, existingSpecies: Sp
     return true
   }
 
-  for (const synonym of synonyms) {
+  return false
+}
+
+const isDuplicateSynonym = (newSpecies: EditDataType<Species>, existingSynonyms: SpeciesSynonym[]) => {
+  for (const synonym of existingSynonyms) {
     if (synonym.syn_genus_name === newSpecies.genus_name && synonym.syn_species_name === newSpecies.species_name) {
-      console.log(synonym)
       return true
     }
   }
-
-  return false
 }
 
 export const checkTaxonomy = (editData: EditDataType<Species>, speciesData: Species[], synonyms: SpeciesSynonym[]) => {
@@ -56,9 +57,14 @@ export const checkTaxonomy = (editData: EditDataType<Species>, speciesData: Spec
   const errors = new Set<string>()
 
   for (const species of speciesData) {
-    const relatedSynonyms = synonyms.filter(syn => syn.species_id === species.species_id)
-    if (isDuplicateTaxon(editData, species, relatedSynonyms)) {
+    if (isDuplicateTaxon(editData, species)) {
       errors.add('The taxon already exists in the database.')
+      return errors
+    }
+
+    const relatedSynonyms = synonyms.filter(syn => syn.species_id === species.species_id)
+    if (isDuplicateSynonym(editData, relatedSynonyms)) {
+      errors.add(`${species.genus_name} ${species.species_name} already has ${genus} ${speciesName} as a synonym.`)
       return errors
     }
 
