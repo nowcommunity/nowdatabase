@@ -260,6 +260,7 @@ describe('Taxonomy checks work', () => {
     cy.visit('/species/new')
     cy.get('[id=genus_name-textfield]').type('testGenus')
     cy.get('[id=species_name-textfield]').type('testSpecies')
+    cy.get('[id=family_name-textfield]').type('testFamily')
 
     cy.get('[id=order_name-textfield]').type('test Order')
     cy.contains('​Order must not contain any spaces, unless the value is "incertae sedis".')
@@ -268,6 +269,7 @@ describe('Taxonomy checks work', () => {
     cy.get('[id=order_name-textfield]').type('incertae sedis')
     cy.get('[id=write-button]').should('not.be.disabled')
 
+    cy.get('[id=family_name-textfield]').clear()
     cy.get('[id=family_name-textfield]').type('test Family')
     cy.contains('Family must not contain any spaces, unless the value is "incertae sedis".')
     cy.get('[id=write-button]').should('be.disabled')
