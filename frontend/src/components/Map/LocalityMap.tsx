@@ -4,6 +4,9 @@ import { borders } from './country_borders_WGS84'
 import L, { LatLngExpression } from 'leaflet'
 import '../../styles/LocalityMap.css'
 import northarrow from './images/north-arrow.png'
+import './leaflet.markercluster.js'
+import './MarkerCluster.css'
+import './MarkerCluster.Default.css'
 
 interface Props {
   dec_lat: number | undefined
