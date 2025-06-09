@@ -5,7 +5,7 @@ import { borders } from './country_borders_WGS84'
 import { Button } from '@mui/material'
 import MapIcon from '@mui/icons-material/Map'
 import L, { LatLngExpression } from 'leaflet'
-import { Locality } from '@/shared/types/data.js'
+import { SimplifiedLocality } from '@/shared/types/data.js'
 import { usePageContext } from '../Page'
 
 import './leaflet.markercluster.js'
@@ -16,7 +16,7 @@ import '../../styles/LocalityMap.css'
 import northarrow from './images/north-arrow.png'
 
 interface Props {
-  localitiesQueryData?: Locality[]
+  localitiesQueryData?: SimplifiedLocality[]
   localitiesQueryIsFetching: boolean
 }
 
@@ -109,16 +109,7 @@ export const LocalitiesMap = ({ localitiesQueryData, localitiesQueryIsFetching }
     // with no module exports that extends 'L' when imported
     const newMarkers: Layer = cluster ? L.markerClusterGroup() : L.layerGroup()
 
-    const localityIds = columnFilters.idList as unknown as number[]
-    const filterApplied = localityIds.length > 0 && localityIds.every(id => id === null)
-
-    const validIds = localityIds.filter(id => typeof id === 'number')
-
-    const filteredLocalities = !filterApplied
-      ? localitiesQueryData?.filter(locality => validIds.includes(locality.lid))
-      : localitiesQueryData
-
-    filteredLocalities?.forEach(locality =>
+    localitiesQueryData?.forEach(locality =>
       newMarkers.addLayer(
         L.circleMarker([locality.dec_lat, locality.dec_long], {
           radius: 4,

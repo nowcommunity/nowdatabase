@@ -1,15 +1,21 @@
 import { useMemo } from 'react'
 import { type MRT_ColumnDef } from 'material-react-table'
-import { CrossSearch } from '@/shared/types'
+import { CrossSearch, SimplifiedLocality } from '@/shared/types'
 import { TableView } from '../TableView/TableView'
-import { useGetAllCrossSearchQuery } from '@/redux/crossSearchReducer'
+import { useGetAllCrossSearchQuery, useGetAllCrossSearchLocalitiesQuery } from '@/redux/crossSearchReducer'
 import { usePageContext } from '../Page'
+import { LocalitiesMap } from '../Map/LocalitiesMap'
 
 export const CrossSearchTable = ({ selectorFn }: { selectorFn?: (newObject: CrossSearch) => void }) => {
   const { sqlLimit, sqlOffset, sqlColumnFilters, sqlOrderBy } = usePageContext()
   const { data: crossSearchQueryData, isFetching } = useGetAllCrossSearchQuery({
     limit: sqlLimit,
     offset: sqlOffset,
+    columnFilters: sqlColumnFilters,
+    sorting: sqlOrderBy,
+  })
+
+  const { data: localitiesData, isFetching: localitiesFetching } = useGetAllCrossSearchLocalitiesQuery({
     columnFilters: sqlColumnFilters,
     sorting: sqlOrderBy,
   })
@@ -800,19 +806,22 @@ export const CrossSearchTable = ({ selectorFn }: { selectorFn?: (newObject: Cros
   }
 
   return (
-    <TableView<CrossSearch>
-      title="Locality-Species-Cross-Search"
-      selectorFn={selectorFn}
-      checkRowRestriction={checkRowRestriction}
-      idFieldName="lid_now_loc"
-      columns={columns}
-      isFetching={isFetching}
-      visibleColumns={visibleColumns}
-      data={crossSearchQueryData}
-      url="crosssearch"
-      enableColumnFilterModes={true}
-      serverSidePagination={true}
-      isCrossSearchTable={true}
-    />
+    <>
+      <LocalitiesMap localitiesQueryData={localitiesData} localitiesQueryIsFetching={localitiesFetching} />
+      <TableView<CrossSearch>
+        title="Locality-Species-Cross-Search"
+        selectorFn={selectorFn}
+        checkRowRestriction={checkRowRestriction}
+        idFieldName="lid_now_loc"
+        columns={columns}
+        isFetching={isFetching}
+        visibleColumns={visibleColumns}
+        data={crossSearchQueryData}
+        url="crosssearch"
+        enableColumnFilterModes={true}
+        serverSidePagination={true}
+        isCrossSearchTable={true}
+      />
+    </>
   )
 }

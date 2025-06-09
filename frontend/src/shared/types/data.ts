@@ -4,6 +4,7 @@ import * as Prisma from '../../../../backend/prisma/generated/now_test_client/de
 import * as LogPrisma from '../../../../backend/prisma/generated/now_log_test_client/default'
 import { Editable, FixBigInt, RowState } from './util'
 import { Decimal } from '../../../../backend/prisma/generated/now_test_client/runtime/library'
+import { LargeNumberLike } from 'crypto'
 
 export type SpeciesType = FixBigInt<Prisma.com_species>
 export type SedimentaryStructureValues = Prisma.now_ss_values
@@ -471,3 +472,10 @@ export type GeonamesJSON = {
 }
 
 export type ParsedGeoname = Pick<Geoname, 'name' | 'countryName' | 'fclName' | 'adminName1' | 'lat' | 'lng'>
+
+export type SimplifiedLocality = {
+  lid: number
+  dec_lat: number
+  dec_long: number
+  loc_name: string
+}
