@@ -16,7 +16,6 @@
 
 #map-container.open {
   height: var(--map-height);
-  display: flex;
 }
 
 #map-container > div {
