@@ -107,7 +107,11 @@ export const checkTaxonomy = (
     }
 
     if (checkFamily()) {
-      if (family === existingSpecies.family_name && order !== existingSpecies.order_name) {
+      if (
+        family === existingSpecies.family_name &&
+        order !== existingSpecies.order_name &&
+        existingSpecies.order_name !== 'incertae sedis'
+      ) {
         errors.add(`Family ${family} belongs to order ${existingSpecies.order_name}, not ${order}.`)
       }
       if (
