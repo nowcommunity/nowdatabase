@@ -22,6 +22,13 @@ const isDuplicateSynonym = (newSpecies: EditDataType<Species>, existingSynonyms:
   }
 }
 
+const speciesEqualsUniqueIdentifier = (newSpecies: EditDataType<Species>, existingSpecies: Species) => {
+  return (
+    newSpecies.genus_name === existingSpecies.genus_name &&
+    newSpecies.species_name === existingSpecies.unique_identifier
+  )
+}
+
 export const checkTaxonomy = (
   newSpecies: EditDataType<Species>,
   existingSpeciesArray: Species[],
@@ -68,6 +75,14 @@ export const checkTaxonomy = (
     if (isDuplicateSynonym(newSpecies, relatedSynonyms)) {
       errors.add(
         `${existingSpecies.genus_name} ${existingSpecies.species_name} already has ${genus} ${speciesName} as a synonym.`
+      )
+      return errors
+    }
+
+    if (speciesEqualsUniqueIdentifier(newSpecies, existingSpecies)) {
+      errors.add(`The taxon already exists in the database.`)
+      errors.add(
+        `(${existingSpecies.genus_name} ${existingSpecies.species_name} already has ${newSpecies.species_name} as a unique identifier.)`
       )
       return errors
     }
