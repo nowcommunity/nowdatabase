@@ -45,3 +45,9 @@
   border: none;
   box-shadow: 0 0 0 0.15em rgba(0, 0, 0, 0.22);
 }
+
+.map-locality-container > div {
+  height: 30vh;
+  margin-top: 2rem;
+  border-radius: 0.25em;
+}
