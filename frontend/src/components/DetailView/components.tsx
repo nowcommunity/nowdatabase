@@ -108,7 +108,7 @@ export const WriteButton = <T,>({
       const errors = checkTaxonomy(speciesEditData, speciesData, synonyms)
       if (errors.size > 0) {
         const errorMessage = [...errors].reduce((acc, currentError) => acc + `\n${currentError}`)
-        notify(errorMessage, 'error')
+        notify(errorMessage, 'error', null)
         return
       }
       setEditData(speciesEditData as EditDataType<T>)

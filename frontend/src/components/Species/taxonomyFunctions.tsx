@@ -29,6 +29,106 @@ const speciesEqualsUniqueIdentifier = (newSpecies: EditDataType<Species>, existi
   )
 }
 
+const checkOrderFamily = (newSpecies: EditDataType<Species>, existingSpecies: Species) => {
+  return (
+    newSpecies.subclass_or_superorder_name !== 'indet.' &&
+    newSpecies.order_name !== 'indet.' &&
+    newSpecies.order_name !== 'incertae sedis' &&
+    newSpecies.suborder_or_superfamily_name !== 'indet.' &&
+    newSpecies.family_name !== 'indet.' &&
+    newSpecies.family_name !== 'incertae sedis' &&
+    newSpecies.family_name === existingSpecies.family_name &&
+    newSpecies.order_name !== existingSpecies.order_name
+  )
+}
+
+const checkFamilyGenus = (newSpecies: EditDataType<Species>, existingSpecies: Species) => {
+  return (
+    newSpecies.subclass_or_superorder_name !== 'indet.' &&
+    newSpecies.order_name !== 'indet.' &&
+    newSpecies.order_name !== 'incertae sedis' &&
+    newSpecies.suborder_or_superfamily_name !== 'indet.' &&
+    newSpecies.family_name !== 'indet.' &&
+    newSpecies.family_name !== 'incertae sedis' &&
+    newSpecies.subfamily_name !== 'indet.' &&
+    newSpecies.genus_name !== 'indet.' &&
+    newSpecies.genus_name !== 'gen.' &&
+    newSpecies.genus_name === existingSpecies.genus_name &&
+    newSpecies.family_name !== existingSpecies.family_name
+  )
+}
+
+const checkSubClassOrder = (newSpecies: EditDataType<Species>, existingSpecies: Species) => {
+  return (
+    newSpecies.subclass_or_superorder_name &&
+    newSpecies.subclass_or_superorder_name !== 'indet.' &&
+    newSpecies.order_name !== 'indet.' &&
+    newSpecies.order_name !== 'incertae sedis' &&
+    existingSpecies.subclass_or_superorder_name &&
+    newSpecies.order_name === existingSpecies.order_name &&
+    newSpecies.subclass_or_superorder_name !== existingSpecies.subclass_or_superorder_name
+  )
+}
+const checkOrderSubOrder = (newSpecies: EditDataType<Species>, existingSpecies: Species) => {
+  return (
+    newSpecies.subclass_or_superorder_name !== 'indet.' &&
+    newSpecies.order_name !== 'indet.' &&
+    newSpecies.order_name !== 'incertae sedis' &&
+    newSpecies.suborder_or_superfamily_name &&
+    newSpecies.suborder_or_superfamily_name !== 'indet.' &&
+    newSpecies.suborder_or_superfamily_name === existingSpecies.suborder_or_superfamily_name &&
+    newSpecies.order_name !== existingSpecies.order_name
+  )
+}
+
+const checkSubOrderFamily = (newSpecies: EditDataType<Species>, existingSpecies: Species) => {
+  return (
+    newSpecies.subclass_or_superorder_name !== 'indet.' &&
+    newSpecies.order_name !== 'indet.' &&
+    newSpecies.order_name !== 'incertae sedis' &&
+    newSpecies.suborder_or_superfamily_name &&
+    newSpecies.suborder_or_superfamily_name !== 'indet.' &&
+    newSpecies.family_name !== 'indet.' &&
+    newSpecies.family_name !== 'incertae sedis' &&
+    existingSpecies.suborder_or_superfamily_name &&
+    newSpecies.family_name === existingSpecies.family_name &&
+    newSpecies.suborder_or_superfamily_name !== existingSpecies.suborder_or_superfamily_name
+  )
+}
+
+const checkFamilySubFamily = (newSpecies: EditDataType<Species>, existingSpecies: Species) => {
+  return (
+    newSpecies.subclass_or_superorder_name !== 'indet.' &&
+    newSpecies.order_name !== 'indet.' &&
+    newSpecies.order_name !== 'incertae sedis' &&
+    newSpecies.suborder_or_superfamily_name !== 'indet.' &&
+    newSpecies.family_name !== 'indet.' &&
+    newSpecies.family_name !== 'incertae sedis' &&
+    newSpecies.subfamily_name &&
+    newSpecies.subfamily_name !== 'indet.' &&
+    newSpecies.subfamily_name === existingSpecies.subfamily_name &&
+    newSpecies.family_name !== existingSpecies.family_name
+  )
+}
+
+const checkSubFamilyGenus = (newSpecies: EditDataType<Species>, existingSpecies: Species) => {
+  return (
+    newSpecies.subclass_or_superorder_name !== 'indet.' &&
+    newSpecies.order_name !== 'indet.' &&
+    newSpecies.order_name !== 'incertae sedis' &&
+    newSpecies.suborder_or_superfamily_name !== 'indet.' &&
+    newSpecies.family_name !== 'indet.' &&
+    newSpecies.family_name !== 'incertae sedis' &&
+    newSpecies.subfamily_name &&
+    newSpecies.subfamily_name !== 'indet.' &&
+    newSpecies.genus_name !== 'indet.' &&
+    newSpecies.genus_name !== 'gen.' &&
+    existingSpecies.subfamily_name &&
+    newSpecies.genus_name === existingSpecies.genus_name &&
+    newSpecies.subfamily_name !== existingSpecies.subfamily_name
+  )
+}
+
 export const checkTaxonomy = (
   newSpecies: EditDataType<Species>,
   existingSpeciesArray: Species[],
@@ -43,25 +143,6 @@ export const checkTaxonomy = (
     genus_name: genus,
     species_name: speciesName,
   } = newSpecies
-
-  const checkSubClass = () => {
-    return subClass && subClass !== 'indet.'
-  }
-  const checkOrder = () => {
-    return order !== 'indet.' && order !== 'incertae sedis'
-  }
-  const checkSubOrder = () => {
-    return checkOrder() && subOrder && subOrder !== 'indet.'
-  }
-  const checkFamily = () => {
-    return checkOrder() && family !== 'indet.' && family !== 'incertae sedis'
-  }
-  const checkSubfamily = () => {
-    return checkFamily() && subfamily && subfamily !== 'indet.'
-  }
-  const checkGenus = () => {
-    return checkFamily() && genus !== 'indet.'
-  }
 
   const errors = new Set<string>()
 
@@ -87,67 +168,34 @@ export const checkTaxonomy = (
       return errors
     }
 
-    if (checkOrder()) {
-      if (
-        checkSubClass() &&
-        existingSpecies.subclass_or_superorder_name &&
-        order === existingSpecies.order_name &&
-        subClass !== existingSpecies.subclass_or_superorder_name
-      ) {
-        errors.add(
-          `Order ${order} belongs to subclass ${existingSpecies.subclass_or_superorder_name}, not ${subClass}.`
-        )
-      }
+    if (checkOrderFamily(newSpecies, existingSpecies)) {
+      errors.add(`Family ${family} belongs to order ${existingSpecies.order_name}, not ${order}.`)
     }
 
-    if (checkSubOrder()) {
-      if (subOrder === existingSpecies.suborder_or_superfamily_name && order !== existingSpecies.order_name) {
-        errors.add(`Suborder ${subOrder} belongs to order ${existingSpecies.order_name}, not ${order}.`)
-      }
+    if (checkFamilyGenus(newSpecies, existingSpecies)) {
+      errors.add(`Genus ${genus} belongs to family ${existingSpecies.family_name}, not ${family}.`)
     }
 
-    if (checkFamily()) {
-      if (
-        family === existingSpecies.family_name &&
-        order !== existingSpecies.order_name &&
-        existingSpecies.order_name !== 'incertae sedis'
-      ) {
-        errors.add(`Family ${family} belongs to order ${existingSpecies.order_name}, not ${order}.`)
-      }
-      if (
-        checkSubOrder() &&
-        existingSpecies.suborder_or_superfamily_name &&
-        family === existingSpecies.family_name &&
-        subOrder !== existingSpecies.suborder_or_superfamily_name
-      ) {
-        errors.add(
-          `Family ${family} belongs to suborder ${existingSpecies.suborder_or_superfamily_name}, not ${subOrder}.`
-        )
-      }
+    if (checkSubClassOrder(newSpecies, existingSpecies)) {
+      errors.add(`Order ${order} belongs to subclass ${existingSpecies.subclass_or_superorder_name}, not ${subClass}.`)
     }
 
-    if (checkSubfamily()) {
-      if (subfamily === existingSpecies.subfamily_name && family !== existingSpecies.family_name) {
-        errors.add(`Subfamily ${subfamily} belongs to family ${existingSpecies.family_name}, not ${family}.`)
-      }
+    if (checkOrderSubOrder(newSpecies, existingSpecies)) {
+      errors.add(`Suborder ${subOrder} belongs to order ${existingSpecies.order_name}, not ${order}.`)
     }
 
-    if (checkGenus()) {
-      if (
-        genus === existingSpecies.genus_name &&
-        family !== existingSpecies.family_name &&
-        existingSpecies.family_name !== 'incertae sedis'
-      ) {
-        errors.add(`Genus ${genus} belongs to family ${existingSpecies.family_name}, not ${family}.`)
-      }
-      if (
-        checkSubfamily() &&
-        existingSpecies.subfamily_name &&
-        genus === existingSpecies.genus_name &&
-        subfamily !== existingSpecies.subfamily_name
-      ) {
-        errors.add(`Genus ${genus} belongs to subfamily ${existingSpecies.subfamily_name}, not ${subfamily}.`)
-      }
+    if (checkSubOrderFamily(newSpecies, existingSpecies)) {
+      errors.add(
+        `Family ${family} belongs to suborder ${existingSpecies.suborder_or_superfamily_name}, not ${subOrder}.`
+      )
+    }
+
+    if (checkFamilySubFamily(newSpecies, existingSpecies)) {
+      errors.add(`Subfamily ${subfamily} belongs to family ${existingSpecies.family_name}, not ${family}.`)
+    }
+
+    if (checkSubFamilyGenus(newSpecies, existingSpecies)) {
+      errors.add(`Genus ${genus} belongs to subfamily ${existingSpecies.subfamily_name}, not ${subfamily}.`)
     }
   }
   return errors
