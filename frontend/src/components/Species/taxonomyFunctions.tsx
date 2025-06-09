@@ -129,7 +129,11 @@ export const checkTaxonomy = (
     }
 
     if (checkGenus()) {
-      if (genus === existingSpecies.genus_name && family !== existingSpecies.family_name) {
+      if (
+        genus === existingSpecies.genus_name &&
+        family !== existingSpecies.family_name &&
+        existingSpecies.family_name !== 'incertae sedis'
+      ) {
         errors.add(`Genus ${genus} belongs to family ${existingSpecies.family_name}, not ${family}.`)
       }
       if (
