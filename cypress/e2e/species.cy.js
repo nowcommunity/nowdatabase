@@ -7,7 +7,7 @@ describe('Creating a species', () => {
     cy.login('testSu')
   })
 
-  it('with valid data works', () => {
+  it('with valid data works and is formatted properly', () => {
     cy.visit('/species/new')
     // spaces should be automatically removed
     cy.get('[id=subclass_or_superorder_name-textfield]').type('   testSuperOrder')

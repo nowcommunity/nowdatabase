@@ -38,6 +38,7 @@ const checkOrderFamily = (newSpecies: EditDataType<Species>, existingSpecies: Sp
     newSpecies.suborder_or_superfamily_name !== 'indet.' &&
     newSpecies.family_name !== 'indet.' &&
     newSpecies.family_name !== 'incertae sedis' &&
+    newSpecies.family_name !== 'fam.' &&
     newSpecies.family_name === existingSpecies.family_name &&
     newSpecies.order_name !== existingSpecies.order_name
   )
@@ -203,46 +204,19 @@ export const checkTaxonomy = (
   return errors
 }
 
+const convertTaxonomyField = (value: string | null | undefined) => {
+  let convertedValue = ''
+  if (value) {
+    if (!['incertae sedis', 'indet.', 'fam.', 'gen.', 'sp.'].includes(value)) {
+      convertedValue = value[0].toUpperCase() + value.slice(1).toLowerCase()
+    } else {
+      convertedValue = value
+    }
+  }
+  return convertedValue
+}
+
 export const convertTaxonomyFields = (species: EditDataType<Species>) => {
-  const subClass = species.subclass_or_superorder_name
-  const capitalizedSubClass = subClass ? subClass[0].toUpperCase() + subClass.slice(1).toLowerCase() : ''
-
-  const order = species.order_name
-  let capitalizedOrder = ''
-  if (order) {
-    if (order !== 'indet.' && order !== 'incertae sedis') {
-      capitalizedOrder = order[0].toUpperCase() + order.slice(1).toLowerCase()
-    } else {
-      capitalizedOrder = order
-    }
-  }
-
-  const subOrder = species.suborder_or_superfamily_name
-  const capitalizedSubOrder = subOrder ? subOrder[0].toUpperCase() + subOrder.slice(1).toLowerCase() : ''
-
-  const family = species.family_name
-  let capitalizedFamily = ''
-  if (family) {
-    if (family !== 'fam.' && family !== 'indet.' && family !== 'incertae sedis') {
-      capitalizedFamily = family[0].toUpperCase() + family.slice(1).toLowerCase()
-    } else {
-      capitalizedFamily = family
-    }
-  }
-
-  const subFamily = species.subfamily_name
-  const capitalizedSubfamily = subFamily ? subFamily[0].toUpperCase() + subFamily.slice(1).toLowerCase() : ''
-
-  const genus = species.genus_name
-  let capitalizedGenus = ''
-  if (genus) {
-    if (genus !== 'gen.' && genus !== 'indet.') {
-      capitalizedGenus = genus[0].toUpperCase() + genus.slice(1).toLowerCase()
-    } else {
-      capitalizedGenus = genus
-    }
-  }
-
   const speciesName = species.species_name
   let lowercasedSpeciesName = ''
   if (speciesName) {
@@ -252,15 +226,15 @@ export const convertTaxonomyFields = (species: EditDataType<Species>) => {
       lowercasedSpeciesName = speciesName
     }
   }
-
-  return {
+  const convertedSpecies = {
     ...species,
-    subclass_or_superorder_name: capitalizedSubClass,
-    order_name: capitalizedOrder,
-    suborder_or_superfamily_name: capitalizedSubOrder,
-    family_name: capitalizedFamily,
-    subfamily_name: capitalizedSubfamily,
-    genus_name: capitalizedGenus,
+    subclass_or_superorder_name: convertTaxonomyField(species.subclass_or_superorder_name),
+    order_name: convertTaxonomyField(species.order_name),
+    suborder_or_superfamily_name: convertTaxonomyField(species.suborder_or_superfamily_name),
+    family_name: convertTaxonomyField(species.family_name),
+    subfamily_name: convertTaxonomyField(species.subfamily_name),
+    genus_name: convertTaxonomyField(species.genus_name),
     species_name: lowercasedSpeciesName,
-  } as EditDataType<Species>
+  }
+  return convertedSpecies as EditDataType<Species>
 }

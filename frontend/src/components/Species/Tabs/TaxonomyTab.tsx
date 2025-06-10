@@ -32,6 +32,7 @@ export const TaxonomyTab = () => {
             subfamily_name: selectedSpecies.subfamily_name ?? '',
             genus_name: selectedSpecies.genus_name ?? '',
             species_name: selectedSpecies.species_name ?? '',
+            unique_identifier: selectedSpecies.unique_identifier ?? '',
           })
         }}
       />
