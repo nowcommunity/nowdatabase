@@ -5,8 +5,7 @@ const isDuplicateTaxon = (newSpecies: EditDataType<Species>, existingSpecies: Sp
     newSpecies.species_id !== existingSpecies.species_id &&
     newSpecies.genus_name === existingSpecies.genus_name &&
     newSpecies.species_name === existingSpecies.species_name &&
-    newSpecies.unique_identifier === existingSpecies.unique_identifier &&
-    !(newSpecies.genus_name === 'indet.' || newSpecies.species_name === 'indet.')
+    newSpecies.unique_identifier === existingSpecies.unique_identifier
   ) {
     return true
   }
