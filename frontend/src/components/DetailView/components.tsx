@@ -8,7 +8,7 @@ import { useDetailContext } from './Context/DetailContext'
 import { EditDataType, Editable, Reference, Species } from '@/shared/types'
 import { useState, useEffect, Fragment } from 'react'
 import { referenceValidator } from '@/shared/validators/validator'
-import { checkTaxonomy, convertTaxonomyFields } from '../Species/taxonomyFunctions'
+import { checkTaxonomy, convertTaxonomyFields } from '../../util/taxonomyFunctions'
 import { useLazyGetAllSpeciesQuery, useLazyGetAllSynonymsQuery } from '@/redux/speciesReducer'
 import { useNotify } from '@/hooks/notification'
 
