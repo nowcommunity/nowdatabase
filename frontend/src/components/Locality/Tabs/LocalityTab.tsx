@@ -183,7 +183,7 @@ export const LocalityTab = () => {
       </HalfFrames>
 
       <Grouped>
-        <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'flex-start', gap: 2, justifyContent: 'center' }}>
+        <Box sx={{ display: 'flex', flexDirection: 'row', gap: 2, justifyContent: 'center' }}>
           <ArrayFrame array={latlong} title="Latitude & Longitude" />
           <Box sx={{ minWidth: 250, minHeight: 250 }}>
             {locality && <LocalityMap dec_lat={editData.dec_lat} dec_long={editData.dec_long} />}
