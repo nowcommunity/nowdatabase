@@ -1,6 +1,7 @@
 import { Box, Button, Modal, Tooltip } from '@mui/material'
 import { ReactNode, useState } from 'react'
 import { modalStyle } from './misc'
+import '../../../styles/modal.css'
 
 /* 
   buttonText = Text for the button that opens modal
@@ -43,14 +44,14 @@ export const EditingModal = ({
       <Button data-cy={dataCy} onClick={() => setOpen(true)} variant="contained" sx={{ marginBottom: '1em' }}>
         {buttonText}
       </Button>
-    )
-  }
 
-  return (
-    <Box>
-      <OpenModalButton />
-      <Modal open={open} aria-labelledby={`modal-${buttonText}`} aria-describedby={`modal-${buttonText}`}>
-        <Box sx={{ ...modalStyle }}>
+      <Modal
+        open={open}
+        aria-labelledby={`modal-${buttonText}`}
+        aria-describedby={`modal-${buttonText}`}
+        className="modal big"
+      >
+        <Box sx={{ ...modalStyle }} className="modal-content">
           <Box marginBottom="2em" marginTop="1em">
             {' '}
             {children}
