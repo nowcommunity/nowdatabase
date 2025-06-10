@@ -208,7 +208,14 @@ const convertTaxonomyField = (value: string | null | undefined) => {
   let convertedValue = ''
   if (value) {
     if (!['incertae sedis', 'indet.', 'fam.', 'gen.', 'sp.'].includes(value)) {
-      convertedValue = value[0].toUpperCase() + value.slice(1).toLowerCase()
+      if (value.indexOf('/') !== -1) {
+        const words = value.split('/')
+        const convertedWord1 = words[0][0].toUpperCase() + words[0].slice(1).toLowerCase()
+        const convertedWord2 = words[1][0].toUpperCase() + words[1].slice(1).toLowerCase()
+        convertedValue = `${convertedWord1}/${convertedWord2}`
+      } else {
+        convertedValue = value[0].toUpperCase() + value.slice(1).toLowerCase()
+      }
     } else {
       convertedValue = value
     }
