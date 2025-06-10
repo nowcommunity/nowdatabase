@@ -15,6 +15,8 @@ export const validateSpecies = (
       name: 'Subclass or Superorder',
       asString: (subClassName: string) => {
         if (subClassName.indexOf(' ') !== -1) return 'Subclass must not contain any spaces.'
+        if (subClassName.indexOf('/') !== -1 && editData.taxonomic_status !== 'informal species')
+          return 'Subclass must not contain a forward slash (/), unless Taxonomic Status is set to "informal species".'
         return
       },
     },
@@ -24,6 +26,8 @@ export const validateSpecies = (
       asString: (orderName: string) => {
         if (orderName !== 'incertae sedis' && orderName.indexOf(' ') !== -1)
           return 'Order must not contain any spaces, unless the value is "incertae sedis".'
+        if (orderName.indexOf('/') !== -1 && editData.taxonomic_status !== 'informal species')
+          return 'Order must not contain a forward slash (/), unless Taxonomic Status is set to "informal species".'
         return
       },
     },
@@ -31,6 +35,8 @@ export const validateSpecies = (
       name: 'Suborder or Superfamily',
       asString: (subOrderName: string) => {
         if (subOrderName.indexOf(' ') !== -1) return 'Suborder must not contain any spaces.'
+        if (subOrderName.indexOf('/') !== -1 && editData.taxonomic_status !== 'informal species')
+          return 'Suborder must not contain a forward slash (/), unless Taxonomic Status is set to "informal species".'
         return
       },
     },
@@ -42,6 +48,8 @@ export const validateSpecies = (
           return 'Family must not contain any spaces, unless the value is "incertae sedis".'
         if (familyName !== 'indet.' && editData.order_name === 'indet.')
           return 'when the Family is indet., Genus must also be indet.'
+        if (familyName.indexOf('/') !== -1 && editData.taxonomic_status !== 'informal species')
+          return 'Family must not contain a forward slash (/), unless Taxonomic Status is set to "informal species".'
         return
       },
     },
@@ -49,6 +57,8 @@ export const validateSpecies = (
       name: 'Subfamily or Tribe',
       asString: (subFamilyName: string) => {
         if (subFamilyName.indexOf(' ') !== -1) return 'Subfamily must not contain any spaces.'
+        if (subFamilyName.indexOf('/') !== -1 && editData.taxonomic_status !== 'informal species')
+          return 'Subfamily must not contain a forward slash (/), unless Taxonomic Status is set to "informal species".'
         return
       },
     },
@@ -61,6 +71,8 @@ export const validateSpecies = (
           return 'when the Family is indet., Genus must also be indet.'
         if (genusName !== 'gen.' && editData.family_name === 'fam.')
           return 'when the Family is fam., Genus must be gen.'
+        if (genusName.indexOf('/') !== -1 && editData.taxonomic_status !== 'informal species')
+          return 'Genus must not contain a forward slash (/), unless Taxonomic Status is set to "informal species".'
         return
       },
     },
@@ -72,6 +84,8 @@ export const validateSpecies = (
           return 'when the Genus is indet., Species must also be indet.'
         if (speciesName !== 'sp.' && editData.genus_name === 'gen.')
           return 'when the Genus is gen., Species must be sp.'
+        if (speciesName.indexOf('/') !== -1 && editData.taxonomic_status !== 'informal species')
+          return 'Species must not contain a forward slash (/), unless Taxonomic Status is set to "informal species".'
         return
       },
     },
