@@ -111,6 +111,7 @@ export const WriteButton = <T,>({
         notify(errorMessage, 'error', null)
         return
       }
+      notify('', undefined, 0)
       setEditData(speciesEditData as EditDataType<T>)
 
       if (hasStagingMode) {

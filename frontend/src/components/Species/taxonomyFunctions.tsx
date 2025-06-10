@@ -34,6 +34,7 @@ const checkOrderFamily = (newSpecies: EditDataType<Species>, existingSpecies: Sp
     newSpecies.subclass_or_superorder_name !== 'indet.' &&
     newSpecies.order_name !== 'indet.' &&
     newSpecies.order_name !== 'incertae sedis' &&
+    existingSpecies.order_name !== 'incertae sedis' &&
     newSpecies.suborder_or_superfamily_name !== 'indet.' &&
     newSpecies.family_name !== 'indet.' &&
     newSpecies.family_name !== 'incertae sedis' &&
@@ -50,6 +51,7 @@ const checkFamilyGenus = (newSpecies: EditDataType<Species>, existingSpecies: Sp
     newSpecies.suborder_or_superfamily_name !== 'indet.' &&
     newSpecies.family_name !== 'indet.' &&
     newSpecies.family_name !== 'incertae sedis' &&
+    existingSpecies.family_name !== 'incertae sedis' &&
     newSpecies.subfamily_name !== 'indet.' &&
     newSpecies.genus_name !== 'indet.' &&
     newSpecies.genus_name !== 'gen.' &&
