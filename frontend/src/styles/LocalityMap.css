@@ -27,7 +27,6 @@
 
 #map-container.open > div {
   opacity: 1;
-  display: flex;
 }
 
 .map-locality-container > div {
