@@ -473,3 +473,10 @@ export type GeonamesJSON = {
 }
 
 export type ParsedGeoname = Pick<Geoname, 'name' | 'countryName' | 'fclName' | 'adminName1' | 'lat' | 'lng'>
+
+export type SimplifiedLocality = {
+  lid: number
+  dec_lat: number
+  dec_long: number
+  loc_name: string
+}

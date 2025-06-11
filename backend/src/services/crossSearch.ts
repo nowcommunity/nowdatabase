@@ -6,9 +6,10 @@ import {
   ParsedCrossSearchRouteParameters,
   SortingState,
   ColumnFilter,
+  SimplifiedLocality,
 } from '../../../frontend/src/shared/types'
 import { getCrossSearchFields, getFieldsOfTables, nowDb } from '../utils/db'
-import { generateCrossSearchSql } from './queries/crossSearchQuery'
+import { generateCrossSearchLocalitiesSql, generateCrossSearchSql } from './queries/crossSearchQuery'
 import { ValidationObject } from '../../../frontend/src/shared/validators/validator'
 import { validateCrossSearchRouteParams } from '../../../frontend/src/shared/validators/crossSearch'
 
@@ -123,6 +124,51 @@ export const getCrossSearchRawSql = async (
   )
 
   const result: Partial<CrossSearch>[] = await nowDb.$queryRaw(sql)
+  return result
+}
+
+export const getCrossSearchLocalitiesRawSql = async (
+  user: User | undefined,
+  columnFilters?: ColumnFilter[],
+  sorting?: SortingState[]
+) => {
+  let orderBy: string | undefined
+  let descendingOrder: boolean = false
+  if (!sorting || sorting.length === 0) {
+    orderBy = undefined
+  } else {
+    orderBy = sorting[0].id
+    descendingOrder = sorting[0].desc
+  }
+
+  let convertedOrderBy = undefined
+  if (orderBy) {
+    convertedOrderBy = convertFilterIdToFieldName(orderBy)
+    if (!getCrossSearchFields().includes(convertedOrderBy)) throw new Error('orderBy was not a valid column id.')
+  }
+
+  const convertedColumnFilters = []
+  if (columnFilters) {
+    const allowedColumns = getCrossSearchFields()
+    for (const filter of columnFilters) {
+      const convertedId = convertFilterIdToFieldName(filter.id)
+      if (!allowedColumns.includes(convertedId)) throw new Error('columnFilters has an invalid column id.')
+      convertedColumnFilters.push({ id: convertedId, value: filter.value })
+    }
+  }
+
+  const showAll = user ? [Role.Admin, Role.EditUnrestricted].includes(user.role) : false
+  const allowedLocalities = user ? await getAllowedLocalities(user) : []
+
+  const sql = generateCrossSearchLocalitiesSql(
+    showAll,
+    allowedLocalities,
+    convertedColumnFilters,
+    convertedOrderBy,
+    descendingOrder
+  )
+
+  const result: Partial<SimplifiedLocality>[] = await nowDb.$queryRaw(sql)
   return result
 }
 
