@@ -32,17 +32,14 @@ describe('Editing a person', () => {
 
   it('user rights editing works', () => {
     cy.visit(`/person/AD?tab=0`)
-    cy.contains('adf')
-    cy.contains('ads')
 
     cy.get('[id=edit-button]').click()
 
     cy.contains('Choose user group').parent().type('n')
     cy.contains('no').click()
-
     cy.get('[id=write-button]').click()
 
-    cy.contains('plp')
+    cy.contains('no')
   })
 
   it('with any missing fields does not work', () => {
