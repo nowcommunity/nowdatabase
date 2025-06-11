@@ -1,6 +1,6 @@
 import { MRT_ColumnFiltersState, MRT_SortingState } from 'material-react-table'
 import { api } from './api'
-import { CrossSearch } from '@/shared/types'
+import { CrossSearch, SimplifiedLocality } from '@/shared/types'
 
 const crossSearchApi = api.injectEndpoints({
   endpoints: builder => ({
@@ -13,7 +13,16 @@ const crossSearchApi = api.injectEndpoints({
       }),
       providesTags: result => (result ? [{ type: 'localities' }] : []),
     }),
+    getAllCrossSearchLocalities: builder.query<
+      SimplifiedLocality[],
+      { columnFilters: MRT_ColumnFiltersState; sorting: MRT_SortingState }
+    >({
+      query: ({ columnFilters, sorting }) => ({
+        url: `/crosssearch/localities/${JSON.stringify(columnFilters)}/${JSON.stringify(sorting)}`,
+      }),
+      providesTags: result => (result ? [{ type: 'localities' }] : []),
+    }),
   }),
 })
 
-export const { useGetAllCrossSearchQuery } = crossSearchApi
+export const { useGetAllCrossSearchQuery, useGetAllCrossSearchLocalitiesQuery } = crossSearchApi
