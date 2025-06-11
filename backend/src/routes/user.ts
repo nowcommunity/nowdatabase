@@ -129,7 +129,7 @@ router.put('/password', async (req, res) => {
 
   if (newPassword.length < 8) return res.status(400).send({ error: 'New password must be at least 8 characters long.' })
 
-  if (!/^[0-9A-Za-z$%&~]+/.test(newPassword))
+  if (!/^[0-9A-Za-z$%&~]+$/.test(newPassword))
     return res
       .status(400)
       .send({ error: 'Use only alphanumeric characters a-z, A-Z and 0-9 and symbols ^?$%&~ in the new password.' })
