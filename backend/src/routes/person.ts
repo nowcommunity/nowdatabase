@@ -62,7 +62,7 @@ router.put(
       editedPerson.now_user_group &&
       validUserGroups.includes(editedPerson.now_user_group)
     ) {
-      writeUserGroup(editedPerson.user_id, editedPerson.now_user_group as UserGroup)
+      await writeUserGroup(editedPerson.user_id, editedPerson.now_user_group as UserGroup)
     }
 
     return res.status(200).send({ initials })
