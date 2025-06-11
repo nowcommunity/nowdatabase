@@ -1,16 +1,11 @@
 import { useGetLocalityDetailsQuery } from '../../redux/localityReducer'
 import { useState, useEffect, useRef } from 'react'
 import 'leaflet/dist/leaflet.css'
-import L, { LatLngExpression } from 'leaflet'
 import { borders } from './country_borders_WGS84'
 import { Button } from '@mui/material'
 import MapIcon from '@mui/icons-material/Map'
-<<<<<<< HEAD
 import L, { LatLngExpression } from 'leaflet'
 import { SimplifiedLocality } from '@/shared/types/data.js'
-=======
-import { Locality } from '@/shared/types/data.js'
->>>>>>> 20796bf2365fa057240a3bb105ac22c7423c2046
 import { usePageContext } from '../Page'
 import { skipToken } from '@reduxjs/toolkit/query'
 import './leaflet.markercluster.js'
