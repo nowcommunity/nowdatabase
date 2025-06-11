@@ -55,7 +55,7 @@ describe('Editing a person', () => {
     cy.get('[id=organization-textfield]').type('test organization')
 
     cy.get('[id=Country-multiselect]').click()
-    cy.get('[data-testid=CloseIcon]').click() // clears the country dropdown
+    cy.get('[id=Country-multiselect]').children('[data-testid=CloseIcon]').click() // clears the country dropdown
     cy.contains('Country: This field is required')
     cy.get('[id=write-button]').should('be.disabled')
     cy.get('[id=Country-multiselect]').type('Andorra')
