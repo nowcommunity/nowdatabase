@@ -1,1 +1,1 @@
-![Architecture Diagram](./documentation/images/architecture.drawio.svg)
+![Architecture Diagram](./images/architecture.drawio.svg)
