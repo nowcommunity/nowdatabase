@@ -1,12 +1,13 @@
 import { useMemo } from 'react'
 import { MRT_TableInstance, type MRT_ColumnDef, MRT_RowData } from 'material-react-table'
 import { useGetAllLocalitiesQuery, useGetLocalitySpeciesListMutation } from '../../redux/localityReducer'
-import { Locality } from '@/shared/types'
+import { SimplifiedLocality, Locality } from '@/shared/types'
 import { TableView } from '../TableView/TableView'
 import { useNotify } from '@/hooks/notification'
 import { LocalitiesMap } from '../Map/LocalitiesMap'
 import { generateKml } from '@/util/kml'
 import { generateSvg } from '../Map/generateSvg'
+import { usePageContext } from '../Page'
 
 const decimalCount = (num: number) => {
   const numAsString = num.toString()
@@ -20,6 +21,7 @@ export const LocalityTable = ({ selectorFn }: { selectorFn?: (newObject: Localit
   const { data: localitiesQueryData, isFetching: localitiesQueryIsFetching } = useGetAllLocalitiesQuery()
   const [getLocalitySpeciesList, { isLoading }] = useGetLocalitySpeciesListMutation()
   const notify = useNotify()
+  const columnFilters = usePageContext()
   const columns = useMemo<MRT_ColumnDef<Locality>[]>(
     () => [
       {
@@ -413,9 +415,17 @@ export const LocalityTable = ({ selectorFn }: { selectorFn?: (newObject: Localit
     return !!row.loc_status
   }
 
+  // Filter localities for the map component
+  const localityIds = columnFilters.idList as unknown as number[]
+  const validIds = localityIds.filter(id => typeof id === 'number')
+  const filteredLocalities = localitiesQueryData?.filter(locality => validIds.includes(locality.lid))
+
   return (
     <>
-      <LocalitiesMap localitiesQueryData={localitiesQueryData} localitiesQueryIsFetching={localitiesQueryIsFetching} />
+      <LocalitiesMap
+        localitiesQueryData={filteredLocalities as SimplifiedLocality[]}
+        localitiesQueryIsFetching={localitiesQueryIsFetching}
+      />
       <TableView<Locality>
         title="Localities"
         selectorFn={selectorFn}
