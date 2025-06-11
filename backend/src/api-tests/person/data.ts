@@ -14,6 +14,7 @@ export const existingPerson: Omit<PersonDetailsType, 'user'> = {
   used_morph: null,
   used_now: null,
   used_gene: null,
+  now_user_group: 'eu',
 }
 
 export const editedPerson = {
