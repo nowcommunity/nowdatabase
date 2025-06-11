@@ -1,6 +1,6 @@
 import { useMemo } from 'react'
 import { type MRT_ColumnDef } from 'material-react-table'
-import { CrossSearch, SimplifiedLocality } from '@/shared/types'
+import { CrossSearch } from '@/shared/types'
 import { TableView } from '../TableView/TableView'
 import { useGetAllCrossSearchQuery, useGetAllCrossSearchLocalitiesQuery } from '@/redux/crossSearchReducer'
 import { usePageContext } from '../Page'
@@ -807,7 +807,10 @@ export const CrossSearchTable = ({ selectorFn }: { selectorFn?: (newObject: Cros
 
   return (
     <>
-      <LocalitiesMap localitiesQueryData={localitiesData} localitiesQueryIsFetching={localitiesFetching} />
+      <LocalitiesMap
+        localitiesQueryData={localitiesData}
+        localitiesQueryIsFetching={localitiesFetching || isFetching}
+      />
       <TableView<CrossSearch>
         title="Locality-Species-Cross-Search"
         selectorFn={selectorFn}

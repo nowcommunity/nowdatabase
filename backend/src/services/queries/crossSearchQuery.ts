@@ -15,7 +15,7 @@ const generateWhereClause = (showAll: boolean, allowedLocalities: Array<number>,
   else {
     const conditions: Prisma.Sql[] = []
     for (const filter of columnFilters) {
-      const newQuery = Prisma.sql`${Prisma.raw(filter.id)} = ${filter.value}`
+      const newQuery = Prisma.sql`${Prisma.raw(filter.id)} LIKE ${'%' + filter.value + '%'}`
       conditions.push(newQuery)
     }
 
@@ -257,7 +257,6 @@ export const generateCrossSearchSql = (
   `
 }
 
-// change name
 export const generateCrossSearchLocalitiesSql = (
   showAll: boolean,
   allowedLocalities: Array<number>,

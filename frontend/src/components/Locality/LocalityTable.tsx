@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from 'react'
+import { useMemo } from 'react'
 import { MRT_TableInstance, type MRT_ColumnDef, MRT_RowData } from 'material-react-table'
 import { useGetAllLocalitiesQuery, useGetLocalitySpeciesListMutation } from '../../redux/localityReducer'
 import { SimplifiedLocality, Locality } from '@/shared/types'
@@ -416,14 +416,15 @@ export const LocalityTable = ({ selectorFn }: { selectorFn?: (newObject: Localit
     return !!row.loc_status
   }
 
+  // Filter localities for the map component
   const localityIds = columnFilters.idList as unknown as number[]
   const validIds = localityIds.filter(id => typeof id === 'number')
-  const simplifiedData = localitiesQueryData?.filter(locality => validIds.includes(locality.lid))
+  const filteredLocalities = localitiesQueryData?.filter(locality => validIds.includes(locality.lid))
 
   return (
     <>
       <LocalitiesMap
-        localitiesQueryData={simplifiedData as SimplifiedLocality[]}
+        localitiesQueryData={filteredLocalities as SimplifiedLocality[]}
         localitiesQueryIsFetching={localitiesQueryIsFetching}
       />
       <TableView<Locality>
