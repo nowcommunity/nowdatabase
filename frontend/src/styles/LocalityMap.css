@@ -16,6 +16,7 @@
 
 #map-container.open {
   height: var(--map-height);
+  display: flex;
 }
 
 #map-container > div {
@@ -26,6 +27,12 @@
 
 #map-container.open > div {
   opacity: 1;
+}
+
+.map-locality-container > div {
+  height: 250px;
+  margin-top: 2rem;
+  border-radius: 0.25em;
 }
 
 #localities-map .button-row {
@@ -44,10 +51,4 @@
   border-radius: 0.25em;
   border: none;
   box-shadow: 0 0 0 0.15em rgba(0, 0, 0, 0.22);
-}
-
-.map-locality-container > div {
-  height: 30vh;
-  margin-top: 2rem;
-  border-radius: 0.25em;
 }
