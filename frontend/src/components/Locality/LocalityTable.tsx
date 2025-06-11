@@ -402,7 +402,6 @@ export const LocalityTable = ({ selectorFn }: { selectorFn?: (newObject: Localit
 
   const svgExport = <T extends MRT_RowData>(table: MRT_TableInstance<T>) => {
     const rowData: Locality[] = table.getPrePaginationRowModel().rows.map(row => row.original as unknown as Locality)
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const dataString = generateSvg(rowData)
     const blob = new Blob([dataString], { type: 'image/svg+xml' })
     const url = URL.createObjectURL(blob)
