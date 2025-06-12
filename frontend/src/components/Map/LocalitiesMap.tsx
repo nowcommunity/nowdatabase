@@ -13,7 +13,7 @@ import './MarkerCluster.css'
 import './MarkerCluster.Default.css'
 import { SlidingModal } from './SlidingModal.tsx'
 import { LocalityInfo } from './LocalityDetailsPanel.tsx'
-import '../../styles/LocalityMap.css'
+import '../../styles/LocalitiesMap.css'
 import northarrow from './images/north-arrow.png'
 
 interface Props {
