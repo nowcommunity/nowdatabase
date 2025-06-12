@@ -7,7 +7,7 @@ import { logDb, nowDb } from '../utils/db'
 import { getReferenceDetails } from './reference'
 
 export const getAllSpecies = async () => {
-  const result = await nowDb.com_species.findMany({
+  const speciesResult = await nowDb.com_species.findMany({
     select: {
       species_id: true,
       order_name: true,
@@ -53,6 +53,17 @@ export const getAllSpecies = async () => {
       sp_comment: true,
     },
   })
+
+  const synonyms: { species_id: number }[] = await nowDb.com_taxa_synonym.findMany({
+    select: { species_id: true },
+    distinct: ['species_id'],
+  })
+
+  const synonymIdSet = new Set(synonyms.map(s => s.species_id))
+  const result = speciesResult.map(sp => ({
+    ...sp,
+    has_synonym: synonymIdSet.has(sp.species_id),
+  }))
 
   return result
 }
