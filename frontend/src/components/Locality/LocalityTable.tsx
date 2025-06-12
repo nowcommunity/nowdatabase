@@ -30,7 +30,7 @@ export const LocalityTable = ({ selectorFn }: { selectorFn?: (newObject: Localit
     const validIds = localityIds.filter(id => typeof id === 'number')
     const localities = localitiesQueryData?.filter(locality => validIds.includes(locality.lid))
     setFilteredLocalities(localities as SimplifiedLocality[])
-  }, [columnFilters])
+  }, [columnFilters, localitiesQueryData])
 
   const columns = useMemo<MRT_ColumnDef<Locality>[]>(
     () => [
