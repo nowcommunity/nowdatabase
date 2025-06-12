@@ -17,14 +17,14 @@ import '../../styles/LocalitiesMap.css'
 import northarrow from './images/north-arrow.png'
 
 interface Props {
-  localitiesQueryData?: SimplifiedLocality[]
-  localitiesQueryIsFetching: boolean
+  localities?: SimplifiedLocality[]
+  isFetching: boolean
 }
 
 type CustomCircleMarkerOptions = L.CircleMarkerOptions & { localityId: number }
 type CustomCircleMarker = L.CircleMarker & { options: CustomCircleMarkerOptions }
 
-export const LocalitiesMap = ({ localitiesQueryData, localitiesQueryIsFetching }: Props) => {
+export const LocalitiesMap = ({ localities, isFetching }: Props) => {
   const [selectedLocality, setSelectedLocality] = useState<string | null>(null)
   const mapRef = useRef<HTMLDivElement | null>(null)
   const [map, setMap] = useState<L.Map | null>(null)
@@ -107,7 +107,7 @@ export const LocalitiesMap = ({ localitiesQueryData, localitiesQueryIsFetching }
   }, [])
 
   useEffect(() => {
-    if (!map || localitiesQueryIsFetching) return
+    if (!map || isFetching) return
 
     // To prevent eslint from complaining about that 'markers' variable below:
     /* eslint-disable @typescript-eslint/no-unsafe-assignment */
@@ -119,7 +119,7 @@ export const LocalitiesMap = ({ localitiesQueryData, localitiesQueryIsFetching }
     // with no module exports that extends 'L' when imported
     const newMarkers: Layer = cluster ? L.markerClusterGroup() : L.layerGroup()
 
-    localitiesQueryData?.forEach(locality => {
+    localities?.forEach(locality => {
       const options: CustomCircleMarkerOptions = {
         localityId: locality.lid,
         radius: 4,
@@ -150,7 +150,7 @@ export const LocalitiesMap = ({ localitiesQueryData, localitiesQueryIsFetching }
       // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
       map.removeLayer(newMarkers)
     }
-  }, [localitiesQueryData, localitiesQueryIsFetching, columnFilters, map, cluster])
+  }, [localities, isFetching, columnFilters, map, cluster])
 
   document.title = 'Map'
 
@@ -165,7 +165,7 @@ export const LocalitiesMap = ({ localitiesQueryData, localitiesQueryIsFetching }
             </button>
           )}
         </div>
-        {!localitiesQueryIsFetching && localitiesQueryData && (
+        {!isFetching && localities && (
           <div className="button-row">
             <Button variant="contained" startIcon={<MapIcon />} onClick={() => setIsOpen(v => !v)}>
               {isOpen ? 'Close' : 'Open'} map
