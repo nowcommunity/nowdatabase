@@ -1,7 +1,7 @@
-import { useMemo } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { MRT_TableInstance, type MRT_ColumnDef, MRT_RowData } from 'material-react-table'
 import { useGetAllLocalitiesQuery, useGetLocalitySpeciesListMutation } from '../../redux/localityReducer'
-import { SimplifiedLocality, Locality } from '@/shared/types'
+import { Locality, SimplifiedLocality } from '@/shared/types'
 import { TableView } from '../TableView/TableView'
 import { useNotify } from '@/hooks/notification'
 import { LocalitiesMap } from '../Map/LocalitiesMap'
@@ -20,8 +20,18 @@ const decimalCount = (num: number) => {
 export const LocalityTable = ({ selectorFn }: { selectorFn?: (newObject: Locality) => void }) => {
   const { data: localitiesQueryData, isFetching: localitiesQueryIsFetching } = useGetAllLocalitiesQuery()
   const [getLocalitySpeciesList, { isLoading }] = useGetLocalitySpeciesListMutation()
-  const notify = useNotify()
+  const [filteredLocalities, setFilteredLocalities] = useState<SimplifiedLocality[]>()
   const columnFilters = usePageContext()
+  const notify = useNotify()
+
+  useEffect(() => {
+    // Filter localities for the map component
+    const localityIds = columnFilters.idList as unknown as number[]
+    const validIds = localityIds.filter(id => typeof id === 'number')
+    const localities = localitiesQueryData?.filter(locality => validIds.includes(locality.lid))
+    setFilteredLocalities(localities as SimplifiedLocality[])
+  }, [columnFilters, localitiesQueryData])
+
   const columns = useMemo<MRT_ColumnDef<Locality>[]>(
     () => [
       {
@@ -415,17 +425,9 @@ export const LocalityTable = ({ selectorFn }: { selectorFn?: (newObject: Localit
     return !!row.loc_status
   }
 
-  // Filter localities for the map component
-  const localityIds = columnFilters.idList as unknown as number[]
-  const validIds = localityIds.filter(id => typeof id === 'number')
-  const filteredLocalities = localitiesQueryData?.filter(locality => validIds.includes(locality.lid))
-
   return (
     <>
-      <LocalitiesMap
-        localitiesQueryData={filteredLocalities as SimplifiedLocality[]}
-        localitiesQueryIsFetching={localitiesQueryIsFetching}
-      />
+      <LocalitiesMap localities={filteredLocalities} isFetching={localitiesQueryIsFetching} />
       <TableView<Locality>
         title="Localities"
         selectorFn={selectorFn}

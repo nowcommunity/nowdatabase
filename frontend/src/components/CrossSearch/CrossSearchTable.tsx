@@ -807,10 +807,7 @@ export const CrossSearchTable = ({ selectorFn }: { selectorFn?: (newObject: Cros
 
   return (
     <>
-      <LocalitiesMap
-        localitiesQueryData={localitiesData}
-        localitiesQueryIsFetching={localitiesFetching || isFetching}
-      />
+      <LocalitiesMap localities={localitiesData} isFetching={localitiesFetching || isFetching} />
       <TableView<CrossSearch>
         title="Locality-Species-Cross-Search"
         selectorFn={selectorFn}
