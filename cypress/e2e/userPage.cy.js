@@ -20,7 +20,7 @@ describe('Change password form validates passwords correctly and shows errors to
     cy.contains('Please fill all fields.')
     cy.get('[id=new-password-verification-textfield]').type('test2')
     cy.get('[id=change-password-button]').click()
-    cy.contains('New password must be at least 8 characters long.')
+    cy.contains('Password must be at least 8 characters long')
   })
 
   it('Incorrect old password', () => {
@@ -40,14 +40,14 @@ describe('Change password form validates passwords correctly and shows errors to
     cy.get('[id=new-password-textfield]').type('short')
     cy.get('[id=new-password-verification-textfield]').type('short')
     cy.get('[id=change-password-button]').click()
-    cy.contains('New password must be at least 8 characters long.')
+    cy.contains('Password must be at least 8 characters long')
 
     cy.get('[id=new-password-textfield]').clear()
     cy.get('[id=new-password-textfield]').type('€uroisnotallowed')
     cy.get('[id=new-password-verification-textfield]').clear()
     cy.get('[id=new-password-verification-textfield]').type('€uroisnotallowed')
     cy.get('[id=change-password-button]').click()
-    cy.contains('Use only alphanumeric characters a-z, A-Z and 0-9 and symbols ^?$%&~ in the new password.')
+    cy.contains('Password must only contain characters a-z, A-Z, 0-9 and ^?$%&~!')
   })
 
   it('New password and verification do not match', () => {

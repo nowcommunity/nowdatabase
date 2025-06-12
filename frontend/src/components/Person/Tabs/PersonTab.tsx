@@ -22,6 +22,7 @@ export const PersonTab = () => {
   }, [currentUser])
 
   const countryOptions = ['', ...validCountries]
+  const userGroupOptions = ['su', 'eu', 'er', 'pl', 'plp', 'no', 'ro']
 
   const person = [
     ['Initials', textField('initials', { type: 'text', disabled: true })],
@@ -37,7 +38,10 @@ export const PersonTab = () => {
     ? [
         ['User Name', data.user?.user_name ?? ''],
         ['Last log in', lastLogin ? formatLastLoginDate(lastLogin) : 'No data'],
-        ['User Group', data.user?.now_user_group ?? ''],
+        [
+          'User Group',
+          dropdownWithSearch('now_user_group', userGroupOptions, 'User Group', false, 'Choose user group'),
+        ],
       ]
     : [['Not a user']]
 

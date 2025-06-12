@@ -15,7 +15,9 @@ export type SpeciesLocality = FixBigInt<Prisma.now_ls> & { now_loc: Prisma.now_l
 export type LocalityUpdate = Prisma.now_lau & { now_lr: LocalityReference[] } & { updates: UpdateLog[] }
 export type SpeciesUpdate = Prisma.now_sau & { now_sr: SpeciesReference[] } & { updates: UpdateLog[] }
 export type Museum = Prisma.com_mlist
-export type PersonDetailsType = Prisma.com_people & { user: Omit<Prisma.com_users, 'password, newpassword'> | null }
+export type PersonDetailsType = Prisma.com_people & { user: Omit<Prisma.com_users, 'password, newpassword'> | null } & {
+  now_user_group: string
+}
 export type ProjectPeople = Prisma.now_proj_people
 export type ProjectDetailsType = Prisma.now_proj & { now_proj_people: Array<ProjectPeople> }
 export type Project = Prisma.now_proj
