@@ -1,7 +1,7 @@
 import { useMemo } from 'react'
 import { MRT_TableInstance, type MRT_ColumnDef, MRT_RowData } from 'material-react-table'
 import { useGetAllLocalitiesQuery, useGetLocalitySpeciesListMutation } from '../../redux/localityReducer'
-import { SimplifiedLocality, Locality } from '@/shared/types'
+import { Locality } from '@/shared/types'
 import { TableView } from '../TableView/TableView'
 import { useNotify } from '@/hooks/notification'
 import { LocalitiesMap } from '../Map/LocalitiesMap'
@@ -422,10 +422,9 @@ export const LocalityTable = ({ selectorFn }: { selectorFn?: (newObject: Localit
 
   return (
     <>
-      <LocalitiesMap
-        localitiesQueryData={filteredLocalities as SimplifiedLocality[]}
-        localitiesQueryIsFetching={localitiesQueryIsFetching}
-      />
+      {filteredLocalities && (
+        <LocalitiesMap localitiesQueryData={filteredLocalities} localitiesQueryIsFetching={localitiesQueryIsFetching} />
+      )}
       <TableView<Locality>
         title="Localities"
         selectorFn={selectorFn}
