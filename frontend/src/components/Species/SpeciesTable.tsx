@@ -3,9 +3,16 @@ import { type MRT_ColumnDef } from 'material-react-table'
 import { useGetAllSpeciesQuery } from '../../redux/speciesReducer'
 import { Species } from '@/shared/types'
 import { TableView } from '../TableView/TableView'
+import { useNavigate } from 'react-router-dom'
 
 export const SpeciesTable = ({ selectorFn }: { selectorFn?: (id: Species) => void }) => {
   const { data: speciesQueryData, isFetching } = useGetAllSpeciesQuery()
+  const navigate = useNavigate()
+
+  const handleSpeciesRowActionClick = (row: Species) => {
+    navigate(`/species/${row.species_id}?tab=1`)
+  }
+
   const columns = useMemo<MRT_ColumnDef<Species>[]>(
     () => [
       {
@@ -377,6 +384,7 @@ export const SpeciesTable = ({ selectorFn }: { selectorFn?: (id: Species) => voi
       data={speciesQueryData}
       url="species"
       enableColumnFilterModes={true}
+      tableRowAction={handleSpeciesRowActionClick}
     />
   )
 }

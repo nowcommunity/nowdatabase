@@ -35,6 +35,7 @@ export const TableView = <T extends MRT_RowData>({
   idFieldName,
   checkRowRestriction,
   selectorFn,
+  tableRowAction,
   url,
   title,
   combinedExport,
@@ -52,6 +53,8 @@ export const TableView = <T extends MRT_RowData>({
   idFieldName: keyof T
   checkRowRestriction?: (row: T) => boolean
   selectorFn?: (id: T) => void
+  // here
+  tableRowAction?: (row: T) => void
   url?: string
   title?: string
   combinedExport?: (lids: number[]) => Promise<void>
@@ -133,10 +136,12 @@ export const TableView = <T extends MRT_RowData>({
       return (
         <Box sx={{ display: 'flex', flexWrap: 'nowrap', gap: '8px' }}>
           <ActionComponent {...{ selectorFn, url, checkRowRestriction, row, idFieldName }} />
-          {hasSynonym && (
+          {/* {hasSynonym && (
             <button onClick={() => alert(`Synonym exists for id ${row.original[idFieldName]}`)}>Synonym icon</button>
+          )} */}
+          {hasSynonym && (
+            <ActionComponent {...{ selectorFn, tableRowAction, url, checkRowRestriction, row, idFieldName }} />
           )}
-          {/* {hasSynonym && <ActionComponent {...{ selectorFn, url, checkRowRestriction, row, idFieldName }} />} */}
         </Box>
       )
     },

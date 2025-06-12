@@ -3,6 +3,8 @@ import { MRT_RowData, MRT_Row } from 'material-react-table'
 import { useNavigate } from 'react-router-dom'
 import ManageSearchIcon from '@mui/icons-material/ManageSearch'
 import PolicyIcon from '@mui/icons-material/Policy'
+import StarIcon from '@mui/icons-material/Star'
+import HelpCenter from '@mui/icons-material/HelpCenter'
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline'
 
 export const ActionComponent = <T extends MRT_RowData>({
@@ -11,25 +13,33 @@ export const ActionComponent = <T extends MRT_RowData>({
   checkRowRestriction,
   url,
   selectorFn,
+  tableRowAction,
 }: {
   row: MRT_Row<T>
   idFieldName: keyof T
   checkRowRestriction?: ((row: T) => boolean) | undefined
   url: string | undefined
   selectorFn?: (id: T) => void
+  tableRowAction?: (row: T) => void
 }) => {
   const navigate = useNavigate()
 
   const id = row.original[idFieldName]
 
   const getIconToShow = () => {
-    if (selectorFn) return <AddCircleOutlineIcon />
+    if (selectorFn) {
+      return <AddCircleOutlineIcon />
+    } else if (tableRowAction) {
+      return <HelpCenter />
+    }
     return <ManageSearchIcon />
   }
 
   const onClick = () => {
     if (selectorFn) {
       selectorFn(row.original)
+    } else if (tableRowAction) {
+      tableRowAction(row.original)
     } else {
       navigate(`/${url}/${id}`)
     }
