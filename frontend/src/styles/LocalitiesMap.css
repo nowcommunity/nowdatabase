@@ -29,17 +29,6 @@
   opacity: 1;
 }
 
-.map-locality-container > div {
-  height: 250px;
-  margin-top: 2rem;
-  border-radius: 0.25em;
-}
-
-#localities-map .button-row {
-  display: flex;
-  justify-content: flex-end;
-}
-
 #localities-map .cluster-btn {
   background-color: #fdfeff;
   height: 2em;
@@ -51,4 +40,9 @@
   border-radius: 0.25em;
   border: none;
   box-shadow: 0 0 0 0.15em rgba(0, 0, 0, 0.22);
+}
+
+#localities-map .button-row {
+  display: flex;
+  justify-content: flex-end;
 }
