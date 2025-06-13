@@ -1,11 +1,11 @@
 import { useGetLocalityDetailsQuery } from '../../redux/localityReducer'
 import { useState, useEffect, useRef } from 'react'
 import 'leaflet/dist/leaflet.css'
-import L, { LatLngExpression } from 'leaflet'
 import { borders } from './country_borders_WGS84'
 import { Button } from '@mui/material'
 import MapIcon from '@mui/icons-material/Map'
-import { Locality } from '@/shared/types/data.js'
+import L, { LatLngExpression } from 'leaflet'
+import { SimplifiedLocality } from '@/shared/types/data.js'
 import { usePageContext } from '../Page'
 import { skipToken } from '@reduxjs/toolkit/query'
 import './leaflet.markercluster.js'
@@ -13,18 +13,18 @@ import './MarkerCluster.css'
 import './MarkerCluster.Default.css'
 import { SlidingModal } from './SlidingModal.tsx'
 import { LocalityInfo } from './LocalityDetailsPanel.tsx'
-import '../../styles/LocalityMap.css'
+import '../../styles/LocalitiesMap.css'
 import northarrow from './images/north-arrow.png'
 
 interface Props {
-  localitiesQueryData?: Locality[]
-  localitiesQueryIsFetching: boolean
+  localities?: SimplifiedLocality[]
+  isFetching: boolean
 }
 
 type CustomCircleMarkerOptions = L.CircleMarkerOptions & { localityId: number }
 type CustomCircleMarker = L.CircleMarker & { options: CustomCircleMarkerOptions }
 
-export const LocalitiesMap = ({ localitiesQueryData, localitiesQueryIsFetching }: Props) => {
+export const LocalitiesMap = ({ localities, isFetching }: Props) => {
   const [selectedLocality, setSelectedLocality] = useState<string | null>(null)
   const mapRef = useRef<HTMLDivElement | null>(null)
   const [map, setMap] = useState<L.Map | null>(null)
@@ -107,7 +107,7 @@ export const LocalitiesMap = ({ localitiesQueryData, localitiesQueryIsFetching }
   }, [])
 
   useEffect(() => {
-    if (!map || localitiesQueryIsFetching) return
+    if (!map || isFetching) return
 
     // To prevent eslint from complaining about that 'markers' variable below:
     /* eslint-disable @typescript-eslint/no-unsafe-assignment */
@@ -119,16 +119,7 @@ export const LocalitiesMap = ({ localitiesQueryData, localitiesQueryIsFetching }
     // with no module exports that extends 'L' when imported
     const newMarkers: Layer = cluster ? L.markerClusterGroup() : L.layerGroup()
 
-    const localityIds = columnFilters.idList as unknown as number[]
-    const filterApplied = localityIds.length > 0 && localityIds.every(id => id === null)
-
-    const validIds = localityIds.filter(id => typeof id === 'number')
-
-    const filteredLocalities = !filterApplied
-      ? localitiesQueryData?.filter(locality => validIds.includes(locality.lid))
-      : localitiesQueryData
-
-    filteredLocalities?.forEach(locality => {
+    localities?.forEach(locality => {
       const options: CustomCircleMarkerOptions = {
         localityId: locality.lid,
         radius: 4,
@@ -159,7 +150,7 @@ export const LocalitiesMap = ({ localitiesQueryData, localitiesQueryIsFetching }
       // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
       map.removeLayer(newMarkers)
     }
-  }, [localitiesQueryData, localitiesQueryIsFetching, columnFilters, map, cluster])
+  }, [localities, isFetching, columnFilters, map, cluster])
 
   document.title = 'Map'
 
@@ -174,7 +165,7 @@ export const LocalitiesMap = ({ localitiesQueryData, localitiesQueryIsFetching }
             </button>
           )}
         </div>
-        {!localitiesQueryIsFetching && localitiesQueryData && (
+        {!isFetching && localities && (
           <div className="button-row">
             <Button variant="contained" startIcon={<MapIcon />} onClick={() => setIsOpen(v => !v)}>
               {isOpen ? 'Close' : 'Open'} map

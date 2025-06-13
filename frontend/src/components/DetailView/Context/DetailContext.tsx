@@ -71,7 +71,8 @@ export type DetailContextType<T> = {
     field: keyof EditDataType<T>,
     options: Array<DropdownOption | string>,
     name: string,
-    disabled?: boolean
+    disabled?: boolean,
+    label?: string
   ) => JSX.Element
   radioSelection: (
     field: keyof EditDataType<T>,
