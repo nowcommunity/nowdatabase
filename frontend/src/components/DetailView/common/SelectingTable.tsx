@@ -67,7 +67,7 @@ export const SelectingTable = <T extends MRT_RowData, ParentType extends object>
   if (isError) return <Box>Error fetching data for the selecting table.</Box>
   if (!data) return <CircularProgress />
   return (
-    <EditingModal dataCy={`${buttonText}-button`} buttonText={buttonText}>
+    <EditingModal buttonText={buttonText}>
       {data ? (
         <TableView<T>
           data={filteredData}
