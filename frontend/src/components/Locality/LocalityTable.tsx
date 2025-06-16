@@ -20,7 +20,7 @@ const decimalCount = (num: number) => {
 export const LocalityTable = ({ selectorFn }: { selectorFn?: (newObject: Locality) => void }) => {
   const { data: localitiesQueryData, isFetching: localitiesQueryIsFetching } = useGetAllLocalitiesQuery()
   const [getLocalitySpeciesList, { isLoading }] = useGetLocalitySpeciesListMutation()
-  const [filteredLocalities, setFilteredLocalities] = useState<SimplifiedLocality[] | null >(null)
+  const [filteredLocalities, setFilteredLocalities] = useState<SimplifiedLocality[] | null>(null)
   const columnFilters = usePageContext()
   const notify = useNotify()
 
@@ -427,7 +427,7 @@ export const LocalityTable = ({ selectorFn }: { selectorFn?: (newObject: Localit
 
   return (
     <>
-    {filteredLocalities && (<LocalitiesMap localities={filteredLocalities} isFetching={localitiesQueryIsFetching} />)}
+      {filteredLocalities && <LocalitiesMap localities={filteredLocalities} isFetching={localitiesQueryIsFetching} />}
       <TableView<Locality>
         title="Localities"
         selectorFn={selectorFn}
