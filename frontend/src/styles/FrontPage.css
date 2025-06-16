@@ -46,8 +46,6 @@
   position: relative;
   margin-top: 0em;
   user-select: none;
-  /* padding-bottom: -10000px; */
-  /* height: ; */
 }
 
 #front-page .stats {
@@ -60,7 +58,6 @@
   left: 0;
   right: 0;
   z-index: 2;
-  /* background-color: red; */
 }
 
 #front-page .stats span b {
