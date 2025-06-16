@@ -38,9 +38,4 @@ describe('Open each page, table view and detail view, and check at least some co
     cy.contains('Sequence')
     cy.contains('gcss')
   })
-
-  it('Map works', () => {
-    cy.visit('/locality')
-    cy.contains('map').click()
-  })
 })

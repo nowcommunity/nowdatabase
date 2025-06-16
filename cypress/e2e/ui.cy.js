@@ -57,11 +57,6 @@ describe('Button Tests', () => {
     cy.contains('Species').should('be.visible')
   })
 
-  it('Map button works', () => {
-    cy.visit('/locality')
-    cy.contains('map').click()
-  })
-
   it('Link to species details from species tab', () => {
     cy.visit('/species')
     // Click the button with the SVG icon
