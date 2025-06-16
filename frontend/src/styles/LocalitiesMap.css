@@ -26,14 +26,14 @@
 }
 
 #localities-map .map-btn-up {
-  font-size: 35px;
-  transform: rotateX(0deg);
+  font-size: 50px;
+  transform: rotateX(180deg);
   transition: transform 0.5s ease-in-out;
 }
 
 #localities-map .map-btn-down {
-  font-size: 35px;
-  transform: rotateX(-180deg);
+  font-size: 50px;
+  transform: rotateX(0deg);
   transition: transform 0.5s ease-in-out;
 }
 

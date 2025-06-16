@@ -2,7 +2,7 @@ import { useGetLocalityDetailsQuery } from '../../redux/localityReducer'
 import { useState, useEffect, useRef } from 'react'
 import 'leaflet/dist/leaflet.css'
 import { borders } from './country_borders_WGS84'
-import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward'
+import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown'
 import L, { LatLngExpression } from 'leaflet'
 import { SimplifiedLocality } from '@/shared/types/data.js'
 import { usePageContext } from '../Page'
@@ -164,7 +164,10 @@ export const LocalitiesMap = ({ localities, isFetching }: Props) => {
           <div id="blur-container" className={isOpen ? 'open' : ''}></div>
         </div>
         <div className="button-row">
-          <ArrowUpwardIcon className={isOpen ? 'map-btn-up' : 'map-btn-down'} onClick={() => setIsOpen(v => !v)} />
+          <KeyboardArrowDownIcon
+            className={isOpen ? 'map-btn-up' : 'map-btn-down'}
+            onClick={() => setIsOpen(v => !v)}
+          />
         </div>
       </article>
       <SlidingModal isOpen={localityDetailsIsOpen} onClose={() => setLocalityDetailsIsOpen(false)}>
