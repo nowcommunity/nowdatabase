@@ -1,11 +1,6 @@
-#locality-map {
-  height: 100%;
-  width: 100%;
-}
-
 .map-locality-container > div {
-  height: 250px;
-  margin-top: 2.5rem;
-  margin-right: 1rem;
+  height: 260px;
+  margin-top: 1rem;
+  margin-right: 0.4rem;
   border-radius: 0.25em;
 }
