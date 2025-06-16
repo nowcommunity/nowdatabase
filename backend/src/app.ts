@@ -2,6 +2,7 @@ import 'express-async-errors'
 import express from 'express'
 import cors from 'cors'
 import crossSearchRouter from './routes/crossSearch'
+import statisticsRouter from './routes/statistics'
 import localityRouter from './routes/locality'
 import museumRouter from './routes/museum'
 import referenceRouter from './routes/reference'
@@ -52,6 +53,7 @@ app.use('/crosssearch', crossSearchRouter)
 app.use('/locality', localityRouter)
 app.use('/locality-species', localitySpeciesRouter)
 app.use('/species', speciesRouter)
+app.use('/statistics', statisticsRouter)
 app.use('/reference', referenceRouter)
 app.use('/time-unit', timeUnitRouter)
 app.use('/time-bound', requireOneOf([Role.Admin, Role.EditUnrestricted]), timeBoundRouter)

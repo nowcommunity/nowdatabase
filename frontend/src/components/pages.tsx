@@ -28,6 +28,7 @@ import { ProjectDetails } from './Project/ProjectDetails'
 import { RegionTable } from './Region/RegionTable'
 import { RegionDetails } from './Region/RegionDetails'
 import { UserState } from '@/redux/userReducer'
+import { FrontPage } from './FrontPage'
 
 const noRights: EditRights = {}
 const fullRights: EditRights = { new: true, edit: true, delete: true }
@@ -50,6 +51,8 @@ export const localityPage = (
     }}
   />
 )
+
+export const frontPage = <FrontPage />
 
 export const crossSearchPage = (
   <Page

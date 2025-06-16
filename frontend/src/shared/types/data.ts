@@ -5,6 +5,8 @@ import * as LogPrisma from '../../../../backend/prisma/generated/now_log_test_cl
 import { Editable, FixBigInt, RowState } from './util'
 import { Decimal } from '../../../../backend/prisma/generated/now_test_client/runtime/library'
 
+export type Statistics = { localityCount: number; speciesCount: number; localitySpeciesCount: number }
+export type ActivityStatistic = { year: number; month: number; surname: string }
 export type SpeciesType = FixBigInt<Prisma.com_species>
 export type SedimentaryStructureValues = Prisma.now_ss_values
 export type CollectingMethod = Prisma.now_coll_meth

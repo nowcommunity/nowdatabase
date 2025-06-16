@@ -1,10 +1,10 @@
 import { Container, Grid } from '@mui/material'
-import { FrontPage } from './components/FrontPage'
 import { NavBar } from './components/NavBar'
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import { Login } from './components/Login'
 import {
   crossSearchPage,
+  frontPage,
   localityPage,
   personPage,
   projectPage,
@@ -16,6 +16,7 @@ import {
 } from './components/pages'
 import { Notification, NotificationContextProvider } from './components/Notification'
 import { EmailPage } from './components/EmailPage'
+import { Footer } from './Footer'
 
 const App = () => {
   return (
@@ -40,12 +41,13 @@ const App = () => {
                 <Route element={projectPage} path="/project/:id?" />
                 <Route element={<EmailPage />} path="/email/" />
                 <Route element={<Login />} path="/login" />
-                <Route element={<FrontPage />} path="/" />
+                <Route element={frontPage} path="/" />
                 <Route element={<div>Page not found.</div>} path="*" />
               </Routes>
             </Grid>
           </Container>
         </Grid>
+        <Footer />
       </NotificationContextProvider>
     </BrowserRouter>
   )
