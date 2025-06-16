@@ -18,10 +18,10 @@ export const FrontPage = () => {
   const { data: localityStatisticsQueryData, isFetching: localityStatisticsQueryIsFetching } =
     useGetLocalityStatisticsQuery()
 
-  // Hover effect
+  // Map hover effect
   useEffect(() => {
     if (!mapContainerRef.current) return
-    mapContainerRef.current.onmousemove = (e: any) => {
+    mapContainerRef.current.onmousemove = (e: MouseEvent) => {
       if (!mapContainerRef.current) return
       const rect = mapContainerRef.current.getBoundingClientRect()
       const height = rect.bottom - rect.top
