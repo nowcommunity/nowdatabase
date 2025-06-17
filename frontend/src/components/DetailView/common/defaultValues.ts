@@ -5,7 +5,10 @@ import {
   SpeciesDetailsType,
   TimeBoundDetailsType,
   TimeUnitDetailsType,
+  PersonDetailsType, 
+  PersonDetails
 } from '@/shared/types'
+
 import { MRT_PaginationState } from 'material-react-table'
 
 export const emptyLocality = {
@@ -246,5 +249,15 @@ export const emptyRegion = {
   now_reg_coord_country: [],
 } as unknown as RegionDetails
 
+export const emptyPerson = {
+  initials: '', 
+  first_name: '', 
+  surname: '', 
+  email: '', 
+  organization: '', 
+  country: ''
+} as unknown as PersonDetailsType
+
 export const defaultPagination: MRT_PaginationState = { pageIndex: 0, pageSize: 15 }
 export const defaultPaginationSmall: MRT_PaginationState = { pageIndex: 0, pageSize: 10 }
+
