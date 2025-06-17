@@ -1,7 +1,8 @@
 import { useGetLocalityDetailsQuery } from '../../redux/localityReducer'
 import { useState, useEffect, useRef } from 'react'
 import 'leaflet/dist/leaflet.css'
-import { borders } from './country_borders_WGS84'
+import { countryPolygons } from '../../country_data/countryPolygons.ts'
+import { countryBoundingBoxes } from '../../country_data/countryBoundingBoxes.ts'
 import L, { LatLngExpression } from 'leaflet'
 import { SimplifiedLocality } from '@/shared/types/data.js'
 import { skipToken } from '@reduxjs/toolkit/query'
@@ -59,15 +60,12 @@ export const LocalitiesMap = ({ localities, isFetching }: Props) => {
 
     // ---- Layers on top of base maps ----
 
-    // Add borders to the map
-    borders.forEach(poly => {
-      L.polygon(poly as LatLngExpression[], { color: 'gray', weight: 1 }).addTo(mapInstance)
-    })
-
     // Create a polygon layer for the country borders that is in layer control panel.
     const borderLayer = L.layerGroup()
-    borders.forEach(country_border => {
-      const polygon = L.polygon(country_border as LatLngExpression[], {
+    countryPolygons.forEach(countryBorder => {
+      L.polygon(countryBorder as LatLngExpression[], { color: 'gray', weight: 1 }).addTo(mapInstance)
+
+      const polygon = L.polygon(countryBorder as LatLngExpression[], {
         color: '#136f94',
         fillOpacity: 0.3,
         weight: 1,
