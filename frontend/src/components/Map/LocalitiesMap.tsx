@@ -2,7 +2,6 @@ import { useGetLocalityDetailsQuery } from '../../redux/localityReducer'
 import { useState, useEffect, useRef } from 'react'
 import 'leaflet/dist/leaflet.css'
 import { borders } from './country_borders_WGS84'
-import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown'
 import L, { LatLngExpression } from 'leaflet'
 import { SimplifiedLocality } from '@/shared/types/data.js'
 import { skipToken } from '@reduxjs/toolkit/query'
@@ -155,19 +154,16 @@ export const LocalitiesMap = ({ localities, isFetching }: Props) => {
 
   return (
     <>
-      <article id="localities-map">
-        <div id="map-container" className={isOpen ? 'open' : ''}>
-          <div className={'map'} ref={mapRef} style={{ flex: 1 }} />
-          <button className="cluster-btn" onClick={() => setClusteringEnabled(cluster => !cluster)}>
+      <article id="localities-map" className={isOpen ? 'open' : ''}>
+        <div className="map-container">
+          <div className="map" ref={mapRef} />
+          <button className="cluster" onClick={() => setClusteringEnabled(cluster => !cluster)}>
             {clusteringEnabled ? 'Show individual' : 'Show cluster'}
           </button>
-          <div id="blur-container" className={isOpen ? 'open' : ''}></div>
+          <div className="gradient" onClick={() => setIsOpen(v => !v)}></div>
         </div>
-        <div className="button-row">
-          <KeyboardArrowDownIcon
-            className={isOpen ? 'map-btn-up' : 'map-btn-down'}
-            onClick={() => setIsOpen(v => !v)}
-          />
+        <div className="open-button" onClick={() => setIsOpen(v => !v)} title="Close map">
+          <span className="downarrow"></span>
         </div>
       </article>
       <SlidingModal isOpen={localityDetailsIsOpen} onClose={() => setLocalityDetailsIsOpen(false)}>
