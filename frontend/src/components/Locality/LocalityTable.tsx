@@ -28,8 +28,10 @@ export const LocalityTable = ({ selectorFn }: { selectorFn?: (newObject: Localit
     // Filter localities for the map component
     const localityIds = columnFilters.idList as unknown as number[]
     const validIds = localityIds.filter(id => typeof id === 'number')
-    const localities = localitiesQueryData?.filter(locality => validIds.includes(locality.lid))
-    setFilteredLocalities(localities as SimplifiedLocality[])
+
+    if (validIds.length > 0)
+      setFilteredLocalities(localitiesQueryData?.filter(locality => validIds.includes(locality.lid)))
+    else setFilteredLocalities(localitiesQueryData as SimplifiedLocality[])
   }, [columnFilters, localitiesQueryData])
 
   const columns = useMemo<MRT_ColumnDef<Locality>[]>(
@@ -427,9 +429,7 @@ export const LocalityTable = ({ selectorFn }: { selectorFn?: (newObject: Localit
 
   return (
     <>
-      {filteredLocalities && filteredLocalities.length !== 0 && (
-        <LocalitiesMap localities={filteredLocalities} isFetching={localitiesQueryIsFetching} />
-      )}
+      <LocalitiesMap localities={filteredLocalities} isFetching={localitiesQueryIsFetching} />
       <TableView<Locality>
         title="Localities"
         selectorFn={selectorFn}
