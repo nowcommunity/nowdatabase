@@ -27,7 +27,7 @@ export const getPersonDetails = async (id: string) => {
     select: { user_id: true, user_name: true, last_login: true, now_user_group: true },
   })
 
-  return { ...person, user }
+  return { ...person, user, now_user_group: user?.now_user_group }
 }
 
 export const validateEntirePerson = (editedFields: EditDataType<Prisma.com_people>) => {

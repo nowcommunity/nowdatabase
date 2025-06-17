@@ -117,8 +117,9 @@ export const DetailView = <T extends object>({
     field: keyof EditDataType<T>,
     options: Array<DropdownOption | string>,
     name: string,
-    disabled?: boolean
-  ) => <DropdownSelectorWithSearch field={field} options={options} name={name} disabled={disabled} />
+    disabled?: boolean,
+    label?: string
+  ) => <DropdownSelectorWithSearch field={field} options={options} name={name} disabled={disabled} label={label} />
 
   const onDelete = () => {
     if (!window.confirm('Are you sure you want to delete this item? This operation cannot be undone.')) return

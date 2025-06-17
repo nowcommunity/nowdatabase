@@ -8,6 +8,7 @@ import { getRole } from '../middlewares/authenticator'
 import { AccessError } from '../middlewares/authorizer'
 import { Role } from '../../../frontend/src/shared/types'
 import md5 from 'md5'
+import { validatePassword } from '../utils/validatePassword'
 
 const router = Router()
 
@@ -127,12 +128,8 @@ router.put('/password', async (req, res) => {
 
   if (!passwordMatches) return res.status(403).send({ error: 'Old password does not match your current password.' })
 
-  if (newPassword.length < 8) return res.status(400).send({ error: 'New password must be at least 8 characters long.' })
-
-  if (!/^[0-9A-Za-z$%&~]+/.test(newPassword))
-    return res
-      .status(400)
-      .send({ error: 'Use only alphanumeric characters a-z, A-Z and 0-9 and symbols ^?$%&~ in the new password.' })
+  const validationResult = validatePassword(newPassword)
+  if (!validationResult.isValid) return res.status(400).send({ error: validationResult.error })
 
   const passwordHash = await createPasswordHash(newPassword)
 
