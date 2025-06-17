@@ -204,7 +204,7 @@ export const TableView = <T extends MRT_RowData>({
     <Paper elevation={5}>
       {user && (
         <div className="table-top-row">
-          <Box className="title">{title ?? ''}</Box>
+          {title && <Box className="title">{title}</Box>}
           <TableToolBar<T>
             table={table}
             combinedExport={combinedExport}
