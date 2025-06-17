@@ -2,10 +2,8 @@ import { useGetLocalityDetailsQuery } from '../../redux/localityReducer'
 import { useState, useEffect, useRef } from 'react'
 import 'leaflet/dist/leaflet.css'
 import { borders } from './country_borders_WGS84'
-import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown'
 import L, { LatLngExpression } from 'leaflet'
 import { SimplifiedLocality } from '@/shared/types/data.js'
-import { usePageContext } from '../Page'
 import { skipToken } from '@reduxjs/toolkit/query'
 import './leaflet.markercluster.js'
 import './MarkerCluster.css'
@@ -29,12 +27,12 @@ export const LocalitiesMap = ({ localities, isFetching }: Props) => {
   const [map, setMap] = useState<L.Map | null>(null)
   const [isOpen, setIsOpen] = useState(false)
   const [localityDetailsIsOpen, setLocalityDetailsIsOpen] = useState(false)
-  const columnFilters = usePageContext()
-  const [cluster, setCluster] = useState(true)
+  const [clusteringEnabled, setClusteringEnabled] = useState(true)
 
+  // Use skipToken to skip query when state is null
   const { data: localityDetailsQueryData, isFetching: detailsLoading } = useGetLocalityDetailsQuery(
     selectedLocality ?? skipToken
-  ) // use skipToken to skip query when state is null
+  )
 
   useEffect(() => {
     if (!mapRef.current) return
@@ -45,26 +43,28 @@ export const LocalitiesMap = ({ localities, isFetching }: Props) => {
     const coords: LatLngExpression = [15, 13]
     mapInstance.setView(coords, 3)
 
-    // BASE MAPS
-    //// OpenTopoMap
+    // ---- Base maps ----
+
+    // OpenTopoMap
     const topomap = L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', {
       attribution: 'Map data: © <a href="https://opentopomap.org">OpenTopoMap</a> (CC-BY-SA)',
       noWrap: true,
     }).addTo(mapInstance)
 
-    //// OpenStreetMap
+    // OpenStreetMap
     const osm = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
       noWrap: true,
     })
 
-    // LAYERS ON TOP OF BASE MAPS
-    //// Add borders to the map
+    // ---- Layers on top of base maps ----
+
+    // Add borders to the map
     borders.forEach(poly => {
       L.polygon(poly as LatLngExpression[], { color: 'gray', weight: 1 }).addTo(mapInstance)
     })
 
-    // create a polygon layer for the country borders that is in layer control panel..
+    // Create a polygon layer for the country borders that is in layer control panel.
     const borderLayer = L.layerGroup()
     borders.forEach(country_border => {
       const polygon = L.polygon(country_border as LatLngExpression[], {
@@ -81,13 +81,13 @@ export const LocalitiesMap = ({ localities, isFetching }: Props) => {
       Countries: borderLayer,
     }
 
-    // Add a scale bar to the map
+    // Scale bar
     L.control.scale({ position: 'bottomright' }).addTo(mapInstance)
 
-    //Add a layer control to the map
+    // Layer control
     L.control.layers(baseMaps, {}, { position: 'topright' }).addTo(mapInstance)
 
-    // Add north-arrow to the map
+    // North-arrow
     const northArrowControl = L.Control.extend({
       onAdd: function () {
         const img = L.DomUtil.create('img')
@@ -96,7 +96,6 @@ export const LocalitiesMap = ({ localities, isFetching }: Props) => {
         return img
       },
     })
-
     const northArrow = new northArrowControl({ position: 'bottomright' })
     northArrow.addTo(mapInstance)
 
@@ -116,7 +115,7 @@ export const LocalitiesMap = ({ localities, isFetching }: Props) => {
 
     // @ts-expect-error The marker cluster library is a plain javascript library
     // with no module exports that extends 'L' when imported
-    const newMarkers: Layer = cluster ? L.markerClusterGroup() : L.layerGroup()
+    const newMarkers: Layer = clusteringEnabled ? L.markerClusterGroup() : L.layerGroup()
 
     localities?.forEach(locality => {
       const options: CustomCircleMarkerOptions = {
@@ -149,25 +148,22 @@ export const LocalitiesMap = ({ localities, isFetching }: Props) => {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
       map.removeLayer(newMarkers)
     }
-  }, [localities, isFetching, columnFilters, map, cluster])
+  }, [localities, isFetching, map, clusteringEnabled])
 
   document.title = 'Map'
 
   return (
     <>
-      <article id="localities-map">
-        <div id="map-container" className={isOpen ? 'open' : ''}>
-          <div className={'map'} ref={mapRef} style={{ flex: 1 }} />
-          <button className="cluster-btn" onClick={() => setCluster(cluster => !cluster)}>
-            {cluster ? 'Show individual' : 'Show cluster'}
+      <article id="localities-map" className={isOpen ? 'open' : ''}>
+        <div className="map-container">
+          <div className="map" ref={mapRef} />
+          <button className="cluster" onClick={() => setClusteringEnabled(cluster => !cluster)}>
+            {clusteringEnabled ? 'Show individual' : 'Show cluster'}
           </button>
-          <div id="blur-container" className={isOpen ? 'open' : ''}></div>
+          <div className="gradient" onClick={() => setIsOpen(v => !v)}></div>
         </div>
-        <div className="button-row">
-          <KeyboardArrowDownIcon
-            className={isOpen ? 'map-btn-up' : 'map-btn-down'}
-            onClick={() => setIsOpen(v => !v)}
-          />
+        <div className="open-button" onClick={() => setIsOpen(v => !v)} title="Close map">
+          <span className="downarrow"></span>
         </div>
       </article>
       <SlidingModal isOpen={localityDetailsIsOpen} onClose={() => setLocalityDetailsIsOpen(false)}>
