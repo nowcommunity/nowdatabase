@@ -2,8 +2,7 @@ import { useGetLocalityDetailsQuery } from '../../redux/localityReducer'
 import { useState, useEffect, useRef } from 'react'
 import 'leaflet/dist/leaflet.css'
 import { borders } from './country_borders_WGS84'
-import { Button } from '@mui/material'
-import MapIcon from '@mui/icons-material/Map'
+import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown'
 import L, { LatLngExpression } from 'leaflet'
 import { SimplifiedLocality } from '@/shared/types/data.js'
 import { usePageContext } from '../Page'
@@ -44,7 +43,7 @@ export const LocalitiesMap = ({ localities, isFetching }: Props) => {
     setMap(mapInstance)
 
     const coords: LatLngExpression = [15, 13]
-    mapInstance.setView(coords, 2)
+    mapInstance.setView(coords, 3)
 
     // BASE MAPS
     //// OpenTopoMap
@@ -158,20 +157,18 @@ export const LocalitiesMap = ({ localities, isFetching }: Props) => {
     <>
       <article id="localities-map">
         <div id="map-container" className={isOpen ? 'open' : ''}>
-          <div ref={mapRef} style={{ flex: 1 }} />
-          {isOpen && (
-            <button className="cluster-btn" onClick={() => setCluster(cluster => !cluster)}>
-              {cluster ? 'Individual' : 'Cluster'}
-            </button>
-          )}
+          <div className={'map'} ref={mapRef} style={{ flex: 1 }} />
+          <button className="cluster-btn" onClick={() => setCluster(cluster => !cluster)}>
+            {cluster ? 'Show individual' : 'Show cluster'}
+          </button>
+          <div id="blur-container" className={isOpen ? 'open' : ''}></div>
         </div>
-        {!isFetching && localities && (
-          <div className="button-row">
-            <Button variant="contained" startIcon={<MapIcon />} onClick={() => setIsOpen(v => !v)}>
-              {isOpen ? 'Close' : 'Open'} map
-            </Button>
-          </div>
-        )}
+        <div className="button-row">
+          <KeyboardArrowDownIcon
+            className={isOpen ? 'map-btn-up' : 'map-btn-down'}
+            onClick={() => setIsOpen(v => !v)}
+          />
+        </div>
       </article>
       <SlidingModal isOpen={localityDetailsIsOpen} onClose={() => setLocalityDetailsIsOpen(false)}>
         <LocalityInfo

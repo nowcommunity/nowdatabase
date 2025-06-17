@@ -427,7 +427,9 @@ export const LocalityTable = ({ selectorFn }: { selectorFn?: (newObject: Localit
 
   return (
     <>
-      <LocalitiesMap localities={filteredLocalities} isFetching={localitiesQueryIsFetching} />
+      {filteredLocalities && filteredLocalities.length !== 0 && (
+        <LocalitiesMap localities={filteredLocalities} isFetching={localitiesQueryIsFetching} />
+      )}
       <TableView<Locality>
         title="Localities"
         selectorFn={selectorFn}
