@@ -1,16 +1,18 @@
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 import { type MRT_ColumnDef } from 'material-react-table'
 import { useGetAllSpeciesQuery } from '../../redux/speciesReducer'
 import { Species } from '@/shared/types'
 import { TableView } from '../TableView/TableView'
-import { useNavigate } from 'react-router-dom'
+import { SynonymsModal } from './SynonymsModal'
 
 export const SpeciesTable = ({ selectorFn }: { selectorFn?: (id: Species) => void }) => {
+  const [selectedSpecies, setSelectedSpecies] = useState<string | undefined>()
+  const [modalOpen, setModalOpen] = useState<boolean>(false)
   const { data: speciesQueryData, isFetching } = useGetAllSpeciesQuery()
-  const navigate = useNavigate()
 
   const handleSpeciesRowActionClick = (row: Species) => {
-    navigate(`/species/${row.species_id}?tab=1`)
+    setSelectedSpecies(row.species_id.toString())
+    setModalOpen(true)
   }
 
   const columns = useMemo<MRT_ColumnDef<Species>[]>(
@@ -374,17 +376,20 @@ export const SpeciesTable = ({ selectorFn }: { selectorFn?: (id: Species) => voi
   }
 
   return (
-    <TableView<Species>
-      title="Species"
-      selectorFn={selectorFn}
-      idFieldName="species_id"
-      columns={columns}
-      isFetching={isFetching}
-      visibleColumns={visibleColumns}
-      data={speciesQueryData}
-      url="species"
-      enableColumnFilterModes={true}
-      tableRowAction={handleSpeciesRowActionClick}
-    />
+    <>
+      <TableView<Species>
+        title="Species"
+        selectorFn={selectorFn}
+        idFieldName="species_id"
+        columns={columns}
+        isFetching={isFetching}
+        visibleColumns={visibleColumns}
+        data={speciesQueryData}
+        url="species"
+        enableColumnFilterModes={true}
+        tableRowAction={handleSpeciesRowActionClick}
+      />
+      <SynonymsModal open={modalOpen} onClose={() => setModalOpen(false)} selectedSpecies={selectedSpecies} />
+    </>
   )
 }
