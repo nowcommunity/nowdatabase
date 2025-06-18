@@ -1,6 +1,8 @@
 #main-navbar {
   background-color: #2e7fab;
   --color-hl: #3896c9;
+  padding-left: 0;
+  margin-left: 0;
 }
 
 #main-navbar > * {
@@ -25,6 +27,7 @@
 
 #main-navbar .username-box {
   display: flex;
+  align-items: center;
   border: 2px solid var(--color-hl);
   border-radius: 0.25rem;
   padding: 0.4em 1em 0.3em 0.5em;
@@ -34,11 +37,17 @@
   font-weight: 500;
 }
 
+#main-navbar .container {
+  display: flex;
+  align-items: stretch;
+}
+
 #main-navbar .menu-list {
-  margin-left: 1.4em;
+  margin-left: 2em;
+  padding: 0.6em 0;
   display: flex;
   flex-wrap: wrap;
-  align-items: center;
+  align-items: stretch;
 }
 
 #main-navbar .dropdown-link {
@@ -76,4 +85,14 @@
 #main-navbar .login-link:hover,
 #main-navbar .username-box:hover {
   background-color: var(--color-hl);
+}
+
+#main-navbar .logo-link {
+  padding: 0;
+}
+
+#main-navbar .logo-link img {
+  height: 4em;
+  transform-origin: 0 80%;
+  transform: scale(1.03);
 }
