@@ -11,7 +11,7 @@ import { CoordinateSelectionMap } from '@/components/Map/CoordinateSelectionMap'
 import { useState } from 'react'
 import { convertDmsToDec, convertDecToDms } from '@/util/coordinateConversion'
 import { validCountries } from '@/shared/validators/countryList'
-import { LocalityMap } from '@/components/Map/LocalityMap'
+import { SingleLocalityMap } from '@/components/Map/SingleLocalityMap'
 
 export const LocalityTab = () => {
   const { textField, radioSelection, dropdown, dropdownWithSearch, mode, bigTextField } =
@@ -183,10 +183,16 @@ export const LocalityTab = () => {
       </HalfFrames>
 
       <Grouped>
-        <Box sx={{ display: 'flex', flexDirection: 'row', gap: 2, justifyContent: 'center' }}>
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: 'row',
+            gap: 2,
+          }}
+        >
           <ArrayFrame array={latlong} title="Latitude & Longitude" />
-          <Box sx={{ minWidth: 250, minHeight: 250 }}>
-            {locality && <LocalityMap dec_lat={editData.dec_lat} dec_long={editData.dec_long} />}
+          <Box sx={{ width: '50%' }}>
+            {locality && <SingleLocalityMap dec_lat={editData.dec_lat} dec_long={editData.dec_long} />}
           </Box>
         </Box>
         {!mode.read && coordinateButton}

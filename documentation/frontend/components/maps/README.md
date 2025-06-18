@@ -1,6 +1,6 @@
 # Map features
 
-See component-specific docs at [CoordinateSelectionMap](./CoordinateSelectionMap.md) and [LocalityMap](./LocalityMap.md)
+See component-specific docs at [CoordinateSelectionMap](./CoordinateSelectionMap.md) and [LocalitiesMap](./LocalitiesMap.md)
 
 The map features use the React Leaflet package and OpenStreetMap.
 

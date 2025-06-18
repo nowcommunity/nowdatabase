@@ -98,11 +98,13 @@ export const DropdownSelectorWithSearch = <T extends object>({
   name,
   field,
   disabled,
+  label,
 }: {
   options: Array<DropdownOption | string>
   name: string
   field: keyof EditDataType<T>
   disabled?: boolean
+  label?: string
 }) => {
   const { setEditData, editData, validator, fieldsWithErrors, setFieldsWithErrors } = useDetailContext<T>()
   const errorObject = validator(editData, field)
@@ -139,7 +141,7 @@ export const DropdownSelectorWithSearch = <T extends object>({
           setInputValue(newInputValue)
         }}
         sx={{ width: fieldWidth, backgroundColor: disabled ? 'grey' : '' }}
-        renderInput={params => <TextField {...params} label="Choose a country" error={!!error} />}
+        renderInput={params => <TextField {...params} label={label ?? 'Choose a country'} error={!!error} />}
       />
 
       {error && <FormHelperText>{error}</FormHelperText>}

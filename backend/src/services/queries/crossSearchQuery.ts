@@ -15,7 +15,7 @@ const generateWhereClause = (showAll: boolean, allowedLocalities: Array<number>,
   else {
     const conditions: Prisma.Sql[] = []
     for (const filter of columnFilters) {
-      const newQuery = Prisma.sql`${Prisma.raw(filter.id)} = ${filter.value}`
+      const newQuery = Prisma.sql`${Prisma.raw(filter.id)} LIKE ${'%' + filter.value + '%'}`
       conditions.push(newQuery)
     }
 
@@ -254,5 +254,31 @@ export const generateCrossSearchSql = (
     ${orderBy ? Prisma.raw(orderBy) : Prisma.sql`now_loc.lid`} ${descendingOrder ? Prisma.sql`DESC` : Prisma.empty}
   ${limit ? Prisma.sql`LIMIT ${limit}` : Prisma.empty}
   ${offset ? Prisma.sql`OFFSET ${offset}` : Prisma.empty}
+  `
+}
+
+export const generateCrossSearchLocalitiesSql = (
+  showAll: boolean,
+  allowedLocalities: Array<number>,
+  columnFilters: ColumnFilter[],
+  orderBy: string | undefined,
+  descendingOrder: boolean
+) => {
+  const whereClause = generateWhereClause(showAll, allowedLocalities, columnFilters)
+
+  return Prisma.sql`
+  SELECT 
+      -- now_loc fields
+      now_loc.lid,
+      now_loc.loc_name,
+      now_loc.dec_lat,
+      now_loc.dec_long
+  FROM com_species
+  INNER JOIN now_ls ON com_species.species_id = now_ls.species_id
+  INNER JOIN now_loc ON now_ls.lid = now_loc.lid
+  ${whereClause}
+  GROUP BY now_loc.lid
+  ORDER BY
+    ${orderBy ? Prisma.raw(orderBy) : Prisma.sql`now_loc.lid`} ${descendingOrder ? Prisma.sql`DESC` : Prisma.empty}
   `
 }

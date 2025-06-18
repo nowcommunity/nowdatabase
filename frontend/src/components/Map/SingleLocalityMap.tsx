@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import 'leaflet/dist/leaflet.css'
 import { borders } from './country_borders_WGS84'
 import L, { LatLngExpression } from 'leaflet'
-import '../../styles/LocalityMap.css'
+import '../../styles/SingleLocalityMap.css'
 import northarrow from './images/north-arrow.png'
 
 interface Props {
@@ -10,7 +10,7 @@ interface Props {
   dec_long: number | undefined
 }
 
-export const LocalityMap = ({ dec_lat, dec_long }: Props) => {
+export const SingleLocalityMap = ({ dec_lat, dec_long }: Props) => {
   const mapRef = useRef<HTMLDivElement | null>(null)
   const [map, setMap] = useState<L.Map | null>(null)
 
@@ -111,7 +111,7 @@ export const LocalityMap = ({ dec_lat, dec_long }: Props) => {
   document.title = 'Map'
 
   return (
-    <article id="localities-map">
+    <article id="locality-map">
       <div className={'map-locality-container'}>
         <div ref={mapRef}></div>
       </div>

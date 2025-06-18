@@ -5,6 +5,8 @@ import * as LogPrisma from '../../../../backend/prisma/generated/now_log_test_cl
 import { Editable, FixBigInt, RowState } from './util'
 import { Decimal } from '../../../../backend/prisma/generated/now_test_client/runtime/library'
 
+export type Statistics = { localityCount: number; speciesCount: number; localitySpeciesCount: number }
+export type ActivityStatistic = { year: number; month: number; surname: string }
 export type SpeciesType = FixBigInt<Prisma.com_species>
 export type SedimentaryStructureValues = Prisma.now_ss_values
 export type CollectingMethod = Prisma.now_coll_meth
@@ -15,7 +17,9 @@ export type SpeciesLocality = FixBigInt<Prisma.now_ls> & { now_loc: Prisma.now_l
 export type LocalityUpdate = Prisma.now_lau & { now_lr: LocalityReference[] } & { updates: UpdateLog[] }
 export type SpeciesUpdate = Prisma.now_sau & { now_sr: SpeciesReference[] } & { updates: UpdateLog[] }
 export type Museum = Prisma.com_mlist
-export type PersonDetailsType = Prisma.com_people & { user: Omit<Prisma.com_users, 'password, newpassword'> | null }
+export type PersonDetailsType = Prisma.com_people & { user: Omit<Prisma.com_users, 'password, newpassword'> | null } & {
+  now_user_group: string
+}
 export type ProjectPeople = Prisma.now_proj_people
 export type ProjectDetailsType = Prisma.now_proj & { now_proj_people: Array<ProjectPeople> }
 export type Project = Prisma.now_proj
@@ -471,3 +475,10 @@ export type GeonamesJSON = {
 }
 
 export type ParsedGeoname = Pick<Geoname, 'name' | 'countryName' | 'fclName' | 'adminName1' | 'lat' | 'lng'>
+
+export type SimplifiedLocality = {
+  lid: number
+  dec_lat: number
+  dec_long: number
+  loc_name: string
+}
