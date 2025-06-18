@@ -8,11 +8,14 @@ import { Box } from '@mui/material'
 import { useEffect } from 'react'
 import { useNotify } from '@/hooks/notification'
 import { validCountries } from '@/shared/validators/countryList'
+import { useParams } from 'react-router-dom'
 
 export const PersonTab = () => {
   const { textField, dropdownWithSearch, data } = useDetailContext<PersonDetailsType>()
   const currentUser = useUser()
   const notify = useNotify()
+  const { id: idFromUrl } = useParams()
+  const isNew = idFromUrl === 'new'
 
   useEffect(() => {
     if (!currentUser?.isFirstLogin) return
@@ -25,7 +28,7 @@ export const PersonTab = () => {
   const userGroupOptions = ['su', 'eu', 'er', 'pl', 'plp', 'no', 'ro']
 
   const person = [
-    ['Initials', textField('initials', { type: 'text', disabled: true })],
+    ['Initials', textField('initials', { type: 'text',  disabled: !isNew })],
     ['First Name', textField('first_name')],
     ['Surname', textField('surname')],
     ['Email', textField('email')],
