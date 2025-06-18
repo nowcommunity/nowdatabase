@@ -21,10 +21,8 @@ export const PersonDetails = () => {
   // while omitting some detailview buttons like 'return to table' and browsing.
   // We designate special id 'user-page' instead of normal initials to mean current user's own page.
   const isUserPage = idFromUrl === 'user-page'
-  console.log('onko userpage? ', isUserPage, 'id-from url: ', idFromUrl, 'user.initials:',  user.initials)
   const id = isUserPage ? user.initials : idFromUrl
   const isNew = idFromUrl === 'new'
-  console.log('isNew: ',  isNew)
 
   const { isLoading, isError, data } = useGetPersonDetailsQuery(id!, {skip:isNew})
 
@@ -37,7 +35,6 @@ export const PersonDetails = () => {
   }, [])
 
   const onWrite = async (editData: EditDataType<PersonDetailsType>) => {
-    console.log('personin onWritessa')
     try {
       const { initials } = await editPersonRequest(editData).unwrap()
       notify('Saved person successfully.')
@@ -63,8 +60,6 @@ export const PersonDetails = () => {
       content: <PersonTab />,
     },
   ]
-  console.log('onWrite', onWrite)
-  console.log('is userpage:',  isUserPage)
 
   return (
     <DetailView
