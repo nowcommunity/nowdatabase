@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useNavigate } from 'react-router-dom'
-import { Button, Box, Typography, CircularProgress, Divider, alpha, List, ListItemText } from '@mui/material'
+import { Button, Box, Typography, CircularProgress, Divider, alpha, List, ListItemText, Modal } from '@mui/material'
 import ArrowBackIcon from '@mui/icons-material/ArrowBack'
 import SaveIcon from '@mui/icons-material/Save'
 import { usePageContext } from '../Page'
@@ -8,6 +8,33 @@ import { useDetailContext } from './Context/DetailContext'
 import { EditDataType, Editable, Reference } from '@/shared/types'
 import { useState, useEffect, Fragment } from 'react'
 import { referenceValidator } from '@/shared/validators/validator'
+import { countryBoundingBoxes } from '@/country_data/countryBoundingBoxes'
+import { isPointInBox } from '@/util/isPointInBox'
+
+export const OutOfBoundsWarningModal = ({
+  isOpen,
+  onAnswer,
+}: {
+  isOpen: boolean
+  onAnswer: (answer: boolean) => void
+}) => {
+  return (
+    <Modal open={isOpen} className={`modal ${isOpen ? 'open' : ''}`} onClick={() => onAnswer(false)}>
+      <div className="modal-content">
+        <h3>Coordinate warning</h3>
+        <p style={{ marginBottom: '2em' }}>
+          The coordinate selected is outside of the locality country. Do you still want to proceed?
+        </p>
+        <Button variant="contained" onClick={() => onAnswer(false)}>
+          Cancel
+        </Button>
+        <Button sx={{ marginLeft: '0.6em' }} variant="contained" onClick={() => onAnswer(true)}>
+          Proceed
+        </Button>
+      </div>
+    </Modal>
+  )
+}
 
 export const WriteButton = <T,>({
   onWrite,
@@ -19,9 +46,18 @@ export const WriteButton = <T,>({
   const { editData, setEditData, mode, setMode, validator, fieldsWithErrors, setFieldsWithErrors } =
     useDetailContext<T>()
   const [loading, setLoading] = useState(false)
+
+  const [outOfBoundsWarningOpen, setOutOfBoundsWarningOpen] = useState(false)
+
   const getButtonText = () => {
     if (!mode.staging) return hasStagingMode ? 'Finalize entry' : 'Save changes'
     return 'Complete and save'
+  }
+
+  // Checks if given coordinate is outside of country bounding box
+  const isCoordinateOutOfBounds = (dec_lat: number, dec_long: number, country: string): boolean => {
+    if (!(country in countryBoundingBoxes)) return false
+    return !isPointInBox(dec_lat, dec_long, countryBoundingBoxes[country])
   }
 
   /*  validates all fields when entering new/editing mode
@@ -81,31 +117,64 @@ export const WriteButton = <T,>({
     // @ts-expect-error Reason: Typescript doesn't recognise that references do exist. Unable to find a way around it. Fix if extra time
   }, [mode, editData.references])
 
+  const save = () => {
+    if (!mode.staging && hasStagingMode) {
+      setMode(mode.new ? 'staging-new' : 'staging-edit')
+      return
+    }
+
+    setLoading(true)
+    void onWrite(editData, setEditData).then(() => {
+      setLoading(false)
+      setMode('read')
+    })
+  }
+
   return (
-    <Button
-      disabled={Object.keys(fieldsWithErrors).length > 0}
-      id="write-button"
-      sx={{ width: '20em' }}
-      onClick={() => {
-        if (!mode.staging && hasStagingMode) {
-          setMode(mode.new ? 'staging-new' : 'staging-edit')
-          return
-        }
-        setLoading(true)
-        void onWrite(editData, setEditData).then(() => {
-          setLoading(false)
-          setMode('read')
-        })
-      }}
-      variant="contained"
-    >
-      {loading ? (
-        <CircularProgress size="1.2em" sx={{ color: 'white', marginRight: '1em' }} />
-      ) : (
-        <SaveIcon style={{ marginRight: '0.5em' }} />
-      )}
-      {getButtonText()}
-    </Button>
+    <>
+      <OutOfBoundsWarningModal
+        isOpen={outOfBoundsWarningOpen}
+        onAnswer={isOkay => {
+          setOutOfBoundsWarningOpen(false)
+          if (isOkay) save()
+        }}
+      />
+      <Button
+        disabled={Object.keys(fieldsWithErrors).length > 0}
+        id="write-button"
+        sx={{ width: '20em' }}
+        onClick={() => {
+          // Check for out-of-boundness before saving
+
+          if (
+            !('dec_lat' in (editData as object)) ||
+            !('dec_long' in (editData as object)) ||
+            !('country' in (editData as object))
+          ) {
+            save()
+            return
+          }
+
+          const localityObject = editData as unknown as { dec_lat: number; dec_long: number; country: string }
+          if (
+            !isCoordinateOutOfBounds(localityObject['dec_lat'], localityObject['dec_long'], localityObject['country'])
+          ) {
+            save()
+            return
+          }
+
+          setOutOfBoundsWarningOpen(true)
+        }}
+        variant="contained"
+      >
+        {loading ? (
+          <CircularProgress size="1.2em" sx={{ color: 'white', marginRight: '1em' }} />
+        ) : (
+          <SaveIcon style={{ marginRight: '0.5em' }} />
+        )}
+        {getButtonText()}
+      </Button>
+    </>
   )
 }
 

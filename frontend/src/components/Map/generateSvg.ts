@@ -1,5 +1,5 @@
 import { SVG } from '@svgdotjs/svg.js'
-import { borders } from './country_borders_WGS84'
+import { countryPolygons } from '../../country_data/countryPolygons.ts'
 import { Locality } from '@/shared/types'
 
 interface PixelCoordinates {
@@ -36,10 +36,10 @@ export const generateSvg = (
 
   if (!transparent) draw.polygon(`0,0 ${width},0 ${width},${width} 0,${width}`).fill('#ffffff')
 
-  borders.forEach(country_border => {
+  countryPolygons.forEach(countryBorder => {
     const points: string[] = []
 
-    country_border.forEach(coordinate => {
+    countryBorder.forEach(coordinate => {
       const pixelCoords = webMercatorConvert(coordinate[0], coordinate[1], width)
       points.push(`${pixelCoords.x},${pixelCoords.y}`)
     })
