@@ -182,7 +182,7 @@ export const DetailView = <T extends object>({
   )
 
   return (
-    <Stack rowGap={2}>
+    <Stack rowGap={2} sx={{ overflowX: 'hidden' }}>
       <DetailContextProvider contextState={initialState}>
         {!isUserPage && (
           <Box>

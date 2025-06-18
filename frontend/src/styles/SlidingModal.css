@@ -19,7 +19,7 @@
 
 /* width was 40em*/
 .sliding-modal-container .content {
-  --max-width: calc(100vw - 6em); 
+  --max-width: calc(100vw - 16em);
   background-color: white;
   position: absolute;
   top: 0;
@@ -33,10 +33,11 @@
 
 @media screen and (max-width: 600px) {
   .sliding-modal-container .content {
-  --max-width: calc(100vw - 3em); 
-}}
+    --max-width: calc(100vw - 3em);
+  }
+}
 
-.sliding-modal-container.open .content  {
+.sliding-modal-container.open .content {
   transform: translateX(0);
   pointer-events: initial;
 }
