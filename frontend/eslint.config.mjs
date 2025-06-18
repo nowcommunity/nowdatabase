@@ -31,7 +31,7 @@ export default [
       '**/jest.config.ts',
       '**/coverage',
       'src/components/Map/*.js',
-      'src/components/Map/country_borders_WGS84.ts',
+      'src/country_data/**',
     ],
   },
   ...fixupConfigRules(

@@ -31,3 +31,20 @@ $ node countryExport.js world-administrative-boundaries.geojson
 ```
 
 Which will either quietly create the aforementioned files in this directory or crash with an error.
+
+### Country name mappings
+
+Sometimes country names between the country name list in the validators folder and the U.N. data differ.
+For this purpose, at the top of the script there is a mapping object to convert the U.N. name to the name used in this application.
+Simply edit this object as needed.
+
+```js
+const nameMappings = {
+  // 'U.N. name': 'Our in-project name',
+  'Antigua & Barbuda': 'Antigua and Barbuda',
+  'U.K. of Great Britain and Northern Ireland': 'United Kingdom',
+  'United States Virgin Islands': 'Virgin Islands',
+
+  // ...
+}
+```
