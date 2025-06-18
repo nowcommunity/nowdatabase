@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import 'leaflet/dist/leaflet.css'
-import { borders } from './country_borders_WGS84'
+import { countryPolygons } from '../../country_data/countryPolygons.ts'
 import L, { LatLngExpression } from 'leaflet'
 import '../../styles/SingleLocalityMap.css'
 import northarrow from './images/north-arrow.png'
@@ -23,29 +23,28 @@ export const SingleLocalityMap = ({ dec_lat, dec_long }: Props) => {
     const coords: LatLngExpression = [dec_lat, dec_long]
     mapInstance.setView(coords, 4)
 
-    // BASE MAPS
-    //// OpenTopoMap
+    // ---- Base maps ----
+
+    // OpenTopoMap
     const topomap = L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', {
       attribution: 'Map data: © <a href="https://opentopomap.org">OpenTopoMap</a> (CC-BY-SA)',
       noWrap: true,
     }).addTo(mapInstance)
 
-    //// OpenStreetMap
+    // OpenStreetMap
     const osm = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
       noWrap: true,
     })
 
-    // LAYERS ON TOP OF BASE MAPS
-    //// Add borders to the map
-    borders.forEach(poly => {
-      L.polygon(poly as LatLngExpression[], { color: 'gray', weight: 1 }).addTo(mapInstance)
-    })
+    // ---- Layers on top of base maps ----
 
-    // create a polygon layer for the country borders that is in layer control panel..
+    // Create a polygon layer for the country borders that is in layer control panel..
     const borderLayer = L.layerGroup()
-    borders.forEach(country_border => {
-      const polygon = L.polygon(country_border as LatLngExpression[], {
+    countryPolygons.forEach(countryBorder => {
+      L.polygon(countryBorder as LatLngExpression[], { color: 'gray', weight: 1 }).addTo(mapInstance)
+
+      const polygon = L.polygon(countryBorder as LatLngExpression[], {
         color: '#136f94',
         fillOpacity: 0.3,
         weight: 1,
@@ -62,7 +61,7 @@ export const SingleLocalityMap = ({ dec_lat, dec_long }: Props) => {
     // Add a scale bar to the map
     L.control.scale({ position: 'bottomright' }).addTo(mapInstance)
 
-    //Add a layer control to the map
+    // Add a layer control to the map
     L.control.layers(baseMaps, {}, { position: 'topright' }).addTo(mapInstance)
 
     // Add north-arrow to the map
