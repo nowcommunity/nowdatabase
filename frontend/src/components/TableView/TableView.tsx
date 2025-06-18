@@ -132,7 +132,6 @@ export const TableView = <T extends MRT_RowData>({
     onColumnFiltersChange: setColumnFilters,
     renderRowActions: ({ row }) => {
       const hasSynonym = row.original.has_synonym ? true : false
-
       return (
         <Box sx={{ display: 'flex', flexWrap: 'nowrap', gap: '8px' }}>
           <ActionComponent {...{ selectorFn, url, checkRowRestriction, row, idFieldName }} />
@@ -233,9 +232,7 @@ export const TableView = <T extends MRT_RowData>({
           />
         </div>
       )}
-
       <MaterialReactTable table={table} />
-      <p> moikka </p>
     </Paper>
   )
 }
