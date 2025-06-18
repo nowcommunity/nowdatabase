@@ -35,6 +35,7 @@ export const TableView = <T extends MRT_RowData>({
   idFieldName,
   checkRowRestriction,
   selectorFn,
+  tableRowAction,
   url,
   title,
   combinedExport,
@@ -46,14 +47,16 @@ export const TableView = <T extends MRT_RowData>({
   serverSidePagination,
   isFetching,
 }: {
-  title?: string
   data: T[] | undefined
   columns: MRT_ColumnDef<T>[]
   visibleColumns: MRT_VisibilityState
   idFieldName: keyof T
   checkRowRestriction?: (row: T) => boolean
   selectorFn?: (id: T) => void
+  // here
+  tableRowAction?: (row: T) => void
   url?: string
+  title?: string
   combinedExport?: (lids: number[]) => Promise<void>
   kmlExport?: (table: MRT_TableInstance<T>) => void
   svgExport?: (table: MRT_TableInstance<T>) => void
@@ -127,7 +130,20 @@ export const TableView = <T extends MRT_RowData>({
       columnVisibility: visibleColumns,
     },
     onColumnFiltersChange: setColumnFilters,
-    renderRowActions: ({ row }) => <ActionComponent {...{ selectorFn, url, checkRowRestriction, row, idFieldName }} />,
+    renderRowActions: ({ row }) => {
+      const hasSynonym = row.original.has_synonym ? true : false
+      return (
+        <Box sx={{ display: 'flex', flexWrap: 'nowrap', gap: '8px' }}>
+          <ActionComponent {...{ selectorFn, url, checkRowRestriction, row, idFieldName }} />
+          {/* {hasSynonym && (
+            <button onClick={() => alert(`Synonym exists for id ${row.original[idFieldName]}`)}>Synonym icon</button>
+          )} */}
+          {hasSynonym && (
+            <ActionComponent {...{ selectorFn, tableRowAction, url, checkRowRestriction, row, idFieldName }} />
+          )}
+        </Box>
+      )
+    },
     displayColumnDefOptions: { 'mrt-row-actions': { size: 50, header: '' } },
     enableRowActions: true,
     enableMultiSort: !serverSidePagination,
@@ -216,7 +232,6 @@ export const TableView = <T extends MRT_RowData>({
           />
         </div>
       )}
-
       <MaterialReactTable table={table} />
     </Paper>
   )
