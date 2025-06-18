@@ -118,6 +118,14 @@ export const TableView = <T extends MRT_RowData>({
   const table = useMaterialReactTable({
     columns: columns,
     data: data || [],
+    muiTableBodyRowProps: ({ row }) => ({
+      onClick: () => {
+        navigate(`/${url}/${row.original[idFieldName]}`)
+      },
+      sx: {
+        cursor: 'pointer',
+      },
+    }),
     state: {
       columnFilters,
       showColumnFilters: true,
