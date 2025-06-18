@@ -1,9 +1,8 @@
-import { Box, Button, Tooltip } from '@mui/material'
+import { Box, Button, Tooltip, Typography } from '@mui/material'
 import { MRT_RowData, MRT_Row } from 'material-react-table'
 import { useNavigate } from 'react-router-dom'
 import ManageSearchIcon from '@mui/icons-material/ManageSearch'
 import PolicyIcon from '@mui/icons-material/Policy'
-import HelpCenter from '@mui/icons-material/HelpCenter'
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline'
 
 export const ActionComponent = <T extends MRT_RowData>({
@@ -29,7 +28,20 @@ export const ActionComponent = <T extends MRT_RowData>({
     if (selectorFn) {
       return <AddCircleOutlineIcon />
     } else if (tableRowAction) {
-      return <HelpCenter />
+      return (
+        <Typography
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            height: '100%',
+          }}
+          variant="button"
+          component="p"
+        >
+          S
+        </Typography>
+      )
     }
     return <ManageSearchIcon />
   }
