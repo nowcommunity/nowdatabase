@@ -3,7 +3,6 @@ import { MRT_RowData, MRT_Row } from 'material-react-table'
 import { useNavigate } from 'react-router-dom'
 import ManageSearchIcon from '@mui/icons-material/ManageSearch'
 import PolicyIcon from '@mui/icons-material/Policy'
-import StarIcon from '@mui/icons-material/Star'
 import HelpCenter from '@mui/icons-material/HelpCenter'
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline'
 
