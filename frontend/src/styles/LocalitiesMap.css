@@ -99,8 +99,10 @@
   transition: background-color 0.2s ease-out;
 }
 
-#localities-map .open-button:hover .downarrow::before,
-#localities-map .open-button:hover .downarrow::after {
+#localities-map:not(.open):hover .open-button .downarrow::before,
+#localities-map:not(.open):hover .open-button .downarrow::after,
+#localities-map.open .open-button:hover .downarrow::before,
+#localities-map.open .open-button:hover .downarrow::after {
   background-color: #606060;
 }
 
