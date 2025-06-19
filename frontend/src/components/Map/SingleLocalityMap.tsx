@@ -121,7 +121,7 @@ export const SingleLocalityMap = ({ decLat, decLong, boxes }: Props) => {
     return () => {
       map.removeLayer(newMarker)
     }
-  }, [map, decLat, decLong])
+  }, [map, decLat, decLong, boxes])
 
   document.title = 'Map'
 
