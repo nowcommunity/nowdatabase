@@ -141,8 +141,8 @@ export const FrontPage = () => {
           <p>
             The NOW Community [year]. New and Old Worlds Database of Fossil Mammals (NOW). Licensed under CC BY 4.0.
             Retrieved [download date] from{' '}
+            <a href="https://nowdatabase.org/now/database/">https://nowdatabase.org/now/database/</a>.<h3>DOI</h3>{' '}
           </p>
-          <a href="https://nowdatabase.org/now/database/">https://nowdatabase.org/now/database/</a>.<h3>DOI</h3>{' '}
           <a href="http://doi.org/10.5281/zenodo.4268068">doi:10.5281/zenodo.4268068</a>.
         </div>
       </section>

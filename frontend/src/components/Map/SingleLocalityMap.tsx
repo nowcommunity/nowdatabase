@@ -4,23 +4,25 @@ import { countryPolygons } from '../../country_data/countryPolygons.ts'
 import L, { LatLngExpression } from 'leaflet'
 import '../../styles/SingleLocalityMap.css'
 import northarrow from './images/north-arrow.png'
+import { CountryBoundingBox } from '@/country_data/countryBoundingBoxes.ts'
 
 interface Props {
-  dec_lat: number | undefined
-  dec_long: number | undefined
+  decLat?: number
+  decLong?: number
+  boxes?: CountryBoundingBox[]
 }
 
-export const SingleLocalityMap = ({ dec_lat, dec_long }: Props) => {
+export const SingleLocalityMap = ({ decLat, decLong, boxes }: Props) => {
   const mapRef = useRef<HTMLDivElement | null>(null)
   const [map, setMap] = useState<L.Map | null>(null)
 
   useEffect(() => {
-    if (!mapRef.current || !dec_lat || !dec_long) return
+    if (!mapRef.current || !decLat || !decLong) return
 
     const mapInstance = L.map(mapRef.current, { maxZoom: 16 })
     setMap(mapInstance)
 
-    const coords: LatLngExpression = [dec_lat, dec_long]
+    const coords: LatLngExpression = [decLat, decLong]
     mapInstance.setView(coords, 4)
 
     // ---- Base maps ----
@@ -80,15 +82,29 @@ export const SingleLocalityMap = ({ dec_lat, dec_long }: Props) => {
     return () => {
       mapInstance.remove()
     }
-  }, [dec_lat, dec_long])
+  }, [decLat, decLong])
 
   useEffect(() => {
-    if (!map || !dec_lat || !dec_long) return
+    if (!map || !decLat || !decLong) return
+
+    if (boxes) {
+      boxes.forEach(box => {
+        L.polygon(
+          [
+            [box.top, box.left],
+            [box.top, box.right],
+            [box.bottom, box.right],
+            [box.bottom, box.left],
+          ] as LatLngExpression[],
+          { color: 'blue' }
+        ).addTo(map)
+      })
+    }
 
     const newMarker = L.layerGroup()
 
     newMarker.addLayer(
-      L.circleMarker([dec_lat, dec_long], {
+      L.circleMarker([decLat, decLong], {
         radius: 4,
         color: '#db2c2c',
         fillColor: '#d95050',
@@ -105,7 +121,7 @@ export const SingleLocalityMap = ({ dec_lat, dec_long }: Props) => {
     return () => {
       map.removeLayer(newMarker)
     }
-  }, [map, dec_lat, dec_long])
+  }, [map, decLat, decLong, boxes])
 
   document.title = 'Map'
 
