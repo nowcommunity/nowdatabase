@@ -54,15 +54,17 @@ function main() {
           const lat = coord[1]
           const long = coord[0]
 
-          if (!bounds.top) bounds.top = long
-          if (!bounds.bottom) bounds.bottom = long
-          if (!bounds.left) bounds.left = lat
-          if (!bounds.right) bounds.right = lat
+          if (!bounds.top) bounds.top = lat
+          if (!bounds.bottom) bounds.bottom = lat
+          if (!bounds.left) bounds.left = long
+          if (!bounds.right) bounds.right = long
 
-          bounds.top = Math.min(bounds.top, long)
-          bounds.bottom = Math.max(bounds.bottom, long)
-          bounds.left = Math.min(bounds.left, lat)
-          bounds.right = Math.max(bounds.right, lat)
+          bounds.top = Math.min(bounds.top, lat)
+          bounds.bottom = Math.max(bounds.bottom, lat)
+
+          if ((long < 0 && bounds.left < 0) || (long > 0 && bounds.left > 0)) bounds.left = Math.min(bounds.left, long)
+          if ((long < 0 && bounds.right < 0) || (long > 0 && bounds.right > 0))
+            bounds.right = Math.max(bounds.right, long)
           return [lat, long]
         })
       )
