@@ -48,6 +48,13 @@ function main() {
       right: null,
     }
 
+    const halvedBounds = {
+      top: null,
+      left: null,
+      bottom: null,
+      right: null,
+    }
+
     feature.geometry.coordinates.forEach(poly => {
       polygons.push(
         poly[0].map(coord => {
@@ -58,13 +65,21 @@ function main() {
           if (!bounds.bottom) bounds.bottom = lat
           if (!bounds.left) bounds.left = long
           if (!bounds.right) bounds.right = long
-
           bounds.top = Math.min(bounds.top, lat)
           bounds.bottom = Math.max(bounds.bottom, lat)
+          bounds.left = Math.min(bounds.left, long)
+          bounds.right = Math.max(bounds.right, long)
 
-          if ((long < 0 && bounds.left < 0) || (long > 0 && bounds.left > 0)) bounds.left = Math.min(bounds.left, long)
-          if ((long < 0 && bounds.right < 0) || (long > 0 && bounds.right > 0))
-            bounds.right = Math.max(bounds.right, long)
+          if (!halvedBounds.top) halvedBounds.top = lat
+          if (!halvedBounds.bottom) halvedBounds.bottom = lat
+          if (!halvedBounds.right) halvedBounds.right = -180
+          if (!halvedBounds.left) halvedBounds.left = long
+          halvedBounds.top = Math.min(halvedBounds.top, lat)
+          halvedBounds.bottom = Math.max(halvedBounds.bottom, lat)
+
+          if (long < 0) halvedBounds.right = Math.max(halvedBounds.right, long)
+          else halvedBounds.left = Math.min(halvedBounds.left, long)
+
           return [lat, long]
         })
       )
@@ -73,7 +88,10 @@ function main() {
     let country = feature.properties.name
     if (country in nameMappings) country = nameMappings[country]
 
-    boundingBoxes[country] = bounds
+    const boundsWidth = bounds.right - bounds.left
+    const halvedBoundsWidth = halvedBounds.right + 180 + 180 - halvedBounds.left
+    const box = boundsWidth < halvedBoundsWidth ? bounds : halvedBounds
+    boundingBoxes[country] = box
   })
 
   const polygonString = 'export const countryPolygons: number[][][] = ' + JSON.stringify(polygons) + ';'
