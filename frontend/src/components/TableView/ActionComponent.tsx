@@ -48,6 +48,7 @@ export const ActionComponent = <T extends MRT_RowData>({
 
   const onClick = (event: React.MouseEvent) => {
     if (selectorFn) {
+      event.stopPropagation()
       selectorFn(row.original)
     } else if (tableRowAction) {
       event.stopPropagation()
