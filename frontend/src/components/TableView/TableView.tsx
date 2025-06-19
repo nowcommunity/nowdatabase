@@ -10,7 +10,7 @@ import {
   MRT_VisibilityState,
   MRT_TableInstance,
 } from 'material-react-table'
-import { Box, CircularProgress, Paper } from '@mui/material'
+import { Box, CircularProgress, IconButton, Paper, Button, Tooltip } from '@mui/material'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { ActionComponent } from './ActionComponent'
 import { usePageContext } from '../Page'
@@ -18,6 +18,7 @@ import { useUser } from '@/hooks/user'
 import { defaultPagination, defaultPaginationSmall } from '@/common'
 import '../../styles/TableView.css'
 import { TableToolBar } from './TableToolBar'
+import NotListedLocationIcon from '@mui/icons-material/NotListedLocation'
 
 type TableStateInUrl = 'sorting' | 'columnfilters' | 'pagination'
 
@@ -129,17 +130,22 @@ export const TableView = <T extends MRT_RowData>({
     initialState: {
       columnVisibility: visibleColumns,
     },
+    // Tooltip, mui docs: https://mui.com/material-ui/react-tooltip/
     onColumnFiltersChange: setColumnFilters,
     renderRowActions: ({ row }) => {
       const hasSynonym = row.original.has_synonym ? true : false
       return (
         <Box sx={{ display: 'flex', flexWrap: 'nowrap', gap: '8px' }}>
           <ActionComponent {...{ selectorFn, url, checkRowRestriction, row, idFieldName }} />
-          {/* {hasSynonym && (
-            <button onClick={() => alert(`Synonym exists for id ${row.original[idFieldName]}`)}>Synonym icon</button>
-          )} */}
           {hasSynonym && (
             <ActionComponent {...{ selectorFn, tableRowAction, url, checkRowRestriction, row, idFieldName }} />
+          )}
+          {row.id === '1' && (
+            <Tooltip title="This species is not currently in any locality" placement="right-start">
+              <Button>
+                <NotListedLocationIcon color="primary" />
+              </Button>
+            </Tooltip>
           )}
         </Box>
       )
