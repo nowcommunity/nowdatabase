@@ -22,7 +22,7 @@ export const PersonTab = () => {
   }, [currentUser])
 
   const countryOptions = ['', ...validCountries]
-  const userGroupOptions = ['su', 'eu', 'er', 'pl', 'plp', 'no', 'ro']
+  const userGroupOptions = ['su (admin)', 'eu (edit unrestricted)', 'er (edit restricted)', 'ro (read only)']
 
   const person = [
     ['Initials', textField('initials', { type: 'text', disabled: true })],

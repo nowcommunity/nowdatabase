@@ -46,10 +46,12 @@ export const ActionComponent = <T extends MRT_RowData>({
     return <ManageSearchIcon />
   }
 
-  const onClick = () => {
+  const onClick = (event: React.MouseEvent) => {
     if (selectorFn) {
+      event.stopPropagation()
       selectorFn(row.original)
     } else if (tableRowAction) {
+      event.stopPropagation()
       tableRowAction(row.original)
     } else {
       navigate(`/${url}/${id}`)

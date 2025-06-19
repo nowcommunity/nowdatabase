@@ -1,3 +1,5 @@
+import { Button } from '@mui/material'
+import ArrowBackIcon from '@mui/icons-material/ArrowBack'
 import '../../styles/SlidingModal.css'
 
 interface Props {
@@ -16,6 +18,10 @@ export const SlidingModal = ({ children, isOpen, onClose }: Props) => {
           e.stopPropagation()
         }}
       >
+        <Button sx={{ marginTop: '2.5em', marginLeft: '1em' }} onClick={onClose}>
+          <ArrowBackIcon color="primary" style={{ marginRight: '0.2em' }} />
+          Return to map
+        </Button>
         {children}
       </div>
     </div>
