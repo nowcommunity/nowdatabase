@@ -36,7 +36,7 @@ describe('Editing a person', () => {
     cy.get('[id=edit-button]').click()
 
     cy.contains('Choose user group').parent().type('e')
-    cy.contains('er').click()
+    cy.contains('er (edit restricted)').click()
     cy.get('[id=write-button]').click()
 
     cy.contains('er')
