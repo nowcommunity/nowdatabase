@@ -1,5 +1,6 @@
 import {
   LocalityDetailsType,
+  Museum,
   ReferenceDetailsType,
   RegionDetails,
   SpeciesDetailsType,
@@ -245,6 +246,19 @@ export const emptyRegion = {
   now_reg_coord_people: [],
   now_reg_coord_country: [],
 } as unknown as RegionDetails
+
+export const emptyMuseum = {
+  country: '',
+  state: '',
+  used_morph: false,
+  used_now: false,
+  used_gene: false,
+  museum: '',
+  institution: '',
+  alt_int_name: '',
+  city: '',
+  state_code: '',
+} as unknown as Museum
 
 export const defaultPagination: MRT_PaginationState = { pageIndex: 0, pageSize: 15 }
 export const defaultPaginationSmall: MRT_PaginationState = { pageIndex: 0, pageSize: 10 }
