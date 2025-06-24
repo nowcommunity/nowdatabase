@@ -48,21 +48,38 @@ function main() {
       right: null,
     }
 
+    const halvedBounds = {
+      top: null,
+      left: null,
+      bottom: null,
+      right: null,
+    }
+
     feature.geometry.coordinates.forEach(poly => {
       polygons.push(
         poly[0].map(coord => {
           const lat = coord[1]
           const long = coord[0]
 
-          if (!bounds.top) bounds.top = long
-          if (!bounds.bottom) bounds.bottom = long
-          if (!bounds.left) bounds.left = lat
-          if (!bounds.right) bounds.right = lat
+          if (!bounds.top) bounds.top = lat
+          if (!bounds.bottom) bounds.bottom = lat
+          if (!bounds.left) bounds.left = long
+          if (!bounds.right) bounds.right = long
+          bounds.top = Math.min(bounds.top, lat)
+          bounds.bottom = Math.max(bounds.bottom, lat)
+          bounds.left = Math.min(bounds.left, long)
+          bounds.right = Math.max(bounds.right, long)
 
-          bounds.top = Math.min(bounds.top, long)
-          bounds.bottom = Math.max(bounds.bottom, long)
-          bounds.left = Math.min(bounds.left, lat)
-          bounds.right = Math.max(bounds.right, lat)
+          if (!halvedBounds.top) halvedBounds.top = lat
+          if (!halvedBounds.bottom) halvedBounds.bottom = lat
+          if (!halvedBounds.right) halvedBounds.right = -180
+          if (!halvedBounds.left) halvedBounds.left = long
+          halvedBounds.top = Math.min(halvedBounds.top, lat)
+          halvedBounds.bottom = Math.max(halvedBounds.bottom, lat)
+
+          if (long < 0) halvedBounds.right = Math.max(halvedBounds.right, long)
+          else halvedBounds.left = Math.min(halvedBounds.left, long)
+
           return [lat, long]
         })
       )
@@ -71,7 +88,10 @@ function main() {
     let country = feature.properties.name
     if (country in nameMappings) country = nameMappings[country]
 
-    boundingBoxes[country] = bounds
+    const boundsWidth = bounds.right - bounds.left
+    const halvedBoundsWidth = halvedBounds.right + 180 + 180 - halvedBounds.left
+    const box = boundsWidth < halvedBoundsWidth ? bounds : halvedBounds
+    boundingBoxes[country] = box
   })
 
   const polygonString = 'export const countryPolygons: number[][][] = ' + JSON.stringify(polygons) + ';'

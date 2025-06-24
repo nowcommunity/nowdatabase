@@ -1,3 +1,5 @@
+//  NOTE: Contact button is disabled until we get the email server access working
+
 import { Box, Button, Modal } from '@mui/material'
 import { ReactNode, useState } from 'react'
 import { modalStyle } from './misc'
@@ -20,6 +22,7 @@ export const ContactModal = ({
     setOpen(false)
   }
 
+  return <></>
   return (
     <Box>
       <Button onClick={() => setOpen(true)} variant="outlined" startIcon={<EmailIcon />} className="button">
