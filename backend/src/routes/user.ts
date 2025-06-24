@@ -1,14 +1,15 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-import { Router } from 'express'
+import { Request, Router } from 'express'
 import { sign } from 'jsonwebtoken'
 import { SECRET, LOGIN_VALID_SECONDS } from '../utils/config'
 import * as bcrypt from 'bcrypt'
 import { nowDb } from '../utils/db'
 import { getRole } from '../middlewares/authenticator'
 import { AccessError } from '../middlewares/authorizer'
-import { Role } from '../../../frontend/src/shared/types'
+import { EditDataType, Role, UserDetailsType } from '../../../frontend/src/shared/types'
 import md5 from 'md5'
 import { validatePassword } from '../utils/validatePassword'
+import { validateUser } from '../services/user'
 
 const router = Router()
 
@@ -137,6 +138,26 @@ router.put('/password', async (req, res) => {
   return res.status(200).send()
 })
 
-router.post('/create')
+router.post('/create', async (req: Request<object, object, { user: UserDetailsType }>, res) => {
+  const { ...user } = req.body.user
+
+  if (!user.initials) {
+    return res.status(403).send({ error: 'Missing initials' })
+  }
+
+  if (!req.user || req.user.role !== Role.Admin)
+    return res.status(401).send({
+      message: 'User not authorized for the requested resource or action',
+    })
+
+  const error = await validateUser(user)
+  if (error)
+    return res.status(400).send({
+      message: error,
+    })
+
+  //  TODO: All good, write user.
+  return res.status(200).send({ content: 'nothing' })
+})
 
 export default router

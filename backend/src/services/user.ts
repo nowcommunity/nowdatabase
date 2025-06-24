@@ -2,6 +2,9 @@ import { nowDb } from '../utils/db'
 import * as bcrypt from 'bcrypt'
 import { logger } from '../utils/logger'
 import { sleep } from '../utils/common'
+import { UserDetailsType } from '../../../frontend/src/shared/types'
+import { validatePassword } from '../utils/validatePassword'
+import { personExists } from './person'
 
 export const createDraftLocality = async () => {
   const draftLocality = await nowDb.now_loc.findUnique({ where: { lid: 49999 } })
@@ -98,4 +101,27 @@ export const createTestUsers = async () => {
       await sleep(6000)
     }
   }
+}
+
+export const isUsernameTaken = async (username: string): Promise<boolean> =>
+  !!(await nowDb.com_users.findFirst({ where: { user_name: username } }))
+
+export const validateUser = async (user: UserDetailsType): Promise<string | null> => {
+  const usernameMinLength = 3
+  const usernameMaxLength = 100
+
+  if (!user.user_name) return 'Username is missing.'
+  if (!user.password) return 'Password is missing.'
+  if (!user.now_user_group) return 'User group is missing.'
+
+  if (user.user_name?.length < usernameMinLength || user.user_name?.length > usernameMaxLength)
+    return `Username must be between ${usernameMinLength} and ${usernameMaxLength} characters.`
+
+  const res = validatePassword(user.password)
+  if (!res.isValid) return res.error ?? 'Password is invalid.'
+
+  if (await isUsernameTaken(user.user_name)) return 'Username is already in use.'
+  if (!(await personExists(user.initials))) return "Person doesn't exist"
+
+  return null
 }

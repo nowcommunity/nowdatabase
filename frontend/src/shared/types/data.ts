@@ -5,6 +5,7 @@ import * as LogPrisma from '../../../../backend/prisma/generated/now_log_test_cl
 import { Editable, FixBigInt, RowState } from './util'
 import { Decimal } from '../../../../backend/prisma/generated/now_test_client/runtime/library'
 
+export type UserDetailsType = Prisma.com_users & { initials: string }
 export type Statistics = { localityCount: number; speciesCount: number; localitySpeciesCount: number }
 export type ActivityStatistic = { year: number; month: number; surname: string }
 export type SpeciesType = FixBigInt<Prisma.com_species>
@@ -475,6 +476,9 @@ export type GeonamesJSON = {
 }
 
 export type ParsedGeoname = Pick<Geoname, 'name' | 'countryName' | 'fclName' | 'adminName1' | 'lat' | 'lng'>
+
+export type UserGroup = 'su (admin)' | 'eu (edit unrestricted)' | 'er (edit restricted)' | 'ro (read only)'
+export const userGroups = ['ro (read only)', 'er (edit restricted)', 'eu (edit unrestricted)', 'su (admin)']
 
 export type SimplifiedLocality = {
   lid: number

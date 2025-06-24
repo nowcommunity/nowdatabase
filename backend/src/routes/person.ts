@@ -1,6 +1,6 @@
 import { Router, Request } from 'express'
 import { getAllPersons, getPersonDetails, validateEntirePerson } from '../services/person'
-import { Role, PersonDetailsType, EditDataType, EditMetaData } from '../../../frontend/src/shared/types'
+import { Role, PersonDetailsType, EditDataType, EditMetaData, userGroups } from '../../../frontend/src/shared/types'
 import { requireOneOf } from '../middlewares/authorizer'
 import { writePerson } from '../services/write/person'
 import { UserGroup, validUserGroups, writeUserGroup } from '../services/write/user'
@@ -60,7 +60,7 @@ router.put(
       req.user.role === Role.Admin &&
       editedPerson.user_id &&
       editedPerson.now_user_group &&
-      validUserGroups.includes(editedPerson.now_user_group)
+      userGroups.includes(editedPerson.now_user_group)
     ) {
       await writeUserGroup(editedPerson.user_id, editedPerson.now_user_group as UserGroup)
     }
