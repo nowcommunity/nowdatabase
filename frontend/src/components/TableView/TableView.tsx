@@ -10,7 +10,7 @@ import {
   MRT_VisibilityState,
   MRT_TableInstance,
 } from 'material-react-table'
-import { Box, CircularProgress, IconButton, Paper, Button, Tooltip } from '@mui/material'
+import { Box, CircularProgress, Paper, Tooltip } from '@mui/material'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { ActionComponent } from './ActionComponent'
 import { usePageContext } from '../Page'
