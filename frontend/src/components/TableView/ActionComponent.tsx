@@ -57,7 +57,7 @@ export const ActionComponent = <T extends MRT_RowData>({
   }
 
   return (
-    <Box display="flex" gap="0.2em" alignItems="center" width="3.6em">
+    <Box display="flex" gap="0.2em" alignItems="center">
       <Button data-cy={`detailview-button-${id}`} variant="text" style={{ width: '2em' }} onClick={onClick}>
         {getIconToShow()}
       </Button>

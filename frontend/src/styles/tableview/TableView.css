@@ -1,0 +1,13 @@
+ .row-actions-column {
+  display: grid;
+  grid-template-columns: repeat(3, 3.6em);
+  align-items: start;
+  justify-items: start;
+  gap: 1px; 
+  max-width: 10.8em;
+  min-width: 10.8em;
+}
+
+ .row-actions-column:last-child {
+    margin-right: 1.5em;
+ }

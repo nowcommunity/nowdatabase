@@ -19,6 +19,7 @@ import { defaultPagination, defaultPaginationSmall } from '@/common'
 import '../../styles/TableView.css'
 import { TableToolBar } from './TableToolBar'
 import NotListedLocationIcon from '@mui/icons-material/NotListedLocation'
+import '../../styles/tableview/TableView.css'
 
 type TableStateInUrl = 'sorting' | 'columnfilters' | 'pagination'
 
@@ -130,23 +131,27 @@ export const TableView = <T extends MRT_RowData>({
     initialState: {
       columnVisibility: visibleColumns,
     },
-    // Tooltip, mui docs: https://mui.com/material-ui/react-tooltip/
     onColumnFiltersChange: setColumnFilters,
     renderRowActions: ({ row }) => {
-      const hasSynonym = row.original.has_synonym ? true : false
       return (
-        <Box sx={{ display: 'flex', flexWrap: 'nowrap', gap: '8px' }}>
-          <ActionComponent {...{ selectorFn, url, checkRowRestriction, row, idFieldName }} />
-          {hasSynonym && (
-            <ActionComponent {...{ selectorFn, tableRowAction, url, checkRowRestriction, row, idFieldName }} />
-          )}
-          {row.id === '1' && (
-            <Tooltip title="This species is not currently in any locality" placement="right-start">
-              <Button>
-                <NotListedLocationIcon color="primary" />
-              </Button>
-            </Tooltip>
-          )}
+        <Box className="row-actions-column">
+          <Box>
+            <ActionComponent {...{ selectorFn, url, checkRowRestriction, row, idFieldName }} />
+          </Box>
+          <Box>
+            {row.original.has_synonym && (
+              <ActionComponent {...{ selectorFn, tableRowAction, url, checkRowRestriction, row, idFieldName }} />
+            )}
+          </Box>
+          <Box>
+            {row.original.has_no_locality && (
+              <Tooltip title="This species is not currently in any locality" placement="right-start">
+                <Button>
+                  <NotListedLocationIcon color="primary" />
+                </Button>
+              </Tooltip>
+            )}
+          </Box>
         </Box>
       )
     },

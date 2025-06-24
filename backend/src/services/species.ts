@@ -54,15 +54,29 @@ export const getAllSpecies = async () => {
     },
   })
 
+  const speciesWithLocality: { species_id: number }[] = await nowDb.now_ls.findMany({
+    where: {
+      now_loc: {
+        NOT: undefined,
+      },
+    },
+    select: {
+      species_id: true,
+    },
+    distinct: ['species_id'],
+  })
+
   const synonyms: { species_id: number }[] = await nowDb.com_taxa_synonym.findMany({
     select: { species_id: true },
     distinct: ['species_id'],
   })
 
+  const speciesWithLocalitySet = new Set(speciesWithLocality.map(s => s.species_id))
   const synonymIdSet = new Set(synonyms.map(s => s.species_id))
   const result = speciesResult.map(sp => ({
     ...sp,
     has_synonym: synonymIdSet.has(sp.species_id),
+    has_no_locality: !speciesWithLocalitySet.has(sp.species_id),
   }))
 
   return result
