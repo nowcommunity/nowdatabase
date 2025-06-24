@@ -80,9 +80,9 @@ export const getSpeciesDetails = async (id: number) => {
       now_sau: {
         include: {
           now_sr: {
-            include: {
+            select: {
               ref_ref: {
-                include: {
+                select: {
                   ref_authors: true,
                   ref_journal: true,
                 },
