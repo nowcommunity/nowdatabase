@@ -14,6 +14,7 @@ export const SynonymsModal = ({
   selectedSpecies: string | undefined
 }) => {
   const { isError, isFetching, data } = useGetSpeciesDetailsQuery(selectedSpecies ? selectedSpecies : skipToken)
+  console.log('SpeciesDetails: ', data)
 
   if (isFetching) {
     return (

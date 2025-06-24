@@ -59,7 +59,7 @@ export const getAllLocalities = async (user?: User) => {
     return rest
   }
 
-  const result = (await nowDb.now_loc.findMany({
+  const localityResult = (await nowDb.now_loc.findMany({
     select: {
       lid: true,
       loc_name: true,
@@ -116,6 +116,17 @@ export const getAllLocalities = async (user?: User) => {
       },
     },
   })) as LocalityPreFilter[]
+
+  const synonyms: { lid: number }[] = await nowDb.now_syn_loc.findMany({
+    select: { lid: true },
+    distinct: ['lid'],
+  })
+
+  const synonymIdSet = new Set(synonyms.map(s => s.lid))
+  const result = localityResult.map(loc => ({
+    ...loc,
+    has_loc_synonym: synonymIdSet.has(loc.lid),
+  }))
 
   if (showAll) return result.map(removeProjects)
 

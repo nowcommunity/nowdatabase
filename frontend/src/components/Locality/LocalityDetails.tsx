@@ -34,6 +34,7 @@ export const LocalityDetails = () => {
   const { isFetching, isError, data } = useGetLocalityDetailsQuery(id!, {
     skip: isNew,
   })
+  console.log('LocalityDetails: ', data)
 
   const notify = useNotify()
   const [deleteMutation, { isSuccess: deleteSuccess, isError: deleteError }] = useDeleteLocalityMutation()

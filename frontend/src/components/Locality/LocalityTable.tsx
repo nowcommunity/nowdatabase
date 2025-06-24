@@ -8,6 +8,7 @@ import { LocalitiesMap } from '../Map/LocalitiesMap'
 import { generateKml } from '@/util/kml'
 import { generateSvg } from '../Map/generateSvg'
 import { usePageContext } from '../Page'
+import { LocalitySynonymsModal } from './LocalitySynonymsModal'
 
 const decimalCount = (num: number) => {
   const numAsString = num.toString()
@@ -18,11 +19,19 @@ const decimalCount = (num: number) => {
 }
 
 export const LocalityTable = ({ selectorFn }: { selectorFn?: (newObject: Locality) => void }) => {
+  const [selectedLocality, setSelectedLocality] = useState<string | undefined>()
+  const [modalOpen, setModalOpen] = useState<boolean>(false)
   const { data: localitiesQueryData, isFetching: localitiesQueryIsFetching } = useGetAllLocalitiesQuery()
   const [getLocalitySpeciesList, { isLoading }] = useGetLocalitySpeciesListMutation()
   const [filteredLocalities, setFilteredLocalities] = useState<SimplifiedLocality[]>()
   const columnFilters = usePageContext()
   const notify = useNotify()
+
+  const handleLocalityRowActionClick = (row: Locality) => {
+    setSelectedLocality(row.lid.toString())
+    setModalOpen(true)
+    console.log('Row action clicked for locality:', row)
+  }
 
   useEffect(() => {
     // Filter localities for the map component
@@ -445,7 +454,9 @@ export const LocalityTable = ({ selectorFn }: { selectorFn?: (newObject: Localit
         svgExport={svgExport}
         exportIsLoading={isLoading}
         enableColumnFilterModes={true}
+        tableRowAction={handleLocalityRowActionClick}
       />
+      <LocalitySynonymsModal open={modalOpen} onClose={() => setModalOpen(false)} selectedLocality={selectedLocality} />
     </>
   )
 }
