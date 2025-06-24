@@ -10,7 +10,7 @@ import {
   MRT_VisibilityState,
   MRT_TableInstance,
 } from 'material-react-table'
-import { Box, CircularProgress, Paper } from '@mui/material'
+import { Box, CircularProgress, Paper, Tooltip } from '@mui/material'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { ActionComponent } from './ActionComponent'
 import { usePageContext } from '../Page'
@@ -18,6 +18,8 @@ import { useUser } from '@/hooks/user'
 import { defaultPagination, defaultPaginationSmall } from '@/common'
 import '../../styles/TableView.css'
 import { TableToolBar } from './TableToolBar'
+import NotListedLocationIcon from '@mui/icons-material/NotListedLocation'
+import '../../styles/tableview/TableView.css'
 
 type TableStateInUrl = 'sorting' | 'columnfilters' | 'pagination'
 
@@ -139,16 +141,23 @@ export const TableView = <T extends MRT_RowData>({
     },
     onColumnFiltersChange: setColumnFilters,
     renderRowActions: ({ row }) => {
-      const hasSynonym = row.original.has_synonym ? true : false
       return (
-        <Box sx={{ display: 'flex', flexWrap: 'nowrap', gap: '8px' }}>
-          <ActionComponent {...{ selectorFn, url, checkRowRestriction, row, idFieldName }} />
-          {/* {hasSynonym && (
-            <button onClick={() => alert(`Synonym exists for id ${row.original[idFieldName]}`)}>Synonym icon</button>
-          )} */}
-          {hasSynonym && (
-            <ActionComponent {...{ selectorFn, tableRowAction, url, checkRowRestriction, row, idFieldName }} />
-          )}
+        <Box className="row-actions-column">
+          <Box>
+            <ActionComponent {...{ selectorFn, url, checkRowRestriction, row, idFieldName }} />
+          </Box>
+          <Box>
+            {row.original.has_synonym && (
+              <ActionComponent {...{ selectorFn, tableRowAction, url, checkRowRestriction, row, idFieldName }} />
+            )}
+          </Box>
+          <Box display="flex" alignItems="center" px="1.35em">
+            {row.original.has_no_locality && (
+              <Tooltip title="This species is not currently in any locality" placement="right-start">
+                <NotListedLocationIcon color="disabled" sx={{}} />
+              </Tooltip>
+            )}
+          </Box>
         </Box>
       )
     },
