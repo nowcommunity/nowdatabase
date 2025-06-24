@@ -17,6 +17,7 @@ export const PersonTab = () => {
   const notify = useNotify()
   const isAdmin = currentUser.role == Role.Admin
   const [isAddUserModalOpen, setIsAddUserModalOpen] = useState(false)
+  const [disableAddUserButton, setDisableAddUserButton] = useState(false)
 
   useEffect(() => {
     if (!currentUser?.isFirstLogin) return
@@ -45,11 +46,18 @@ export const PersonTab = () => {
 
   return (
     <>
-      <AddUserModal isOpen={isAddUserModalOpen} onClose={() => setIsAddUserModalOpen(false)} />
+      <AddUserModal
+        isOpen={isAddUserModalOpen}
+        onClose={() => {
+          setIsAddUserModalOpen(false)
+        }}
+        onSave={() => setDisableAddUserButton(true)}
+        personInitials={data.initials}
+      />
       <ArrayFrame array={person} title="Person" />
       {data.user && <ArrayFrame array={user} title="User" />}
 
-      {isAdmin && !data.user && (
+      {isAdmin && !data.user && !disableAddUserButton && (
         <Button
           variant="contained"
           startIcon={<PersonAddIcon />}

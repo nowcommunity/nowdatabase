@@ -30,9 +30,6 @@ export const getPersonDetails = async (id: string) => {
   return { ...person, user, now_user_group: user?.now_user_group }
 }
 
-export const personExists = async (initials: string): Promise<boolean> =>
-  !!(await nowDb.com_people.findFirst({ where: { initials } }))
-
 export const validateEntirePerson = (editedFields: EditDataType<Prisma.com_people>) => {
   const keys = Object.keys(editedFields)
   const errors: ValidationObject[] = []

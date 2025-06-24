@@ -6,10 +6,12 @@ import * as bcrypt from 'bcrypt'
 import { nowDb } from '../utils/db'
 import { getRole } from '../middlewares/authenticator'
 import { AccessError } from '../middlewares/authorizer'
-import { EditDataType, Role, UserDetailsType } from '../../../frontend/src/shared/types'
+import { Role, UserDetailsType } from '../../../frontend/src/shared/types'
 import md5 from 'md5'
 import { validatePassword } from '../utils/validatePassword'
-import { validateUser } from '../services/user'
+import { createPasswordHash } from '../utils/createPasswordHash'
+import { writeUser } from '../services/write/user'
+import { validateUser } from '../utils/validateUser'
 
 const router = Router()
 
@@ -76,11 +78,7 @@ router.post('/login', async (req, res) => {
   })
 })
 
-const createPasswordHash = async (password: string) => {
-  const saltRounds = 10
-  return await bcrypt.hash(password, saltRounds)
-}
-
+//  TODO: Remove if not needed for anything
 router.post('/create', async (req, res) => {
   const { username, password, initials, role, secret } = req.body
 
@@ -138,16 +136,17 @@ router.put('/password', async (req, res) => {
   return res.status(200).send()
 })
 
-router.post('/create', async (req: Request<object, object, { user: UserDetailsType }>, res) => {
-  const { ...user } = req.body.user
+router.post('/new', async (req: Request<UserDetailsType>, res) => {
+  const user: UserDetailsType = req.body
+  if (!user) return res.status(400).send({ message: 'Missing user' })
 
   if (!user.initials) {
-    return res.status(403).send({ error: 'Missing initials' })
+    return res.status(403).send({ message: 'Missing initials' })
   }
 
   if (!req.user || req.user.role !== Role.Admin)
     return res.status(401).send({
-      message: 'User not authorized for the requested resource or action',
+      message: 'User not authorized for the requested resource or action.',
     })
 
   const error = await validateUser(user)
@@ -156,8 +155,14 @@ router.post('/create', async (req: Request<object, object, { user: UserDetailsTy
       message: error,
     })
 
-  //  TODO: All good, write user.
-  return res.status(200).send({ content: 'nothing' })
+  // All good, write user.
+  try {
+    await writeUser(user)
+  } catch (e) {
+    return res.status(500).send({ message: 'Unknown server error occurred' })
+  }
+
+  return res.status(200).send({ message: '' })
 })
 
 export default router

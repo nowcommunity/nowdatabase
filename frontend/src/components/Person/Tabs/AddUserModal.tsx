@@ -7,14 +7,9 @@ import SaveIcon from '@mui/icons-material/Save'
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff'
 import VisibilityIcon from '@mui/icons-material/Visibility'
 import CasinoIcon from '@mui/icons-material/Casino'
-import { userGroups } from '@/shared/types'
-
-type ChangePasswordError = { status: number; data: { error: string } }
-
-interface Props {
-  isOpen: boolean
-  onClose: () => void
-}
+import { UserDetailsType, userGroups } from '@/shared/types'
+import { useCreateUserMutation } from '@/redux/userReducer'
+import { useNavigate } from 'react-router-dom'
 
 const UserFieldInput = ({
   field,
@@ -47,13 +42,7 @@ const UserFieldInput = ({
   )
 }
 
-const UserPasswordInput = ({
-  onChange,
-  value,
-}: {
-  onChange: (value: string) => void
-  value: string
-}) => {
+const UserPasswordInput = ({ onChange, value }: { onChange: (value: string) => void; value: string }) => {
   const [hidePassword, setHidePassword] = useState(false)
 
   const randomPassword = () => {
@@ -95,7 +84,11 @@ const UserGroupSelect = ({
   value,
   onChange,
   id,
-}: { value: string; onChange: (e: SelectChangeEvent) => void; id?: string }) => {
+}: {
+  value: string
+  onChange: (e: SelectChangeEvent) => void
+  id?: string
+}) => {
   return (
     <Select label={'User group'} value={value} onChange={onChange} size="small" id={id}>
       {userGroups.map(group => (
@@ -113,12 +106,42 @@ interface UserFieldValues {
   userGroup: string
 }
 
-export const AddUserModal = ({ isOpen, onClose }: Props) => {
+interface Props {
+  isOpen: boolean
+  onClose: () => void
+  onSave: () => void
+  personInitials: string
+}
+
+export const AddUserModal = ({ isOpen, onClose, onSave, personInitials }: Props) => {
   const [fieldValues, setFieldValues] = useState<UserFieldValues>({
     username: '',
     password: '',
     userGroup: userGroups[0],
   })
+  const [createUser, { isLoading }] = useCreateUserMutation()
+  const notify = useNotify()
+  const navigate = useNavigate()
+
+  const save = () => {
+    const userDetails: UserDetailsType = {
+      initials: personInitials,
+      password: fieldValues.password,
+      user_name: fieldValues.username,
+      now_user_group: fieldValues.userGroup,
+    }
+
+    createUser(userDetails)
+      .unwrap()
+      .then(() => {
+        notify('User saved successfully.')
+        onClose()
+        onSave()
+      })
+      .catch(e => {
+        notify((e as { data: { message: string } }).data.message, 'error')
+      })
+  }
 
   return (
     <SlidingModal isOpen={isOpen} onClose={onClose} id="add-user-modal">
@@ -140,12 +163,7 @@ export const AddUserModal = ({ isOpen, onClose }: Props) => {
         />
         <div></div>
         <div className="save-btn-container">
-          <Button
-            variant="contained"
-            className="save-btn"
-            startIcon={<SaveIcon />}
-            onClick={() => console.log(fieldValues)}
-          >
+          <Button variant="contained" className="save-btn" startIcon={<SaveIcon />} onClick={save} disabled={isLoading}>
             Save
           </Button>
         </div>
