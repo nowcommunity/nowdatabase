@@ -34,7 +34,10 @@ export const ActionComponent = <T extends MRT_RowData>({
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
+            textAlign: 'center',
+
             height: '100%',
+            width: '100%',
           }}
           variant="button"
           component="p"
