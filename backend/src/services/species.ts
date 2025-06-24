@@ -87,6 +87,7 @@ export const getSpeciesDetails = async (id: number) => {
                   ref_journal: true,
                 },
               },
+              rid: true,
             },
           },
         },
