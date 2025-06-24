@@ -14,7 +14,6 @@ export const LocalitySynonymsModal = ({
   selectedLocality: string | undefined
 }) => {
   const { isError, isFetching, data } = useGetLocalityDetailsQuery(selectedLocality ? selectedLocality : skipToken)
-  console.log('LocalityDetails: ', data)
 
   if (isFetching) {
     return (
