@@ -151,11 +151,6 @@ export const TableView = <T extends MRT_RowData>({
               <ActionComponent {...{ selectorFn, tableRowAction, url, checkRowRestriction, row, idFieldName }} />
             )}
           </Box>
-          <Box>
-            {row.original.has_loc_synonym && (
-              <ActionComponent {...{ selectorFn, tableRowAction, url, checkRowRestriction, row, idFieldName }} />
-            )}
-          </Box>
           <Box display="flex" alignItems="center" px="1.35em">
             {row.original.has_no_locality && (
               <Tooltip title="This species is not currently in any locality" placement="right-start">

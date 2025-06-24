@@ -30,7 +30,6 @@ export const LocalityTable = ({ selectorFn }: { selectorFn?: (newObject: Localit
   const handleLocalityRowActionClick = (row: Locality) => {
     setSelectedLocality(row.lid.toString())
     setModalOpen(true)
-    console.log('Row action clicked for locality:', row)
   }
 
   useEffect(() => {

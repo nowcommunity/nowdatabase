@@ -125,7 +125,7 @@ export const getAllLocalities = async (user?: User) => {
   const synonymIdSet = new Set(synonyms.map(s => s.lid))
   const result = localityResult.map(loc => ({
     ...loc,
-    has_loc_synonym: synonymIdSet.has(loc.lid),
+    has_synonym: synonymIdSet.has(loc.lid),
   }))
 
   if (showAll) return result.map(removeProjects)
