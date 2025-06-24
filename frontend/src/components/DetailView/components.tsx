@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useNavigate } from 'react-router-dom'
-import { Button, Box, Typography, CircularProgress, Divider, alpha, List, ListItemText, Modal } from '@mui/material'
+import { Button, Box, Typography, CircularProgress, Divider, alpha, List, ListItemText } from '@mui/material'
 import ArrowBackIcon from '@mui/icons-material/ArrowBack'
 import SaveIcon from '@mui/icons-material/Save'
 import { usePageContext } from '../Page'
@@ -9,32 +9,8 @@ import { EditDataType, Editable, Reference } from '@/shared/types'
 import { useState, useEffect, Fragment } from 'react'
 import { referenceValidator } from '@/shared/validators/validator'
 import { countryBoundingBoxes } from '@/country_data/countryBoundingBoxes'
-import { isPointInBox } from '@/util/isPointInBox'
-
-export const OutOfBoundsWarningModal = ({
-  isOpen,
-  onAnswer,
-}: {
-  isOpen: boolean
-  onAnswer: (answer: boolean) => void
-}) => {
-  return (
-    <Modal open={isOpen} className={`modal ${isOpen ? 'open' : ''}`} onClick={() => onAnswer(false)}>
-      <div className="modal-content">
-        <h3>Coordinate warning</h3>
-        <p style={{ marginBottom: '2em' }}>
-          The coordinate selected is outside of the locality country. Do you still want to proceed?
-        </p>
-        <Button variant="contained" onClick={() => onAnswer(false)}>
-          Cancel
-        </Button>
-        <Button sx={{ marginLeft: '0.6em' }} variant="contained" onClick={() => onAnswer(true)}>
-          Proceed
-        </Button>
-      </div>
-    </Modal>
-  )
-}
+import { boundingBoxSplit, isPointInBoxes } from '@/util/isPointInBox'
+import { OutOfBoundsWarningModal, OutOfBoundsWarningModalState } from './OutOfBoundsWarningModal'
 
 export const WriteButton = <T,>({
   onWrite,
@@ -47,7 +23,13 @@ export const WriteButton = <T,>({
     useDetailContext<T>()
   const [loading, setLoading] = useState(false)
 
-  const [outOfBoundsWarningOpen, setOutOfBoundsWarningOpen] = useState(false)
+  // For coordinate out of bounds warning
+  const [warningModalState, setWarningModalState] = useState<OutOfBoundsWarningModalState>({
+    decLong: 0,
+    decLat: 0,
+    boxes: undefined,
+  })
+  const [warningModalOpen, setWarningModalOpen] = useState(false)
 
   const getButtonText = () => {
     if (!mode.staging) return hasStagingMode ? 'Finalize entry' : 'Save changes'
@@ -57,7 +39,7 @@ export const WriteButton = <T,>({
   // Checks if given coordinate is outside of country bounding box
   const isCoordinateOutOfBounds = (dec_lat: number, dec_long: number, country: string): boolean => {
     if (!(country in countryBoundingBoxes)) return false
-    return !isPointInBox(dec_lat, dec_long, countryBoundingBoxes[country])
+    return !isPointInBoxes(dec_lat, dec_long, boundingBoxSplit(countryBoundingBoxes[country]))
   }
 
   /*  validates all fields when entering new/editing mode
@@ -133,11 +115,12 @@ export const WriteButton = <T,>({
   return (
     <>
       <OutOfBoundsWarningModal
-        isOpen={outOfBoundsWarningOpen}
+        isOpen={warningModalOpen}
         onAnswer={isOkay => {
-          setOutOfBoundsWarningOpen(false)
+          setWarningModalOpen(false)
           if (isOkay) save()
         }}
+        state={warningModalState}
       />
       <Button
         disabled={Object.keys(fieldsWithErrors).length > 0}
@@ -156,14 +139,19 @@ export const WriteButton = <T,>({
           }
 
           const localityObject = editData as unknown as { dec_lat: number; dec_long: number; country: string }
-          if (
-            !isCoordinateOutOfBounds(localityObject['dec_lat'], localityObject['dec_long'], localityObject['country'])
-          ) {
+          if (!isCoordinateOutOfBounds(localityObject.dec_lat, localityObject.dec_long, localityObject.country)) {
             save()
             return
           }
 
-          setOutOfBoundsWarningOpen(true)
+          setWarningModalOpen(true)
+          setWarningModalState({
+            decLat: localityObject.dec_lat,
+            decLong: localityObject.dec_long,
+            // Guaranteed to exist by the isCoordinateOutOfBounds check above,
+            // as it will return false and return on no key found
+            boxes: boundingBoxSplit(countryBoundingBoxes[localityObject.country]),
+          })
         }}
         variant="contained"
       >

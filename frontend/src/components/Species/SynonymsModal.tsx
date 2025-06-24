@@ -53,11 +53,13 @@ export const SynonymsModal = ({
                   <strong>Comments</strong>
                 </TableCell>
               </TableRow>
-              <TableRow>
-                <TableCell>{data?.genus_name}</TableCell>
-                <TableCell>{data?.species_name}</TableCell>
-                <TableCell>{data?.sp_comment}</TableCell>
-              </TableRow>
+              {data?.com_taxa_synonym?.map((synonym, index) => (
+                <TableRow key={index}>
+                  <TableCell>{synonym.syn_genus_name}</TableCell>
+                  <TableCell>{synonym.syn_species_name}</TableCell>
+                  <TableCell>{synonym.syn_comment}</TableCell>
+                </TableRow>
+              ))}
             </TableBody>
           </Table>
         )}
