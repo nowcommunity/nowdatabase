@@ -5,6 +5,7 @@ import { emptyMuseum } from '../DetailView/common/defaultValues'
 import { validateMuseum } from '@/shared/validators/museum'
 import { useParams } from 'react-router-dom'
 import { CircularProgress } from '@mui/material'
+import { Museum } from '@/shared/types'
 
 export const MuseumDetails = () => {
   const { id } = useParams()
@@ -28,14 +29,14 @@ export const MuseumDetails = () => {
   }
 
   return (
-    <DetailView
+    <DetailView<Museum>
       tabs={tabs}
       data={!data ? emptyMuseum : data}
       onWrite={undefined}
       isNew={false}
-      hasStagingMode={false}
       validator={validateMuseum}
       deleteFunction={undefined}
+      hasStagingMode
     />
   )
 }
