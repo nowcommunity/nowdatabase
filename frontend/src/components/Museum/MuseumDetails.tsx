@@ -1,11 +1,12 @@
 import { useGetMuseumDetailsQuery } from '../../redux/museumReducer'
 import { DetailView, TabType } from '../DetailView/DetailView'
-import { MuseumInfoTab } from '../Locality/Tabs/MuseumInfoTab'
+import { MuseumInfoTab } from './Tabs/MuseumInfoTab'
 import { emptyMuseum } from '../DetailView/common/defaultValues'
 import { validateMuseum } from '@/shared/validators/museum'
 import { useParams } from 'react-router-dom'
 import { CircularProgress } from '@mui/material'
 import { Museum } from '@/shared/types'
+import { LocalityTab } from './Tabs/LocalityTab'
 
 export const MuseumDetails = () => {
   const { id } = useParams()
@@ -18,7 +19,7 @@ export const MuseumDetails = () => {
     },
     {
       title: 'Localities',
-      content: <>localities tab</>,
+      content: <LocalityTab />,
     },
   ]
 

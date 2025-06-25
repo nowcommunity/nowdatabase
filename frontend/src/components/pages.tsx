@@ -104,7 +104,7 @@ export const museumPage = (
     viewName="museum"
     idFieldName="museum"
     createTitle={(museum: Museum) => `${museum.institution}`}
-    createSubtitle={(museum: Museum) => `${museum.city}, ${museum.country}`}
+    createSubtitle={(museum: Museum) => `${museum.city ? `${museum.city}, ` : ''}${museum.country}`}
     getEditRights={(user: UserState, id: string | number) => {
       if ([Role.Admin, Role.EditUnrestricted].includes(user.role)) return fullRights
       if (user.role === Role.EditRestricted && user.localities.includes(id as number)) return limitedRights

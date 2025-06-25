@@ -7,6 +7,7 @@ export const MuseumInfoTab = () => {
   const museumInfo = [
     ['Institution', textField('institution')],
     ['Alt. name', textField('alt_int_name')],
+    ['City', textField('city')],
     ['Country', textField('country')],
     ['State', textField('state')],
     ['State code', textField('state_code')],
