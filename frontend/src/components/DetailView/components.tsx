@@ -8,6 +8,9 @@ import { useDetailContext } from './Context/DetailContext'
 import { EditDataType, Editable, Reference } from '@/shared/types'
 import { useState, useEffect, Fragment } from 'react'
 import { referenceValidator } from '@/shared/validators/validator'
+import { countryBoundingBoxes } from '@/country_data/countryBoundingBoxes'
+import { boundingBoxSplit, isPointInBoxes } from '@/util/isPointInBox'
+import { OutOfBoundsWarningModal, OutOfBoundsWarningModalState } from './OutOfBoundsWarningModal'
 
 export const WriteButton = <T,>({
   onWrite,
@@ -19,9 +22,24 @@ export const WriteButton = <T,>({
   const { editData, setEditData, mode, setMode, validator, fieldsWithErrors, setFieldsWithErrors } =
     useDetailContext<T>()
   const [loading, setLoading] = useState(false)
+
+  // For coordinate out of bounds warning
+  const [warningModalState, setWarningModalState] = useState<OutOfBoundsWarningModalState>({
+    decLong: 0,
+    decLat: 0,
+    boxes: undefined,
+  })
+  const [warningModalOpen, setWarningModalOpen] = useState(false)
+
   const getButtonText = () => {
     if (!mode.staging) return hasStagingMode ? 'Finalize entry' : 'Save changes'
     return 'Complete and save'
+  }
+
+  // Checks if given coordinate is outside of country bounding box
+  const isCoordinateOutOfBounds = (dec_lat: number, dec_long: number, country: string): boolean => {
+    if (!(country in countryBoundingBoxes)) return false
+    return !isPointInBoxes(dec_lat, dec_long, boundingBoxSplit(countryBoundingBoxes[country]))
   }
 
   /*  validates all fields when entering new/editing mode
@@ -81,31 +99,70 @@ export const WriteButton = <T,>({
     // @ts-expect-error Reason: Typescript doesn't recognise that references do exist. Unable to find a way around it. Fix if extra time
   }, [mode, editData.references])
 
+  const save = () => {
+    if (!mode.staging && hasStagingMode) {
+      setMode(mode.new ? 'staging-new' : 'staging-edit')
+      return
+    }
+
+    setLoading(true)
+    void onWrite(editData, setEditData).then(() => {
+      setLoading(false)
+      setMode('read')
+    })
+  }
+
   return (
-    <Button
-      disabled={Object.keys(fieldsWithErrors).length > 0}
-      id="write-button"
-      sx={{ width: '20em' }}
-      onClick={() => {
-        if (!mode.staging && hasStagingMode) {
-          setMode(mode.new ? 'staging-new' : 'staging-edit')
-          return
-        }
-        setLoading(true)
-        void onWrite(editData, setEditData).then(() => {
-          setLoading(false)
-          setMode('read')
-        })
-      }}
-      variant="contained"
-    >
-      {loading ? (
-        <CircularProgress size="1.2em" sx={{ color: 'white', marginRight: '1em' }} />
-      ) : (
-        <SaveIcon style={{ marginRight: '0.5em' }} />
-      )}
-      {getButtonText()}
-    </Button>
+    <>
+      <OutOfBoundsWarningModal
+        isOpen={warningModalOpen}
+        onAnswer={isOkay => {
+          setWarningModalOpen(false)
+          if (isOkay) save()
+        }}
+        state={warningModalState}
+      />
+      <Button
+        disabled={Object.keys(fieldsWithErrors).length > 0}
+        id="write-button"
+        sx={{ width: '20em' }}
+        onClick={() => {
+          // Check for out-of-boundness before saving
+
+          if (
+            !('dec_lat' in (editData as object)) ||
+            !('dec_long' in (editData as object)) ||
+            !('country' in (editData as object))
+          ) {
+            save()
+            return
+          }
+
+          const localityObject = editData as unknown as { dec_lat: number; dec_long: number; country: string }
+          if (!isCoordinateOutOfBounds(localityObject.dec_lat, localityObject.dec_long, localityObject.country)) {
+            save()
+            return
+          }
+
+          setWarningModalOpen(true)
+          setWarningModalState({
+            decLat: localityObject.dec_lat,
+            decLong: localityObject.dec_long,
+            // Guaranteed to exist by the isCoordinateOutOfBounds check above,
+            // as it will return false and return on no key found
+            boxes: boundingBoxSplit(countryBoundingBoxes[localityObject.country]),
+          })
+        }}
+        variant="contained"
+      >
+        {loading ? (
+          <CircularProgress size="1.2em" sx={{ color: 'white', marginRight: '1em' }} />
+        ) : (
+          <SaveIcon style={{ marginRight: '0.5em' }} />
+        )}
+        {getButtonText()}
+      </Button>
+    </>
   )
 }
 

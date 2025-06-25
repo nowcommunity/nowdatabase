@@ -1,51 +1,52 @@
 import { useEffect, useRef, useState } from 'react'
 import 'leaflet/dist/leaflet.css'
-import { borders } from './country_borders_WGS84'
+import { countryPolygons } from '../../country_data/countryPolygons.ts'
 import L, { LatLngExpression } from 'leaflet'
 import '../../styles/SingleLocalityMap.css'
 import northarrow from './images/north-arrow.png'
+import { CountryBoundingBox } from '@/country_data/countryBoundingBoxes.ts'
 
 interface Props {
-  dec_lat: number | undefined
-  dec_long: number | undefined
+  decLat?: number
+  decLong?: number
+  boxes?: CountryBoundingBox[]
 }
 
-export const SingleLocalityMap = ({ dec_lat, dec_long }: Props) => {
+export const SingleLocalityMap = ({ decLat, decLong, boxes }: Props) => {
   const mapRef = useRef<HTMLDivElement | null>(null)
   const [map, setMap] = useState<L.Map | null>(null)
 
   useEffect(() => {
-    if (!mapRef.current || !dec_lat || !dec_long) return
+    if (!mapRef.current || !decLat || !decLong) return
 
     const mapInstance = L.map(mapRef.current, { maxZoom: 16 })
     setMap(mapInstance)
 
-    const coords: LatLngExpression = [dec_lat, dec_long]
+    const coords: LatLngExpression = [decLat, decLong]
     mapInstance.setView(coords, 4)
 
-    // BASE MAPS
-    //// OpenTopoMap
+    // ---- Base maps ----
+
+    // OpenTopoMap
     const topomap = L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', {
       attribution: 'Map data: © <a href="https://opentopomap.org">OpenTopoMap</a> (CC-BY-SA)',
       noWrap: true,
     }).addTo(mapInstance)
 
-    //// OpenStreetMap
+    // OpenStreetMap
     const osm = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
       noWrap: true,
     })
 
-    // LAYERS ON TOP OF BASE MAPS
-    //// Add borders to the map
-    borders.forEach(poly => {
-      L.polygon(poly as LatLngExpression[], { color: 'gray', weight: 1 }).addTo(mapInstance)
-    })
+    // ---- Layers on top of base maps ----
 
-    // create a polygon layer for the country borders that is in layer control panel..
+    // Create a polygon layer for the country borders that is in layer control panel..
     const borderLayer = L.layerGroup()
-    borders.forEach(country_border => {
-      const polygon = L.polygon(country_border as LatLngExpression[], {
+    countryPolygons.forEach(countryBorder => {
+      L.polygon(countryBorder as LatLngExpression[], { color: 'gray', weight: 1 }).addTo(mapInstance)
+
+      const polygon = L.polygon(countryBorder as LatLngExpression[], {
         color: '#136f94',
         fillOpacity: 0.3,
         weight: 1,
@@ -62,7 +63,7 @@ export const SingleLocalityMap = ({ dec_lat, dec_long }: Props) => {
     // Add a scale bar to the map
     L.control.scale({ position: 'bottomright' }).addTo(mapInstance)
 
-    //Add a layer control to the map
+    // Add a layer control to the map
     L.control.layers(baseMaps, {}, { position: 'topright' }).addTo(mapInstance)
 
     // Add north-arrow to the map
@@ -81,15 +82,29 @@ export const SingleLocalityMap = ({ dec_lat, dec_long }: Props) => {
     return () => {
       mapInstance.remove()
     }
-  }, [dec_lat, dec_long])
+  }, [decLat, decLong])
 
   useEffect(() => {
-    if (!map || !dec_lat || !dec_long) return
+    if (!map || !decLat || !decLong) return
+
+    if (boxes) {
+      boxes.forEach(box => {
+        L.polygon(
+          [
+            [box.top, box.left],
+            [box.top, box.right],
+            [box.bottom, box.right],
+            [box.bottom, box.left],
+          ] as LatLngExpression[],
+          { color: 'blue' }
+        ).addTo(map)
+      })
+    }
 
     const newMarker = L.layerGroup()
 
     newMarker.addLayer(
-      L.circleMarker([dec_lat, dec_long], {
+      L.circleMarker([decLat, decLong], {
         radius: 4,
         color: '#db2c2c',
         fillColor: '#d95050',
@@ -106,7 +121,7 @@ export const SingleLocalityMap = ({ dec_lat, dec_long }: Props) => {
     return () => {
       map.removeLayer(newMarker)
     }
-  }, [map, dec_lat, dec_long])
+  }, [map, decLat, decLong, boxes])
 
   document.title = 'Map'
 

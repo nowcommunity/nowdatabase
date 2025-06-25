@@ -12,9 +12,9 @@
   background-color: white;
   padding: 2em 2em;
   width: calc(100% - 4em);
-  height: calc(100% - 2em);
+  max-height: calc(100% - 2em);
+  height: fit-content;
   max-width: 50em;
-  max-height: fit-content;
   border-radius: 0.25rem;
   overflow-y: auto;
 }

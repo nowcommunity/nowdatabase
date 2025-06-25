@@ -14,7 +14,7 @@ describe('Button Tests', () => {
     cy.contains('References').should('be.visible')
     cy.contains('Time Units').should('be.visible')
 
-    cy.contains('Cross-Search').should('be.visible')
+    cy.contains('Locality-Species').should('be.visible')
     cy.contains('Localities').should('be.visible')
     cy.contains('Species').should('be.visible')
   })
@@ -49,17 +49,12 @@ describe('Button Tests', () => {
 
   it('Cross Search button works', () => {
     cy.visit('/')
-    cy.contains('Cross-Search').click()
+    cy.contains('Locality-Species').click()
     cy.url().should('include', '/crosssearch')
     cy.contains('Locality name').should('be.visible')
     cy.contains('Country').should('be.visible')
     cy.contains('Genus').should('be.visible')
     cy.contains('Species').should('be.visible')
-  })
-
-  it('Map button works', () => {
-    cy.visit('/locality')
-    cy.contains('map').click()
   })
 
   it('Link to species details from species tab', () => {

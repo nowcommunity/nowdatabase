@@ -1,0 +1,15 @@
+#wrapper {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+footer {
+  background-color: #2e7fab;
+  color: white;
+  padding: 0.6em;
+  padding-left: 1em;
+  padding-top: 0.7em;
+  font-weight: 500;
+}
