@@ -52,7 +52,7 @@ export const PersonDetails = () => {
   const onWrite = async (editData: EditDataType<PersonDetailsType>) => {
     if (!editData.initials) return
     try {
-      if (await personExists(editData.initials)) {
+      if (isNew && (await personExists(editData.initials))) {
         notify('Initials already exists. Select Edit.', 'error')
         return
       }
