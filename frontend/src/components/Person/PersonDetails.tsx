@@ -1,5 +1,5 @@
 import { useParams, useNavigate } from 'react-router-dom'
-import { useEditPersonMutation, useGetPersonDetailsQuery } from '../../redux/personReducer'
+import { useEditPersonMutation, useGetPersonDetailsIdMutation, useGetPersonDetailsQuery } from '../../redux/personReducer'
 import { CircularProgress } from '@mui/material'
 import { DetailView, TabType } from '../DetailView/DetailView'
 import { PersonTab } from './Tabs/PersonTab'
@@ -25,7 +25,8 @@ export const PersonDetails = () => {
   const isNew = idFromUrl === 'new'
 
   const { isLoading, isError, data } = useGetPersonDetailsQuery(id!, {skip:isNew})
-
+  const [getPersonDetailsId] = useGetPersonDetailsIdMutation()
+  
   useEffect(() => {
     if (!isUserPage && user.role !== Role.Admin) {
       // if user has navigated to any person details page through the url, they are redirected to user-page instead
@@ -34,10 +35,27 @@ export const PersonDetails = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
+  const personExists = async (initials: string) => {
+      try{
+        const isPerson = await getPersonDetailsId(initials).unwrap()
+        if(isPerson) return true
+        return false
+      }catch 
+      {    
+        return false
+      }
+  }
+
   const onWrite = async (editData: EditDataType<PersonDetailsType>) => {
+    if (!editData.initials) return 
     try {
+      if (await personExists(editData.initials)) {
+        notify('Initials already exists. Select Edit.', 'error')
+        return
+      } 
       const { initials } = await editPersonRequest(editData).unwrap()
       notify('Saved person successfully.')
+      
       if (isUserPage) {
         setTimeout(() => navigate('/person/user-page'), 15)
       } else {
