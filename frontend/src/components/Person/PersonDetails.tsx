@@ -1,5 +1,9 @@
 import { useParams, useNavigate } from 'react-router-dom'
-import { useEditPersonMutation, useGetPersonDetailsIdMutation, useGetPersonDetailsQuery } from '../../redux/personReducer'
+import {
+  useEditPersonMutation,
+  useGetPersonDetailsIdMutation,
+  useGetPersonDetailsQuery,
+} from '../../redux/personReducer'
 import { CircularProgress } from '@mui/material'
 import { DetailView, TabType } from '../DetailView/DetailView'
 import { PersonTab } from './Tabs/PersonTab'
@@ -24,9 +28,9 @@ export const PersonDetails = () => {
   const id = isUserPage ? user.initials : idFromUrl
   const isNew = idFromUrl === 'new'
 
-  const { isLoading, isError, data } = useGetPersonDetailsQuery(id!, {skip:isNew})
+  const { isLoading, isError, data } = useGetPersonDetailsQuery(id!, { skip: isNew })
   const [getPersonDetailsId] = useGetPersonDetailsIdMutation()
-  
+
   useEffect(() => {
     if (!isUserPage && user.role !== Role.Admin) {
       // if user has navigated to any person details page through the url, they are redirected to user-page instead
@@ -36,26 +40,24 @@ export const PersonDetails = () => {
   }, [])
 
   const personExists = async (initials: string) => {
-      try{
-        const isPerson = await getPersonDetailsId(initials).unwrap()
-        if(isPerson) return true
-        return false
-      }catch 
-      {    
-        return false
-      }
+    try {
+      const isPerson = await getPersonDetailsId(initials).unwrap()
+      if (isPerson) return true
+      return false
+    } catch {
+      return false
+    }
   }
 
   const onWrite = async (editData: EditDataType<PersonDetailsType>) => {
-    if (!editData.initials) return 
+    if (!editData.initials) return
     try {
       if (await personExists(editData.initials)) {
         notify('Initials already exists. Select Edit.', 'error')
         return
-      } 
+      }
       const { initials } = await editPersonRequest(editData).unwrap()
       notify('Saved person successfully.')
-      
       if (isUserPage) {
         setTimeout(() => navigate('/person/user-page'), 15)
       } else {
@@ -68,9 +70,9 @@ export const PersonDetails = () => {
   }
 
   if (isError) return <div>Error loading data</div>
-  if (isLoading || !data && !isNew || mutationLoading) return <CircularProgress />
+  if (isLoading || (!data && !isNew) || mutationLoading) return <CircularProgress />
 
-  document.title = isNew ?  'New person' : `User - ${data!.user?.user_name}`
+  document.title = isNew ? 'New person' : `User - ${data!.user?.user_name}`
 
   const tabs: TabType[] = [
     {

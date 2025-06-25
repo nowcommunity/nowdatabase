@@ -59,8 +59,7 @@ router.put(
       editedPerson.user_id &&
       editedPerson.now_user_group &&
       validUserGroups.includes(editedPerson.now_user_group)
-    ) 
-    {
+    ) {
       await writeUserGroup(editedPerson.user_id, editedPerson.now_user_group as UserGroup)
     }
 

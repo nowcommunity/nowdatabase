@@ -28,7 +28,7 @@ export const PersonTab = () => {
   const userGroupOptions = ['su', 'eu', 'er', 'pl', 'plp', 'no', 'ro']
 
   const person = [
-    ['Initials', textField('initials', { type: 'text',  disabled: !isNew })],
+    ['Initials', textField('initials', { type: 'text', disabled: !isNew })],
     ['First Name', textField('first_name')],
     ['Surname', textField('surname')],
     ['Email', textField('email')],

@@ -1,7 +1,6 @@
 import { EditDataType, PersonDetailsType } from '../types'
 import { Validators, validator } from './validator'
 
-
 export const validatePerson = (
   editData: EditDataType<PersonDetailsType>,
   fieldName: keyof EditDataType<PersonDetailsType>
@@ -13,14 +12,13 @@ export const validatePerson = (
       asString: true,
       minLength: 2,
       maxLength: 8,
-  },
+    },
     first_name: {
       name: 'First Name',
       required: true,
       asString: true,
       minLength: 2,
       maxLength: 20,
-
     },
     surname: {
       name: 'Surname',
@@ -29,7 +27,7 @@ export const validatePerson = (
       minLength: 2,
       maxLength: 20,
     },
-    email: { 
+    email: {
       name: 'Email',
       required: true,
       asString: true,
@@ -47,7 +45,6 @@ export const validatePerson = (
       name: 'Country',
       required: true,
     },
-
   }
 
   return validator<EditDataType<PersonDetailsType>>(validators, editData, fieldName)
