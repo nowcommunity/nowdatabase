@@ -9,7 +9,6 @@ import VisibilityIcon from '@mui/icons-material/Visibility'
 import CasinoIcon from '@mui/icons-material/Casino'
 import { UserDetailsType, userGroups } from '@/shared/types'
 import { useCreateUserMutation } from '@/redux/userReducer'
-import { useNavigate } from 'react-router-dom'
 
 const UserFieldInput = ({
   field,
@@ -121,7 +120,6 @@ export const AddUserModal = ({ isOpen, onClose, onSave, personInitials }: Props)
   })
   const [createUser, { isLoading }] = useCreateUserMutation()
   const notify = useNotify()
-  const navigate = useNavigate()
 
   const save = () => {
     const userDetails: UserDetailsType = {

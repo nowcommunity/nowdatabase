@@ -2,8 +2,6 @@ import { nowDb } from '../utils/db'
 import * as bcrypt from 'bcrypt'
 import { logger } from '../utils/logger'
 import { sleep } from '../utils/common'
-import { UserDetailsType } from '../../../frontend/src/shared/types'
-import { validatePassword } from '../utils/validatePassword'
 
 export const createDraftLocality = async () => {
   const draftLocality = await nowDb.now_loc.findUnique({ where: { lid: 49999 } })

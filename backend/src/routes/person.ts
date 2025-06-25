@@ -1,9 +1,16 @@
 import { Router, Request } from 'express'
 import { getAllPersons, getPersonDetails, validateEntirePerson } from '../services/person'
-import { Role, PersonDetailsType, EditDataType, EditMetaData, userGroups } from '../../../frontend/src/shared/types'
+import {
+  Role,
+  PersonDetailsType,
+  EditDataType,
+  EditMetaData,
+  userGroups,
+  UserGroup,
+} from '../../../frontend/src/shared/types'
 import { requireOneOf } from '../middlewares/authorizer'
 import { writePerson } from '../services/write/person'
-import { UserGroup, validUserGroups, writeUserGroup } from '../services/write/user'
+import { writeUserGroup } from '../services/write/user'
 
 const router = Router()
 
