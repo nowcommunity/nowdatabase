@@ -54,7 +54,7 @@ export const FrontPage = () => {
             <a href="https://nowdatabase.org/now/board/">advisory board</a>.
           </p>
           <p>
-            <a href="https://nowdatabase.org/" target="_blank">
+            <a href="https://nowdatabase.org/" target="_blank" rel="noreferrer">
               See more information at nowdatabase.org
             </a>
           </p>
