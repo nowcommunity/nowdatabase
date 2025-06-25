@@ -13,7 +13,7 @@ import PersonAddIcon from '@mui/icons-material/PersonAdd'
 import { AddUserModal } from './AddUserModal'
 
 export const PersonTab = () => {
-  const { textField, dropdownWithSearch, data } = useDetailContext<PersonDetailsType>()
+  const { textField, dropdownWithSearch, data, mode } = useDetailContext<PersonDetailsType>()
   const currentUser = useUser()
   const notify = useNotify()
   const { id: idFromUrl } = useParams()
@@ -60,7 +60,7 @@ export const PersonTab = () => {
       <ArrayFrame array={person} title="Person" />
       {data.user && <ArrayFrame array={user} title="User" />}
 
-      {isAdmin && !data.user && !disableAddUserButton && (
+      {isAdmin && !data.user && !disableAddUserButton && mode.option === 'read' && (
         <Button
           variant="contained"
           startIcon={<PersonAddIcon />}
