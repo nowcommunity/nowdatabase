@@ -29,6 +29,7 @@
 
 #add-user-modal .password-input-container .field {
   flex: 1;
+  margin-right: 0.6em;
 }
 
 @media screen and (max-width: 600px) {
