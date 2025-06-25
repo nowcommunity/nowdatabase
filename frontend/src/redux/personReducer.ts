@@ -19,7 +19,6 @@ const personsApi = api.injectEndpoints({
       query: id => ({
         url: `/person/${id}`,
       }),
-
   }),
     editPerson: builder.mutation<PersonDetailsType, EditDataType<PersonDetailsType>>({
       query: person => ({

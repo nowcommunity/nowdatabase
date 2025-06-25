@@ -17,12 +17,19 @@ if (!isPerson) {
     })
     personId = newPerson.initials
   } else {
-    await nowDb.com_people.update({
+    await nowDb.com_people.update({ 
       where: { initials: person.initials },
-      data: { ...filteredPerson, full_name: `${filteredPerson.first_name} ${filteredPerson.surname}` },
+      data: { 
+        first_name: filteredPerson.first_name,
+        surname: filteredPerson.surname,
+        email: filteredPerson.email,
+        organization: filteredPerson.organization,
+        country: filteredPerson.country,
+        full_name: `${filteredPerson.first_name} ${filteredPerson.surname}` },
     })
     personId = filteredPerson.initials
-  }
+   }
 
   return personId
 }
+

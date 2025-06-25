@@ -4,7 +4,6 @@ import { Role, PersonDetailsType, EditDataType, EditMetaData } from '../../../fr
 import { requireOneOf } from '../middlewares/authorizer'
 import { writePerson } from '../services/write/person'
 import { UserGroup, validUserGroups, writeUserGroup } from '../services/write/user'
-import { request } from 'https'
 
 const router = Router()
 
@@ -35,12 +34,9 @@ router.put(
   '/',
   async (req: Request<object, object, { person: EditDataType<PersonDetailsType> & EditMetaData }>, res) => {
     const { ...editedPerson } = req.body.person
-    console.log('person-routessa eka', req.body.person)
     if (!editedPerson.initials) {
-      console.log('persons-routessa')
       return res.status(403).send({ error: 'Missing initials, creating new persons is not yet implemented' })
     }
-
     /* Access checking happens differently for this route, since we want to allow users to modify their own data */
     if (!req.user)
       return res.status(401).send({
@@ -63,8 +59,8 @@ router.put(
       editedPerson.user_id &&
       editedPerson.now_user_group &&
       validUserGroups.includes(editedPerson.now_user_group)
-    ) {
-      console.log('userGroupin yllä')
+    ) 
+    {
       await writeUserGroup(editedPerson.user_id, editedPerson.now_user_group as UserGroup)
     }
 
