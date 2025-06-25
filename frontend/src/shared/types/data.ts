@@ -337,6 +337,15 @@ export type RegionDetails = Prisma.now_reg_coord & { now_reg_coord_people: Array
   now_reg_coord_country: Array<RegionCountry>
 }
 
+export type PersonDetails = {
+  initials: string | null
+  first_name: string | null
+  surname: string | null
+  email: string | null
+  organization: string | null
+  country: string | null
+}
+
 // used in Region's CoordinatorTab to allow adding com_people field to the editData manually
 export type RegionDetailsWithComPeople = Prisma.now_reg_coord & {
   now_reg_coord_people: Array<RegionCoordinator & { com_people?: Prisma.com_people }>

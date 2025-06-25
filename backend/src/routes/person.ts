@@ -41,11 +41,9 @@ router.put(
   '/',
   async (req: Request<object, object, { person: EditDataType<PersonDetailsType> & EditMetaData }>, res) => {
     const { ...editedPerson } = req.body.person
-
     if (!editedPerson.initials) {
       return res.status(403).send({ error: 'Missing initials, creating new persons is not yet implemented' })
     }
-
     /* Access checking happens differently for this route, since we want to allow users to modify their own data */
     if (!req.user)
       return res.status(401).send({

@@ -1,5 +1,9 @@
 import { useParams, useNavigate } from 'react-router-dom'
-import { useEditPersonMutation, useGetPersonDetailsQuery } from '../../redux/personReducer'
+import {
+  useEditPersonMutation,
+  useGetPersonDetailsIdMutation,
+  useGetPersonDetailsQuery,
+} from '../../redux/personReducer'
 import { CircularProgress } from '@mui/material'
 import { DetailView, TabType } from '../DetailView/DetailView'
 import { PersonTab } from './Tabs/PersonTab'
@@ -8,6 +12,7 @@ import { EditDataType, PersonDetailsType, Role, ValidationErrors } from '@/share
 import { validatePerson } from '@/shared/validators/person'
 import { useNotify } from '@/hooks/notification'
 import { useEffect } from 'react'
+import { emptyPerson } from '../DetailView/common/defaultValues'
 
 export const PersonDetails = () => {
   const { id: idFromUrl } = useParams()
@@ -21,8 +26,10 @@ export const PersonDetails = () => {
   // We designate special id 'user-page' instead of normal initials to mean current user's own page.
   const isUserPage = idFromUrl === 'user-page'
   const id = isUserPage ? user.initials : idFromUrl
+  const isNew = idFromUrl === 'new'
 
-  const { isLoading, isError, data } = useGetPersonDetailsQuery(id!)
+  const { isLoading, isError, data } = useGetPersonDetailsQuery(id!, { skip: isNew })
+  const [getPersonDetailsId] = useGetPersonDetailsIdMutation()
 
   useEffect(() => {
     if (!isUserPage && user.role !== Role.Admin) {
@@ -32,8 +39,23 @@ export const PersonDetails = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  const onWrite = async (editData: EditDataType<PersonDetailsType>) => {
+  const personExists = async (initials: string) => {
     try {
+      const isPerson = await getPersonDetailsId(initials).unwrap()
+      if (isPerson) return true
+      return false
+    } catch {
+      return false
+    }
+  }
+
+  const onWrite = async (editData: EditDataType<PersonDetailsType>) => {
+    if (!editData.initials) return
+    try {
+      if (isNew && (await personExists(editData.initials))) {
+        notify('Initials already exists. Select Edit.', 'error')
+        return
+      }
       const { initials } = await editPersonRequest(editData).unwrap()
       notify('Saved person successfully.')
       if (isUserPage) {
@@ -48,9 +70,9 @@ export const PersonDetails = () => {
   }
 
   if (isError) return <div>Error loading data</div>
-  if (isLoading || !data || mutationLoading) return <CircularProgress />
+  if (isLoading || (!data && !isNew) || mutationLoading) return <CircularProgress />
 
-  document.title = `User - ${data.user?.user_name}`
+  document.title = isNew ? 'New person' : `User - ${data!.user?.user_name}`
 
   const tabs: TabType[] = [
     {
@@ -62,10 +84,11 @@ export const PersonDetails = () => {
   return (
     <DetailView
       onWrite={onWrite}
+      isNew={isNew}
       isUserPage={isUserPage}
       isPersonPage={true}
       tabs={tabs}
-      data={data}
+      data={isNew ? emptyPerson : data!}
       validator={validatePerson}
     />
   )

@@ -8,13 +8,16 @@ import { Box, Button } from '@mui/material'
 import { useEffect, useState } from 'react'
 import { useNotify } from '@/hooks/notification'
 import { validCountries } from '@/shared/validators/countryList'
+import { useParams } from 'react-router-dom'
 import PersonAddIcon from '@mui/icons-material/PersonAdd'
 import { AddUserModal } from './AddUserModal'
 
 export const PersonTab = () => {
-  const { textField, dropdownWithSearch, data } = useDetailContext<PersonDetailsType>()
+  const { textField, dropdownWithSearch, data, mode } = useDetailContext<PersonDetailsType>()
   const currentUser = useUser()
   const notify = useNotify()
+  const { id: idFromUrl } = useParams()
+  const isNew = idFromUrl === 'new'
   const isAdmin = currentUser.role == Role.Admin
   const [isAddUserModalOpen, setIsAddUserModalOpen] = useState(false)
   const [disableAddUserButton, setDisableAddUserButton] = useState(false)
@@ -29,7 +32,7 @@ export const PersonTab = () => {
   const countryOptions = ['', ...validCountries]
 
   const person = [
-    ['Initials', textField('initials', { type: 'text', disabled: true })],
+    ['Initials', textField('initials', { type: 'text', disabled: !isNew })],
     ['First Name', textField('first_name')],
     ['Surname', textField('surname')],
     ['Email', textField('email')],
@@ -57,7 +60,7 @@ export const PersonTab = () => {
       <ArrayFrame array={person} title="Person" />
       {data.user && <ArrayFrame array={user} title="User" />}
 
-      {isAdmin && !data.user && !disableAddUserButton && (
+      {isAdmin && !data.user && !disableAddUserButton && mode.option === 'read' && (
         <Button
           variant="contained"
           startIcon={<PersonAddIcon />}
