@@ -54,7 +54,9 @@ export const FrontPage = () => {
             <a href="https://nowdatabase.org/now/board/">advisory board</a>.
           </p>
           <p>
-            <a href="https://nowdatabase.org/">See more information at nowdatabase.org</a>
+            <a href="https://nowdatabase.org/" target="_blank">
+              See more information at nowdatabase.org
+            </a>
           </p>
         </div>
         <div className="image-container">
