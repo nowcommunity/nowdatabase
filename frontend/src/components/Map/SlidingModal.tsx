@@ -6,11 +6,13 @@ interface Props {
   children: JSX.Element
   isOpen: boolean
   onClose: () => void
+  returnButtonText?: string
+  id?: string
 }
 
-export const SlidingModal = ({ children, isOpen, onClose }: Props) => {
+export const SlidingModal = ({ children, isOpen, onClose, returnButtonText = 'Return', id }: Props) => {
   return (
-    <div className={`sliding-modal-container ${isOpen ? 'open' : ''}`}>
+    <div className={`sliding-modal-container ${isOpen ? 'open' : ''}`} id={id}>
       <div className="background" onClick={onClose}></div>
       <div
         className="content"
@@ -20,7 +22,7 @@ export const SlidingModal = ({ children, isOpen, onClose }: Props) => {
       >
         <Button sx={{ marginTop: '2.5em', marginLeft: '1em' }} onClick={onClose}>
           <ArrowBackIcon color="primary" style={{ marginRight: '0.2em' }} />
-          Return to map
+          {returnButtonText}
         </Button>
         {children}
       </div>
