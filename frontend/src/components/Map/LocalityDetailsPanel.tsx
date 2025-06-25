@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react'
 import { LocalityDetailsType } from '@/shared/types/data.js'
 import { SpeciesTable } from './SpeciesTable'
 import '../../styles/LocalityDetailsPanel.css'
+import { Link } from 'react-router-dom'
 
 interface Props {
   localityDetailsQueryData: LocalityDetailsType | undefined
@@ -37,7 +38,9 @@ export const LocalityInfo = ({ localityDetailsQueryData, selectedLocality, detai
           <p>Loading...</p>
         ) : (
           <div>
-            <h2>{localityDetailsQueryData.loc_name}</h2>
+            <Link to={`/locality/${localityDetailsQueryData.lid}`}>
+              <h2>{localityDetailsQueryData.loc_name}</h2>
+            </Link>
             <p>
               <strong>ID:</strong> {localityDetailsQueryData.lid}
             </p>

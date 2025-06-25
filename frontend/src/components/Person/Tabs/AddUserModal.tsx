@@ -45,8 +45,8 @@ const UserPasswordInput = ({ onChange, value }: { onChange: (value: string) => v
   const [hidePassword, setHidePassword] = useState(false)
 
   const randomPassword = () => {
-    const passwordLength = 12
-    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
+    const passwordLength = 14
+    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789^?$%&~!'
     let result: string = ''
 
     for (let i = 0; i < passwordLength; i++) {
