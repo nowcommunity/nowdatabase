@@ -249,7 +249,6 @@ export const emptyRegion = {
   now_reg_coord_country: [],
 } as unknown as RegionDetails
 
-<<<<<<< museum-tab
 export const emptyMuseum = {
   country: '',
   state: '',
@@ -262,7 +261,7 @@ export const emptyMuseum = {
   city: '',
   state_code: '',
 } as unknown as Museum
-=======
+
 export const emptyPerson = {
   initials: '',
   first_name: '',
@@ -271,7 +270,6 @@ export const emptyPerson = {
   organization: '',
   country: '',
 } as unknown as PersonDetailsType
->>>>>>> main
 
 export const defaultPagination: MRT_PaginationState = { pageIndex: 0, pageSize: 15 }
 export const defaultPaginationSmall: MRT_PaginationState = { pageIndex: 0, pageSize: 10 }
