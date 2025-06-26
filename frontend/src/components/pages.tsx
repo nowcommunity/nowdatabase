@@ -8,6 +8,7 @@ import {
   ProjectDetailsType,
   RegionDetails as RegionDetailsType,
   Role,
+  Museum,
 } from '@/shared/types'
 import { CrossSearchTable } from './CrossSearch/CrossSearchTable'
 import { LocalityDetails } from './Locality/LocalityDetails'
@@ -29,6 +30,8 @@ import { RegionTable } from './Region/RegionTable'
 import { RegionDetails } from './Region/RegionDetails'
 import { UserState } from '@/redux/userReducer'
 import { FrontPage } from './FrontPage'
+import { MuseumTable } from './Museum/MuseumTable'
+import { MuseumDetails } from './Museum/MuseumDetails'
 
 const noRights: EditRights = {}
 const fullRights: EditRights = { new: true, edit: true, delete: true }
@@ -89,6 +92,22 @@ export const speciesPage = (
     getEditRights={(user: UserState) => {
       if ([Role.Admin, Role.EditUnrestricted].includes(user.role)) return fullRights
       if (user.role === Role.EditRestricted) return limitedRights
+      return noRights
+    }}
+  />
+)
+
+export const museumPage = (
+  <Page
+    tableView={<MuseumTable />}
+    detailView={<MuseumDetails />}
+    viewName="museum"
+    idFieldName="museum"
+    createTitle={(museum: Museum) => `${museum.institution}`}
+    createSubtitle={(museum: Museum) => `${museum.city ? `${museum.city}, ` : ''}${museum.country}`}
+    getEditRights={(user: UserState, id: string | number) => {
+      if ([Role.Admin, Role.EditUnrestricted].includes(user.role)) return fullRights
+      if (user.role === Role.EditRestricted && user.localities.includes(id as number)) return limitedRights
       return noRights
     }}
   />

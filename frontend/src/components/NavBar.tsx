@@ -24,6 +24,7 @@ export const NavBar = () => {
     { title: 'References', url: '/reference' },
     { title: 'Time Units', url: '/time-unit' },
     { title: 'Time Bounds', url: '/time-bound', allowedRoles: [Role.Admin, Role.EditUnrestricted] },
+    { title: 'Museums', url: '/museum' },
     {
       title: 'Admin',
       url: '/admin',
