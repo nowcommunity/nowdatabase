@@ -21,10 +21,10 @@ export const NavBar = () => {
     { title: 'Localities', url: '/locality' },
     { title: 'Species', url: '/species' },
     { title: 'Locality-Species', url: '/crosssearch' },
-    { title: 'Museums', url: '/museum' },
     { title: 'References', url: '/reference' },
     { title: 'Time Units', url: '/time-unit' },
     { title: 'Time Bounds', url: '/time-bound', allowedRoles: [Role.Admin, Role.EditUnrestricted] },
+    { title: 'Museums', url: '/museum' },
     {
       title: 'Admin',
       url: '/admin',
