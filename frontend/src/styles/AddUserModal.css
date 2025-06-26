@@ -1,0 +1,45 @@
+#add-user-modal .content {
+  width: 100%;
+  max-width: 40em;
+}
+
+#add-user-modal .inputs {
+  display: grid;
+  padding: 2em;
+
+  grid-template-columns: 1fr 2fr;
+  align-items: center;
+  row-gap: 0.8em;
+  column-gap: 1em;
+}
+
+#add-user-modal .inputs > label {
+  font-weight: 600;
+}
+
+#add-user-modal .save-btn-container {
+  display: flex;
+  justify-content: flex-end;
+  padding-top: 1em;
+}
+
+#add-user-modal .password-input-container {
+  display: flex;
+}
+
+#add-user-modal .password-input-container .field {
+  flex: 1;
+  margin-right: 0.6em;
+}
+
+@media screen and (max-width: 600px) {
+  #add-user-modal .inputs {
+    grid-template-columns: 1fr;
+    column-gap: 0;
+    row-gap: 0.3em;
+  }
+
+  #add-user-modal .inputs > label {
+    margin-top: 0.6em;
+  }
+}

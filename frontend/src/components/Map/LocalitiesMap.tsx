@@ -163,7 +163,11 @@ export const LocalitiesMap = ({ localities, isFetching }: Props) => {
           <span className="downarrow"></span>
         </div>
       </article>
-      <SlidingModal isOpen={localityDetailsIsOpen} onClose={() => setLocalityDetailsIsOpen(false)}>
+      <SlidingModal
+        isOpen={localityDetailsIsOpen}
+        onClose={() => setLocalityDetailsIsOpen(false)}
+        returnButtonText="Return to map"
+      >
         <LocalityInfo
           localityDetailsQueryData={localityDetailsQueryData}
           detailsLoading={detailsLoading}
