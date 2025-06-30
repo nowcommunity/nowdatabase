@@ -1,5 +1,14 @@
 import { EditDataType, Species, SpeciesSynonym } from '@/shared/types'
 
+const generateMultipleParentsError = (
+  invalidField: string,
+  invalidValue1: string | null,
+  invalidValue2: string | null
+) => {
+  return `This taxon has several entries for ${invalidField}: ${invalidValue1}, ${invalidValue2}.
+Please contact the NOW administration to fix this taxonomy.`
+}
+
 const isDuplicateTaxon = (newSpecies: EditDataType<Species>, existingSpecies: Species) => {
   if (
     newSpecies.species_id !== existingSpecies.species_id &&
@@ -38,8 +47,7 @@ const checkOrderFamily = (newSpecies: EditDataType<Species>, existingSpecies: Sp
     newSpecies.family_name !== 'indet.' &&
     newSpecies.family_name !== 'incertae sedis' &&
     newSpecies.family_name !== 'fam.' &&
-    newSpecies.family_name === existingSpecies.family_name &&
-    newSpecies.order_name !== existingSpecies.order_name
+    newSpecies.family_name === existingSpecies.family_name
   )
 }
 
@@ -55,8 +63,7 @@ const checkFamilyGenus = (newSpecies: EditDataType<Species>, existingSpecies: Sp
     newSpecies.subfamily_name !== 'indet.' &&
     newSpecies.genus_name !== 'indet.' &&
     newSpecies.genus_name !== 'gen.' &&
-    newSpecies.genus_name === existingSpecies.genus_name &&
-    newSpecies.family_name !== existingSpecies.family_name
+    newSpecies.genus_name === existingSpecies.genus_name
   )
 }
 
@@ -67,8 +74,7 @@ const checkSubClassOrder = (newSpecies: EditDataType<Species>, existingSpecies: 
     newSpecies.order_name !== 'indet.' &&
     newSpecies.order_name !== 'incertae sedis' &&
     existingSpecies.subclass_or_superorder_name &&
-    newSpecies.order_name === existingSpecies.order_name &&
-    newSpecies.subclass_or_superorder_name !== existingSpecies.subclass_or_superorder_name
+    newSpecies.order_name === existingSpecies.order_name
   )
 }
 const checkOrderSubOrder = (newSpecies: EditDataType<Species>, existingSpecies: Species) => {
@@ -78,8 +84,7 @@ const checkOrderSubOrder = (newSpecies: EditDataType<Species>, existingSpecies: 
     newSpecies.order_name !== 'incertae sedis' &&
     newSpecies.suborder_or_superfamily_name &&
     newSpecies.suborder_or_superfamily_name !== 'indet.' &&
-    newSpecies.suborder_or_superfamily_name === existingSpecies.suborder_or_superfamily_name &&
-    newSpecies.order_name !== existingSpecies.order_name
+    newSpecies.suborder_or_superfamily_name === existingSpecies.suborder_or_superfamily_name
   )
 }
 
@@ -93,8 +98,7 @@ const checkSubOrderFamily = (newSpecies: EditDataType<Species>, existingSpecies:
     newSpecies.family_name !== 'indet.' &&
     newSpecies.family_name !== 'incertae sedis' &&
     existingSpecies.suborder_or_superfamily_name &&
-    newSpecies.family_name === existingSpecies.family_name &&
-    newSpecies.suborder_or_superfamily_name !== existingSpecies.suborder_or_superfamily_name
+    newSpecies.family_name === existingSpecies.family_name
   )
 }
 
@@ -108,8 +112,7 @@ const checkFamilySubFamily = (newSpecies: EditDataType<Species>, existingSpecies
     newSpecies.family_name !== 'incertae sedis' &&
     newSpecies.subfamily_name &&
     newSpecies.subfamily_name !== 'indet.' &&
-    newSpecies.subfamily_name === existingSpecies.subfamily_name &&
-    newSpecies.family_name !== existingSpecies.family_name
+    newSpecies.subfamily_name === existingSpecies.subfamily_name
   )
 }
 
@@ -126,8 +129,7 @@ const checkSubFamilyGenus = (newSpecies: EditDataType<Species>, existingSpecies:
     newSpecies.genus_name !== 'indet.' &&
     newSpecies.genus_name !== 'gen.' &&
     existingSpecies.subfamily_name &&
-    newSpecies.genus_name === existingSpecies.genus_name &&
-    newSpecies.subfamily_name !== existingSpecies.subfamily_name
+    newSpecies.genus_name === existingSpecies.genus_name
   )
 }
 
@@ -147,6 +149,11 @@ export const checkTaxonomy = (
   } = newSpecies
 
   const errors = new Set<string>()
+  let speciesWithSameOrder = undefined
+  let speciesWithSameFamily = undefined
+  let speciesWithSameGenus = undefined
+  let speciesWithSameSuborder = undefined
+  let speciesWithSameSubfamily = undefined
 
   for (const existingSpecies of existingSpeciesArray) {
     if (isDuplicateTaxon(newSpecies, existingSpecies)) {
@@ -171,33 +178,118 @@ export const checkTaxonomy = (
     }
 
     if (checkOrderFamily(newSpecies, existingSpecies)) {
-      errors.add(`Family ${family} belongs to order ${existingSpecies.order_name}, not ${order}.`)
+      if (!speciesWithSameFamily) speciesWithSameFamily = existingSpecies
+      if (existingSpecies.order_name !== speciesWithSameFamily.order_name) {
+        errors.clear()
+        errors.add(generateMultipleParentsError('order', existingSpecies.order_name, speciesWithSameFamily.order_name))
+        return errors
+      } else {
+        if (newSpecies.order_name !== existingSpecies.order_name) {
+          errors.add(`Family ${family} belongs to order ${existingSpecies.order_name}, not ${order}.`)
+        }
+      }
     }
 
     if (checkFamilyGenus(newSpecies, existingSpecies)) {
-      errors.add(`Genus ${genus} belongs to family ${existingSpecies.family_name}, not ${family}.`)
+      if (!speciesWithSameGenus) speciesWithSameGenus = existingSpecies
+      if (existingSpecies.family_name !== speciesWithSameGenus.family_name) {
+        errors.clear()
+        errors.add(
+          generateMultipleParentsError('family', existingSpecies.family_name, speciesWithSameGenus.family_name)
+        )
+        return errors
+      } else {
+        if (newSpecies.family_name !== existingSpecies.family_name) {
+          errors.add(`Genus ${genus} belongs to family ${existingSpecies.family_name}, not ${family}.`)
+        }
+      }
     }
 
     if (checkSubClassOrder(newSpecies, existingSpecies)) {
-      errors.add(`Order ${order} belongs to subclass ${existingSpecies.subclass_or_superorder_name}, not ${subClass}.`)
+      if (!speciesWithSameOrder) speciesWithSameOrder = existingSpecies
+      if (existingSpecies.subclass_or_superorder_name !== speciesWithSameOrder.subclass_or_superorder_name) {
+        errors.clear()
+        errors.add(
+          generateMultipleParentsError(
+            'subclass',
+            existingSpecies.subclass_or_superorder_name,
+            speciesWithSameOrder.subclass_or_superorder_name
+          )
+        )
+        return errors
+      } else {
+        if (newSpecies.subclass_or_superorder_name !== existingSpecies.subclass_or_superorder_name) {
+          errors.add(
+            `Order ${order} belongs to subclass ${existingSpecies.subclass_or_superorder_name}, not ${subClass}.`
+          )
+        }
+      }
     }
 
     if (checkOrderSubOrder(newSpecies, existingSpecies)) {
-      errors.add(`Suborder ${subOrder} belongs to order ${existingSpecies.order_name}, not ${order}.`)
+      if (!speciesWithSameSuborder) speciesWithSameSuborder = existingSpecies
+      if (existingSpecies.order_name !== speciesWithSameSuborder.order_name) {
+        errors.clear()
+        errors.add(
+          generateMultipleParentsError('order', existingSpecies.order_name, speciesWithSameSuborder.order_name)
+        )
+        return errors
+      } else {
+        if (newSpecies.order_name !== existingSpecies.order_name) {
+          errors.add(`Suborder ${subOrder} belongs to order ${existingSpecies.order_name}, not ${order}.`)
+        }
+      }
     }
 
     if (checkSubOrderFamily(newSpecies, existingSpecies)) {
-      errors.add(
-        `Family ${family} belongs to suborder ${existingSpecies.suborder_or_superfamily_name}, not ${subOrder}.`
-      )
+      if (!speciesWithSameFamily) speciesWithSameFamily = existingSpecies
+      if (existingSpecies.suborder_or_superfamily_name !== speciesWithSameFamily.suborder_or_superfamily_name) {
+        errors.clear()
+        errors.add(
+          generateMultipleParentsError(
+            'suborder',
+            existingSpecies.suborder_or_superfamily_name,
+            speciesWithSameFamily.suborder_or_superfamily_name
+          )
+        )
+        return errors
+      } else {
+        if (newSpecies.suborder_or_superfamily_name !== existingSpecies.suborder_or_superfamily_name) {
+          errors.add(
+            `Family ${family} belongs to suborder ${existingSpecies.suborder_or_superfamily_name}, not ${subOrder}.`
+          )
+        }
+      }
     }
 
     if (checkFamilySubFamily(newSpecies, existingSpecies)) {
-      errors.add(`Subfamily ${subfamily} belongs to family ${existingSpecies.family_name}, not ${family}.`)
+      if (!speciesWithSameSubfamily) speciesWithSameSubfamily = existingSpecies
+      if (existingSpecies.family_name !== speciesWithSameSubfamily.family_name) {
+        errors.clear()
+        errors.add(
+          generateMultipleParentsError('family', existingSpecies.family_name, speciesWithSameSubfamily.family_name)
+        )
+        return errors
+      } else {
+        if (newSpecies.family_name !== existingSpecies.family_name) {
+          errors.add(`Subfamily ${subfamily} belongs to family ${existingSpecies.family_name}, not ${family}.`)
+        }
+      }
     }
 
     if (checkSubFamilyGenus(newSpecies, existingSpecies)) {
-      errors.add(`Genus ${genus} belongs to subfamily ${existingSpecies.subfamily_name}, not ${subfamily}.`)
+      if (!speciesWithSameGenus) speciesWithSameGenus = existingSpecies
+      if (existingSpecies.subfamily_name !== speciesWithSameGenus.subfamily_name) {
+        errors.clear()
+        errors.add(
+          generateMultipleParentsError('subfamily', existingSpecies.subfamily_name, speciesWithSameGenus.subfamily_name)
+        )
+        return errors
+      } else {
+        if (newSpecies.subfamily_name !== existingSpecies.subfamily_name) {
+          errors.add(`Genus ${genus} belongs to subfamily ${existingSpecies.subfamily_name}, not ${subfamily}.`)
+        }
+      }
     }
   }
   return errors

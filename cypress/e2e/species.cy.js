@@ -152,6 +152,10 @@ describe('Taxonomy checks work', () => {
     cy.contains('Genus Simplomys belongs to family Gliridae, not Soricidae.')
   })
 
+  // TODO
+  it.skip('Creating a species whose family is included in multiple existing suborders does not work')
+  it.skip('Editing a species whose family is included in multiple existing suborders does not work')
+
   it('Invalid superorder/order pair does not work', () => {
     cy.visit('/species/new')
     cy.get('[id=copy_existing_taxonomy_button]').contains('Copy existing taxonomy')
