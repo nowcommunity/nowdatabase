@@ -153,8 +153,8 @@ describe('Taxonomy checks work', () => {
   })
 
   // TODO
-  it.skip('Creating a species whose family is included in multiple existing suborders does not work')
-  it.skip('Editing a species whose family is included in multiple existing suborders does not work')
+  // it.skip('Creating a species whose family is included in multiple existing suborders does not work')
+  // it.skip('Editing a species whose family is included in multiple existing suborders does not work')
 
   it('Invalid superorder/order pair does not work', () => {
     cy.visit('/species/new')

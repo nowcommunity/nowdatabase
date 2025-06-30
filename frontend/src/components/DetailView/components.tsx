@@ -170,7 +170,7 @@ export const WriteButton = <T,>({
         isOpen={warningModalOpen}
         onAnswer={isOkay => {
           setWarningModalOpen(false)
-          if (isOkay) save()
+          if (isOkay) void handleWriteButtonClick()
         }}
         state={warningModalState}
       />
