@@ -8,6 +8,7 @@ import { LocalitiesMap } from '../Map/LocalitiesMap'
 import { generateKml } from '@/util/kml'
 import { generateSvg } from '../Map/generateSvg'
 import { usePageContext } from '../Page'
+import { LocalitySynonymsModal } from './LocalitySynonymsModal'
 
 const decimalCount = (num: number) => {
   const numAsString = num.toString()
@@ -18,18 +19,27 @@ const decimalCount = (num: number) => {
 }
 
 export const LocalityTable = ({ selectorFn }: { selectorFn?: (newObject: Locality) => void }) => {
+  const [selectedLocality, setSelectedLocality] = useState<string | undefined>()
+  const [modalOpen, setModalOpen] = useState<boolean>(false)
   const { data: localitiesQueryData, isFetching: localitiesQueryIsFetching } = useGetAllLocalitiesQuery()
   const [getLocalitySpeciesList, { isLoading }] = useGetLocalitySpeciesListMutation()
   const [filteredLocalities, setFilteredLocalities] = useState<SimplifiedLocality[]>()
   const columnFilters = usePageContext()
   const notify = useNotify()
 
+  const handleLocalityRowActionClick = (row: Locality) => {
+    setSelectedLocality(row.lid.toString())
+    setModalOpen(true)
+  }
+
   useEffect(() => {
     // Filter localities for the map component
     const localityIds = columnFilters.idList as unknown as number[]
     const validIds = localityIds.filter(id => typeof id === 'number')
-    const localities = localitiesQueryData?.filter(locality => validIds.includes(locality.lid))
-    setFilteredLocalities(localities as SimplifiedLocality[])
+
+    if (validIds.length > 0)
+      setFilteredLocalities(localitiesQueryData?.filter(locality => validIds.includes(locality.lid)))
+    else setFilteredLocalities(localitiesQueryData as SimplifiedLocality[])
   }, [columnFilters, localitiesQueryData])
 
   const columns = useMemo<MRT_ColumnDef<Locality>[]>(
@@ -427,9 +437,7 @@ export const LocalityTable = ({ selectorFn }: { selectorFn?: (newObject: Localit
 
   return (
     <>
-      {filteredLocalities && filteredLocalities.length !== 0 && (
-        <LocalitiesMap localities={filteredLocalities} isFetching={localitiesQueryIsFetching} />
-      )}
+      <LocalitiesMap localities={filteredLocalities} isFetching={localitiesQueryIsFetching} />
       <TableView<Locality>
         title="Localities"
         selectorFn={selectorFn}
@@ -445,7 +453,9 @@ export const LocalityTable = ({ selectorFn }: { selectorFn?: (newObject: Localit
         svgExport={svgExport}
         exportIsLoading={isLoading}
         enableColumnFilterModes={true}
+        tableRowAction={handleLocalityRowActionClick}
       />
+      <LocalitySynonymsModal open={modalOpen} onClose={() => setModalOpen(false)} selectedLocality={selectedLocality} />
     </>
   )
 }

@@ -295,6 +295,8 @@ describe("Locality's coordinate selection map works", () => {
   it('Map view and location search work', () => {
     cy.visit(`/locality/20920?tab=1`)
     cy.get('[id=edit-button]').click()
+    cy.contains('Choose a country').parent().type('Finland')
+    cy.contains('Finland').click()
     cy.contains('Get Coordinates').click()
     cy.contains('OpenStreetMap')
     cy.contains('Leaflet')

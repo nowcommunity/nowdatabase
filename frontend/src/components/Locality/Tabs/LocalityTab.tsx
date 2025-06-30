@@ -192,7 +192,7 @@ export const LocalityTab = () => {
         >
           <ArrayFrame array={latlong} title="Latitude & Longitude" />
           <Box sx={{ width: '50%' }}>
-            {locality && <SingleLocalityMap dec_lat={editData.dec_lat} dec_long={editData.dec_long} />}
+            {locality && <SingleLocalityMap decLat={editData.dec_lat} decLong={editData.dec_long} />}
           </Box>
         </Box>
         {!mode.read && coordinateButton}

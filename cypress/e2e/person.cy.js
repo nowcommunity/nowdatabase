@@ -35,11 +35,11 @@ describe('Editing a person', () => {
 
     cy.get('[id=edit-button]').click()
 
-    cy.contains('Choose user group').parent().type('n')
-    cy.contains('no').click()
+    cy.contains('Choose user group').parent().type('e')
+    cy.contains('er (edit restricted)').click()
     cy.get('[id=write-button]').click()
 
-    cy.contains('no')
+    cy.contains('er')
   })
 
   it('with any missing fields does not work', () => {

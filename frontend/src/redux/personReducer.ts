@@ -15,6 +15,11 @@ const personsApi = api.injectEndpoints({
       }),
       providesTags: result => (result ? [{ type: 'person', id: result.initials }] : []),
     }),
+    getPersonDetailsId: builder.mutation<PersonDetailsType, string>({
+      query: id => ({
+        url: `/person/${id}`,
+      }),
+    }),
     editPerson: builder.mutation<PersonDetailsType, EditDataType<PersonDetailsType>>({
       query: person => ({
         url: `/person`,
@@ -26,4 +31,5 @@ const personsApi = api.injectEndpoints({
   }),
 })
 
-export const { useGetAllPersonsQuery, useGetPersonDetailsQuery, useEditPersonMutation } = personsApi
+export const { useGetAllPersonsQuery, useGetPersonDetailsQuery, useEditPersonMutation, useGetPersonDetailsIdMutation } =
+  personsApi
