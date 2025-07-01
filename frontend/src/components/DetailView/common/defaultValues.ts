@@ -1,11 +1,14 @@
 import {
   LocalityDetailsType,
+  Museum,
   ReferenceDetailsType,
   RegionDetails,
   SpeciesDetailsType,
   TimeBoundDetailsType,
   TimeUnitDetailsType,
+  PersonDetailsType,
 } from '@/shared/types'
+
 import { MRT_PaginationState } from 'material-react-table'
 
 export const emptyLocality = {
@@ -245,6 +248,28 @@ export const emptyRegion = {
   now_reg_coord_people: [],
   now_reg_coord_country: [],
 } as unknown as RegionDetails
+
+export const emptyMuseum = {
+  country: '',
+  state: '',
+  used_morph: false,
+  used_now: false,
+  used_gene: false,
+  museum: '',
+  institution: '',
+  alt_int_name: '',
+  city: '',
+  state_code: '',
+} as unknown as Museum
+
+export const emptyPerson = {
+  initials: '',
+  first_name: '',
+  surname: '',
+  email: '',
+  organization: '',
+  country: '',
+} as unknown as PersonDetailsType
 
 export const defaultPagination: MRT_PaginationState = { pageIndex: 0, pageSize: 15 }
 export const defaultPaginationSmall: MRT_PaginationState = { pageIndex: 0, pageSize: 10 }

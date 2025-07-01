@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { api } from '@/redux/api'
-import { Role } from '@/shared/types'
+import { Role, UserDetailsType } from '@/shared/types'
 
 export type LoginResponse = {
   token: string
@@ -33,6 +33,13 @@ const userApi = api.injectEndpoints({
           oldPassword,
         },
         method: 'PUT',
+      }),
+    }),
+    createUser: builder.mutation<void, UserDetailsType>({
+      query: (user: UserDetailsType) => ({
+        url: '/user/new',
+        body: user,
+        method: 'POST',
       }),
     }),
   }),
@@ -77,4 +84,4 @@ const userSlice = createSlice({
 
 export const { setUser, setToken, clearUser, removeFirstLogin } = userSlice.actions
 export const userReducer = userSlice.reducer
-export const { useTryLoginMutation, useChangePasswordMutation } = userApi
+export const { useTryLoginMutation, useChangePasswordMutation, useCreateUserMutation } = userApi

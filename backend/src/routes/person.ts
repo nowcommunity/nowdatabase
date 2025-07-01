@@ -1,8 +1,16 @@
 import { Router, Request } from 'express'
 import { getAllPersons, getPersonDetails, validateEntirePerson } from '../services/person'
-import { Role, PersonDetailsType, EditDataType, EditMetaData } from '../../../frontend/src/shared/types'
+import {
+  Role,
+  PersonDetailsType,
+  EditDataType,
+  EditMetaData,
+  userGroups,
+  UserGroup,
+} from '../../../frontend/src/shared/types'
 import { requireOneOf } from '../middlewares/authorizer'
 import { writePerson } from '../services/write/person'
+import { writeUserGroup } from '../services/write/user'
 
 const router = Router()
 
@@ -33,11 +41,9 @@ router.put(
   '/',
   async (req: Request<object, object, { person: EditDataType<PersonDetailsType> & EditMetaData }>, res) => {
     const { ...editedPerson } = req.body.person
-
     if (!editedPerson.initials) {
       return res.status(403).send({ error: 'Missing initials, creating new persons is not yet implemented' })
     }
-
     /* Access checking happens differently for this route, since we want to allow users to modify their own data */
     if (!req.user)
       return res.status(401).send({
@@ -53,6 +59,17 @@ router.put(
       return res.status(403).send(validationErrors)
     }
     const initials = await writePerson(editedPerson)
+
+    /* Update user group (admin-only) */
+    if (
+      req.user.role === Role.Admin &&
+      editedPerson.user_id &&
+      editedPerson.now_user_group &&
+      userGroups.includes(editedPerson.now_user_group)
+    ) {
+      await writeUserGroup(editedPerson.user_id, editedPerson.now_user_group as UserGroup)
+    }
+
     return res.status(200).send({ initials })
   }
 )

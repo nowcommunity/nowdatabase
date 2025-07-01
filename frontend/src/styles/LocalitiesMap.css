@@ -1,0 +1,125 @@
+#localities-map .map-container {
+  position: relative;
+  --map-height: 70vh;
+  overflow: hidden;
+  height: calc(var(--map-height) * 0.15);
+  transition: height 0.2s ease-out;
+  margin-bottom: 0.8em;
+  border-radius: 0.25em;
+  z-index: 1;
+}
+
+#localities-map .gradient {
+  z-index: 400;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  opacity: 1;
+  transition: opacity 0.2s ease-out;
+  background: linear-gradient(to bottom, rgba(255, 255, 255, 0) 40%, rgb(255, 255, 255) 100%);
+  cursor: pointer;
+}
+
+#localities-map.open .gradient {
+  opacity: 0;
+  pointer-events: none;
+}
+
+#localities-map.open .map-container {
+  height: var(--map-height);
+  position: relative;
+}
+
+#localities-map .map-container .map {
+  height: var(--map-height);
+  width: 100%;
+}
+
+#localities-map:not(.open) .map-container .map {
+  pointer-events: none !important;
+  user-select: none;
+}
+
+#localities-map:not(.open) .map-container .map * {
+  pointer-events: none;
+}
+
+#localities-map:not(.open) button.cluster {
+  pointer-events: none;
+}
+
+#localities-map button.cluster {
+  user-select: none;
+  cursor: pointer;
+  background-color: #fdfeff;
+  position: absolute;
+  padding: 0.3em 0.6em;
+  z-index: 1000;
+  left: 4.2em;
+  top: 0.90em;
+  border-radius: 0.25em;
+  border: none;
+  box-shadow: 0 0 0 0.15em rgba(0, 0, 0, 0.22);
+}
+
+#localities-map button.cluster:hover {
+  background-color: #f4f4f4;
+}
+#localities-map .open-button {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  margin-bottom: 1rem;
+  height: 4em;
+  cursor: pointer;
+}
+
+#localities-map .downarrow {
+  --line-width: 4px;
+  --radius: 3px;
+  --angle: 130deg;
+  width: 2em;
+  height: 2em;
+  display: flex;
+  align-items: flex-end;
+  transform: translateY(-0.4em) rotate(-45deg);
+  transition: transform 0.3s ease-out;
+}
+
+#localities-map.open .downarrow {
+  transform: scaleY(-1) translateY(-1.8em) rotate(-45deg);
+}
+
+#localities-map .downarrow::before,
+#localities-map .downarrow::after {
+  content: "";
+  display: block;
+  background-color: #a5a5a5;
+  transition: background-color 0.2s ease-out;
+}
+
+#localities-map:not(.open):hover .open-button .downarrow::before,
+#localities-map:not(.open):hover .open-button .downarrow::after,
+#localities-map.open .open-button:hover .downarrow::before,
+#localities-map.open .open-button:hover .downarrow::after {
+  background-color: #606060;
+}
+
+#localities-map .downarrow::before {
+  height: 100%;
+  width: var(--line-width);
+  border-radius: var(--radius);
+  transform: rotate(calc(45deg - var(--angle) * 0.5));
+  transform-origin: 50% 100%;
+}
+
+#localities-map .downarrow::after {
+  width: 100%;
+  height: var(--line-width);
+  border-radius: var(--radius);
+  transform: rotate(calc(-1 * (45deg - var(--angle) * 0.5)));
+  transform-origin: 0% 50%;
+  margin-left: calc(-1 * var(--line-width));
+}

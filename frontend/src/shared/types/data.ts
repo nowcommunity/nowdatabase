@@ -5,6 +5,15 @@ import * as LogPrisma from '../../../../backend/prisma/generated/now_log_test_cl
 import { Editable, FixBigInt, RowState } from './util'
 import { Decimal } from '../../../../backend/prisma/generated/now_test_client/runtime/library'
 
+export type UserDetailsType = {
+  password: string | null
+  user_name: string | null
+  now_user_group: string | null
+  initials: string
+}
+
+export type Statistics = { localityCount: number; speciesCount: number; localitySpeciesCount: number }
+export type ActivityStatistic = { year: number; month: number; surname: string }
 export type SpeciesType = FixBigInt<Prisma.com_species>
 export type SedimentaryStructureValues = Prisma.now_ss_values
 export type CollectingMethod = Prisma.now_coll_meth
@@ -15,7 +24,10 @@ export type SpeciesLocality = FixBigInt<Prisma.now_ls> & { now_loc: Prisma.now_l
 export type LocalityUpdate = Prisma.now_lau & { now_lr: LocalityReference[] } & { updates: UpdateLog[] }
 export type SpeciesUpdate = Prisma.now_sau & { now_sr: SpeciesReference[] } & { updates: UpdateLog[] }
 export type Museum = Prisma.com_mlist
-export type PersonDetailsType = Prisma.com_people & { user: Omit<Prisma.com_users, 'password, newpassword'> | null }
+export type MuseumLocalities = Prisma.com_mlist & { localities: Prisma.now_loc[] }
+export type PersonDetailsType = Prisma.com_people & { user: Omit<Prisma.com_users, 'password, newpassword'> | null } & {
+  now_user_group: string
+}
 export type ProjectPeople = Prisma.now_proj_people
 export type ProjectDetailsType = Prisma.now_proj & { now_proj_people: Array<ProjectPeople> }
 export type Project = Prisma.now_proj
@@ -326,6 +338,15 @@ export type RegionDetails = Prisma.now_reg_coord & { now_reg_coord_people: Array
   now_reg_coord_country: Array<RegionCountry>
 }
 
+export type PersonDetails = {
+  initials: string | null
+  first_name: string | null
+  surname: string | null
+  email: string | null
+  organization: string | null
+  country: string | null
+}
+
 // used in Region's CoordinatorTab to allow adding com_people field to the editData manually
 export type RegionDetailsWithComPeople = Prisma.now_reg_coord & {
   now_reg_coord_people: Array<RegionCoordinator & { com_people?: Prisma.com_people }>
@@ -471,3 +492,13 @@ export type GeonamesJSON = {
 }
 
 export type ParsedGeoname = Pick<Geoname, 'name' | 'countryName' | 'fclName' | 'adminName1' | 'lat' | 'lng'>
+
+export type UserGroup = 'su (admin)' | 'eu (edit unrestricted)' | 'er (edit restricted)' | 'ro (read only)'
+export const userGroups = ['ro (read only)', 'er (edit restricted)', 'eu (edit unrestricted)', 'su (admin)']
+
+export type SimplifiedLocality = {
+  lid: number
+  dec_lat: number
+  dec_long: number
+  loc_name: string
+}

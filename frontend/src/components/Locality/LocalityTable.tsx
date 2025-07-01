@@ -1,11 +1,14 @@
-import { useMemo } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { MRT_TableInstance, type MRT_ColumnDef, MRT_RowData } from 'material-react-table'
 import { useGetAllLocalitiesQuery, useGetLocalitySpeciesListMutation } from '../../redux/localityReducer'
-import { Locality } from '@/shared/types'
+import { Locality, SimplifiedLocality } from '@/shared/types'
 import { TableView } from '../TableView/TableView'
 import { useNotify } from '@/hooks/notification'
 import { LocalitiesMap } from '../Map/LocalitiesMap'
 import { generateKml } from '@/util/kml'
+import { generateSvg } from '../Map/generateSvg'
+import { usePageContext } from '../Page'
+import { LocalitySynonymsModal } from './LocalitySynonymsModal'
 
 const decimalCount = (num: number) => {
   const numAsString = num.toString()
@@ -16,9 +19,29 @@ const decimalCount = (num: number) => {
 }
 
 export const LocalityTable = ({ selectorFn }: { selectorFn?: (newObject: Locality) => void }) => {
+  const [selectedLocality, setSelectedLocality] = useState<string | undefined>()
+  const [modalOpen, setModalOpen] = useState<boolean>(false)
   const { data: localitiesQueryData, isFetching: localitiesQueryIsFetching } = useGetAllLocalitiesQuery()
   const [getLocalitySpeciesList, { isLoading }] = useGetLocalitySpeciesListMutation()
+  const [filteredLocalities, setFilteredLocalities] = useState<SimplifiedLocality[]>()
+  const columnFilters = usePageContext()
   const notify = useNotify()
+
+  const handleLocalityRowActionClick = (row: Locality) => {
+    setSelectedLocality(row.lid.toString())
+    setModalOpen(true)
+  }
+
+  useEffect(() => {
+    // Filter localities for the map component
+    const localityIds = columnFilters.idList as unknown as number[]
+    const validIds = localityIds.filter(id => typeof id === 'number')
+
+    if (validIds.length > 0)
+      setFilteredLocalities(localitiesQueryData?.filter(locality => validIds.includes(locality.lid)))
+    else setFilteredLocalities(localitiesQueryData as SimplifiedLocality[])
+  }, [columnFilters, localitiesQueryData])
+
   const columns = useMemo<MRT_ColumnDef<Locality>[]>(
     () => [
       {
@@ -397,13 +420,24 @@ export const LocalityTable = ({ selectorFn }: { selectorFn?: (newObject: Localit
     a.click()
   }
 
+  const svgExport = <T extends MRT_RowData>(table: MRT_TableInstance<T>) => {
+    const rowData: Locality[] = table.getPrePaginationRowModel().rows.map(row => row.original as unknown as Locality)
+    const dataString = generateSvg(rowData)
+    const blob = new Blob([dataString], { type: 'image/svg+xml' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = 'map.svg'
+    a.click()
+  }
+
   const checkRowRestriction = (row: Locality) => {
     return !!row.loc_status
   }
 
   return (
     <>
-      <LocalitiesMap localitiesQueryData={localitiesQueryData} localitiesQueryIsFetching={localitiesQueryIsFetching} />
+      <LocalitiesMap localities={filteredLocalities} isFetching={localitiesQueryIsFetching} />
       <TableView<Locality>
         title="Localities"
         selectorFn={selectorFn}
@@ -416,9 +450,12 @@ export const LocalityTable = ({ selectorFn }: { selectorFn?: (newObject: Localit
         url="locality"
         combinedExport={combinedExport}
         kmlExport={kmlExport}
+        svgExport={svgExport}
         exportIsLoading={isLoading}
         enableColumnFilterModes={true}
+        tableRowAction={handleLocalityRowActionClick}
       />
+      <LocalitySynonymsModal open={modalOpen} onClose={() => setModalOpen(false)} selectedLocality={selectedLocality} />
     </>
   )
 }

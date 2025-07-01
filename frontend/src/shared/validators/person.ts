@@ -9,22 +9,37 @@ export const validatePerson = (
     initials: {
       name: 'initials',
       required: true,
+      asString: true,
+      minLength: 2,
+      maxLength: 8,
     },
     first_name: {
       name: 'First Name',
       required: true,
+      asString: true,
+      minLength: 2,
+      maxLength: 20,
     },
     surname: {
       name: 'Surname',
       required: true,
+      asString: true,
+      minLength: 2,
+      maxLength: 20,
     },
     email: {
       name: 'Email',
       required: true,
+      asString: true,
+      minLength: 5,
+      maxLength: 30,
     },
     organization: {
       name: 'Organization',
       required: true,
+      asString: true,
+      minLength: 2,
+      maxLength: 30,
     },
     country: {
       name: 'Country',

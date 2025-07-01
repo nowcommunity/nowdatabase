@@ -50,6 +50,7 @@ const baseQueryWithReauth: BaseQueryFn<string | FetchArgs, unknown, FetchBaseQue
 export const api = createApi({
   reducerPath: 'api',
   tagTypes: [
+    'museum',
     'user',
     'crosssearch',
     'locality',

@@ -1,4 +1,4 @@
-import { Editable, LocalityDetailsType, LocalitySynonym } from '@/shared/types'
+import { Editable, LocalityDetailsType, LocalitySynonym, Locality } from '@/shared/types'
 import { useDetailContext } from '@/components/DetailView/Context/DetailContext'
 import { Grouped, ArrayFrame, HalfFrames } from '@/components/DetailView/common/tabLayoutHelpers'
 import { Box, TextField } from '@mui/material'
@@ -11,11 +11,14 @@ import { CoordinateSelectionMap } from '@/components/Map/CoordinateSelectionMap'
 import { useState } from 'react'
 import { convertDmsToDec, convertDecToDms } from '@/util/coordinateConversion'
 import { validCountries } from '@/shared/validators/countryList'
+import { SingleLocalityMap } from '@/components/Map/SingleLocalityMap'
 
 export const LocalityTab = () => {
   const { textField, radioSelection, dropdown, dropdownWithSearch, mode, bigTextField } =
     useDetailContext<LocalityDetailsType>()
   const { editData, setEditData } = useDetailContext<LocalityDetailsType>()
+
+  const locality: Locality[] = [editData as Locality]
 
   const generalLocalityOptions = [emptyOption, { display: 'No', value: 'n' }, { display: 'Yes', value: 'y' }]
 
@@ -180,7 +183,18 @@ export const LocalityTab = () => {
       </HalfFrames>
 
       <Grouped>
-        <ArrayFrame array={latlong} title="Latitude & Longitude" />
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: 'row',
+            gap: 2,
+          }}
+        >
+          <ArrayFrame array={latlong} title="Latitude & Longitude" />
+          <Box sx={{ width: '50%' }}>
+            {locality && <SingleLocalityMap decLat={editData.dec_lat} decLong={editData.dec_long} />}
+          </Box>
+        </Box>
         {!mode.read && coordinateButton}
       </Grouped>
 

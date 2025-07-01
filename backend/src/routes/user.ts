@@ -1,13 +1,17 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-import { Router } from 'express'
+import { Request, Router } from 'express'
 import { sign } from 'jsonwebtoken'
 import { SECRET, LOGIN_VALID_SECONDS } from '../utils/config'
 import * as bcrypt from 'bcrypt'
 import { nowDb } from '../utils/db'
 import { getRole } from '../middlewares/authenticator'
 import { AccessError } from '../middlewares/authorizer'
-import { Role } from '../../../frontend/src/shared/types'
+import { Role, UserDetailsType } from '../../../frontend/src/shared/types'
 import md5 from 'md5'
+import { validatePassword } from '../utils/validatePassword'
+import { createPasswordHash } from '../utils/createPasswordHash'
+import { writeUser } from '../services/write/user'
+import { validateUser } from '../utils/validateUser'
 
 const router = Router()
 
@@ -74,11 +78,7 @@ router.post('/login', async (req, res) => {
   })
 })
 
-const createPasswordHash = async (password: string) => {
-  const saltRounds = 10
-  return await bcrypt.hash(password, saltRounds)
-}
-
+//  TODO: Remove if not needed for anything
 router.post('/create', async (req, res) => {
   const { username, password, initials, role, secret } = req.body
 
@@ -127,12 +127,8 @@ router.put('/password', async (req, res) => {
 
   if (!passwordMatches) return res.status(403).send({ error: 'Old password does not match your current password.' })
 
-  if (newPassword.length < 8) return res.status(400).send({ error: 'New password must be at least 8 characters long.' })
-
-  if (!/^[0-9A-Za-z$%&~]+/.test(newPassword))
-    return res
-      .status(400)
-      .send({ error: 'Use only alphanumeric characters a-z, A-Z and 0-9 and symbols ^?$%&~ in the new password.' })
+  const validationResult = validatePassword(newPassword)
+  if (!validationResult.isValid) return res.status(400).send({ error: validationResult.error })
 
   const passwordHash = await createPasswordHash(newPassword)
 
@@ -140,6 +136,33 @@ router.put('/password', async (req, res) => {
   return res.status(200).send()
 })
 
-router.post('/create')
+router.post('/new', async (req: Request<UserDetailsType>, res) => {
+  const user: UserDetailsType = req.body
+  if (!user) return res.status(400).send({ message: 'Missing user' })
+
+  if (!user.initials) {
+    return res.status(403).send({ message: 'Missing initials' })
+  }
+
+  if (!req.user || req.user.role !== Role.Admin)
+    return res.status(401).send({
+      message: 'User not authorized for the requested resource or action.',
+    })
+
+  const error = await validateUser(user)
+  if (error)
+    return res.status(400).send({
+      message: error,
+    })
+
+  // All good, write user.
+  try {
+    await writeUser(user)
+  } catch (e) {
+    return res.status(500).send({ message: 'Unknown server error occurred' })
+  }
+
+  return res.status(200).send({ message: '' })
+})
 
 export default router

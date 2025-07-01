@@ -295,6 +295,8 @@ describe("Locality's coordinate selection map works", () => {
   it('Map view and location search work', () => {
     cy.visit(`/locality/20920?tab=1`)
     cy.get('[id=edit-button]').click()
+    cy.contains('Choose a country').parent().type('Finland')
+    cy.contains('Finland').click()
     cy.contains('Get Coordinates').click()
     cy.contains('OpenStreetMap')
     cy.contains('Leaflet')
@@ -312,7 +314,6 @@ describe("Locality's coordinate selection map works", () => {
     cy.contains('Central Finland').first().click() // first item on the list
     cy.contains('Latitude: 63.05484, Longitude: 24.75291')
     cy.contains('Save').click()
-    cy.contains('OpenStreetMap').should('not.exist')
     cy.contains('Finalize entry').click()
     cy.contains('button', 'Add existing reference').click()
     cy.get('button[data-cy^="detailview-button"]').first().click()

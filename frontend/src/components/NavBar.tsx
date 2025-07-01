@@ -5,11 +5,12 @@ import { clearUser } from '../redux/userReducer'
 import { api } from '../redux/api'
 import { Role } from '@/shared/types'
 import { useUser } from '@/hooks/user'
-import { ENV } from '@/util/config'
 import { useNotify } from '@/hooks/notification'
 import PersonIcon from '@mui/icons-material/Person'
 import '../styles/NavBar.css'
 import { LinkDefinition, NavBarLink } from './NavBarLink'
+
+import logo from '../resource/nowlogo.jpg'
 
 export const NavBar = () => {
   const user = useUser()
@@ -19,10 +20,11 @@ export const NavBar = () => {
   const pages: LinkDefinition[] = [
     { title: 'Localities', url: '/locality' },
     { title: 'Species', url: '/species' },
-    { title: 'Cross-Search', url: '/crosssearch' },
+    { title: 'Locality-Species', url: '/crosssearch' },
     { title: 'References', url: '/reference' },
     { title: 'Time Units', url: '/time-unit' },
     { title: 'Time Bounds', url: '/time-bound', allowedRoles: [Role.Admin, Role.EditUnrestricted] },
+    { title: 'Museums', url: '/museum' },
     {
       title: 'Admin',
       url: '/admin',
@@ -53,16 +55,11 @@ export const NavBar = () => {
     </MenuItem>
   )
 
-  const getModeText = () => {
-    if (ENV === 'staging') return '(test)'
-    if (ENV === 'dev') return '(dev)'
-    return ''
-  }
   return (
     <AppBar position="static" id="main-navbar">
-      <Stack spacing={10} direction="row" marginLeft={2} justifyContent="flex-start">
-        <MenuItem component={Link} to="/">
-          <Typography fontSize={'1.4em'}>NOW Database {getModeText()}</Typography>
+      <div className="container">
+        <MenuItem component={Link} to="/" className="logo-link">
+          <img src={logo} title="Logo © Noira Martiskainen" />
         </MenuItem>
         <MenuList className="menu-list">
           {pages
@@ -86,7 +83,7 @@ export const NavBar = () => {
             </Stack>
           )}
         </Box>
-      </Stack>
+      </div>
     </AppBar>
   )
 }
