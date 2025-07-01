@@ -15,13 +15,13 @@ describe('Creating a journal', () => {
     cy.get('[id=title_primary-textfield]').type('New test reference')
 
     cy.contains('Select author').click()
-    cy.get('[data-cy=detailview-button-1]').click()
+    cy.get('[data-cy=add-button-1]').click()
     cy.contains('Close').click()
 
     cy.get('[id=date_primary-textfield]').type('2025')
 
     cy.contains('Select Journal').click()
-    cy.get('[data-cy=detailview-button-100]').click()
+    cy.get('[data-cy=add-button-100]').click()
     cy.contains('Close').click()
 
     cy.get('[id=write-button]').click()
@@ -38,7 +38,7 @@ describe('Creating a journal', () => {
     cy.get('[id=write-button]').should('be.disabled')
 
     cy.contains('Select author').click()
-    cy.get('[data-cy=detailview-button-1]').click()
+    cy.get('[data-cy=add-button-1]').click()
     cy.contains('Close').click()
     cy.contains('2 invalid fields')
     cy.get('[id=write-button]').should('be.disabled')
@@ -48,14 +48,14 @@ describe('Creating a journal', () => {
     cy.get('[id=write-button]').should('be.disabled')
 
     cy.contains('Select Journal').click()
-    cy.get('[data-cy=detailview-button-100]').click()
+    cy.get('[data-cy=add-button-100]').click()
     cy.contains('Close').click()
     cy.get('[id=write-button]').should('not.be.disabled')
 
     cy.get('[data-testid=RemoveCircleOutlineIcon]').first().click() // removes the selected author
     cy.get('[id=write-button]').should('be.disabled')
     cy.contains('Select author').click()
-    cy.get('[data-cy=detailview-button-1]').click()
+    cy.get('[data-cy=add-button-1]').click()
     cy.contains('Close').click()
     cy.get('[id=write-button]').should('not.be.disabled')
   })
@@ -107,7 +107,7 @@ describe('Editing a journal', () => {
     cy.get('[id=title_primary-textfield]').type('New primary title.')
 
     cy.contains('Select author').click()
-    cy.get('[data-cy=detailview-button-2]').click()
+    cy.get('[data-cy=add-button-2]').click()
     cy.contains('Close').click()
 
     cy.get('[id=write-button]').click()
@@ -131,7 +131,7 @@ describe('Editing a journal', () => {
     cy.contains('1 invalid field')
     cy.get('[id=write-button]').should('be.disabled')
     cy.contains('Select author').click()
-    cy.get('[data-cy=detailview-button-1]').click()
+    cy.get('[data-cy=add-button-1]').click()
     cy.contains('Close').click()
     cy.get('[id=write-button]').should('not.be.disabled')
   })
