@@ -27,6 +27,7 @@ export type TabType = {
 export type TextFieldOptions = (
   | {
       type: 'text'
+      trim?: boolean
     }
   | {
       type: 'number'
@@ -60,6 +61,7 @@ export const DetailView = <T extends object>({
   isNew = false,
   isUserPage = false,
   isPersonPage = false,
+  taxonomy = false,
   hasStagingMode = false,
   deleteFunction,
 }: {
@@ -70,6 +72,7 @@ export const DetailView = <T extends object>({
   isNew?: boolean
   isUserPage?: boolean
   isPersonPage?: boolean
+  taxonomy?: boolean
   hasStagingMode?: boolean
   deleteFunction?: () => Promise<void>
 }) => {
@@ -220,7 +223,7 @@ export const DetailView = <T extends object>({
             )}
             {!mode.read && Object.keys(fieldsWithErrors).length > 0 && <ErrorBox />}
             {(!mode.read || initialState.mode.new) && onWrite && (
-              <WriteButton onWrite={onWrite} hasStagingMode={hasStagingMode} />
+              <WriteButton onWrite={onWrite} taxonomy={taxonomy} hasStagingMode={hasStagingMode} />
             )}
           </Box>
         </Box>
