@@ -6,10 +6,19 @@ import { Box } from '@mui/material'
 import { SelectingTable } from '@/components/DetailView/common/SelectingTable'
 import { useGetAllSpeciesQuery } from '@/redux/speciesReducer'
 import { smallSpeciesTableColumns } from '@/common'
+import { SynonymsModal } from '../SynonymsModal'
+import { useState } from 'react'
 
 export const TaxonomyTab = () => {
   const { textField, dropdown, bigTextField, editData, setEditData, mode } = useDetailContext<SpeciesDetailsType>()
   const { data: speciesQueryData, isError } = useGetAllSpeciesQuery()
+  const [selectedSpecies, setSelectedSpecies] = useState<string | undefined>()
+  const [modalOpen, setModalOpen] = useState<boolean>(false)
+
+  const handleRowActionClick = (row: Species) => {
+    setSelectedSpecies(row.species_id.toString())
+    setModalOpen(true)
+  }
 
   const copyTaxonomyButton = (
     <Box key="copy_existing_taxonomy_button" id="copy_existing_taxonomy_button">
@@ -21,6 +30,7 @@ export const TaxonomyTab = () => {
         fieldName="order_name" // this doesn't do anything here but is required
         idFieldName="species_id"
         useObject={true}
+        tableRowAction={handleRowActionClick}
         editingAction={(selectedSpecies: Species) => {
           setEditData({
             ...editData,
@@ -35,6 +45,7 @@ export const TaxonomyTab = () => {
           })
         }}
       />
+      <SynonymsModal open={modalOpen} onClose={() => setModalOpen(false)} selectedSpecies={selectedSpecies} />
     </Box>
   )
 

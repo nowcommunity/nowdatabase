@@ -16,6 +16,7 @@ export const SelectingTable = <T extends MRT_RowData, ParentType extends object>
   data,
   columns,
   editingAction,
+  tableRowAction,
   fieldName,
   idFieldName,
   selectedValues,
@@ -26,6 +27,7 @@ export const SelectingTable = <T extends MRT_RowData, ParentType extends object>
   data: T[] | undefined
   columns: MRT_ColumnDef<T>[]
   editingAction?: (object: T) => void
+  tableRowAction?: (row: T) => void
   fieldName: keyof ParentType
   idFieldName: keyof T
   selectedValues?: string[]
@@ -76,6 +78,7 @@ export const SelectingTable = <T extends MRT_RowData, ParentType extends object>
           visibleColumns={visibleColumns}
           selectorFn={editingAction ?? defaultEditingAction}
           idFieldName={idFieldName}
+          tableRowAction={tableRowAction}
         />
       ) : (
         <CircularProgress />

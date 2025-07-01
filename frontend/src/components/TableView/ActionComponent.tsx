@@ -25,9 +25,7 @@ export const ActionComponent = <T extends MRT_RowData>({
   const id = row.original[idFieldName]
 
   const getIconToShow = () => {
-    if (selectorFn) {
-      return <AddCircleOutlineIcon />
-    } else if (tableRowAction) {
+    if (tableRowAction) {
       return (
         <Typography
           sx={{
@@ -45,17 +43,19 @@ export const ActionComponent = <T extends MRT_RowData>({
           S
         </Typography>
       )
+    } else if (selectorFn) {
+      return <AddCircleOutlineIcon />
     }
     return <ManageSearchIcon />
   }
 
   const onClick = (event: React.MouseEvent) => {
-    if (selectorFn) {
-      event.stopPropagation()
-      selectorFn(row.original)
-    } else if (tableRowAction) {
+    if (tableRowAction) {
       event.stopPropagation()
       tableRowAction(row.original)
+    } else if (selectorFn) {
+      event.stopPropagation()
+      selectorFn(row.original)
     } else {
       navigate(`/${url}/${id}`)
     }
