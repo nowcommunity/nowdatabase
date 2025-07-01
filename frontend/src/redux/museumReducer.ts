@@ -8,7 +8,13 @@ const museumsApi = api.injectEndpoints({
         url: `/museum/all`,
       }),
     }),
+    getMuseumDetails: builder.query<Museum, string>({
+      query: id => ({
+        url: `museum/${id}`,
+      }),
+      providesTags: result => (result ? [{ type: 'museum', id: result.museum }] : []),
+    }),
   }),
 })
 
-export const { useGetAllMuseumsQuery } = museumsApi
+export const { useGetAllMuseumsQuery, useGetMuseumDetailsQuery } = museumsApi

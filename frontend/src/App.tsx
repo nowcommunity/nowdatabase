@@ -6,6 +6,7 @@ import {
   crossSearchPage,
   frontPage,
   localityPage,
+  museumPage,
   personPage,
   projectPage,
   referencePage,
@@ -34,6 +35,7 @@ const App = () => {
                   <Route element={crossSearchPage} path="/crosssearch/:id?" />
                   <Route element={localityPage} path="/locality/:id?" />
                   <Route element={speciesPage} path="/species/:id?" />
+                  <Route element={museumPage} path="/museum/:id?" />
                   <Route element={referencePage} path="/reference/:id?" />
                   <Route element={timeUnitPage} path="/time-unit/:id?" />
                   <Route element={timeBoundPage} path="/time-bound/:id?" />
