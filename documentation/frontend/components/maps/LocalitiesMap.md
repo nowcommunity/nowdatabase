@@ -25,8 +25,9 @@ A normal street map as well as a simplified map with only country borders visibl
 
 ## Country border view
 
-The simplified country border map view is achieved through a hardcoded array of latitude-longitude polygons that represent country borders, imported from [`country_borders_WGS84.ts`](../../../../frontend/src/components/Map/country_borders_WGS84.ts).
+
+The simplified country border map view is achieved through an array of latitude-longitude polygons that represent country borders, imported from [`countryPolygons.ts`](../../../../frontend/src/country_data/countryPolygons.ts).
 This means that the country borders are fixed in time to the moment of when that file was last updated.
-Detailed instructions on where to get the data and how to convert it to this desired format can be found at (TBD).
+Detailed instructions on where to get the data and how to convert it to this desired format can be found [here](../../../../frontend/src/country_data/README.md).
 
 
