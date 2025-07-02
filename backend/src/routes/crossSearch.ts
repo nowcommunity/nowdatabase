@@ -105,15 +105,15 @@ router.get(`/export/:columnfilters/:sorting`, async (req, res) => {
     return res.status(403).send('Unknown error')
   }
 
-  let data
+  let dataArray: Partial<CrossSearch[][]>
   try {
-    data = await getCrossSearchRawSql(
+    dataArray = (await getCrossSearchRawSql(
       req.user,
       undefined,
       undefined,
       validatedValues.validatedColumnFilters,
       validatedValues.validatedSorting
-    )
+    )) as Partial<CrossSearch[][]>
   } catch (error) {
     if (error instanceof Error) return res.status(403).send({ error: error.message })
     return res.status(403).send('Unknown error')
@@ -123,6 +123,7 @@ router.get(`/export/:columnfilters/:sorting`, async (req, res) => {
   res.on('finish', () => {
     logger.info('Cross search export sent.')
   })
+
   // quoteColumns is needed to make sure linebreaks do not mess up the data
   const stream = format({ headers: true, quoteColumns: true }).transform(
     transformFunction as FormatterRowTransformFunction<FormatterRow, FormatterRow>
@@ -131,12 +132,19 @@ router.get(`/export/:columnfilters/:sorting`, async (req, res) => {
   pipeline(stream, res, err => {
     if (err) {
       logger.error(`Error in crosssearch/export pipeline: ${err.message}`)
+    } else {
+      logger.info('Cross search pipeline finished.')
     }
   })
 
-  for (const row of data) {
-    stream.write(row)
+  for (const data of dataArray) {
+    if (data) {
+      for (const row of data) {
+        stream.write(row)
+      }
+    }
   }
+
   return stream.end()
 })
 
