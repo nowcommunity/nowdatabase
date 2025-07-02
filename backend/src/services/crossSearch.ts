@@ -114,8 +114,8 @@ export const getCrossSearchRawSql = async (
   const allowedLocalities = user ? await getAllowedLocalities(user) : []
 
   if (!limit) {
-    // ONLY for exporting
-    limit = 10000
+    // this is only ran when exporting the cross-search table
+    limit = 20000
     offset = 0
     const results = []
     while (true) {
@@ -131,7 +131,7 @@ export const getCrossSearchRawSql = async (
       const result: Partial<CrossSearch>[] = await nowDb.$queryRaw(sql)
       if (result.length === 0) break
       results.push(result)
-      offset = offset + 10000
+      offset = offset + limit
     }
     return results
   }

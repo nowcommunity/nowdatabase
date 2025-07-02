@@ -10,6 +10,7 @@ import { pipeline } from 'stream'
 import { logger } from '../utils/logger'
 import { currentDateAsString } from '../../../frontend/src/shared/currentDateAsString'
 import { CrossSearch } from '../../../frontend/src/shared/types'
+import { once } from 'events'
 
 const router = Router()
 
@@ -140,7 +141,10 @@ router.get(`/export/:columnfilters/:sorting`, async (req, res) => {
   for (const data of dataArray) {
     if (data) {
       for (const row of data) {
-        stream.write(row)
+        const ok = stream.write(row)
+        if (!ok) {
+          await once(stream, 'drain')
+        }
       }
     }
   }
