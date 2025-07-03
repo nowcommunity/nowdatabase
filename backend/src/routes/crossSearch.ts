@@ -14,10 +14,14 @@ import { once } from 'events'
 
 const router = Router()
 
-const transformFunction = (row: CrossSearch) => {
+const transformFunction = (row: CrossSearch & { full_count?: number }) => {
   const transformedRow: { [key: string]: string | number | boolean | null } = {}
-  const keys = Object.keys(row) as Array<keyof CrossSearch>
+  const keys = Object.keys(row) as Array<keyof (CrossSearch & { full_count?: number })>
   for (const key of keys) {
+    if (key === 'full_count') {
+      delete row['full_count']
+      continue
+    }
     const value = row[key]
     if (typeof value === 'string') {
       transformedRow[key] = value.replace(/[\r\n]+/g, ' ')
