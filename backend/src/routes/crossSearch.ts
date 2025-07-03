@@ -5,12 +5,32 @@ import {
   parseAndValidateCrossSearchRouteParameters,
 } from '../services/crossSearch'
 import { fixBigInt } from '../utils/common'
-import { format } from '@fast-csv/format'
+import { format, FormatterRow, FormatterRowTransformFunction } from 'fast-csv'
 import { pipeline } from 'stream'
 import { logger } from '../utils/logger'
 import { currentDateAsString } from '../../../frontend/src/shared/currentDateAsString'
+import { CrossSearch } from '../../../frontend/src/shared/types'
+import { once } from 'events'
 
 const router = Router()
+
+const transformFunction = (row: CrossSearch & { full_count?: number }) => {
+  const transformedRow: { [key: string]: string | number | boolean | null } = {}
+  const keys = Object.keys(row) as Array<keyof (CrossSearch & { full_count?: number })>
+  for (const key of keys) {
+    if (key === 'full_count') {
+      delete row['full_count']
+      continue
+    }
+    const value = row[key]
+    if (typeof value === 'string') {
+      transformedRow[key] = value.replace(/[\r\n]+/g, ' ')
+    } else {
+      transformedRow[key] = row[key]
+    }
+  }
+  return transformedRow
+}
 
 router.get(`/all/:limit/:offset/:columnfilters/:sorting`, async (req, res) => {
   let validatedValues
@@ -90,15 +110,15 @@ router.get(`/export/:columnfilters/:sorting`, async (req, res) => {
     return res.status(403).send('Unknown error')
   }
 
-  let data
+  let dataArray: Partial<CrossSearch[][]>
   try {
-    data = await getCrossSearchRawSql(
+    dataArray = (await getCrossSearchRawSql(
       req.user,
       undefined,
       undefined,
       validatedValues.validatedColumnFilters,
       validatedValues.validatedSorting
-    )
+    )) as Partial<CrossSearch[][]>
   } catch (error) {
     if (error instanceof Error) return res.status(403).send({ error: error.message })
     return res.status(403).send('Unknown error')
@@ -110,16 +130,29 @@ router.get(`/export/:columnfilters/:sorting`, async (req, res) => {
   })
 
   // quoteColumns is needed to make sure linebreaks do not mess up the data
-  const stream = format({ headers: true, quoteColumns: true })
+  const stream = format({ headers: true, quoteColumns: true }).transform(
+    transformFunction as FormatterRowTransformFunction<FormatterRow, FormatterRow>
+  )
+
   pipeline(stream, res, err => {
     if (err) {
       logger.error(`Error in crosssearch/export pipeline: ${err.message}`)
+    } else {
+      logger.info('Cross search pipeline finished.')
     }
   })
 
-  for (const row of data) {
-    stream.write(row)
+  for (const data of dataArray) {
+    if (data) {
+      for (const row of data) {
+        const ok = stream.write(row)
+        if (!ok) {
+          await once(stream, 'drain')
+        }
+      }
+    }
   }
+
   return stream.end()
 })
 
