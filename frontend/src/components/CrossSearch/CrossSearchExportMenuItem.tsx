@@ -9,7 +9,7 @@ import { currentDateAsString } from '@/shared/currentDateAsString'
 export const CrossSearchExportMenuItem = ({ handleClose }: { handleClose: () => void }) => {
   const [loading, setLoading] = useState(false)
   const { sqlColumnFilters, sqlOrderBy } = usePageContext()
-  const { notify, setMessage } = useNotify()
+  const { notify, setMessage: setNotificationMessage } = useNotify()
 
   const token = useUser().token
   const fetchOptions = token ? { headers: { Authorization: `Bearer ${token}` } } : {}
@@ -35,7 +35,7 @@ export const CrossSearchExportMenuItem = ({ handleClose }: { handleClose: () => 
     const showDownloadProgress = () => {
       if (!closed) {
         setTimeout(() => {
-          setMessage(`Downloading CSV file, ${Math.round((bytes / 1000000) * 10) / 10} MB`)
+          setNotificationMessage(`Downloading CSV file, ${Math.round((bytes / 1000000) * 10) / 10} MB`)
           showDownloadProgress()
         }, 500)
       }
