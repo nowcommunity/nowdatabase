@@ -40,7 +40,7 @@ export const newSpeciesBasis: EditDataType<SpeciesDetailsType & EditMetaData> = 
   order_name: 'Eulipotyphla',
   family_name: 'Soricidae',
   subclass_or_superorder_name: 'Eutheria',
-  suborder_or_superfamily_name: null,
+  suborder_or_superfamily_name: '',
   subfamily_name: 'Soricinae',
   genus_name: 'Petenyia',
   species_name: 'dubia test',
