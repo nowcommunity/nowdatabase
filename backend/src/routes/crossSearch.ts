@@ -124,10 +124,13 @@ router.get(`/export/:columnfilters/:sorting`, async (req, res) => {
     return res.status(403).send('Unknown error')
   }
 
-  res.attachment(`cross_search${currentDateAsString()}.csv`) // filename will get overwritten in frontend when fetching data from this route
   res.on('finish', () => {
     logger.info('Cross search export sent.')
   })
+  res.on('error', () => {
+    logger.info('ERROR!')
+  })
+  res.attachment(`cross_search${currentDateAsString()}.csv`) // filename will get overwritten in frontend when fetching data from this route
 
   // quoteColumns is needed to make sure linebreaks do not mess up the data
   const stream = format({ headers: true, quoteColumns: true }).transform(
@@ -142,15 +145,21 @@ router.get(`/export/:columnfilters/:sorting`, async (req, res) => {
     }
   })
 
-  for (const data of dataArray) {
-    if (data) {
-      for (const row of data) {
-        const ok = stream.write(row)
-        if (!ok) {
-          await once(stream, 'drain')
+  try {
+    for (const data of dataArray) {
+      if (data) {
+        for (const row of data) {
+          const ok = stream.write(row)
+          if (!ok) {
+            await once(stream, 'drain')
+          }
         }
       }
     }
+  } catch (error) {
+    logger.error(
+      'Error in crosssearch/export: Could not write to stream, user might have left the page or refreshed it.'
+    )
   }
 
   return stream.end()
