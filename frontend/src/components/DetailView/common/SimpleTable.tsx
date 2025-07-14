@@ -11,7 +11,8 @@ import { useDetailContext } from '../Context/DetailContext'
 import { ActionComponent } from '@/components/TableView/ActionComponent'
 import { defaultPaginationSmall } from './defaultValues'
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate, useSearchParams } from 'react-router-dom'
+import { usePageContext } from '@/components/Page'
 
 export const SimpleTable = <T extends MRT_RowData, ParentType extends MRT_RowData>({
   data,
@@ -28,6 +29,10 @@ export const SimpleTable = <T extends MRT_RowData, ParentType extends MRT_RowDat
   const [pagination, setPagination] = useState<MRT_PaginationState>(defaultPaginationSmall)
   const navigate = useNavigate()
 
+  const location = useLocation()
+  const { tableUrl, setTableUrl } = usePageContext()
+  const [searchParams] = useSearchParams()
+
   const linkToDetails = ({ row }: { row: MRT_Row<T> }) => {
     if (mode.read && idFieldName && url) return <ActionComponent {...{ row, idFieldName, url }} />
     return null // code shouldn't get here!
@@ -40,6 +45,7 @@ export const SimpleTable = <T extends MRT_RowData, ParentType extends MRT_RowDat
           renderRowActions: linkToDetails,
           muiTableBodyRowProps: ({ row }: { row: MRT_Row<T> }) => ({
             onClick: () => {
+              setTableUrl(`${location.pathname}?tab=${searchParams.get('tab')}`)
               navigate(`/${url}/${row.original[idFieldName]}`)
             },
             sx: {
