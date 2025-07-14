@@ -11,6 +11,7 @@ import { useDetailContext } from '../Context/DetailContext'
 import { ActionComponent } from '@/components/TableView/ActionComponent'
 import { defaultPaginationSmall } from './defaultValues'
 import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 
 export const SimpleTable = <T extends MRT_RowData, ParentType extends MRT_RowData>({
   data,
@@ -25,6 +26,7 @@ export const SimpleTable = <T extends MRT_RowData, ParentType extends MRT_RowDat
 }) => {
   const { mode } = useDetailContext<ParentType>()
   const [pagination, setPagination] = useState<MRT_PaginationState>(defaultPaginationSmall)
+  const navigate = useNavigate()
 
   const linkToDetails = ({ row }: { row: MRT_Row<T> }) => {
     if (mode.read && idFieldName && url) return <ActionComponent {...{ row, idFieldName, url }} />
@@ -32,7 +34,20 @@ export const SimpleTable = <T extends MRT_RowData, ParentType extends MRT_RowDat
   }
 
   const actionRowProps =
-    mode.read && idFieldName && url ? { enableRowActions: true, renderRowActions: linkToDetails } : {}
+    mode.read && idFieldName && url
+      ? {
+          enableRowActions: true,
+          renderRowActions: linkToDetails,
+          muiTableBodyRowProps: ({ row }: { row: MRT_Row<T> }) => ({
+            onClick: () => {
+              navigate(`/${url}/${row.original[idFieldName]}`)
+            },
+            sx: {
+              cursor: 'pointer',
+            },
+          }),
+        }
+      : {}
 
   const table = useMaterialReactTable({
     columns: columns,
