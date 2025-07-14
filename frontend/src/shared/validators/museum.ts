@@ -36,6 +36,7 @@ export const validateMuseum = (editData: EditDataType<Museum>, fieldName: keyof 
       name: 'State code',
       asString: value => {
         if (value.length > 5) return 'State code must contain a maximum of 5 characters'
+        return null
       },
     },
   }
