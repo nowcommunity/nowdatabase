@@ -9,6 +9,7 @@ import {
   MaterialReactTable,
   MRT_VisibilityState,
   MRT_TableInstance,
+  MRT_Row,
 } from 'material-react-table'
 import { Box, CircularProgress, Paper, Tooltip } from '@mui/material'
 import { useLocation, useNavigate } from 'react-router-dom'
@@ -45,6 +46,7 @@ export const TableView = <T extends MRT_RowData>({
   svgExport,
   exportIsLoading,
   isCrossSearchTable,
+  clickableRows = true,
   enableColumnFilterModes,
   serverSidePagination,
   isFetching,
@@ -64,6 +66,7 @@ export const TableView = <T extends MRT_RowData>({
   svgExport?: (table: MRT_TableInstance<T>) => void
   exportIsLoading?: boolean
   isCrossSearchTable?: boolean
+  clickableRows?: boolean
   enableColumnFilterModes?: boolean
   serverSidePagination?: boolean
   isFetching: boolean
@@ -117,17 +120,19 @@ export const TableView = <T extends MRT_RowData>({
     else rowCount = data.length
   }
 
+  const muiTableBodyRowProps = ({ row }: { row: MRT_Row<T> }) => ({
+    onClick: () => {
+      navigate(`/${url}/${row.original[idFieldName]}`)
+    },
+    sx: {
+      cursor: 'pointer',
+    },
+  })
+
   const table = useMaterialReactTable({
     columns: columns,
     data: data || [],
-    muiTableBodyRowProps: ({ row }) => ({
-      onClick: () => {
-        navigate(`/${url}/${row.original[idFieldName]}`)
-      },
-      sx: {
-        cursor: 'pointer',
-      },
-    }),
+    muiTableBodyRowProps: clickableRows ? muiTableBodyRowProps : undefined,
     state: {
       columnFilters,
       showColumnFilters: true,
