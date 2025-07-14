@@ -17,7 +17,7 @@ export const Login = () => {
   const location = useLocation()
   const search = new URLSearchParams(location.search)
   const loginHadExpired = search.get('expired')
-  const notify = useNotify()
+  const { notify } = useNotify()
 
   document.title = 'Login'
 

@@ -28,7 +28,7 @@ export const CrossSearchExportMenuItem = ({ handleClose }: { handleClose: () => 
       throw new Error('Server response was not OK.')
     }
     const reader = response.body!.getReader()
-    const file: Uint8Array<ArrayBufferLike>[] = []
+    const file: Uint8Array[] = []
     let bytes = 0
     let closed = false
 
