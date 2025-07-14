@@ -1,4 +1,4 @@
-import { Museum } from '@/shared/types'
+import { Museum, EditDataType } from '@/shared/types'
 import { api } from './api'
 
 const museumsApi = api.injectEndpoints({
@@ -14,7 +14,15 @@ const museumsApi = api.injectEndpoints({
       }),
       providesTags: result => (result ? [{ type: 'museum', id: result.museum }] : []),
     }),
+    editMuseum: builder.mutation<Museum, EditDataType<Museum>>({
+      query: museum => ({
+        url: `/museum`,
+        method: 'PUT',
+        body: { museum },
+      }),
+      invalidatesTags: (result, _error, { museum }) => (result ? [{ type: 'museum', id: museum }, 'museums'] : []),
+    }),
   }),
 })
 
-export const { useGetAllMuseumsQuery, useGetMuseumDetailsQuery } = museumsApi
+export const { useGetAllMuseumsQuery, useGetMuseumDetailsQuery, useEditMuseumMutation } = museumsApi

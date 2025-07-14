@@ -4,6 +4,8 @@ import { Museum } from '@/shared/types'
 
 export const MuseumInfoTab = () => {
   const { textField, radioSelection } = useDetailContext<Museum>()
+  const { editData } = useDetailContext()
+
   const museumInfo = [
     ['Institution', textField('institution')],
     ['Alt. name', textField('alt_int_name')],
