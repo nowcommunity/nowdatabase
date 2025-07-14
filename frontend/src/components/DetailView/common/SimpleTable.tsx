@@ -30,7 +30,7 @@ export const SimpleTable = <T extends MRT_RowData, ParentType extends MRT_RowDat
   const navigate = useNavigate()
 
   const location = useLocation()
-  const { tableUrl, setTableUrl } = usePageContext()
+  const { setTableUrl } = usePageContext()
   const [searchParams] = useSearchParams()
 
   const linkToDetails = ({ row }: { row: MRT_Row<T> }) => {
