@@ -40,6 +40,7 @@ export const CrossSearchExportMenuItem = ({ handleClose }: { handleClose: () => 
         }, 500)
       }
     }
+    notify(`Downloading CSV file...`, 'info', null)
     showDownloadProgress()
     while (true) {
       const { done, value } = await reader.read()
