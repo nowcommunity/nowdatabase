@@ -9,46 +9,66 @@ import { currentDateAsString } from '@/shared/currentDateAsString'
 export const CrossSearchExportMenuItem = ({ handleClose }: { handleClose: () => void }) => {
   const [loading, setLoading] = useState(false)
   const { sqlColumnFilters, sqlOrderBy } = usePageContext()
-  const notify = useNotify()
+  const { notify, setMessage: setNotificationMessage } = useNotify()
 
   const token = useUser().token
   const fetchOptions = token ? { headers: { Authorization: `Bearer ${token}` } } : {}
 
   const filename = `cross_search${currentDateAsString()}.csv`
 
-  const fetchCSVFile = () => {
+  const fetchCSVFile = async () => {
     setLoading(true)
-    notify('Downloading CSV file, please wait...', 'info', null)
     const URIColumnFilters = encodeURIComponent(JSON.stringify(sqlColumnFilters))
     const URIOrderBy = encodeURIComponent(JSON.stringify(sqlOrderBy))
 
-    fetch(`${BACKEND_URL}/crosssearch/export/${URIColumnFilters}/${URIOrderBy}`, fetchOptions)
-      .then(response => {
-        if (!response.ok) {
-          throw new Error('Server response was not OK.')
-        }
-        return response.blob()
-      })
-      .then(blob => {
-        const blobUrl = window.URL.createObjectURL(blob)
-        const downloadLink = document.createElement('a')
-        downloadLink.href = blobUrl
-        downloadLink.download = filename
-        document.body.appendChild(downloadLink)
-        downloadLink.click()
-        downloadLink.remove()
-        window.URL.revokeObjectURL(blobUrl)
-        notify('Download finished.')
-      })
-      .catch(_ => {
-        notify('Downloading cross-search export failed.', 'error')
-      })
-      .finally(() => setLoading(false))
+    notify('Generating CSV file, please wait...', 'info', null)
+    const response = await fetch(`${BACKEND_URL}/crosssearch/export/${URIColumnFilters}/${URIOrderBy}`, fetchOptions)
+
+    if (!response.ok) {
+      throw new Error('Server response was not OK.')
+    }
+    const reader = response.body!.getReader()
+    const file: Uint8Array[] = []
+    let bytes = 0
+    let closed = false
+
+    const showDownloadProgress = () => {
+      if (!closed) {
+        setTimeout(() => {
+          setNotificationMessage(`Downloading CSV file, ${Math.round((bytes / 1000000) * 10) / 10} MB`)
+          showDownloadProgress()
+        }, 500)
+      }
+    }
+    notify(`Downloading CSV file...`, 'info', null)
+    showDownloadProgress()
+    while (true) {
+      const { done, value } = await reader.read()
+      if (done) break
+      bytes = bytes + value.length
+      file.push(value)
+    }
+    closed = true
+    try {
+      const blobUrl = window.URL.createObjectURL(new Blob(file))
+      const downloadLink = document.createElement('a')
+      downloadLink.href = blobUrl
+      downloadLink.download = filename
+      document.body.appendChild(downloadLink)
+      downloadLink.click()
+      downloadLink.remove()
+      window.URL.revokeObjectURL(blobUrl)
+      notify('Download finished.')
+    } catch {
+      notify('Downloading cross-search export failed.', 'error')
+    } finally {
+      setLoading(false)
+    }
   }
   return (
     <MenuItem
       onClick={() => {
-        fetchCSVFile()
+        void fetchCSVFile()
         handleClose()
       }}
       disabled={loading}

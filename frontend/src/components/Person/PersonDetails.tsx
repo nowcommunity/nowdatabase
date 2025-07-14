@@ -18,7 +18,7 @@ export const PersonDetails = () => {
   const { id: idFromUrl } = useParams()
   const user = useUser()
   const [editPersonRequest, { isLoading: mutationLoading }] = useEditPersonMutation()
-  const notify = useNotify()
+  const { notify } = useNotify()
   const navigate = useNavigate()
 
   // A bit convoluted, but this is to allow using the same component for user's own page

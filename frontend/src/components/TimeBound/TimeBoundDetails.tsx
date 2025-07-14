@@ -26,7 +26,7 @@ export const TimeBoundDetails = () => {
   })
   const [editTimeBoundRequest] = useEditTimeBoundMutation()
 
-  const notify = useNotify()
+  const { notify } = useNotify()
   const navigate = useNavigate()
   const [deleteMutation, { isSuccess: deleteSuccess, isError: deleteError }] = useDeleteTimeBoundMutation()
 

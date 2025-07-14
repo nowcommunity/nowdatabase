@@ -15,7 +15,7 @@ import { AddUserModal } from './AddUserModal'
 export const PersonTab = () => {
   const { textField, dropdownWithSearch, data, mode } = useDetailContext<PersonDetailsType>()
   const currentUser = useUser()
-  const notify = useNotify()
+  const { notify } = useNotify()
   const { id: idFromUrl } = useParams()
   const isNew = idFromUrl === 'new'
   const isAdmin = currentUser.role == Role.Admin

@@ -25,7 +25,7 @@ export const SpeciesDetails = () => {
   }
   const [editSpeciesRequest, { isLoading: mutationLoading }] = useEditSpeciesMutation()
   const { isError, isFetching, data } = useGetSpeciesDetailsQuery(id!, { skip: isNew })
-  const notify = useNotify()
+  const { notify } = useNotify()
   const navigate = useNavigate()
   const [deleteMutation, { isSuccess: deleteSuccess, isError: deleteError }] = useDeleteSpeciesMutation()
 

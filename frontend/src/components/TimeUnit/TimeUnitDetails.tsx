@@ -25,7 +25,7 @@ export const TimeUnitDetails = () => {
   const { isLoading, isError, isFetching, data } = useGetTimeUnitDetailsQuery(encodeURIComponent(id!), { skip: isNew })
   const [editTimeUnitRequest] = useEditTimeUnitMutation()
 
-  const notify = useNotify()
+  const { notify } = useNotify()
   const navigate = useNavigate()
   const [deleteMutation, { isSuccess: deleteSuccess, isError: deleteError }] = useDeleteTimeUnitMutation()
 

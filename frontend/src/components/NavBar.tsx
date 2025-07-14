@@ -16,7 +16,7 @@ export const NavBar = () => {
   const user = useUser()
   const navigate = useNavigate()
   const dispatch = useDispatch()
-  const notify = useNotify()
+  const { notify } = useNotify()
   const pages: LinkDefinition[] = [
     { title: 'Localities', url: '/locality' },
     { title: 'Species', url: '/species' },

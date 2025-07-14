@@ -8,6 +8,7 @@ export type NotificationContext = {
   open: boolean
   setOpen: (open: boolean) => void
   message: string
+  setMessage: (message: string) => void
   severity?: Severity
   timeoutValue?: number | null
 }
@@ -36,7 +37,7 @@ export const NotificationContextProvider = ({ children }: { children: ReactNode 
     }, 200)
   }
   return (
-    <NotificationContext.Provider value={{ open, setOpen, message, severity, timeoutValue, notify }}>
+    <NotificationContext.Provider value={{ open, setOpen, message, setMessage, severity, timeoutValue, notify }}>
       {children}
     </NotificationContext.Provider>
   )

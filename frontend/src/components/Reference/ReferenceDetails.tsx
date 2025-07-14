@@ -24,7 +24,7 @@ export const ReferenceDetails = () => {
   const { isFetching, isError, data } = useGetReferenceDetailsQuery(id!, { skip: isNew })
   const [editReferenceRequest, { isLoading: mutationLoading }] = useEditReferenceMutation()
   const [deleteMutation, { isSuccess: deleteSuccess, isError: deleteError }] = useDeleteReferenceMutation()
-  const notify = useNotify()
+  const { notify } = useNotify()
   const navigate = useNavigate()
 
   useEffect(() => {
