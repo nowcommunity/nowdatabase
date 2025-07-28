@@ -12,3 +12,16 @@ export const newMuseumBasis: Museum = {
   used_now: null,
   used_gene: null,
 }
+
+export const editedMuseum: Museum = {
+  ...newMuseumBasis,
+  institution: 'Australian Museum',
+  alt_int_name: '',
+  city: 'Canberra',
+  state_code: 'NSW',
+  state: 'New South Wales',
+  country: 'Australia',
+  used_morph: false,
+  used_now: true,
+  used_gene: null,
+}

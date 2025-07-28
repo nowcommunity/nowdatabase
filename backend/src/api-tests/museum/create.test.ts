@@ -33,9 +33,13 @@ describe('Creating new museum works', () => {
   })
 
   it('Contains correct data', () => {
-    const { museum: museumId, institution } = createdMuseum!
-    expect(institution).toEqual('Australian Museum') // 'Institution name is different'
+    const { museum: museumId, institution, used_morph, used_now, used_gene } = createdMuseum!
     expect(museumId).toBeDefined()
+    expect(institution).toEqual('Australian Museum') // 'Institution name is different'
+    expect(used_morph).toEqual(true)
+    // fixRadioSelection converts null values into false
+    expect(used_now).toEqual(false)
+    expect(used_gene).toEqual(false)
   })
 
   it('Creation fails with empty museum code', async () => {
