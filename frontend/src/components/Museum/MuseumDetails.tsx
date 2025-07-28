@@ -12,7 +12,9 @@ import { useNotify } from '@/hooks/notification'
 export const MuseumDetails = () => {
   const { id } = useParams()
   const isNew = id === 'new'
-  const { isError, isFetching, data } = useGetMuseumDetailsQuery(id!)
+  const { isError, isFetching, data } = useGetMuseumDetailsQuery(id!, {
+    skip: isNew,
+  })
   const [editMuseumRequest, { isLoading: mutationLoading }] = useEditMuseumMutation()
   const notify = useNotify()
   const navigate = useNavigate()
@@ -20,7 +22,7 @@ export const MuseumDetails = () => {
   const tabs: TabType[] = [
     {
       title: 'Museum',
-      content: <MuseumInfoTab />,
+      content: <MuseumInfoTab isNew={isNew} />,
     },
     {
       title: 'Localities',
@@ -48,9 +50,9 @@ export const MuseumDetails = () => {
   return (
     <DetailView<Museum>
       tabs={tabs}
-      data={!data ? emptyMuseum : data}
+      data={isNew ? emptyMuseum : data!}
       onWrite={onWrite}
-      isNew={false}
+      isNew={isNew}
       validator={validateMuseum}
       deleteFunction={undefined}
       hasStagingMode

@@ -2,7 +2,7 @@ import { ArrayFrame } from '@/components/DetailView/common/tabLayoutHelpers'
 import { useDetailContext } from '@/components/DetailView/Context/DetailContext'
 import { Museum } from '@/shared/types'
 
-export const MuseumInfoTab = () => {
+export const MuseumInfoTab = ({ isNew }: { isNew?: boolean }) => {
   const { textField, radioSelection } = useDetailContext<Museum>()
 
   const museumInfo = [
@@ -45,7 +45,7 @@ export const MuseumInfoTab = () => {
         'used-gene'
       ),
     ],
-    ['Museum code', textField('museum', { type: 'text', readonly: true })],
+    ['Museum code', textField('museum', { type: 'text', readonly: !isNew })],
   ]
 
   return (
