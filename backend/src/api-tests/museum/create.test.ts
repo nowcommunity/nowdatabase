@@ -22,7 +22,6 @@ describe('Creating new museum works', () => {
       museum: newMuseumBasis,
     })
     const { museum: createdId } = resultBody
-    console.log(resultBody)
 
     expect(typeof createdId).toEqual('string') // `Invalid result returned on write: ${createdId}`
     expect(getReqStatus).toEqual(200)
