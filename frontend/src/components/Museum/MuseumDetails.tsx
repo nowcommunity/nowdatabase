@@ -26,7 +26,7 @@ export const MuseumDetails = () => {
     },
     {
       title: 'Localities',
-      content: <LocalityTab />,
+      content: <LocalityTab isNew={isNew} />,
     },
   ]
 
