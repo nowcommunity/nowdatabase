@@ -53,7 +53,6 @@ export const PageContextProvider = <T extends object>({
   const [sqlOffset, setSqlOffset] = useState<number>(0)
   const [sqlColumnFilters, setSqlColumnFilters] = useState<MRT_ColumnFiltersState>([])
   const [sqlOrderBy, setSqlOrderBy] = useState<MRT_SortingState>([])
-  console.log(previousTableUrls)
 
   return (
     <PageContext.Provider
