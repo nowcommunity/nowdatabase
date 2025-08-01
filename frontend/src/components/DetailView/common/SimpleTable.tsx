@@ -30,7 +30,7 @@ export const SimpleTable = <T extends MRT_RowData, ParentType extends MRT_RowDat
   const navigate = useNavigate()
 
   const location = useLocation()
-  const { setTableUrl } = usePageContext()
+  const { previousTableUrls, setPreviousTableUrls } = usePageContext()
   const [searchParams] = useSearchParams()
 
   const linkToDetails = ({ row }: { row: MRT_Row<T> }) => {
@@ -45,7 +45,7 @@ export const SimpleTable = <T extends MRT_RowData, ParentType extends MRT_RowDat
           renderRowActions: linkToDetails,
           muiTableBodyRowProps: ({ row }: { row: MRT_Row<T> }) => ({
             onClick: () => {
-              setTableUrl(`${location.pathname}?tab=${searchParams.get('tab')}`)
+              setPreviousTableUrls([...previousTableUrls, `${location.pathname}?tab=${searchParams.get('tab')}`])
               navigate(`/${url}/${row.original[idFieldName]}`)
             },
             sx: {

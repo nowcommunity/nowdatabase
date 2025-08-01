@@ -72,7 +72,15 @@ export const TableView = <T extends MRT_RowData>({
   isFetching: boolean
 }) => {
   const location = useLocation()
-  const { editRights, setSqlLimit, setSqlOffset, setSqlColumnFilters, setSqlOrderBy } = usePageContext()
+  const {
+    editRights,
+    setSqlLimit,
+    setSqlOffset,
+    setSqlColumnFilters,
+    setSqlOrderBy,
+    previousTableUrls,
+    setPreviousTableUrls,
+  } = usePageContext()
   const [columnFilters, setColumnFilters] = useState<MRT_ColumnFiltersState>([])
   const [sorting, setSorting] = useState<MRT_SortingState>([])
   const navigate = useNavigate()
@@ -80,7 +88,7 @@ export const TableView = <T extends MRT_RowData>({
     selectorFn ? defaultPaginationSmall : defaultPagination
   )
   const user = useUser()
-  const { setIdList, setTableUrl } = usePageContext<T>()
+  const { setIdList } = usePageContext<T>()
 
   useEffect(() => {
     setSqlLimit(pagination.pageSize)
@@ -122,6 +130,13 @@ export const TableView = <T extends MRT_RowData>({
 
   const muiTableBodyRowProps = ({ row }: { row: MRT_Row<T> }) => ({
     onClick: () => {
+      const columnFilterToUrl = `columnfilters=${JSON.stringify(columnFilters)}`
+      const sortingToUrl = `sorting=${JSON.stringify(sorting)}`
+      const paginationToUrl = `pagination=${JSON.stringify(pagination)}`
+      setPreviousTableUrls([
+        ...previousTableUrls,
+        `${location.pathname}?&${columnFilterToUrl}&${sortingToUrl}&${paginationToUrl}`,
+      ])
       navigate(`/${url}/${row.original[idFieldName]}`)
     },
     sx: {
@@ -211,7 +226,6 @@ export const TableView = <T extends MRT_RowData>({
     const columnFilterToUrl = `columnfilters=${JSON.stringify(columnFilters)}`
     const sortingToUrl = `sorting=${JSON.stringify(sorting)}`
     const paginationToUrl = `pagination=${JSON.stringify(pagination)}`
-    setTableUrl(`${location.pathname}?&${columnFilterToUrl}&${sortingToUrl}&${paginationToUrl}`)
     navigate(`${location.pathname}?&${columnFilterToUrl}&${sortingToUrl}&${paginationToUrl}`, {
       replace: true,
     })
