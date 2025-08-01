@@ -252,9 +252,9 @@ export const emptyRegion = {
 export const emptyMuseum = {
   country: '',
   state: '',
-  used_morph: false,
-  used_now: false,
-  used_gene: false,
+  used_morph: null,
+  used_now: null,
+  used_gene: null,
   museum: '',
   institution: '',
   alt_int_name: '',

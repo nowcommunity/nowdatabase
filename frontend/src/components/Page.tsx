@@ -14,8 +14,8 @@ export type PageContextType<T> = {
   setIdList: (ids: string[]) => void
   idFieldName: string
   viewName: string
-  tableUrl: string
-  setTableUrl: (newUrl: string) => void
+  previousTableUrls: string[]
+  setPreviousTableUrls: (newPreviousTableUrls: string[]) => void
   createTitle: (data: T) => string
   createSubtitle: (data: T) => string
   editRights: EditRights
@@ -47,7 +47,7 @@ export const PageContextProvider = <T extends object>({
   editRights: EditRights
 }) => {
   const [idList, setIdList] = useState<string[]>([])
-  const [tableUrl, setTableUrl] = useState<string>(`/${viewName}`)
+  const [previousTableUrls, setPreviousTableUrls] = useState<string[]>([`/${viewName}`])
   // TODO: replace with some default values from variables
   const [sqlLimit, setSqlLimit] = useState<number>(defaultPagination.pageSize)
   const [sqlOffset, setSqlOffset] = useState<number>(0)
@@ -62,8 +62,8 @@ export const PageContextProvider = <T extends object>({
         idFieldName,
         setIdList: (newIdList: string[]) => setIdList(newIdList),
         viewName,
-        tableUrl,
-        setTableUrl: (newUrl: string) => setTableUrl(newUrl),
+        previousTableUrls,
+        setPreviousTableUrls,
         createTitle: (data: unknown) => createTitle(data as T),
         createSubtitle: (data: unknown) => createSubtitle(data as T),
         sqlLimit,
