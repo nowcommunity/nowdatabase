@@ -273,12 +273,10 @@ export const filterDuplicateLocalitySpecies = async (
       // Logic is flipped for filter as we want to skip the ones the check matches
       return !(localityDetailsSpeciesIds.includes(localitySpecies.species_id) && localitySpecies.rowState === 'new')
     }
-
-    // code shouldn't get here ever
-    logger.info(
-      `Filter already existing species: localitySpecies didn't have species_id. Skipping. ${JSON.stringify(localitySpecies)}`
-    )
-    return false
+    // if localitySpecies doesn't have species_id (i.e. it was created with the "add new species" button in Species tab),
+    // it will never be filtered out. However, once the taxonomy check for the "add new species" button is working,
+    // it should not let the user create a duplicate species in this way.
+    return true
   })
 
   return updatedLocalityNow_ls
