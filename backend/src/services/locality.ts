@@ -1,5 +1,15 @@
-import { EditDataType, EditMetaData, LocalityDetailsType, User, Role } from '../../../frontend/src/shared/types'
+import {
+  EditDataType,
+  EditMetaData,
+  LocalityDetailsType,
+  User,
+  Role,
+  LocalitySpeciesDetailsType,
+  Editable,
+  SpeciesDetailsType,
+} from '../../../frontend/src/shared/types'
 import { validateLocality } from '../../../frontend/src/shared/validators/locality'
+import { validateSpecies } from '../../../frontend/src/shared/validators/species'
 import { ValidationObject, referenceValidator } from '../../../frontend/src/shared/validators/validator'
 import Prisma from '../../prisma/generated/now_test_client'
 import { AccessError } from '../middlewares/authorizer'
@@ -200,12 +210,24 @@ export const getLocalityDetails = async (id: number, user: User | undefined) => 
   return JSON.parse(fixBigInt(result)!) as LocalityDetailsType
 }
 
+// also validates possible new species that were added to this locality
 export const validateEntireLocality = async (editedFields: EditDataType<Prisma.now_loc> & EditMetaData) => {
   const keys = Object.keys(editedFields)
   const errors: ValidationObject[] = []
   for (const key of keys) {
     const error = validateLocality(editedFields as EditDataType<LocalityDetailsType>, key as keyof LocalityDetailsType)
     if (error.error) errors.push(error)
+  }
+  if ('now_ls' in editedFields) {
+    for (const species of editedFields.now_ls as Array<Editable<LocalitySpeciesDetailsType>>) {
+      if (species.rowState === 'new') {
+        const keys = Object.keys(species.com_species)
+        for (const key of keys) {
+          const newSpeciesError = validateSpecies(species.com_species, key as keyof SpeciesDetailsType)
+          if (newSpeciesError.error) errors.push(newSpeciesError)
+        }
+      }
+    }
   }
   let error = null
   if ('references' in editedFields && editedFields.references) {
