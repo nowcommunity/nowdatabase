@@ -5,7 +5,7 @@ import { ArrayFrame, Grouped } from '@/components/DetailView/common/tabLayoutHel
 import { useDetailContext } from '@/components/DetailView/Context/DetailContext'
 import { SequenceTable } from '@/components/Sequence/SequenceTable'
 import { Box } from '@mui/material'
-import { EditingForm } from '@/components/DetailView/common/EditingForm'
+import { EditingForm, EditingFormField } from '@/components/DetailView/common/EditingForm'
 
 export const TimeUnitTab = () => {
   const { textField, dropdown, data, editData, setEditData, fieldsWithErrors, mode } =
@@ -68,9 +68,9 @@ export const TimeUnitTab = () => {
     ['Comment', low_bcomment],
   ]
 
-  const formFields: { name: string; label: string; required?: boolean }[] = [
+  const formFields: EditingFormField[] = [
     { name: 'b_name', label: 'Name', required: true },
-    { name: 'age', label: 'Age (Ma)', required: true },
+    { name: 'age', label: 'Age (Ma)', required: true, type: 'number' },
     { name: 'b_comment', label: 'Comment', required: false },
   ]
 

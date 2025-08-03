@@ -4,7 +4,7 @@ import { useForm } from 'react-hook-form'
 import { Editable, EditDataType } from '@/shared/types'
 import { useDetailContext } from '../Context/DetailContext'
 
-export type EditingFormField = { name: string; label: string; required?: boolean }
+export type EditingFormField = { name: string; label: string; required?: boolean; type?: 'number' | 'string' }
 
 /* 
 Renders a button, that will open EditingModal, which can be used
@@ -53,8 +53,14 @@ export const EditingForm = <T extends object, ParentType extends object>({
         {formFields.map(field => (
           <TextField
             key={field.name}
-            {...register(field.name, { required: field.required })}
+            {...register(field.name, {
+              required: field.required ? 'This field is required' : false,
+              ...(field.type === 'number' && {
+                pattern: { value: /^(0|[1-9]\d*)(\.\d+)?$/, message: 'Value must be a valid number' },
+              }),
+            })}
             error={!!errors[field.name]}
+            helperText={errors[field.name]?.message}
             {...{ label: field.label, required: field.required }}
           />
         ))}
