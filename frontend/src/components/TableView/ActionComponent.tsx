@@ -21,13 +21,19 @@ export const ActionComponent = <T extends MRT_RowData>({
   tableRowAction?: (row: T) => void
 }) => {
   const navigate = useNavigate()
-
   const id = row.original[idFieldName]
 
+  let buttonType: string
+  if (tableRowAction) {
+    buttonType = 'synonyms'
+  } else if (selectorFn) {
+    buttonType = 'add'
+  } else {
+    buttonType = 'details'
+  }
+
   const getIconToShow = () => {
-    if (selectorFn) {
-      return <AddCircleOutlineIcon />
-    } else if (tableRowAction) {
+    if (tableRowAction) {
       return (
         <Typography
           sx={{
@@ -45,17 +51,19 @@ export const ActionComponent = <T extends MRT_RowData>({
           S
         </Typography>
       )
+    } else if (selectorFn) {
+      return <AddCircleOutlineIcon />
     }
     return <ManageSearchIcon />
   }
 
   const onClick = (event: React.MouseEvent) => {
-    if (selectorFn) {
-      event.stopPropagation()
-      selectorFn(row.original)
-    } else if (tableRowAction) {
+    if (tableRowAction) {
       event.stopPropagation()
       tableRowAction(row.original)
+    } else if (selectorFn) {
+      event.stopPropagation()
+      selectorFn(row.original)
     } else {
       navigate(`/${url}/${id}`)
     }
@@ -63,7 +71,7 @@ export const ActionComponent = <T extends MRT_RowData>({
 
   return (
     <Box display="flex" gap="0.2em" alignItems="center">
-      <Button data-cy={`detailview-button-${id}`} variant="text" style={{ width: '2em' }} onClick={onClick}>
+      <Button data-cy={`${buttonType}-button-${id}`} variant="text" style={{ width: '2em' }} onClick={onClick}>
         {getIconToShow()}
       </Button>
       {checkRowRestriction && checkRowRestriction(row.original) && (

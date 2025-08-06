@@ -60,7 +60,12 @@ export const Notification = () => {
         anchorOrigin={{ vertical: 'top', horizontal: 'left' }}
         onClose={handleClose}
       >
-        <Alert onClose={handleClose} severity={severity} variant="filled" sx={{ width: '100%', fontSize: 16 }}>
+        <Alert
+          onClose={handleClose}
+          severity={severity}
+          variant="filled"
+          sx={{ width: '100%', fontSize: 16, whiteSpace: 'pre-line' }}
+        >
           {message}
         </Alert>
       </Snackbar>

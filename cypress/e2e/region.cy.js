@@ -35,7 +35,7 @@ describe('Editing a region', () => {
     cy.contains('France')
     cy.get('[id=edit-button]').click()
     cy.contains('Select Coordinator').click()
-    cy.get('[data-cy=detailview-button-AD]').click()
+    cy.get('[data-cy=add-button-AD]').click()
     cy.contains('Close').click()
     cy.contains('ads')
     cy.get('[id=country-multiselect]').click()

@@ -5,6 +5,7 @@ The EditableTextField component is a basic text input field. The component is us
 - a `field` which is the field in editData that the component should change (Required)
 - a `type` which details the type of input the component receives (Optional, defaults to 'text')
 - a `round` value which controls how the value should be rounded if it's a number (Optional)
+- a `trim` boolean value which controls whether the leading and trailing whitespaces should be removed (Optional, defaults to false)
 - a `big` boolean value that changes the field to a multiline field (Optional)
 - a `disabled` boolean value (Optional)
 - a `readonly` boolean value (Optional)
@@ -13,6 +14,8 @@ The EditableTextField component is a basic text input field. The component is us
 The component's `type` can be a lot of values, but the ones we use are `text` and `number`.
 
 The `round` value controls how many values are shown after the decimal point. This only affects fields that contain numbers, obviously.
+
+`trim` only affects fields that have their `type` set to `text`.
 
 If `disabled` is set to true, the EditableTextField cannot be clicked.
 
