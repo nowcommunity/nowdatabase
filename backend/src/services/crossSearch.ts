@@ -113,6 +113,29 @@ export const getCrossSearchRawSql = async (
   const showAll = user ? [Role.Admin, Role.EditUnrestricted].includes(user.role) : false
   const allowedLocalities = user ? await getAllowedLocalities(user) : []
 
+  if (!limit) {
+    // this is only ran when exporting the cross-search table
+    limit = 20000
+    offset = 0
+    const results = []
+    while (true) {
+      const sql = generateCrossSearchSql(
+        showAll,
+        allowedLocalities,
+        limit,
+        offset,
+        convertedColumnFilters,
+        convertedOrderBy,
+        descendingOrder
+      )
+      const result: Partial<CrossSearch>[] = await nowDb.$queryRaw(sql)
+      if (result.length === 0) break
+      results.push(result)
+      offset = offset + limit
+    }
+    return results
+  }
+
   const sql = generateCrossSearchSql(
     showAll,
     allowedLocalities,

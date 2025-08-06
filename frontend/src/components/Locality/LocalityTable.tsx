@@ -25,7 +25,7 @@ export const LocalityTable = ({ selectorFn }: { selectorFn?: (newObject: Localit
   const [getLocalitySpeciesList, { isLoading }] = useGetLocalitySpeciesListMutation()
   const [filteredLocalities, setFilteredLocalities] = useState<SimplifiedLocality[]>()
   const columnFilters = usePageContext()
-  const notify = useNotify()
+  const { notify } = useNotify()
 
   const handleLocalityRowActionClick = (row: Locality) => {
     setSelectedLocality(row.lid.toString())

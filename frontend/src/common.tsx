@@ -1,5 +1,5 @@
 import { MRT_ColumnDef, MRT_PaginationState } from 'material-react-table'
-import { Reference, PersonDetailsType } from './shared/types'
+import { Reference, PersonDetailsType, Species } from './shared/types'
 import { Cell } from './components/commonComponents'
 
 export const formatLastLoginDate = (date: Date) => {
@@ -103,6 +103,45 @@ export const personTableColumns: MRT_ColumnDef<PersonDetailsType>[] = [
   {
     accessorFn: person => person.user?.now_user_group ?? 'None',
     header: 'User role',
+  },
+]
+
+export const smallSpeciesTableColumns: MRT_ColumnDef<Species>[] = [
+  {
+    accessorKey: 'subclass_or_superorder_name',
+    header: 'Subclass or Superorder',
+  },
+  {
+    accessorKey: 'order_name',
+    header: 'Order',
+  },
+  {
+    accessorKey: 'suborder_or_superfamily_name',
+    header: 'Suborder or Superfamily',
+  },
+  {
+    accessorKey: 'family_name',
+    header: 'Family',
+  },
+  {
+    accessorKey: 'subfamily_name',
+    header: 'Subfamily or Tribe',
+  },
+  {
+    accessorKey: 'genus_name',
+    header: 'Genus',
+  },
+  {
+    accessorKey: 'species_name',
+    header: 'Species',
+  },
+  {
+    accessorKey: 'unique_identifier',
+    header: 'Unique Identifier',
+  },
+  {
+    accessorKey: 'taxonomic_status',
+    header: 'Taxon status',
   },
 ]
 
