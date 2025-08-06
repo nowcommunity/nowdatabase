@@ -15,7 +15,7 @@ import { EditDataType, SpeciesDetailsType, ValidationErrors } from '@/shared/typ
 import { validateSpecies } from '@/shared/validators/species'
 import { emptySpecies } from '../DetailView/common/defaultValues'
 import { useNotify } from '@/hooks/notification'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 
 export const SpeciesDetails = () => {
   const { id } = useParams()
@@ -28,6 +28,7 @@ export const SpeciesDetails = () => {
   const notify = useNotify()
   const navigate = useNavigate()
   const [deleteMutation, { isSuccess: deleteSuccess, isError: deleteError }] = useDeleteSpeciesMutation()
+  const [modifiedData, setModifiedData] = useState<SpeciesDetailsType | undefined>()
 
   useEffect(() => {
     if (deleteSuccess) {
@@ -38,8 +39,22 @@ export const SpeciesDetails = () => {
     }
   }, [deleteSuccess, deleteError, notify, navigate])
 
+  useEffect(() => {
+    // changes subclass, suborder, and subfamily from null to empty string to make validators work
+    // this should be removed if validators are improved in the future
+    if (data) {
+      setModifiedData({
+        ...data,
+        subclass_or_superorder_name: data.subclass_or_superorder_name ?? '',
+        suborder_or_superfamily_name: data.suborder_or_superfamily_name ?? '',
+        subfamily_name: data.subfamily_name ?? '',
+      })
+    }
+  }, [data])
+
   if (isError) return <div>Error loading data</div>
-  if (isFetching || (!data && !isNew) || mutationLoading) return <CircularProgress />
+  if (isFetching || (!modifiedData && !isNew) || mutationLoading) return <CircularProgress />
+
   if (data) {
     document.title = `Species - ${data.species_name}`
   }
@@ -101,9 +116,10 @@ export const SpeciesDetails = () => {
   return (
     <DetailView
       tabs={tabs}
-      data={isNew ? emptySpecies : data!}
+      data={isNew ? emptySpecies : modifiedData!}
       onWrite={onWrite}
       isNew={isNew}
+      taxonomy={true}
       hasStagingMode
       validator={validateSpecies}
       deleteFunction={deleteFunction}

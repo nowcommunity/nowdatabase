@@ -1,5 +1,5 @@
 import { api } from './api'
-import { EditDataType, Species, SpeciesDetailsType } from '@/shared/types'
+import { EditDataType, Species, SpeciesDetailsType, SpeciesSynonym } from '@/shared/types'
 
 const speciesApi = api.injectEndpoints({
   endpoints: builder => ({
@@ -8,6 +8,11 @@ const speciesApi = api.injectEndpoints({
         url: `/species/all`,
       }),
       providesTags: result => (result ? [{ type: 'specieslist' }] : []),
+    }),
+    getAllSynonyms: builder.query<SpeciesSynonym[], void>({
+      query: () => ({
+        url: `/species/synonyms`,
+      }),
     }),
     getSpeciesDetails: builder.query<SpeciesDetailsType, string>({
       query: id => ({
@@ -36,5 +41,11 @@ const speciesApi = api.injectEndpoints({
   }),
 })
 
-export const { useGetAllSpeciesQuery, useGetSpeciesDetailsQuery, useEditSpeciesMutation, useDeleteSpeciesMutation } =
-  speciesApi
+export const {
+  useGetAllSpeciesQuery,
+  useLazyGetAllSpeciesQuery,
+  useLazyGetAllSynonymsQuery,
+  useGetSpeciesDetailsQuery,
+  useEditSpeciesMutation,
+  useDeleteSpeciesMutation,
+} = speciesApi
