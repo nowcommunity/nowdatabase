@@ -15,7 +15,7 @@ export const RegionDetails = () => {
   const { isLoading, isError, data } = useGetRegionDetailsQuery(id!, { skip: isNew })
   const [editRegionRequest, { isLoading: mutationLoading }] = useEditRegionMutation()
   const [deleteMutation, { isSuccess: deleteSuccess, isError: deleteError }] = useDeleteRegionMutation()
-  const notify = useNotify()
+  const { notify } = useNotify()
   const navigate = useNavigate()
 
   useEffect(() => {
