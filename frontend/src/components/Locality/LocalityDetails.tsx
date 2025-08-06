@@ -35,7 +35,7 @@ export const LocalityDetails = () => {
     skip: isNew,
   })
 
-  const notify = useNotify()
+  const { notify } = useNotify()
   const [deleteMutation, { isSuccess: deleteSuccess, isError: deleteError }] = useDeleteLocalityMutation()
 
   useEffect(() => {

@@ -119,7 +119,7 @@ export const AddUserModal = ({ isOpen, onClose, onSave, personInitials }: Props)
     userGroup: userGroups[0],
   })
   const [createUser, { isLoading }] = useCreateUserMutation()
-  const notify = useNotify()
+  const { notify } = useNotify()
 
   const save = () => {
     const userDetails: UserDetailsType = {
