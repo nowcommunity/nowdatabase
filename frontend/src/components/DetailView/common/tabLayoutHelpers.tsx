@@ -23,7 +23,6 @@ export const ArrayToTable = ({ array, half }: { array: Array<Array<ReactNode>>; 
                 alignItems: 'center',
                 justifyContent: 'left',
                 height: '100%',
-                width: '100%',
                 borderBottom: '1px solid rgba(224, 224, 224, 1)',
                 borderRight: '1px solid rgba(224, 224, 224, 1)',
                 gap: '1em',
