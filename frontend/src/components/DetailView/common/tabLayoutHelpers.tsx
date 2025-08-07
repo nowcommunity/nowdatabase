@@ -1,4 +1,4 @@
-import { Card, Typography, Box, Grid, Divider } from '@mui/material'
+import { Card, Typography, Box, Grid2, Divider } from '@mui/material'
 import { ReactNode } from 'react'
 import { useDetailContext } from '../Context/DetailContext'
 import { EditDataType } from '@/shared/types'
@@ -11,30 +11,31 @@ export const ArrayToTable = ({ array, half }: { array: Array<Array<ReactNode>>; 
     return width
   }
   return (
-    <Grid container direction="row">
+    <Grid2 container direction="row" width={'100%'} gap={'1em'}>
       {array.map((row, rowIndex) => (
-        <Grid key={rowIndex} container direction="row" minHeight="2.5em">
+        <Grid2 key={rowIndex} container direction="row" minHeight="2.5em" width={'100%'} height={'100%'} gap={'1em'}>
           {row.map((item, index) => (
-            <Grid
+            <Grid2
               key={index}
-              item
-              xs={getCellWidth(rowIndex, index)}
+              size={{ xs: getCellWidth(rowIndex, index) }}
               sx={{
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'left',
                 height: '100%',
+                width: '100%',
                 borderBottom: '1px solid rgba(224, 224, 224, 1)',
                 borderRight: '1px solid rgba(224, 224, 224, 1)',
+                gap: '1em',
               }}
               padding="5px"
             >
               {typeof item === 'string' ? <b>{item}</b> : item}
-            </Grid>
+            </Grid2>
           ))}
-        </Grid>
+        </Grid2>
       ))}
-    </Grid>
+    </Grid2>
   )
 }
 
@@ -94,6 +95,7 @@ export const Grouped = ({
     borderColor: error ? 'red' : warning ? 'orange' : '',
     borderRadius: error || warning ? 4 : '',
     borderStyle: error || warning ? 'none none none solid' : '',
+    gap: '1em',
   }
 
   const titleColor = error ? 'red' : warning ? 'orange' : 'text.secondary'
@@ -108,7 +110,9 @@ export const Grouped = ({
           <Divider />
         </>
       )}
-      <Box marginTop="15px">{children}</Box>
+      <Box marginTop="15px" gap={'2em'}>
+        {children}
+      </Box>
     </Card>
   )
 }
