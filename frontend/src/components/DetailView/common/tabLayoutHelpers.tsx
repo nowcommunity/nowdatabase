@@ -25,7 +25,6 @@ export const ArrayToTable = ({ array, half }: { array: Array<Array<ReactNode>>; 
                 height: '100%',
                 borderBottom: '1px solid rgba(224, 224, 224, 1)',
                 borderRight: '1px solid rgba(224, 224, 224, 1)',
-                gap: '1em',
               }}
               padding="5px"
               size={getCellWidth(rowIndex, index)}
@@ -110,7 +109,7 @@ export const Grouped = ({
           <Divider />
         </>
       )}
-      <Box marginTop="15px" gap={'2em'}>
+      <Box marginTop="15px" gap={'2em'} sx={{ display: 'flex', flexDirection: 'column', gap: '1em' }}>
         {children}
       </Box>
     </Card>
