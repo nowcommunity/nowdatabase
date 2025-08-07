@@ -1,4 +1,5 @@
-import { Card, Typography, Box, Grid2, Divider } from '@mui/material'
+import { Card, Typography, Box, Divider } from '@mui/material'
+import Grid from '@mui/material/Grid2'
 import { ReactNode } from 'react'
 import { useDetailContext } from '../Context/DetailContext'
 import { EditDataType } from '@/shared/types'
@@ -11,13 +12,12 @@ export const ArrayToTable = ({ array, half }: { array: Array<Array<ReactNode>>; 
     return width
   }
   return (
-    <Grid2 container direction="row" width={'100%'} gap={'1em'}>
+    <Grid container direction="row" width={'100%'}>
       {array.map((row, rowIndex) => (
-        <Grid2 key={rowIndex} container direction="row" minHeight="2.5em" width={'100%'} height={'100%'} gap={'1em'}>
+        <Grid key={rowIndex} container direction="row" minHeight="2.5em" width={'100%'}>
           {row.map((item, index) => (
-            <Grid2
+            <Grid
               key={index}
-              size={{ xs: getCellWidth(rowIndex, index) }}
               sx={{
                 display: 'flex',
                 alignItems: 'center',
@@ -29,13 +29,14 @@ export const ArrayToTable = ({ array, half }: { array: Array<Array<ReactNode>>; 
                 gap: '1em',
               }}
               padding="5px"
+              size={getCellWidth(rowIndex, index)}
             >
               {typeof item === 'string' ? <b>{item}</b> : item}
-            </Grid2>
+            </Grid>
           ))}
-        </Grid2>
+        </Grid>
       ))}
-    </Grid2>
+    </Grid>
   )
 }
 
