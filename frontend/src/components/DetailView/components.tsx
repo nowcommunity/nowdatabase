@@ -27,7 +27,7 @@ export const WriteButton = <T,>({
   const { editData, setEditData, mode, setMode, validator, fieldsWithErrors, setFieldsWithErrors } =
     useDetailContext<T>()
   const [loading, setLoading] = useState(false)
-  const notify = useNotify()
+  const { notify } = useNotify()
   const [getSpeciesData] = useLazyGetAllSpeciesQuery()
   const [getSynonyms] = useLazyGetAllSynonymsQuery()
 
