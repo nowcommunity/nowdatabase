@@ -256,7 +256,7 @@ export const ErrorBox = <T,>() => {
 
 export const ReturnButton = () => {
   const navigate = useNavigate()
-  const { tableUrl } = usePageContext()
+  const { setPreviousTableUrls, previousTableUrls } = usePageContext()
   const { mode, setMode } = useDetailContext()
 
   if (mode.staging) {
@@ -274,7 +274,17 @@ export const ReturnButton = () => {
     )
   }
   return (
-    <Button onClick={() => navigate(tableUrl, { relative: 'path' })}>
+    <Button
+      onClick={() => {
+        if (previousTableUrls.length > 0) {
+          const previousTableUrl = previousTableUrls[previousTableUrls.length - 1]
+          const newUrls = [...previousTableUrls]
+          newUrls.splice(-1)
+          setPreviousTableUrls(newUrls)
+          navigate(previousTableUrl, { relative: 'path' })
+        }
+      }}
+    >
       <ArrowBackIcon color="primary" style={{ marginRight: '0.2em' }} />
       Return to table
     </Button>

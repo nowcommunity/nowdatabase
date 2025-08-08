@@ -78,6 +78,7 @@ export const SelectingTable = <T extends MRT_RowData, ParentType extends object>
           visibleColumns={visibleColumns}
           selectorFn={editingAction ?? defaultEditingAction}
           idFieldName={idFieldName}
+          clickableRows={false}
           tableRowAction={tableRowAction}
         />
       ) : (

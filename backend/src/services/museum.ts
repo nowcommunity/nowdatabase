@@ -1,5 +1,8 @@
-import { Locality } from '../../../frontend/src/shared/types'
+import { Locality, Museum, EditDataType, EditMetaData } from '../../../frontend/src/shared/types'
 import { nowDb } from '../utils/db'
+import { ValidationObject } from '../../../frontend/src/shared/validators/validator'
+import Prisma from '../../prisma/generated/now_test_client'
+import { validateMuseum } from '../../../frontend/src/shared/validators/museum'
 
 export const getAllMuseums = async () => {
   const result = await nowDb.com_mlist.findMany({})
@@ -30,4 +33,14 @@ export const getMuseumDetails = async (id: string) => {
   }
 
   return combined
+}
+
+export const validateEntireMuseum = (editedFields: EditDataType<Prisma.com_mlist> & EditMetaData) => {
+  const keys = Object.keys(editedFields)
+  const errors: ValidationObject[] = []
+  for (const key of keys) {
+    const error = validateMuseum(editedFields as EditDataType<Museum>, key as keyof Museum)
+    if (error.error) errors.push(error)
+  }
+  return errors
 }

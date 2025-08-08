@@ -46,6 +46,7 @@ export const makeListRemoved = (list: Editable<Record<string, unknown>>[]) => {
 
 export const fixRadioSelection = (value: unknown) => {
   if (typeof value === 'string') {
+    if (value === 'null') return null
     return value === 'true' ? true : false
   }
   if (typeof value === 'boolean') return value
