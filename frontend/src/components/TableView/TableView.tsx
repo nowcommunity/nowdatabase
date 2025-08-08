@@ -9,6 +9,7 @@ import {
   MaterialReactTable,
   MRT_VisibilityState,
   MRT_TableInstance,
+  MRT_Row,
 } from 'material-react-table'
 import { Box, CircularProgress, Paper, Tooltip } from '@mui/material'
 import { useLocation, useNavigate } from 'react-router-dom'
@@ -45,6 +46,7 @@ export const TableView = <T extends MRT_RowData>({
   svgExport,
   exportIsLoading,
   isCrossSearchTable,
+  clickableRows = true,
   enableColumnFilterModes,
   serverSidePagination,
   isFetching,
@@ -64,12 +66,21 @@ export const TableView = <T extends MRT_RowData>({
   svgExport?: (table: MRT_TableInstance<T>) => void
   exportIsLoading?: boolean
   isCrossSearchTable?: boolean
+  clickableRows?: boolean
   enableColumnFilterModes?: boolean
   serverSidePagination?: boolean
   isFetching: boolean
 }) => {
   const location = useLocation()
-  const { editRights, setSqlLimit, setSqlOffset, setSqlColumnFilters, setSqlOrderBy } = usePageContext()
+  const {
+    editRights,
+    setSqlLimit,
+    setSqlOffset,
+    setSqlColumnFilters,
+    setSqlOrderBy,
+    previousTableUrls,
+    setPreviousTableUrls,
+  } = usePageContext()
   const [columnFilters, setColumnFilters] = useState<MRT_ColumnFiltersState>([])
   const [sorting, setSorting] = useState<MRT_SortingState>([])
   const navigate = useNavigate()
@@ -77,7 +88,7 @@ export const TableView = <T extends MRT_RowData>({
     selectorFn ? defaultPaginationSmall : defaultPagination
   )
   const user = useUser()
-  const { setIdList, setTableUrl } = usePageContext<T>()
+  const { setIdList } = usePageContext<T>()
 
   useEffect(() => {
     setSqlLimit(pagination.pageSize)
@@ -117,17 +128,26 @@ export const TableView = <T extends MRT_RowData>({
     else rowCount = data.length
   }
 
+  const muiTableBodyRowProps = ({ row }: { row: MRT_Row<T> }) => ({
+    onClick: () => {
+      const columnFilterToUrl = `columnfilters=${JSON.stringify(columnFilters)}`
+      const sortingToUrl = `sorting=${JSON.stringify(sorting)}`
+      const paginationToUrl = `pagination=${JSON.stringify(pagination)}`
+      setPreviousTableUrls([
+        ...previousTableUrls,
+        `${location.pathname}?&${columnFilterToUrl}&${sortingToUrl}&${paginationToUrl}`,
+      ])
+      navigate(`/${url}/${row.original[idFieldName]}`)
+    },
+    sx: {
+      cursor: 'pointer',
+    },
+  })
+
   const table = useMaterialReactTable({
     columns: columns,
     data: data || [],
-    muiTableBodyRowProps: ({ row }) => ({
-      onClick: () => {
-        navigate(`/${url}/${row.original[idFieldName]}`)
-      },
-      sx: {
-        cursor: 'pointer',
-      },
-    }),
+    muiTableBodyRowProps: clickableRows ? muiTableBodyRowProps : undefined,
     state: {
       columnFilters,
       showColumnFilters: true,
@@ -206,7 +226,6 @@ export const TableView = <T extends MRT_RowData>({
     const columnFilterToUrl = `columnfilters=${JSON.stringify(columnFilters)}`
     const sortingToUrl = `sorting=${JSON.stringify(sorting)}`
     const paginationToUrl = `pagination=${JSON.stringify(pagination)}`
-    setTableUrl(`${location.pathname}?&${columnFilterToUrl}&${sortingToUrl}&${paginationToUrl}`)
     navigate(`${location.pathname}?&${columnFilterToUrl}&${sortingToUrl}&${paginationToUrl}`, {
       replace: true,
     })
