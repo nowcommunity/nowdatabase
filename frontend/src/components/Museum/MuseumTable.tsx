@@ -7,19 +7,6 @@ import { Museum } from '@/shared/types'
 export const MuseumTable = ({ selectorFn }: { selectorFn?: (museum: Museum) => void }) => {
   const { data: museumQueryData, isFetching } = useGetAllMuseumsQuery()
 
-  /*
-    museum: string;
-    institution: string;
-    alt_int_name: string | null;
-    city: string | null;
-    state_code: string | null;
-    state: string | null;
-    country: string | null;
-    used_morph: boolean | null;
-    used_now: boolean | null;
-    used_gene: boolean | null;
-  */
-
   const columns = useMemo<MRT_ColumnDef<Museum>[]>(
     () => [
       {

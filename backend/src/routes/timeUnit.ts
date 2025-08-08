@@ -1,5 +1,11 @@
 import { Request, Router } from 'express'
-import { EditDataType, EditMetaData, TimeUnitDetailsType, Role } from '../../../frontend/src/shared/types'
+import {
+  EditDataType,
+  EditMetaData,
+  TimeUnitDetailsType,
+  Role,
+  TimeBoundDetailsType,
+} from '../../../frontend/src/shared/types'
 import { requireOneOf } from '../middlewares/authorizer'
 import { getAllSequences } from '../services/sequence'
 import {
@@ -8,9 +14,10 @@ import {
   getTimeUnitLocalities,
   validateEntireTimeUnit,
 } from '../services/timeUnit'
-import { getTimeBoundDetails } from '../services/timeBound'
+import { getTimeBoundDetails, validateEntireTimeBound } from '../services/timeBound'
 import { deleteTimeUnit, writeTimeUnit } from '../services/write/timeUnit'
 import { fixBigInt } from '../utils/common'
+import { writeTimeBound } from '../services/write/timeBound'
 
 const router = Router()
 
@@ -45,22 +52,66 @@ router.put(
 
     let validationUpBound = undefined
     let validationLowBound = undefined
-    if (editedTimeUnit.up_bnd) {
+    let newUpBoundId = undefined
+    let newLowBoundId = undefined
+
+    // new up bound has been created in time unit edit view
+    if (!editedTimeUnit.up_bnd && editedTimeUnit.up_bound) {
+      const newUpBound = {
+        ...editedTimeUnit.up_bound,
+        now_bau: [],
+        references: references,
+      } as EditDataType<TimeBoundDetailsType> & EditMetaData
+
+      const newUpBoundValidationErrors = await validateEntireTimeBound(newUpBound)
+      if (newUpBoundValidationErrors.length > 0) {
+        return res.status(403).send(newUpBoundValidationErrors)
+      }
+
+      const { result } = await writeTimeBound(newUpBound, undefined, references, req.user!.initials)
+      newUpBoundId = result
+      validationUpBound = (await getTimeBoundDetails(newUpBoundId)) ?? undefined
+    } else if (editedTimeUnit.up_bnd) {
       validationUpBound = (await getTimeBoundDetails(editedTimeUnit.up_bnd)) ?? undefined
     }
-    if (editedTimeUnit.low_bnd) {
+
+    // new low bound has been created in time unit edit view
+    if (!editedTimeUnit.low_bnd && editedTimeUnit.low_bound) {
+      const newLowBound = { ...editedTimeUnit.low_bound, now_bau: [], references: references }
+
+      const newLowBoundValidationErrors = await validateEntireTimeBound(newLowBound)
+      if (newLowBoundValidationErrors.length > 0) {
+        return res.status(403).send(newLowBoundValidationErrors)
+      }
+
+      const { result } = await writeTimeBound(newLowBound, undefined, references, req.user!.initials)
+      newLowBoundId = result
+      validationLowBound = (await getTimeBoundDetails(newLowBoundId)) ?? undefined
+    } else if (editedTimeUnit.low_bnd) {
       validationLowBound = (await getTimeBoundDetails(editedTimeUnit.low_bnd)) ?? undefined
     }
+
     const validationErrors = await validateEntireTimeUnit({
       ...editedTimeUnit,
+      up_bnd: newUpBoundId ?? editedTimeUnit.up_bnd,
       up_bound: validationUpBound,
+      low_bnd: newLowBoundId ?? editedTimeUnit.low_bnd,
       low_bound: validationLowBound,
       references: references,
     })
     if (validationErrors.length > 0) {
       return res.status(403).send(validationErrors)
     }
-    const { tu_name, errorObject } = await writeTimeUnit(editedTimeUnit, comment, references, req.user!.initials)
+    const { tu_name, errorObject } = await writeTimeUnit(
+      {
+        ...editedTimeUnit,
+        up_bnd: newUpBoundId ?? editedTimeUnit.up_bnd,
+        low_bnd: newLowBoundId ?? editedTimeUnit.low_bnd,
+      },
+      comment,
+      references,
+      req.user!.initials
+    )
     if (errorObject) {
       return res.status(403).send(errorObject)
     }

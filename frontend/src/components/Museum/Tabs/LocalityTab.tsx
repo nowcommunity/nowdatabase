@@ -2,7 +2,7 @@ import { SimpleTable } from '@/components/DetailView/common/SimpleTable'
 import { useDetailContext } from '@/components/DetailView/Context/DetailContext'
 import { MuseumLocalities } from '@/shared/types'
 
-export const LocalityTab = () => {
+export const LocalityTab = ({ isNew }: { isNew: boolean }) => {
   const { data } = useDetailContext<MuseumLocalities>()
 
   const columns = [
@@ -23,7 +23,12 @@ export const LocalityTab = () => {
       header: 'Min Age',
     },
   ]
-  if (!data) return <div>No localities</div>
+  if (isNew)
+    return (
+      <div>
+        Link localities to this museum after finalizing it by editing a locality and navigating to the museum tab there.
+      </div>
+    )
 
   return <SimpleTable columns={columns} data={data.localities} idFieldName="lid" url="locality" />
 }
