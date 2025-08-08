@@ -11,7 +11,7 @@ export const ChangePasswordForm = () => {
   const [newPassword, setNewPassword] = useState('')
   const [verifyPassword, setVerifyPassword] = useState('')
   const [changePasswordMutation] = useChangePasswordMutation()
-  const notify = useNotify()
+  const { notify } = useNotify()
   const sx = { display: 'flex', alignItems: 'center', width: '10em', fontWeight: 'bold' }
   const dispatch = useDispatch()
 

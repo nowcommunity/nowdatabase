@@ -1,13 +1,15 @@
-import { SequenceDetailsType, TimeUnitDetailsType } from '@/shared/types'
+import { SequenceDetailsType, TimeBound, TimeUnitDetailsType } from '@/shared/types'
 import { FieldWithTableSelection, TimeBoundSelection } from '@/components/DetailView/common/editingComponents'
 import { emptyOption } from '@/components/DetailView/common/misc'
 import { ArrayFrame, Grouped } from '@/components/DetailView/common/tabLayoutHelpers'
 import { useDetailContext } from '@/components/DetailView/Context/DetailContext'
 import { SequenceTable } from '@/components/Sequence/SequenceTable'
 import { Box } from '@mui/material'
+import { EditingForm, EditingFormField } from '@/components/DetailView/common/EditingForm'
 
 export const TimeUnitTab = () => {
-  const { textField, dropdown, data, editData, fieldsWithErrors, mode } = useDetailContext<TimeUnitDetailsType>()
+  const { textField, dropdown, data, editData, setEditData, fieldsWithErrors, mode } =
+    useDetailContext<TimeUnitDetailsType>()
 
   const rankOptions = [
     'Age',
@@ -66,6 +68,12 @@ export const TimeUnitTab = () => {
     ['Comment', low_bcomment],
   ]
 
+  const formFields: EditingFormField[] = [
+    { name: 'b_name', label: 'Name', required: true },
+    { name: 'age', label: 'Age (Ma)', required: true, type: 'number' },
+    { name: 'b_comment', label: 'Comment', required: false },
+  ]
+
   return (
     <>
       <ArrayFrame array={timeUnit} title="Time Unit" />
@@ -73,6 +81,21 @@ export const TimeUnitTab = () => {
         <Grouped title="Upper Bound" error={'up_bnd' in fieldsWithErrors}>
           {!mode.read && (
             <Box display="flex" gap={1} marginBottom={'15px'}>
+              <EditingForm<TimeBound, TimeUnitDetailsType>
+                buttonText="Add new time bound"
+                formFields={formFields}
+                editAction={(newUpTimeBound: TimeBound) => {
+                  setEditData({
+                    ...editData,
+                    up_bnd: undefined,
+                    up_bound: {
+                      b_name: newUpTimeBound.b_name,
+                      age: Number(newUpTimeBound.age),
+                      b_comment: newUpTimeBound.b_comment,
+                    },
+                  })
+                }}
+              />
               <TimeBoundSelection key="up_bnd" targetField="up_bnd" />
             </Box>
           )}
@@ -81,6 +104,21 @@ export const TimeUnitTab = () => {
         <Grouped title="Lower Bound" error={'low_bnd' in fieldsWithErrors}>
           {!mode.read && (
             <Box display="flex" gap={1} marginBottom={'15px'}>
+              <EditingForm<TimeBound, TimeUnitDetailsType>
+                buttonText="Add new time bound"
+                formFields={formFields}
+                editAction={(newLowTimeBound: TimeBound) => {
+                  setEditData({
+                    ...editData,
+                    low_bnd: undefined,
+                    low_bound: {
+                      b_name: newLowTimeBound.b_name,
+                      age: Number(newLowTimeBound.age),
+                      b_comment: newLowTimeBound.b_comment,
+                    },
+                  })
+                }}
+              />
               <TimeBoundSelection key="low_bnd" targetField="low_bnd" />
             </Box>
           )}

@@ -43,7 +43,7 @@ export const ContactForm = <T extends object>({
   const [sendEmailMutation] = useEmailMutation()
   const { trigger, getValues, register, setValue, control, formState } = useForm<ContactFormValues>()
   const { errors } = formState
-  const notify = useNotify()
+  const { notify } = useNotify()
   const user = useUser()
   const { data: personData, isLoading: personQueryloading } = useGetPersonDetailsQuery(user.initials ?? skipToken)
 

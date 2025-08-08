@@ -65,6 +65,8 @@ export const api = createApi({
     'timebounds',
     'region',
     'regions',
+    'museum',
+    'museums',
     'person',
     'persons',
     'author',
