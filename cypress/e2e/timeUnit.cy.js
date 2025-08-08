@@ -40,7 +40,56 @@ describe('Creating a time unit', () => {
     cy.get('[id=write-button]').should('be.disabled')
   })
 
-  it('with incorrect bounds does not work', () => {
+  it('with incorrect, newly created bounds does not work', () => {
+    cy.visit(`/time-unit/new`)
+    cy.get('[id=tu_display_name-textfield]').type('Testing Time Unit Creation')
+    cy.get('[id=sequence-tableselection]').first().click()
+    cy.get('[data-cy=add-button-ALMAAsianlandmammalage]').first().click()
+    cy.get('[id=low_bnd-tableselection]').click()
+    cy.get('[data-cy=add-button-11]').first().click()
+
+    cy.get('[data-cy=add-new-up-bound-form]').click()
+    cy.get('[name=b_name]').type('new upper time bound name')
+    cy.get('[name=b_comment]').type('test comment')
+
+    cy.get('[name=age]').type('one')
+    cy.contains('Save').click()
+    cy.contains('Value must be a valid number')
+
+    cy.get('[name=age]').clear()
+    cy.get('[name=age]').type('-2')
+    cy.contains('Save').click()
+    cy.contains('Value must be a valid number')
+
+    cy.get('[name=age]').clear()
+    cy.get('[name=age]').type('0123')
+    cy.contains('Save').click()
+    cy.contains('Value must be a valid number')
+
+    cy.get('[name=age]').clear()
+    cy.get('[name=age]').type('0,5')
+    cy.contains('Save').click()
+    cy.contains('Value must be a valid number')
+
+    cy.get('[name=age]').clear()
+    cy.get('[name=age]').type('1')
+    cy.contains('Save').click()
+    cy.contains('Value must be a valid number').should('not.exist')
+
+    cy.get('[id=write-button]').should('not.be.disabled')
+
+    cy.get('[data-cy=add-new-low-bound-form]').click()
+    cy.get('[name=b_name]').type('new lower time bound name')
+    cy.get('[name=b_comment]').type('test comment')
+    cy.get('[name=age]').type('0.5')
+    cy.contains('Save').click()
+
+    cy.contains('Upper Bound: Upper bound age has to be lower than lower bound age')
+    cy.contains('Lower Bound: Lower bound age has to be higher than upper bound age')
+    cy.get('[id=write-button]').should('be.disabled')
+  })
+
+  it('with incorrect, existing bounds does not work', () => {
     cy.visit(`/time-unit/new`)
     cy.get('[id=tu_display_name-textfield]').type('Testing Time Unit Creation')
     cy.get('[id=sequence-tableselection]').first().click()
@@ -150,7 +199,45 @@ describe('Editing a time unit', () => {
     cy.contains('ALMAAsianlandmammalage')
   })
 
-  it('with incorrect bounds does not work', () => {
+  it('with incorrect, newly created bounds does not work', () => {
+    cy.visit(`/time-unit/bahean?tab=0`)
+    cy.get('[id=edit-button]').click()
+    cy.contains('7.2') // existing upper bound age
+    cy.contains('11.63') // existing lower bound age
+
+    cy.get('[data-cy=add-new-up-bound-form]').click()
+    cy.get('[name=b_name]').type('new upper time bound name')
+    cy.get('[name=b_comment]').type('test comment')
+    cy.get('[name=age]').type('12')
+    cy.contains('Save').click()
+    cy.contains('Upper Bound: Upper bound age has to be lower than lower bound age')
+    cy.contains('Lower Bound: Lower bound age has to be higher than upper bound age')
+    cy.get('[id=write-button]').should('be.disabled')
+
+    cy.get('[data-cy=add-new-up-bound-form]').click()
+    cy.get('[name=age]').clear()
+    cy.get('[name=age]').type('11.02')
+    cy.contains('Save').click()
+    cy.get('[id=write-button]').should('not.be.disabled')
+
+    cy.get('[data-cy=add-new-low-bound-form]').click()
+    cy.get('[name=b_name]').type('new lower time bound name')
+    cy.get('[name=b_comment]').type('test comment')
+    cy.get('[name=age]').type('0.5')
+    cy.contains('Save').click()
+
+    cy.contains('Upper Bound: Upper bound age has to be lower than lower bound age')
+    cy.contains('Lower Bound: Lower bound age has to be higher than upper bound age')
+    cy.get('[id=write-button]').should('be.disabled')
+
+    cy.get('[data-cy=add-new-low-bound-form]').click()
+    cy.get('[name=age]').clear()
+    cy.get('[name=age]').type('15.55')
+    cy.contains('Save').click()
+    cy.get('[id=write-button]').should('not.be.disabled')
+  })
+
+  it('with incorrect, existing bounds does not work', () => {
     cy.visit(`/time-unit/bahean?tab=0`)
     cy.contains('Bahean')
     cy.get('[id=edit-button]').click()
