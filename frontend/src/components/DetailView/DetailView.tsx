@@ -98,6 +98,28 @@ export const DetailView = <T extends object>({
     )
   }, [tab, setSearchParams])
 
+  // asks user for confirmation before leaving or refreshing a page with potential unsaved changes
+  // does not work if user navigates away using browser back or forward buttons,
+  // or navigates to another page using the navigation bar. (See issue #911)
+  useEffect(() => {
+    const handleBeforeUnload = (event: BeforeUnloadEvent) => {
+      event.preventDefault()
+    }
+    if (
+      [
+        modeOptionToMode['edit'],
+        modeOptionToMode['new'],
+        modeOptionToMode['staging-edit'],
+        modeOptionToMode['staging-new'],
+      ].includes(mode)
+    ) {
+      window.addEventListener('beforeunload', handleBeforeUnload)
+    }
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload)
+    }
+  }, [mode])
+
   const setMode = (newMode: ModeOptions) => {
     setModeState(modeOptionToMode[newMode])
   }
