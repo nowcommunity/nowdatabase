@@ -5,9 +5,10 @@ import { ContactForm } from '../DetailView/common/ContactForm'
 import FileDownloadIcon from '@mui/icons-material/FileDownload'
 import '../../styles/TableToolBar.css'
 import { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useLocation } from 'react-router-dom'
 import AddCircleIcon from '@mui/icons-material/AddCircle'
 import { CrossSearchExportMenuItem } from '../CrossSearch/CrossSearchExportMenuItem'
+import { usePageContext } from '../Page'
 
 export const TableToolBar = <T extends MRT_RowData>({
   table,
@@ -28,6 +29,8 @@ export const TableToolBar = <T extends MRT_RowData>({
   selectorFn?: (id: T) => void
   showNewButton?: boolean
 }) => {
+  const { previousTableUrls, setPreviousTableUrls } = usePageContext<T>()
+  const location = useLocation()
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
   const open = Boolean(anchorEl)
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -44,7 +47,14 @@ export const TableToolBar = <T extends MRT_RowData>({
           <ContactForm<T> buttonText="Contact" noContext={true} />
 
           {showNewButton && (
-            <Button variant="outlined" component={Link} to="new" className="button" startIcon={<AddCircleIcon />}>
+            <Button
+              variant="outlined"
+              component={Link}
+              to="new"
+              className="button"
+              startIcon={<AddCircleIcon />}
+              onClick={() => setPreviousTableUrls([...previousTableUrls, `${location.pathname}`])}
+            >
               New
             </Button>
           )}

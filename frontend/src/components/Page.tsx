@@ -47,7 +47,7 @@ export const PageContextProvider = <T extends object>({
   editRights: EditRights
 }) => {
   const [idList, setIdList] = useState<string[]>([])
-  const [previousTableUrls, setPreviousTableUrls] = useState<string[]>([`/${viewName}`])
+  const [previousTableUrls, setPreviousTableUrls] = useState<string[]>([])
   // TODO: replace with some default values from variables
   const [sqlLimit, setSqlLimit] = useState<number>(defaultPagination.pageSize)
   const [sqlOffset, setSqlOffset] = useState<number>(0)
