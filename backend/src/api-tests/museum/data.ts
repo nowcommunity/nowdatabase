@@ -8,9 +8,6 @@ export const newMuseumBasis: Museum = {
   state_code: '',
   state: '',
   country: 'Australia',
-  used_morph: true,
-  used_now: null,
-  used_gene: null,
 }
 
 export const editedMuseum: Museum = {
@@ -21,7 +18,4 @@ export const editedMuseum: Museum = {
   state_code: 'NSW',
   state: 'New South Wales',
   country: 'Australia',
-  used_morph: false,
-  used_now: true,
-  used_gene: null,
 }

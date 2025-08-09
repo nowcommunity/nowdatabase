@@ -16,7 +16,7 @@ export const MuseumDetails = () => {
     skip: isNew,
   })
   const [editMuseumRequest, { isLoading: mutationLoading }] = useEditMuseumMutation()
-  const notify = useNotify()
+  const { notify } = useNotify()
   const navigate = useNavigate()
 
   const tabs: TabType[] = [
