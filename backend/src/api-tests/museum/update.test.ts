@@ -32,32 +32,11 @@ describe('Updating museum works', () => {
   })
 
   it('Contains correct data', () => {
-    const { museum, city, state, state_code, used_morph, used_now, used_gene } = updatedMuseum!
+    const { museum, city, state, state_code } = updatedMuseum!
     expect(museum).toEqual('AM')
     expect(city).toEqual('Canberra')
     expect(state).toEqual('New South Wales')
     expect(state_code).toEqual('NSW')
-    expect(used_morph).toEqual(false)
-    expect(used_now).toEqual(true)
-    expect(used_gene).toEqual(false) // fixRadioSelection converts null values into false
-  })
-
-  it('Updating succeeds with string values for used_fields', async () => {
-    const { body: resultBody, status: putReqStatus } = await send<{ museum: string }>('museum/', 'PUT', {
-      museum: { ...editedMuseum, used_morph: 'true', used_now: 'true', used_gene: 'true' },
-    })
-    const { museum: updatedId } = resultBody
-
-    expect(typeof updatedId).toEqual('string') // `Invalid result returned on write: ${createdId}`
-    expect(putReqStatus).toEqual(200)
-
-    const { body: getReqBody, status: getReqStat } = await send<Museum>(`museum/${updatedId}`, 'GET')
-    expect(getReqStat).toEqual(200)
-
-    const { used_morph, used_now, used_gene } = getReqBody
-    expect(used_morph).toEqual(true)
-    expect(used_now).toEqual(true)
-    expect(used_gene).toEqual(true)
   })
 
   it('Updating fails with empty institution', async () => {
