@@ -31,7 +31,7 @@ export const EditingModal = ({
 
   return (
     <Box>
-      <Button data-cy={dataCy} onClick={() => setOpen(true)} variant="contained" sx={{ marginBottom: '1em' }}>
+      <Button data-cy={dataCy} onClick={() => setOpen(true)} variant="contained">
         {buttonText}
       </Button>
       <Modal

@@ -1,4 +1,5 @@
-import { Card, Typography, Box, Grid, Divider } from '@mui/material'
+import { Card, Typography, Box, Divider } from '@mui/material'
+import Grid from '@mui/material/Grid2'
 import { ReactNode } from 'react'
 import { useDetailContext } from '../Context/DetailContext'
 import { EditDataType } from '@/shared/types'
@@ -11,14 +12,12 @@ export const ArrayToTable = ({ array, half }: { array: Array<Array<ReactNode>>; 
     return width
   }
   return (
-    <Grid container direction="row">
+    <Grid container direction="row" width={'100%'}>
       {array.map((row, rowIndex) => (
-        <Grid key={rowIndex} container direction="row" minHeight="2.5em">
+        <Grid key={rowIndex} container direction="row" minHeight="2.5em" width={'100%'}>
           {row.map((item, index) => (
             <Grid
               key={index}
-              item
-              xs={getCellWidth(rowIndex, index)}
               sx={{
                 display: 'flex',
                 alignItems: 'center',
@@ -28,6 +27,7 @@ export const ArrayToTable = ({ array, half }: { array: Array<Array<ReactNode>>; 
                 borderRight: '1px solid rgba(224, 224, 224, 1)',
               }}
               padding="5px"
+              size={getCellWidth(rowIndex, index)}
             >
               {typeof item === 'string' ? <b>{item}</b> : item}
             </Grid>
@@ -94,6 +94,7 @@ export const Grouped = ({
     borderColor: error ? 'red' : warning ? 'orange' : '',
     borderRadius: error || warning ? 4 : '',
     borderStyle: error || warning ? 'none none none solid' : '',
+    gap: '1em',
   }
 
   const titleColor = error ? 'red' : warning ? 'orange' : 'text.secondary'
@@ -108,7 +109,9 @@ export const Grouped = ({
           <Divider />
         </>
       )}
-      <Box marginTop="15px">{children}</Box>
+      <Box marginTop="15px" gap={'2em'} sx={{ display: 'flex', flexDirection: 'column', gap: '1em' }}>
+        {children}
+      </Box>
     </Card>
   )
 }
