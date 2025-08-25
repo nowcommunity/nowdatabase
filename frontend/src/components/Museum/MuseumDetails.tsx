@@ -55,7 +55,6 @@ export const MuseumDetails = () => {
       isNew={isNew}
       validator={validateMuseum}
       deleteFunction={undefined}
-      hasStagingMode
     />
   )
 }
