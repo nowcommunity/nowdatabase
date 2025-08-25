@@ -15,6 +15,7 @@ export const SelectingTable = <T extends MRT_RowData, ParentType extends object>
   buttonText,
   data,
   columns,
+  title,
   editingAction,
   tableRowAction,
   fieldName,
@@ -26,6 +27,7 @@ export const SelectingTable = <T extends MRT_RowData, ParentType extends object>
   buttonText: string
   data: T[] | undefined
   columns: MRT_ColumnDef<T>[]
+  title: string
   editingAction?: (object: T) => void
   tableRowAction?: (row: T) => void
   fieldName: keyof ParentType
@@ -74,6 +76,7 @@ export const SelectingTable = <T extends MRT_RowData, ParentType extends object>
         <TableView<T>
           data={filteredData}
           columns={columns}
+          title={title}
           isFetching={false}
           visibleColumns={visibleColumns}
           selectorFn={editingAction ?? defaultEditingAction}

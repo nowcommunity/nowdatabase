@@ -38,6 +38,7 @@ export const MuseumTab = () => {
           <SelectingTable<Museum, LocalityDetailsType>
             buttonText="Select Museum"
             data={museumData}
+            title="Museums"
             isError={isError}
             columns={columns}
             fieldName="now_mus"

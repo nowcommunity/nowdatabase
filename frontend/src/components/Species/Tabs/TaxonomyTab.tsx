@@ -25,6 +25,7 @@ export const TaxonomyTab = () => {
       <SelectingTable<Species, Species>
         buttonText="Copy existing taxonomy"
         data={speciesQueryData}
+        title="Species"
         isError={isError}
         columns={smallSpeciesTableColumns}
         fieldName="order_name" // this doesn't do anything here but is required

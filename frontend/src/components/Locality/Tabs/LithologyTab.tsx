@@ -192,6 +192,7 @@ export const LithologyTab = () => {
                 isError={isError}
                 columns={selectingTableColumns}
                 data={sedimentaryStructuresData}
+                title="Sedimentary structures"
                 fieldName="now_ss"
                 idFieldName="ss_value"
                 editingAction={(newSed: SedimentaryStructureValues) => {

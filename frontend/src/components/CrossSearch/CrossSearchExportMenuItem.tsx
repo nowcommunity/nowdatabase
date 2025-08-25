@@ -14,7 +14,7 @@ export const CrossSearchExportMenuItem = ({ handleClose }: { handleClose: () => 
   const token = useUser().token
   const fetchOptions = token ? { headers: { Authorization: `Bearer ${token}` } } : {}
 
-  const filename = `cross_search${currentDateAsString()}.csv`
+  const filename = `cross_search-${currentDateAsString()}.csv`
 
   const fetchCSVFile = async () => {
     setLoading(true)
