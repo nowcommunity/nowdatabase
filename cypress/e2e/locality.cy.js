@@ -1,3 +1,70 @@
+describe('Adding species in Locality -> Species tab', () => {
+  beforeEach('Login as admin', () => {
+    cy.login('testSu')
+  })
+
+  it('does not work if the species has already been added', () => {
+    cy.visit(`/locality/20920?tab=2`)
+    cy.contains('Lantian-Shuijiazui')
+    cy.get('[id=edit-button]').click()
+    cy.contains('Select Species').click()
+    cy.get('[data-cy=add-button-21052]').first().click()
+    cy.get('[data-cy=add-button-21426]').first().click()
+    cy.contains('Close').click()
+    cy.contains('Rodentia')
+    cy.contains('Eulipotyphla')
+
+    // adding species that already exists in the database
+    cy.contains('Add new Species').click()
+    cy.get('[name=order_name]').type('Rodentia')
+    cy.get('[name=family_name]').type('Gliridae')
+    cy.get('[name=genus_name]').type('Simplomys')
+    cy.get('[name=species_name]').type('Simplicidens')
+    cy.get('[name=unique_identifier]').type('-')
+    cy.contains('Save').click()
+    cy.contains('The taxon already exists in the database.')
+
+    // add new, unique species
+    cy.contains('Add new Species').click()
+    cy.get('[name=order_name]').clear()
+    cy.get('[name=order_name]').type('new order')
+    cy.get('[name=family_name]').clear()
+    cy.get('[name=family_name]').type('new family')
+    cy.get('[name=genus_name]').clear()
+    cy.get('[name=genus_name]').type('new genus')
+    cy.get('[name=species_name]').clear()
+    cy.get('[name=species_name]').type('new species')
+    cy.get('[name=unique_identifier]').clear()
+    cy.get('[name=unique_identifier]').type('-')
+    cy.contains('Save').click()
+
+    cy.get('[id=write-button]').click()
+    cy.get('[id=write-button]').should('be.disabled')
+    cy.contains('button', 'Add existing reference').click()
+    cy.get('button[data-cy^="add-button"]').first().click()
+    cy.contains('button', 'Close').click()
+    cy.get('[id=write-button]').should('not.be.disabled')
+    cy.get('[id=write-button]').click()
+    cy.contains('Edited item successfully.')
+    cy.visit(`/locality/20920?tab=2`)
+    cy.contains('Lantian-Shuijiazui')
+    cy.get('[id=edit-button]').click()
+    cy.contains('Rodentia')
+    cy.contains('Eulipotyphla')
+    cy.contains('New order')
+
+    // adding species that has been added earlier through "add new species" button
+    cy.contains('Add new Species').click()
+    cy.get('[name=order_name]').type('anything')
+    cy.get('[name=family_name]').type('anything')
+    cy.get('[name=genus_name]').type('new genus')
+    cy.get('[name=species_name]').type('new species')
+    cy.get('[name=unique_identifier]').type('-')
+    cy.contains('Save').click()
+    cy.contains('The taxon already exists in the database.')
+  })
+})
+
 describe('Creating a new locality', () => {
   beforeEach('Login as admin', () => {
     cy.login('testSu')

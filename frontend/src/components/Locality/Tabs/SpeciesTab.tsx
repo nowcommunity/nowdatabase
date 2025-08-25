@@ -8,7 +8,7 @@ import { useGetAllSpeciesQuery } from '@/redux/speciesReducer'
 import { Box, CircularProgress } from '@mui/material'
 import { skipToken } from '@reduxjs/toolkit/query'
 import { MRT_ColumnDef } from 'material-react-table'
-import { checkTaxonomy } from '@/util/taxonomyFunctions'
+import { checkTaxonomy, convertTaxonomyFields } from '@/util/taxonomyFunctions'
 import { useNotify } from '@/hooks/notification'
 
 export const SpeciesTab = () => {
@@ -105,9 +105,11 @@ export const SpeciesTab = () => {
             buttonText="Add new Species"
             formFields={formFields}
             editAction={(newSpecies: Species) => {
+              const convertedSpecies = convertTaxonomyFields(newSpecies)
               const allSpecies = editData.now_ls.map(ls => ls.com_species) as unknown as Editable<Species>[]
               const filteredSpecies = allSpecies.filter(species => species.rowState === 'new')
-              const taxonomyErrors = checkTaxonomy(newSpecies, speciesData!.concat(filteredSpecies), [])
+
+              const taxonomyErrors = checkTaxonomy(convertedSpecies, speciesData!.concat(filteredSpecies), [])
               if (taxonomyErrors.size > 0) {
                 const errorMessage = [...taxonomyErrors].reduce((acc, currentError) => acc + `\n${currentError}`)
                 notify(errorMessage, 'error', null)
@@ -120,7 +122,7 @@ export const SpeciesTab = () => {
                   {
                     lid: editData.lid,
                     species_id: newSpecies.species_id,
-                    com_species: { ...(newSpecies as unknown as SpeciesDetailsType) },
+                    com_species: { ...(convertedSpecies as unknown as SpeciesDetailsType) },
                     rowState: 'new',
                   },
                 ],
@@ -142,7 +144,14 @@ export const SpeciesTab = () => {
                   {
                     lid: editData.lid,
                     species_id: newSpecies.species_id,
-                    com_species: { ...(newSpecies as unknown as SpeciesDetailsType) },
+                    com_species: {
+                      ...(newSpecies as unknown as SpeciesDetailsType),
+                      // changes subclass, suborder, and subfamily from null to empty string to make validators work
+                      // this should be removed if validators are improved in the future
+                      subclass_or_superorder_name: newSpecies.subclass_or_superorder_name ?? '',
+                      suborder_or_superfamily_name: newSpecies.suborder_or_superfamily_name ?? '',
+                      subfamily_name: newSpecies.subfamily_name ?? '',
+                    },
                     rowState: 'new',
                   },
                 ],
