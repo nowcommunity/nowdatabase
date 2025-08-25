@@ -16,6 +16,7 @@ import { validateSpecies } from '@/shared/validators/species'
 import { emptySpecies } from '../DetailView/common/defaultValues'
 import { useNotify } from '@/hooks/notification'
 import { useEffect, useState } from 'react'
+import { fixNullValuesInTaxonomyFields } from '@/util/taxonomyFunctions'
 
 export const SpeciesDetails = () => {
   const { id } = useParams()
@@ -43,12 +44,8 @@ export const SpeciesDetails = () => {
     // changes subclass, suborder, and subfamily from null to empty string to make validators work
     // this should be removed if validators are improved in the future
     if (data) {
-      setModifiedData({
-        ...data,
-        subclass_or_superorder_name: data.subclass_or_superorder_name ?? '',
-        suborder_or_superfamily_name: data.suborder_or_superfamily_name ?? '',
-        subfamily_name: data.subfamily_name ?? '',
-      })
+      const fixedSpeciesData = fixNullValuesInTaxonomyFields(data)
+      setModifiedData(fixedSpeciesData as SpeciesDetailsType)
     }
   }, [data])
 
