@@ -13,12 +13,14 @@ If using for adding new, provide arrayFieldName.
 For editing existing row, use existingObject and editAction.
 */
 export const EditingForm = <T extends object, ParentType extends object>({
+  dataCy,
   buttonText,
   formFields,
   editAction,
   existingObject,
   arrayFieldName,
 }: {
+  dataCy?: string
   buttonText: string
   formFields: EditingFormField[]
   arrayFieldName?: keyof ParentType
@@ -48,7 +50,7 @@ export const EditingForm = <T extends object, ParentType extends object>({
   }
 
   return (
-    <EditingModal {...{ buttonText, onSave }}>
+    <EditingModal {...{ dataCy, buttonText, onSave }}>
       <Box sx={{ display: 'flex', flexDirection: 'column', gap: '1em' }}>
         {formFields.map(field => (
           <TextField

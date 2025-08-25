@@ -82,6 +82,7 @@ export const TimeUnitTab = () => {
           {!mode.read && (
             <Box display="flex" gap={1} marginBottom={'15px'}>
               <EditingForm<TimeBound, TimeUnitDetailsType>
+                dataCy="add-new-up-bound-form"
                 buttonText="Add new time bound"
                 formFields={formFields}
                 editAction={(newUpTimeBound: TimeBound) => {
@@ -105,6 +106,7 @@ export const TimeUnitTab = () => {
           {!mode.read && (
             <Box display="flex" gap={1} marginBottom={'15px'}>
               <EditingForm<TimeBound, TimeUnitDetailsType>
+                dataCy="add-new-low-bound-form"
                 buttonText="Add new time bound"
                 formFields={formFields}
                 editAction={(newLowTimeBound: TimeBound) => {
