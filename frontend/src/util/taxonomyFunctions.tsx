@@ -11,7 +11,10 @@ Please contact the NOW administration to fix this taxonomy.`
 
 const isDuplicateTaxon = (newSpecies: EditDataType<Species>, existingSpecies: Species) => {
   if (
-    newSpecies.species_id !== existingSpecies.species_id &&
+    // the check for undefined species_id is here to make sure you cannot add two new,
+    // identical species at the same time (e.g. in Locality -> Species -> Add new species)
+    ((newSpecies.species_id === undefined && existingSpecies.species_id === undefined) ||
+      newSpecies.species_id !== existingSpecies.species_id) &&
     newSpecies.genus_name === existingSpecies.genus_name &&
     newSpecies.species_name === existingSpecies.species_name &&
     newSpecies.unique_identifier === existingSpecies.unique_identifier
@@ -156,6 +159,7 @@ export const checkTaxonomy = (
   let speciesWithSameSubfamily = undefined
 
   for (const existingSpecies of existingSpeciesArray) {
+    if (existingSpecies.unique_identifier === newSpecies.unique_identifier) console.log('should throw error')
     if (isDuplicateTaxon(newSpecies, existingSpecies)) {
       errors.add('The taxon already exists in the database.')
       return errors
