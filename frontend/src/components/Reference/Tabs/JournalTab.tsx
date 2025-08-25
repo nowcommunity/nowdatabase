@@ -88,6 +88,7 @@ export const JournalTab: React.FC<JournalTabProps> = ({ tab_name = 'Journal' }) 
             <SelectingTable<ReferenceJournalType, ReferenceDetailsType>
               buttonText="Select Journal"
               data={journalData}
+              title="Journals"
               isError={isError}
               columns={journalColumns}
               fieldName="ref_journal"

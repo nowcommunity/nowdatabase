@@ -117,6 +117,7 @@ export const SpeciesTab = () => {
           <SelectingTable<Species, LocalityDetailsType>
             buttonText="Select Species"
             data={speciesData}
+            title="Species"
             isError={isError}
             columns={speciesColumns}
             fieldName="now_ls"
