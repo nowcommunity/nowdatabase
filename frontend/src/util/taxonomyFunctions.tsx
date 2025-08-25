@@ -159,7 +159,6 @@ export const checkTaxonomy = (
   let speciesWithSameSubfamily = undefined
 
   for (const existingSpecies of existingSpeciesArray) {
-    if (existingSpecies.unique_identifier === newSpecies.unique_identifier) console.log('should throw error')
     if (isDuplicateTaxon(newSpecies, existingSpecies)) {
       errors.add('The taxon already exists in the database.')
       return errors
