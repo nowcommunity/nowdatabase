@@ -3,6 +3,9 @@ describe('Adding species in Locality -> Species tab', () => {
     cy.login('testSu')
   })
 
+  it.skip('works with valid, unique species')
+  it.skip('does not work with invalid species')
+
   it('does not work if the species has already been added', () => {
     cy.visit(`/locality/20920?tab=2`)
     cy.contains('Lantian-Shuijiazui')
@@ -63,6 +66,8 @@ describe('Adding species in Locality -> Species tab', () => {
     cy.contains('Save').click()
     cy.contains('The taxon already exists in the database.')
   })
+
+  it.skip('does not work with species with invalid taxonomic order')
 })
 
 describe('Creating a new locality', () => {
