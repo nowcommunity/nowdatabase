@@ -1,3 +1,7 @@
+before('Reset database', () => {
+  cy.request(Cypress.env('databaseResetUrl'))
+})
+
 describe('Adding species in Locality -> Species tab', () => {
   beforeEach('Login as admin', () => {
     cy.login('testSu')
@@ -30,13 +34,13 @@ describe('Adding species in Locality -> Species tab', () => {
     // add new, unique species
     cy.contains('Add new Species').click()
     cy.get('[name=order_name]').clear()
-    cy.get('[name=order_name]').type('new order')
+    cy.get('[name=order_name]').type('neworder')
     cy.get('[name=family_name]').clear()
-    cy.get('[name=family_name]').type('new family')
+    cy.get('[name=family_name]').type('newfamily')
     cy.get('[name=genus_name]').clear()
-    cy.get('[name=genus_name]').type('new genus')
+    cy.get('[name=genus_name]').type('newgenus')
     cy.get('[name=species_name]').clear()
-    cy.get('[name=species_name]').type('new species')
+    cy.get('[name=species_name]').type('newspecies')
     cy.get('[name=unique_identifier]').clear()
     cy.get('[name=unique_identifier]').type('-')
     cy.contains('Save').click()
@@ -54,14 +58,14 @@ describe('Adding species in Locality -> Species tab', () => {
     cy.get('[id=edit-button]').click()
     cy.contains('Rodentia')
     cy.contains('Eulipotyphla')
-    cy.contains('New order')
+    cy.contains('Neworder')
 
     // adding species that has been added earlier through "add new species" button
     cy.contains('Add new Species').click()
     cy.get('[name=order_name]').type('anything')
     cy.get('[name=family_name]').type('anything')
-    cy.get('[name=genus_name]').type('new genus')
-    cy.get('[name=species_name]').type('new species')
+    cy.get('[name=genus_name]').type('newgenus')
+    cy.get('[name=species_name]').type('newspecies')
     cy.get('[name=unique_identifier]').type('-')
     cy.contains('Save').click()
     cy.contains('The taxon already exists in the database.')
