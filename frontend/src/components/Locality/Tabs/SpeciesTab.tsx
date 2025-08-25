@@ -1,17 +1,20 @@
-import { LocalityDetailsType, LocalitySpecies, Species, SpeciesDetailsType } from '@/shared/types'
+import { Editable, LocalityDetailsType, LocalitySpecies, Species, SpeciesDetailsType } from '@/shared/types'
 import { EditableTable } from '@/components/DetailView/common/EditableTable'
 import { EditingForm } from '@/components/DetailView/common/EditingForm'
 import { SelectingTable } from '@/components/DetailView/common/SelectingTable'
 import { Grouped } from '@/components/DetailView/common/tabLayoutHelpers'
 import { useDetailContext } from '@/components/DetailView/Context/DetailContext'
 import { useGetAllSpeciesQuery } from '@/redux/speciesReducer'
-import { Box } from '@mui/material'
+import { Box, CircularProgress } from '@mui/material'
 import { skipToken } from '@reduxjs/toolkit/query'
 import { MRT_ColumnDef } from 'material-react-table'
+import { checkTaxonomy } from '@/util/taxonomyFunctions'
+import { useNotify } from '@/hooks/notification'
 
 export const SpeciesTab = () => {
   const { mode, editData, setEditData } = useDetailContext<LocalityDetailsType>()
   const { data: speciesData, isError } = useGetAllSpeciesQuery(mode.read ? skipToken : undefined)
+  const { notify } = useNotify()
 
   const speciesColumns: MRT_ColumnDef<Species>[] = [
     {
@@ -92,6 +95,8 @@ export const SpeciesTab = () => {
     { name: 'taxonomic_status', label: 'Taxon status' },
   ]
 
+  if (!mode.read && !speciesData) return <CircularProgress />
+
   return (
     <Grouped title="Species">
       {!mode.read && (
@@ -100,6 +105,14 @@ export const SpeciesTab = () => {
             buttonText="Add new Species"
             formFields={formFields}
             editAction={(newSpecies: Species) => {
+              const allSpecies = editData.now_ls.map(ls => ls.com_species) as unknown as Editable<Species>[]
+              const filteredSpecies = allSpecies.filter(species => species.rowState === 'new')
+              const taxonomyErrors = checkTaxonomy(newSpecies, speciesData!.concat(filteredSpecies), [])
+              if (taxonomyErrors.size > 0) {
+                const errorMessage = [...taxonomyErrors].reduce((acc, currentError) => acc + `\n${currentError}`)
+                notify(errorMessage, 'error', null)
+                return
+              }
               setEditData({
                 ...editData,
                 now_ls: [
