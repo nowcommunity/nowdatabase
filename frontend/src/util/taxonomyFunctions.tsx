@@ -1,4 +1,4 @@
-import { EditDataType, Species, SpeciesSynonym } from '@/shared/types'
+import { EditDataType, Species, SpeciesDetailsType, SpeciesSynonym } from '@/shared/types'
 
 const generateMultipleParentsError = (
   invalidField: string,
@@ -338,4 +338,13 @@ export const convertTaxonomyFields = (species: EditDataType<Species>) => {
     species_name: lowercasedSpeciesName,
   }
   return convertedSpecies as EditDataType<Species>
+}
+
+export const fixNullValuesInTaxonomyFields = (species: EditDataType<Species> | SpeciesDetailsType) => {
+  return {
+    ...species,
+    subclass_or_superorder_name: species.subclass_or_superorder_name ?? '',
+    suborder_or_superfamily_name: species.suborder_or_superfamily_name ?? '',
+    subfamily_name: species.subfamily_name ?? '',
+  }
 }

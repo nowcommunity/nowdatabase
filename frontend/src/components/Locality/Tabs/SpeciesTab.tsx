@@ -1,4 +1,11 @@
-import { Editable, LocalityDetailsType, LocalitySpecies, Species, SpeciesDetailsType } from '@/shared/types'
+import {
+  Editable,
+  EditDataType,
+  LocalityDetailsType,
+  LocalitySpecies,
+  Species,
+  SpeciesDetailsType,
+} from '@/shared/types'
 import { EditableTable } from '@/components/DetailView/common/EditableTable'
 import { EditingForm } from '@/components/DetailView/common/EditingForm'
 import { SelectingTable } from '@/components/DetailView/common/SelectingTable'
@@ -8,8 +15,9 @@ import { useGetAllSpeciesQuery } from '@/redux/speciesReducer'
 import { Box, CircularProgress } from '@mui/material'
 import { skipToken } from '@reduxjs/toolkit/query'
 import { MRT_ColumnDef } from 'material-react-table'
-import { checkTaxonomy, convertTaxonomyFields } from '@/util/taxonomyFunctions'
+import { checkTaxonomy, convertTaxonomyFields, fixNullValuesInTaxonomyFields } from '@/util/taxonomyFunctions'
 import { useNotify } from '@/hooks/notification'
+import { validateSpecies } from '@/shared/validators/species'
 
 export const SpeciesTab = () => {
   const { mode, editData, setEditData } = useDetailContext<LocalityDetailsType>()
@@ -105,6 +113,20 @@ export const SpeciesTab = () => {
             buttonText="Add new Species"
             formFields={formFields}
             editAction={(newSpecies: Species) => {
+              const errors = []
+              for (const field in newSpecies) {
+                const errorObject = validateSpecies(
+                  newSpecies as unknown as EditDataType<SpeciesDetailsType>,
+                  field as unknown as keyof EditDataType<SpeciesDetailsType>
+                )
+                const { error } = errorObject
+                if (error) errors.push(errorObject)
+              }
+              if (errors.length > 0) {
+                notify('Following validators failed: \n' + errors.map(e => `${e.name}: ${e.error}`).join('\n'), 'error')
+                return
+              }
+
               const convertedSpecies = convertTaxonomyFields(newSpecies)
               const allSpecies = editData.now_ls.map(ls => ls.com_species) as unknown as Editable<Species>[]
               const filteredSpecies = allSpecies.filter(species => species.rowState === 'new')
@@ -145,12 +167,7 @@ export const SpeciesTab = () => {
                     lid: editData.lid,
                     species_id: newSpecies.species_id,
                     com_species: {
-                      ...(newSpecies as unknown as SpeciesDetailsType),
-                      // changes subclass, suborder, and subfamily from null to empty string to make validators work
-                      // this should be removed if validators are improved in the future
-                      subclass_or_superorder_name: newSpecies.subclass_or_superorder_name ?? '',
-                      suborder_or_superfamily_name: newSpecies.suborder_or_superfamily_name ?? '',
-                      subfamily_name: newSpecies.subfamily_name ?? '',
+                      ...(fixNullValuesInTaxonomyFields(newSpecies) as SpeciesDetailsType),
                     },
                     rowState: 'new',
                   },
