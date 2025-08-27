@@ -24,6 +24,34 @@ export const SpeciesTab = () => {
   const { data: speciesData, isError } = useGetAllSpeciesQuery(mode.read ? skipToken : undefined)
   const { notify } = useNotify()
 
+  const convertAndCheckNewSpeciesTaxonomy = (newSpecies: Species) => {
+    const errors = []
+    for (const field in newSpecies) {
+      const errorObject = validateSpecies(
+        newSpecies as unknown as EditDataType<SpeciesDetailsType>,
+        field as unknown as keyof EditDataType<SpeciesDetailsType>
+      )
+      const { error } = errorObject
+      if (error) errors.push(errorObject)
+    }
+    if (errors.length > 0) {
+      notify('Following validators failed: \n' + errors.map(e => `${e.name}: ${e.error}`).join('\n'), 'error')
+      return false
+    }
+
+    const convertedSpecies = convertTaxonomyFields(newSpecies)
+    const everyLs = editData.now_ls.map(ls => ls.com_species) as unknown as Editable<Species>[]
+    const filteredLs = everyLs.filter(species => species.rowState === 'new')
+
+    const taxonomyErrors = checkTaxonomy(convertedSpecies, speciesData!.concat(filteredLs), [])
+    if (taxonomyErrors.size > 0) {
+      const errorMessage = [...taxonomyErrors].reduce((acc, currentError) => acc + `\n${currentError}`)
+      notify(errorMessage, 'error', null)
+      return false
+    }
+    return convertedSpecies
+  }
+
   const speciesColumns: MRT_ColumnDef<Species>[] = [
     {
       accessorKey: 'order_name',
@@ -113,30 +141,8 @@ export const SpeciesTab = () => {
             buttonText="Add new Species"
             formFields={formFields}
             editAction={(newSpecies: Species) => {
-              const errors = []
-              for (const field in newSpecies) {
-                const errorObject = validateSpecies(
-                  newSpecies as unknown as EditDataType<SpeciesDetailsType>,
-                  field as unknown as keyof EditDataType<SpeciesDetailsType>
-                )
-                const { error } = errorObject
-                if (error) errors.push(errorObject)
-              }
-              if (errors.length > 0) {
-                notify('Following validators failed: \n' + errors.map(e => `${e.name}: ${e.error}`).join('\n'), 'error')
-                return
-              }
-
-              const convertedSpecies = convertTaxonomyFields(newSpecies)
-              const everyLs = editData.now_ls.map(ls => ls.com_species) as unknown as Editable<Species>[]
-              const filteredLs = everyLs.filter(species => species.rowState === 'new')
-
-              const taxonomyErrors = checkTaxonomy(convertedSpecies, speciesData!.concat(filteredLs), [])
-              if (taxonomyErrors.size > 0) {
-                const errorMessage = [...taxonomyErrors].reduce((acc, currentError) => acc + `\n${currentError}`)
-                notify(errorMessage, 'error', null)
-                return
-              }
+              const convertedSpecies = convertAndCheckNewSpeciesTaxonomy(newSpecies)
+              if (!convertedSpecies) return
               setEditData({
                 ...editData,
                 now_ls: [
