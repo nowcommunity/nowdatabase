@@ -57,6 +57,9 @@ export const SpeciesTab = () => {
             genus_name: fixedSpecies.genus_name!,
             species_name: fixedSpecies.species_name!,
             unique_identifier: fixedSpecies.unique_identifier!,
+            taxonomic_status: '',
+            sp_comment: '',
+            sp_author: '',
           })
         }}
       />
@@ -190,6 +193,7 @@ export const SpeciesTab = () => {
           <EditingForm<EditDataType<Species>, LocalityDetailsType>
             buttonText="Add new Species"
             formFields={formFields}
+            existingObject={{ unique_identifier: '-' }}
             replacedValues={replacedValues}
             copyTaxonomyButton={copyTaxonomyButton}
             editAction={(newSpecies: EditDataType<Species>) => {
