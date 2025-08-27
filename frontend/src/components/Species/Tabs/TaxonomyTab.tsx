@@ -1,7 +1,7 @@
 import { SpeciesDetailsType, Species } from '@/shared/types'
 import { ArrayFrame, HalfFrames } from '@/components/DetailView/common/tabLayoutHelpers'
 import { useDetailContext } from '@/components/DetailView/Context/DetailContext'
-import { taxonStatusOptions } from '@/util/taxonStatusOptions'
+import { fixNullValuesInTaxonomyFields, taxonStatusOptions } from '@/util/taxonomyUtilities'
 import { Box } from '@mui/material'
 import { SelectingTable } from '@/components/DetailView/common/SelectingTable'
 import { useGetAllSpeciesQuery } from '@/redux/speciesReducer'
@@ -34,14 +34,7 @@ export const TaxonomyTab = () => {
         editingAction={(selectedSpecies: Species) => {
           setEditData({
             ...editData,
-            subclass_or_superorder_name: selectedSpecies.subclass_or_superorder_name ?? '',
-            order_name: selectedSpecies.order_name ?? '',
-            suborder_or_superfamily_name: selectedSpecies.suborder_or_superfamily_name ?? '',
-            family_name: selectedSpecies.family_name ?? '',
-            subfamily_name: selectedSpecies.subfamily_name ?? '',
-            genus_name: selectedSpecies.genus_name ?? '',
-            species_name: selectedSpecies.species_name ?? '',
-            unique_identifier: selectedSpecies.unique_identifier ?? '',
+            ...(fixNullValuesInTaxonomyFields(selectedSpecies) as SpeciesDetailsType),
           })
         }}
       />

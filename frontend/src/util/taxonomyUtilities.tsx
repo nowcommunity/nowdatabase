@@ -1,5 +1,15 @@
 import { EditDataType, Species, SpeciesDetailsType, SpeciesSynonym } from '@/shared/types'
+import { emptyOption } from '@/components/DetailView/common/misc'
 
+export const taxonStatusOptions = [
+  emptyOption,
+  'family attrib of genus uncertain',
+  'genus attrib of species uncertain',
+  'informal species',
+  'species validity uncertain',
+  'taxonomic validity uncertain',
+  'NOW synonym',
+]
 const generateMultipleParentsError = (
   invalidField: string,
   invalidValue1: string | null,
@@ -340,7 +350,7 @@ export const convertTaxonomyFields = (species: EditDataType<Species>) => {
   return convertedSpecies as EditDataType<Species>
 }
 
-export const fixNullValuesInTaxonomyFields = (species: EditDataType<Species> | SpeciesDetailsType) => {
+export const fixNullValuesInTaxonomyFields = (species: Species | SpeciesDetailsType) => {
   return {
     ...species,
     subclass_or_superorder_name: species.subclass_or_superorder_name ?? '',

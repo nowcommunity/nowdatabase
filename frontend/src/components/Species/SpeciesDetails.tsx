@@ -16,7 +16,7 @@ import { validateSpecies } from '@/shared/validators/species'
 import { emptySpecies } from '../DetailView/common/defaultValues'
 import { useNotify } from '@/hooks/notification'
 import { useEffect, useState } from 'react'
-import { fixNullValuesInTaxonomyFields } from '@/util/taxonomyFunctions'
+import { fixNullValuesInTaxonomyFields } from '@/util/taxonomyUtilities'
 
 export const SpeciesDetails = () => {
   const { id } = useParams()
