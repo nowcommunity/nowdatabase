@@ -1,7 +1,7 @@
 import { SpeciesDetailsType, Species } from '@/shared/types'
 import { ArrayFrame, HalfFrames } from '@/components/DetailView/common/tabLayoutHelpers'
 import { useDetailContext } from '@/components/DetailView/Context/DetailContext'
-import { emptyOption } from '@/components/DetailView/common/misc'
+import { taxonStatusOptions } from '@/util/taxonStatusOptions'
 import { Box } from '@mui/material'
 import { SelectingTable } from '@/components/DetailView/common/SelectingTable'
 import { useGetAllSpeciesQuery } from '@/redux/speciesReducer'
@@ -48,16 +48,6 @@ export const TaxonomyTab = () => {
       <SynonymsModal open={modalOpen} onClose={() => setModalOpen(false)} selectedSpecies={selectedSpecies} />
     </Box>
   )
-
-  const taxonStatusOptions = [
-    emptyOption,
-    'family attrib of genus uncertain',
-    'genus attrib of species uncertain',
-    'informal species',
-    'species validity uncertain',
-    'taxonomic validity uncertain',
-    'NOW synonym',
-  ]
 
   const classification = [
     [
