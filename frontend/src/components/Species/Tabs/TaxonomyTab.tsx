@@ -32,9 +32,17 @@ export const TaxonomyTab = () => {
         useObject={true}
         tableRowAction={handleRowActionClick}
         editingAction={(selectedSpecies: Species) => {
+          const fixedSpecies = fixNullValuesInTaxonomyFields(selectedSpecies)
           setEditData({
             ...editData,
-            ...(fixNullValuesInTaxonomyFields(selectedSpecies) as SpeciesDetailsType),
+            subclass_or_superorder_name: fixedSpecies.subclass_or_superorder_name,
+            order_name: fixedSpecies.order_name!,
+            suborder_or_superfamily_name: fixedSpecies.suborder_or_superfamily_name,
+            family_name: fixedSpecies.family_name!,
+            subfamily_name: fixedSpecies.subfamily_name,
+            genus_name: fixedSpecies.genus_name!,
+            species_name: fixedSpecies.species_name!,
+            unique_identifier: fixedSpecies.unique_identifier!,
           })
         }}
       />

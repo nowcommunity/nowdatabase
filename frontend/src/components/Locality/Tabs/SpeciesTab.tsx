@@ -26,7 +26,7 @@ export const SpeciesTab = () => {
   const { mode, editData, setEditData } = useDetailContext<LocalityDetailsType>()
   const { data: speciesData, isError } = useGetAllSpeciesQuery(mode.read ? skipToken : undefined)
   const { notify } = useNotify()
-  const [replacedValues, setReplacedValues] = useState<Species | undefined>()
+  const [replacedValues, setReplacedValues] = useState<EditDataType<Species> | undefined>()
   const [selectedSpecies, setSelectedSpecies] = useState<string | undefined>()
   const [modalOpen, setModalOpen] = useState<boolean>(false)
 
@@ -47,14 +47,24 @@ export const SpeciesTab = () => {
         useObject={true}
         tableRowAction={handleRowActionClick}
         editingAction={(selectedSpecies: Species) => {
-          setReplacedValues(fixNullValuesInTaxonomyFields(selectedSpecies) as Species)
+          const fixedSpecies = fixNullValuesInTaxonomyFields(selectedSpecies)
+          setReplacedValues({
+            subclass_or_superorder_name: fixedSpecies.subclass_or_superorder_name,
+            order_name: fixedSpecies.order_name!,
+            suborder_or_superfamily_name: fixedSpecies.suborder_or_superfamily_name,
+            family_name: fixedSpecies.family_name!,
+            subfamily_name: fixedSpecies.subfamily_name,
+            genus_name: fixedSpecies.genus_name!,
+            species_name: fixedSpecies.species_name!,
+            unique_identifier: fixedSpecies.unique_identifier!,
+          })
         }}
       />
       <SynonymsModal open={modalOpen} onClose={() => setModalOpen(false)} selectedSpecies={selectedSpecies} />
     </Box>
   )
 
-  const convertAndCheckNewSpeciesTaxonomy = (newSpecies: Species) => {
+  const convertAndCheckNewSpeciesTaxonomy = (newSpecies: EditDataType<Species>) => {
     const errors = []
     for (const field in newSpecies) {
       const errorObject = validateSpecies(
@@ -149,6 +159,14 @@ export const SpeciesTab = () => {
       accessorKey: 'com_species.taxonomic_status',
       header: 'Taxon status',
     },
+    {
+      accessorKey: 'com_species.sp_comment',
+      header: 'Comment',
+    },
+    {
+      accessorKey: 'com_species.sp_author',
+      header: 'Author',
+    },
   ]
   const formFields: { name: string; label: string; required?: boolean }[] = [
     { name: 'order_name', label: 'Order', required: true },
@@ -169,12 +187,12 @@ export const SpeciesTab = () => {
     <Grouped title="Species">
       {!mode.read && (
         <Box display="flex" gap={1}>
-          <EditingForm<Species, LocalityDetailsType>
+          <EditingForm<EditDataType<Species>, LocalityDetailsType>
             buttonText="Add new Species"
             formFields={formFields}
             replacedValues={replacedValues}
             copyTaxonomyButton={copyTaxonomyButton}
-            editAction={(newSpecies: Species) => {
+            editAction={(newSpecies: EditDataType<Species>) => {
               const convertedSpecies = convertAndCheckNewSpeciesTaxonomy(newSpecies)
               if (!convertedSpecies) return
               setEditData({
@@ -183,7 +201,7 @@ export const SpeciesTab = () => {
                   ...editData.now_ls,
                   {
                     lid: editData.lid,
-                    species_id: newSpecies.species_id,
+                    species_id: undefined,
                     com_species: { ...(convertedSpecies as unknown as SpeciesDetailsType) },
                     rowState: 'new',
                   },

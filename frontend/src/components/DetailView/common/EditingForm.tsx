@@ -40,7 +40,7 @@ export const EditingForm = <T extends object, ParentType extends object>({
     if (!existingObject) return {}
     return existingObject
   }
-  const { register, trigger, formState, getValues, setValue, reset } = useForm({ defaultValues: getDefaultValues() })
+  const { register, trigger, formState, getValues, reset } = useForm({ defaultValues: getDefaultValues() })
   const { errors } = formState
   const { editData, setEditData } = useDetailContext<ParentType>()
 
