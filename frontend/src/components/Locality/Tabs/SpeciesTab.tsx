@@ -129,6 +129,8 @@ export const SpeciesTab = () => {
     { name: 'suborder_or_superfamily_name', label: 'Suborder or Superfamily' },
     { name: 'unique_identifier', label: 'Unique Identifier', required: true },
     { name: 'taxonomic_status', label: 'Taxon status' },
+    { name: 'sp_comment', label: 'Comment' },
+    { name: 'sp_author', label: 'Author' },
   ]
 
   if (!mode.read && !speciesData) return <CircularProgress />

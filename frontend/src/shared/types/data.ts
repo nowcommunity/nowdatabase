@@ -332,6 +332,7 @@ export type Species = {
   locomo2: string | null
   locomo3: string | null
   sp_comment: string | null
+  sp_author: string | null
 }
 
 export type RegionDetails = Prisma.now_reg_coord & { now_reg_coord_people: Array<RegionCoordinator> } & {
