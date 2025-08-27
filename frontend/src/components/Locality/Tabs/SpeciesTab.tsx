@@ -57,7 +57,7 @@ export const SpeciesTab = () => {
             genus_name: fixedSpecies.genus_name!,
             species_name: fixedSpecies.species_name!,
             unique_identifier: fixedSpecies.unique_identifier!,
-            taxonomic_status: '',
+            taxonomic_status: null,
             sp_comment: '',
             sp_author: '',
           })
