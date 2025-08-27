@@ -15,14 +15,44 @@ import { useGetAllSpeciesQuery } from '@/redux/speciesReducer'
 import { Box, CircularProgress } from '@mui/material'
 import { skipToken } from '@reduxjs/toolkit/query'
 import { MRT_ColumnDef } from 'material-react-table'
-import { checkTaxonomy, convertTaxonomyFields, fixNullValuesInTaxonomyFields } from '@/util/taxonomyFunctions'
+import { checkTaxonomy, convertTaxonomyFields, fixNullValuesInTaxonomyFields } from '@/util/taxonomyUtilities'
 import { useNotify } from '@/hooks/notification'
 import { validateSpecies } from '@/shared/validators/species'
+import { smallSpeciesTableColumns } from '@/common'
+import { useState } from 'react'
+import { SynonymsModal } from '@/components/Species/SynonymsModal'
 
 export const SpeciesTab = () => {
   const { mode, editData, setEditData } = useDetailContext<LocalityDetailsType>()
   const { data: speciesData, isError } = useGetAllSpeciesQuery(mode.read ? skipToken : undefined)
   const { notify } = useNotify()
+  const [replacedValues, setReplacedValues] = useState<Species | undefined>()
+  const [selectedSpecies, setSelectedSpecies] = useState<string | undefined>()
+  const [modalOpen, setModalOpen] = useState<boolean>(false)
+
+  const handleRowActionClick = (row: Species) => {
+    setSelectedSpecies(row.species_id.toString())
+    setModalOpen(true)
+  }
+
+  const copyTaxonomyButton = (
+    <Box key="copy_existing_taxonomy_button" id="copy_existing_taxonomy_button">
+      <SelectingTable<Species, Species>
+        buttonText="Copy existing taxonomy"
+        data={speciesData}
+        isError={isError}
+        columns={smallSpeciesTableColumns}
+        fieldName="order_name" // this doesn't do anything here but is required
+        idFieldName="species_id"
+        useObject={true}
+        tableRowAction={handleRowActionClick}
+        editingAction={(selectedSpecies: Species) => {
+          setReplacedValues(fixNullValuesInTaxonomyFields(selectedSpecies) as Species)
+        }}
+      />
+      <SynonymsModal open={modalOpen} onClose={() => setModalOpen(false)} selectedSpecies={selectedSpecies} />
+    </Box>
+  )
 
   const convertAndCheckNewSpeciesTaxonomy = (newSpecies: Species) => {
     const errors = []
@@ -142,6 +172,8 @@ export const SpeciesTab = () => {
           <EditingForm<Species, LocalityDetailsType>
             buttonText="Add new Species"
             formFields={formFields}
+            replacedValues={replacedValues}
+            copyTaxonomyButton={copyTaxonomyButton}
             editAction={(newSpecies: Species) => {
               const convertedSpecies = convertAndCheckNewSpeciesTaxonomy(newSpecies)
               if (!convertedSpecies) return
