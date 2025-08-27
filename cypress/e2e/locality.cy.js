@@ -8,6 +8,7 @@ describe('Adding species in Locality -> Species tab', () => {
   })
 
   it.skip('works with valid, unique species')
+  it.skip('works through "copy species taxonomy" button')
   it.skip('does not work with invalid species')
 
   it('does not work if the species has already been added', () => {
@@ -72,6 +73,7 @@ describe('Adding species in Locality -> Species tab', () => {
   })
 
   it.skip('does not work with species with invalid taxonomic order')
+  it.skip('does not work through "copy species taxonomy" button if nothing is changed')
 })
 
 describe('Creating a new locality', () => {
