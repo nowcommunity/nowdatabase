@@ -128,10 +128,10 @@ export const SpeciesTab = () => {
               }
 
               const convertedSpecies = convertTaxonomyFields(newSpecies)
-              const allSpecies = editData.now_ls.map(ls => ls.com_species) as unknown as Editable<Species>[]
-              const filteredSpecies = allSpecies.filter(species => species.rowState === 'new')
+              const everyLs = editData.now_ls.map(ls => ls.com_species) as unknown as Editable<Species>[]
+              const filteredLs = everyLs.filter(species => species.rowState === 'new')
 
-              const taxonomyErrors = checkTaxonomy(convertedSpecies, speciesData!.concat(filteredSpecies), [])
+              const taxonomyErrors = checkTaxonomy(convertedSpecies, speciesData!.concat(filteredLs), [])
               if (taxonomyErrors.size > 0) {
                 const errorMessage = [...taxonomyErrors].reduce((acc, currentError) => acc + `\n${currentError}`)
                 notify(errorMessage, 'error', null)
