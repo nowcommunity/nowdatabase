@@ -208,7 +208,7 @@ export const SpeciesTab = () => {
                   {
                     lid: editData.lid,
                     species_id: undefined,
-                    com_species: { ...(convertedSpecies as unknown as SpeciesDetailsType) },
+                    com_species: { ...(convertedSpecies as unknown as SpeciesDetailsType), class_name: 'Mammalia' },
                     rowState: 'new',
                   },
                 ],
