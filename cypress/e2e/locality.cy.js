@@ -11,6 +11,7 @@ describe('Adding species in Locality -> Species tab for an existing locality', (
     cy.visit(`/locality/20920?tab=2`)
     cy.contains('Lantian-Shuijiazui')
     cy.get('[id=edit-button]').click()
+
     cy.contains('Add new Species').click()
     cy.get('[name=order_name]').type('Rodentia')
     cy.get('[name=family_name]').type('Gliridae')
@@ -43,7 +44,22 @@ describe('Adding species in Locality -> Species tab for an existing locality', (
     cy.visit(`/locality/20920?tab=2`)
     cy.contains('newspecies')
   })
-  it.skip('does not work with invalid species')
+
+  it('does not work with invalid species', () => {
+    cy.visit(`/locality/20920?tab=2`)
+    cy.contains('Lantian-Shuijiazui')
+    cy.get('[id=edit-button]').click()
+
+    cy.contains('Add new Species').click()
+    cy.clearNewSpeciesForm()
+    cy.get('[name=order_name]').type('Order with spaces')
+    cy.get('[name=family_name]').type('newfamily')
+    cy.get('[name=genus_name]').type('newgenus')
+    cy.get('[name=species_name]').type('newspecies')
+    cy.get('[name=unique_identifier]').type('veryunique')
+    cy.contains('Save').click()
+    cy.contains('Order must not contain any spaces, unless the value is "incertae sedis".')
+  })
 
   it('does not work if the species has already been added', () => {
     cy.visit(`/locality/20920?tab=2`)
@@ -90,7 +106,43 @@ describe('Adding species in Locality -> Species tab for an existing locality', (
     cy.contains('The taxon already exists in the database.')
   })
 
-  it.skip('does not work with species with invalid taxonomic order')
+  it('does not work with species with invalid taxonomic order', () => {
+    cy.visit(`/locality/20920?tab=2`)
+    cy.contains('Lantian-Shuijiazui')
+    cy.get('[id=edit-button]').click()
+
+    // adding species that already exists in the database
+    cy.contains('Add new Species').click()
+    cy.clearNewSpeciesForm()
+    cy.get('[name=order_name]').type('Rodentia')
+    cy.get('[name=family_name]').type('Soricidae')
+    cy.get('[name=genus_name]').type('Simplomys')
+    cy.get('[name=species_name]').type('Simplicidens')
+    cy.get('[name=unique_identifier]').type('unique')
+    cy.contains('Save').click()
+    cy.contains('Family Soricidae belongs to order Eulipotyphla, not Rodentia.')
+    cy.contains('Genus Simplomys belongs to family Gliridae, not Soricidae.')
+
+    cy.contains('Add new Species').click()
+    cy.clearNewSpeciesForm()
+    cy.get('[name=order_name]').type('Carnivora')
+    cy.get('[name=family_name]').type('Canidae')
+    cy.get('[name=genus_name]').type('Simplomys')
+    cy.get('[name=species_name]').type('Simplicidens')
+    cy.get('[name=unique_identifier]').type('moreunique')
+    cy.contains('Save').click()
+    cy.contains('Genus Simplomys belongs to family Gliridae, not Canidae.')
+
+    cy.contains('Add new Species').click()
+    cy.clearNewSpeciesForm()
+    cy.get('[name=order_name]').type('Artiodactyla')
+    cy.get('[name=family_name]').type('Bovidae')
+    cy.get('[name=genus_name]').type('Amblycoptus')
+    cy.get('[name=species_name]').type('indet.')
+    cy.get('[name=unique_identifier]').type('uniquest')
+    cy.contains('Save').click()
+    cy.contains('Genus Amblycoptus belongs to family Soricidae, not Bovidae.')
+  })
 
   it('does not work through "copy species taxonomy" button if nothing is changed', () => {
     cy.visit(`/locality/20920?tab=2`)
