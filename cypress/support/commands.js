@@ -42,3 +42,14 @@ Cypress.Commands.add('pageForbidden', url => {
 Cypress.Commands.add('resetDatabase', () => {
   cy.task('resetDatabase')
 })
+
+// use this once you have edited some data and want to save it
+Cypress.Commands.add('addReferenceAndSave', () => {
+  cy.get('[id=write-button]').click()
+  cy.get('[id=write-button]').should('be.disabled')
+  cy.contains('button', 'Add existing reference').click()
+  cy.get('button[data-cy^="add-button"]').first().click()
+  cy.contains('button', 'Close').click()
+  cy.get('[id=write-button]').should('not.be.disabled')
+  cy.get('[id=write-button]').click()
+})

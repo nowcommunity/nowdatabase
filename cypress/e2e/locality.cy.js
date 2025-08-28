@@ -7,7 +7,21 @@ describe('Adding species in Locality -> Species tab', () => {
     cy.login('testSu')
   })
 
-  it.skip('works with valid, unique species')
+  it('works with valid, unique species', () => {
+    cy.visit(`/locality/20920?tab=2`)
+    cy.contains('Lantian-Shuijiazui')
+    cy.get('[id=edit-button]').click()
+    cy.contains('Add new Species').click()
+    cy.get('[name=order_name]').type('Rodentia')
+    cy.get('[name=family_name]').type('Gliridae')
+    cy.get('[name=genus_name]').type('Simplomys')
+    cy.get('[name=species_name]').type('someSpecies')
+    cy.get('[name=unique_identifier]').type('veryunique')
+    cy.contains('Save').click()
+    cy.contains('somespecies')
+
+    cy.addReferenceAndSave()
+  })
   it.skip('works through "copy species taxonomy" button')
   it.skip('does not work with invalid species')
 
