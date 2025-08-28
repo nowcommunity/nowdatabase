@@ -30,7 +30,7 @@ export const MuseumInfoTab = ({ isNew }: { isNew?: boolean }) => {
     ['Country', dropdownWithSearch('country', countryOptions, 'Country')],
     ['State', textField('state')],
     ['State code', textField('state_code')],
-    ['Museum code', textField('museum', { type: 'text', readonly: !isNew })],
+    ['Museum code', textField('museum', { type: 'text', readonly: !isNew, trim: true })],
   ]
 
   return (
