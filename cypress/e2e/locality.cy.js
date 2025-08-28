@@ -2,7 +2,7 @@ before('Reset database', () => {
   cy.request(Cypress.env('databaseResetUrl'))
 })
 
-describe('Adding species in Locality -> Species tab', () => {
+describe('Adding species in Locality -> Species tab for an existing locality', () => {
   beforeEach('Login as admin', () => {
     cy.login('testSu')
   })
@@ -25,19 +25,30 @@ describe('Adding species in Locality -> Species tab', () => {
     cy.visit(`/locality/20920?tab=2`)
     cy.contains('somespecies')
   })
-  it.skip('works through "copy species taxonomy" button')
+
+  it('works through "copy species taxonomy" button', () => {
+    cy.visit(`/locality/20920?tab=2`)
+    cy.contains('Lantian-Shuijiazui')
+    cy.get('[id=edit-button]').click()
+    cy.contains('Add new Species').click()
+    cy.get('[data-cy=copy_existing_taxonomy_button]').click()
+    cy.get('[data-cy=add-button-21426]').click()
+    cy.contains('Close').click()
+    cy.get('[name=species_name]').clear()
+    cy.get('[name=species_name]').type('Newspecies')
+    cy.contains('Save').click()
+
+    cy.addReferenceAndSave()
+    cy.contains('Edited item successfully.')
+    cy.visit(`/locality/20920?tab=2`)
+    cy.contains('newspecies')
+  })
   it.skip('does not work with invalid species')
 
   it('does not work if the species has already been added', () => {
     cy.visit(`/locality/20920?tab=2`)
     cy.contains('Lantian-Shuijiazui')
     cy.get('[id=edit-button]').click()
-    cy.contains('Select Species').click()
-    cy.get('[data-cy=add-button-21052]').first().click()
-    cy.get('[data-cy=add-button-21426]').first().click()
-    cy.contains('Close').click()
-    cy.contains('Rodentia')
-    cy.contains('Eulipotyphla')
 
     // adding species that already exists in the database
     cy.contains('Add new Species').click()
@@ -65,8 +76,6 @@ describe('Adding species in Locality -> Species tab', () => {
     cy.visit(`/locality/20920?tab=2`)
     cy.contains('Lantian-Shuijiazui')
     cy.get('[id=edit-button]').click()
-    cy.contains('Rodentia')
-    cy.contains('Eulipotyphla')
     cy.contains('Neworder')
 
     // adding species that has been added earlier through "add new species" button
@@ -82,7 +91,18 @@ describe('Adding species in Locality -> Species tab', () => {
   })
 
   it.skip('does not work with species with invalid taxonomic order')
-  it.skip('does not work through "copy species taxonomy" button if nothing is changed')
+
+  it('does not work through "copy species taxonomy" button if nothing is changed', () => {
+    cy.visit(`/locality/20920?tab=2`)
+    cy.contains('Lantian-Shuijiazui')
+    cy.get('[id=edit-button]').click()
+    cy.contains('Add new Species').click()
+    cy.get('[data-cy=copy_existing_taxonomy_button]').click()
+    cy.get('[data-cy=add-button-21052]').click()
+    cy.contains('Close').click()
+    cy.contains('Save').click()
+    cy.contains('The taxon already exists in the database.')
+  })
 })
 
 describe('Creating a new locality', () => {
