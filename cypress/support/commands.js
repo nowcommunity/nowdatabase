@@ -53,3 +53,16 @@ Cypress.Commands.add('addReferenceAndSave', () => {
   cy.get('[id=write-button]').should('not.be.disabled')
   cy.get('[id=write-button]').click()
 })
+
+Cypress.Commands.add('clearNewSpeciesForm', () => {
+  cy.get('[name=order_name]').clear()
+  cy.get('[name=subclass_or_superorder_name]').clear()
+  cy.get('[name=family_name]').clear()
+  cy.get('[name=suborder_or_superfamily_name]').clear()
+  cy.get('[name=genus_name]').clear()
+  cy.get('[name=species_name]').clear()
+  cy.get('[name=unique_identifier]').clear()
+  cy.get('[name=taxonomic_status]').clear()
+  cy.get('[name=sp_comment]').clear()
+  cy.get('[name=sp_author]').clear()
+})
