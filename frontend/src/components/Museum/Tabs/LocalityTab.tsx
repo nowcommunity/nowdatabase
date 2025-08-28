@@ -23,12 +23,16 @@ export const LocalityTab = ({ isNew }: { isNew: boolean }) => {
       header: 'Min Age',
     },
   ]
-  if (isNew)
+
+  if (isNew) {
     return (
       <div>
         Link localities to this museum after finalizing it by editing a locality and navigating to the museum tab there.
       </div>
     )
+  } else if (data.localities.length === 0) {
+    return <div>Link localities to this museum by editing a locality and navigating to the museum tab there.</div>
+  }
 
   return <SimpleTable columns={columns} data={data.localities} idFieldName="lid" url="locality" />
 }
