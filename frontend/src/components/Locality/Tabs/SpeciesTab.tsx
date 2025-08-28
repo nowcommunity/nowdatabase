@@ -179,6 +179,7 @@ export const SpeciesTab = () => {
     { name: 'species_name', label: 'Species', required: true },
     { name: 'subclass_or_superorder_name', label: 'Subclass or Superorder' },
     { name: 'suborder_or_superfamily_name', label: 'Suborder or Superfamily' },
+    { name: 'subfamily_name', label: 'Subfamily or Tribe' },
     { name: 'unique_identifier', label: 'Unique Identifier', required: true },
     { name: 'taxonomic_status', label: 'Taxon status' },
     { name: 'sp_comment', label: 'Comment' },

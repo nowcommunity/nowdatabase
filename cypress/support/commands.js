@@ -56,11 +56,12 @@ Cypress.Commands.add('addReferenceAndSave', () => {
 
 Cypress.Commands.add('clearNewSpeciesForm', () => {
   cy.get('[name=order_name]').clear()
-  cy.get('[name=subclass_or_superorder_name]').clear()
   cy.get('[name=family_name]').clear()
-  cy.get('[name=suborder_or_superfamily_name]').clear()
   cy.get('[name=genus_name]').clear()
   cy.get('[name=species_name]').clear()
+  cy.get('[name=subclass_or_superorder_name]').clear()
+  cy.get('[name=suborder_or_superfamily_name]').clear()
+  cy.get('[name=subfamily_name]').clear()
   cy.get('[name=unique_identifier]').clear()
   cy.get('[name=taxonomic_status]').clear()
   cy.get('[name=sp_comment]').clear()
