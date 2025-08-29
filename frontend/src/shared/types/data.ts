@@ -448,6 +448,8 @@ export type SpeciesReference = Prisma.now_sr & { ref_ref: ReferenceOfUpdate }
 export type TimeUnitReference = Prisma.now_tr & { ref_ref: ReferenceOfUpdate }
 export type TimeBoundReference = Prisma.now_br & { ref_ref: ReferenceOfUpdate }
 
+export type AnyReference = LocalityReference | SpeciesReference | TimeUnitReference | TimeBoundReference
+
 export type ReferenceJournalType = {
   journal_id?: number
   journal_title?: string
