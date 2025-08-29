@@ -1,11 +1,4 @@
-import {
-  LocalityReference,
-  ReferenceOfUpdate,
-  SpeciesReference,
-  TimeBoundReference,
-  TimeUnitReference,
-  UpdateLog,
-} from '@/shared/types'
+import { AnyReference, ReferenceOfUpdate, UpdateLog } from '@/shared/types'
 import { useDetailContext } from '@/components/DetailView/Context/DetailContext'
 import { EditingModal } from '@/components/DetailView/common/EditingModal'
 import { SimpleTable } from '@/components/DetailView/common/SimpleTable'
@@ -25,13 +18,7 @@ const makeNameList = (names: Array<string | null>) => {
   return names[0] ?? ''
 }
 
-const ReferenceList = ({
-  references,
-  big,
-}: {
-  references: Array<LocalityReference | SpeciesReference | TimeUnitReference | TimeBoundReference>
-  big: boolean
-}) => {
+const ReferenceList = ({ references, big }: { references: AnyReference[]; big: boolean }) => {
   const getReferenceText = (ref: ReferenceOfUpdate) => {
     // php version: html/include/database.php -> referenceCitation()
     //const ref = referenceOfUpdate.ref_ref
@@ -139,7 +126,7 @@ const DetailsModal = ({
   coordinator,
 }: {
   updates: UpdateLog[]
-  references: Array<LocalityReference | SpeciesReference | TimeUnitReference | TimeBoundReference>
+  references: AnyReference[]
   comment: string
   date: Date
   authorizer: string
