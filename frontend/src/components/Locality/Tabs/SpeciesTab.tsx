@@ -15,7 +15,11 @@ import { useGetAllSpeciesQuery } from '@/redux/speciesReducer'
 import { Box, CircularProgress } from '@mui/material'
 import { skipToken } from '@reduxjs/toolkit/query'
 import { MRT_ColumnDef } from 'material-react-table'
-import { checkTaxonomy, convertTaxonomyFields, fixNullValuesInTaxonomyFields } from '@/util/taxonomyUtilities'
+import {
+  checkSpeciesTaxonomy,
+  convertSpeciesTaxonomyFields,
+  fixNullValuesInTaxonomyFields,
+} from '@/util/taxonomyUtilities'
 import { useNotify } from '@/hooks/notification'
 import { validateSpecies } from '@/shared/validators/species'
 import { smallSpeciesTableColumns } from '@/common'
@@ -83,11 +87,11 @@ export const SpeciesTab = () => {
       return false
     }
 
-    const convertedSpecies = convertTaxonomyFields(newSpecies)
+    const convertedSpecies = convertSpeciesTaxonomyFields(newSpecies)
     const everyLs = editData.now_ls.map(ls => ls.com_species) as unknown as Editable<Species>[]
     const filteredLs = everyLs.filter(species => species.rowState === 'new')
 
-    const taxonomyErrors = checkTaxonomy(convertedSpecies, speciesData!.concat(filteredLs), [])
+    const taxonomyErrors = checkSpeciesTaxonomy(convertedSpecies, speciesData!.concat(filteredLs), [])
     if (taxonomyErrors.size > 0) {
       const errorMessage = [...taxonomyErrors].reduce((acc, currentError) => acc + `\n${currentError}`)
       notify(errorMessage, 'error', null)
