@@ -57,6 +57,7 @@ export const api = createApi({
     'localities',
     'species',
     'specieslist',
+    'speciessynonyms',
     'reference',
     'references',
     'timeunits',

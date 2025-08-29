@@ -146,7 +146,7 @@ const checkSubFamilyGenus = (newSpecies: EditDataType<Species>, existingSpecies:
   )
 }
 
-export const checkTaxonomy = (
+export const checkSpeciesTaxonomy = (
   newSpecies: EditDataType<Species>,
   existingSpeciesArray: Species[],
   synonyms: SpeciesSynonym[]
@@ -327,7 +327,7 @@ const convertTaxonomyField = (value: string | null | undefined) => {
   return convertedValue
 }
 
-export const convertTaxonomyFields = (species: EditDataType<Species>) => {
+export const convertSpeciesTaxonomyFields = (species: EditDataType<Species>) => {
   const speciesName = species.species_name
   let lowercasedSpeciesName = ''
   if (speciesName) {
@@ -357,4 +357,22 @@ export const fixNullValuesInTaxonomyFields = (species: Species | SpeciesDetailsT
     suborder_or_superfamily_name: species.suborder_or_superfamily_name ?? '',
     subfamily_name: species.subfamily_name ?? '',
   }
+}
+
+export const convertSynonymTaxonomyFields = (synonym: EditDataType<SpeciesSynonym>) => {
+  const synSpeciesName = synonym.syn_species_name
+  let lowercasedSynSpeciesName = ''
+  if (synSpeciesName) {
+    if (synSpeciesName !== 'indet.') {
+      lowercasedSynSpeciesName = synSpeciesName.toLowerCase()
+    } else {
+      lowercasedSynSpeciesName = synSpeciesName
+    }
+  }
+  const convertedSynonym = {
+    ...synonym,
+    syn_genus_name: convertTaxonomyField(synonym.syn_genus_name),
+    syn_species_name: lowercasedSynSpeciesName,
+  }
+  return convertedSynonym as EditDataType<SpeciesSynonym>
 }
