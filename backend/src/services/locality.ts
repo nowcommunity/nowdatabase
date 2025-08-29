@@ -15,7 +15,6 @@ import Prisma from '../../prisma/generated/now_test_client'
 import { AccessError } from '../middlewares/authorizer'
 import { fixBigInt } from '../utils/common'
 import { logDb, nowDb } from '../utils/db'
-import { logger } from '../utils/logger'
 import { getReferenceDetails } from './reference'
 
 const getIdsOfUsersProjects = async (user: User) => {
@@ -274,7 +273,7 @@ export const filterDuplicateLocalitySpecies = async (
       return !(localityDetailsSpeciesIds.includes(localitySpecies.species_id) && localitySpecies.rowState === 'new')
     }
     // if localitySpecies doesn't have species_id (i.e. it was created with the "add new species" button in Species tab),
-    // it will never be filtered out. However, once the taxonomy check for the "add new species" button is working,
+    // it will never be filtered out. However, due to the taxonomy check for the "add new species" button,
     // it should not let the user create a duplicate species in this way.
     return true
   })
