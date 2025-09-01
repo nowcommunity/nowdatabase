@@ -50,6 +50,7 @@ export const LocalityTab = () => {
     <SelectingTable<Editable<Locality>, SpeciesDetailsType>
       buttonText="Select Locality"
       columns={columns}
+      title="Localities"
       isError={isError}
       data={localitiesData}
       fieldName="now_ls"
