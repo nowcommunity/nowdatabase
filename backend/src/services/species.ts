@@ -94,14 +94,13 @@ export const getSpeciesDetails = async (id: number) => {
       now_sau: {
         include: {
           now_sr: {
-            select: {
+            include: {
               ref_ref: {
-                select: {
+                include: {
                   ref_authors: true,
                   ref_journal: true,
                 },
               },
-              rid: true,
             },
           },
         },
