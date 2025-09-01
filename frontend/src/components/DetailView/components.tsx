@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import { Button, Box, Typography, CircularProgress, Divider, alpha, List, ListItemText } from '@mui/material'
 import ArrowBackIcon from '@mui/icons-material/ArrowBack'
 import SaveIcon from '@mui/icons-material/Save'
@@ -258,6 +258,7 @@ export const ReturnButton = () => {
   const navigate = useNavigate()
   const { setPreviousTableUrls, previousTableUrls } = usePageContext()
   const { mode, setMode } = useDetailContext()
+  const location = useLocation()
 
   if (mode.staging) {
     return (
@@ -282,6 +283,10 @@ export const ReturnButton = () => {
           newUrls.splice(-1)
           setPreviousTableUrls(newUrls)
           navigate(previousTableUrl, { relative: 'path' })
+        } else {
+          // this should only happen if the user navigates to e.g. a detail view directly with an url,
+          // instead of using link in the app
+          navigate(location.pathname.substring(0, location.pathname.indexOf('/', 1)), { relative: 'path' })
         }
       }}
     >
