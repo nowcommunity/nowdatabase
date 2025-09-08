@@ -1,13 +1,14 @@
 import { SpeciesDetailsType, Species } from '@/shared/types'
 import { ArrayFrame, HalfFrames } from '@/components/DetailView/common/tabLayoutHelpers'
 import { useDetailContext } from '@/components/DetailView/Context/DetailContext'
-import { fixNullValuesInTaxonomyFields, taxonStatusOptions } from '@/util/taxonomyUtilities'
+import { fixNullValuesInTaxonomyFields } from '@/util/taxonomyUtilities'
 import { Box } from '@mui/material'
 import { SelectingTable } from '@/components/DetailView/common/SelectingTable'
 import { useGetAllSpeciesQuery } from '@/redux/speciesReducer'
 import { smallSpeciesTableColumns } from '@/common'
 import { SynonymsModal } from '../SynonymsModal'
 import { useState } from 'react'
+import { taxonStatusOptions } from '@/shared/taxonStatusOptions'
 
 export const TaxonomyTab = () => {
   const { textField, dropdown, bigTextField, editData, setEditData, mode } = useDetailContext<SpeciesDetailsType>()

@@ -1,15 +1,5 @@
 import { EditDataType, Species, SpeciesDetailsType, SpeciesSynonym } from '@/shared/types'
-import { emptyOption } from '@/components/DetailView/common/misc'
 
-export const taxonStatusOptions = [
-  emptyOption,
-  'family attrib of genus uncertain',
-  'genus attrib of species uncertain',
-  'informal species',
-  'species validity uncertain',
-  'taxonomic validity uncertain',
-  'NOW synonym',
-]
 const generateMultipleParentsError = (
   invalidField: string,
   invalidValue1: string | null,

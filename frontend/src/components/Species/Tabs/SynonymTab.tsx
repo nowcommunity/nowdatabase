@@ -69,7 +69,7 @@ export const SynonymTab = () => {
 
   const editingForm = (
     <EditingForm<Species, SpeciesDetailsType>
-      buttonText="Add new Species"
+      buttonText="Add synonym"
       formFields={formFields}
       editAction={(newSynonym: EditDataType<SpeciesSynonym>) => {
         const convertedSynonym = convertAndCheckNewSynonymTaxonomy(newSynonym)

@@ -1,3 +1,4 @@
+import { taxonStatusOptions } from '../taxonStatusOptions'
 import { EditDataType, SpeciesDetailsType } from '../types'
 import { Validators, validator } from './validator'
 
@@ -86,6 +87,14 @@ export const validateSpecies = (
           return 'when the Genus is gen., Species must be sp.'
         if (speciesName.indexOf('/') !== -1 && editData.taxonomic_status !== 'informal species')
           return 'Species must not contain a forward slash (/), unless Taxonomic Status is set to "informal species".'
+        return
+      },
+    },
+    taxonomic_status: {
+      name: 'Taxonomic Status',
+      asString: (taxonomicStatus: string) => {
+        if (!taxonStatusOptions.slice(1).includes(taxonomicStatus) && taxonomicStatus !== '')
+          return `Taxonomic Status must be one of the following: ${taxonStatusOptions.slice(1).join(', ')}, or empty.`
         return
       },
     },
