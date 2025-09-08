@@ -1,4 +1,4 @@
-# Localities
+# Species
 
 ## Required fields
 

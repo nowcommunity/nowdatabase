@@ -19,13 +19,7 @@ describe('Creating a species', () => {
     cy.get('[id=species_name-textfield]').type('testSpecies')
     cy.get('[id=unique_identifier-textfield]').type('{backspace}testUniqueIdentifier')
     cy.get('[id=write-button]').should('not.be.disabled')
-    cy.get('[id=write-button]').click()
-    cy.get('[id=write-button]').should('be.disabled')
-    cy.contains('button', 'Add existing reference').click()
-    cy.get('button[data-cy^="add-button"]').first().click()
-    cy.contains('button', 'Close').click()
-    cy.get('[id=write-button]').should('not.be.disabled')
-    cy.get('[id=write-button]').click()
+    cy.addReferenceAndSave()
 
     // tests that values are capitalised and trimmed properly
     cy.contains('Testsuperorder')
@@ -66,12 +60,7 @@ describe('Editing a species', () => {
     cy.get('[id=subfamily_name-textfield]').type('heimo')
 
     cy.get('[id=write-button]').should('not.be.disabled')
-    cy.get('[id=write-button]').click()
-    cy.contains('button', 'Add existing reference').click()
-    cy.get('button[data-cy^="add-button"]').first().click()
-    cy.contains('button', 'Close').click()
-    cy.get('[id=write-button]').should('not.be.disabled')
-    cy.get('[id=write-button]').click()
+    cy.addReferenceAndSave()
     cy.contains('Saved species entry successfully.')
     cy.contains('Modifiedgenus')
     cy.contains('modifiedspecies')
@@ -101,14 +90,8 @@ describe('Editing a species', () => {
 
     cy.get('[id=species_name-textfield]').type('newSpecies')
     cy.contains('Species: This field is required').should('not.exist')
-    cy.get('[id=write-button]').click()
 
-    cy.contains('button', 'Add existing reference').click()
-    cy.get('button[data-cy^="add-button"]').first().click()
-    cy.contains('button', 'Close').click()
-    cy.get('[id=write-button]').should('not.be.disabled')
-    cy.get('[id=write-button]').click()
-
+    cy.addReferenceAndSave()
     cy.contains('Saved species entry successfully.')
     cy.contains('Newgenus')
     cy.contains('newspecies')
@@ -126,8 +109,7 @@ describe('Taxonomy checks work', () => {
 
   it('Creating a species that already exists in database does not work', () => {
     cy.visit('/species/new')
-    cy.get('[id=copy_existing_taxonomy_button]').contains('Copy existing taxonomy')
-    cy.get('[id=copy_existing_taxonomy_button]').click()
+    cy.get('[data-cy=copy_existing_taxonomy_button]').click()
     cy.get('[data-cy=add-button-21052]').click()
     cy.contains('Close').click()
     cy.get('[id=write-button]').click()
@@ -136,8 +118,7 @@ describe('Taxonomy checks work', () => {
 
   it('Invalid main taxonomy values do not work', () => {
     cy.visit('/species/new')
-    cy.get('[id=copy_existing_taxonomy_button]').contains('Copy existing taxonomy')
-    cy.get('[id=copy_existing_taxonomy_button]').click()
+    cy.get('[data-cy=copy_existing_taxonomy_button]').click()
     cy.get('[data-cy=add-button-21052]').click()
     cy.contains('Close').click()
     cy.get('[id=unique_identifier-textfield]').type('{backspace}new identifier') // change identifier so it's not a duplicate species
@@ -158,8 +139,7 @@ describe('Taxonomy checks work', () => {
 
   it('Invalid superorder/order pair does not work', () => {
     cy.visit('/species/new')
-    cy.get('[id=copy_existing_taxonomy_button]').contains('Copy existing taxonomy')
-    cy.get('[id=copy_existing_taxonomy_button]').click()
+    cy.get('[data-cy=copy_existing_taxonomy_button]').click()
     cy.get('[data-cy=add-button-21052]').click()
     cy.contains('Close').click()
     cy.get('[id=unique_identifier-textfield]').type('{backspace}new identifier')
@@ -172,8 +152,7 @@ describe('Taxonomy checks work', () => {
 
   it('Invalid order/suborder/family trio does not work', () => {
     cy.visit('/species/new')
-    cy.get('[id=copy_existing_taxonomy_button]').contains('Copy existing taxonomy')
-    cy.get('[id=copy_existing_taxonomy_button]').click()
+    cy.get('[data-cy=copy_existing_taxonomy_button]').click()
     cy.get('[data-cy=add-button-84357]').click()
     cy.contains('Close').click()
     cy.get('[id=unique_identifier-textfield]').type('{backspace}new identifier')
@@ -187,8 +166,7 @@ describe('Taxonomy checks work', () => {
 
   it('Invalid suborder/family pair does not work', () => {
     cy.visit('/species/new')
-    cy.get('[id=copy_existing_taxonomy_button]').contains('Copy existing taxonomy')
-    cy.get('[id=copy_existing_taxonomy_button]').click()
+    cy.get('[data-cy=copy_existing_taxonomy_button]').click()
     cy.get('[data-cy=add-button-84357]').click()
     cy.contains('Close').click()
     cy.get('[id=unique_identifier-textfield]').type('{backspace}new identifier')
@@ -201,8 +179,7 @@ describe('Taxonomy checks work', () => {
 
   it('Invalid family/subfamily/genus trio does not work', () => {
     cy.visit('/species/new')
-    cy.get('[id=copy_existing_taxonomy_button]').contains('Copy existing taxonomy')
-    cy.get('[id=copy_existing_taxonomy_button]').click()
+    cy.get('[data-cy=copy_existing_taxonomy_button]').click()
     cy.get('[data-cy=add-button-23065]').click()
     cy.contains('Close').click()
     cy.get('[id=unique_identifier-textfield]').type('{backspace}new identifier')
@@ -216,8 +193,7 @@ describe('Taxonomy checks work', () => {
 
   it('Invalid subfamily/genus pair does not work', () => {
     cy.visit('/species/new')
-    cy.get('[id=copy_existing_taxonomy_button]').contains('Copy existing taxonomy')
-    cy.get('[id=copy_existing_taxonomy_button]').click()
+    cy.get('[data-cy=copy_existing_taxonomy_button]').click()
     cy.get('[data-cy=add-button-23065]').click()
     cy.contains('Close').click()
     cy.get('[id=unique_identifier-textfield]').type('{backspace}new identifier')
@@ -230,8 +206,7 @@ describe('Taxonomy checks work', () => {
 
   it('When genus is indet. species has to be indet.', () => {
     cy.visit('/species/new')
-    cy.get('[id=copy_existing_taxonomy_button]').contains('Copy existing taxonomy')
-    cy.get('[id=copy_existing_taxonomy_button]').click()
+    cy.get('[data-cy=copy_existing_taxonomy_button]').click()
     cy.get('[data-cy=add-button-21052]').click()
     cy.contains('Close').click()
     cy.get('[id=unique_identifier-textfield]').type('{backspace}new identifier')
@@ -246,8 +221,7 @@ describe('Taxonomy checks work', () => {
 
   it('When genus is gen. species has to be sp.', () => {
     cy.visit('/species/new')
-    cy.get('[id=copy_existing_taxonomy_button]').contains('Copy existing taxonomy')
-    cy.get('[id=copy_existing_taxonomy_button]').click()
+    cy.get('[data-cy=copy_existing_taxonomy_button]').click()
     cy.get('[data-cy=add-button-21052]').click()
     cy.contains('Close').click()
     cy.get('[id=unique_identifier-textfield]').type('{backspace}new identifier')

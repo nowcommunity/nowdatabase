@@ -28,7 +28,8 @@ const localitiesApi = api.injectEndpoints({
         method: 'PUT',
         body: { locality },
       }),
-      invalidatesTags: (result, _error, { lid }) => (result ? [{ type: 'locality', id: lid }, 'localities'] : []),
+      invalidatesTags: (result, _error, { lid }) =>
+        result ? [{ type: 'locality', id: lid }, 'localities', 'specieslist'] : [],
     }),
     deleteLocality: builder.mutation<void, number>({
       query: id => ({
