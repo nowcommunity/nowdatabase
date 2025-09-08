@@ -346,6 +346,7 @@ export const fixNullValuesInTaxonomyFields = (species: Species | SpeciesDetailsT
     subclass_or_superorder_name: species.subclass_or_superorder_name ?? '',
     suborder_or_superfamily_name: species.suborder_or_superfamily_name ?? '',
     subfamily_name: species.subfamily_name ?? '',
+    taxonomic_status: species.taxonomic_status ?? '',
   }
 }
 

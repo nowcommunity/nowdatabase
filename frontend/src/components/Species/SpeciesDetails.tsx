@@ -41,7 +41,7 @@ export const SpeciesDetails = () => {
   }, [deleteSuccess, deleteError, notify, navigate])
 
   useEffect(() => {
-    // changes subclass, suborder, and subfamily from null to empty string to make validators work
+    // changes subclass, suborder, subfamily and taxonomic_status from null to empty string to make validators work
     // this should be removed if validators are improved in the future
     if (data) {
       const fixedSpeciesData = fixNullValuesInTaxonomyFields(data)
