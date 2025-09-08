@@ -81,6 +81,7 @@ export const validateSpecies = (
       name: 'Species',
       required: true,
       asString: (speciesName: string) => {
+        if (speciesName.indexOf(' ') !== -1) return 'Species name must not contain any spaces.'
         if (speciesName !== 'indet.' && editData.genus_name === 'indet.')
           return 'when the Genus is indet., Species must also be indet.'
         if (speciesName !== 'sp.' && editData.genus_name === 'gen.')
