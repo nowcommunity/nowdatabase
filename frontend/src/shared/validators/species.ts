@@ -95,7 +95,7 @@ export const validateSpecies = (
       name: 'Taxonomic Status',
       asString: (taxonomicStatus: string) => {
         if (!taxonStatusOptions.slice(1).includes(taxonomicStatus) && taxonomicStatus !== '')
-          return `Taxonomic Status must be one of the following: ${taxonStatusOptions.slice(1).join(', ')}, or empty.`
+          return `Taxonomic Status must be one of the following (or left empty): ${taxonStatusOptions.slice(1).join(', ')}.`
         return
       },
     },
