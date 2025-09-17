@@ -1,15 +1,17 @@
 import { MRT_RowData, MRT_TableInstance } from 'material-react-table'
 import { mkConfig, generateCsv, download } from 'export-to-csv'
 import { AcceptedData } from 'node_modules/export-to-csv/output/lib/types'
+import { currentDateAsString } from '@/shared/currentDateAsString'
 
 export type ExportFn<T> = (data: T) => { [k: string]: AcceptedData }
 
-export const exportRows = <T extends MRT_RowData>(table: MRT_TableInstance<T>) => {
+export const exportRows = <T extends MRT_RowData>(table: MRT_TableInstance<T>, tableName: string) => {
   const csvConfig = mkConfig({
     fieldSeparator: ',',
     decimalSeparator: '.',
     useKeysAsHeaders: true,
     quoteStrings: true, // If true, will wrap all values in double quotes
+    filename: `${tableName.toLowerCase()}-${currentDateAsString()}`,
   })
   const rowData = table.getPrePaginationRowModel().rows.map(row => {
     const r = {} as Record<string, AcceptedData>

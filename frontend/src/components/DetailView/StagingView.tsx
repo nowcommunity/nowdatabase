@@ -25,6 +25,7 @@ export const StagingView = <T extends MRT_RowData>() => {
         <SelectingTable<Reference, T>
           buttonText="Add existing reference"
           data={data}
+          title="References"
           isError={isError}
           columns={referenceTableColumns}
           idFieldName="rid"
