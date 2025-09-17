@@ -7,18 +7,19 @@ const speciesApi = api.injectEndpoints({
       query: () => ({
         url: `/species/all`,
       }),
-      providesTags: result => (result ? [{ type: 'specieslist' }] : []),
+      providesTags: result => (result ? [{ type: 'specieslist' }, 'speciessynonyms'] : []),
     }),
     getAllSynonyms: builder.query<SpeciesSynonym[], void>({
       query: () => ({
         url: `/species/synonyms`,
       }),
+      providesTags: result => (result ? ['speciessynonyms'] : []),
     }),
     getSpeciesDetails: builder.query<SpeciesDetailsType, string>({
       query: id => ({
         url: `/species/${id}`,
       }),
-      providesTags: result => (result ? [{ type: 'species', id: result.species_id }] : []),
+      providesTags: result => (result ? [{ type: 'species', id: result.species_id }, 'speciessynonyms'] : []),
     }),
     editSpecies: builder.mutation<SpeciesDetailsType, EditDataType<SpeciesDetailsType>>({
       query: species => ({
@@ -27,7 +28,7 @@ const speciesApi = api.injectEndpoints({
         body: { species },
       }),
       invalidatesTags: (result, _error, { species_id }) =>
-        result ? [{ type: 'species', id: species_id }, 'specieslist'] : [],
+        result ? [{ type: 'species', id: species_id }, 'specieslist', 'speciessynonyms'] : [],
     }),
     deleteSpecies: builder.mutation<void, number>({
       query: id => ({
@@ -36,15 +37,14 @@ const speciesApi = api.injectEndpoints({
       }),
 
       invalidatesTags: (result, _error, species_id) =>
-        typeof result !== 'undefined' ? [{ type: 'species', id: species_id }, 'specieslist'] : [],
+        typeof result !== 'undefined' ? [{ type: 'species', id: species_id }, 'specieslist', 'speciessynonyms'] : [],
     }),
   }),
 })
 
 export const {
   useGetAllSpeciesQuery,
-  useLazyGetAllSpeciesQuery,
-  useLazyGetAllSynonymsQuery,
+  useGetAllSynonymsQuery,
   useGetSpeciesDetailsQuery,
   useEditSpeciesMutation,
   useDeleteSpeciesMutation,

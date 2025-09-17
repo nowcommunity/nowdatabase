@@ -1,4 +1,4 @@
-### Time Bound
+### Time Bounds
 
 A Time Bound can be given the following information:
 

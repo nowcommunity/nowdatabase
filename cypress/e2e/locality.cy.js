@@ -1,3 +1,162 @@
+before('Reset database', () => {
+  cy.request(Cypress.env('databaseResetUrl'))
+})
+
+describe('Adding species in Locality -> Species tab for an existing locality', () => {
+  beforeEach('Login as admin', () => {
+    cy.login('testSu')
+  })
+
+  it('works with valid, unique species', () => {
+    cy.visit(`/locality/20920?tab=2`)
+    cy.contains('Lantian-Shuijiazui')
+    cy.get('[id=edit-button]').click()
+
+    cy.contains('Add new Species').click()
+    cy.get('[name=order_name]').type('Rodentia')
+    cy.get('[name=family_name]').type('Gliridae')
+    cy.get('[name=genus_name]').type('Simplomys')
+    cy.get('[name=species_name]').type('someSpecies')
+    cy.get('[name=unique_identifier]').type('veryunique')
+    cy.contains('Save').click()
+    cy.contains('somespecies')
+
+    cy.addReferenceAndSave()
+    cy.contains('Edited item successfully.')
+    cy.visit(`/locality/20920?tab=2`)
+    cy.contains('somespecies')
+  })
+
+  it('works through "copy species taxonomy" button', () => {
+    cy.visit(`/locality/20920?tab=2`)
+    cy.contains('Lantian-Shuijiazui')
+    cy.get('[id=edit-button]').click()
+    cy.contains('Add new Species').click()
+    cy.get('[data-cy=copy_existing_taxonomy_button]').click()
+    cy.get('[data-cy=add-button-21426]').click()
+    cy.contains('Close').click()
+    cy.get('[name=species_name]').clear()
+    cy.get('[name=species_name]').type('Newspecies')
+    cy.contains('Save').click()
+
+    cy.addReferenceAndSave()
+    cy.contains('Edited item successfully.')
+    cy.visit(`/locality/20920?tab=2`)
+    cy.contains('newspecies')
+  })
+
+  it('does not work with invalid species', () => {
+    cy.visit(`/locality/20920?tab=2`)
+    cy.contains('Lantian-Shuijiazui')
+    cy.get('[id=edit-button]').click()
+
+    cy.contains('Add new Species').click()
+    cy.clearNewSpeciesForm()
+    cy.get('[name=order_name]').type('Order with spaces')
+    cy.get('[name=family_name]').type('newfamily')
+    cy.get('[name=genus_name]').type('newgenus')
+    cy.get('[name=species_name]').type('newspecies')
+    cy.get('[name=unique_identifier]').type('veryunique')
+    cy.contains('Save').click()
+    cy.contains('Order must not contain any spaces, unless the value is "incertae sedis".')
+  })
+
+  it('does not work if the species has already been added', () => {
+    cy.visit(`/locality/20920?tab=2`)
+    cy.contains('Lantian-Shuijiazui')
+    cy.get('[id=edit-button]').click()
+
+    // adding species that already exists in the database
+    cy.contains('Add new Species').click()
+    cy.clearNewSpeciesForm()
+    cy.get('[name=order_name]').type('Rodentia')
+    cy.get('[name=family_name]').type('Gliridae')
+    cy.get('[name=genus_name]').type('Simplomys')
+    cy.get('[name=species_name]').type('Simplicidens')
+    cy.get('[name=unique_identifier]').type('-')
+    cy.contains('Save').click()
+    cy.contains('The taxon already exists in the database.')
+
+    // add new, unique species
+    cy.contains('Add new Species').click()
+    cy.clearNewSpeciesForm()
+    cy.get('[name=order_name]').type('neworder')
+    cy.get('[name=family_name]').type('newfamily')
+    cy.get('[name=genus_name]').type('newgenus')
+    cy.get('[name=species_name]').type('newspecies')
+    cy.get('[name=unique_identifier]').type('-')
+    cy.contains('Save').click()
+
+    cy.addReferenceAndSave()
+    cy.contains('Edited item successfully.')
+    cy.visit(`/locality/20920?tab=2`)
+    cy.contains('Lantian-Shuijiazui')
+    cy.get('[id=edit-button]').click()
+    cy.contains('Neworder')
+
+    // adding species that has been added earlier through "add new species" button
+    cy.contains('Add new Species').click()
+    cy.clearNewSpeciesForm()
+    cy.get('[name=order_name]').type('neworder')
+    cy.get('[name=family_name]').type('newfamily')
+    cy.get('[name=genus_name]').type('newgenus')
+    cy.get('[name=species_name]').type('newspecies')
+    cy.get('[name=unique_identifier]').type('-')
+    cy.contains('Save').click()
+    cy.contains('The taxon already exists in the database.')
+  })
+
+  it('does not work with species with invalid taxonomic order', () => {
+    cy.visit(`/locality/20920?tab=2`)
+    cy.contains('Lantian-Shuijiazui')
+    cy.get('[id=edit-button]').click()
+
+    // adding species that already exists in the database
+    cy.contains('Add new Species').click()
+    cy.clearNewSpeciesForm()
+    cy.get('[name=order_name]').type('Rodentia')
+    cy.get('[name=family_name]').type('Soricidae')
+    cy.get('[name=genus_name]').type('Simplomys')
+    cy.get('[name=species_name]').type('Simplicidens')
+    cy.get('[name=unique_identifier]').type('unique')
+    cy.contains('Save').click()
+    cy.contains('Family Soricidae belongs to order Eulipotyphla, not Rodentia.')
+    cy.contains('Genus Simplomys belongs to family Gliridae, not Soricidae.')
+
+    cy.contains('Add new Species').click()
+    cy.clearNewSpeciesForm()
+    cy.get('[name=order_name]').type('Carnivora')
+    cy.get('[name=family_name]').type('Canidae')
+    cy.get('[name=genus_name]').type('Simplomys')
+    cy.get('[name=species_name]').type('Simplicidens')
+    cy.get('[name=unique_identifier]').type('moreunique')
+    cy.contains('Save').click()
+    cy.contains('Genus Simplomys belongs to family Gliridae, not Canidae.')
+
+    cy.contains('Add new Species').click()
+    cy.clearNewSpeciesForm()
+    cy.get('[name=order_name]').type('Artiodactyla')
+    cy.get('[name=family_name]').type('Bovidae')
+    cy.get('[name=genus_name]').type('Amblycoptus')
+    cy.get('[name=species_name]').type('indet.')
+    cy.get('[name=unique_identifier]').type('uniquest')
+    cy.contains('Save').click()
+    cy.contains('Genus Amblycoptus belongs to family Soricidae, not Bovidae.')
+  })
+
+  it('does not work through "copy species taxonomy" button if nothing is changed', () => {
+    cy.visit(`/locality/20920?tab=2`)
+    cy.contains('Lantian-Shuijiazui')
+    cy.get('[id=edit-button]').click()
+    cy.contains('Add new Species').click()
+    cy.get('[data-cy=copy_existing_taxonomy_button]').click()
+    cy.get('[data-cy=add-button-21052]').click()
+    cy.contains('Close').click()
+    cy.contains('Save').click()
+    cy.contains('The taxon already exists in the database.')
+  })
+})
+
 describe('Creating a new locality', () => {
   beforeEach('Login as admin', () => {
     cy.login('testSu')
@@ -30,13 +189,8 @@ describe('Creating a new locality', () => {
     cy.get('[id=dec_long-textfield]').type('103.67')
     cy.get('[id=dms_lat-textfield]').should('have.value', '49 4 12 N')
     cy.get('[id=dms_long-textfield]').should('have.value', '103 40 12 E')
-    cy.get('[id=write-button]').click()
-    cy.get('[id=write-button]').should('be.disabled')
-    cy.contains('button', 'Add existing reference').click()
-    cy.get('button[data-cy^="add-button"]').first().click()
-    cy.contains('button', 'Close').click()
-    cy.get('[id=write-button]').should('not.be.disabled')
-    cy.get('[id=write-button]').click()
+
+    cy.addReferenceAndSave()
     cy.contains('Edited item successfully.')
     cy.contains('Bugat')
     cy.get('[id=delete-button]').should('exist')
@@ -150,15 +304,8 @@ describe('Creating a new locality', () => {
     cy.get('[id=dec_lat-textfield]').type('49.07')
     cy.get('[id=dec_long-textfield]').type('103.67')
     cy.get('[id=write-button]').should('not.be.disabled')
-    cy.get('[id=write-button]').click()
 
-    cy.get('[id=write-button]').should('be.disabled')
-    cy.contains('button', 'Add existing reference').click()
-    cy.get('button[data-cy^="add-button"]').first().click()
-    cy.contains('button', 'Close').click()
-    cy.get('[id=write-button]').should('not.be.disabled')
-    cy.get('[id=write-button]').click()
-
+    cy.addReferenceAndSave()
     cy.contains('Edited item successfully.')
     cy.contains('Bugat')
     cy.contains('8.676')
@@ -314,11 +461,8 @@ describe("Locality's coordinate selection map works", () => {
     cy.contains('Central Finland').first().click() // first item on the list
     cy.contains('Latitude: 63.05484, Longitude: 24.75291')
     cy.contains('Save').click()
-    cy.contains('Finalize entry').click()
-    cy.contains('button', 'Add existing reference').click()
-    cy.get('button[data-cy^="add-button"]').first().click()
-    cy.contains('button', 'Close').click()
-    cy.get('[id=write-button]').click()
+
+    cy.addReferenceAndSave()
     cy.visit(`/locality/20920?tab=1`)
     cy.contains('63.05484')
     cy.contains('24.75291')

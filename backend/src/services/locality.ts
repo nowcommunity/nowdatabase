@@ -1,11 +1,20 @@
-import { EditDataType, EditMetaData, LocalityDetailsType, User, Role } from '../../../frontend/src/shared/types'
+import {
+  EditDataType,
+  EditMetaData,
+  LocalityDetailsType,
+  User,
+  Role,
+  LocalitySpeciesDetailsType,
+  Editable,
+  SpeciesDetailsType,
+} from '../../../frontend/src/shared/types'
 import { validateLocality } from '../../../frontend/src/shared/validators/locality'
+import { validateSpecies } from '../../../frontend/src/shared/validators/species'
 import { ValidationObject, referenceValidator } from '../../../frontend/src/shared/validators/validator'
 import Prisma from '../../prisma/generated/now_test_client'
 import { AccessError } from '../middlewares/authorizer'
 import { fixBigInt } from '../utils/common'
 import { logDb, nowDb } from '../utils/db'
-import { logger } from '../utils/logger'
 import { getReferenceDetails } from './reference'
 
 const getIdsOfUsersProjects = async (user: User) => {
@@ -200,12 +209,24 @@ export const getLocalityDetails = async (id: number, user: User | undefined) => 
   return JSON.parse(fixBigInt(result)!) as LocalityDetailsType
 }
 
+// also validates possible new species that were added to this locality
 export const validateEntireLocality = async (editedFields: EditDataType<Prisma.now_loc> & EditMetaData) => {
   const keys = Object.keys(editedFields)
   const errors: ValidationObject[] = []
   for (const key of keys) {
     const error = validateLocality(editedFields as EditDataType<LocalityDetailsType>, key as keyof LocalityDetailsType)
     if (error.error) errors.push(error)
+  }
+  if ('now_ls' in editedFields) {
+    for (const species of editedFields.now_ls as Array<Editable<LocalitySpeciesDetailsType>>) {
+      if (species.rowState === 'new') {
+        const keys = Object.keys(species.com_species)
+        for (const key of keys) {
+          const newSpeciesError = validateSpecies(species.com_species, key as keyof SpeciesDetailsType)
+          if (newSpeciesError.error) errors.push(newSpeciesError)
+        }
+      }
+    }
   }
   let error = null
   if ('references' in editedFields && editedFields.references) {
@@ -251,12 +272,10 @@ export const filterDuplicateLocalitySpecies = async (
       // Logic is flipped for filter as we want to skip the ones the check matches
       return !(localityDetailsSpeciesIds.includes(localitySpecies.species_id) && localitySpecies.rowState === 'new')
     }
-
-    // code shouldn't get here ever
-    logger.info(
-      `Filter already existing species: localitySpecies didn't have species_id. Skipping. ${JSON.stringify(localitySpecies)}`
-    )
-    return false
+    // if localitySpecies doesn't have species_id (i.e. it was created with the "add new species" button in Species tab),
+    // it will never be filtered out. However, due to the taxonomy check for the "add new species" button,
+    // it should not let the user create a duplicate species in this way.
+    return true
   })
 
   return updatedLocalityNow_ls
