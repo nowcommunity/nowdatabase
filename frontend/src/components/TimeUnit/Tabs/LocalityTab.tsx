@@ -11,6 +11,7 @@ export const LocalityTab = () => {
   if (isError) return 'Error loading Localities.'
   if (!localitiesData) return <CircularProgress />
 
+  // changes min and max age values to checkmarks or X symbols, to show whether this time unit is set as the basis for min/max age or not
   const modifiedData = localitiesData.map(locality => {
     return {
       ...locality,
