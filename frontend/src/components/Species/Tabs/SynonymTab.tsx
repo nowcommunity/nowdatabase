@@ -7,9 +7,13 @@ import { EditingForm, EditingFormField } from '@/components/DetailView/common/Ed
 import { useNotify } from '@/hooks/notification'
 import { validateSynonym } from '@/shared/validators/synonym'
 import { convertSynonymTaxonomyFields } from '@/util/taxonomyUtilities'
+import { useGetAllSpeciesQuery } from '@/redux/speciesReducer'
+import { skipToken } from '@reduxjs/toolkit/query'
+import { CircularProgress } from '@mui/material'
 
 export const SynonymTab = () => {
   const { mode, setEditData, editData } = useDetailContext<SpeciesDetailsType>()
+  const { data: speciesQueryData, isFetching } = useGetAllSpeciesQuery(mode.read ? skipToken : undefined)
   const { notify } = useNotify()
 
   const convertAndCheckNewSynonymTaxonomy = (newSynonym: EditDataType<SpeciesSynonym>) => {
@@ -36,6 +40,21 @@ export const SynonymTab = () => {
         notify(
           `${convertedSynonym.syn_genus_name} ${convertedSynonym.syn_species_name} \
           has already been added as a synonym for this species.`,
+          'error',
+          null
+        )
+        return false
+      }
+    }
+
+    for (const existingSpecies of speciesQueryData!) {
+      if (
+        convertedSynonym.syn_genus_name === existingSpecies.genus_name &&
+        convertedSynonym.syn_species_name === existingSpecies.species_name
+      ) {
+        notify(
+          `${convertedSynonym.syn_genus_name} ${convertedSynonym.syn_species_name} \
+          has already been created as a separate species, adding it as a synonym is currently not allowed.`,
           'error',
           null
         )
@@ -87,6 +106,8 @@ export const SynonymTab = () => {
       }}
     />
   )
+
+  if (isFetching) return <CircularProgress />
 
   return (
     <>

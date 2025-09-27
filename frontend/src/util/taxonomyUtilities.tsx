@@ -19,6 +19,9 @@ const isDuplicateTaxon = (newSpecies: EditDataType<Species>, existingSpecies: Sp
     newSpecies.species_name === existingSpecies.species_name &&
     newSpecies.unique_identifier === existingSpecies.unique_identifier
   ) {
+    console.log('joo')
+    console.log(newSpecies)
+    console.log(existingSpecies)
     return true
   }
 
