@@ -11,6 +11,14 @@ export const LocalityTab = () => {
   if (isError) return 'Error loading Localities.'
   if (!localitiesData) return <CircularProgress />
 
+  const modifiedData = localitiesData.map(locality => {
+    return {
+      ...locality,
+      min_age: locality.bfa_min === data.tu_name ? '\u2713' : '\u0058',
+      max_age: locality.bfa_max === data.tu_name ? '\u2713' : '\u0058',
+    }
+  })
+
   const columns = [
     {
       accessorKey: 'loc_name',
@@ -30,5 +38,5 @@ export const LocalityTab = () => {
     },
   ]
 
-  return <SimpleTable columns={columns} data={localitiesData} idFieldName="lid" url="locality" />
+  return <SimpleTable columns={columns} data={modifiedData} idFieldName="lid" url="locality" />
 }
