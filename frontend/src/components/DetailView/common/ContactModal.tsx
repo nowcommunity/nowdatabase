@@ -22,7 +22,6 @@ export const ContactModal = ({
     setOpen(false)
   }
 
-  return <></>
   return (
     <Box>
       <Button onClick={() => setOpen(true)} variant="outlined" startIcon={<EmailIcon />} className="button">
