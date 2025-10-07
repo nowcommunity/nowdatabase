@@ -432,6 +432,21 @@ describe('Editing a locality', () => {
   })
 })
 
+describe('Locality table filtering', () => {
+  beforeEach('Login as admin', () => {
+    cy.login('testSu')
+  })
+
+  it('supports filtering by synonym names', () => {
+    cy.visit('/locality')
+    cy.contains('Name').should('be.visible')
+
+    cy.get('[aria-label="Filter by Name"]').clear().type('Bahe')
+
+    cy.contains('Lantian-Shuijiazui').should('be.visible')
+  })
+})
+
 // This test needs GEONAMES_USERNAME to be set in .anon.env!
 
 describe("Locality's coordinate selection map works", () => {

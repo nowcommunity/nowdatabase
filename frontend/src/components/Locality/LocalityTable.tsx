@@ -56,7 +56,22 @@ export const LocalityTable = ({ selectorFn }: { selectorFn?: (newObject: Localit
         accessorFn: row => row.loc_name || '',
         header: 'Name',
         enableHiding: false,
-        filterFn: 'contains',
+        filterFn: (row, columnId, filterValue) => {
+          const search =
+            typeof filterValue === 'string'
+              ? filterValue.trim().toLowerCase()
+              : Array.isArray(filterValue)
+                ? filterValue.join(' ').trim().toLowerCase()
+                : ''
+          if (!search) return true
+
+          const nameValue = `${row.getValue<string>(columnId) ?? ''}`.toLowerCase()
+          if (nameValue.includes(search)) return true
+
+          return (row.original.synonyms ?? []).some(synonym =>
+            synonym.toLowerCase().includes(search)
+          )
+        },
       },
       {
         accessorKey: 'dms_lat',
