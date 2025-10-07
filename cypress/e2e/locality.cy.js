@@ -441,7 +441,8 @@ describe('Locality table filtering', () => {
     cy.visit('/locality')
     cy.contains('Name').should('be.visible')
 
-    cy.get('[aria-label="Filter by Name"]').clear().type('Bahe')
+    cy.get('[aria-label="Filter by Name"]').clear()
+    cy.get('[aria-label="Filter by Name"]').type('Bahe')
 
     cy.contains('Lantian-Shuijiazui').should('be.visible')
   })
