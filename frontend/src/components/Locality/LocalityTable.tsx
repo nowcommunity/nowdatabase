@@ -68,9 +68,7 @@ export const LocalityTable = ({ selectorFn }: { selectorFn?: (newObject: Localit
           const nameValue = `${row.getValue<string>(columnId) ?? ''}`.toLowerCase()
           if (nameValue.includes(search)) return true
 
-          return (row.original.synonyms ?? []).some(synonym =>
-            synonym.toLowerCase().includes(search)
-          )
+          return (row.original.synonyms ?? []).some(synonym => synonym.toLowerCase().includes(search))
         },
       },
       {
