@@ -47,8 +47,8 @@ describe('Creating new locality works', () => {
     const created = body.find(locality => locality.lid === createdLocality!.lid)
 
     expect(created).toBeDefined()
-    expect(created?.has_synonym).toEqual(true)
-    expect(created?.synonyms).toEqual(expect.arrayContaining(['Shuijiazui', 'Bahe']))
+    expect(created!.has_synonym).toEqual(true)
+    expect(created!.synonyms).toEqual(expect.arrayContaining(['Shuijiazui', 'Bahe']))
   })
 
   it('Creation fails without permissions', async () => {
