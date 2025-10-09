@@ -8,12 +8,13 @@ import { useDetailContext } from './Context/DetailContext'
 import { EditDataType, Editable, Reference, Species } from '@/shared/types'
 import { useState, useEffect, Fragment } from 'react'
 import { referenceValidator } from '@/shared/validators/validator'
-import { checkTaxonomy, convertTaxonomyFields } from '../../util/taxonomyFunctions'
-import { useLazyGetAllSpeciesQuery, useLazyGetAllSynonymsQuery } from '@/redux/speciesReducer'
+import { checkSpeciesTaxonomy, convertSpeciesTaxonomyFields } from '../../util/taxonomyUtilities'
+import { useGetAllSpeciesQuery, useGetAllSynonymsQuery } from '@/redux/speciesReducer'
 import { useNotify } from '@/hooks/notification'
 import { countryBoundingBoxes } from '@/country_data/countryBoundingBoxes'
 import { boundingBoxSplit, isPointInBoxes } from '@/util/isPointInBox'
 import { OutOfBoundsWarningModal, OutOfBoundsWarningModalState } from './OutOfBoundsWarningModal'
+import { skipToken } from '@reduxjs/toolkit/query'
 
 export const WriteButton = <T,>({
   onWrite,
@@ -28,8 +29,8 @@ export const WriteButton = <T,>({
     useDetailContext<T>()
   const [loading, setLoading] = useState(false)
   const { notify } = useNotify()
-  const [getSpeciesData] = useLazyGetAllSpeciesQuery()
-  const [getSynonyms] = useLazyGetAllSynonymsQuery()
+  const { data: speciesData } = useGetAllSpeciesQuery(!taxonomy ? skipToken : undefined)
+  const { data: synonymData } = useGetAllSynonymsQuery(!taxonomy ? skipToken : undefined)
 
   // For coordinate out of bounds warning
   const [warningModalState, setWarningModalState] = useState<OutOfBoundsWarningModalState>({
@@ -49,6 +50,11 @@ export const WriteButton = <T,>({
     if (!(country in countryBoundingBoxes)) return false
     return !isPointInBoxes(dec_lat, dec_long, boundingBoxSplit(countryBoundingBoxes[country]))
   }
+
+  useEffect(() => {
+    if (taxonomy && (!speciesData || !synonymData)) setLoading(true)
+    else setLoading(false)
+  }, [speciesData, synonymData])
 
   /*  validates all fields when entering new/editing mode
       to disable write button when unvisited tabs have
@@ -107,23 +113,21 @@ export const WriteButton = <T,>({
     // @ts-expect-error Reason: Typescript doesn't recognise that references do exist. Unable to find a way around it. Fix if extra time
   }, [mode, editData.references])
 
-  const writeWithTaxonomyCheck = async () => {
+  const writeWithTaxonomyCheck = () => {
     let speciesEditData: EditDataType<Species> | undefined = undefined
 
     if (!mode.staging) {
-      const { data: speciesData } = await getSpeciesData(undefined, true)
-      const { data: synonyms } = await getSynonyms(undefined, true)
       if (!speciesData) {
         notify('Could not fetch species to check taxonomy data.', 'error')
         return
       }
-      if (!synonyms) {
+      if (!synonymData) {
         notify('Could not fetch synonyms to check taxonomy data.', 'error')
         return
       }
       // converts taxonomy fields to capitalized/lowercased
-      speciesEditData = convertTaxonomyFields(editData as EditDataType<Species>)
-      const errors = checkTaxonomy(speciesEditData, speciesData, synonyms)
+      speciesEditData = convertSpeciesTaxonomyFields(editData as EditDataType<Species>)
+      const errors = checkSpeciesTaxonomy(speciesEditData, speciesData, synonymData)
       if (errors.size > 0) {
         const errorMessage = [...errors].reduce((acc, currentError) => acc + `\n${currentError}`)
         notify(errorMessage, 'error', null)
@@ -144,10 +148,10 @@ export const WriteButton = <T,>({
     })
   }
 
-  const handleWriteButtonClick = async () => {
+  const handleWriteButtonClick = () => {
     if (taxonomy) {
       setLoading(true)
-      await writeWithTaxonomyCheck()
+      writeWithTaxonomyCheck()
       setLoading(false)
       return
     }
@@ -186,13 +190,13 @@ export const WriteButton = <T,>({
             !('dec_long' in (editData as object)) ||
             !('country' in (editData as object))
           ) {
-            void handleWriteButtonClick()
+            handleWriteButtonClick()
             return
           }
 
           const localityObject = editData as unknown as { dec_lat: number; dec_long: number; country: string }
           if (!isCoordinateOutOfBounds(localityObject.dec_lat, localityObject.dec_long, localityObject.country)) {
-            void handleWriteButtonClick()
+            handleWriteButtonClick()
             return
           }
 
