@@ -12,6 +12,7 @@ give an array in prop "selectedValues" that contains the string values
 that already exist in editdata
 */
 export const SelectingTable = <T extends MRT_RowData, ParentType extends object>({
+  dataCy,
   buttonText,
   data,
   columns,
@@ -24,6 +25,7 @@ export const SelectingTable = <T extends MRT_RowData, ParentType extends object>
   isError,
   useObject,
 }: {
+  dataCy?: string
   buttonText: string
   data: T[] | undefined
   columns: MRT_ColumnDef<T>[]
@@ -71,7 +73,7 @@ export const SelectingTable = <T extends MRT_RowData, ParentType extends object>
   if (isError) return <Box>Error fetching data for the selecting table.</Box>
   if (!data) return <CircularProgress />
   return (
-    <EditingModal buttonText={buttonText}>
+    <EditingModal buttonText={buttonText} dataCy={dataCy}>
       {data ? (
         <TableView<T>
           data={filteredData}

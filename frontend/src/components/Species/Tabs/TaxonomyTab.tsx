@@ -1,13 +1,14 @@
 import { SpeciesDetailsType, Species } from '@/shared/types'
 import { ArrayFrame, HalfFrames } from '@/components/DetailView/common/tabLayoutHelpers'
 import { useDetailContext } from '@/components/DetailView/Context/DetailContext'
-import { emptyOption } from '@/components/DetailView/common/misc'
+import { fixNullValuesInTaxonomyFields } from '@/util/taxonomyUtilities'
 import { Box } from '@mui/material'
 import { SelectingTable } from '@/components/DetailView/common/SelectingTable'
 import { useGetAllSpeciesQuery } from '@/redux/speciesReducer'
 import { smallSpeciesTableColumns } from '@/common'
 import { SynonymsModal } from '../SynonymsModal'
 import { useState } from 'react'
+import { taxonStatusOptions } from '@/shared/taxonStatusOptions'
 
 export const TaxonomyTab = () => {
   const { textField, dropdown, bigTextField, editData, setEditData, mode } = useDetailContext<SpeciesDetailsType>()
@@ -21,8 +22,9 @@ export const TaxonomyTab = () => {
   }
 
   const copyTaxonomyButton = (
-    <Box key="copy_existing_taxonomy_button" id="copy_existing_taxonomy_button">
+    <Box key="copy_existing_taxonomy_button">
       <SelectingTable<Species, Species>
+        dataCy="copy_existing_taxonomy_button"
         buttonText="Copy existing taxonomy"
         data={speciesQueryData}
         title="Species"
@@ -33,32 +35,23 @@ export const TaxonomyTab = () => {
         useObject={true}
         tableRowAction={handleRowActionClick}
         editingAction={(selectedSpecies: Species) => {
+          const fixedSpecies = fixNullValuesInTaxonomyFields(selectedSpecies)
           setEditData({
             ...editData,
-            subclass_or_superorder_name: selectedSpecies.subclass_or_superorder_name ?? '',
-            order_name: selectedSpecies.order_name ?? '',
-            suborder_or_superfamily_name: selectedSpecies.suborder_or_superfamily_name ?? '',
-            family_name: selectedSpecies.family_name ?? '',
-            subfamily_name: selectedSpecies.subfamily_name ?? '',
-            genus_name: selectedSpecies.genus_name ?? '',
-            species_name: selectedSpecies.species_name ?? '',
-            unique_identifier: selectedSpecies.unique_identifier ?? '',
+            subclass_or_superorder_name: fixedSpecies.subclass_or_superorder_name,
+            order_name: fixedSpecies.order_name!,
+            suborder_or_superfamily_name: fixedSpecies.suborder_or_superfamily_name,
+            family_name: fixedSpecies.family_name!,
+            subfamily_name: fixedSpecies.subfamily_name,
+            genus_name: fixedSpecies.genus_name!,
+            species_name: fixedSpecies.species_name!,
+            unique_identifier: fixedSpecies.unique_identifier!,
           })
         }}
       />
       <SynonymsModal open={modalOpen} onClose={() => setModalOpen(false)} selectedSpecies={selectedSpecies} />
     </Box>
   )
-
-  const taxonStatusOptions = [
-    emptyOption,
-    'family attrib of genus uncertain',
-    'genus attrib of species uncertain',
-    'informal species',
-    'species validity uncertain',
-    'taxonomic validity uncertain',
-    'NOW synonym',
-  ]
 
   const classification = [
     [

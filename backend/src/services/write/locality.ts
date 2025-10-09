@@ -49,9 +49,9 @@ export const writeLocality = async (
   try {
     await writeHandler.start()
 
-    const filteredLocality = await filterDuplicateLocalitySpecies(locality, user)
-    if (updateOrAdd === 'update' && filteredLocality) {
-      locality.now_ls = filteredLocality
+    const filteredLocalities = await filterDuplicateLocalitySpecies(locality, user)
+    if (updateOrAdd === 'update' && filteredLocalities && filteredLocalities.length > 0) {
+      locality.now_ls = filteredLocalities
     }
 
     if (updateOrAdd === 'add') {
