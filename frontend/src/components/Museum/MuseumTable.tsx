@@ -64,7 +64,7 @@ export const MuseumTable = ({ selectorFn }: { selectorFn?: (museum: Museum) => v
 
   return (
     <TableView<Museum>
-      title="Museum"
+      title="Museums"
       selectorFn={selectorFn}
       idFieldName="museum"
       columns={columns}

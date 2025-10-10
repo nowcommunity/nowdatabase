@@ -27,6 +27,7 @@ export const TaxonomyTab = () => {
         dataCy="copy_existing_taxonomy_button"
         buttonText="Copy existing taxonomy"
         data={speciesQueryData}
+        title="Species"
         isError={isError}
         columns={smallSpeciesTableColumns}
         fieldName="order_name" // this doesn't do anything here but is required

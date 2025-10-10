@@ -124,6 +124,7 @@ export const AuthorTab: React.FC<AuthorTabProps> = ({ field_num_param, tab_name 
             <SelectingTable<ReferenceAuthorType, ReferenceDetailsType>
               buttonText={`Select ${buttonText}`}
               data={authorData}
+              title="Authors"
               isError={isError}
               columns={authorColumns}
               fieldName="ref_authors"
