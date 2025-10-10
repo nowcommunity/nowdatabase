@@ -1,4 +1,4 @@
-import { EditDataType, Species, SpeciesSynonym } from '@/shared/types'
+import { EditDataType, Species, SpeciesDetailsType, SpeciesSynonym } from '@/shared/types'
 
 const generateMultipleParentsError = (
   invalidField: string,
@@ -11,7 +11,10 @@ Please contact the NOW administration to fix this taxonomy.`
 
 const isDuplicateTaxon = (newSpecies: EditDataType<Species>, existingSpecies: Species) => {
   if (
-    newSpecies.species_id !== existingSpecies.species_id &&
+    // the check for undefined species_id is here to make sure you cannot add two new,
+    // identical species at the same time (e.g. in Locality -> Species -> Add new species)
+    ((newSpecies.species_id === undefined && existingSpecies.species_id === undefined) ||
+      newSpecies.species_id !== existingSpecies.species_id) &&
     newSpecies.genus_name === existingSpecies.genus_name &&
     newSpecies.species_name === existingSpecies.species_name &&
     newSpecies.unique_identifier === existingSpecies.unique_identifier
@@ -133,7 +136,7 @@ const checkSubFamilyGenus = (newSpecies: EditDataType<Species>, existingSpecies:
   )
 }
 
-export const checkTaxonomy = (
+export const checkSpeciesTaxonomy = (
   newSpecies: EditDataType<Species>,
   existingSpeciesArray: Species[],
   synonyms: SpeciesSynonym[]
@@ -314,7 +317,7 @@ const convertTaxonomyField = (value: string | null | undefined) => {
   return convertedValue
 }
 
-export const convertTaxonomyFields = (species: EditDataType<Species>) => {
+export const convertSpeciesTaxonomyFields = (species: EditDataType<Species>) => {
   const speciesName = species.species_name
   let lowercasedSpeciesName = ''
   if (speciesName) {
@@ -335,4 +338,32 @@ export const convertTaxonomyFields = (species: EditDataType<Species>) => {
     species_name: lowercasedSpeciesName,
   }
   return convertedSpecies as EditDataType<Species>
+}
+
+export const fixNullValuesInTaxonomyFields = (species: Species | SpeciesDetailsType) => {
+  return {
+    ...species,
+    subclass_or_superorder_name: species.subclass_or_superorder_name ?? '',
+    suborder_or_superfamily_name: species.suborder_or_superfamily_name ?? '',
+    subfamily_name: species.subfamily_name ?? '',
+    taxonomic_status: species.taxonomic_status ?? '',
+  }
+}
+
+export const convertSynonymTaxonomyFields = (synonym: EditDataType<SpeciesSynonym>) => {
+  const synSpeciesName = synonym.syn_species_name
+  let lowercasedSynSpeciesName = ''
+  if (synSpeciesName) {
+    if (synSpeciesName !== 'indet.') {
+      lowercasedSynSpeciesName = synSpeciesName.toLowerCase()
+    } else {
+      lowercasedSynSpeciesName = synSpeciesName
+    }
+  }
+  const convertedSynonym = {
+    ...synonym,
+    syn_genus_name: convertTaxonomyField(synonym.syn_genus_name),
+    syn_species_name: lowercasedSynSpeciesName,
+  }
+  return convertedSynonym as EditDataType<SpeciesSynonym>
 }
