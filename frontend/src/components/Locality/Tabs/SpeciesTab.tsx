@@ -44,6 +44,7 @@ export const SpeciesTab = () => {
       <SelectingTable<Species, Species>
         dataCy="copy_existing_taxonomy_button"
         buttonText="Copy existing taxonomy"
+        title="Copy existing taxonomy"
         data={speciesData}
         isError={isError}
         columns={smallSpeciesTableColumns}
