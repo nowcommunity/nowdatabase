@@ -119,7 +119,7 @@ export const emptyLocality = {
 } as unknown as LocalityDetailsType
 
 export const emptySpecies = {
-  class_name: '',
+  class_name: 'Mammalia',
   order_name: '',
   family_name: '',
   subclass_or_superorder_name: '',
@@ -128,7 +128,7 @@ export const emptySpecies = {
   genus_name: '',
   species_name: '',
   unique_identifier: '-',
-  taxonomic_status: null,
+  taxonomic_status: '',
   common_name: '',
   sp_author: '',
   strain: null,

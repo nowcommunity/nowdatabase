@@ -106,6 +106,7 @@ export const CoordinatorTab = () => {
           <SelectingTable<PersonDetailsType, RegionDetails>
             buttonText="Select Coordinator"
             data={personsData}
+            title="Coordinators"
             isError={isError}
             columns={personTableColumns}
             fieldName="now_reg_coord_people"

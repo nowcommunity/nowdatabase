@@ -57,10 +57,9 @@ export const TableView = <T extends MRT_RowData>({
   idFieldName: keyof T
   checkRowRestriction?: (row: T) => boolean
   selectorFn?: (id: T) => void
-  // here
   tableRowAction?: (row: T) => void
   url?: string
-  title?: string
+  title: string
   combinedExport?: (lids: number[]) => Promise<void>
   kmlExport?: (table: MRT_TableInstance<T>) => void
   svgExport?: (table: MRT_TableInstance<T>) => void
@@ -259,6 +258,7 @@ export const TableView = <T extends MRT_RowData>({
           {title && <Box className="title">{title}</Box>}
           <TableToolBar<T>
             table={table}
+            tableName={title}
             combinedExport={combinedExport}
             kmlExport={kmlExport}
             svgExport={svgExport}

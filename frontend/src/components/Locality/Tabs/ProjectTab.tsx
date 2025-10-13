@@ -43,6 +43,7 @@ export const ProjectTab = () => {
           <SelectingTable<Project, LocalityDetailsType>
             buttonText="Select Project"
             data={projectData}
+            title="Projects"
             columns={columns}
             isError={isError}
             idFieldName="pid"

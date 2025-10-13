@@ -9,6 +9,7 @@ import { generateKml } from '@/util/kml'
 import { generateSvg } from '../Map/generateSvg'
 import { usePageContext } from '../Page'
 import { LocalitySynonymsModal } from './LocalitySynonymsModal'
+import { currentDateAsString } from '@/shared/currentDateAsString'
 
 const decimalCount = (num: number) => {
   const numAsString = num.toString()
@@ -403,7 +404,8 @@ export const LocalityTable = ({ selectorFn }: { selectorFn?: (newObject: Localit
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
     a.href = url
-    a.download = 'localitiesWithSpecies.csv'
+
+    a.download = `localities-with-species-${currentDateAsString()}.csv`
     a.click()
   }
 
@@ -416,7 +418,7 @@ export const LocalityTable = ({ selectorFn }: { selectorFn?: (newObject: Localit
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
     a.href = url
-    a.download = 'localities.kml'
+    a.download = `localities-${currentDateAsString()}.kml`
     a.click()
   }
 
@@ -427,7 +429,7 @@ export const LocalityTable = ({ selectorFn }: { selectorFn?: (newObject: Localit
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
     a.href = url
-    a.download = 'map.svg'
+    a.download = `localities-map-${currentDateAsString()}.svg`
     a.click()
   }
 
