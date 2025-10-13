@@ -1,4 +1,4 @@
-import { ReferenceOfUpdate, UpdateLog } from '@/shared/types'
+import { AnyReference, ReferenceOfUpdate, UpdateLog } from '@/shared/types'
 import { useDetailContext } from '@/components/DetailView/Context/DetailContext'
 import { EditingModal } from '@/components/DetailView/common/EditingModal'
 import { SimpleTable } from '@/components/DetailView/common/SimpleTable'
@@ -18,9 +18,10 @@ const makeNameList = (names: Array<string | null>) => {
   return names[0] ?? ''
 }
 
-const ReferenceList = ({ references, big }: { references: ReferenceOfUpdate[]; big: boolean }) => {
+const ReferenceList = ({ references, big }: { references: AnyReference[]; big: boolean }) => {
   const getReferenceText = (ref: ReferenceOfUpdate) => {
     // php version: html/include/database.php -> referenceCitation()
+    //const ref = referenceOfUpdate.ref_ref
     const authors = makeNameList(ref.ref_authors.map(author => author.author_surname))
     const issue = ref.issue ? ` (${ref.issue}) ` : ''
     if (ref.ref_type_id === 1) {
@@ -37,6 +38,7 @@ const ReferenceList = ({ references, big }: { references: ReferenceOfUpdate[]; b
     // All other types
     return `${authors} ${ref.date_primary ? `(${ref.date_primary}). ` : ''} ${ref.title_primary?.concat('. ') ?? ''}${ref.title_secondary?.concat('. ') ?? ''}${ref.title_series?.concat('. ') ?? ''}${ref.gen_notes?.concat('.') ?? ''}`
   }
+
   return (
     <Stack>
       {references.map(ref => (
@@ -44,7 +46,7 @@ const ReferenceList = ({ references, big }: { references: ReferenceOfUpdate[]; b
           key={ref.rid}
           sx={{ padding: '0.4em', margin: '0.5em', maxWidth: big ? '50em' : '30em', backgroundColor: 'lightblue' }}
         >
-          <div style={{ wordWrap: 'break-word', whiteSpace: 'normal' }}>{getReferenceText(ref)}</div>
+          <div style={{ wordWrap: 'break-word', whiteSpace: 'normal' }}>{getReferenceText(ref.ref_ref)}</div>
           {big && (
             <div>
               <Link to={`/reference/${ref.rid}`}>View</Link>
@@ -90,10 +92,7 @@ export const UpdateTab = <T, UpdateType extends MRT_RowData & { updates: UpdateL
       accessorKey: refFieldName as string,
       header: 'Reference',
       Cell: ({ row }: { row: MRT_Row<UpdateType> }) => (
-        <ReferenceList
-          references={(row.original[refFieldName] as { ref_ref: ReferenceOfUpdate }[]).map(item => item.ref_ref)}
-          big={false}
-        />
+        <ReferenceList references={row.original[refFieldName]} big={false} />
       ),
     },
     {
@@ -105,7 +104,7 @@ export const UpdateTab = <T, UpdateType extends MRT_RowData & { updates: UpdateL
           coordinator={row.original[`${prefix}_coordinator`] as string}
           updates={row.original.updates}
           comment={row.original[`${prefix}_comment` as keyof UpdateType] as string}
-          references={row.original[refFieldName] as { ref_ref: ReferenceOfUpdate }[]}
+          references={row.original[refFieldName]}
         />
       ),
     },
@@ -118,7 +117,7 @@ export const UpdateTab = <T, UpdateType extends MRT_RowData & { updates: UpdateL
   )
 }
 
-const DetailsModal = <RefType extends { ref_ref: ReferenceOfUpdate }>({
+const DetailsModal = ({
   updates,
   references,
   comment,
@@ -127,7 +126,7 @@ const DetailsModal = <RefType extends { ref_ref: ReferenceOfUpdate }>({
   coordinator,
 }: {
   updates: UpdateLog[]
-  references: RefType[]
+  references: AnyReference[]
   comment: string
   date: Date
   authorizer: string
@@ -179,11 +178,7 @@ const DetailsModal = <RefType extends { ref_ref: ReferenceOfUpdate }>({
       </Card>
       <Divider />
       <h3>References</h3>
-      {references.length === 0 ? (
-        <Box>Update has no references.</Box>
-      ) : (
-        <ReferenceList references={references.map(ref => ref.ref_ref)} big />
-      )}
+      {references.length === 0 ? <Box>Update has no references.</Box> : <ReferenceList references={references} big />}
       <Divider />
       <h3>Changed database values</h3>
       <SimpleTable columns={columns} data={updates} />

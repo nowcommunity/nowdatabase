@@ -132,8 +132,8 @@ router.get(`/export/:columnfilters/:sorting`, async (req, res) => {
   })
   res.attachment(`cross_search${currentDateAsString()}.csv`) // filename will get overwritten in frontend when fetching data from this route
 
-  // quoteColumns is needed to make sure linebreaks do not mess up the data
-  const stream = format({ headers: true, quoteColumns: true }).transform(
+  // this should match the csvConfig in frontend exportRows() function as closely as possible
+  const stream = format({ delimiter: ',', headers: true, quoteColumns: true }).transform(
     transformFunction as FormatterRowTransformFunction<FormatterRow, FormatterRow>
   )
 
