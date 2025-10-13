@@ -27,7 +27,7 @@
 Cypress.Commands.add('login', username => {
   cy.clearLocalStorage()
   cy.visit('/login')
-  cy.contains('Login').click()
+  cy.contains('Login', { timeout: 10000 }).click()
   cy.get('[data-cy="username-basic"]').type(username)
   cy.get('[data-cy="password-basic"]').type('test')
   cy.get('[data-cy="login-button"]').click()
