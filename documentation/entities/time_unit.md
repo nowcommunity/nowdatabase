@@ -1,4 +1,4 @@
-### Time Unit
+### Time Units
 
 A Time Unit can be given the following information:
 

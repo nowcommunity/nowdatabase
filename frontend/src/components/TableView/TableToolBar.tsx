@@ -12,6 +12,7 @@ import { usePageContext } from '../Page'
 
 export const TableToolBar = <T extends MRT_RowData>({
   table,
+  tableName,
   combinedExport,
   kmlExport,
   svgExport,
@@ -21,6 +22,7 @@ export const TableToolBar = <T extends MRT_RowData>({
   showNewButton,
 }: {
   table: MRT_TableInstance<T>
+  tableName: string
   combinedExport?: (lids: number[]) => Promise<void>
   kmlExport?: (table: MRT_TableInstance<T>) => void
   svgExport?: (table: MRT_TableInstance<T>) => void
@@ -87,7 +89,7 @@ export const TableToolBar = <T extends MRT_RowData>({
           ) : (
             <MenuItem
               onClick={() => {
-                exportRows(table)
+                exportRows(table, tableName)
                 handleClose()
               }}
             >
