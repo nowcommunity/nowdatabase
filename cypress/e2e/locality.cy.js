@@ -432,6 +432,22 @@ describe('Editing a locality', () => {
   })
 })
 
+describe('Locality table filtering', () => {
+  beforeEach('Login as admin', () => {
+    cy.login('testSu')
+  })
+
+  it('supports filtering by synonym names', () => {
+    cy.visit('/locality')
+    cy.contains('Name').should('be.visible')
+
+    cy.get('[aria-label="Filter by Name"]').clear()
+    cy.get('[aria-label="Filter by Name"]').type('Bahe')
+
+    cy.contains('Lantian-Shuijiazui').should('be.visible')
+  })
+})
+
 // This test needs GEONAMES_USERNAME to be set in .anon.env!
 
 describe("Locality's coordinate selection map works", () => {
@@ -447,7 +463,8 @@ describe("Locality's coordinate selection map works", () => {
     cy.contains('Get Coordinates').click()
     cy.contains('OpenStreetMap')
     cy.contains('Leaflet')
-    cy.get('[alt="Marker"]').should('have.attr', 'src').should('include', 'marker-icon.png')
+    cy.get('[alt="Marker"]').should('have.attr', 'src')
+    cy.get('[alt="Marker"]').invoke('attr', 'src').should('include', 'marker-icon.png')
     cy.get('[id=geonames-search-textfield]').type('kum')
     cy.get('[id=geonames-search-button]').should('not.be.disabled')
     cy.get('[id=geonames-search-textfield]').type('{backspace}{backspace}{backspace}')

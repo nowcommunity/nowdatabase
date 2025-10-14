@@ -1,4 +1,4 @@
-import { Editable, LocalityDetailsType, LocalitySynonym, Locality } from '@/shared/types'
+import { Editable, LocalityDetailsType, LocalitySynonym } from '@/shared/types'
 import { useDetailContext } from '@/components/DetailView/Context/DetailContext'
 import { Grouped, ArrayFrame, HalfFrames } from '@/components/DetailView/common/tabLayoutHelpers'
 import { Box, TextField } from '@mui/material'
@@ -18,7 +18,7 @@ export const LocalityTab = () => {
     useDetailContext<LocalityDetailsType>()
   const { editData, setEditData } = useDetailContext<LocalityDetailsType>()
 
-  const locality: Locality[] = [editData as Locality]
+  const hasCoordinates = editData.dec_lat != null && editData.dec_long != null
 
   const generalLocalityOptions = [emptyOption, { display: 'No', value: 'n' }, { display: 'Yes', value: 'y' }]
 
@@ -192,7 +192,7 @@ export const LocalityTab = () => {
         >
           <ArrayFrame array={latlong} title="Latitude & Longitude" />
           <Box sx={{ width: '50%' }}>
-            {locality && <SingleLocalityMap decLat={editData.dec_lat} decLong={editData.dec_long} />}
+            {hasCoordinates && <SingleLocalityMap decLat={editData.dec_lat} decLong={editData.dec_long} />}
           </Box>
         </Box>
         {!mode.read && coordinateButton}
