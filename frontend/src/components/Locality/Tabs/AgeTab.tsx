@@ -106,7 +106,7 @@ export const AgeTab = () => {
         targetField="bfa_min"
         fraction={editData.frac_min}
         timeUnit={bfaMinData}
-        selectorTable={<TimeUnitTable />}
+        selectorTable={<TimeUnitTable clickableRows={false} />}
         disabled={minAgeTimeUnitDisabled}
       />,
       dropdown('frac_min', fracOptions, 'Minimum fraction', minAgeTimeUnitDisabled),

@@ -4,7 +4,13 @@ import { useGetAllTimeUnitsQuery } from '../../redux/timeUnitReducer'
 import { TimeUnit } from '@/shared/types'
 import { TableView } from '../TableView/TableView'
 
-export const TimeUnitTable = ({ selectorFn }: { selectorFn?: (newTimeUnit: TimeUnit) => void }) => {
+export const TimeUnitTable = ({
+  selectorFn,
+  clickableRows = true,
+}: {
+  selectorFn?: (newTimeUnit: TimeUnit) => void
+  clickableRows?: boolean
+}) => {
   const { data: timeUnitQueryData, isFetching } = useGetAllTimeUnitsQuery()
   const columns = useMemo<MRT_ColumnDef<TimeUnit>[]>(
     () => [
@@ -60,6 +66,7 @@ export const TimeUnitTable = ({ selectorFn }: { selectorFn?: (newTimeUnit: TimeU
       columns={columns}
       isFetching={isFetching}
       visibleColumns={visibleColumns}
+      clickableRows={clickableRows}
       data={timeUnitQueryData}
       url="time-unit"
       enableColumnFilterModes={true}
