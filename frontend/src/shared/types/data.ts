@@ -101,6 +101,8 @@ export type Locality = {
   regional_culture_1: string | null
   regional_culture_2: string | null
   regional_culture_3: string | null
+  has_synonym: boolean
+  synonyms: string[]
 }
 
 export type CrossSearch = {

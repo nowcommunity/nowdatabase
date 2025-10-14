@@ -1,5 +1,5 @@
 import { beforeEach, beforeAll, afterAll, describe, it, expect } from '@jest/globals'
-import { LocalityDetailsType, SpeciesDetailsType } from '../../../../frontend/src/shared/types'
+import { Locality, LocalityDetailsType, SpeciesDetailsType } from '../../../../frontend/src/shared/types'
 import { LogRow } from '../../services/write/writeOperations/types'
 import { newLocalityBasis } from './data'
 import { login, logout, resetDatabase, send, testLogRows, resetDatabaseTimeout, noPermError } from '../utils'
@@ -40,6 +40,15 @@ describe('Creating new locality works', () => {
     expect(!!newSpecies).toEqual(true) // 'New species not found'
     const oldSpecies = now_ls.find(ls => ls.species_id === 21052 && ls.lid === createdLocality!.lid)
     expect(!!oldSpecies).toEqual(true) // 'Old species not found'
+  })
+
+  it('Locality list exposes synonym data for filtering', async () => {
+    const { body } = await send<Locality[]>('locality/all', 'GET')
+    const created = body.find(locality => locality.lid === createdLocality!.lid)
+
+    expect(created).toBeDefined()
+    expect(created!.has_synonym).toEqual(true)
+    expect(created!.synonyms).toEqual(expect.arrayContaining(['Shuijiazui', 'Bahe']))
   })
 
   it('Creation fails without permissions', async () => {
