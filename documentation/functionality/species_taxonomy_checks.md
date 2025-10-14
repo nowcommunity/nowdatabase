@@ -1,8 +1,10 @@
 ### Species taxonomy checks
 
+NOTE: This document might be outdated, especially the order/content of the lists.
+
 If you are unsure how the taxonomic conventions work or what the different taxonomic fields mean, you should read [this document](https://github.com/nowcommunity/NOW-Django/wiki/Data-Conventions%3A-Taxonomic-Fields) first. (NOTE: some information might be incorrect, outdated or not implemented in the new version of the app. Once an updated document is made, it should be linked here.)
 
-When the user is creating a new species or editing an existing one, clicking the write button calls the functions inside [taxonomyFunctions.tsx](../../frontend/src/components/Species/taxonomyFunctions.tsx) in the following order:
+In edit views which have the need for a taxonomy check, the `taxonomy` prop should be given to the [WriteButton](../../frontend/src/components/DetailView/components.tsx) component. The WriteButton then runs the taxonomy checks once pressed. For example, if the user is creating a new species or editing an existing one, clicking the write button calls the functions inside [taxonomyUtilities.tsx](../../frontend/src/util/taxonomyUtilities.tsx) in the following order:
 
 1. The `convertTaxonomyFields` function formats the taxonomy values given by the user. Everything except `species_name` and `unique_identifier` begins with a capital letter, with all other letters lowercased. The exceptions to this are special values: "incertae sedis", "indet.", "fam.", "gen." and "sp.", which are left unchanged. `species_name` is fully lowercased, and `unique_identifier` is also left unchanged.
 2. The `checkTaxonomy` function ensures that the species does not already exist in the database, and that the taxonomy tree is correct. The function loops through every species in the database and for each one:
@@ -13,7 +15,7 @@ When the user is creating a new species or editing an existing one, clicking the
 
 If any of these checks fail, the creating/updating fails and the user is notified about it.
 
-The [taxonomyFunctions file](../../frontend/src/components/Species/taxonomyFunctions.tsx) has a bunch of functions named `checkXY` which check the validity of taxonomic data between fields X and Y (step 4 in the list above). For example, X could be `family` and Y could be `subfamily`, and the function `checkFamilySubfamily` returns `true` if:
+The [taxonomyUtilities file](../../frontend/src/util/taxonomyUtilities.tsx) has a bunch of functions named `checkXY` which check the validity of taxonomic data between fields X and Y (step 4 in the list above). For example, X could be `family` and Y could be `subfamily`, and the function `checkFamilySubfamily` returns `true` if:
 
 1. The new species contains both `family` and `subfamily` values
 2. These values are not "incertae sedis" or "indet."

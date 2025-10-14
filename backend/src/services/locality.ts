@@ -59,11 +59,19 @@ type LocalityPreFilter = {
   now_plr: {
     pid: number
   }[]
+  now_syn_loc: {
+    synonym: string | null
+  }[]
 }
 
 export const getAllLocalities = async (user?: User) => {
   const showAll = user && [Role.Admin, Role.EditUnrestricted].includes(user.role)
-  const removeProjects: (loc: LocalityPreFilter) => Omit<LocalityPreFilter, 'now_plr'> = loc => {
+  const removeProjects = (
+    loc: Omit<LocalityPreFilter, 'now_syn_loc'> & {
+      synonyms: string[]
+      has_synonym: boolean
+    }
+  ) => {
     const { now_plr, ...rest } = loc
     return rest
   }
@@ -123,19 +131,23 @@ export const getAllLocalities = async (user?: User) => {
       now_plr: {
         select: { pid: true },
       },
+      now_syn_loc: {
+        select: { synonym: true },
+      },
     },
   })) as LocalityPreFilter[]
 
-  const synonyms: { lid: number }[] = await nowDb.now_syn_loc.findMany({
-    select: { lid: true },
-    distinct: ['lid'],
+  const result = localityResult.map(loc => {
+    const synonyms = loc.now_syn_loc
+      .map(({ synonym }) => synonym)
+      .filter((syn): syn is string => typeof syn === 'string' && syn.trim().length > 0)
+    const { now_syn_loc, ...rest } = loc
+    return {
+      ...rest,
+      synonyms,
+      has_synonym: synonyms.length > 0,
+    }
   })
-
-  const synonymIdSet = new Set(synonyms.map(s => s.lid))
-  const result = localityResult.map(loc => ({
-    ...loc,
-    has_synonym: synonymIdSet.has(loc.lid),
-  }))
 
   if (showAll) return result.map(removeProjects)
 

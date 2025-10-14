@@ -23,9 +23,81 @@ export const getMuseumDetails = async (id: string) => {
 
   const localityIds = localityLinks.map(link => link.lid)
 
-  const localities = (await nowDb.now_loc.findMany({
+  const localitiesResult = await nowDb.now_loc.findMany({
     where: { lid: { in: localityIds } },
-  })) as Locality[]
+    select: {
+      lid: true,
+      loc_name: true,
+      bfa_max: true,
+      bfa_min: true,
+      max_age: true,
+      min_age: true,
+      bfa_max_abs: true,
+      bfa_min_abs: true,
+      frac_max: true,
+      frac_min: true,
+      chron: true,
+      age_comm: true,
+      basin: true,
+      subbasin: true,
+      dms_lat: true,
+      dms_long: true,
+      dec_lat: true,
+      dec_long: true,
+      altitude: true,
+      country: true,
+      state: true,
+      county: true,
+      appr_num_spm: true,
+      site_area: true,
+      gen_loc: true,
+      plate: true,
+      formation: true,
+      member: true,
+      bed: true,
+      loc_status: true,
+      estimate_precip: true,
+      estimate_temp: true,
+      estimate_npp: true,
+      pers_woody_cover: true,
+      pers_pollen_ap: true,
+      pers_pollen_nap: true,
+      pers_pollen_other: true,
+      hominin_skeletal_remains: true,
+      bipedal_footprints: true,
+      stone_tool_cut_marks_on_bones: true,
+      stone_tool_technology: true,
+      technological_mode_1: true,
+      technological_mode_2: true,
+      technological_mode_3: true,
+      cultural_stage_1: true,
+      cultural_stage_2: true,
+      cultural_stage_3: true,
+      regional_culture_1: true,
+      regional_culture_2: true,
+      regional_culture_3: true,
+      now_syn_loc: {
+        select: { synonym: true },
+      },
+    },
+  })
+
+  const localities: Locality[] = localitiesResult.map(locality => {
+    const synonyms = locality.now_syn_loc
+      .map(({ synonym }) => synonym)
+      .filter((syn): syn is string => typeof syn === 'string' && syn.trim().length > 0)
+
+    const { now_syn_loc, altitude, appr_num_spm, country, ...rest } = locality
+
+    return {
+      ...rest,
+      country: country ?? '',
+      altitude: altitude ?? 0,
+      appr_num_spm: appr_num_spm ?? 0,
+      synonyms,
+      has_synonym: synonyms.length > 0,
+    }
+  })
 
   const combined = {
     ...museum,
