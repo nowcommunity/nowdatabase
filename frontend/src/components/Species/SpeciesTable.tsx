@@ -1,9 +1,31 @@
 import { useMemo, useState } from 'react'
-import { type MRT_ColumnDef } from 'material-react-table'
+import { type MRT_ColumnDef, type MRT_FilterFn } from 'material-react-table'
 import { useGetAllSpeciesQuery } from '../../redux/speciesReducer'
 import { Species } from '@/shared/types'
 import { TableView } from '../TableView/TableView'
 import { SynonymsModal } from './SynonymsModal'
+
+const createSynonymAwareFilter = (type: 'genus' | 'species'): MRT_FilterFn<Species> => {
+  return (row, columnId, filterValue) => {
+    if (typeof filterValue !== 'string' || filterValue.trim().length === 0) return true
+
+    const searchValue = filterValue.trim().toLowerCase()
+    const columnValue = `${row.getValue<string | null>(columnId) || ''}`.toLowerCase()
+
+    if (columnValue.includes(searchValue)) return true
+
+    const synonyms = row.original.synonyms || []
+
+    return synonyms.some(({ synonym_name, syn_genus_name, syn_species_name }) => {
+      const candidateValues =
+        type === 'genus'
+          ? [synonym_name, syn_genus_name]
+          : [synonym_name, syn_species_name]
+
+      return candidateValues.some(value => (value ?? '').toLowerCase().includes(searchValue))
+    })
+  }
+}
 
 export const SpeciesTable = ({ selectorFn }: { selectorFn?: (id: Species) => void }) => {
   const [selectedSpecies, setSelectedSpecies] = useState<string | undefined>()
@@ -64,7 +86,7 @@ export const SpeciesTable = ({ selectorFn }: { selectorFn?: (id: Species) => voi
         header: 'Genus',
         size: 20,
         enableHiding: false,
-        filterFn: 'contains',
+        filterFn: createSynonymAwareFilter('genus'),
       },
       {
         id: 'species_name',
@@ -72,7 +94,7 @@ export const SpeciesTable = ({ selectorFn }: { selectorFn?: (id: Species) => voi
         header: 'Species',
         size: 20,
         enableHiding: false,
-        filterFn: 'contains',
+        filterFn: createSynonymAwareFilter('species'),
       },
       {
         id: 'unique_identifier',

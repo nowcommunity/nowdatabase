@@ -6,6 +6,12 @@ import { fixBigInt } from '../utils/common'
 import { logDb, nowDb } from '../utils/db'
 import { getReferenceDetails } from './reference'
 
+type SpeciesListSynonym = {
+  syn_genus_name: string | null
+  syn_species_name: string | null
+  synonym_name: string | null
+}
+
 export const getAllSpecies = async () => {
   const speciesResult = await nowDb.com_species.findMany({
     select: {
@@ -66,17 +72,38 @@ export const getAllSpecies = async () => {
     distinct: ['species_id'],
   })
 
-  const synonyms: { species_id: number }[] = await nowDb.com_taxa_synonym.findMany({
-    select: { species_id: true },
-    distinct: ['species_id'],
+  const synonyms = await nowDb.com_taxa_synonym.findMany({
+    select: {
+      species_id: true,
+      syn_genus_name: true,
+      syn_species_name: true,
+    },
   })
 
+  const synonymsBySpecies = synonyms.reduce<Map<number, SpeciesListSynonym[]>>((acc, synonym) => {
+    const synonymName = [synonym.syn_genus_name, synonym.syn_species_name]
+      .filter((value): value is string => Boolean(value && value.trim().length > 0))
+      .join(' ')
+      .trim()
+
+    const synonymEntry: SpeciesListSynonym = {
+      syn_genus_name: synonym.syn_genus_name ?? null,
+      syn_species_name: synonym.syn_species_name ?? null,
+      synonym_name: synonymName.length > 0 ? synonymName : null,
+    }
+
+    const currentSynonyms = acc.get(synonym.species_id) ?? []
+    currentSynonyms.push(synonymEntry)
+    acc.set(synonym.species_id, currentSynonyms)
+    return acc
+  }, new Map())
+
   const speciesWithLocalitySet = new Set(speciesWithLocality.map(s => s.species_id))
-  const synonymIdSet = new Set(synonyms.map(s => s.species_id))
   const result = speciesResult.map(sp => ({
     ...sp,
-    has_synonym: synonymIdSet.has(sp.species_id),
+    has_synonym: synonymsBySpecies.has(sp.species_id),
     has_no_locality: !speciesWithLocalitySet.has(sp.species_id),
+    synonyms: synonymsBySpecies.get(sp.species_id) ?? [],
   }))
 
   return result

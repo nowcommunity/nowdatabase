@@ -37,6 +37,11 @@ export type RegionCountry = Prisma.now_reg_coord_country
 export type SedimentaryStructure = Prisma.now_ss
 export type LocalitySynonym = Prisma.now_syn_loc
 export type SpeciesSynonym = Prisma.com_taxa_synonym
+export type SpeciesTableSynonym = {
+  syn_genus_name: string | null
+  syn_species_name: string | null
+  synonym_name: string | null
+}
 export type LocalityMuseum = Prisma.now_mus & { com_mlist: Museum }
 export type LocalityDetailsType = Prisma.now_loc & {
   now_mus: Array<LocalityMuseum>
@@ -335,6 +340,9 @@ export type Species = {
   locomo3: string | null
   sp_comment: string | null
   sp_author: string | null
+  has_synonym: boolean
+  has_no_locality: boolean
+  synonyms: SpeciesTableSynonym[]
 }
 
 export type RegionDetails = Prisma.now_reg_coord & { now_reg_coord_people: Array<RegionCoordinator> } & {
