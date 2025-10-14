@@ -1,6 +1,6 @@
 ### Species taxonomy checks
 
-NOTE: This document might be outdated, especially the order/content of the lists.git
+NOTE: This document might be outdated, especially the order/content of the lists.
 
 If you are unsure how the taxonomic conventions work or what the different taxonomic fields mean, you should read [this document](https://github.com/nowcommunity/NOW-Django/wiki/Data-Conventions%3A-Taxonomic-Fields) first. (NOTE: some information might be incorrect, outdated or not implemented in the new version of the app. Once an updated document is made, it should be linked here.)
 
