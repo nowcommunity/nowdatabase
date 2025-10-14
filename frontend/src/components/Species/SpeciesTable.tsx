@@ -17,10 +17,7 @@ const createSynonymAwareFilter = (type: 'genus' | 'species'): MRT_FilterFn<Speci
     const synonyms = row.original.synonyms || []
 
     return synonyms.some(({ synonym_name, syn_genus_name, syn_species_name }) => {
-      const candidateValues =
-        type === 'genus'
-          ? [synonym_name, syn_genus_name]
-          : [synonym_name, syn_species_name]
+      const candidateValues = type === 'genus' ? [synonym_name, syn_genus_name] : [synonym_name, syn_species_name]
 
       return candidateValues.some(value => (value ?? '').toLowerCase().includes(searchValue))
     })
