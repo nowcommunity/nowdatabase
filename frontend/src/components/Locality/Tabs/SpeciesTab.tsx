@@ -66,6 +66,7 @@ export const SpeciesTab = () => {
             taxonomic_status: '',
             sp_comment: '',
             sp_author: '',
+            synonyms: [],
           })
         }}
       />
@@ -200,7 +201,7 @@ export const SpeciesTab = () => {
           <EditingForm<EditDataType<Species>, LocalityDetailsType>
             buttonText="Add new Species"
             formFields={formFields}
-            existingObject={{ unique_identifier: '-' }}
+            existingObject={{ unique_identifier: '-', synonyms: [] }}
             replacedValues={replacedValues}
             copyTaxonomyButton={copyTaxonomyButton}
             editAction={(newSpecies: EditDataType<Species>) => {
