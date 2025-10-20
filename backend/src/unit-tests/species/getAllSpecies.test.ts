@@ -17,9 +17,7 @@ jest.mock('../../utils/db', () => ({
   logDb: {},
 }))
 
-const speciesFindManyMock = nowDb.com_species.findMany as jest.Mock<Promise<PrismaSpeciesRow[]>, []>
-const nowLsFindManyMock = nowDb.now_ls.findMany as jest.Mock<Promise<PrismaNowLsRow[]>, []>
-const synonymFindManyMock = nowDb.com_taxa_synonym.findMany as jest.Mock<Promise<PrismaSpeciesSynonymRow[]>, []>
+const mockedNowDb = jest.mocked(nowDb, true)
 
 describe('getAllSpecies', () => {
   const speciesRow = (overrides: Partial<PrismaSpeciesRow> = {}): PrismaSpeciesRow => {
@@ -87,9 +85,12 @@ describe('getAllSpecies', () => {
       species_name: 'lupus',
     }
 
-    speciesFindManyMock.mockResolvedValue([speciesRow(firstSpeciesOverrides), speciesRow(secondSpeciesOverrides)])
-    nowLsFindManyMock.mockResolvedValue([{ species_id: 1 }])
-    synonymFindManyMock.mockResolvedValue([
+    mockedNowDb.com_species.findMany.mockResolvedValue([
+      speciesRow(firstSpeciesOverrides),
+      speciesRow(secondSpeciesOverrides),
+    ])
+    mockedNowDb.now_ls.findMany.mockResolvedValue([{ species_id: 1 }])
+    mockedNowDb.com_taxa_synonym.findMany.mockResolvedValue([
       {
         species_id: 2,
         syn_genus_name: 'Lupus',
