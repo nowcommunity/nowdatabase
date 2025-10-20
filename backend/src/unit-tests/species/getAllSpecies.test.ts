@@ -16,8 +16,8 @@ jest.mock('../../utils/db', () => ({
 type PrismaSpeciesRow = com_species
 
 describe('getAllSpecies', () => {
-  const speciesRow = (overrides: Partial<PrismaSpeciesRow> = {}): PrismaSpeciesRow =>
-    ({
+  const speciesRow = (overrides: Partial<PrismaSpeciesRow> = {}): PrismaSpeciesRow => {
+    const base: PrismaSpeciesRow = {
       species_id: 1,
       order_name: null,
       family_name: null,
@@ -60,8 +60,10 @@ describe('getAllSpecies', () => {
       locomo2: null,
       locomo3: null,
       sp_comment: null,
-      ...overrides,
-    }) as PrismaSpeciesRow
+    }
+
+    return { ...base, ...overrides }
+  }
 
   beforeEach(() => {
     jest.resetAllMocks()
