@@ -1,11 +1,25 @@
 import { useMemo, useState } from 'react'
-import { type MRT_ColumnDef, type MRT_FilterFns, type MRT_FilterFn } from 'material-react-table'
+import { type MRT_ColumnDef, type MRT_FilterFn } from 'material-react-table'
 import { useGetAllSpeciesQuery } from '../../redux/speciesReducer'
 import { Species } from '@/shared/types'
 import { TableView } from '../TableView/TableView'
 import { SynonymsModal } from './SynonymsModal'
 
-const normalizeFilterValue = (value: unknown) => value?.toString().toLowerCase().trim() ?? ''
+const normalizeFilterValue = (value: unknown): string => {
+  if (typeof value === 'string') {
+    return value.toLowerCase().trim()
+  }
+
+  if (typeof value === 'number' || typeof value === 'boolean') {
+    return value.toString().toLowerCase().trim()
+  }
+
+  if (value instanceof Date) {
+    return value.toISOString().toLowerCase().trim()
+  }
+
+  return ''
+}
 
 const createSynonymAwareFilter = (
   primaryKey: 'genus_name' | 'species_name',
@@ -34,7 +48,7 @@ export const SpeciesTable = ({ selectorFn }: { selectorFn?: (id: Species) => voi
   const [modalOpen, setModalOpen] = useState<boolean>(false)
   const { data: speciesQueryData, isFetching } = useGetAllSpeciesQuery()
 
-  const synonymFilterFns = useMemo<MRT_FilterFns<Species>>(
+  const synonymFilterFns = useMemo<Record<string, MRT_FilterFn<Species>>>(
     () => ({
       genusSynonymContains: createSynonymAwareFilter('genus_name', 'syn_genus_name'),
       speciesSynonymContains: createSynonymAwareFilter('species_name', 'syn_species_name'),
