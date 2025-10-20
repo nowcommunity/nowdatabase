@@ -79,18 +79,15 @@ export const getAllSpecies = async () => {
     },
   })
 
-  const synonymsBySpecies = synonyms.reduce(
-    (acc, synonymRow) => {
-      const existing = acc.get(synonymRow.species_id) ?? []
-      existing.push({
-        syn_genus_name: synonymRow.syn_genus_name,
-        syn_species_name: synonymRow.syn_species_name,
-      })
-      acc.set(synonymRow.species_id, existing)
-      return acc
-    },
-    new Map<number, SpeciesSynonym[]>()
-  )
+  const synonymsBySpecies = synonyms.reduce((acc, synonymRow) => {
+    const existing = acc.get(synonymRow.species_id) ?? []
+    existing.push({
+      syn_genus_name: synonymRow.syn_genus_name,
+      syn_species_name: synonymRow.syn_species_name,
+    })
+    acc.set(synonymRow.species_id, existing)
+    return acc
+  }, new Map<number, SpeciesSynonym[]>())
 
   const speciesWithLocalitySet = new Set(speciesWithLocality.map(s => s.species_id))
   const synonymIdSet = new Set(synonyms.map(s => s.species_id))
