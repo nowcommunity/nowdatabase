@@ -10,6 +10,7 @@ import {
   MRT_VisibilityState,
   MRT_TableInstance,
   MRT_Row,
+  type MRT_FilterFns,
 } from 'material-react-table'
 import { Box, CircularProgress, Paper, Tooltip } from '@mui/material'
 import { useLocation, useNavigate } from 'react-router-dom'
@@ -50,6 +51,7 @@ export const TableView = <T extends MRT_RowData>({
   enableColumnFilterModes,
   serverSidePagination,
   isFetching,
+  filterFns,
 }: {
   data: T[] | undefined
   columns: MRT_ColumnDef<T>[]
@@ -69,6 +71,7 @@ export const TableView = <T extends MRT_RowData>({
   enableColumnFilterModes?: boolean
   serverSidePagination?: boolean
   isFetching: boolean
+  filterFns?: MRT_FilterFns<T>
 }) => {
   const location = useLocation()
   const {
@@ -207,6 +210,7 @@ export const TableView = <T extends MRT_RowData>({
     enableHiding: true,
     enableTopToolbar: false,
     renderToolbarInternalActions: () => <></>,
+    filterFns,
     // renderToolbarInternalActions: selectorFn ? renderCustomToolbarModalVersion : renderCustomToolbar,
   })
 

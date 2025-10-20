@@ -1,14 +1,46 @@
 import { useMemo, useState } from 'react'
-import { type MRT_ColumnDef } from 'material-react-table'
+import { type MRT_ColumnDef, type MRT_FilterFns, type MRT_FilterFn } from 'material-react-table'
 import { useGetAllSpeciesQuery } from '../../redux/speciesReducer'
 import { Species } from '@/shared/types'
 import { TableView } from '../TableView/TableView'
 import { SynonymsModal } from './SynonymsModal'
 
+const normalizeFilterValue = (value: unknown) => value?.toString().toLowerCase().trim() ?? ''
+
+const createSynonymAwareFilter = (
+  primaryKey: 'genus_name' | 'species_name',
+  synonymKey: 'syn_genus_name' | 'syn_species_name'
+): MRT_FilterFn<Species> => {
+  return (row, _columnId, filterValue) => {
+    const normalizedFilter = normalizeFilterValue(filterValue)
+    if (!normalizedFilter) {
+      return true
+    }
+
+    const primaryValue = row.original[primaryKey]?.toLowerCase() ?? ''
+    if (primaryValue.includes(normalizedFilter)) {
+      return true
+    }
+
+    return (row.original.synonyms ?? []).some(synonym => {
+      const synonymValue = synonym[synonymKey]?.toLowerCase()
+      return synonymValue ? synonymValue.includes(normalizedFilter) : false
+    })
+  }
+}
+
 export const SpeciesTable = ({ selectorFn }: { selectorFn?: (id: Species) => void }) => {
   const [selectedSpecies, setSelectedSpecies] = useState<string | undefined>()
   const [modalOpen, setModalOpen] = useState<boolean>(false)
   const { data: speciesQueryData, isFetching } = useGetAllSpeciesQuery()
+
+  const synonymFilterFns = useMemo<MRT_FilterFns<Species>>(
+    () => ({
+      genusSynonymContains: createSynonymAwareFilter('genus_name', 'syn_genus_name'),
+      speciesSynonymContains: createSynonymAwareFilter('species_name', 'syn_species_name'),
+    }),
+    []
+  )
 
   const handleSpeciesRowActionClick = (row: Species) => {
     setSelectedSpecies(row.species_id.toString())
@@ -64,7 +96,8 @@ export const SpeciesTable = ({ selectorFn }: { selectorFn?: (id: Species) => voi
         header: 'Genus',
         size: 20,
         enableHiding: false,
-        filterFn: 'contains',
+        filterFn: 'genusSynonymContains',
+        enableColumnFilterModes: false,
       },
       {
         id: 'species_name',
@@ -72,7 +105,8 @@ export const SpeciesTable = ({ selectorFn }: { selectorFn?: (id: Species) => voi
         header: 'Species',
         size: 20,
         enableHiding: false,
-        filterFn: 'contains',
+        filterFn: 'speciesSynonymContains',
+        enableColumnFilterModes: false,
       },
       {
         id: 'unique_identifier',
@@ -388,6 +422,7 @@ export const SpeciesTable = ({ selectorFn }: { selectorFn?: (id: Species) => voi
         url="species"
         enableColumnFilterModes={true}
         tableRowAction={handleSpeciesRowActionClick}
+        filterFns={synonymFilterFns}
       />
       <SynonymsModal open={modalOpen} onClose={() => setModalOpen(false)} selectedSpecies={selectedSpecies} />
     </>
