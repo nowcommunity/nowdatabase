@@ -70,12 +70,12 @@ describe('getAllSpecies', () => {
   })
 
   it('attaches synonym arrays and flags for each species', async () => {
-    const firstSpecies = speciesRow({
+    const firstSpecies: PrismaSpeciesRow = speciesRow({
       species_id: 1,
       genus_name: 'Panthera',
       species_name: 'leo',
     })
-    const secondSpecies = speciesRow({
+    const secondSpecies: PrismaSpeciesRow = speciesRow({
       species_id: 2,
       genus_name: 'Canis',
       species_name: 'lupus',
