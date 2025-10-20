@@ -1,7 +1,12 @@
 import { beforeEach, describe, expect, it, jest } from '@jest/globals'
 import { getAllSpecies } from '../../services/species'
 import { nowDb } from '../../utils/db'
-import type { com_species } from '../../prisma/generated/now_test_client'
+import type { com_species, com_taxa_synonym, now_ls } from '../../../prisma/generated/now_test_client'
+
+// Use the generated Prisma types to keep fixtures aligned with the schema.
+type PrismaSpeciesRow = com_species
+type PrismaNowLsRow = Pick<now_ls, 'species_id'>
+type PrismaSpeciesSynonymRow = Pick<com_taxa_synonym, 'species_id' | 'syn_genus_name' | 'syn_species_name'>
 
 jest.mock('../../utils/db', () => ({
   nowDb: {
@@ -12,8 +17,9 @@ jest.mock('../../utils/db', () => ({
   logDb: {},
 }))
 
-// Use the generated Prisma type to keep tests aligned with the real schema
-type PrismaSpeciesRow = com_species
+const speciesFindManyMock = nowDb.com_species.findMany as jest.Mock<Promise<PrismaSpeciesRow[]>, []>
+const nowLsFindManyMock = nowDb.now_ls.findMany as jest.Mock<Promise<PrismaNowLsRow[]>, []>
+const synonymFindManyMock = nowDb.com_taxa_synonym.findMany as jest.Mock<Promise<PrismaSpeciesSynonymRow[]>, []>
 
 describe('getAllSpecies', () => {
   const speciesRow = (overrides: Partial<PrismaSpeciesRow> = {}): PrismaSpeciesRow => {
@@ -81,12 +87,9 @@ describe('getAllSpecies', () => {
       species_name: 'lupus',
     }
 
-    ;(nowDb.com_species.findMany as jest.Mock).mockResolvedValue([
-      speciesRow(firstSpeciesOverrides),
-      speciesRow(secondSpeciesOverrides),
-    ])
-    ;(nowDb.now_ls.findMany as jest.Mock).mockResolvedValue([{ species_id: 1 }])
-    ;(nowDb.com_taxa_synonym.findMany as jest.Mock).mockResolvedValue([
+    speciesFindManyMock.mockResolvedValue([speciesRow(firstSpeciesOverrides), speciesRow(secondSpeciesOverrides)])
+    nowLsFindManyMock.mockResolvedValue([{ species_id: 1 }])
+    synonymFindManyMock.mockResolvedValue([
       {
         species_id: 2,
         syn_genus_name: 'Lupus',
