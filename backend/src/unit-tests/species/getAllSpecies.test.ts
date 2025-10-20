@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, jest } from '@jest/globals'
 import { getAllSpecies } from '../../services/species'
 import { nowDb } from '../../utils/db'
-import type { com_species } from '@prisma/client'
+import type { com_species } from '../../prisma/generated/now_test_client'
 
 jest.mock('../../utils/db', () => ({
   nowDb: {
@@ -70,18 +70,21 @@ describe('getAllSpecies', () => {
   })
 
   it('attaches synonym arrays and flags for each species', async () => {
-    const firstSpecies: PrismaSpeciesRow = speciesRow({
+    const firstSpeciesOverrides: Partial<PrismaSpeciesRow> = {
       species_id: 1,
       genus_name: 'Panthera',
       species_name: 'leo',
-    })
-    const secondSpecies: PrismaSpeciesRow = speciesRow({
+    }
+    const secondSpeciesOverrides: Partial<PrismaSpeciesRow> = {
       species_id: 2,
       genus_name: 'Canis',
       species_name: 'lupus',
-    })
+    }
 
-    ;(nowDb.com_species.findMany as jest.Mock).mockResolvedValue([firstSpecies, secondSpecies])
+    ;(nowDb.com_species.findMany as jest.Mock).mockResolvedValue([
+      speciesRow(firstSpeciesOverrides),
+      speciesRow(secondSpeciesOverrides),
+    ])
     ;(nowDb.now_ls.findMany as jest.Mock).mockResolvedValue([{ species_id: 1 }])
     ;(nowDb.com_taxa_synonym.findMany as jest.Mock).mockResolvedValue([
       {
