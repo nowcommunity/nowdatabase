@@ -150,9 +150,9 @@ describe('getAllSpecies', () => {
       },
     ]
 
-    mockedNowDb.com_species.findMany.mockResolvedValue(speciesRows)
-    mockedNowDb.now_ls.findMany.mockResolvedValue(localityRows)
-    mockedNowDb.com_taxa_synonym.findMany.mockResolvedValue(synonymRows)
+    ;(mockedNowDb.com_species.findMany as jest.Mock).mockResolvedValue(speciesRows)
+    ;(mockedNowDb.now_ls.findMany as jest.Mock).mockResolvedValue(localityRows)
+    ;(mockedNowDb.com_taxa_synonym.findMany as jest.Mock).mockResolvedValue(synonymRows)
 
     const result = await getAllSpecies()
 
