@@ -63,7 +63,7 @@ jest.mock('../../utils/db', () => ({
   logDb: {},
 }))
 
-const mockedNowDb = nowDb as unknown as {
+const mockedNowDb = jest.mocked(nowDb, { shallow: true }) as unknown as {
   com_species: { findMany: jest.Mock<Promise<PrismaSpeciesRow[]>, [unknown?]> }
   now_ls: { findMany: jest.Mock<Promise<PrismaNowLsRow[]>, [unknown?]> }
   com_taxa_synonym: { findMany: jest.Mock<Promise<PrismaSpeciesSynonymRow[]>, [unknown?]> }
