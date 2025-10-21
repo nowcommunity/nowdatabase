@@ -163,7 +163,7 @@ export const TableView = <T extends MRT_RowData>({
         if (Array.isArray(columnFilter.value)) {
           return {
             ...columnFilter,
-            value: columnFilter.value.map(val => (val === null ? '' : val)),
+            value: columnFilter.value.map((val: string | number | null) => (val === null ? '' : val)),
           }
         }
         return columnFilter
