@@ -10,6 +10,7 @@ import {
   MRT_VisibilityState,
   MRT_TableInstance,
   MRT_Row,
+  type MRT_FilterFn,
 } from 'material-react-table'
 import { Box, CircularProgress, Paper, Tooltip } from '@mui/material'
 import { useLocation, useNavigate } from 'react-router-dom'
@@ -50,6 +51,7 @@ export const TableView = <T extends MRT_RowData>({
   enableColumnFilterModes,
   serverSidePagination,
   isFetching,
+  filterFns,
 }: {
   data: T[] | undefined
   columns: MRT_ColumnDef<T>[]
@@ -69,6 +71,7 @@ export const TableView = <T extends MRT_RowData>({
   enableColumnFilterModes?: boolean
   serverSidePagination?: boolean
   isFetching: boolean
+  filterFns?: Record<string, MRT_FilterFn<T>>
 }) => {
   const location = useLocation()
   const {
@@ -97,25 +100,85 @@ export const TableView = <T extends MRT_RowData>({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pagination, columnFilters, sorting])
 
+  const safeJsonParse = (value: string): unknown => {
+    try {
+      return JSON.parse(value) as unknown
+    } catch {
+      return undefined
+    }
+  }
+
+  const isColumnFiltersState = (value: unknown): value is MRT_ColumnFiltersState => {
+    return (
+      Array.isArray(value) &&
+      value.every(item => {
+        if (typeof item !== 'object' || item === null) {
+          return false
+        }
+
+        const candidate = item as { id?: unknown }
+        return typeof candidate.id === 'string'
+      })
+    )
+  }
+
+  const isSortingState = (value: unknown): value is MRT_SortingState => {
+    return (
+      Array.isArray(value) &&
+      value.every(item => {
+        if (typeof item !== 'object' || item === null) {
+          return false
+        }
+
+        const candidate = item as { id?: unknown }
+        return typeof candidate.id === 'string'
+      })
+    )
+  }
+
+  const isPaginationState = (value: unknown): value is MRT_PaginationState => {
+    if (typeof value !== 'object' || value === null) {
+      return false
+    }
+
+    const candidate = value as { pageIndex?: unknown; pageSize?: unknown }
+    return typeof candidate.pageIndex === 'number' && typeof candidate.pageSize === 'number'
+  }
+
   const loadStateFromUrl = (state: TableStateInUrl, defaultState: [] | MRT_PaginationState) => {
     const searchParams = new URLSearchParams(location.search)
     const stateFromUrl = searchParams.get(state)
     if (!stateFromUrl) return defaultState
-    const res = JSON.parse(stateFromUrl) as object
+    const parsed = safeJsonParse(stateFromUrl)
+    if (parsed === undefined) {
+      return defaultState
+    }
     if (state === 'columnfilters') {
       // The range filters are written as "null" if they are empty because undefined is not valid JSON.
       // This changes those to empty strings when loading the url to state.
-      return (res as MRT_ColumnFiltersState).map(columnFilter => {
+      if (!isColumnFiltersState(parsed)) {
+        return defaultState
+      }
+      const normalizedFilters = parsed.map(columnFilter => {
         if (Array.isArray(columnFilter.value)) {
           return {
             ...columnFilter,
-            value: columnFilter.value.map(val => (val === null ? '' : val) as unknown),
+            value: columnFilter.value.map((val: string | number | null) => (val === null ? '' : val)),
           }
         }
         return columnFilter
       })
+      return normalizedFilters
     }
-    return res
+    if (state === 'sorting') {
+      return isSortingState(parsed) ? parsed : defaultState
+    }
+
+    if (state === 'pagination') {
+      return isPaginationState(parsed) ? parsed : defaultState
+    }
+
+    return defaultState
   }
   if (title) {
     document.title = `${title}`
@@ -207,6 +270,7 @@ export const TableView = <T extends MRT_RowData>({
     enableHiding: true,
     enableTopToolbar: false,
     renderToolbarInternalActions: () => <></>,
+    filterFns,
     // renderToolbarInternalActions: selectorFn ? renderCustomToolbarModalVersion : renderCustomToolbar,
   })
 
