@@ -1,12 +1,58 @@
 import { beforeEach, describe, expect, it, jest } from '@jest/globals'
 import { getAllSpecies } from '../../services/species'
 import { nowDb } from '../../utils/db'
-import type { com_species, com_taxa_synonym, now_ls } from '../../../prisma/generated/now_test_client'
 
-// Use the generated Prisma types to keep fixtures aligned with the schema.
-type PrismaSpeciesRow = com_species
-type PrismaNowLsRow = Pick<now_ls, 'species_id'>
-type PrismaSpeciesSynonymRow = Pick<com_taxa_synonym, 'species_id' | 'syn_genus_name' | 'syn_species_name'>
+type PrismaSpeciesRow = {
+  species_id: number
+  order_name: string
+  family_name: string
+  genus_name: string
+  species_name: string
+  subclass_or_superorder_name: string | null
+  suborder_or_superfamily_name: string | null
+  subfamily_name: string | null
+  unique_identifier: string
+  taxonomic_status: string | null
+  sv_length: string | null
+  body_mass: bigint | null
+  sd_size: string | null
+  sd_display: string | null
+  tshm: string | null
+  tht: string | null
+  horizodonty: string | null
+  crowntype: string | null
+  cusp_shape: string | null
+  cusp_count_buccal: string | null
+  cusp_count_lingual: string | null
+  loph_count_lon: string | null
+  loph_count_trs: string | null
+  fct_al: string | null
+  fct_ol: string | null
+  fct_sf: string | null
+  fct_ot: string | null
+  fct_cm: string | null
+  microwear: string | null
+  mesowear: string | null
+  mw_or_high: number | null
+  mw_or_low: number | null
+  mw_cs_sharp: number | null
+  mw_cs_round: number | null
+  mw_cs_blunt: number | null
+  diet1: string | null
+  diet2: string | null
+  diet3: string | null
+  locomo1: string | null
+  locomo2: string | null
+  locomo3: string | null
+  sp_comment: string | null
+}
+
+type PrismaNowLsRow = { species_id: number }
+type PrismaSpeciesSynonymRow = {
+  species_id: number
+  syn_genus_name: string | null
+  syn_species_name: string | null
+}
 
 jest.mock('../../utils/db', () => ({
   nowDb: {
@@ -17,23 +63,27 @@ jest.mock('../../utils/db', () => ({
   logDb: {},
 }))
 
-const mockedNowDb = jest.mocked(nowDb, true)
+const mockedNowDb = nowDb as unknown as {
+  com_species: { findMany: jest.Mock<Promise<PrismaSpeciesRow[]>, [unknown?]> }
+  now_ls: { findMany: jest.Mock<Promise<PrismaNowLsRow[]>, [unknown?]> }
+  com_taxa_synonym: { findMany: jest.Mock<Promise<PrismaSpeciesSynonymRow[]>, [unknown?]> }
+}
 
 describe('getAllSpecies', () => {
   const speciesRow = (overrides: Partial<PrismaSpeciesRow> = {}): PrismaSpeciesRow => {
     const base: PrismaSpeciesRow = {
       species_id: 1,
-      order_name: null,
-      family_name: null,
-      genus_name: null,
-      species_name: null,
+      order_name: '',
+      family_name: '',
+      genus_name: '',
+      species_name: '',
       subclass_or_superorder_name: null,
       suborder_or_superfamily_name: null,
       subfamily_name: null,
-      unique_identifier: null,
+      unique_identifier: '',
       taxonomic_status: null,
       sv_length: null,
-      body_mass: 0,
+      body_mass: null,
       sd_size: null,
       sd_display: null,
       tshm: null,
@@ -52,11 +102,11 @@ describe('getAllSpecies', () => {
       fct_cm: null,
       microwear: null,
       mesowear: null,
-      mw_or_high: 0,
-      mw_or_low: 0,
-      mw_cs_sharp: 0,
-      mw_cs_round: 0,
-      mw_cs_blunt: 0,
+      mw_or_high: null,
+      mw_or_low: null,
+      mw_cs_sharp: null,
+      mw_cs_round: null,
+      mw_cs_blunt: null,
       diet1: null,
       diet2: null,
       diet3: null,
@@ -85,12 +135,9 @@ describe('getAllSpecies', () => {
       species_name: 'lupus',
     }
 
-    mockedNowDb.com_species.findMany.mockResolvedValue([
-      speciesRow(firstSpeciesOverrides),
-      speciesRow(secondSpeciesOverrides),
-    ])
-    mockedNowDb.now_ls.findMany.mockResolvedValue([{ species_id: 1 }])
-    mockedNowDb.com_taxa_synonym.findMany.mockResolvedValue([
+    const speciesRows: PrismaSpeciesRow[] = [speciesRow(firstSpeciesOverrides), speciesRow(secondSpeciesOverrides)]
+    const localityRows: PrismaNowLsRow[] = [{ species_id: 1 }]
+    const synonymRows: PrismaSpeciesSynonymRow[] = [
       {
         species_id: 2,
         syn_genus_name: 'Lupus',
@@ -101,7 +148,11 @@ describe('getAllSpecies', () => {
         syn_genus_name: 'Canis',
         syn_species_name: 'domesticus',
       },
-    ])
+    ]
+
+    mockedNowDb.com_species.findMany.mockResolvedValue(speciesRows)
+    mockedNowDb.now_ls.findMany.mockResolvedValue(localityRows)
+    mockedNowDb.com_taxa_synonym.findMany.mockResolvedValue(synonymRows)
 
     const result = await getAllSpecies()
 
