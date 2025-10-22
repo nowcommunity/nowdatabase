@@ -57,17 +57,12 @@ type PrismaSpeciesSynonymRow = {
 jest.mock('../../utils/db', () => ({
   nowDb: {
     com_species: { findMany: jest.fn() },
-    now_ls: { findMany: jest.fn() },
-    com_taxa_synonym: { findMany: jest.fn() },
+    now_ls:      { findMany: jest.fn() },
+    com_taxa_synonym: { findMany: jest.fn() }
   },
   logDb: {},
 }))
-
-const mockedNowDb = jest.mocked(nowDb, { shallow: true }) as {
-  com_species:    { findMany: jest.Mock<Promise<PrismaSpeciesRow[]>, any[]> },
-  now_ls:         { findMany: jest.Mock<Promise<PrismaNowLsRow[]>, any[]> },
-  com_taxa_synonym: { findMany: jest.Mock<Promise<PrismaSpeciesSynonymRow[]>, any[]> },
-}
+const mockedNowDb: jest.MockedObject<typeof nowDb> = jest.mocked(nowDb, { shallow: true })
 
 describe('getAllSpecies', () => {
   const speciesRow = (overrides: Partial<PrismaSpeciesRow> = {}): PrismaSpeciesRow => {
@@ -113,7 +108,7 @@ describe('getAllSpecies', () => {
       locomo1: null,
       locomo2: null,
       locomo3: null,
-      sp_comment: null,
+      sp_comment: null
     }
 
     return { ...base, ...overrides }
