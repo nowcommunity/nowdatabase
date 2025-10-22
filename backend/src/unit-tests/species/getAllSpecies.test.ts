@@ -1,58 +1,80 @@
 import { beforeEach, describe, expect, it, jest } from '@jest/globals'
 import { getAllSpecies } from '../../services/species'
 import { nowDb } from '../../utils/db'
+import type { Prisma } from '../../../prisma/generated/now_test_client'
 
-type PrismaSpeciesRow = {
-  species_id: number
-  order_name: string
-  family_name: string
-  genus_name: string
-  species_name: string
-  subclass_or_superorder_name: string | null
-  suborder_or_superfamily_name: string | null
-  subfamily_name: string | null
-  unique_identifier: string
-  taxonomic_status: string | null
-  sv_length: string | null
-  body_mass: bigint | null
-  sd_size: string | null
-  sd_display: string | null
-  tshm: string | null
-  tht: string | null
-  horizodonty: string | null
-  crowntype: string | null
-  cusp_shape: string | null
-  cusp_count_buccal: string | null
-  cusp_count_lingual: string | null
-  loph_count_lon: string | null
-  loph_count_trs: string | null
-  fct_al: string | null
-  fct_ol: string | null
-  fct_sf: string | null
-  fct_ot: string | null
-  fct_cm: string | null
-  microwear: string | null
-  mesowear: string | null
-  mw_or_high: number | null
-  mw_or_low: number | null
-  mw_cs_sharp: number | null
-  mw_cs_round: number | null
-  mw_cs_blunt: number | null
-  diet1: string | null
-  diet2: string | null
-  diet3: string | null
-  locomo1: string | null
-  locomo2: string | null
-  locomo3: string | null
-  sp_comment: string | null
+const speciesFindManyArgs: Parameters<typeof nowDb.com_species.findMany>[0] = {
+  select: {
+    species_id: true,
+    order_name: true,
+    family_name: true,
+    genus_name: true,
+    species_name: true,
+    subclass_or_superorder_name: true,
+    suborder_or_superfamily_name: true,
+    subfamily_name: true,
+    unique_identifier: true,
+    taxonomic_status: true,
+    sv_length: true,
+    body_mass: true,
+    sd_size: true,
+    sd_display: true,
+    tshm: true,
+    tht: true,
+    horizodonty: true,
+    crowntype: true,
+    cusp_shape: true,
+    cusp_count_buccal: true,
+    cusp_count_lingual: true,
+    loph_count_lon: true,
+    loph_count_trs: true,
+    fct_al: true,
+    fct_ol: true,
+    fct_sf: true,
+    fct_ot: true,
+    fct_cm: true,
+    microwear: true,
+    mesowear: true,
+    mw_or_high: true,
+    mw_or_low: true,
+    mw_cs_sharp: true,
+    mw_cs_round: true,
+    mw_cs_blunt: true,
+    diet1: true,
+    diet2: true,
+    diet3: true,
+    locomo1: true,
+    locomo2: true,
+    locomo3: true,
+    sp_comment: true,
+  },
 }
 
-type PrismaNowLsRow = { species_id: number }
-type PrismaSpeciesSynonymRow = {
-  species_id: number
-  syn_genus_name: string | null
-  syn_species_name: string | null
+type PrismaSpeciesRow = Prisma.com_speciesGetPayload<typeof speciesFindManyArgs>
+
+const nowLsFindManyArgs: Parameters<typeof nowDb.now_ls.findMany>[0] = {
+  where: {
+    now_loc: {
+      NOT: undefined,
+    },
+  },
+  select: {
+    species_id: true,
+  },
+  distinct: ['species_id'],
 }
+
+type PrismaNowLsRow = Prisma.now_lsGetPayload<typeof nowLsFindManyArgs>
+
+const speciesSynonymFindManyArgs: Parameters<typeof nowDb.com_taxa_synonym.findMany>[0] = {
+  select: {
+    species_id: true,
+    syn_genus_name: true,
+    syn_species_name: true,
+  },
+}
+
+type PrismaSpeciesSynonymRow = Prisma.com_taxa_synonymGetPayload<typeof speciesSynonymFindManyArgs>
 
 jest.mock('../../utils/db', () => ({
   nowDb: {
@@ -151,6 +173,10 @@ describe('getAllSpecies', () => {
     mockedNowDb.com_taxa_synonym.findMany.mockResolvedValue(synonymRows)
 
     const result = await getAllSpecies()
+
+    expect(mockedNowDb.com_species.findMany.mock.calls[0]?.[0]).toEqual(speciesFindManyArgs)
+    expect(mockedNowDb.now_ls.findMany.mock.calls[0]?.[0]).toEqual(nowLsFindManyArgs)
+    expect(mockedNowDb.com_taxa_synonym.findMany.mock.calls[0]?.[0]).toEqual(speciesSynonymFindManyArgs)
 
     expect(result).toHaveLength(2)
 
