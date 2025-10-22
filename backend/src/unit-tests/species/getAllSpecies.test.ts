@@ -1,9 +1,9 @@
 import { beforeEach, describe, expect, it, jest } from '@jest/globals'
 import { getAllSpecies } from '../../services/species'
 import { nowDb } from '../../utils/db'
-import type { Prisma } from '../../../prisma/generated/now_test_client'
+import { Prisma } from '../../../prisma/generated/now_test_client'
 
-const speciesFindManyArgs: Parameters<typeof nowDb.com_species.findMany>[0] = {
+const speciesFindManyArgs = Prisma.validator<Prisma.com_speciesFindManyArgs>()({
   select: {
     species_id: true,
     order_name: true,
@@ -48,11 +48,11 @@ const speciesFindManyArgs: Parameters<typeof nowDb.com_species.findMany>[0] = {
     locomo3: true,
     sp_comment: true,
   },
-}
+})
 
-type PrismaSpeciesRow = Prisma.com_speciesGetPayload<typeof speciesFindManyArgs>
+type PrismaSpeciesRow = Awaited<ReturnType<typeof nowDb.com_species.findMany>>[number]
 
-const nowLsFindManyArgs: Parameters<typeof nowDb.now_ls.findMany>[0] = {
+const nowLsFindManyArgs = Prisma.validator<Prisma.now_lsFindManyArgs>()({
   where: {
     now_loc: {
       NOT: undefined,
@@ -62,19 +62,19 @@ const nowLsFindManyArgs: Parameters<typeof nowDb.now_ls.findMany>[0] = {
     species_id: true,
   },
   distinct: ['species_id'],
-}
+})
 
-type PrismaNowLsRow = Prisma.now_lsGetPayload<typeof nowLsFindManyArgs>
+type PrismaNowLsRow = Awaited<ReturnType<typeof nowDb.now_ls.findMany>>[number]
 
-const speciesSynonymFindManyArgs: Parameters<typeof nowDb.com_taxa_synonym.findMany>[0] = {
+const speciesSynonymFindManyArgs = Prisma.validator<Prisma.com_taxa_synonymFindManyArgs>()({
   select: {
     species_id: true,
     syn_genus_name: true,
     syn_species_name: true,
   },
-}
+})
 
-type PrismaSpeciesSynonymRow = Prisma.com_taxa_synonymGetPayload<typeof speciesSynonymFindManyArgs>
+type PrismaSpeciesSynonymRow = Awaited<ReturnType<typeof nowDb.com_taxa_synonym.findMany>>[number]
 
 jest.mock('../../utils/db', () => ({
   nowDb: {
@@ -85,29 +85,55 @@ jest.mock('../../utils/db', () => ({
   logDb: {},
 }))
 
-const mockedNowDb: jest.MockedObject<typeof nowDb> = jest.mocked(nowDb, { shallow: true })
+const mockedNowDb = jest.mocked(nowDb)
 
 describe('getAllSpecies', () => {
   const speciesRow = (overrides: Partial<PrismaSpeciesRow> = {}): PrismaSpeciesRow => {
     const base: PrismaSpeciesRow = {
       species_id: 1,
+      class_name: '',
       order_name: '',
       family_name: '',
-      genus_name: '',
-      species_name: '',
       subclass_or_superorder_name: null,
       suborder_or_superfamily_name: null,
       subfamily_name: null,
+      genus_name: '',
+      species_name: '',
       unique_identifier: '',
       taxonomic_status: null,
-      sv_length: null,
+      common_name: null,
+      sp_author: null,
+      strain: null,
+      gene: null,
+      taxon_status: null,
+      diet1: null,
+      diet2: null,
+      diet3: null,
+      diet_description: null,
+      rel_fib: null,
+      selectivity: null,
+      digestion: null,
+      feedinghab1: null,
+      feedinghab2: null,
+      shelterhab1: null,
+      shelterhab2: null,
+      locomo1: null,
+      locomo2: null,
+      locomo3: null,
+      hunt_forage: null,
       body_mass: null,
+      brain_mass: null,
+      sv_length: null,
+      activity: null,
       sd_size: null,
       sd_display: null,
       tshm: null,
+      symph_mob: null,
+      relative_blade_length: null,
       tht: null,
-      horizodonty: null,
       crowntype: null,
+      microwear: null,
+      horizodonty: null,
       cusp_shape: null,
       cusp_count_buccal: null,
       cusp_count_lingual: null,
@@ -118,20 +144,71 @@ describe('getAllSpecies', () => {
       fct_sf: null,
       fct_ot: null,
       fct_cm: null,
-      microwear: null,
       mesowear: null,
       mw_or_high: null,
       mw_or_low: null,
       mw_cs_sharp: null,
       mw_cs_round: null,
       mw_cs_blunt: null,
-      diet1: null,
-      diet2: null,
-      diet3: null,
-      locomo1: null,
-      locomo2: null,
-      locomo3: null,
+      mw_scale_min: null,
+      mw_scale_max: null,
+      mw_value: null,
+      pop_struc: null,
+      sp_status: null,
+      used_morph: null,
+      used_now: null,
+      used_gene: null,
       sp_comment: null,
+    }
+
+    return { ...base, ...overrides }
+  }
+
+  const localityRow = (overrides: Partial<PrismaNowLsRow> = {}): PrismaNowLsRow => {
+    const base: PrismaNowLsRow = {
+      lid: 1,
+      species_id: 1,
+      nis: null,
+      pct: null,
+      quad: null,
+      mni: null,
+      qua: null,
+      id_status: null,
+      orig_entry: null,
+      source_name: null,
+      body_mass: null,
+      mesowear: null,
+      mw_or_high: null,
+      mw_or_low: null,
+      mw_cs_sharp: null,
+      mw_cs_round: null,
+      mw_cs_blunt: null,
+      mw_scale_min: null,
+      mw_scale_max: null,
+      mw_value: null,
+      microwear: null,
+      dc13_mean: null,
+      dc13_n: null,
+      dc13_max: null,
+      dc13_min: null,
+      dc13_stdev: null,
+      do18_mean: null,
+      do18_n: null,
+      do18_max: null,
+      do18_min: null,
+      do18_stdev: null,
+    }
+
+    return { ...base, ...overrides }
+  }
+
+  const synonymRow = (overrides: Partial<PrismaSpeciesSynonymRow> = {}): PrismaSpeciesSynonymRow => {
+    const base: PrismaSpeciesSynonymRow = {
+      synonym_id: 1,
+      species_id: 1,
+      syn_genus_name: null,
+      syn_species_name: null,
+      syn_comment: null,
     }
 
     return { ...base, ...overrides }
@@ -154,18 +231,20 @@ describe('getAllSpecies', () => {
     }
 
     const speciesRows: PrismaSpeciesRow[] = [speciesRow(firstSpeciesOverrides), speciesRow(secondSpeciesOverrides)]
-    const localityRows: PrismaNowLsRow[] = [{ species_id: 1 }]
+    const localityRows: PrismaNowLsRow[] = [localityRow({ lid: 1, species_id: 1 })]
     const synonymRows: PrismaSpeciesSynonymRow[] = [
-      {
+      synonymRow({
+        synonym_id: 10,
         species_id: 2,
         syn_genus_name: 'Lupus',
         syn_species_name: 'familiaris',
-      },
-      {
+      }),
+      synonymRow({
+        synonym_id: 11,
         species_id: 2,
         syn_genus_name: 'Canis',
         syn_species_name: 'domesticus',
-      },
+      }),
     ]
 
     mockedNowDb.com_species.findMany.mockResolvedValue(speciesRows)
