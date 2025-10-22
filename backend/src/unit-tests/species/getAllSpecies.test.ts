@@ -47,11 +47,30 @@ type PrismaSpeciesRow = {
   sp_comment: string | null
 }
 
-type PrismaNowLsRow = { species_id: number }
+type PrismaNowLsRow = {
+  species_id: number
+  body_mass: bigint | null
+  microwear: string | null
+  mesowear: string | null
+  mw_or_high: number | null
+  mw_or_low: number | null
+  mw_cs_sharp: number | null
+  mw_cs_round: number | null
+  mw_cs_blunt: number | null
+  diet1: string | null
+  diet2: string | null
+  diet3: string | null
+  locomo1: string | null
+  locomo2: string | null
+  locomo3: string | null
+  sp_comment: string | null
+}
 type PrismaSpeciesSynonymRow = {
   species_id: number
   syn_genus_name: string | null
   syn_species_name: string | null
+  synonym_id: number
+  syn_comment: string | null
 }
 
 jest.mock('../../utils/db', () => ({
@@ -62,7 +81,7 @@ jest.mock('../../utils/db', () => ({
   },
   logDb: {},
 }))
-const mockedNowDb: jest.MockedObject<typeof nowDb> = jest.mocked(nowDb, { shallow: true })
+const mockedNowDb: jest.MockedShallow<typeof nowDb> = jest.mocked(nowDb, { shallow: true })
 
 describe('getAllSpecies', () => {
   const speciesRow = (overrides: Partial<PrismaSpeciesRow> = {}): PrismaSpeciesRow => {
