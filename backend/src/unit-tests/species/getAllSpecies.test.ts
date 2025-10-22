@@ -63,7 +63,11 @@ jest.mock('../../utils/db', () => ({
   logDb: {},
 }))
 
-const mockedNowDb: jest.MockedObject<typeof nowDb> = jest.mocked(nowDb, { shallow: true })
+const mockedNowDb = jest.mocked(nowDb, { shallow: true }) as {
+  com_species:    { findMany: jest.Mock<Promise<PrismaSpeciesRow[]>, any[]> },
+  now_ls:         { findMany: jest.Mock<Promise<PrismaNowLsRow[]>, any[]> },
+  com_taxa_synonym: { findMany: jest.Mock<Promise<PrismaSpeciesSynonymRow[]>, any[]> },
+}
 
 describe('getAllSpecies', () => {
   const speciesRow = (overrides: Partial<PrismaSpeciesRow> = {}): PrismaSpeciesRow => {
