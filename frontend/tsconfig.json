@@ -30,7 +30,7 @@
       "@shared/*": ["../shared/*"]
     }
   },
-  "include": ["src"],
+  "include": ["src", "tests"],
   "exclude": ["../backend/**/*", "./src/country_data/**"],
 
   "references": [{ "path": "./tsconfig.node.json" }]
