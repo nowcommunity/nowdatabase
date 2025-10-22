@@ -57,8 +57,8 @@ type PrismaSpeciesSynonymRow = {
 jest.mock('../../utils/db', () => ({
   nowDb: {
     com_species: { findMany: jest.fn() },
-    now_ls:      { findMany: jest.fn() },
-    com_taxa_synonym: { findMany: jest.fn() }
+    now_ls: { findMany: jest.fn() },
+    com_taxa_synonym: { findMany: jest.fn() },
   },
   logDb: {},
 }))
@@ -108,7 +108,7 @@ describe('getAllSpecies', () => {
       locomo1: null,
       locomo2: null,
       locomo3: null,
-      sp_comment: null
+      sp_comment: null,
     }
 
     return { ...base, ...overrides }
