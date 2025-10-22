@@ -13,6 +13,7 @@ import {
   type MRT_FilterFn,
 } from 'material-react-table'
 import { Box, CircularProgress, Paper, Tooltip } from '@mui/material'
+import type { FilterFn } from '@tanstack/table-core'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { ActionComponent } from './ActionComponent'
 import { usePageContext } from '../Page'
@@ -270,9 +271,7 @@ export const TableView = <T extends MRT_RowData>({
     enableHiding: true,
     enableTopToolbar: false,
     renderToolbarInternalActions: () => <></>,
-    filterFns: filterFns as
-      | Record<string, import('@tanstack/table-core').FilterFn<any>>
-      | undefined,
+    filterFns: filterFns as Record<string, FilterFn<T>> | undefined,
     // renderToolbarInternalActions: selectorFn ? renderCustomToolbarModalVersion : renderCustomToolbar,
   })
 
