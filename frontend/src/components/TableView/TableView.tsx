@@ -270,7 +270,9 @@ export const TableView = <T extends MRT_RowData>({
     enableHiding: true,
     enableTopToolbar: false,
     renderToolbarInternalActions: () => <></>,
-    filterFns,
+    filterFns: filterFns as
+      | Record<string, import('@tanstack/table-core').FilterFn<any>>
+      | undefined,
     // renderToolbarInternalActions: selectorFn ? renderCustomToolbarModalVersion : renderCustomToolbar,
   })
 
