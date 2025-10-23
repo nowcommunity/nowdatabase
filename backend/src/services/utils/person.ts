@@ -19,10 +19,7 @@ const buildFullName = (person: PersonNameSource | null | undefined) => {
   return initials && initials.length > 0 ? initials : null
 }
 
-export const getPersonDisplayName = (
-  person: PersonNameSource | null | undefined,
-  fallback?: string | null
-) => {
+export const getPersonDisplayName = (person: PersonNameSource | null | undefined, fallback?: string | null) => {
   const fullName = buildFullName(person)
   if (fullName) {
     return fullName
