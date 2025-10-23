@@ -3,7 +3,7 @@ import { EditDataType, TimeUnitDetailsType, EditMetaData } from '../../../fronte
 import { ValidationObject, referenceValidator } from '../../../frontend/src/shared/validators/validator'
 import { validateTimeUnit } from '../../../frontend/src/shared/validators/timeUnit'
 import { getReferenceDetails } from './reference'
-import { getPersonDisplayName } from './utils/person'
+import { buildPersonLookupByInitials, getPersonDisplayName, getPersonFromLookup } from './utils/person'
 
 export const getAllTimeUnits = async () => {
   const result = await nowDb.now_time_unit.findMany({
@@ -59,12 +59,6 @@ export const getTimeUnitDetails = async (id: string) => {
               },
             },
           },
-          com_people_now_tau_tau_coordinatorTocom_people: {
-            select: { first_name: true, surname: true, initials: true },
-          },
-          com_people_now_tau_tau_authorizerTocom_people: {
-            select: { first_name: true, surname: true, initials: true },
-          },
         },
       },
     },
@@ -76,9 +70,13 @@ export const getTimeUnitDetails = async (id: string) => {
 
   const logResult = await logDb.log.findMany({ where: { tuid: { in: tuids } } })
 
+  const peopleLookup = await buildPersonLookupByInitials(
+    result.now_tau.flatMap(tau => [tau.tau_coordinator, tau.tau_authorizer])
+  )
+
   result.now_tau = result.now_tau.map(tau => {
-    const coordinatorPerson = tau.com_people_now_tau_tau_coordinatorTocom_people
-    const authorizerPerson = tau.com_people_now_tau_tau_authorizerTocom_people
+    const coordinatorPerson = getPersonFromLookup(peopleLookup, tau.tau_coordinator)
+    const authorizerPerson = getPersonFromLookup(peopleLookup, tau.tau_authorizer)
 
     const updates = logResult.filter((logRow: (typeof logResult)[number]) => logRow.tuid === tau.tuid)
 

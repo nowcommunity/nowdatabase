@@ -5,7 +5,7 @@ import Prisma from '../../prisma/generated/now_test_client'
 import { fixBigInt } from '../utils/common'
 import { logDb, nowDb } from '../utils/db'
 import { getReferenceDetails } from './reference'
-import { getPersonDisplayName } from './utils/person'
+import { buildPersonLookupByInitials, getPersonDisplayName, getPersonFromLookup } from './utils/person'
 
 type SpeciesSynonym = {
   syn_genus_name: string | null
@@ -123,12 +123,6 @@ export const getSpeciesDetails = async (id: number) => {
               },
             },
           },
-          com_people_now_sau_sau_coordinatorTocom_people: {
-            select: { first_name: true, surname: true, initials: true },
-          },
-          com_people_now_sau_sau_authorizerTocom_people: {
-            select: { first_name: true, surname: true, initials: true },
-          },
         },
       },
     },
@@ -142,9 +136,13 @@ export const getSpeciesDetails = async (id: number) => {
 
   const logResult = await logDb.log.findMany({ where: { suid: { in: suids } } })
 
+  const peopleLookup = await buildPersonLookupByInitials(
+    result.now_sau.flatMap(sau => [sau.sau_coordinator, sau.sau_authorizer])
+  )
+
   result.now_sau = result.now_sau.map(sau => {
-    const coordinatorPerson = sau.com_people_now_sau_sau_coordinatorTocom_people
-    const authorizerPerson = sau.com_people_now_sau_sau_authorizerTocom_people
+    const coordinatorPerson = getPersonFromLookup(peopleLookup, sau.sau_coordinator)
+    const authorizerPerson = getPersonFromLookup(peopleLookup, sau.sau_authorizer)
 
     const updates = logResult.filter((logRow: (typeof logResult)[number]) => logRow.suid === sau.suid)
 
