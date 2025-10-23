@@ -143,21 +143,15 @@ export const getSpeciesDetails = async (id: number) => {
   const logResult = await logDb.log.findMany({ where: { suid: { in: suids } } })
 
   result.now_sau = result.now_sau.map(sau => {
-    const {
-      com_people_now_sau_sau_coordinatorTocom_people: coordinatorPerson,
-      com_people_now_sau_sau_authorizerTocom_people: authorizerPerson,
-      ...rest
-    } = sau
+    const coordinatorPerson = sau.com_people_now_sau_sau_coordinatorTocom_people
+    const authorizerPerson = sau.com_people_now_sau_sau_authorizerTocom_people
 
-    const updates = logResult.filter(logRow => logRow.suid === rest.suid)
-
-    const fallbackCoordinator = rest.sau_coordinator
-    const fallbackAuthorizer = rest.sau_authorizer
+    const updates = logResult.filter((logRow: (typeof logResult)[number]) => logRow.suid === sau.suid)
 
     return {
-      ...rest,
-      sau_coordinator: getPersonDisplayName(coordinatorPerson, fallbackCoordinator),
-      sau_authorizer: getPersonDisplayName(authorizerPerson, fallbackAuthorizer),
+      ...sau,
+      sau_coordinator: getPersonDisplayName(coordinatorPerson, sau.sau_coordinator),
+      sau_authorizer: getPersonDisplayName(authorizerPerson, sau.sau_authorizer),
       updates,
     }
   })

@@ -213,21 +213,15 @@ export const getLocalityDetails = async (id: number, user: User | undefined) => 
   const logResult = await logDb.log.findMany({ where: { luid: { in: luids } } })
 
   result.now_lau = result.now_lau.map(lau => {
-    const {
-      com_people_now_lau_lau_coordinatorTocom_people: coordinatorPerson,
-      com_people_now_lau_lau_authorizerTocom_people: authorizerPerson,
-      ...rest
-    } = lau
+    const coordinatorPerson = lau.com_people_now_lau_lau_coordinatorTocom_people
+    const authorizerPerson = lau.com_people_now_lau_lau_authorizerTocom_people
 
-    const updates = logResult.filter(logRow => logRow.luid === rest.luid)
-
-    const fallbackCoordinator = rest.lau_coordinator
-    const fallbackAuthorizer = rest.lau_authorizer
+    const updates = logResult.filter((logRow: (typeof logResult)[number]) => logRow.luid === lau.luid)
 
     return {
-      ...rest,
-      lau_coordinator: getPersonDisplayName(coordinatorPerson, fallbackCoordinator),
-      lau_authorizer: getPersonDisplayName(authorizerPerson, fallbackAuthorizer),
+      ...lau,
+      lau_coordinator: getPersonDisplayName(coordinatorPerson, lau.lau_coordinator),
+      lau_authorizer: getPersonDisplayName(authorizerPerson, lau.lau_authorizer),
       updates,
     }
   })

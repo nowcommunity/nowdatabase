@@ -4,7 +4,7 @@ const UNKNOWN_DISPLAY_NAME = 'Unknown'
 
 type PersonNameSource = Pick<Prisma.com_people, 'first_name' | 'surname' | 'initials'>
 
-const buildFullName = (person: PersonNameSource | null | undefined) => {
+const buildFullName = (person: PersonNameSource | null | undefined): string | null => {
   if (!person) return null
 
   const parts = [person.first_name, person.surname]
@@ -19,7 +19,7 @@ const buildFullName = (person: PersonNameSource | null | undefined) => {
   return initials && initials.length > 0 ? initials : null
 }
 
-export const getPersonDisplayName = (person: PersonNameSource | null | undefined, fallback?: string | null) => {
+export const getPersonDisplayName = (person: PersonNameSource | null | undefined, fallback?: string | null): string => {
   const fullName = buildFullName(person)
   if (fullName) {
     return fullName

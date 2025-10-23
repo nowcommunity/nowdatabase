@@ -53,21 +53,15 @@ export const getTimeBoundDetails = async (id: number) => {
   const logResult = await logDb.log.findMany({ where: { buid: { in: buids } } })
 
   result.now_bau = result.now_bau.map(bau => {
-    const {
-      com_people_now_bau_bau_coordinatorTocom_people: coordinatorPerson,
-      com_people_now_bau_bau_authorizerTocom_people: authorizerPerson,
-      ...rest
-    } = bau
+    const coordinatorPerson = bau.com_people_now_bau_bau_coordinatorTocom_people
+    const authorizerPerson = bau.com_people_now_bau_bau_authorizerTocom_people
 
-    const updates = logResult.filter(logRow => logRow.buid === rest.buid)
-
-    const fallbackCoordinator = rest.bau_coordinator
-    const fallbackAuthorizer = rest.bau_authorizer
+    const updates = logResult.filter((logRow: (typeof logResult)[number]) => logRow.buid === bau.buid)
 
     return {
-      ...rest,
-      bau_coordinator: getPersonDisplayName(coordinatorPerson, fallbackCoordinator),
-      bau_authorizer: getPersonDisplayName(authorizerPerson, fallbackAuthorizer),
+      ...bau,
+      bau_coordinator: getPersonDisplayName(coordinatorPerson, bau.bau_coordinator),
+      bau_authorizer: getPersonDisplayName(authorizerPerson, bau.bau_authorizer),
       updates,
     }
   })

@@ -25,7 +25,7 @@ describe('getPersonDisplayName', () => {
   it('falls back to initials when name parts missing', () => {
     const displayName = getPersonDisplayName({
       first_name: null,
-      surname: null,
+      surname: '',
       initials: 'JD',
     })
 

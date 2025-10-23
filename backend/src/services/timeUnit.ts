@@ -77,21 +77,15 @@ export const getTimeUnitDetails = async (id: string) => {
   const logResult = await logDb.log.findMany({ where: { tuid: { in: tuids } } })
 
   result.now_tau = result.now_tau.map(tau => {
-    const {
-      com_people_now_tau_tau_coordinatorTocom_people: coordinatorPerson,
-      com_people_now_tau_tau_authorizerTocom_people: authorizerPerson,
-      ...rest
-    } = tau
+    const coordinatorPerson = tau.com_people_now_tau_tau_coordinatorTocom_people
+    const authorizerPerson = tau.com_people_now_tau_tau_authorizerTocom_people
 
-    const updates = logResult.filter(logRow => logRow.tuid === rest.tuid)
-
-    const fallbackCoordinator = rest.tau_coordinator
-    const fallbackAuthorizer = rest.tau_authorizer
+    const updates = logResult.filter((logRow: (typeof logResult)[number]) => logRow.tuid === tau.tuid)
 
     return {
-      ...rest,
-      tau_coordinator: getPersonDisplayName(coordinatorPerson, fallbackCoordinator),
-      tau_authorizer: getPersonDisplayName(authorizerPerson, fallbackAuthorizer),
+      ...tau,
+      tau_coordinator: getPersonDisplayName(coordinatorPerson, tau.tau_coordinator),
+      tau_authorizer: getPersonDisplayName(authorizerPerson, tau.tau_authorizer),
       updates,
     }
   })
