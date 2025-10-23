@@ -4,6 +4,7 @@ import { TimeBoundDetailsType, EditDataType, EditMetaData } from '../../../front
 import Prisma from '../../prisma/generated/now_test_client'
 import { ValidationObject, referenceValidator } from '../../../frontend/src/shared/validators/validator'
 import { getReferenceDetails } from './reference'
+import { getPersonDisplayName } from './utils/person'
 
 export const getAllTimeBounds = async () => {
   const result = await nowDb.now_tu_bound.findMany({
@@ -35,6 +36,12 @@ export const getTimeBoundDetails = async (id: number) => {
               },
             },
           },
+          com_people_now_bau_bau_coordinatorTocom_people: {
+            select: { first_name: true, surname: true, initials: true },
+          },
+          com_people_now_bau_bau_authorizerTocom_people: {
+            select: { first_name: true, surname: true, initials: true },
+          },
         },
       },
     },
@@ -45,10 +52,25 @@ export const getTimeBoundDetails = async (id: number) => {
 
   const logResult = await logDb.log.findMany({ where: { buid: { in: buids } } })
 
-  result.now_bau = result.now_bau.map(bau => ({
-    ...bau,
-    updates: logResult.filter(logRow => logRow.buid === bau.buid),
-  }))
+  result.now_bau = result.now_bau.map(bau => {
+    const {
+      com_people_now_bau_bau_coordinatorTocom_people: coordinatorPerson,
+      com_people_now_bau_bau_authorizerTocom_people: authorizerPerson,
+      ...rest
+    } = bau
+
+    const updates = logResult.filter(logRow => logRow.buid === rest.buid)
+
+    const fallbackCoordinator = rest.bau_coordinator
+    const fallbackAuthorizer = rest.bau_authorizer
+
+    return {
+      ...rest,
+      bau_coordinator: getPersonDisplayName(coordinatorPerson, fallbackCoordinator),
+      bau_authorizer: getPersonDisplayName(authorizerPerson, fallbackAuthorizer),
+      updates,
+    }
+  })
 
   return result
 }

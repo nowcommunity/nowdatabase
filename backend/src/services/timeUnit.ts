@@ -3,6 +3,7 @@ import { EditDataType, TimeUnitDetailsType, EditMetaData } from '../../../fronte
 import { ValidationObject, referenceValidator } from '../../../frontend/src/shared/validators/validator'
 import { validateTimeUnit } from '../../../frontend/src/shared/validators/timeUnit'
 import { getReferenceDetails } from './reference'
+import { getPersonDisplayName } from './utils/person'
 
 export const getAllTimeUnits = async () => {
   const result = await nowDb.now_time_unit.findMany({
@@ -58,6 +59,12 @@ export const getTimeUnitDetails = async (id: string) => {
               },
             },
           },
+          com_people_now_tau_tau_coordinatorTocom_people: {
+            select: { first_name: true, surname: true, initials: true },
+          },
+          com_people_now_tau_tau_authorizerTocom_people: {
+            select: { first_name: true, surname: true, initials: true },
+          },
         },
       },
     },
@@ -69,10 +76,25 @@ export const getTimeUnitDetails = async (id: string) => {
 
   const logResult = await logDb.log.findMany({ where: { tuid: { in: tuids } } })
 
-  result.now_tau = result.now_tau.map(tau => ({
-    ...tau,
-    updates: logResult.filter(logRow => logRow.tuid === tau.tuid),
-  }))
+  result.now_tau = result.now_tau.map(tau => {
+    const {
+      com_people_now_tau_tau_coordinatorTocom_people: coordinatorPerson,
+      com_people_now_tau_tau_authorizerTocom_people: authorizerPerson,
+      ...rest
+    } = tau
+
+    const updates = logResult.filter(logRow => logRow.tuid === rest.tuid)
+
+    const fallbackCoordinator = rest.tau_coordinator
+    const fallbackAuthorizer = rest.tau_authorizer
+
+    return {
+      ...rest,
+      tau_coordinator: getPersonDisplayName(coordinatorPerson, fallbackCoordinator),
+      tau_authorizer: getPersonDisplayName(authorizerPerson, fallbackAuthorizer),
+      updates,
+    }
+  })
 
   const {
     now_tu_bound_now_time_unit_low_bndTonow_tu_bound: low_bound,

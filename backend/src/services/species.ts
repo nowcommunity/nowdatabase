@@ -5,6 +5,7 @@ import Prisma from '../../prisma/generated/now_test_client'
 import { fixBigInt } from '../utils/common'
 import { logDb, nowDb } from '../utils/db'
 import { getReferenceDetails } from './reference'
+import { getPersonDisplayName } from './utils/person'
 
 type SpeciesSynonym = {
   syn_genus_name: string | null
@@ -122,6 +123,12 @@ export const getSpeciesDetails = async (id: number) => {
               },
             },
           },
+          com_people_now_sau_sau_coordinatorTocom_people: {
+            select: { first_name: true, surname: true, initials: true },
+          },
+          com_people_now_sau_sau_authorizerTocom_people: {
+            select: { first_name: true, surname: true, initials: true },
+          },
         },
       },
     },
@@ -135,10 +142,25 @@ export const getSpeciesDetails = async (id: number) => {
 
   const logResult = await logDb.log.findMany({ where: { suid: { in: suids } } })
 
-  result.now_sau = result.now_sau.map(sau => ({
-    ...sau,
-    updates: logResult.filter(logRow => logRow.suid === sau.suid),
-  }))
+  result.now_sau = result.now_sau.map(sau => {
+    const {
+      com_people_now_sau_sau_coordinatorTocom_people: coordinatorPerson,
+      com_people_now_sau_sau_authorizerTocom_people: authorizerPerson,
+      ...rest
+    } = sau
+
+    const updates = logResult.filter(logRow => logRow.suid === rest.suid)
+
+    const fallbackCoordinator = rest.sau_coordinator
+    const fallbackAuthorizer = rest.sau_authorizer
+
+    return {
+      ...rest,
+      sau_coordinator: getPersonDisplayName(coordinatorPerson, fallbackCoordinator),
+      sau_authorizer: getPersonDisplayName(authorizerPerson, fallbackAuthorizer),
+      updates,
+    }
+  })
 
   return JSON.parse(fixBigInt({ ...result, com_taxa_synonym: synonyms || [] })!) as SpeciesDetailsType
 }

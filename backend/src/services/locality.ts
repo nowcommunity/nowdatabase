@@ -15,6 +15,7 @@ import Prisma from '../../prisma/generated/now_test_client'
 import { AccessError } from '../middlewares/authorizer'
 import { fixBigInt } from '../utils/common'
 import { logDb, nowDb } from '../utils/db'
+import { getPersonDisplayName } from './utils/person'
 import { getReferenceDetails } from './reference'
 
 const getIdsOfUsersProjects = async (user: User) => {
@@ -194,6 +195,12 @@ export const getLocalityDetails = async (id: number, user: User | undefined) => 
               },
             },
           },
+          com_people_now_lau_lau_coordinatorTocom_people: {
+            select: { first_name: true, surname: true, initials: true },
+          },
+          com_people_now_lau_lau_authorizerTocom_people: {
+            select: { first_name: true, surname: true, initials: true },
+          },
         },
       },
     },
@@ -205,10 +212,25 @@ export const getLocalityDetails = async (id: number, user: User | undefined) => 
 
   const logResult = await logDb.log.findMany({ where: { luid: { in: luids } } })
 
-  result.now_lau = result.now_lau.map(lau => ({
-    ...lau,
-    updates: logResult.filter(logRow => logRow.luid === lau.luid),
-  }))
+  result.now_lau = result.now_lau.map(lau => {
+    const {
+      com_people_now_lau_lau_coordinatorTocom_people: coordinatorPerson,
+      com_people_now_lau_lau_authorizerTocom_people: authorizerPerson,
+      ...rest
+    } = lau
+
+    const updates = logResult.filter(logRow => logRow.luid === rest.luid)
+
+    const fallbackCoordinator = rest.lau_coordinator
+    const fallbackAuthorizer = rest.lau_authorizer
+
+    return {
+      ...rest,
+      lau_coordinator: getPersonDisplayName(coordinatorPerson, fallbackCoordinator),
+      lau_authorizer: getPersonDisplayName(authorizerPerson, fallbackAuthorizer),
+      updates,
+    }
+  })
 
   if (result.loc_status) {
     if (!user) throw new AccessError()
