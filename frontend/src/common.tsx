@@ -1,10 +1,40 @@
-import { MRT_ColumnDef, MRT_PaginationState } from 'material-react-table'
+import { type MRT_FilterFn, MRT_ColumnDef, MRT_PaginationState } from 'material-react-table'
 import { Reference, PersonDetailsType, Species } from './shared/types'
 import { Cell } from './components/commonComponents'
 
 export const formatLastLoginDate = (date: Date) => {
   const dateFormat = new Intl.DateTimeFormat('en-GB', { year: 'numeric', month: 'long', day: 'numeric' })
   return dateFormat.format(new Date(date))
+}
+
+const filterReferenceAuthors: MRT_FilterFn<Reference> = (row, _columnId, filterValue) => {
+  if (filterValue === undefined || filterValue === null) {
+    return true
+  }
+
+  const normalizedFilter = String(filterValue).trim().toLowerCase()
+
+  if (!normalizedFilter) {
+    return true
+  }
+
+  const { ref_authors: authors } = row.original
+
+  if (!authors?.length) {
+    return false
+  }
+
+  return authors.some(author => {
+    const surname = author.author_surname?.toLowerCase() ?? ''
+    const initials = author.author_initials?.toLowerCase() ?? ''
+    const combined = `${surname} ${initials}`.trim()
+
+    return (
+      surname.includes(normalizedFilter) ||
+      initials.includes(normalizedFilter) ||
+      combined.includes(normalizedFilter)
+    )
+  })
 }
 
 export const referenceTableColumns: MRT_ColumnDef<Reference>[] = [
@@ -19,7 +49,7 @@ export const referenceTableColumns: MRT_ColumnDef<Reference>[] = [
     Cell,
     header: 'Author',
     maxSize: 60,
-    filterFn: 'contains',
+    filterFn: filterReferenceAuthors,
   },
   {
     accessorKey: 'date_primary',
