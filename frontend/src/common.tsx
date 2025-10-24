@@ -30,9 +30,7 @@ const filterReferenceAuthors: MRT_FilterFn<Reference> = (row, _columnId, filterV
     const combined = `${surname} ${initials}`.trim()
 
     return (
-      surname.includes(normalizedFilter) ||
-      initials.includes(normalizedFilter) ||
-      combined.includes(normalizedFilter)
+      surname.includes(normalizedFilter) || initials.includes(normalizedFilter) || combined.includes(normalizedFilter)
     )
   })
 }
