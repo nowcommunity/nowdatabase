@@ -14,10 +14,6 @@ const filterReferenceAuthors: MRT_FilterFn<Reference> = (row, _columnId, filterV
 
   const normalizedFilter = String(filterValue).trim().toLowerCase()
 
-  if (!normalizedFilter) {
-    return true
-  }
-
   const { ref_authors: authors } = row.original
 
   if (!authors?.length) {
