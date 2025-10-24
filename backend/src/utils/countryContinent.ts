@@ -1,4 +1,5 @@
-import countryContinentCsv from '../../../../data/countryContinentMap.csv?raw'
+import { readFileSync } from 'fs'
+import path from 'path'
 
 export type Continent =
   | 'Africa'
@@ -23,6 +24,13 @@ const CONTINENT_VALUES: readonly Continent[] = [
   'Oceania',
   'South America',
 ]
+
+const CSV_PATH = path.resolve(
+  __dirname,
+  '../../..',
+  'data',
+  'countryContinentMap.csv',
+)
 
 const isContinent = (value: string): value is Continent =>
   (CONTINENT_VALUES as readonly string[]).includes(value)
@@ -89,12 +97,17 @@ const parseCountryContinentCsv = (csv: string): CountryContinentEntry[] => {
   })
 }
 
-const countryContinentEntriesInternal = parseCountryContinentCsv(countryContinentCsv)
+const loadCountryContinentEntries = (): readonly CountryContinentEntry[] => {
+  const csvContent = readFileSync(CSV_PATH, 'utf8')
+  return parseCountryContinentCsv(csvContent)
+}
+
+const countryContinentEntries = loadCountryContinentEntries()
 
 const countryToContinent = new Map<string, Continent>()
 const continentToCountries = new Map<Continent, string[]>()
 
-for (const entry of countryContinentEntriesInternal) {
+for (const entry of countryContinentEntries) {
   if (countryToContinent.has(entry.country)) {
     throw new Error(`Duplicate country entry detected: ${entry.country}`)
   }
@@ -109,16 +122,12 @@ for (const entry of countryContinentEntriesInternal) {
   }
 }
 
-export const countryContinentEntries: readonly CountryContinentEntry[] =
-  countryContinentEntriesInternal
-
-export const validCountries: readonly string[] = countryContinentEntries.map(
-  (entry) => entry.country,
-)
-
-export const availableContinents: readonly Continent[] = CONTINENT_VALUES.filter(
+const availableContinentList: readonly Continent[] = CONTINENT_VALUES.filter(
   (continent) => continentToCountries.has(continent),
 )
+
+export const getCountryContinentEntries = (): readonly CountryContinentEntry[] =>
+  countryContinentEntries
 
 export const getContinentForCountry = (
   country: string,
@@ -127,6 +136,9 @@ export const getContinentForCountry = (
 export const getCountriesForContinent = (
   continent: Continent,
 ): string[] => [...(continentToCountries.get(continent) ?? [])]
+
+export const getAvailableContinents = (): readonly Continent[] =>
+  availableContinentList
 
 export const isValidCountry = (value: string): boolean =>
   countryToContinent.has(value)
