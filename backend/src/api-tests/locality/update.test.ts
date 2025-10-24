@@ -27,6 +27,13 @@ describe('Locality update works', () => {
     resultLocality = body
   })
 
+  it('Returns full names for coordinator and authorizer in update logs', () => {
+    const updateWithCoordinator = resultLocality!.now_lau.find(lau => lau.luid === 23101)
+    expect(updateWithCoordinator).toBeDefined()
+    expect(updateWithCoordinator?.lau_coordinator).toEqual('cfn csn')
+    expect(updateWithCoordinator?.lau_authorizer).toEqual('euf eus')
+  })
+
   it('Name changed correctly', () => {
     expect(resultLocality!.loc_name).toEqual(editedLocality.loc_name) // 'Name was not changed correctly'
   })

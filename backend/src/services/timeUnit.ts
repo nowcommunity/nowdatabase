@@ -3,6 +3,7 @@ import { EditDataType, TimeUnitDetailsType, EditMetaData } from '../../../fronte
 import { ValidationObject, referenceValidator } from '../../../frontend/src/shared/validators/validator'
 import { validateTimeUnit } from '../../../frontend/src/shared/validators/timeUnit'
 import { getReferenceDetails } from './reference'
+import { buildPersonLookupByInitials, getPersonDisplayName, getPersonFromLookup } from './utils/person'
 
 export const getAllTimeUnits = async () => {
   const result = await nowDb.now_time_unit.findMany({
@@ -69,10 +70,23 @@ export const getTimeUnitDetails = async (id: string) => {
 
   const logResult = await logDb.log.findMany({ where: { tuid: { in: tuids } } })
 
-  result.now_tau = result.now_tau.map(tau => ({
-    ...tau,
-    updates: logResult.filter(logRow => logRow.tuid === tau.tuid),
-  }))
+  const peopleLookup = await buildPersonLookupByInitials(
+    result.now_tau.flatMap(tau => [tau.tau_coordinator, tau.tau_authorizer])
+  )
+
+  result.now_tau = result.now_tau.map(tau => {
+    const coordinatorPerson = getPersonFromLookup(peopleLookup, tau.tau_coordinator)
+    const authorizerPerson = getPersonFromLookup(peopleLookup, tau.tau_authorizer)
+
+    const updates = logResult.filter((logRow: (typeof logResult)[number]) => logRow.tuid === tau.tuid)
+
+    return {
+      ...tau,
+      tau_coordinator: getPersonDisplayName(coordinatorPerson, tau.tau_coordinator),
+      tau_authorizer: getPersonDisplayName(authorizerPerson, tau.tau_authorizer),
+      updates,
+    }
+  })
 
   const {
     now_tu_bound_now_time_unit_low_bndTonow_tu_bound: low_bound,

@@ -15,6 +15,7 @@ import Prisma from '../../prisma/generated/now_test_client'
 import { AccessError } from '../middlewares/authorizer'
 import { fixBigInt } from '../utils/common'
 import { logDb, nowDb } from '../utils/db'
+import { buildPersonLookupByInitials, getPersonDisplayName, getPersonFromLookup } from './utils/person'
 import { getReferenceDetails } from './reference'
 
 const getIdsOfUsersProjects = async (user: User) => {
@@ -205,10 +206,23 @@ export const getLocalityDetails = async (id: number, user: User | undefined) => 
 
   const logResult = await logDb.log.findMany({ where: { luid: { in: luids } } })
 
-  result.now_lau = result.now_lau.map(lau => ({
-    ...lau,
-    updates: logResult.filter(logRow => logRow.luid === lau.luid),
-  }))
+  const peopleLookup = await buildPersonLookupByInitials(
+    result.now_lau.flatMap(lau => [lau.lau_coordinator, lau.lau_authorizer])
+  )
+
+  result.now_lau = result.now_lau.map(lau => {
+    const coordinatorPerson = getPersonFromLookup(peopleLookup, lau.lau_coordinator)
+    const authorizerPerson = getPersonFromLookup(peopleLookup, lau.lau_authorizer)
+
+    const updates = logResult.filter((logRow: (typeof logResult)[number]) => logRow.luid === lau.luid)
+
+    return {
+      ...lau,
+      lau_coordinator: getPersonDisplayName(coordinatorPerson, lau.lau_coordinator),
+      lau_authorizer: getPersonDisplayName(authorizerPerson, lau.lau_authorizer),
+      updates,
+    }
+  })
 
   if (result.loc_status) {
     if (!user) throw new AccessError()

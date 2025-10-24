@@ -4,6 +4,7 @@ import { TimeBoundDetailsType, EditDataType, EditMetaData } from '../../../front
 import Prisma from '../../prisma/generated/now_test_client'
 import { ValidationObject, referenceValidator } from '../../../frontend/src/shared/validators/validator'
 import { getReferenceDetails } from './reference'
+import { buildPersonLookupByInitials, getPersonDisplayName, getPersonFromLookup } from './utils/person'
 
 export const getAllTimeBounds = async () => {
   const result = await nowDb.now_tu_bound.findMany({
@@ -45,10 +46,23 @@ export const getTimeBoundDetails = async (id: number) => {
 
   const logResult = await logDb.log.findMany({ where: { buid: { in: buids } } })
 
-  result.now_bau = result.now_bau.map(bau => ({
-    ...bau,
-    updates: logResult.filter(logRow => logRow.buid === bau.buid),
-  }))
+  const peopleLookup = await buildPersonLookupByInitials(
+    result.now_bau.flatMap(bau => [bau.bau_coordinator, bau.bau_authorizer])
+  )
+
+  result.now_bau = result.now_bau.map(bau => {
+    const coordinatorPerson = getPersonFromLookup(peopleLookup, bau.bau_coordinator)
+    const authorizerPerson = getPersonFromLookup(peopleLookup, bau.bau_authorizer)
+
+    const updates = logResult.filter((logRow: (typeof logResult)[number]) => logRow.buid === bau.buid)
+
+    return {
+      ...bau,
+      bau_coordinator: getPersonDisplayName(coordinatorPerson, bau.bau_coordinator),
+      bau_authorizer: getPersonDisplayName(authorizerPerson, bau.bau_authorizer),
+      updates,
+    }
+  })
 
   return result
 }

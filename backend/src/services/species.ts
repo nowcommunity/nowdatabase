@@ -5,6 +5,7 @@ import Prisma from '../../prisma/generated/now_test_client'
 import { fixBigInt } from '../utils/common'
 import { logDb, nowDb } from '../utils/db'
 import { getReferenceDetails } from './reference'
+import { buildPersonLookupByInitials, getPersonDisplayName, getPersonFromLookup } from './utils/person'
 
 type SpeciesSynonym = {
   syn_genus_name: string | null
@@ -135,10 +136,23 @@ export const getSpeciesDetails = async (id: number) => {
 
   const logResult = await logDb.log.findMany({ where: { suid: { in: suids } } })
 
-  result.now_sau = result.now_sau.map(sau => ({
-    ...sau,
-    updates: logResult.filter(logRow => logRow.suid === sau.suid),
-  }))
+  const peopleLookup = await buildPersonLookupByInitials(
+    result.now_sau.flatMap(sau => [sau.sau_coordinator, sau.sau_authorizer])
+  )
+
+  result.now_sau = result.now_sau.map(sau => {
+    const coordinatorPerson = getPersonFromLookup(peopleLookup, sau.sau_coordinator)
+    const authorizerPerson = getPersonFromLookup(peopleLookup, sau.sau_authorizer)
+
+    const updates = logResult.filter((logRow: (typeof logResult)[number]) => logRow.suid === sau.suid)
+
+    return {
+      ...sau,
+      sau_coordinator: getPersonDisplayName(coordinatorPerson, sau.sau_coordinator),
+      sau_authorizer: getPersonDisplayName(authorizerPerson, sau.sau_authorizer),
+      updates,
+    }
+  })
 
   return JSON.parse(fixBigInt({ ...result, com_taxa_synonym: synonyms || [] })!) as SpeciesDetailsType
 }
