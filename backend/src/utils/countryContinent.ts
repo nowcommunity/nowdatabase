@@ -22,10 +22,7 @@ let cachedIndex: CountryContinentIndex | null = null
 const removeDiacritics = (value: string): string => value.normalize('NFKD').replace(/[\u0300-\u036f]/g, '')
 
 const normaliseKey = (value: string): string =>
-  removeDiacritics(value)
-    .replace(/\s+/g, ' ')
-    .trim()
-    .toLowerCase()
+  removeDiacritics(value).replace(/\s+/g, ' ').trim().toLowerCase()
 
 const ensureIndex = (): CountryContinentIndex => {
   if (cachedIndex) {
