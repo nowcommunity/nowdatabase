@@ -8,6 +8,7 @@ WORKDIR /usr/src/app
 USER node
 
 COPY --chown=node frontend/src/shared /usr/src/app/frontend/src/shared/
+COPY --chown=node ./data /usr/src/app/data/
 COPY --chown=node backend/package.json backend/
 COPY --chown=node backend/package-lock.json backend/
 COPY --chown=node backend/prisma/schema.prisma backend
@@ -39,6 +40,7 @@ WORKDIR /usr/src/app
 USER node
 
 COPY --from=backend-build --chown=node /usr/src/app/frontend/src/shared/ ../frontend/src/shared/
+COPY --from=backend-build --chown=node /usr/src/app/data ./data
 COPY --from=backend-build --chown=node /usr/src/app/backend/build .
 COPY --from=backend-build --chown=node /usr/src/app/backend/node_modules ./backend/node_modules
 COPY --from=backend-build --chown=node /usr/src/app/backend/prisma ./backend/prisma

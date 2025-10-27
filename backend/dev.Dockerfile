@@ -9,8 +9,10 @@ USER node
 WORKDIR /usr/src/app
 
 RUN mkdir -p /usr/src/app/frontend/src/shared/validators
+RUN mkdir -p /usr/src/app/data
 
 COPY --chown=node frontend/src/shared /usr/src/app/frontend/src/shared/
+COPY --chown=node ./data /usr/src/app/data/
 COPY --chown=node ./backend/package.json backend/
 COPY --chown=node ./backend/package-lock.json backend/
 COPY --chown=node ./backend/prisma/schema.prisma backend
