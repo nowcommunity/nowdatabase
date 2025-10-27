@@ -29,14 +29,6 @@ describe('country/continent mapping utility', () => {
 
   it('exposes available continents', () => {
     const continents = getAvailableContinents()
-    expect(continents).toEqual([
-      'Africa',
-      'Antarctica',
-      'Asia',
-      'Europe',
-      'North America',
-      'Oceania',
-      'South America',
-    ])
+    expect(continents).toEqual(['Africa', 'Antarctica', 'Asia', 'Europe', 'North America', 'Oceania', 'South America'])
   })
 })

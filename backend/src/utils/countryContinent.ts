@@ -1,14 +1,7 @@
 import { readFileSync } from 'fs'
 import path from 'path'
 
-export type Continent =
-  | 'Africa'
-  | 'Antarctica'
-  | 'Asia'
-  | 'Europe'
-  | 'North America'
-  | 'Oceania'
-  | 'South America'
+export type Continent = 'Africa' | 'Antarctica' | 'Asia' | 'Europe' | 'North America' | 'Oceania' | 'South America'
 
 export interface CountryContinentEntry {
   country: string
@@ -25,15 +18,9 @@ const CONTINENT_VALUES: readonly Continent[] = [
   'South America',
 ]
 
-const CSV_PATH = path.resolve(
-  __dirname,
-  '../../..',
-  'data',
-  'countryContinentMap.csv',
-)
+const CSV_PATH = path.resolve(__dirname, '../../..', 'data', 'countryContinentMap.csv')
 
-const isContinent = (value: string): value is Continent =>
-  (CONTINENT_VALUES as readonly string[]).includes(value)
+const isContinent = (value: string): value is Continent => (CONTINENT_VALUES as readonly string[]).includes(value)
 
 const parseCsvLine = (line: string): string[] => {
   const cells: string[] = []
@@ -65,8 +52,8 @@ const parseCsvLine = (line: string): string[] => {
 const parseCountryContinentCsv = (csv: string): CountryContinentEntry[] => {
   const lines = csv
     .split(/\r?\n/)
-    .map((line) => line.trim())
-    .filter((line) => line.length > 0)
+    .map(line => line.trim())
+    .filter(line => line.length > 0)
 
   if (lines.length <= 1) {
     throw new Error('countryContinentMap.csv must include at least one row')
@@ -75,10 +62,7 @@ const parseCountryContinentCsv = (csv: string): CountryContinentEntry[] => {
   const [header, ...rows] = lines
   const [countryHeader, continentHeader] = parseCsvLine(header)
 
-  if (
-    countryHeader.toLowerCase() !== 'country' ||
-    continentHeader.toLowerCase() !== 'continent'
-  ) {
+  if (countryHeader.toLowerCase() !== 'country' || continentHeader.toLowerCase() !== 'continent') {
     throw new Error('countryContinentMap.csv must have "country" and "continent" headers')
   }
 
@@ -122,23 +106,18 @@ for (const entry of countryContinentEntries) {
   }
 }
 
-const availableContinentList: readonly Continent[] = CONTINENT_VALUES.filter(
-  (continent) => continentToCountries.has(continent),
+const availableContinentList: readonly Continent[] = CONTINENT_VALUES.filter(continent =>
+  continentToCountries.has(continent)
 )
 
-export const getCountryContinentEntries = (): readonly CountryContinentEntry[] =>
-  countryContinentEntries
+export const getCountryContinentEntries = (): readonly CountryContinentEntry[] => countryContinentEntries
 
-export const getContinentForCountry = (
-  country: string,
-): Continent | undefined => countryToContinent.get(country)
+export const getContinentForCountry = (country: string): Continent | undefined => countryToContinent.get(country)
 
-export const getCountriesForContinent = (
-  continent: Continent,
-): string[] => [...(continentToCountries.get(continent) ?? [])]
+export const getCountriesForContinent = (continent: Continent): string[] => [
+  ...(continentToCountries.get(continent) ?? []),
+]
 
-export const getAvailableContinents = (): readonly Continent[] =>
-  availableContinentList
+export const getAvailableContinents = (): readonly Continent[] => availableContinentList
 
-export const isValidCountry = (value: string): boolean =>
-  countryToContinent.has(value)
+export const isValidCountry = (value: string): boolean => countryToContinent.has(value)
