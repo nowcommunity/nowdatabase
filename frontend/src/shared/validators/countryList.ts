@@ -1,4 +1,4 @@
-import countryContinentCsv from '../../../../data/countryContinentMap.csv?raw'
+import countryContinentJson from '../../../../data/countryContinentMap.json'
 
 export type Continent = 'Africa' | 'Antarctica' | 'Asia' | 'Europe' | 'North America' | 'Oceania' | 'South America'
 
@@ -19,66 +19,29 @@ const CONTINENT_VALUES: readonly Continent[] = [
 
 const isContinent = (value: string): value is Continent => (CONTINENT_VALUES as readonly string[]).includes(value)
 
-const parseCsvLine = (line: string): string[] => {
-  const cells: string[] = []
-  let current = ''
-  let inQuotes = false
-
-  for (let index = 0; index < line.length; index += 1) {
-    const char = line[index]
-
-    if (char === '"') {
-      if (inQuotes && line[index + 1] === '"') {
-        current += '"'
-        index += 1
-      } else {
-        inQuotes = !inQuotes
-      }
-    } else if (char === ',' && !inQuotes) {
-      cells.push(current.trim())
-      current = ''
-    } else {
-      current += char
-    }
+const normalizeEntry = (entry: unknown, index: number): CountryContinentEntry => {
+  if (!entry || typeof entry !== 'object') {
+    throw new Error(`Invalid country-continent entry at index ${index}`)
   }
 
-  cells.push(current.trim())
-  return cells
+  const { country, continent } = entry as { country?: unknown; continent?: unknown }
+
+  if (typeof country !== 'string' || country.trim().length === 0) {
+    throw new Error(`country is missing for mapping entry at index ${index}`)
+  }
+
+  if (typeof continent !== 'string' || continent.trim().length === 0) {
+    throw new Error(`continent is missing for mapping entry at index ${index}`)
+  }
+
+  if (!isContinent(continent)) {
+    throw new Error(`Unknown continent "${continent}" on mapping entry at index ${index}`)
+  }
+
+  return { country, continent }
 }
 
-const parseCountryContinentCsv = (csv: string): CountryContinentEntry[] => {
-  const lines = csv
-    .split(/\r?\n/)
-    .map(line => line.trim())
-    .filter(line => line.length > 0)
-
-  if (lines.length <= 1) {
-    throw new Error('countryContinentMap.csv must include at least one row')
-  }
-
-  const [header, ...rows] = lines
-  const [countryHeader, continentHeader] = parseCsvLine(header)
-
-  if (countryHeader.toLowerCase() !== 'country' || continentHeader.toLowerCase() !== 'continent') {
-    throw new Error('countryContinentMap.csv must have "country" and "continent" headers')
-  }
-
-  return rows.map((line, rowIndex) => {
-    const [country, continent] = parseCsvLine(line)
-
-    if (!country) {
-      throw new Error(`country is missing for CSV row ${rowIndex + 2}`)
-    }
-
-    if (!isContinent(continent)) {
-      throw new Error(`Unknown continent "${continent}" on CSV row ${rowIndex + 2}`)
-    }
-
-    return { country, continent }
-  })
-}
-
-const countryContinentEntriesInternal = parseCountryContinentCsv(countryContinentCsv)
+const countryContinentEntriesInternal = (countryContinentJson as unknown[]).map(normalizeEntry)
 
 const countryToContinent = new Map<string, Continent>()
 const continentToCountries = new Map<Continent, string[]>()

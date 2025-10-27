@@ -1,11 +1,13 @@
-import { readFileSync } from 'fs'
-import path from 'path'
-
 export type Continent = 'Africa' | 'Antarctica' | 'Asia' | 'Europe' | 'North America' | 'Oceania' | 'South America'
 
 export interface CountryContinentEntry {
   country: string
   continent: Continent
+}
+
+type CountryContinentJsonEntry = {
+  country: string
+  continent: string
 }
 
 const CONTINENT_VALUES: readonly Continent[] = [
@@ -18,75 +20,28 @@ const CONTINENT_VALUES: readonly Continent[] = [
   'South America',
 ]
 
-const CSV_PATH = path.resolve(__dirname, '../../..', 'data', 'countryContinentMap.csv')
-
 const isContinent = (value: string): value is Continent => (CONTINENT_VALUES as readonly string[]).includes(value)
 
-const parseCsvLine = (line: string): string[] => {
-  const cells: string[] = []
-  let current = ''
-  let inQuotes = false
+// eslint-disable-next-line @typescript-eslint/no-var-requires -- JSON import via require for CommonJS compatibility
+const countryContinentJson = require('../../../data/countryContinentMap.json') as CountryContinentJsonEntry[]
 
-  for (let index = 0; index < line.length; index += 1) {
-    const char = line[index]
+const countryContinentEntries: readonly CountryContinentEntry[] = countryContinentJson.map((entry, index) => {
+  const { country, continent } = entry
 
-    if (char === '"') {
-      if (inQuotes && line[index + 1] === '"') {
-        current += '"'
-        index += 1
-      } else {
-        inQuotes = !inQuotes
-      }
-    } else if (char === ',' && !inQuotes) {
-      cells.push(current.trim())
-      current = ''
-    } else {
-      current += char
-    }
+  if (!country || typeof country !== 'string') {
+    throw new Error(`country is missing for mapping row ${index + 1}`)
   }
 
-  cells.push(current.trim())
-  return cells
-}
-
-const parseCountryContinentCsv = (csv: string): CountryContinentEntry[] => {
-  const lines = csv
-    .split(/\r?\n/)
-    .map(line => line.trim())
-    .filter(line => line.length > 0)
-
-  if (lines.length <= 1) {
-    throw new Error('countryContinentMap.csv must include at least one row')
+  if (!continent || typeof continent !== 'string') {
+    throw new Error(`continent is missing for mapping row ${index + 1}`)
   }
 
-  const [header, ...rows] = lines
-  const [countryHeader, continentHeader] = parseCsvLine(header)
-
-  if (countryHeader.toLowerCase() !== 'country' || continentHeader.toLowerCase() !== 'continent') {
-    throw new Error('countryContinentMap.csv must have "country" and "continent" headers')
+  if (!isContinent(continent)) {
+    throw new Error(`Unknown continent "${continent}" on mapping row ${index + 1}`)
   }
 
-  return rows.map((line, rowIndex) => {
-    const [country, continent] = parseCsvLine(line)
-
-    if (!country) {
-      throw new Error(`country is missing for CSV row ${rowIndex + 2}`)
-    }
-
-    if (!isContinent(continent)) {
-      throw new Error(`Unknown continent "${continent}" on CSV row ${rowIndex + 2}`)
-    }
-
-    return { country, continent }
-  })
-}
-
-const loadCountryContinentEntries = (): readonly CountryContinentEntry[] => {
-  const csvContent = readFileSync(CSV_PATH, 'utf8')
-  return parseCountryContinentCsv(csvContent)
-}
-
-const countryContinentEntries = loadCountryContinentEntries()
+  return { country, continent }
+})
 
 const countryToContinent = new Map<string, Continent>()
 const continentToCountries = new Map<Continent, string[]>()
