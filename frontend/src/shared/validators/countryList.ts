@@ -1,4 +1,4 @@
-import countryContinentJson from '../../../../data/countryContinentMap.json'
+import countryContinentJson from '../data/countryContinentMap.json'
 
 export type Continent = 'Africa' | 'Antarctica' | 'Asia' | 'Europe' | 'North America' | 'Oceania' | 'South America'
 
