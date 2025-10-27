@@ -4,6 +4,8 @@
     "outDir": "./build/",
     "module": "CommonJS",
     "moduleResolution": "node",
+    "resolveJsonModule": true,
+    "allowSyntheticDefaultImports": true,
     "strict": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,

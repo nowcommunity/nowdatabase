@@ -1,3 +1,5 @@
+import countryContinentJson from '../../../data/countryContinentMap.json'
+
 export type Continent = 'Africa' | 'Antarctica' | 'Asia' | 'Europe' | 'North America' | 'Oceania' | 'South America'
 
 export interface CountryContinentEntry {
@@ -22,10 +24,9 @@ const CONTINENT_VALUES: readonly Continent[] = [
 
 const isContinent = (value: string): value is Continent => (CONTINENT_VALUES as readonly string[]).includes(value)
 
-// eslint-disable-next-line @typescript-eslint/no-var-requires -- JSON import via require for CommonJS compatibility
-const countryContinentJson = require('../../../data/countryContinentMap.json') as CountryContinentJsonEntry[]
-
-const countryContinentEntries: readonly CountryContinentEntry[] = countryContinentJson.map((entry, index) => {
+const countryContinentEntries: readonly CountryContinentEntry[] = (
+  countryContinentJson as CountryContinentJsonEntry[]
+).map((entry, index) => {
   const { country, continent } = entry
 
   if (!country || typeof country !== 'string') {
