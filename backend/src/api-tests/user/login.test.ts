@@ -2,7 +2,7 @@ import { beforeAll, afterAll, describe, it, expect } from '@jest/globals'
 import { resetDatabase, send, resetDatabaseTimeout } from '../utils'
 import { pool } from '../../utils/db'
 import { testSu } from './data'
-import { Role } from '../../../../frontend/src/shared/types'
+import { Role } from '../../shared/types'
 
 describe('Logging in', () => {
   beforeAll(async () => {
@@ -24,7 +24,7 @@ describe('Logging in', () => {
 
     expect(result.status).toEqual(200)
     expect(result.body.username).toEqual('testSu')
-    expect(result.body.role).toEqual(1) // frontend/src/shared/types: Role enum
+    expect(result.body.role).toEqual(Role.Admin)
     expect(result.body.isFirstLogin).toEqual(true)
   })
 

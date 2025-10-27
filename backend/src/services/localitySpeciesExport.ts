@@ -1,5 +1,6 @@
 import { PoolConnection } from 'mariadb'
-import { User, Role } from '../../../frontend/src/shared/types'
+import { Role } from '../shared/types'
+import type { User } from '../shared/types'
 import { NOW_DB_NAME } from '../utils/config'
 import { pool } from '../utils/db'
 

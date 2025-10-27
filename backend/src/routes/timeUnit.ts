@@ -1,9 +1,9 @@
 import { Request, Router } from 'express'
+import { Role } from '../shared/types'
 import {
   EditDataType,
   EditMetaData,
   TimeUnitDetailsType,
-  Role,
   TimeBoundDetailsType,
 } from '../../../frontend/src/shared/types'
 import { requireOneOf } from '../middlewares/authorizer'

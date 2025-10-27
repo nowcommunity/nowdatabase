@@ -1,13 +1,13 @@
-import {
+import type {
   EditDataType,
   EditMetaData,
   LocalityDetailsType,
-  User,
-  Role,
   LocalitySpeciesDetailsType,
   Editable,
   SpeciesDetailsType,
 } from '../../../frontend/src/shared/types'
+import { Role } from '../shared/types'
+import type { User } from '../shared/types'
 import { validateLocality } from '../../../frontend/src/shared/validators/locality'
 import { validateSpecies } from '../../../frontend/src/shared/validators/species'
 import { ValidationObject, referenceValidator } from '../../../frontend/src/shared/validators/validator'

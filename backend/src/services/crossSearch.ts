@@ -1,13 +1,13 @@
-import {
-  User,
+import type {
   CrossSearch,
-  Role,
   CrossSearchRouteParameters,
   ParsedCrossSearchRouteParameters,
   SortingState,
   ColumnFilter,
   SimplifiedLocality,
 } from '../../../frontend/src/shared/types'
+import { Role } from '../shared/types'
+import type { User } from '../shared/types'
 import { getCrossSearchFields, getFieldsOfTables, nowDb } from '../utils/db'
 import { generateCrossSearchLocalitiesSql, generateCrossSearchSql } from './queries/crossSearchQuery'
 import { ValidationObject } from '../../../frontend/src/shared/validators/validator'

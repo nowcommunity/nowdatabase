@@ -2,7 +2,8 @@ import { Router, Request } from 'express'
 import { getAllMuseums, getMuseumDetails, validateEntireMuseum } from '../services/museum'
 import { fixBigInt } from '../utils/common'
 import { requireOneOf } from '../middlewares/authorizer'
-import { Role, EditDataType, EditMetaData, Museum } from '../../../frontend/src/shared/types'
+import { Role } from '../shared/types'
+import { EditDataType, EditMetaData, Museum } from '../../../frontend/src/shared/types'
 import { writeMuseum } from '../services/write/museum'
 
 const router = Router()

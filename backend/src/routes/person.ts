@@ -1,7 +1,7 @@
 import { Router, Request } from 'express'
 import { getAllPersons, getPersonDetails, validateEntirePerson } from '../services/person'
+import { Role } from '../shared/types'
 import {
-  Role,
   PersonDetailsType,
   EditDataType,
   EditMetaData,

@@ -1,4 +1,4 @@
-import { Role } from '../../../frontend/src/shared/types'
+import { Role } from '../shared/types'
 import { Middleware } from '../types'
 
 export class AccessError extends Error {

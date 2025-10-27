@@ -1,7 +1,8 @@
 import { Router, Request } from 'express'
 import { getAllRegions, getRegionDetails, validateEntireRegion } from '../services/region'
 import { requireOneOf } from '../middlewares/authorizer'
-import { Role, EditDataType, EditMetaData, RegionDetails } from '../../../frontend/src/shared/types'
+import { Role } from '../shared/types'
+import { EditDataType, EditMetaData, RegionDetails } from '../../../frontend/src/shared/types'
 import { writeRegion, deleteRegion } from '../services/write/region'
 
 const router = Router()

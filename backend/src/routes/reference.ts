@@ -12,7 +12,8 @@ import {
   getJournalById,
 } from '../services/reference'
 import { requireOneOf } from '../middlewares/authorizer'
-import { Role, EditMetaData, ReferenceDetailsType, EditDataType } from '../../../frontend/src/shared/types'
+import { Role } from '../shared/types'
+import { EditMetaData, ReferenceDetailsType, EditDataType } from '../../../frontend/src/shared/types'
 import { deleteReference, writeReference } from '../services/write/reference'
 import { fixBigInt } from '../utils/common'
 

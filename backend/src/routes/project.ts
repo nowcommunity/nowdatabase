@@ -1,7 +1,7 @@
 import { Router } from 'express'
 import { getAllProjects, getProjectDetails } from '../services/project'
 import { requireOneOf } from '../middlewares/authorizer'
-import { Role } from '../../../frontend/src/shared/types'
+import { Role } from '../shared/types'
 
 const router = Router()
 

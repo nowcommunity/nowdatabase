@@ -1,4 +1,5 @@
-import { EditDataType, LocalityDetailsType, Reference, User } from '../../../../frontend/src/shared/types'
+import { EditDataType, LocalityDetailsType, Reference } from '../../../../frontend/src/shared/types'
+import type { User } from '../../shared/types'
 import { getHomininSkeletalRemains } from '../../../../frontend/src/shared/calculations'
 import { NOW_DB_NAME } from '../../utils/config'
 import { WriteHandler } from './writeOperations/writeHandler'
