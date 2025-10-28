@@ -19,7 +19,7 @@ export const availableContinents: readonly Continent[] = lookup.availableContine
 
 export const getContinentForCountry = (country: string): Continent | undefined => lookup.getContinentForCountry(country)
 
-export const getCountriesForContinent = (continent: Continent): string[] =>
+export const getCountriesForContinent = (continent: Continent): readonly string[] =>
   lookup.getCountriesForContinent(continent)
 
 export const isValidCountry = (value: string): boolean => lookup.isValidCountry(value)
