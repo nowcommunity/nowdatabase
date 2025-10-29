@@ -8,9 +8,7 @@ import {
 
 describe('country continent mapping', () => {
   it('maps every valid country to a continent', () => {
-    const missingCountries = validCountries.filter(
-      country => !(country in countryToContinentMap)
-    )
+    const missingCountries = validCountries.filter(country => !(country in countryToContinentMap))
 
     expect(missingCountries).toHaveLength(0)
   })
