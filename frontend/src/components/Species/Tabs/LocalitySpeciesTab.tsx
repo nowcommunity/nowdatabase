@@ -5,6 +5,7 @@ import { Grouped } from '@/components/DetailView/common/tabLayoutHelpers'
 import { useDetailContext } from '@/components/DetailView/Context/DetailContext'
 import { Box, TextField } from '@mui/material'
 import { MRT_ColumnDef } from 'material-react-table'
+import { matchesCountryOrContinent } from '@/shared/validators/countryContinents'
 import { useForm } from 'react-hook-form'
 
 export const LocalitySpeciesTab = () => {
@@ -21,7 +22,13 @@ export const LocalitySpeciesTab = () => {
     },
     {
       accessorKey: 'now_loc.country',
-      header: 'Country',
+      header: 'Country or Continent',
+      filterFn: (row, columnId, filterValue) => {
+        const search =
+          typeof filterValue === 'string' ? filterValue : Array.isArray(filterValue) ? filterValue.join(' ') : ''
+
+        return matchesCountryOrContinent(row.getValue<string>(columnId) ?? '', search)
+      },
     },
     {
       accessorKey: 'id_status',
