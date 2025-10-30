@@ -31,6 +31,19 @@ jobs:
       - name: 'Start containers'
         run: npm run start:anon -- --wait -d
 
+      - name: Wait for MariaDB
+        run: |
+          for i in {1..30}; do
+            if docker compose --file docker-compose.anon.yml exec -T db-anon sh -c 'mysqladmin ping -h127.0.0.1 -uroot -p"${MARIADB_ROOT_PASSWORD}" --silent'; then
+              echo "MariaDB is ready"
+              exit 0
+            fi
+            echo "Waiting for MariaDB (attempt ${i})"
+            sleep 2
+          done
+          echo "MariaDB did not become ready in time"
+          exit 1
+
       - name: Run e2e tests
         uses: cypress-io/github-action@v6
         with:
