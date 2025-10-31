@@ -3,21 +3,26 @@
   visiting specific url's directly.
 */
 
+const visitEntry = viewUrl => {
+  const normalizedUrl = viewUrl.startsWith('/') ? viewUrl : `/${viewUrl}`
+  cy.visit(normalizedUrl)
+}
+
 const hasStagingMode = viewUrl => {
-  cy.visit(viewUrl)
-  cy.contains('Edit').click()
-  cy.contains('Finalize entry').click()
-  cy.contains('Complete and save')
-  cy.contains('Reference for the new data')
+  visitEntry(viewUrl)
+  cy.contains('Edit', { timeout: 20000 }).should('be.visible').click()
+  cy.contains('Finalize entry', { timeout: 15000 }).should('be.visible').click()
+  cy.contains('Complete and save', { timeout: 15000 }).should('be.visible')
+  cy.contains('Reference for the new data', { timeout: 15000 }).should('be.visible')
 }
 
 const doesNotHaveStagingMode = viewUrl => {
-  cy.visit(viewUrl)
-  cy.contains('Edit').click()
-  cy.contains('Finalize entry').should('not.exist')
-  cy.contains('Reference for the new data').should('not.exist')
-  cy.contains('Save changes').click()
-  cy.contains('Edit')
+  visitEntry(viewUrl)
+  cy.contains('Edit', { timeout: 20000 }).should('be.visible').click()
+  cy.contains('Finalize entry', { timeout: 15000 }).should('not.exist')
+  cy.contains('Reference for the new data', { timeout: 15000 }).should('not.exist')
+  cy.contains('Save changes', { timeout: 15000 }).should('be.visible').click()
+  cy.contains('Edit', { timeout: 15000 }).should('be.visible')
 }
 
 before('Reset database', () => {

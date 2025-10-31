@@ -31,6 +31,28 @@ jobs:
       - name: 'Start containers'
         run: npm run start:anon -- --wait -d
 
+      - name: Wait for MariaDB
+        run: |
+          container_id=$(docker compose --file docker-compose.anon.yml ps -q db-anon)
+          if [ -z "$container_id" ]; then
+            echo "db-anon container not found"
+            exit 1
+          fi
+
+          for i in {1..30}; do
+            status=$(docker inspect --format='{{.State.Health.Status}}' "$container_id" 2>/dev/null || echo "starting")
+            if [ "$status" = "healthy" ]; then
+              echo "MariaDB is healthy"
+              exit 0
+            fi
+            echo "Waiting for MariaDB (attempt ${i}) - status: $status"
+            sleep 2
+          done
+
+          echo "MariaDB did not become ready in time"
+          docker compose --file docker-compose.anon.yml logs db-anon --tail=200
+          exit 1
+
       - name: Run e2e tests
         uses: cypress-io/github-action@v6
         with:

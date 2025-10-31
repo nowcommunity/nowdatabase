@@ -10,6 +10,7 @@ import { generateSvg } from '../Map/generateSvg'
 import { usePageContext } from '../Page'
 import { LocalitySynonymsModal } from './LocalitySynonymsModal'
 import { currentDateAsString } from '@/shared/currentDateAsString'
+import { matchesCountryOrContinent } from '@/shared/validators/countryContinents'
 
 const decimalCount = (num: number) => {
   const numAsString = num.toString()
@@ -185,10 +186,15 @@ export const LocalityTable = ({ selectorFn }: { selectorFn?: (newObject: Localit
       {
         id: 'country',
         accessorFn: row => row.country || '',
-        header: 'Country',
+        header: 'Country or Continent',
         enableHiding: false,
         enableColumnFilterModes: false,
-        filterFn: 'contains',
+        filterFn: (row, columnId, filterValue) => {
+          const search =
+            typeof filterValue === 'string' ? filterValue : Array.isArray(filterValue) ? filterValue.join(' ') : ''
+
+          return matchesCountryOrContinent(row.getValue<string>(columnId), search)
+        },
       },
       {
         id: 'state',

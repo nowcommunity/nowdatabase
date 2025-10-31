@@ -1,3 +1,6 @@
+const buildTimeUnitName = (base = 'Testing Time Unit Creation') =>
+  `${base} ${Date.now()}-${Math.floor(Math.random() * 1e6)}`
+
 before('Reset database', () => {
   cy.request(Cypress.env('databaseResetUrl'))
 })
@@ -8,8 +11,9 @@ describe('Creating a time unit', () => {
   })
 
   it('with correct values works', () => {
+    const displayName = buildTimeUnitName()
     cy.visit(`/time-unit/new`)
-    cy.get('[id=tu_display_name-textfield]').type('Testing Time Unit Creation')
+    cy.get('[id=tu_display_name-textfield]').type(displayName)
     cy.get('[id=sequence-tableselection]').first().click() // sequence field
     cy.get('[data-cy=add-button-ALMAAsianlandmammalage]').first().click()
     cy.get('[id=up_bnd-tableselection]').first().click() // Select Upper Bound Button
@@ -18,7 +22,7 @@ describe('Creating a time unit', () => {
     cy.get('[data-cy=add-button-14]').first().click()
 
     cy.addReferenceAndSave()
-    cy.contains('Testing Time Unit Creation')
+    cy.contains(displayName)
     cy.contains('ALMAAsianlandmammalage')
     cy.contains('C2N-o')
     cy.contains('C2N-y')
@@ -109,8 +113,9 @@ describe('Creating a time unit', () => {
   })
 
   it('but returning from staging view before saving works', () => {
+    const displayName = buildTimeUnitName()
     cy.visit(`/time-unit/new`)
-    cy.get('[id=tu_display_name-textfield]').type('Testing Time Unit Creation')
+    cy.get('[id=tu_display_name-textfield]').type(displayName)
     cy.get('[id=sequence-tableselection]').first().click()
     cy.get('[data-cy=add-button-ALMAAsianlandmammalage]').first().click()
     cy.get('[id=up_bnd-tableselection]').first().click()
@@ -121,20 +126,22 @@ describe('Creating a time unit', () => {
     cy.get('[id=return-to-editing-button]').click()
     cy.contains('Creating new time-unit')
     cy.get('[id=tu_display_name-textfield]').should('not.be.disabled')
-    cy.get('[id=tu_display_name-textfield]').should('have.value', 'Testing Time Unit Creation')
+    cy.get('[id=tu_display_name-textfield]').should('have.value', displayName)
     cy.get('[id=sequence-tableselection]').should('have.value', 'ALMAAsianlandmammalage')
     cy.contains('C2N-o')
     cy.contains('C2N-y')
 
     cy.addReferenceAndSave()
+    cy.contains(displayName)
     cy.contains('C2N-o')
     cy.contains('C2N-y')
     cy.contains('Creating new time-unit').should('not.exist')
   })
 
   it('and editing after saving works', () => {
+    const displayName = buildTimeUnitName('Testing Time Unit Creation part 3')
     cy.visit(`/time-unit/new`)
-    cy.get('[id=tu_display_name-textfield]').type('Testing Time Unit Creation part 3')
+    cy.get('[id=tu_display_name-textfield]').type(displayName)
     cy.get('[id=sequence-tableselection]').first().click()
     cy.get('[data-cy=add-button-ALMAAsianlandmammalage]').first().click()
     cy.get('[id=up_bnd-tableselection]').first().click()
@@ -143,6 +150,7 @@ describe('Creating a time unit', () => {
     cy.get('[data-cy=add-button-14]').first().click()
 
     cy.addReferenceAndSave()
+    cy.contains(displayName)
     cy.contains('C2N-o')
     cy.contains('C2N-y')
     cy.get('[id=edit-button]').click()

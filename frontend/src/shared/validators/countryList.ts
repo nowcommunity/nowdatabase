@@ -272,3 +272,7 @@ export const validCountries = [
   'Zambia',
   'Zimbabwe',
 ]
+
+export const validCountrySet = new Set(validCountries)
+
+export const isValidCountry = (value: string): boolean => validCountrySet.has(value)
