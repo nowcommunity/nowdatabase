@@ -24,6 +24,29 @@ import { TableToolBar } from './TableToolBar'
 import NotListedLocationIcon from '@mui/icons-material/NotListedLocation'
 import '../../styles/tableview/TableView.css'
 
+/*
+  Investigation Log (Task T1 – Pagination state handling)
+
+  Reproduction steps (manual):
+  1. Navigate to any table using server-side pagination (e.g. Localities).
+  2. Advance to a later page (page index >= 4 with page size 25 reproduces consistently).
+  3. Apply a restrictive filter ("Country equals XYZ" with few matches).
+  4. Observe the data panel display "No results found" while the paginator still reports the
+     original total (e.g. 344 pages). Navigating back to page 1 restores the expected rows.
+
+  Root cause summary:
+  • `autoResetPageIndex` is disabled while server-side pagination is active, so the component
+    keeps the previous `pageIndex` and emits the same SQL offset even when filters change.
+  • When the filter shrinks the dataset, the current offset typically exceeds the available rows,
+    so the API response is empty. With zero rows we never recompute `rowCount`, leaving the stale
+    total derived from the prior data set in place, which makes the paginator claim hundreds of
+    pages and masks that the table is simply querying beyond the end of the filtered result set.
+
+  Next steps: reset/clamp `pagination.pageIndex` whenever filters/sorting change and ensure
+  `rowCount` derives from the latest response even when it is empty, so manual pagination stays
+  aligned with filtered totals.
+*/
+
 type TableStateInUrl = 'sorting' | 'columnfilters' | 'pagination'
 
 /*
