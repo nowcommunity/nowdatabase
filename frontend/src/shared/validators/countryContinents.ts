@@ -323,5 +323,5 @@ export const matchesCountryOrContinent = (
     return true
   }
 
-  return continentAliases[continent].some(alias => alias.includes(normalizedFilter) || normalizedFilter.includes(alias))
+  return continentAliases[continent].some(alias => alias.includes(normalizedFilter))
 }
