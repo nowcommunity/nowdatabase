@@ -284,9 +284,9 @@ const continentAliases: Record<Continent, string[]> = {
   Antarctica: ['antarctica'],
   Asia: ['asia'],
   Europe: ['europe'],
-  'North America': ['north america', 'northern america', 'central america', 'caribbean', 'america', 'americas'],
+  'North America': ['north america', 'northern america', 'central america', 'caribbean'],
   Oceania: ['oceania', 'australia', 'australasia', 'pacific'],
-  'South America': ['south america', 'southern america', 'latin america', 'america', 'americas'],
+  'South America': ['south america', 'southern america', 'latin america'],
 }
 
 const normalize = (value: string | null | undefined) => value?.trim().toLowerCase() ?? ''
