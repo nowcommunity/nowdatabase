@@ -241,9 +241,7 @@ export const TableView = <T extends MRT_RowData>({
     resetPaginationPageIndex()
   }
 
-  const handleSortingChange = (
-    updaterOrValue: MRT_SortingState | ((prev: MRT_SortingState) => MRT_SortingState)
-  ) => {
+  const handleSortingChange = (updaterOrValue: MRT_SortingState | ((prev: MRT_SortingState) => MRT_SortingState)) => {
     setSorting(prev =>
       typeof updaterOrValue === 'function'
         ? (updaterOrValue as (prevState: MRT_SortingState) => MRT_SortingState)(prev)
