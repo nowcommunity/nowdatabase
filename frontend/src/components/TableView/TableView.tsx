@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import {
   type MRT_ColumnFiltersState,
   type MRT_ColumnDef,
@@ -113,6 +113,7 @@ export const TableView = <T extends MRT_RowData>({
   const [pagination, setPagination] = useState<MRT_PaginationState>(
     selectorFn ? defaultPaginationSmall : defaultPagination
   )
+  const { pageIndex, pageSize } = pagination
   const user = useUser()
   const { setIdList } = usePageContext<T>()
 
@@ -208,11 +209,64 @@ export const TableView = <T extends MRT_RowData>({
     document.title = `${title}`
   }
 
-  let rowCount = undefined
-  if (data && data.length > 0) {
-    if (serverSidePagination) rowCount = data[0].full_count as number
-    else rowCount = data.length
+  const rowCount = useMemo(() => {
+    if (!data) {
+      return undefined
+    }
+
+    if (!serverSidePagination) {
+      return data.length
+    }
+
+    if (data.length === 0) {
+      return 0
+    }
+
+    const firstRow = data[0] as { full_count?: unknown }
+    return typeof firstRow.full_count === 'number' ? firstRow.full_count : 0
+  }, [data, serverSidePagination])
+
+  const resetPaginationPageIndex = () => {
+    setPagination(prev => (prev.pageIndex === 0 ? prev : { ...prev, pageIndex: 0 }))
   }
+
+  const handleColumnFiltersChange = (
+    updaterOrValue:
+      | MRT_ColumnFiltersState
+      | ((prev: MRT_ColumnFiltersState) => MRT_ColumnFiltersState)
+  ) => {
+    setColumnFilters(prev =>
+      typeof updaterOrValue === 'function'
+        ? (updaterOrValue as (prevState: MRT_ColumnFiltersState) => MRT_ColumnFiltersState)(prev)
+        : updaterOrValue
+    )
+    resetPaginationPageIndex()
+  }
+
+  const handleSortingChange = (
+    updaterOrValue: MRT_SortingState | ((prev: MRT_SortingState) => MRT_SortingState)
+  ) => {
+    setSorting(prev =>
+      typeof updaterOrValue === 'function'
+        ? (updaterOrValue as (prevState: MRT_SortingState) => MRT_SortingState)(prev)
+        : updaterOrValue
+    )
+    resetPaginationPageIndex()
+  }
+
+  useEffect(() => {
+    if (!serverSidePagination || rowCount === undefined) {
+      return
+    }
+
+    const maxPageIndex = Math.max(0, Math.ceil(rowCount / pageSize) - 1)
+
+    if (pageIndex <= maxPageIndex) {
+      return
+    }
+
+    setPagination(prev => ({ ...prev, pageIndex: Math.min(prev.pageIndex, maxPageIndex) }))
+  }, [serverSidePagination, rowCount, pageIndex, pageSize])
 
   const muiTableBodyRowProps = ({ row }: { row: MRT_Row<T> }) => ({
     onClick: () => {
@@ -245,7 +299,7 @@ export const TableView = <T extends MRT_RowData>({
     initialState: {
       columnVisibility: visibleColumns,
     },
-    onColumnFiltersChange: setColumnFilters,
+    onColumnFiltersChange: handleColumnFiltersChange,
     renderRowActions: ({ row }) => {
       return (
         <Box className="row-actions-column">
@@ -270,7 +324,7 @@ export const TableView = <T extends MRT_RowData>({
     displayColumnDefOptions: { 'mrt-row-actions': { size: 50, header: '' } },
     enableRowActions: true,
     enableMultiSort: !serverSidePagination,
-    onSortingChange: setSorting,
+    onSortingChange: handleSortingChange,
     onPaginationChange: setPagination,
     manualPagination: serverSidePagination,
     manualSorting: serverSidePagination,
