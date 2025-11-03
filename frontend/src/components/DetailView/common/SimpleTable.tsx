@@ -10,7 +10,7 @@ import {
 import { useDetailContext } from '../Context/DetailContext'
 import { ActionComponent } from '@/components/TableView/ActionComponent'
 import { defaultPaginationSmall } from './defaultValues'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom'
 import { usePageContext } from '@/components/Page'
 
@@ -54,6 +54,10 @@ export const SimpleTable = <T extends MRT_RowData, ParentType extends MRT_RowDat
           }),
         }
       : {}
+
+  useEffect(() => {
+    setPagination(prev => (prev.pageIndex === 0 ? prev : { ...prev, pageIndex: 0 }))
+  }, [data])
 
   const table = useMaterialReactTable({
     columns: columns,

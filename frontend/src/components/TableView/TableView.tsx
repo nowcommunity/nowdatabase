@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import {
   type MRT_ColumnFiltersState,
   type MRT_ColumnDef,
@@ -209,44 +209,42 @@ export const TableView = <T extends MRT_RowData>({
     document.title = `${title}`
   }
 
-  const deriveRowCount = () => {
-    if (!data) {
+  const previousFilterSignatureRef = useRef<string>()
+
+  const serverSideRowCount = useMemo(() => {
+    if (!serverSidePagination || !data || data.length === 0) {
       return undefined
     }
 
-    if (!serverSidePagination) {
-      return data.length
+    const firstRow = data[0] as { full_count?: unknown }
+    const parsed = Number(firstRow.full_count)
+    if (!Number.isFinite(parsed) || parsed < 0) {
+      return undefined
     }
 
-    if (data.length === 0) {
+    return parsed
+  }, [data, serverSidePagination])
+
+  const resolvedRowCount = useMemo(() => {
+    if (!serverSidePagination) {
+      return data?.length ?? 0
+    }
+
+    if (!data) {
       return 0
     }
 
-    const estimatedRowCount = pageIndex * pageSize + data.length
-    const firstRow = data[0] as { full_count?: unknown }
-    const parsedFullCount = Number(firstRow.full_count)
-    const hasValidServerCount = Number.isFinite(parsedFullCount) && parsedFullCount >= 0
+    return serverSideRowCount ?? data.length
+  }, [data, serverSidePagination, serverSideRowCount])
 
-    if (pageIndex === 0 && data.length < pageSize) {
-      return hasValidServerCount ? Math.min(parsedFullCount, data.length) : data.length
+  const totalPages = useMemo(() => {
+    if (!serverSidePagination) {
+      return undefined
     }
 
-    if (!hasValidServerCount) {
-      return estimatedRowCount
-    }
-
-    if (pageIndex > 0 && data.length < pageSize && parsedFullCount > estimatedRowCount) {
-      return estimatedRowCount
-    }
-
-    return parsedFullCount
-  }
-
-  const rowCount = deriveRowCount()
-  const sanitizedRowCount = serverSidePagination
-    ? Math.max(0, rowCount ?? (data?.length ?? 0) + pageIndex * pageSize)
-    : rowCount ?? data?.length ?? 0
-  const totalPages = serverSidePagination ? Math.ceil((sanitizedRowCount || 0) / pageSize) : undefined
+    const computedPages = Math.ceil(Math.max(resolvedRowCount, 0) / pageSize)
+    return Math.max(computedPages, 1)
+  }, [pageSize, resolvedRowCount, serverSidePagination])
 
   const resetPaginationPageIndex = useCallback(() => {
     setPagination(prev => (prev.pageIndex === 0 ? prev : { ...prev, pageIndex: 0 }))
@@ -281,29 +279,37 @@ export const TableView = <T extends MRT_RowData>({
 
   useEffect(() => {
     if (!serverSidePagination) {
+      const availableRows = data?.length ?? 0
+      const maxPageIndex = Math.max(Math.ceil(availableRows / pageSize) - 1, 0)
+      if (pageIndex > maxPageIndex) {
+        setPagination(prev => ({ ...prev, pageIndex: maxPageIndex }))
+      }
       return
     }
 
-    const computedRowCount = sanitizedRowCount
-    const maxPageIndex = Math.max(0, Math.ceil((computedRowCount || 0) / pageSize) - 1)
+    const maxPageIndex = Math.max(Math.ceil(resolvedRowCount / pageSize) - 1, 0)
+    if (pageIndex > maxPageIndex) {
+      setPagination(prev => {
+        const nextPageIndex = Math.min(prev.pageIndex, maxPageIndex)
+        if (nextPageIndex === prev.pageIndex) {
+          return prev
+        }
 
-    if (pageIndex <= maxPageIndex) {
+        setSqlOffset(nextPageIndex * prev.pageSize)
+        return { ...prev, pageIndex: nextPageIndex }
+      })
+    }
+  }, [data, pageIndex, pageSize, resolvedRowCount, serverSidePagination, setSqlOffset])
+
+  useEffect(() => {
+    const filterSignature = JSON.stringify({ columnFilters, sorting })
+    if (previousFilterSignatureRef.current === filterSignature) {
       return
     }
+    previousFilterSignatureRef.current = filterSignature
 
-    setPagination(prev => {
-      const clampedPageIndex = Math.min(prev.pageIndex, maxPageIndex)
-      if (clampedPageIndex === prev.pageIndex) {
-        return prev
-      }
-
-      if (serverSidePagination) {
-        setSqlOffset(clampedPageIndex * prev.pageSize)
-      }
-
-      return { ...prev, pageIndex: clampedPageIndex }
-    })
-  }, [data, pageIndex, pageSize, sanitizedRowCount, serverSidePagination, setSqlOffset])
+    setPagination(prev => (prev.pageIndex === 0 ? prev : { ...prev, pageIndex: 0 }))
+  }, [columnFilters, sorting])
 
   const muiTableBodyRowProps = ({ row }: { row: MRT_Row<T> }) => ({
     onClick: () => {
@@ -376,8 +382,8 @@ export const TableView = <T extends MRT_RowData>({
     },
     manualPagination: serverSidePagination,
     manualSorting: serverSidePagination,
-    rowCount: sanitizedRowCount,
-    pageCount: serverSidePagination && typeof totalPages === 'number' ? Math.max(totalPages, 1) : undefined,
+    rowCount: resolvedRowCount,
+    pageCount: totalPages,
     autoResetPageIndex: false,
     positionPagination: selectorFn ? 'top' : 'both',
     paginationDisplayMode: 'pages',
