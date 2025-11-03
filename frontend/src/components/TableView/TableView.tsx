@@ -231,9 +231,7 @@ export const TableView = <T extends MRT_RowData>({
   }
 
   const handleColumnFiltersChange = (
-    updaterOrValue:
-      | MRT_ColumnFiltersState
-      | ((prev: MRT_ColumnFiltersState) => MRT_ColumnFiltersState)
+    updaterOrValue: MRT_ColumnFiltersState | ((prev: MRT_ColumnFiltersState) => MRT_ColumnFiltersState)
   ) => {
     setColumnFilters(prev =>
       typeof updaterOrValue === 'function'
