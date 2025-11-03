@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import {
   type MRT_ColumnFiltersState,
   type MRT_ColumnDef,
@@ -209,7 +209,7 @@ export const TableView = <T extends MRT_RowData>({
     document.title = `${title}`
   }
 
-  const rowCount = useMemo(() => {
+  const deriveRowCount = () => {
     if (!data) {
       return undefined
     }
@@ -223,7 +223,6 @@ export const TableView = <T extends MRT_RowData>({
     }
 
     const estimatedRowCount = pageIndex * pageSize + data.length
-
     const firstRow = data[0] as { full_count?: unknown }
     const parsedFullCount = Number(firstRow.full_count)
     const hasValidServerCount = Number.isFinite(parsedFullCount) && parsedFullCount >= 0
@@ -241,7 +240,12 @@ export const TableView = <T extends MRT_RowData>({
     }
 
     return parsedFullCount
-  }, [data, pageIndex, pageSize, serverSidePagination])
+  }
+
+  const rowCount = deriveRowCount()
+  const effectiveRowCount = serverSidePagination
+    ? rowCount ?? pageIndex * pageSize + (data?.length ?? 0)
+    : rowCount ?? data?.length ?? 0
 
   const resetPaginationPageIndex = useCallback(() => {
     setPagination(prev => (prev.pageIndex === 0 ? prev : { ...prev, pageIndex: 0 }))
@@ -359,7 +363,7 @@ export const TableView = <T extends MRT_RowData>({
     onPaginationChange: setPagination,
     manualPagination: serverSidePagination,
     manualSorting: serverSidePagination,
-    rowCount: rowCount,
+    rowCount: effectiveRowCount,
     autoResetPageIndex: false,
     positionPagination: selectorFn ? 'top' : 'both',
     paginationDisplayMode: 'pages',
