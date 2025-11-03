@@ -243,9 +243,10 @@ export const TableView = <T extends MRT_RowData>({
   }
 
   const rowCount = deriveRowCount()
-  const effectiveRowCount = serverSidePagination
-    ? rowCount ?? pageIndex * pageSize + (data?.length ?? 0)
+  const sanitizedRowCount = serverSidePagination
+    ? Math.max(0, rowCount ?? (data?.length ?? 0) + pageIndex * pageSize)
     : rowCount ?? data?.length ?? 0
+  const totalPages = serverSidePagination ? Math.ceil((sanitizedRowCount || 0) / pageSize) : undefined
 
   const resetPaginationPageIndex = useCallback(() => {
     setPagination(prev => (prev.pageIndex === 0 ? prev : { ...prev, pageIndex: 0 }))
@@ -279,11 +280,12 @@ export const TableView = <T extends MRT_RowData>({
   )
 
   useEffect(() => {
-    if (!serverSidePagination || rowCount === undefined) {
+    if (!serverSidePagination) {
       return
     }
 
-    const maxPageIndex = Math.max(0, Math.ceil(rowCount / pageSize) - 1)
+    const computedRowCount = sanitizedRowCount
+    const maxPageIndex = Math.max(0, Math.ceil((computedRowCount || 0) / pageSize) - 1)
 
     if (pageIndex <= maxPageIndex) {
       return
@@ -301,7 +303,7 @@ export const TableView = <T extends MRT_RowData>({
 
       return { ...prev, pageIndex: clampedPageIndex }
     })
-  }, [data, pageIndex, pageSize, rowCount, serverSidePagination, setSqlOffset])
+  }, [data, pageIndex, pageSize, sanitizedRowCount, serverSidePagination, setSqlOffset])
 
   const muiTableBodyRowProps = ({ row }: { row: MRT_Row<T> }) => ({
     onClick: () => {
@@ -360,10 +362,22 @@ export const TableView = <T extends MRT_RowData>({
     enableRowActions: true,
     enableMultiSort: !serverSidePagination,
     onSortingChange: handleSortingChange,
-    onPaginationChange: setPagination,
+    onPaginationChange: updaterOrValue => {
+      setPagination(prev => {
+        const nextState =
+          typeof updaterOrValue === 'function'
+            ? (updaterOrValue as (previous: MRT_PaginationState) => MRT_PaginationState)(prev)
+            : updaterOrValue
+        return {
+          pageIndex: nextState.pageIndex ?? prev.pageIndex,
+          pageSize: nextState.pageSize ?? prev.pageSize,
+        }
+      })
+    },
     manualPagination: serverSidePagination,
     manualSorting: serverSidePagination,
-    rowCount: effectiveRowCount,
+    rowCount: sanitizedRowCount,
+    pageCount: serverSidePagination && typeof totalPages === 'number' ? Math.max(totalPages, 1) : undefined,
     autoResetPageIndex: false,
     positionPagination: selectorFn ? 'top' : 'both',
     paginationDisplayMode: 'pages',
