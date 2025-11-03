@@ -222,9 +222,26 @@ export const TableView = <T extends MRT_RowData>({
       return 0
     }
 
+    const estimatedRowCount = pageIndex * pageSize + data.length
+
     const firstRow = data[0] as { full_count?: unknown }
-    return typeof firstRow.full_count === 'number' ? firstRow.full_count : 0
-  }, [data, serverSidePagination])
+    const parsedFullCount = Number(firstRow.full_count)
+    const hasValidServerCount = Number.isFinite(parsedFullCount) && parsedFullCount >= 0
+
+    if (pageIndex === 0 && data.length < pageSize) {
+      return hasValidServerCount ? Math.min(parsedFullCount, data.length) : data.length
+    }
+
+    if (!hasValidServerCount) {
+      return estimatedRowCount
+    }
+
+    if (pageIndex > 0 && data.length < pageSize && parsedFullCount > estimatedRowCount) {
+      return estimatedRowCount
+    }
+
+    return parsedFullCount
+  }, [data, pageIndex, pageSize, serverSidePagination])
 
   const resetPaginationPageIndex = useCallback(() => {
     setPagination(prev => (prev.pageIndex === 0 ? prev : { ...prev, pageIndex: 0 }))
