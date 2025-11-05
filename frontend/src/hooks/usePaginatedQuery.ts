@@ -116,7 +116,7 @@ const ensureFullCountOnRows = <TItem>(
 
   if (rows.length === 0) return rows
   const firstRow = rows[0]
-  
+
   // Early return if full_count already exists to avoid unnecessary array recreation
   if (!isObject(firstRow)) return rows
   if ('full_count' in firstRow) return rows
@@ -141,49 +141,39 @@ export const usePaginatedQuery = <
   const envelope = useMemo<PaginatedEnvelope<TRaw> | undefined>(() => {
     const rawData = queryResult.data
     if (!rawData) return undefined
-    
+
     // Handle array responses
     if (Array.isArray(rawData)) {
       return { data: rawData }
     }
-    
+
     // Handle object responses - validate basic structure
     if (isObject(rawData)) {
       // Check if the envelope has a recognizable pagination structure
       const hasData = 'data' in rawData || 'rows' in rawData
-      const hasPaginationFields = 
-        'totalItems' in rawData || 
-        'total' in rawData || 
-        'full_count' in rawData || 
-        'pageSize' in rawData || 
+      const hasPaginationFields =
+        'totalItems' in rawData ||
+        'total' in rawData ||
+        'full_count' in rawData ||
+        'pageSize' in rawData ||
         'limit' in rawData
-      
+
       // Accept envelope if it has data arrays or pagination fields
       if (hasData || hasPaginationFields) {
         return rawData
       }
-      
-      // Log warning for unexpected structure in development
-      if (process.env.NODE_ENV === 'development') {
-        console.warn('usePaginatedQuery: Unexpected envelope structure', rawData)
-      }
     }
-    
+
     return undefined
   }, [queryResult.data])
 
   const rows = useMemo<TRaw[] | undefined>(() => {
     if (!envelope) return undefined
-    
+
     // Validate that data/rows are actually arrays
     if ('data' in envelope && Array.isArray(envelope.data)) return envelope.data
     if ('rows' in envelope && Array.isArray(envelope.rows)) return envelope.rows
-    
-    // Log warning if envelope exists but has no valid array data
-    if (process.env.NODE_ENV === 'development') {
-      console.warn('usePaginatedQuery: Envelope missing valid data/rows array', envelope)
-    }
-    
+
     return undefined
   }, [envelope])
 

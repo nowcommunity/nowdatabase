@@ -51,7 +51,7 @@ jest.mock('@/redux/timeUnitReducer', () => {
     const limit = params?.limit ?? pageSize
     const offset = params?.offset ?? 0
     const derivedPageIndex = limit > 0 ? Math.floor(offset / limit) : 0
-    
+
     // Handle edge case when offset exceeds totalItems
     const clampedPageIndex = Math.min(derivedPageIndex, sequencesByPage.length - 1)
     const pageData = clampedPageIndex >= 0 ? sequencesByPage[clampedPageIndex] ?? [] : []
