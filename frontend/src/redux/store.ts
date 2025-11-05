@@ -1,6 +1,7 @@
 import { configureStore, Middleware } from '@reduxjs/toolkit'
 import { userReducer, UserState } from './userReducer'
 import { api } from './api'
+import tablesReducer from './slices/tablesSlice'
 
 const localStorageMiddleware: Middleware = store => next => action => {
   const result = next(action)
@@ -26,6 +27,7 @@ export const store = configureStore({
   reducer: {
     [api.reducerPath]: api.reducer,
     user: userReducer,
+    tables: tablesReducer,
   },
   middleware: getDefaultMiddleware =>
     getDefaultMiddleware({ immutableCheck: { warnAfter: 128 }, serializableCheck: { warnAfter: 128 } })

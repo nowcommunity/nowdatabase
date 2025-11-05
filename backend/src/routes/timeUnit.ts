@@ -26,8 +26,17 @@ router.get('/all', async (_req, res) => {
   return res.status(200).send(time_units)
 })
 
-router.get('/sequences', async (_req, res) => {
-  const sequences = await getAllSequences()
+router.get('/sequences', async (req, res) => {
+  const parseNumber = (value: unknown) => {
+    if (typeof value !== 'string') return undefined
+    const parsed = Number(value)
+    return Number.isNaN(parsed) ? undefined : parsed
+  }
+
+  const limit = parseNumber(req.query.limit)
+  const offset = parseNumber(req.query.offset)
+
+  const sequences = await getAllSequences({ limit, offset })
   return res.status(200).send(sequences)
 })
 
