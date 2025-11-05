@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { type MRT_ColumnDef } from 'material-react-table'
-import { useGetSequencesQuery } from '@/redux/timeUnitReducer'
+import { type SequenceQueryArgs, useGetSequencesQuery } from '@/redux/timeUnitReducer'
 import { Sequence } from '@/shared/types'
 import { TableView } from '../TableView/TableView'
 import { Table } from '@/components/Table/Table'
@@ -25,7 +25,7 @@ export const SequenceTable = ({ selectorFn }: { selectorFn?: (id: Sequence) => v
     data: sequenceQueryData,
     isFetching,
     pagination,
-  } = usePaginatedQuery(useGetSequencesQuery, {
+  } = usePaginatedQuery<SequenceQueryArgs, Sequence>(useGetSequencesQuery, {
     tableId: TABLE_ID,
     queryArg,
     manualPageIndex: pageIndex,
@@ -72,13 +72,13 @@ export const SequenceTable = ({ selectorFn }: { selectorFn?: (id: Sequence) => v
   }
 
   return (
-    <Table tableId={TABLE_ID} onPageChange={setPageIndex} isLoading={isFetching} paginationPlacement="top">
+    <Table tableId={TABLE_ID} onPageChange={setPageIndex} isLoading={Boolean(isFetching)} paginationPlacement="top">
       <TableView<Sequence>
         selectorFn={selectorFn}
         idFieldName="sequence"
         columns={columns}
         title="Sequences"
-        isFetching={isFetching}
+        isFetching={Boolean(isFetching)}
         visibleColumns={visibleColumns}
         clickableRows={false}
         data={sequenceQueryData}

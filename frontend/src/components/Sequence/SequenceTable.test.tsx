@@ -1,3 +1,4 @@
+import '@testing-library/jest-dom'
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { Provider } from 'react-redux'
@@ -20,7 +21,6 @@ const createSequence = (id: number, name: string): Sequence =>
   ({
     sequence: id,
     seq_name: name,
-    full_count: totalItems,
   } as unknown as Sequence)
 
 const sequencesByPage: Sequence[][] = [
@@ -44,7 +44,12 @@ jest.mock('@/redux/timeUnitReducer', () => {
     const pageData = sequencesByPage[derivedPageIndex] ?? sequencesByPage[0]
 
     return {
-      data: pageData,
+      data: {
+        rows: pageData,
+        full_count: totalItems,
+        limit,
+        offset,
+      },
       isFetching: false,
     }
   })
@@ -83,11 +88,15 @@ describe('SequenceTable', () => {
     renderSequenceTable()
 
     await waitFor(() => expect(screen.getByText('Page 1 of 2')).toBeInTheDocument())
+    await waitFor(() =>
+      expect(screen.getByTestId('sequence-table-view')).toHaveTextContent('Sequence 1, Sequence 2, Sequence 3')
+    )
 
     const nextButton = screen.getByRole('button', { name: /go to next page/i })
     await userEvent.click(nextButton)
 
     await waitFor(() => expect(screen.getByText('Page 2 of 2')).toBeInTheDocument())
+    await waitFor(() => expect(screen.getByTestId('sequence-table-view')).toHaveTextContent('Sequence 11'))
 
     expect(useGetSequencesQuery).toHaveBeenCalledWith({ limit: pageSize, offset: 0 })
     expect(useGetSequencesQuery).toHaveBeenCalledWith({ limit: pageSize, offset: pageSize })

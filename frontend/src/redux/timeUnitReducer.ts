@@ -1,7 +1,14 @@
 import { api } from './api'
 import { EditDataType, Locality, Sequence, TimeUnit, TimeUnitDetailsType } from '@/shared/types'
 
-type SequenceQueryArgs = {
+export type SequenceQueryArgs = {
+  limit?: number
+  offset?: number
+}
+
+type SequenceQueryResult = {
+  rows: Sequence[]
+  full_count: number
   limit?: number
   offset?: number
 }
@@ -25,7 +32,7 @@ const timeunitsApi = api.injectEndpoints({
         url: `/time-unit/localities/${id}`,
       }),
     }),
-    getSequences: builder.query<Sequence[], SequenceQueryArgs | void>({
+    getSequences: builder.query<SequenceQueryResult, SequenceQueryArgs | void>({
       query: params => {
         const searchParams = new URLSearchParams()
         if (typeof params?.limit === 'number') {
