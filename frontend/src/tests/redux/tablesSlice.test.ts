@@ -1,9 +1,5 @@
 import { describe, expect, it } from '@jest/globals'
-import reducer, {
-  clearTableMetadata,
-  TablePaginationMetadata,
-  upsertTableMetadata,
-} from '@/redux/slices/tablesSlice'
+import reducer, { clearTableMetadata, TablePaginationMetadata, upsertTableMetadata } from '@/redux/slices/tablesSlice'
 
 describe('tablesSlice', () => {
   it('stores metadata for table id', () => {

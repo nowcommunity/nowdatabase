@@ -49,7 +49,7 @@ const isObject = (candidate: unknown): candidate is Record<string, unknown> => {
   return typeof candidate === 'object' && candidate !== null
 }
 
-const derivePageSize = <TQueryArg,>(
+const derivePageSize = <TQueryArg>(
   queryArg: TQueryArg,
   envelope: PaginatedEnvelope<unknown> | undefined,
   manualPageSize?: number
@@ -64,7 +64,7 @@ const derivePageSize = <TQueryArg,>(
   return undefined
 }
 
-const deriveOffset = <TQueryArg,>(
+const deriveOffset = <TQueryArg>(
   queryArg: TQueryArg,
   envelope: PaginatedEnvelope<unknown> | undefined
 ): number | undefined => {
@@ -96,7 +96,8 @@ const computeMetadata = <TQueryArg, TItem>(
 
   const pageSize = derivePageSize(queryArg, envelope, manualPageSize) ?? rows.length
   const offset = deriveOffset(queryArg, envelope) ?? 0
-  const pageIndex = typeof manualPageIndex === 'number' ? manualPageIndex : pageSize > 0 ? Math.floor(offset / pageSize) : 0
+  const pageIndex =
+    typeof manualPageIndex === 'number' ? manualPageIndex : pageSize > 0 ? Math.floor(offset / pageSize) : 0
   const totalPages = pageSize > 0 ? Math.max(1, Math.ceil(totalItems / pageSize)) : totalItems > 0 ? 1 : 0
 
   return {
@@ -107,7 +108,7 @@ const computeMetadata = <TQueryArg, TItem>(
   }
 }
 
-const ensureFullCountOnRows = <TItem,>(
+const ensureFullCountOnRows = <TItem>(
   rows: TItem[] | undefined,
   fullCount: number | undefined
 ): TItem[] | undefined => {
@@ -117,15 +118,17 @@ const ensureFullCountOnRows = <TItem,>(
   const firstRow = rows[0]
   if (!isObject(firstRow) || 'full_count' in firstRow) return rows
 
-  return [
-    { ...(firstRow as Record<string, unknown>), full_count: fullCount } as TItem,
-    ...rows.slice(1),
-  ]
+  return [{ ...(firstRow as Record<string, unknown>), full_count: fullCount } as TItem, ...rows.slice(1)]
 }
 
-export const usePaginatedQuery = <TQueryArg, TRaw, TMapped = TRaw, TResult extends UnknownQueryResult<
-  ArrayWithFullCount<TRaw> | PaginatedEnvelope<TRaw>
-> = UnknownQueryResult<ArrayWithFullCount<TRaw> | PaginatedEnvelope<TRaw>>>(
+export const usePaginatedQuery = <
+  TQueryArg,
+  TRaw,
+  TMapped = TRaw,
+  TResult extends UnknownQueryResult<ArrayWithFullCount<TRaw> | PaginatedEnvelope<TRaw>> = UnknownQueryResult<
+    ArrayWithFullCount<TRaw> | PaginatedEnvelope<TRaw>
+  >,
+>(
   queryHook: QueryHook<TQueryArg, TResult>,
   options: UsePaginatedQueryOptions<TQueryArg, TRaw, TMapped>
 ) => {
@@ -139,7 +142,7 @@ export const usePaginatedQuery = <TQueryArg, TRaw, TMapped = TRaw, TResult exten
       return { data: rawData }
     }
     if (isObject(rawData)) {
-      return rawData as PaginatedEnvelope<TRaw>
+      return rawData
     }
     return undefined
   }, [queryResult.data])
@@ -205,10 +208,10 @@ export const usePaginatedQuery = <TQueryArg, TRaw, TMapped = TRaw, TResult exten
     dispatch(upsertTableMetadata({ tableId, metadata }))
   }, [dispatch, tableId, enabled, metadata])
 
-  const decoratedRows = useMemo(() => ensureFullCountOnRows(transformedRows, metadata?.totalItems), [
-    transformedRows,
-    metadata?.totalItems,
-  ])
+  const decoratedRows = useMemo(
+    () => ensureFullCountOnRows(transformedRows, metadata?.totalItems),
+    [transformedRows, metadata?.totalItems]
+  )
 
   return {
     ...queryResult,
@@ -216,4 +219,3 @@ export const usePaginatedQuery = <TQueryArg, TRaw, TMapped = TRaw, TResult exten
     pagination: metadata,
   }
 }
-
