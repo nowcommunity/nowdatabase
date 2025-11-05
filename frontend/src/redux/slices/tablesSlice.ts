@@ -1,4 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
+import type { RootState } from '@/redux/store'
 
 export type TablePaginationMetadata = {
   totalItems: number
@@ -37,6 +38,6 @@ const tablesSlice = createSlice({
 
 export const { upsertTableMetadata, clearTableMetadata } = tablesSlice.actions
 
-export const selectTableMetadata = (state: { tables?: TablesState }, tableId: string) => state.tables?.[tableId] ?? null
+export const selectTableMetadata = (state: RootState, tableId: string) => state.tables?.[tableId] ?? null
 
 export default tablesSlice.reducer
