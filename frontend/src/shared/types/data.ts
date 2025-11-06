@@ -1,3 +1,4 @@
+/* eslint-disable import/no-unresolved */
 /* For types that describe data */
 
 import * as Prisma from '../../../../backend/prisma/generated/now_test_client/default'

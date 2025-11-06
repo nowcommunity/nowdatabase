@@ -1,11 +1,12 @@
-// @ts-nocheck
 import { describe, expect, it, jest } from '@jest/globals'
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MemoryRouter, Route, Routes, useLocation } from 'react-router-dom'
+import type { ReactNode } from 'react'
 
 import { ReturnButton } from '@/components/common/ReturnButton'
-import { DetailContext, modeOptionToMode } from '@/components/DetailView/Context/DetailContext'
+import { DetailContext, modeOptionToMode, type DetailContextType } from '@/components/DetailView/Context/DetailContext'
+import type { PageContextType } from '@/components/Page'
 import { useSyncTabSearch } from '@/hooks/useSyncTabSearch'
 
 jest.mock('lodash-es', () => ({
@@ -20,51 +21,62 @@ jest.mock('@/util/config', () => ({
 
 jest.mock('@/shared/types', () => ({}))
 
-const createPageContextValue = (overrides = {}) => ({
-  idList: [],
-  setIdList: jest.fn(),
-  idFieldName: 'rid',
-  viewName: 'reference',
-  previousTableUrls: [],
-  setPreviousTableUrls: jest.fn(),
-  createTitle: () => '',
-  createSubtitle: () => '',
-  editRights: {},
-  sqlLimit: 25,
-  sqlOffset: 0,
-  sqlColumnFilters: [],
-  sqlOrderBy: [],
-  setSqlLimit: jest.fn(),
-  setSqlOffset: jest.fn(),
-  setSqlColumnFilters: jest.fn(),
-  setSqlOrderBy: jest.fn(),
-  ...overrides,
-})
+type TestPageContext = PageContextType<unknown>
 
-const createDetailContextValue = (overrides = {}) => ({
-  data: {},
-  mode: modeOptionToMode.read,
-  setMode: jest.fn(),
-  editData: {},
-  setEditData: jest.fn(),
-  textField: jest.fn(() => <></>),
-  bigTextField: jest.fn(() => <></>),
-  dropdown: jest.fn(() => <></>),
-  dropdownWithSearch: jest.fn(() => <></>),
-  radioSelection: jest.fn(() => <></>),
-  validator: jest.fn(() => ({ name: 'field', error: null })),
-  fieldsWithErrors: {},
-  setFieldsWithErrors: jest.fn(),
-  ...overrides,
-})
+const createPageContextValue = (overrides: Partial<TestPageContext> = {}): TestPageContext =>
+  ({
+    idList: [],
+    setIdList: () => {},
+    idFieldName: 'rid',
+    viewName: 'reference',
+    previousTableUrls: [],
+    setPreviousTableUrls: () => {},
+    createTitle: () => '',
+    createSubtitle: () => '',
+    editRights: {},
+    sqlLimit: 25,
+    sqlOffset: 0,
+    sqlColumnFilters: [],
+    sqlOrderBy: [],
+    setSqlLimit: () => {},
+    setSqlOffset: () => {},
+    setSqlColumnFilters: () => {},
+    setSqlOrderBy: () => {},
+    ...overrides,
+  }) as TestPageContext
 
-const pageContextValue = createPageContextValue()
+type TestDetailContext = DetailContextType<unknown>
+
+const createDetailContextValue = (overrides: Partial<TestDetailContext> = {}): TestDetailContext =>
+  ({
+    data: {},
+    mode: modeOptionToMode.read,
+    setMode: () => {},
+    editData: {} as TestDetailContext['editData'],
+    setEditData: (() => {}) as TestDetailContext['setEditData'],
+    textField: (() => <></>) as TestDetailContext['textField'],
+    bigTextField: (() => <></>) as TestDetailContext['bigTextField'],
+    dropdown: (() => <></>) as TestDetailContext['dropdown'],
+    dropdownWithSearch: (() => <></>) as TestDetailContext['dropdownWithSearch'],
+    radioSelection: (() => <></>) as TestDetailContext['radioSelection'],
+    validator: () => ({ name: 'field', error: null }),
+    fieldsWithErrors: {},
+    setFieldsWithErrors: () => {},
+    ...overrides,
+  }) as TestDetailContext
+
+const pageContextValue: TestPageContext = createPageContextValue()
 
 jest.mock('@/components/Page', () => ({
   usePageContext: () => pageContextValue,
 }))
 
-const TestProviders = ({ children, detailContextOverrides = {} }) => {
+type TestProvidersProps = {
+  children: ReactNode
+  detailContextOverrides?: Partial<TestDetailContext>
+}
+
+const TestProviders = ({ children, detailContextOverrides = {} }: TestProvidersProps) => {
   const detailContextValue = createDetailContextValue(detailContextOverrides)
   return <DetailContext.Provider value={detailContextValue}>{children}</DetailContext.Provider>
 }
@@ -88,9 +100,7 @@ describe('Detail view return navigation integration', () => {
     const user = userEvent.setup()
 
     render(
-      <MemoryRouter
-        initialEntries={[{ pathname: '/reference/123', state: { returnTo: '/locality/10003?tab=10' } }]}
-      >
+      <MemoryRouter initialEntries={[{ pathname: '/reference/123', state: { returnTo: '/locality/10003?tab=10' } }]}>
         <LocationDisplay />
         <Routes>
           <Route

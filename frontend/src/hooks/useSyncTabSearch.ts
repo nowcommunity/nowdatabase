@@ -4,14 +4,14 @@ import { useLocation, useNavigate } from 'react-router-dom'
 export const useSyncTabSearch = (tab: number) => {
   const location = useLocation()
   const navigate = useNavigate()
-  const preservedStateRef = useRef(location.state)
+  const preservedStateRef = useRef<unknown>(location.state as unknown)
   const lastLocationKeyRef = useRef(location.key)
 
   useEffect(() => {
     if (location.state !== undefined && location.state !== null) {
-      preservedStateRef.current = location.state
+      preservedStateRef.current = location.state as unknown
     } else if (location.key !== lastLocationKeyRef.current) {
-      preservedStateRef.current = location.state
+      preservedStateRef.current = location.state as unknown
     }
 
     lastLocationKeyRef.current = location.key

@@ -1,12 +1,14 @@
-// @ts-nocheck
 import { describe, expect, it, jest, beforeEach } from '@jest/globals'
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MemoryRouter, Route, Routes, useLocation } from 'react-router-dom'
+import type { ReactNode } from 'react'
 
 import { ReferenceList } from '@/components/DetailView/common/ReferenceList'
 import { ReturnButton } from '@/components/common/ReturnButton'
-import { DetailContext, modeOptionToMode } from '@/components/DetailView/Context/DetailContext'
+import { DetailContext, modeOptionToMode, type DetailContextType } from '@/components/DetailView/Context/DetailContext'
+import type { PageContextType } from '@/components/Page'
+import type { AnyReference } from '@/shared/types'
 
 jest.mock('lodash-es', () => ({
   cloneDeep: (value: unknown) => value,
@@ -19,7 +21,7 @@ jest.mock('@/util/config', () => ({
 
 jest.mock('@/shared/types', () => ({}))
 
-type AnyReference = {
+type ReferenceMock = {
   rid: number
   ref_ref: {
     rid: number
@@ -39,9 +41,9 @@ type AnyReference = {
   }
 }
 
-type ReferenceOverride = Partial<AnyReference>
+type ReferenceOverride = Partial<ReferenceMock>
 
-const createReference = (overrides: ReferenceOverride = {}): AnyReference => ({
+const createReference = (overrides: ReferenceOverride = {}): ReferenceMock => ({
   rid: 123,
   ref_ref: {
     rid: 123,
@@ -65,51 +67,63 @@ const createReference = (overrides: ReferenceOverride = {}): AnyReference => ({
   ...overrides,
 })
 
-const createPageContextValue = (overrides = {}) => ({
-  idList: [],
-  setIdList: jest.fn(),
-  idFieldName: 'rid',
-  viewName: 'reference',
-  previousTableUrls: [],
-  setPreviousTableUrls: jest.fn(),
-  createTitle: () => '',
-  createSubtitle: () => '',
-  editRights: {},
-  sqlLimit: 25,
-  sqlOffset: 0,
-  sqlColumnFilters: [],
-  sqlOrderBy: [],
-  setSqlLimit: jest.fn(),
-  setSqlOffset: jest.fn(),
-  setSqlColumnFilters: jest.fn(),
-  setSqlOrderBy: jest.fn(),
-  ...overrides,
-})
+type TestPageContext = PageContextType<unknown>
 
-const createDetailContextValue = (overrides = {}) => ({
-  data: {},
-  mode: modeOptionToMode.read,
-  setMode: jest.fn(),
-  editData: {},
-  setEditData: jest.fn(),
-  textField: jest.fn(() => <></>),
-  bigTextField: jest.fn(() => <></>),
-  dropdown: jest.fn(() => <></>),
-  dropdownWithSearch: jest.fn(() => <></>),
-  radioSelection: jest.fn(() => <></>),
-  validator: jest.fn(() => ({ name: 'field', error: null })),
-  fieldsWithErrors: {},
-  setFieldsWithErrors: jest.fn(),
-  ...overrides,
-})
+const createPageContextValue = (overrides: Partial<TestPageContext> = {}): TestPageContext =>
+  ({
+    idList: [],
+    setIdList: () => {},
+    idFieldName: 'rid',
+    viewName: 'reference',
+    previousTableUrls: [],
+    setPreviousTableUrls: () => {},
+    createTitle: () => '',
+    createSubtitle: () => '',
+    editRights: {},
+    sqlLimit: 25,
+    sqlOffset: 0,
+    sqlColumnFilters: [],
+    sqlOrderBy: [],
+    setSqlLimit: () => {},
+    setSqlOffset: () => {},
+    setSqlColumnFilters: () => {},
+    setSqlOrderBy: () => {},
+    ...overrides,
+  }) as TestPageContext
 
-const pageContextValue = createPageContextValue()
+type TestDetailContext = DetailContextType<unknown>
+
+const createDetailContextValue = (overrides: Partial<TestDetailContext> = {}): TestDetailContext =>
+  ({
+    data: {},
+    mode: modeOptionToMode.read,
+    setMode: () => {},
+    editData: {} as TestDetailContext['editData'],
+    setEditData: (() => {}) as TestDetailContext['setEditData'],
+    textField: (() => <></>) as TestDetailContext['textField'],
+    bigTextField: (() => <></>) as TestDetailContext['bigTextField'],
+    dropdown: (() => <></>) as TestDetailContext['dropdown'],
+    dropdownWithSearch: (() => <></>) as TestDetailContext['dropdownWithSearch'],
+    radioSelection: (() => <></>) as TestDetailContext['radioSelection'],
+    validator: () => ({ name: 'field', error: null }),
+    fieldsWithErrors: {},
+    setFieldsWithErrors: () => {},
+    ...overrides,
+  }) as TestDetailContext
+
+const pageContextValue: TestPageContext = createPageContextValue()
 
 jest.mock('@/components/Page', () => ({
   usePageContext: () => pageContextValue,
 }))
 
-const TestProviders = ({ children, pageContextOverrides = {}, detailContextOverrides = {} }) => {
+type TestProvidersProps = {
+  children: ReactNode
+  pageContextOverrides?: Partial<TestPageContext>
+  detailContextOverrides?: Partial<TestDetailContext>
+}
+
+const TestProviders = ({ children, pageContextOverrides = {}, detailContextOverrides = {} }: TestProvidersProps) => {
   Object.assign(pageContextValue, createPageContextValue(pageContextOverrides))
   const detailContextValue = createDetailContextValue(detailContextOverrides)
 
@@ -122,7 +136,7 @@ const LocationDisplay = () => {
 }
 
 describe('Update log navigation flow', () => {
-  const references = [createReference()]
+  const references = [createReference()] as unknown as AnyReference[]
 
   beforeEach(() => {
     Object.assign(pageContextValue, createPageContextValue())
