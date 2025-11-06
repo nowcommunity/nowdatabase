@@ -1,10 +1,11 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { useLocation, useNavigate } from 'react-router-dom'
+import { To, useLocation, useNavigate } from 'react-router-dom'
 import { Button, Box, Typography, CircularProgress, Divider, alpha, List, ListItemText } from '@mui/material'
 import ArrowBackIcon from '@mui/icons-material/ArrowBack'
 import SaveIcon from '@mui/icons-material/Save'
 import { usePageContext } from '../Page'
 import { useDetailContext } from './Context/DetailContext'
+import { resolveReturnNavigation } from './returnNavigation'
 import { EditDataType, Editable, Reference, Species } from '@/shared/types'
 import { useState, useEffect, Fragment } from 'react'
 import { referenceValidator } from '@/shared/validators/validator'
@@ -263,6 +264,7 @@ export const ReturnButton = () => {
   const { setPreviousTableUrls, previousTableUrls } = usePageContext()
   const { mode, setMode } = useDetailContext()
   const location = useLocation()
+  const returnTo = (location.state as { returnTo?: To } | null)?.returnTo
 
   if (mode.staging) {
     return (
@@ -281,17 +283,25 @@ export const ReturnButton = () => {
   return (
     <Button
       onClick={() => {
-        if (previousTableUrls.length > 0) {
-          const previousTableUrl = previousTableUrls[previousTableUrls.length - 1]
-          const newUrls = [...previousTableUrls]
-          newUrls.splice(-1)
-          setPreviousTableUrls(newUrls)
-          navigate(previousTableUrl, { relative: 'path' })
-        } else {
-          // this should only happen if the user navigates to e.g. a detail view directly with an url,
-          // instead of using link in the app
-          navigate(location.pathname.substring(0, location.pathname.indexOf('/', 1)), { relative: 'path' })
+        const fallback = location.pathname.substring(0, location.pathname.indexOf('/', 1))
+        const decision = resolveReturnNavigation({
+          returnTo,
+          previousUrls: previousTableUrls,
+          fallback,
+        })
+
+        if (decision.type === 'state') {
+          navigate(decision.target)
+          return
         }
+
+        if (decision.type === 'stack') {
+          setPreviousTableUrls(decision.updatedStack)
+          navigate(decision.target, { relative: 'path' })
+          return
+        }
+
+        navigate(decision.target, { relative: 'path' })
       }}
     >
       <ArrowBackIcon color="primary" style={{ marginRight: '0.2em' }} />
