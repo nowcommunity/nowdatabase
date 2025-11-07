@@ -24,9 +24,7 @@ Implement **exactly one task** from an approved feature plan.
 
 ---
 
-## 📌 Task To Implement (Paste the single task object here)
-
-> Replace the JSON below with the **exact** task object (T1 / T2 / …) from the approved plan.
+## 📌 Task To Implement
 
 ```json
 {
