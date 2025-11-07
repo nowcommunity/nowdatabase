@@ -1,9 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { useLocation, useNavigate } from 'react-router-dom'
 import { Button, Box, Typography, CircularProgress, Divider, alpha, List, ListItemText } from '@mui/material'
-import ArrowBackIcon from '@mui/icons-material/ArrowBack'
 import SaveIcon from '@mui/icons-material/Save'
-import { usePageContext } from '../Page'
 import { useDetailContext } from './Context/DetailContext'
 import { EditDataType, Editable, Reference, Species } from '@/shared/types'
 import { useState, useEffect, Fragment } from 'react'
@@ -15,6 +12,7 @@ import { countryBoundingBoxes } from '@/country_data/countryBoundingBoxes'
 import { boundingBoxSplit, isPointInBoxes } from '@/util/isPointInBox'
 import { OutOfBoundsWarningModal, OutOfBoundsWarningModalState } from './OutOfBoundsWarningModal'
 import { skipToken } from '@reduxjs/toolkit/query'
+export { ReturnButton } from '@/components/common/ReturnButton'
 
 export const WriteButton = <T,>({
   onWrite,
@@ -255,47 +253,5 @@ export const ErrorBox = <T,>() => {
         ))}
       </List>
     </Box>
-  )
-}
-
-export const ReturnButton = () => {
-  const navigate = useNavigate()
-  const { setPreviousTableUrls, previousTableUrls } = usePageContext()
-  const { mode, setMode } = useDetailContext()
-  const location = useLocation()
-
-  if (mode.staging) {
-    return (
-      <Button
-        id="return-to-editing-button"
-        onClick={() => {
-          if (mode.new) setMode('new')
-          else setMode('edit')
-        }}
-      >
-        <ArrowBackIcon color="primary" style={{ marginRight: '0.2em' }} />
-        Return to editing
-      </Button>
-    )
-  }
-  return (
-    <Button
-      onClick={() => {
-        if (previousTableUrls.length > 0) {
-          const previousTableUrl = previousTableUrls[previousTableUrls.length - 1]
-          const newUrls = [...previousTableUrls]
-          newUrls.splice(-1)
-          setPreviousTableUrls(newUrls)
-          navigate(previousTableUrl, { relative: 'path' })
-        } else {
-          // this should only happen if the user navigates to e.g. a detail view directly with an url,
-          // instead of using link in the app
-          navigate(location.pathname.substring(0, location.pathname.indexOf('/', 1)), { relative: 'path' })
-        }
-      }}
-    >
-      <ArrowBackIcon color="primary" style={{ marginRight: '0.2em' }} />
-      Return to table
-    </Button>
   )
 }

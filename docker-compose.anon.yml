@@ -38,6 +38,9 @@ services:
     container_name: nowdb-db-anon
     image: mariadb:11.4.3
     env_file: .anon.env
+    environment:
+      - MYSQL_WAIT_TIMEOUT=28800
+      - MYSQL_INTERACTIVE_TIMEOUT=28800
     volumes:
       - ./test_data/:/docker-entrypoint-initdb.d
       - nowdb-db-anon:/var/lib/mysql/data

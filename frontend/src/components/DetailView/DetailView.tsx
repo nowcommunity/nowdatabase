@@ -18,6 +18,7 @@ import { ValidationObject } from '@/shared/validators/validator'
 import { EditDataType } from '@/shared/types'
 import { usePageContext } from '../Page'
 import { ContactForm } from './common/ContactForm'
+import { useSyncTabSearch } from '@/hooks/useSyncTabSearch'
 
 export type TabType = {
   title: string
@@ -76,7 +77,7 @@ export const DetailView = <T extends object>({
   hasStagingMode?: boolean
   deleteFunction?: () => Promise<void>
 }) => {
-  const [searchParams, setSearchParams] = useSearchParams()
+  const [searchParams] = useSearchParams()
   const theme = useTheme()
   const getUrl = () => {
     const tabFromUrl = searchParams.get('tab')
@@ -87,16 +88,7 @@ export const DetailView = <T extends object>({
   const [mode, setModeState] = useState<ModeType>(isNew ? modeOptionToMode['new'] : modeOptionToMode['read'])
   const [fieldsWithErrors, setFieldsWithErrors] = useState<FieldsWithErrorsType>({})
   const [tab, setTab] = useState(getUrl())
-
-  useEffect(() => {
-    setSearchParams(
-      params => {
-        params.set('tab', tab.toString())
-        return params
-      },
-      { replace: true }
-    )
-  }, [tab, setSearchParams])
+  useSyncTabSearch(tab)
 
   // asks user for confirmation before leaving or refreshing a page with potential unsaved changes
   // does not work if user navigates away using browser back or forward buttons,

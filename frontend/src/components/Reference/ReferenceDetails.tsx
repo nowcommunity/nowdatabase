@@ -14,6 +14,7 @@ import { emptyReference } from '../DetailView/common/defaultValues'
 import { validateReference } from '@/shared/validators/reference'
 import { useNotify } from '@/hooks/notification'
 import { useEffect } from 'react'
+import { useReturnNavigation } from '@/hooks/useReturnNavigation'
 
 export const ReferenceDetails = () => {
   const { id } = useParams()
@@ -26,15 +27,16 @@ export const ReferenceDetails = () => {
   const [deleteMutation, { isSuccess: deleteSuccess, isError: deleteError }] = useDeleteReferenceMutation()
   const { notify } = useNotify()
   const navigate = useNavigate()
+  const { fallbackTarget } = useReturnNavigation({ fallback: '/reference' })
 
   useEffect(() => {
     if (deleteSuccess) {
       notify('Deleted item successfully.')
-      navigate('/reference')
+      navigate(fallbackTarget)
     } else if (deleteError) {
       notify('Could not delete item. Error happened.', 'error')
     }
-  }, [deleteSuccess, deleteError, notify, navigate])
+  }, [deleteSuccess, deleteError, notify, navigate, fallbackTarget])
 
   if (isError) return <div>Error loading data</div>
   if (isFetching || (!data && !isNew) || mutationLoading) return <CircularProgress />
