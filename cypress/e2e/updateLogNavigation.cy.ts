@@ -1,6 +1,10 @@
 /// <reference types="cypress" />
 
 describe('Update log navigation', () => {
+  before('Wait for database to become ready', () => {
+    cy.task('waitForDbHealthy')
+  })
+
   before('Reset database', () => {
     cy.request(Cypress.env('databaseResetUrl'))
   })

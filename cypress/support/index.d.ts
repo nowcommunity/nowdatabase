@@ -8,4 +8,14 @@ declare namespace Cypress {
     addReferenceAndSave(): Chainable<void>
     clearNewSpeciesForm(): Chainable<void>
   }
+
+  interface Tasks {
+    waitForDbHealthy(options?: WaitForDbHealthyOptions): null
+  }
+}
+
+interface WaitForDbHealthyOptions {
+  host?: string
+  port?: number
+  timeoutMs?: number
 }
