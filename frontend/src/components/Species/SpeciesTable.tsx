@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react'
 import { type MRT_ColumnDef, type MRT_FilterFn } from 'material-react-table'
 import { useGetAllSpeciesQuery } from '../../redux/speciesReducer'
-import { Species } from '@/shared/types'
+import { Species, formatDevelopmentalCrownType } from '@/shared/types'
 import { TableView } from '../TableView/TableView'
 import { SynonymsModal } from './SynonymsModal'
 
@@ -41,26 +41,6 @@ const createSynonymAwareFilter = (
       return synonymValue ? synonymValue.includes(normalizedFilter) : false
     })
   }
-}
-
-const formatDevelopmentalCrownType = (species: Species): string => {
-  const segments: Array<string | null> = [
-    species.cusp_shape,
-    species.cusp_count_buccal,
-    species.cusp_count_lingual,
-    species.loph_count_lon,
-    species.loph_count_trs,
-  ]
-
-  return segments
-    .map(segment => {
-      if (segment == null || segment === '') {
-        return '-'
-      }
-
-      return segment
-    })
-    .join('')
 }
 
 export const SpeciesTable = ({ selectorFn }: { selectorFn?: (id: Species) => void }) => {

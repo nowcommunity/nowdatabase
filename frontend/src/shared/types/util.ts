@@ -29,3 +29,31 @@ export type RowState = 'new' | 'removed' | 'cancelled' | 'clean'
 // Use this for fields that include array that has to be edited by EditableTable.
 // For example see LocalityDetails: museums field
 export type Editable<T> = T & { rowState?: RowState }
+
+type DevelopmentalCrownTypeSource = {
+  cusp_shape?: string | number | null
+  cusp_count_buccal?: string | number | null
+  cusp_count_lingual?: string | number | null
+  loph_count_lon?: string | number | null
+  loph_count_trs?: string | number | null
+}
+
+const mapDevelopmentalSegment = (segment: string | number | null | undefined): string => {
+  if (segment === null || segment === undefined || segment === '') {
+    return '-'
+  }
+
+  return String(segment)
+}
+
+export const formatDevelopmentalCrownType = <T extends DevelopmentalCrownTypeSource>(source: T): string => {
+  return [
+    source.cusp_shape,
+    source.cusp_count_buccal,
+    source.cusp_count_lingual,
+    source.loph_count_lon,
+    source.loph_count_trs,
+  ]
+    .map(mapDevelopmentalSegment)
+    .join('')
+}
