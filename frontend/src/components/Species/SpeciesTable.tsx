@@ -43,26 +43,6 @@ const createSynonymAwareFilter = (
   }
 }
 
-const formatDevelopmentalCrownType = (species: Species): string => {
-  const segments: Array<string | null> = [
-    species.cusp_shape,
-    species.cusp_count_buccal,
-    species.cusp_count_lingual,
-    species.loph_count_lon,
-    species.loph_count_trs,
-  ]
-
-  return segments
-    .map(segment => {
-      if (segment == null || segment === '') {
-        return '-'
-      }
-
-      return segment
-    })
-    .join('')
-}
-
 export const SpeciesTable = ({ selectorFn }: { selectorFn?: (id: Species) => void }) => {
   const [selectedSpecies, setSelectedSpecies] = useState<string | undefined>()
   const [modalOpen, setModalOpen] = useState<boolean>(false)
