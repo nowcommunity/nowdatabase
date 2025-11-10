@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react'
 import { type MRT_ColumnDef, type MRT_FilterFn } from 'material-react-table'
 import { useGetAllSpeciesQuery } from '../../redux/speciesReducer'
-import { Species } from '@/shared/types'
+import { Species, formatDevelopmentalCrownType, formatFunctionalCrownType } from '@/shared/types'
 import { TableView } from '../TableView/TableView'
 import { SynonymsModal } from './SynonymsModal'
 
@@ -188,16 +188,16 @@ export const SpeciesTable = ({ selectorFn }: { selectorFn?: (id: Species) => voi
         filterFn: 'contains',
       },
       {
-        id: 'crowntype',
-        accessorFn: row => row.crowntype || '',
-        header: 'Crown Type',
+        id: 'developmental_crown_type',
+        accessorFn: formatDevelopmentalCrownType,
+        header: 'Developmental Crown Type',
         size: 10,
         filterFn: 'contains',
       },
       {
-        id: 'crowntype',
-        accessorFn: row => row.crowntype || '',
-        header: 'Developmental Crown Type',
+        id: 'functional_crown_type',
+        accessorFn: formatFunctionalCrownType,
+        header: 'Functional Crown Type',
         size: 10,
         filterFn: 'contains',
       },
@@ -396,7 +396,8 @@ export const SpeciesTable = ({ selectorFn }: { selectorFn?: (id: Species) => voi
     tshm: false,
     tht: false,
     horizodonty: false,
-    crowntype: false,
+    developmental_crown_type: false,
+    functional_crown_type: false,
     cusp_shape: false,
     cusp_count_buccal: false,
     cusp_count_lingual: false,
