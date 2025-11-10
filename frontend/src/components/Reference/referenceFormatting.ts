@@ -48,12 +48,7 @@ export const createReferenceTitle = (ref: ReferenceDetailsType): string => {
     heading = yearSegment
   }
 
-  const titleCandidate = [
-    ref.title_primary,
-    ref.title_secondary,
-    ref.title_series,
-    ref.gen_notes,
-  ]
+  const titleCandidate = [ref.title_primary, ref.title_secondary, ref.title_series, ref.gen_notes]
     .map(value => value?.trim())
     .find(value => value && value.length > 0)
 

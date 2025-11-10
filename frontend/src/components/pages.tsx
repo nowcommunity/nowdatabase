@@ -114,7 +114,6 @@ export const museumPage = (
   />
 )
 
-
 export const referencePage = (
   <Page
     tableView={<ReferenceTable />}
