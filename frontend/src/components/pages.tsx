@@ -32,6 +32,7 @@ import { UserState } from '@/redux/userReducer'
 import { FrontPage } from './FrontPage'
 import { MuseumTable } from './Museum/MuseumTable'
 import { MuseumDetails } from './Museum/MuseumDetails'
+import { createReferenceSubtitle, createReferenceTitle } from './Reference/referenceFormatting'
 
 const noRights: EditRights = {}
 const fullRights: EditRights = { new: true, edit: true, delete: true }
@@ -113,116 +114,6 @@ export const museumPage = (
   />
 )
 
-// from UpdateTab
-const makeNameList = (names: Array<string | null | undefined>) => {
-  if (names.length === 3) {
-    return `${names[0]}, ${names[1]} & ${names[2]}`
-  } else if (names.length >= 4) {
-    return `${names[0]} et al.`
-  } else if (names.length === 2) {
-    return `${names[0]} & ${names[1]}`
-  }
-  return names[0] ?? ''
-}
-
-const createReferenceSubtitle = (ref: ReferenceDetailsType) => {
-  const authorsSurnames = ref.ref_authors.filter(author => author.field_id === 2).map(author => author.author_surname)
-  const editorsSurnames = ref.ref_authors.filter(author => author.field_id === 12).map(author => author.author_surname)
-  const authorsPart = `${makeNameList(authorsSurnames)}`
-  const editorsPart = `${makeNameList(editorsSurnames)} ${editorsSurnames.length > 1 ? '(eds)' : '(ed)'}`
-
-  let title = `${authorsPart} (${ref.date_primary}).`
-
-  switch (ref.ref_type_id) {
-    case 1: // Journal
-      title += ` ${ref.title_primary}. ${ref.ref_journal.journal_title}`
-      if (ref.volume) {
-        title += ` ${ref.volume}`
-      }
-      if (ref.issue) {
-        title += ` (${ref.issue})`
-      }
-      if (ref.start_page || ref.end_page) {
-        title += `: `
-      }
-      if (ref.start_page) {
-        title += `${ref.start_page}-`
-      }
-      if (ref.end_page) {
-        title += `${ref.end_page}`
-      }
-      if (ref.volume || ref.issue || ref.start_page || ref.end_page) {
-        title += `.`
-      }
-      return title
-    case 2: // Book
-      title += ` ${ref.title_primary}.`
-      if (ref.publisher || ref.pub_place) {
-        title += ` `
-      }
-      if (ref.publisher) {
-        title += `${ref.publisher}`
-      }
-      if (ref.publisher && ref.pub_place) {
-        title += `, `
-      }
-      if (ref.pub_place) {
-        title += `${ref.pub_place}`
-      }
-      if (ref.publisher || ref.pub_place) {
-        title += `.`
-      }
-      return title
-    case 3: // Book Chapter
-      title += ` ${ref.title_primary}. IN: ${editorsPart} ${ref.title_secondary}.`
-
-      if (ref.start_page || ref.end_page) {
-        title += ` pp.`
-      }
-      if (ref.start_page) {
-        title += `${ref.start_page}`
-      }
-      if (ref.start_page && ref.end_page) {
-        title += `-`
-      }
-      if (ref.end_page) {
-        title += `${ref.end_page}`
-      }
-      if (ref.start_page || ref.end_page) {
-        title += `.`
-      }
-      if (ref.publisher || ref.pub_place) {
-        title += ` `
-      }
-      if (ref.publisher) {
-        title += `${ref.publisher}`
-      }
-      if (ref.publisher && ref.pub_place) {
-        title += `, `
-      }
-      if (ref.pub_place) {
-        title += `${ref.pub_place}`
-      }
-      if (ref.publisher || ref.pub_place) {
-        title += `.`
-      }
-      return title
-    default:
-      if (ref.title_primary) {
-        title += ` ${ref.title_primary}.`
-      }
-      if (ref.title_secondary) {
-        title += ` ${ref.title_secondary}.`
-      }
-      if (ref.title_series) {
-        title += ` ${ref.title_series}.`
-      }
-      if (ref.gen_notes) {
-        title += ` ${ref.gen_notes}.`
-      }
-      return title
-  }
-}
 
 export const referencePage = (
   <Page
@@ -230,7 +121,7 @@ export const referencePage = (
     detailView={<ReferenceDetails />}
     viewName="reference"
     idFieldName="rid"
-    createTitle={(ref: ReferenceDetailsType) => `${ref.rid}`}
+    createTitle={createReferenceTitle}
     createSubtitle={createReferenceSubtitle}
     getEditRights={(user: UserState) => {
       if ([Role.Admin, Role.EditUnrestricted].includes(user.role)) return fullRights
