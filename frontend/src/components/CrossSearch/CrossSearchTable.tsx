@@ -1,6 +1,6 @@
 import { useMemo } from 'react'
 import { type MRT_ColumnDef } from 'material-react-table'
-import { CrossSearch } from '@/shared/types'
+import { CrossSearch, formatDevelopmentalCrownType } from '@/shared/types'
 import { TableView } from '../TableView/TableView'
 import { useGetAllCrossSearchQuery, useGetAllCrossSearchLocalitiesQuery } from '@/redux/crossSearchReducer'
 import { usePageContext } from '../Page'
@@ -522,7 +522,7 @@ export const CrossSearchTable = ({ selectorFn }: { selectorFn?: (newObject: Cros
       },
       {
         id: 'crowntype',
-        accessorFn: row => row.crowntype || '',
+        accessorFn: formatDevelopmentalCrownType,
         header: 'Developmental Crown Type',
         size: 20,
         filterFn: 'contains',
