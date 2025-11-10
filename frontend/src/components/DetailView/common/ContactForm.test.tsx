@@ -77,4 +77,32 @@ describe('ContactForm detail context integration', () => {
 
     expect(createTitle).toHaveBeenCalledWith(reference)
   })
+
+  it('falls back to the formatter result when minimal metadata is provided', async () => {
+    const reference = {
+      rid: 77,
+      ref_authors: [],
+      date_primary: null,
+      title_primary: null,
+      title_secondary: null,
+      title_series: null,
+      gen_notes: null,
+    } as unknown as ReferenceDetailsType
+
+    const expectedSubject = createReferenceTitle(reference)
+    const createTitle = jest.fn(() => expectedSubject)
+
+    mockUseDetailContext.mockReturnValue({ data: reference } as any)
+    mockUsePageContext.mockReturnValue({ createTitle } as any)
+
+    render(<ContactForm<ReferenceDetailsType> buttonText="Contact" />)
+
+    const subjectField = await screen.findByLabelText(/subject/i)
+
+    await waitFor(() => {
+      expect((subjectField as HTMLInputElement).value).toBe(expectedSubject)
+    })
+
+    expect(createTitle).toHaveBeenCalledWith(reference)
+  })
 })

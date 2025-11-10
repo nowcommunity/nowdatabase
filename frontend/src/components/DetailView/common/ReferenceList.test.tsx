@@ -46,6 +46,16 @@ const ReferenceLocationSpy = () => {
 }
 
 describe('ReferenceList', () => {
+  it('renders descriptive reference text instead of just the identifier', () => {
+    render(
+      <MemoryRouter>
+        <ReferenceList references={references} big />
+      </MemoryRouter>
+    )
+
+    expect(screen.getByText(/Smith \(1999\).*Primary Title/)).toBeTruthy()
+  })
+
   it('passes the current location as return state when navigating to reference details', async () => {
     const user = userEvent.setup()
 
