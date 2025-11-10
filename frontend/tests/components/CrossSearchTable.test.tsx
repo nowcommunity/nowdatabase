@@ -39,8 +39,7 @@ jest.mock('../../src/components/TableView/TableView', () => ({
 
 jest.mock('../../src/redux/crossSearchReducer', () => ({
   useGetAllCrossSearchQuery: (...args: unknown[]) => mockUseGetAllCrossSearchQuery(...args),
-  useGetAllCrossSearchLocalitiesQuery: (...args: unknown[]) =>
-    mockUseGetAllCrossSearchLocalitiesQuery(...args),
+  useGetAllCrossSearchLocalitiesQuery: (...args: unknown[]) => mockUseGetAllCrossSearchLocalitiesQuery(...args),
 }))
 
 jest.mock('../../src/components/Map/LocalitiesMap', () => ({

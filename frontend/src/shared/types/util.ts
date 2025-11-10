@@ -69,7 +69,5 @@ type FunctionalCrownTypeSource = {
 }
 
 export const formatFunctionalCrownType = <T extends FunctionalCrownTypeSource>(source: T): string => {
-  return [source.fct_al, source.fct_ol, source.fct_sf, source.fct_ot, source.fct_cm]
-    .map(mapCrownSegment)
-    .join('')
+  return [source.fct_al, source.fct_ol, source.fct_sf, source.fct_ot, source.fct_cm].map(mapCrownSegment).join('')
 }
