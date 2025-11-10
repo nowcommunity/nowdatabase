@@ -1,11 +1,18 @@
 import { afterEach, beforeEach, describe, expect, it, jest } from '@jest/globals'
-import { renderToStaticMarkup } from 'react-dom/server'
+import { render, waitFor } from '@testing-library/react'
 import type { Species } from '../../src/shared/types'
 
 type SynonymFilter = (row: { original: Species }, columnId: string, filterValue: unknown) => boolean
 
+type MockedColumn = {
+  id?: string
+  accessorKey?: string
+  accessorFn?: (row: Species) => unknown
+}
+
 type MockedTableViewProps = {
   data: Species[] | undefined
+  columns?: MockedColumn[]
   filterFns?: Record<string, SynonymFilter>
 }
 
@@ -102,7 +109,10 @@ describe('SpeciesTable synonym filtering', () => {
     mockUseGetAllSpeciesQuery.mockReturnValue({ data: [regularSpecies, speciesWithSynonyms], isFetching: false })
 
     const { SpeciesTable } = await import('../../src/components/Species/SpeciesTable')
-    renderToStaticMarkup(<SpeciesTable />)
+    render(<SpeciesTable />)
+    await waitFor(() => {
+      expect(mockTableView).toHaveBeenCalled()
+    })
   })
 
   afterEach(() => {
@@ -140,5 +150,57 @@ describe('SpeciesTable synonym filtering', () => {
 
     expect(speciesFilter!(row as { original: Species }, 'species_name', 'fami')).toBe(true)
     expect(speciesFilter!(row as { original: Species }, 'species_name', 'absent')).toBe(false)
+  })
+
+  it('provides unique column identifiers', () => {
+    expect(capturedProps?.columns).toBeDefined()
+    const identifiers = (capturedProps?.columns ?? [])
+      .map(column => {
+        if (!column) {
+          return undefined
+        }
+
+        if (typeof column.id === 'string') {
+          return column.id
+        }
+
+        if (typeof column.accessorKey === 'string') {
+          return column.accessorKey
+        }
+
+        return undefined
+      })
+      .filter((identifier): identifier is string => Boolean(identifier))
+
+    expect(new Set(identifiers).size).toBe(identifiers.length)
+  })
+
+  it('formats developmental crown type values using the shared formatter', () => {
+    const developmentalColumn = (capturedProps?.columns ?? []).find(column => column?.id === 'developmental_crown_type')
+    expect(developmentalColumn).toBeDefined()
+
+    const accessorFn = developmentalColumn?.accessorFn
+    expect(typeof accessorFn).toBe('function')
+
+    const sample = createSpecies({
+      cusp_shape: 'B',
+      cusp_count_buccal: '2',
+      cusp_count_lingual: '3',
+      loph_count_lon: '4',
+      loph_count_trs: '5',
+    })
+
+    expect(accessorFn?.(sample)).toBe('B2345')
+  })
+
+  it('retains the raw crowntype accessor for the Crown Type column', () => {
+    const crownTypeColumn = (capturedProps?.columns ?? []).find(column => column?.id === 'crowntype')
+    expect(crownTypeColumn).toBeDefined()
+
+    const accessorFn = crownTypeColumn?.accessorFn
+    expect(typeof accessorFn).toBe('function')
+
+    const sample = createSpecies({ crowntype: 'Bunodont' })
+    expect(accessorFn?.(sample)).toBe('Bunodont')
   })
 })
