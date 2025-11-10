@@ -57,6 +57,10 @@ export const EditableTable = <
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [errorObject])
 
+  useEffect(() => {
+    setPagination(prev => (prev.pageIndex === 0 ? prev : { ...prev, pageIndex: 0 }))
+  }, [editTableData, tableData, visible_data])
+
   if (tableData === null || editTableData === null) return <CircularProgress />
 
   const actionRow = ({ row, staticRowIndex }: { row: MRT_Row<T>; staticRowIndex?: number | undefined }) => {

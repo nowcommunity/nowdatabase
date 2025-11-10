@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import {
   type MRT_ColumnFiltersState,
   type MRT_ColumnDef,
@@ -23,6 +23,29 @@ import '../../styles/TableView.css'
 import { TableToolBar } from './TableToolBar'
 import NotListedLocationIcon from '@mui/icons-material/NotListedLocation'
 import '../../styles/tableview/TableView.css'
+
+/*
+  Investigation Log (Task T1 – Pagination state handling)
+
+  Reproduction steps (manual):
+  1. Navigate to any table using server-side pagination (e.g. Localities).
+  2. Advance to a later page (page index >= 4 with page size 25 reproduces consistently).
+  3. Apply a restrictive filter ("Country equals XYZ" with few matches).
+  4. Observe the data panel display "No results found" while the paginator still reports the
+     original total (e.g. 344 pages). Navigating back to page 1 restores the expected rows.
+
+  Root cause summary:
+  • `autoResetPageIndex` is disabled while server-side pagination is active, so the component
+    keeps the previous `pageIndex` and emits the same SQL offset even when filters change.
+  • When the filter shrinks the dataset, the current offset typically exceeds the available rows,
+    so the API response is empty. With zero rows we never recompute `rowCount`, leaving the stale
+    total derived from the prior data set in place, which makes the paginator claim hundreds of
+    pages and masks that the table is simply querying beyond the end of the filtered result set.
+
+  Next steps: reset/clamp `pagination.pageIndex` whenever filters/sorting change and ensure
+  `rowCount` derives from the latest response even when it is empty, so manual pagination stays
+  aligned with filtered totals.
+*/
 
 type TableStateInUrl = 'sorting' | 'columnfilters' | 'pagination'
 
@@ -90,6 +113,7 @@ export const TableView = <T extends MRT_RowData>({
   const [pagination, setPagination] = useState<MRT_PaginationState>(
     selectorFn ? defaultPaginationSmall : defaultPagination
   )
+  const { pageIndex, pageSize } = pagination
   const user = useUser()
   const { setIdList } = usePageContext<T>()
 
@@ -185,11 +209,107 @@ export const TableView = <T extends MRT_RowData>({
     document.title = `${title}`
   }
 
-  let rowCount = undefined
-  if (data && data.length > 0) {
-    if (serverSidePagination) rowCount = data[0].full_count as number
-    else rowCount = data.length
-  }
+  const previousFilterSignatureRef = useRef<string>()
+
+  const serverSideRowCount = useMemo(() => {
+    if (!serverSidePagination || !data || data.length === 0) {
+      return undefined
+    }
+
+    const firstRow = data[0] as { full_count?: unknown }
+    const parsed = Number(firstRow.full_count)
+    if (!Number.isFinite(parsed) || parsed < 0) {
+      return undefined
+    }
+
+    return parsed
+  }, [data, serverSidePagination])
+
+  const resolvedRowCount = useMemo(() => {
+    if (!serverSidePagination) {
+      return data?.length ?? 0
+    }
+
+    if (!data) {
+      return 0
+    }
+
+    return serverSideRowCount ?? data.length
+  }, [data, serverSidePagination, serverSideRowCount])
+
+  const totalPages = useMemo(() => {
+    if (!serverSidePagination) {
+      return undefined
+    }
+
+    const computedPages = Math.ceil(Math.max(resolvedRowCount, 0) / pageSize)
+    return Math.max(computedPages, 1)
+  }, [pageSize, resolvedRowCount, serverSidePagination])
+
+  const resetPaginationPageIndex = useCallback(() => {
+    setPagination(prev => (prev.pageIndex === 0 ? prev : { ...prev, pageIndex: 0 }))
+    if (serverSidePagination) {
+      setSqlOffset(0)
+    }
+  }, [serverSidePagination, setSqlOffset])
+
+  const handleColumnFiltersChange = useCallback(
+    (updaterOrValue: MRT_ColumnFiltersState | ((prev: MRT_ColumnFiltersState) => MRT_ColumnFiltersState)) => {
+      resetPaginationPageIndex()
+      setColumnFilters(prev =>
+        typeof updaterOrValue === 'function'
+          ? (updaterOrValue as (prevState: MRT_ColumnFiltersState) => MRT_ColumnFiltersState)(prev)
+          : updaterOrValue
+      )
+    },
+    [resetPaginationPageIndex]
+  )
+
+  const handleSortingChange = useCallback(
+    (updaterOrValue: MRT_SortingState | ((prev: MRT_SortingState) => MRT_SortingState)) => {
+      resetPaginationPageIndex()
+      setSorting(prev =>
+        typeof updaterOrValue === 'function'
+          ? (updaterOrValue as (prevState: MRT_SortingState) => MRT_SortingState)(prev)
+          : updaterOrValue
+      )
+    },
+    [resetPaginationPageIndex]
+  )
+
+  useEffect(() => {
+    if (!serverSidePagination) {
+      const availableRows = data?.length ?? 0
+      const maxPageIndex = Math.max(Math.ceil(availableRows / pageSize) - 1, 0)
+      if (pageIndex > maxPageIndex) {
+        setPagination(prev => ({ ...prev, pageIndex: maxPageIndex }))
+      }
+      return
+    }
+
+    const maxPageIndex = Math.max(Math.ceil(resolvedRowCount / pageSize) - 1, 0)
+    if (pageIndex > maxPageIndex) {
+      setPagination(prev => {
+        const nextPageIndex = Math.min(prev.pageIndex, maxPageIndex)
+        if (nextPageIndex === prev.pageIndex) {
+          return prev
+        }
+
+        setSqlOffset(nextPageIndex * prev.pageSize)
+        return { ...prev, pageIndex: nextPageIndex }
+      })
+    }
+  }, [data, pageIndex, pageSize, resolvedRowCount, serverSidePagination, setSqlOffset])
+
+  useEffect(() => {
+    const filterSignature = JSON.stringify({ columnFilters, sorting })
+    if (previousFilterSignatureRef.current === filterSignature) {
+      return
+    }
+    previousFilterSignatureRef.current = filterSignature
+
+    setPagination(prev => (prev.pageIndex === 0 ? prev : { ...prev, pageIndex: 0 }))
+  }, [columnFilters, sorting])
 
   const muiTableBodyRowProps = ({ row }: { row: MRT_Row<T> }) => ({
     onClick: () => {
@@ -222,7 +342,7 @@ export const TableView = <T extends MRT_RowData>({
     initialState: {
       columnVisibility: visibleColumns,
     },
-    onColumnFiltersChange: setColumnFilters,
+    onColumnFiltersChange: handleColumnFiltersChange,
     renderRowActions: ({ row }) => {
       return (
         <Box className="row-actions-column">
@@ -247,11 +367,23 @@ export const TableView = <T extends MRT_RowData>({
     displayColumnDefOptions: { 'mrt-row-actions': { size: 50, header: '' } },
     enableRowActions: true,
     enableMultiSort: !serverSidePagination,
-    onSortingChange: setSorting,
-    onPaginationChange: setPagination,
+    onSortingChange: handleSortingChange,
+    onPaginationChange: updaterOrValue => {
+      setPagination(prev => {
+        const nextState =
+          typeof updaterOrValue === 'function'
+            ? (updaterOrValue as (previous: MRT_PaginationState) => MRT_PaginationState)(prev)
+            : updaterOrValue
+        return {
+          pageIndex: nextState.pageIndex ?? prev.pageIndex,
+          pageSize: nextState.pageSize ?? prev.pageSize,
+        }
+      })
+    },
     manualPagination: serverSidePagination,
     manualSorting: serverSidePagination,
-    rowCount: rowCount,
+    rowCount: resolvedRowCount,
+    pageCount: totalPages,
     autoResetPageIndex: false,
     positionPagination: selectorFn ? 'top' : 'both',
     paginationDisplayMode: 'pages',
