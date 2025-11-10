@@ -1,6 +1,5 @@
 import {
   TimeUnitDetailsType,
-  ReferenceDetailsType,
   SpeciesDetailsType,
   LocalityDetailsType,
   TimeBoundDetailsType,
