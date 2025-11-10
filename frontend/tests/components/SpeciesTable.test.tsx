@@ -193,14 +193,21 @@ describe('SpeciesTable synonym filtering', () => {
     expect(accessorFn?.(sample)).toBe('B2345')
   })
 
-  it('retains the raw crowntype accessor for the Crown Type column', () => {
-    const crownTypeColumn = (capturedProps?.columns ?? []).find(column => column?.id === 'crowntype')
-    expect(crownTypeColumn).toBeDefined()
+  it('formats functional crown type values using the shared formatter', () => {
+    const functionalColumn = (capturedProps?.columns ?? []).find(column => column?.id === 'functional_crown_type')
+    expect(functionalColumn).toBeDefined()
 
-    const accessorFn = crownTypeColumn?.accessorFn
+    const accessorFn = functionalColumn?.accessorFn
     expect(typeof accessorFn).toBe('function')
 
-    const sample = createSpecies({ crowntype: 'Bunodont' })
-    expect(accessorFn?.(sample)).toBe('Bunodont')
+    const sample = createSpecies({
+      fct_al: 'A',
+      fct_ol: '0',
+      fct_sf: 'S',
+      fct_ot: '',
+      fct_cm: null,
+    })
+
+    expect(accessorFn?.(sample)).toBe('A0S--')
   })
 })
