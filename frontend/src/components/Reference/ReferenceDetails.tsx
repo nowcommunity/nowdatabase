@@ -14,6 +14,7 @@ import { emptyReference } from '../DetailView/common/defaultValues'
 import { validateReference } from '@/shared/validators/reference'
 import { useNotify } from '@/hooks/notification'
 import { useEffect } from 'react'
+import { createReferenceTitle } from './referenceFormatting'
 import { useReturnNavigation } from '@/hooks/useReturnNavigation'
 
 export const ReferenceDetails = () => {
@@ -41,7 +42,7 @@ export const ReferenceDetails = () => {
   if (isError) return <div>Error loading data</div>
   if (isFetching || (!data && !isNew) || mutationLoading) return <CircularProgress />
   if (data) {
-    document.title = `Reference - ${data.title_primary}`
+    document.title = `Reference - ${createReferenceTitle(data)}`
   }
 
   const onWrite = async (editData: EditDataType<ReferenceDetailsType>) => {

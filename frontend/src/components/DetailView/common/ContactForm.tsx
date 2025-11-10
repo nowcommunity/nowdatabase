@@ -145,13 +145,11 @@ const ContactFormDetailView = <T extends object>({
 }) => {
   const { data } = useDetailContext<T>()
   const { createTitle } = usePageContext<T>()
+  const subjectFromContext = createTitle(data)
 
   useEffect(() => {
-    // autofills the subject field on first render
-    const subject = createTitle(data)
-    setValue('subject', subject)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+    setValue('subject', subjectFromContext)
+  }, [setValue, subjectFromContext])
 
   return <ContactModal {...{ buttonText, onSend }}>{form}</ContactModal>
 }
