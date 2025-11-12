@@ -35,6 +35,18 @@ export const ActionComponent = <T extends MRT_RowData>({
     buttonType = 'details'
   }
 
+  /**
+   * Icon mapping (Task T1 audit):
+   * - `tableRowAction` → synonym toggle rendered as a text "S" button (LocalityTable,
+   *   SpeciesTable, and SelectingTable instances that open synonym modals).
+   * - `selectorFn` without `tableRowAction` → AddCircleOutline icon used by selection
+   *   modals (SelectingTable, optional selection mode in entity tables, CrossSearchTable).
+   * - Default branch → ManageSearch icon for navigation to the entity detail view
+   *   (Reference, Museum, Person, Region, TimeBound, TimeUnit, Project, Sequence, etc.).
+   *
+   * The trailing Policy icon depends on `checkRowRestriction` and remains outside this
+   * decision tree so restricted rows still surface their lock indicator.
+   */
   const getIconToShow = () => {
     if (tableRowAction) {
       return (

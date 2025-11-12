@@ -223,6 +223,29 @@ export const TableView = <T extends MRT_RowData>({
       columnVisibility: visibleColumns,
     },
     onColumnFiltersChange: setColumnFilters,
+    /**
+     * Row action audit (Task T1):
+     *
+     * • LocalityTable – supplies `selectorFn`, `checkRowRestriction`, and `tableRowAction`.
+     *   Shows the default ManageSearch navigation icon (or Add when `selectorFn` is used),
+     *   renders an "S" synonym action when `row.original.has_synonym` is true, and displays
+     *   the Policy restriction icon when `loc_status` flags a restricted locality.
+     * • SpeciesTable – provides `selectorFn` and `tableRowAction`. Uses the same default
+     *   ManageSearch/Add icon behaviour, an "S" synonym action for `has_synonym`, and the
+     *   NotListedLocationIcon whenever `row.original.has_no_locality` is true.
+     * • CrossSearchTable – passes `selectorFn` and `checkRowRestriction`, so rows use the
+     *   ManageSearch/Add icon and may show the Policy restriction indicator. No synonym
+     *   action is rendered because the dataset never sets `has_synonym`.
+     * • SelectingTable (used inside detail modals) – always passes `selectorFn` and may
+     *   forward `tableRowAction` (e.g. locality/species synonym modals). This results in
+     *   the Add icon for selection plus optional synonym "S" action.
+     * • ReferenceTable, MuseumTable, PersonTable, RegionTable, TimeBoundTable,
+     *   TimeUnitTable, ProjectTable, and SequenceTable – rely on the default
+     *   ManageSearch navigation action (or Add when a consumer injects `selectorFn`).
+     *
+     * Any future layout refactor must preserve these conditional branches because they
+     * encode the full set of icons currently surfaced in production.
+     */
     renderRowActions: ({ row }) => {
       return (
         <Box className="row-actions-column">
