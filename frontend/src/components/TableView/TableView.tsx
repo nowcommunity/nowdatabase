@@ -267,7 +267,11 @@ export const TableView = <T extends MRT_RowData>({
           )}
           {showNoLocalityIndicator && (
             <Tooltip title="This species is not currently in any locality" placement="right-start">
-              <NotListedLocationIcon color="disabled" fontSize="small" />
+              <NotListedLocationIcon
+                aria-label="Species currently lacks a linked locality"
+                color="disabled"
+                fontSize="small"
+              />
             </Tooltip>
           )}
         </Box>

@@ -100,7 +100,7 @@ export const ActionComponent = <T extends MRT_RowData>({
       </Tooltip>
       {checkRowRestriction && checkRowRestriction(row.original) && (
         <Tooltip placement="top" title="This item has restricted visibility">
-          <PolicyIcon color="primary" fontSize="medium" />
+          <PolicyIcon aria-label="Restricted visibility indicator" color="primary" fontSize="medium" />
         </Tooltip>
       )}
     </Box>
