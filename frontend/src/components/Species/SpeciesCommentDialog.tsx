@@ -19,14 +19,25 @@ const buildHeading = (genusName: string | null, speciesName: string | null) => {
   return `Species Comment - ${parts.join(' ')}`
 }
 
-export const SpeciesCommentDialog = ({ open, onClose, genusName, speciesName, comment }: SpeciesCommentDialogProps) => {
+export const SpeciesCommentDialog = ({
+  open,
+  onClose,
+  genusName,
+  speciesName,
+  comment,
+}: SpeciesCommentDialogProps) => {
   const commentContent = comment?.trim() ?? ''
   const displayText = commentContent.length > 0 ? commentContent : 'No comment available.'
 
   const dialogTitle = buildHeading(genusName, speciesName)
 
   return (
-    <Modal open={open} onClose={onClose} className="synonyms-modal modal" aria-labelledby="species-comment-dialog-title">
+    <Modal
+      open={open}
+      onClose={onClose}
+      className="synonyms-modal modal"
+      aria-labelledby="species-comment-dialog-title"
+    >
       <Box className="modal-content" role="document">
         <Box className="modal-header">
           <Typography id="species-comment-dialog-title" variant="h6" component="h2">
@@ -45,4 +56,3 @@ export const SpeciesCommentDialog = ({ open, onClose, genusName, speciesName, co
     </Modal>
   )
 }
-
