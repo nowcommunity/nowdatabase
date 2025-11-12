@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, type ReactNode } from 'react'
 import {
   type MRT_ColumnFiltersState,
   type MRT_ColumnDef,
@@ -53,6 +53,7 @@ export const TableView = <T extends MRT_RowData>({
   serverSidePagination,
   isFetching,
   filterFns,
+  renderRowActionExtras,
 }: {
   data: T[] | undefined
   columns: MRT_ColumnDef<T>[]
@@ -73,6 +74,7 @@ export const TableView = <T extends MRT_RowData>({
   serverSidePagination?: boolean
   isFetching: boolean
   filterFns?: Record<string, MRT_FilterFn<T>>
+  renderRowActionExtras?: ({ row }: { row: MRT_Row<T> }) => ReactNode
 }) => {
   const location = useLocation()
   const {
@@ -231,8 +233,9 @@ export const TableView = <T extends MRT_RowData>({
      *   renders an "S" synonym action when `row.original.has_synonym` is true, and displays
      *   the Policy restriction icon when `loc_status` flags a restricted locality.
      * • SpeciesTable – provides `selectorFn` and `tableRowAction`. Uses the same default
-     *   ManageSearch/Add icon behaviour, an "S" synonym action for `has_synonym`, and the
-     *   NotListedLocationIcon whenever `row.original.has_no_locality` is true.
+     *   ManageSearch/Add icon behaviour, an "S" synonym action for `has_synonym`, renders
+     *   optional extras via `renderRowActionExtras` (e.g. the species comment "C" button),
+     *   and the NotListedLocationIcon whenever `row.original.has_no_locality` is true.
      * • CrossSearchTable – passes `selectorFn` and `checkRowRestriction`, so rows use the
      *   ManageSearch/Add icon and may show the Policy restriction indicator. No synonym
      *   action is rendered because the dataset never sets `has_synonym`.
@@ -265,6 +268,7 @@ export const TableView = <T extends MRT_RowData>({
               }}
             />
           )}
+          {renderRowActionExtras && renderRowActionExtras({ row })}
           {showNoLocalityIndicator && (
             <Tooltip title="This species is not currently in any locality" placement="right-start">
               <NotListedLocationIcon
