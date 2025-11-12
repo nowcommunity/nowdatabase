@@ -19,13 +19,7 @@ const buildHeading = (genusName: string | null, speciesName: string | null) => {
   return `Species Comment - ${parts.join(' ')}`
 }
 
-export const SpeciesCommentDialog = ({
-  open,
-  onClose,
-  genusName,
-  speciesName,
-  comment,
-}: SpeciesCommentDialogProps) => {
+export const SpeciesCommentDialog = ({ open, onClose, genusName, speciesName, comment }: SpeciesCommentDialogProps) => {
   const commentContent = comment?.trim() ?? ''
   const displayText = commentContent.length > 0 ? commentContent : 'No comment available.'
 

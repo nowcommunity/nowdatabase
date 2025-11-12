@@ -182,13 +182,7 @@ describe('SpeciesTable synonym filtering', () => {
 
   it('renders the fallback message when the comment dialog receives an empty comment', () => {
     render(
-      <MockSpeciesCommentDialog
-        open
-        comment={null}
-        onClose={jest.fn()}
-        genusName={null}
-        speciesName={null}
-      />
+      <MockSpeciesCommentDialog open comment={null} onClose={jest.fn()} genusName={null} speciesName={null} />
     )
 
     expect(screen.getByText('No comment available.')).toBeTruthy()
