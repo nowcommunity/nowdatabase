@@ -223,28 +223,74 @@ export const TableView = <T extends MRT_RowData>({
       columnVisibility: visibleColumns,
     },
     onColumnFiltersChange: setColumnFilters,
+    /**
+     * Row action audit (Task T1):
+     *
+     * • LocalityTable – supplies `selectorFn`, `checkRowRestriction`, and `tableRowAction`.
+     *   Shows the default ManageSearch navigation icon (or Add when `selectorFn` is used),
+     *   renders an "S" synonym action when `row.original.has_synonym` is true, and displays
+     *   the Policy restriction icon when `loc_status` flags a restricted locality.
+     * • SpeciesTable – provides `selectorFn` and `tableRowAction`. Uses the same default
+     *   ManageSearch/Add icon behaviour, an "S" synonym action for `has_synonym`, and the
+     *   NotListedLocationIcon whenever `row.original.has_no_locality` is true.
+     * • CrossSearchTable – passes `selectorFn` and `checkRowRestriction`, so rows use the
+     *   ManageSearch/Add icon and may show the Policy restriction indicator. No synonym
+     *   action is rendered because the dataset never sets `has_synonym`.
+     * • SelectingTable (used inside detail modals) – always passes `selectorFn` and may
+     *   forward `tableRowAction` (e.g. locality/species synonym modals). This results in
+     *   the Add icon for selection plus optional synonym "S" action.
+     * • ReferenceTable, MuseumTable, PersonTable, RegionTable, TimeBoundTable,
+     *   TimeUnitTable, ProjectTable, and SequenceTable – rely on the default
+     *   ManageSearch navigation action (or Add when a consumer injects `selectorFn`).
+     *
+     * Any future layout refactor must preserve these conditional branches because they
+     * encode the full set of icons currently surfaced in production.
+     */
     renderRowActions: ({ row }) => {
+      const showSynonymIndicator = Boolean(row.original.has_synonym)
+      const showNoLocalityIndicator = Boolean(row.original.has_no_locality)
+
       return (
         <Box className="row-actions-column">
-          <Box>
-            <ActionComponent {...{ selectorFn, url, checkRowRestriction, row, idFieldName }} />
-          </Box>
-          <Box>
-            {row.original.has_synonym && (
-              <ActionComponent {...{ selectorFn, tableRowAction, url, checkRowRestriction, row, idFieldName }} />
-            )}
-          </Box>
-          <Box display="flex" alignItems="center" px="1.35em">
-            {row.original.has_no_locality && (
-              <Tooltip title="This species is not currently in any locality" placement="right-start">
-                <NotListedLocationIcon color="disabled" sx={{}} />
-              </Tooltip>
-            )}
-          </Box>
+          <ActionComponent {...{ selectorFn, url, checkRowRestriction, row, idFieldName }} />
+          {showSynonymIndicator && (
+            <ActionComponent
+              {...{
+                selectorFn,
+                tableRowAction,
+                url,
+                checkRowRestriction,
+                row,
+                idFieldName,
+              }}
+            />
+          )}
+          {showNoLocalityIndicator && (
+            <Tooltip title="This species is not currently in any locality" placement="right-start">
+              <NotListedLocationIcon
+                aria-label="Species currently lacks a linked locality"
+                color="disabled"
+                fontSize="small"
+              />
+            </Tooltip>
+          )}
         </Box>
       )
     },
-    displayColumnDefOptions: { 'mrt-row-actions': { size: 50, header: '' } },
+    displayColumnDefOptions: {
+      'mrt-row-actions': {
+        size: 36,
+        header: '',
+        muiTableHeadCellProps: {
+          align: 'right',
+        },
+        muiTableBodyCellProps: {
+          align: 'right',
+          className: 'row-actions-cell',
+        },
+      },
+    },
+    positionActionsColumn: 'last',
     enableRowActions: true,
     enableMultiSort: !serverSidePagination,
     onSortingChange: setSorting,

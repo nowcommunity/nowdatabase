@@ -1,6 +1,9 @@
 # Changelog
 
 ## Unreleased
+### Changed
+- Repositioned table row action icons to the right edge, tightened spacing, and added aria labels so Locality, Species, and related tables reclaim horizontal room while keeping tooltips and restriction markers accessible.
+
 ### Fixed
 - Resolved Update log detail navigation so Return buttons honor the originating table using the new shared return-navigation helper.
 
