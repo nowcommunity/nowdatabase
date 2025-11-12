@@ -1,9 +1,11 @@
-import { useMemo, useState } from 'react'
-import { type MRT_ColumnDef, type MRT_FilterFn } from 'material-react-table'
-import { useGetAllSpeciesQuery } from '../../redux/speciesReducer'
+import { useCallback, useMemo, useState, type MouseEvent } from 'react'
+import { type MRT_ColumnDef, type MRT_FilterFn, type MRT_Row } from 'material-react-table'
+import { IconButton, Tooltip, Typography } from '@mui/material'
 import { Species, formatDevelopmentalCrownType, formatFunctionalCrownType } from '@/shared/types'
 import { TableView } from '../TableView/TableView'
+import { useGetAllSpeciesQuery } from '../../redux/speciesReducer'
 import { SynonymsModal } from './SynonymsModal'
+import { SpeciesCommentDialog } from './SpeciesCommentDialog'
 
 const normalizeFilterValue = (value: unknown): string => {
   if (typeof value === 'string') {
@@ -43,9 +45,17 @@ const createSynonymAwareFilter = (
   }
 }
 
+type CommentModalData = {
+  genusName: string | null | undefined
+  speciesName: string | null | undefined
+  comment: string | null | undefined
+}
+
 export const SpeciesTable = ({ selectorFn }: { selectorFn?: (id: Species) => void }) => {
   const [selectedSpecies, setSelectedSpecies] = useState<string | undefined>()
   const [modalOpen, setModalOpen] = useState<boolean>(false)
+  const [commentModalOpen, setCommentModalOpen] = useState<boolean>(false)
+  const [commentModalData, setCommentModalData] = useState<CommentModalData | null>(null)
   const { data: speciesQueryData, isFetching } = useGetAllSpeciesQuery()
 
   const synonymFilterFns = useMemo<Record<string, MRT_FilterFn<Species>>>(
@@ -60,6 +70,68 @@ export const SpeciesTable = ({ selectorFn }: { selectorFn?: (id: Species) => voi
     setSelectedSpecies(row.species_id.toString())
     setModalOpen(true)
   }
+
+  const handleCommentModalClose = () => {
+    setCommentModalOpen(false)
+    setCommentModalData(null)
+  }
+
+  const handleCommentButtonClick = useCallback((species: Species) => {
+    setCommentModalData({
+      genusName: species.genus_name,
+      speciesName: species.species_name,
+      comment: species.sp_comment,
+    })
+    setCommentModalOpen(true)
+  }, [])
+
+  const renderCommentAction = useCallback(
+    ({ row }: { row: MRT_Row<Species> }) => {
+      const comment = row.original.sp_comment
+      if (typeof comment !== 'string' || comment.trim().length === 0) {
+        return null
+      }
+
+      const handleClick = (event: MouseEvent<HTMLButtonElement>) => {
+        event.stopPropagation()
+        handleCommentButtonClick(row.original)
+      }
+
+      const genusName = row.original.genus_name ?? ''
+      const speciesName = row.original.species_name ?? ''
+      const hasName = genusName || speciesName
+      const ariaLabel = hasName
+        ? `View species comment for ${[genusName, speciesName].filter(Boolean).join(' ')}`
+        : 'View species comment'
+
+      return (
+        <Tooltip title="Click for Species comment" placement="top">
+          <IconButton
+            onClick={handleClick}
+            size="small"
+            aria-label={ariaLabel}
+            data-cy={`comment-button-${row.original.species_id}`}
+            sx={{ p: 0.5 }}
+          >
+            <Typography
+              component="span"
+              variant="button"
+              sx={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                fontWeight: 600,
+                fontSize: '0.85rem',
+                lineHeight: 1,
+              }}
+            >
+              C
+            </Typography>
+          </IconButton>
+        </Tooltip>
+      )
+    },
+    [handleCommentButtonClick]
+  )
 
   const columns = useMemo<MRT_ColumnDef<Species>[]>(
     () => [
@@ -367,13 +439,6 @@ export const SpeciesTable = ({ selectorFn }: { selectorFn?: (id: Species) => voi
         size: 10,
         filterFn: 'contains',
       },
-      {
-        id: 'sp_comment',
-        accessorFn: row => row.sp_comment || '',
-        header: 'Comment',
-        size: 10,
-        filterFn: 'contains',
-      },
     ],
     []
   )
@@ -421,7 +486,6 @@ export const SpeciesTable = ({ selectorFn }: { selectorFn?: (id: Species) => voi
     locomo1: false,
     locomo2: false,
     locomo3: false,
-    sp_comment: false,
   }
 
   return (
@@ -438,6 +502,14 @@ export const SpeciesTable = ({ selectorFn }: { selectorFn?: (id: Species) => voi
         enableColumnFilterModes={true}
         tableRowAction={handleSpeciesRowActionClick}
         filterFns={synonymFilterFns}
+        renderRowActionExtras={renderCommentAction}
+      />
+      <SpeciesCommentDialog
+        open={commentModalOpen}
+        onClose={handleCommentModalClose}
+        genusName={commentModalData?.genusName ?? null}
+        speciesName={commentModalData?.speciesName ?? null}
+        comment={commentModalData?.comment ?? null}
       />
       <SynonymsModal open={modalOpen} onClose={() => setModalOpen(false)} selectedSpecies={selectedSpecies} />
     </>

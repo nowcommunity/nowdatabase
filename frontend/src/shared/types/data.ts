@@ -288,11 +288,13 @@ export type CrossSearch = {
 export type Sequence = Prisma.now_tu_sequence
 export type SequenceDetailsType = Prisma.now_tu_sequence
 
-export type SpeciesDetailsType = Prisma.com_species & { now_ls: Array<SpeciesLocality> } & {
+export type SpeciesDetailsType = (Prisma.com_species & Pick<SpeciesType, 'sp_comment'>) & {
+  now_ls: Array<SpeciesLocality>
+} & {
   com_taxa_synonym: Array<SpeciesSynonym>
 } & { now_sau: Array<SpeciesUpdate> }
 
-export type Species = {
+type SpeciesBase = {
   species_id: number
   order_name: string | null
   family_name: string | null
@@ -334,12 +336,15 @@ export type Species = {
   locomo1: string | null
   locomo2: string | null
   locomo3: string | null
-  sp_comment: string | null
   sp_author: string | null
-  has_synonym?: boolean
-  has_no_locality?: boolean
-  synonyms?: SpeciesListSynonym[]
 }
+
+export type Species = SpeciesBase &
+  Pick<SpeciesType, 'sp_comment'> & {
+    has_synonym?: boolean
+    has_no_locality?: boolean
+    synonyms?: SpeciesListSynonym[]
+  }
 
 export type RegionDetails = Prisma.now_reg_coord & { now_reg_coord_people: Array<RegionCoordinator> } & {
   now_reg_coord_country: Array<RegionCountry>
