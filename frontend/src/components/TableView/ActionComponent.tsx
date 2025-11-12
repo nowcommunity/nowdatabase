@@ -1,4 +1,5 @@
-import { Box, Button, Tooltip, Typography } from '@mui/material'
+import { useMemo, type MouseEvent } from 'react'
+import { Box, IconButton, Tooltip, Typography } from '@mui/material'
 import { MRT_RowData, MRT_Row } from 'material-react-table'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import ManageSearchIcon from '@mui/icons-material/ManageSearch'
@@ -26,70 +27,77 @@ export const ActionComponent = <T extends MRT_RowData>({
   const [searchParams] = useSearchParams()
   const id = row.original[idFieldName]
 
-  let buttonType: string
-  if (tableRowAction) {
-    buttonType = 'synonyms'
-  } else if (selectorFn) {
-    buttonType = 'add'
-  } else {
-    buttonType = 'details'
-  }
-
-  /**
-   * Icon mapping (Task T1 audit):
-   * - `tableRowAction` → synonym toggle rendered as a text "S" button (LocalityTable,
-   *   SpeciesTable, and SelectingTable instances that open synonym modals).
-   * - `selectorFn` without `tableRowAction` → AddCircleOutline icon used by selection
-   *   modals (SelectingTable, optional selection mode in entity tables, CrossSearchTable).
-   * - Default branch → ManageSearch icon for navigation to the entity detail view
-   *   (Reference, Museum, Person, Region, TimeBound, TimeUnit, Project, Sequence, etc.).
-   *
-   * The trailing Policy icon depends on `checkRowRestriction` and remains outside this
-   * decision tree so restricted rows still surface their lock indicator.
-   */
-  const getIconToShow = () => {
+  const actionConfig = useMemo(() => {
     if (tableRowAction) {
-      return (
-        <Typography
-          sx={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            textAlign: 'center',
-
-            height: '100%',
-            width: '100%',
-          }}
-          variant="button"
-          component="p"
-        >
-          S
-        </Typography>
-      )
-    } else if (selectorFn) {
-      return <AddCircleOutlineIcon />
+      return {
+        buttonType: 'synonyms',
+        tooltip: 'Open synonym dialog',
+        ariaLabel: 'Open synonym dialog',
+        icon: (
+          <Typography
+            component="span"
+            variant="button"
+            sx={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              fontWeight: 600,
+              fontSize: '0.85rem',
+              lineHeight: 1,
+            }}
+          >
+            S
+          </Typography>
+        ),
+      }
     }
-    return <ManageSearchIcon />
-  }
 
-  const onClick = (event: React.MouseEvent) => {
+    if (selectorFn) {
+      return {
+        buttonType: 'add',
+        tooltip: 'Select this row',
+        ariaLabel: 'Select this row',
+        icon: <AddCircleOutlineIcon fontSize="small" />,
+      }
+    }
+
+    return {
+      buttonType: 'details',
+      tooltip: 'View details',
+      ariaLabel: 'View details',
+      icon: <ManageSearchIcon fontSize="small" />,
+    }
+  }, [selectorFn, tableRowAction])
+
+  const onClick = (event: MouseEvent<HTMLButtonElement>) => {
     if (tableRowAction) {
       event.stopPropagation()
       tableRowAction(row.original)
-    } else if (selectorFn) {
+      return
+    }
+
+    if (selectorFn) {
       event.stopPropagation()
       selectorFn(row.original)
-    } else {
-      setPreviousTableUrls([...previousTableUrls, `${location.pathname}?tab=${searchParams.get('tab')}`])
-      navigate(`/${url}/${id}`)
+      return
     }
+
+    setPreviousTableUrls([...previousTableUrls, `${location.pathname}?tab=${searchParams.get('tab')}`])
+    navigate(`/${url}/${id}`)
   }
 
   return (
-    <Box display="flex" gap="0.2em" alignItems="center">
-      <Button data-cy={`${buttonType}-button-${id}`} variant="text" style={{ width: '2em' }} onClick={onClick}>
-        {getIconToShow()}
-      </Button>
+    <Box display="flex" alignItems="center" gap={0.5}>
+      <Tooltip placement="top" title={actionConfig.tooltip}>
+        <IconButton
+          aria-label={actionConfig.ariaLabel}
+          data-cy={`${actionConfig.buttonType}-button-${id}`}
+          onClick={onClick}
+          size="small"
+          sx={{ p: 0.5 }}
+        >
+          {actionConfig.icon}
+        </IconButton>
+      </Tooltip>
       {checkRowRestriction && checkRowRestriction(row.original) && (
         <Tooltip placement="top" title="This item has restricted visibility">
           <PolicyIcon color="primary" fontSize="medium" />
