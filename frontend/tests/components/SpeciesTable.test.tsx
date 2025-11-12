@@ -1,6 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, jest } from '@jest/globals'
 import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import type { JSX } from 'react'
+import type { MRT_Row } from 'material-react-table'
 import type { Species } from '../../src/shared/types'
 
 type SynonymFilter = (row: { original: Species }, columnId: string, filterValue: unknown) => boolean
@@ -16,6 +17,7 @@ type MockedTableViewProps = {
   data: Species[] | undefined
   columns?: MockedColumn[]
   filterFns?: Record<string, SynonymFilter>
+  renderRowActionExtras?: (args: { row: MRT_Row<Species> }) => JSX.Element | null
 }
 
 const mockTableView = jest.fn((props: MockedTableViewProps) => {
@@ -25,12 +27,7 @@ const mockTableView = jest.fn((props: MockedTableViewProps) => {
     <div data-testid="mock-table-view">
       {(props.data ?? []).map(row => (
         <div key={row.species_id}>
-          {(props.columns ?? [])
-            .filter(column => column?.id === 'sp_comment' && typeof column.Cell === 'function')
-            .map(column => {
-              const Cell = column.Cell as (args: { row: { original: Species } }) => JSX.Element
-              return <Cell key={column.id ?? column.accessorKey} row={{ original: row }} />
-            })}
+          {props.renderRowActionExtras?.({ row: { original: row } as unknown as MRT_Row<Species> }) ?? null}
         </div>
       ))}
     </div>
@@ -153,9 +150,7 @@ describe('SpeciesTable synonym filtering', () => {
 
     const { SpeciesTable } = await import('../../src/components/Species/SpeciesTable')
     render(<SpeciesTable />)
-    await waitFor(() => {
-      expect(mockTableView).toHaveBeenCalled()
-    })
+    expect(mockTableView).toHaveBeenCalled()
   })
 
   afterEach(() => {
@@ -180,11 +175,8 @@ describe('SpeciesTable synonym filtering', () => {
     })
   })
 
-  it('shows a fallback message when the species comment is absent', async () => {
-    const fallbackButton = screen.getByRole('button', { name: /view species comment for canis lupus/i })
-    fireEvent.click(fallbackButton)
-
-    expect(screen.getByText('No comment available.')).toBeTruthy()
+  it('does not render a comment button when the species comment is absent', () => {
+    expect(screen.queryByRole('button', { name: /view species comment for canis lupus/i })).toBeNull()
   })
 
   it('matches rows when the genus filter value appears in a synonym', () => {
