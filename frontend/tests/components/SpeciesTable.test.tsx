@@ -3,6 +3,7 @@ import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import type { JSX } from 'react'
 import type { MRT_Row } from 'material-react-table'
 import type { Species } from '../../src/shared/types'
+import { SpeciesCommentDialog as MockSpeciesCommentDialog } from '../../src/components/Species/SpeciesCommentDialog'
 
 type SynonymFilter = (row: { original: Species }, columnId: string, filterValue: unknown) => boolean
 
@@ -177,6 +178,20 @@ describe('SpeciesTable synonym filtering', () => {
 
   it('does not render a comment button when the species comment is absent', () => {
     expect(screen.queryByRole('button', { name: /view species comment for canis lupus/i })).toBeNull()
+  })
+
+  it('renders the fallback message when the comment dialog receives an empty comment', () => {
+    render(
+      <MockSpeciesCommentDialog
+        open
+        comment={null}
+        onClose={jest.fn()}
+        genusName={null}
+        speciesName={null}
+      />
+    )
+
+    expect(screen.getByText('No comment available.')).toBeTruthy()
   })
 
   it('matches rows when the genus filter value appears in a synonym', () => {
