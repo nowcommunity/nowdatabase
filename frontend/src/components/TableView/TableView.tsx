@@ -247,27 +247,46 @@ export const TableView = <T extends MRT_RowData>({
      * encode the full set of icons currently surfaced in production.
      */
     renderRowActions: ({ row }) => {
+      const showSynonymIndicator = Boolean(row.original.has_synonym)
+      const showNoLocalityIndicator = Boolean(row.original.has_no_locality)
+
       return (
         <Box className="row-actions-column">
-          <Box>
-            <ActionComponent {...{ selectorFn, url, checkRowRestriction, row, idFieldName }} />
-          </Box>
-          <Box>
-            {row.original.has_synonym && (
-              <ActionComponent {...{ selectorFn, tableRowAction, url, checkRowRestriction, row, idFieldName }} />
-            )}
-          </Box>
-          <Box display="flex" alignItems="center" px="1.35em">
-            {row.original.has_no_locality && (
-              <Tooltip title="This species is not currently in any locality" placement="right-start">
-                <NotListedLocationIcon color="disabled" sx={{}} />
-              </Tooltip>
-            )}
-          </Box>
+          <ActionComponent {...{ selectorFn, url, checkRowRestriction, row, idFieldName }} />
+          {showSynonymIndicator && (
+            <ActionComponent
+              {...{
+                selectorFn,
+                tableRowAction,
+                url,
+                checkRowRestriction,
+                row,
+                idFieldName,
+              }}
+            />
+          )}
+          {showNoLocalityIndicator && (
+            <Tooltip title="This species is not currently in any locality" placement="right-start">
+              <NotListedLocationIcon color="disabled" fontSize="small" />
+            </Tooltip>
+          )}
         </Box>
       )
     },
-    displayColumnDefOptions: { 'mrt-row-actions': { size: 50, header: '' } },
+    displayColumnDefOptions: {
+      'mrt-row-actions': {
+        size: 36,
+        header: '',
+        muiTableHeadCellProps: {
+          align: 'right',
+        },
+        muiTableBodyCellProps: {
+          align: 'right',
+          className: 'row-actions-cell',
+        },
+      },
+    },
+    positionActionsColumn: 'last',
     enableRowActions: true,
     enableMultiSort: !serverSidePagination,
     onSortingChange: setSorting,

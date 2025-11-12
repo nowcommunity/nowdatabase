@@ -1,6 +1,11 @@
 .row-actions-column {
-  display: flex;
-  flex-wrap: nowrap;
-  gap: 1px; 
-  min-width: 13em;
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.35rem;
+  width: 100%;
+}
+
+.row-actions-cell {
+  padding-right: 0.5rem !important;
 }
