@@ -1,6 +1,9 @@
 import { afterEach, beforeEach, describe, expect, it, jest } from '@jest/globals'
-import { render, waitFor } from '@testing-library/react'
+import { fireEvent, render, screen, waitFor } from '@testing-library/react'
+import type { JSX } from 'react'
+import type { MRT_Row } from 'material-react-table'
 import type { Species } from '../../src/shared/types'
+import { SpeciesCommentDialog as MockSpeciesCommentDialog } from '../../src/components/Species/SpeciesCommentDialog'
 
 type SynonymFilter = (row: { original: Species }, columnId: string, filterValue: unknown) => boolean
 
@@ -8,17 +11,28 @@ type MockedColumn = {
   id?: string
   accessorKey?: string
   accessorFn?: (row: Species) => unknown
+  Cell?: (args: { row: { original: Species } }) => JSX.Element
 }
 
 type MockedTableViewProps = {
   data: Species[] | undefined
   columns?: MockedColumn[]
   filterFns?: Record<string, SynonymFilter>
+  renderRowActionExtras?: (args: { row: MRT_Row<Species> }) => JSX.Element | null
 }
 
 const mockTableView = jest.fn((props: MockedTableViewProps) => {
   capturedProps = props
-  return null
+
+  return (
+    <div data-testid="mock-table-view">
+      {(props.data ?? []).map(row => (
+        <div key={row.species_id}>
+          {props.renderRowActionExtras?.({ row: { original: row } as unknown as MRT_Row<Species> }) ?? null}
+        </div>
+      ))}
+    </div>
+  )
 })
 
 const mockUseGetAllSpeciesQuery = jest.fn()
@@ -33,6 +47,32 @@ jest.mock('../../src/redux/speciesReducer', () => ({
 
 jest.mock('../../src/components/Species/SynonymsModal', () => ({
   SynonymsModal: () => null,
+}))
+
+jest.mock('../../src/components/Species/SpeciesCommentDialog', () => ({
+  SpeciesCommentDialog: ({
+    open,
+    comment,
+    onClose,
+  }: {
+    open: boolean
+    comment: string | null
+    onClose: () => void
+  }) => {
+    if (!open) {
+      return null
+    }
+
+    const trimmed = (comment ?? '').trim()
+    const content = trimmed.length > 0 ? trimmed : 'No comment available.'
+
+    return (
+      <div role="dialog">
+        <p>{content}</p>
+        <button onClick={onClose}>close</button>
+      </div>
+    )
+  },
 }))
 
 let capturedProps: MockedTableViewProps | undefined
@@ -104,20 +144,48 @@ describe('SpeciesTable synonym filtering', () => {
       species_id: 1,
       genus_name: 'Panthera',
       species_name: 'leo',
+      sp_comment: 'A fierce cat',
     })
 
     mockUseGetAllSpeciesQuery.mockReturnValue({ data: [regularSpecies, speciesWithSynonyms], isFetching: false })
 
     const { SpeciesTable } = await import('../../src/components/Species/SpeciesTable')
     render(<SpeciesTable />)
-    await waitFor(() => {
-      expect(mockTableView).toHaveBeenCalled()
-    })
+    expect(mockTableView).toHaveBeenCalled()
   })
 
   afterEach(() => {
     jest.clearAllMocks()
     capturedProps = undefined
+  })
+
+  it('opens the comment modal when the comment button is clicked', async () => {
+    expect(mockTableView).toHaveBeenCalled()
+    const commentButton = screen.getByRole('button', { name: /view species comment for panthera leo/i })
+    fireEvent.click(commentButton)
+
+    expect(mockTableView).toHaveBeenCalled()
+
+    // The mocked comment dialog echoes the comment text when open
+    expect(screen.getByText('A fierce cat')).toBeTruthy()
+
+    fireEvent.click(screen.getByText('close'))
+
+    await waitFor(() => {
+      expect(screen.queryByText('A fierce cat')).toBeNull()
+    })
+  })
+
+  it('does not render a comment button when the species comment is absent', () => {
+    expect(screen.queryByRole('button', { name: /view species comment for canis lupus/i })).toBeNull()
+  })
+
+  it('renders the fallback message when the comment dialog receives an empty comment', () => {
+    render(
+      <MockSpeciesCommentDialog open comment={null} onClose={jest.fn()} genusName={null} speciesName={null} />
+    )
+
+    expect(screen.getByText('No comment available.')).toBeTruthy()
   })
 
   it('matches rows when the genus filter value appears in a synonym', () => {
