@@ -12,6 +12,9 @@ import { requireOneOf } from '../middlewares/authorizer'
 import { writePerson } from '../services/write/person'
 import { writeUserGroup } from '../services/write/user'
 
+const UNAUTHENTICATED_ERROR = { message: 'User is not logged in' }
+const FORBIDDEN_ERROR = { message: 'User not authorized for the requested resource or action' }
+
 const router = Router()
 
 router.get('/all', requireOneOf([Role.Admin]), async (_req, res) => {
@@ -23,14 +26,12 @@ router.get('/:id', async (req, res) => {
   const id = req.params.id
 
   /* Access checking happens differently for this route, since we want to allow the route to return the user's own data for any user */
-  if (!req.user)
-    return res.status(401).send({
-      message: 'User is not logged in',
-    })
-  if (req.user.role !== Role.Admin && req.user.initials !== id)
-    return res.status(401).send({
-      message: 'User not authorized for the requested resource or action',
-    })
+  if (!req.user) {
+    return res.status(401).send(UNAUTHENTICATED_ERROR)
+  }
+  if (req.user.role !== Role.Admin && req.user.initials !== id) {
+    return res.status(403).send(FORBIDDEN_ERROR)
+  }
 
   const person = await getPersonDetails(id)
   if (!person) return res.status(404).send()
@@ -45,14 +46,12 @@ router.put(
       return res.status(403).send({ error: 'Missing initials, creating new persons is not yet implemented' })
     }
     /* Access checking happens differently for this route, since we want to allow users to modify their own data */
-    if (!req.user)
-      return res.status(401).send({
-        message: 'User not authorized for the requested resource or action',
-      })
-    if (req.user.role !== Role.Admin && req.user.initials !== editedPerson.initials)
-      return res.status(401).send({
-        message: 'User not authorized for the requested resource or action',
-      })
+    if (!req.user) {
+      return res.status(401).send(UNAUTHENTICATED_ERROR)
+    }
+    if (req.user.role !== Role.Admin && req.user.initials !== editedPerson.initials) {
+      return res.status(403).send(FORBIDDEN_ERROR)
+    }
 
     const validationErrors = validateEntirePerson({ ...editedPerson })
     if (validationErrors.length > 0) {
