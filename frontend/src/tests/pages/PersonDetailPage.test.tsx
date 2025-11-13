@@ -26,7 +26,7 @@ jest.mock('@/hooks/user', () => ({
 describe('PersonDetailPage', () => {
   beforeEach(() => {
     mockUseGetPersonDetailsQuery.mockReset()
-    mockUseUser.mockReturnValue({ initials: 'JD' })
+    mockUseUser.mockReturnValue({ initials: 'JD', token: 'token-123' })
   })
 
   it('shows the permission denied view when details query returns 403', () => {
@@ -59,5 +59,21 @@ describe('PersonDetailPage', () => {
     )
 
     expect(screen.getByTestId('person-details')).toBeTruthy()
+  })
+
+  it('asks the visitor to sign in when no user token is present', () => {
+    mockUseUser.mockReturnValue({ initials: null, token: null })
+    mockUseGetPersonDetailsQuery.mockReturnValue({ isError: false })
+
+    render(
+      <MemoryRouter initialEntries={['/person/JD']}>
+        <Routes>
+          <Route path="/person/:id" element={<PersonDetailPage />} />
+        </Routes>
+      </MemoryRouter>
+    )
+
+    expect(screen.getByText('Sign in to view this person')).toBeTruthy()
+    expect(screen.queryByTestId('person-details')).toBeNull()
   })
 })

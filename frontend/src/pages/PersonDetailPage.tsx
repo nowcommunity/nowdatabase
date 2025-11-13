@@ -16,13 +16,26 @@ export const PersonDetailPage = () => {
   const detailId = isUserPage ? user.initials : idFromUrl
 
   const queryArg = !detailId || isNew ? skipToken : detailId
-  const { isError, error } = useGetPersonDetailsQuery(queryArg)
+  const isAuthenticated = Boolean(user.token)
+
+  const { isError, error } = useGetPersonDetailsQuery(isAuthenticated ? queryArg : skipToken)
 
   const isForbidden = useMemo(() => {
     if (!isError) return false
     const status = resolveErrorStatus(error)
     return status === 403
   }, [error, isError])
+
+  if (!isAuthenticated) {
+    return (
+      <PermissionDenied
+        title="Sign in to view this person"
+        message="You must be signed in to access person records."
+        actionHref="/login"
+        actionLabel="Go to sign in"
+      />
+    )
+  }
 
   if (isForbidden) {
     return (
