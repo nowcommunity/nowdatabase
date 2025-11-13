@@ -12,6 +12,11 @@ import { useState } from 'react'
 import { convertDmsToDec, convertDecToDms } from '@/util/coordinateConversion'
 import { validCountries } from '@/shared/validators/countryList'
 import { SingleLocalityMap } from '@/components/Map/SingleLocalityMap'
+import { useNotify } from '@/hooks/notification'
+
+type SynonymFormValues = {
+  synonym: string
+}
 
 export const LocalityTab = () => {
   const { textField, radioSelection, dropdown, dropdownWithSearch, mode, bigTextField } =
@@ -125,10 +130,17 @@ export const LocalityTab = () => {
     ['Altitude (m)', textField('altitude')],
   ]
 
+  const { notify } = useNotify()
+
   const {
     register,
+    handleSubmit,
+    reset,
     formState: { errors },
-  } = useForm()
+  } = useForm<SynonymFormValues>({
+    defaultValues: { synonym: '' },
+    mode: 'onSubmit',
+  })
 
   const columns: MRT_ColumnDef<LocalitySynonym>[] = [
     {
@@ -137,16 +149,62 @@ export const LocalityTab = () => {
     },
   ]
 
-  // eslint-disable-next-line @typescript-eslint/require-await
   const onSave = async () => {
-    // TODO: Saving logic here (add Synonym to editData)
-    return Object.keys(errors).length === 0
+    let shouldClose = false
+
+    await handleSubmit(
+      ({ synonym }) => {
+        const trimmedSynonym = synonym.trim()
+        setEditData({
+          ...editData,
+          now_syn_loc: [
+            ...editData.now_syn_loc,
+            {
+              lid: editData.lid,
+              synonym: trimmedSynonym,
+              rowState: 'new',
+            },
+          ],
+        })
+        reset()
+        shouldClose = true
+      },
+      submissionErrors => {
+        const message = submissionErrors.synonym?.message
+        if (message) notify(message, 'error')
+        shouldClose = false
+      }
+    )()
+
+    return shouldClose
   }
 
   const editingModal = (
     <EditingModal buttonText="Add new Synonym" onSave={onSave}>
       <Box sx={{ display: 'flex', flexDirection: 'column', gap: '1em' }}>
-        <TextField {...register('synonym', { required: true })} label="Synonym" required />
+        <TextField
+          {...register('synonym', {
+            required: 'Synonym is required',
+            validate: value => {
+              const trimmedValue = value.trim()
+              if (!trimmedValue) return 'Synonym is required'
+              if (trimmedValue.length > 30) return 'Synonym must be 30 characters or fewer'
+
+              const duplicate = editData.now_syn_loc.some(existing => {
+                if (existing.rowState === 'removed' || existing.rowState === 'cancelled') return false
+                return (existing.synonym ?? '').trim().toLowerCase() === trimmedValue.toLowerCase()
+              })
+
+              if (duplicate) return 'This synonym already exists for this locality'
+              return true
+            },
+          })}
+          label="Synonym"
+          required
+          error={Boolean(errors.synonym)}
+          helperText={errors.synonym?.message}
+          inputProps={{ maxLength: 30 }}
+        />
       </Box>
     </EditingModal>
   )
