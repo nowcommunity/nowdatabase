@@ -4,12 +4,7 @@ import { TableView } from '../TableView/TableView'
 import { personTableColumns } from '@/common'
 
 export const PersonTable = ({ selectorFn }: { selectorFn?: (id: PersonDetailsType) => void }) => {
-  const {
-    data: personQueryData,
-    isFetching,
-    isError,
-    error,
-  } = useGetAllPersonsQuery()
+  const { data: personQueryData, isFetching, isError, error } = useGetAllPersonsQuery()
 
   const visibleColumns = {
     iniitals: false,

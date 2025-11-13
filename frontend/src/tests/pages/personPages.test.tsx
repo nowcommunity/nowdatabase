@@ -59,7 +59,9 @@ describe('PersonListPage', () => {
     )
 
     expect(
-      screen.getByText('Your account is not allowed to browse the people directory. Please contact an administrator if you believe this is a mistake.')
+      screen.getByText(
+        'Your account is not allowed to browse the people directory. Please contact an administrator if you believe this is a mistake.'
+      )
     ).toBeTruthy()
     expect(screen.queryByTestId('person-table')).toBeNull()
   })

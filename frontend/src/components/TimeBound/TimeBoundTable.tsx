@@ -11,12 +11,7 @@ export const TimeBoundTable = ({
   selectorFn?: (newTimeBound: TimeBound) => void
   showBid?: boolean
 }) => {
-  const {
-    data: timeBoundQueryData,
-    isFetching,
-    isError,
-    error,
-  } = useGetAllTimeBoundsQuery()
+  const { data: timeBoundQueryData, isFetching, isError, error } = useGetAllTimeBoundsQuery()
   const columns = useMemo<MRT_ColumnDef<TimeBound>[]>(
     () => [
       {

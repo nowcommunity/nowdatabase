@@ -11,12 +11,7 @@ export const TimeUnitTable = ({
   selectorFn?: (newTimeUnit: TimeUnit) => void
   clickableRows?: boolean
 }) => {
-  const {
-    data: timeUnitQueryData,
-    isFetching,
-    isError,
-    error,
-  } = useGetAllTimeUnitsQuery()
+  const { data: timeUnitQueryData, isFetching, isError, error } = useGetAllTimeUnitsQuery()
   const columns = useMemo<MRT_ColumnDef<TimeUnit>[]>(
     () => [
       {

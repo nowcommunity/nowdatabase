@@ -4,12 +4,7 @@ import { TableView } from '../TableView/TableView'
 import { referenceTableColumns } from '@/common'
 
 export const ReferenceTable = ({ selectorFn }: { selectorFn?: (id: Reference) => void }) => {
-  const {
-    data: referenceQueryData,
-    isFetching,
-    isError,
-    error,
-  } = useGetAllReferencesQuery()
+  const { data: referenceQueryData, isFetching, isError, error } = useGetAllReferencesQuery()
   let fixedNullDateData = undefined
   if (referenceQueryData) {
     // remove references with null date_primary values to not break the year filter,

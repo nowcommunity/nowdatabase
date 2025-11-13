@@ -334,10 +334,7 @@ export const TableView = <T extends MRT_RowData>({
 
   const errorStatus = useMemo(() => resolveErrorStatus(error), [error])
 
-  const errorMessage = useMemo(
-    () => resolveErrorMessage(errorStatus, error, isError),
-    [errorStatus, error, isError]
-  )
+  const errorMessage = useMemo(() => resolveErrorMessage(errorStatus, error, isError), [errorStatus, error, isError])
 
   // Load state from url only on first render
   useEffect(() => {

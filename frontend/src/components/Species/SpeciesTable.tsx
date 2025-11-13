@@ -56,12 +56,7 @@ export const SpeciesTable = ({ selectorFn }: { selectorFn?: (id: Species) => voi
   const [modalOpen, setModalOpen] = useState<boolean>(false)
   const [commentModalOpen, setCommentModalOpen] = useState<boolean>(false)
   const [commentModalData, setCommentModalData] = useState<CommentModalData | null>(null)
-  const {
-    data: speciesQueryData,
-    isFetching,
-    isError,
-    error,
-  } = useGetAllSpeciesQuery()
+  const { data: speciesQueryData, isFetching, isError, error } = useGetAllSpeciesQuery()
 
   const synonymFilterFns = useMemo<Record<string, MRT_FilterFn<Species>>>(
     () => ({
