@@ -25,6 +25,8 @@ export const SequenceTable = ({ selectorFn }: { selectorFn?: (id: Sequence) => v
     data: sequenceQueryData,
     isFetching,
     pagination,
+    isError,
+    error,
   } = usePaginatedQuery<SequenceQueryArgs, Sequence>(useGetSequencesQuery, {
     tableId: TABLE_ID,
     queryArg,
@@ -83,6 +85,8 @@ export const SequenceTable = ({ selectorFn }: { selectorFn?: (id: Sequence) => v
         clickableRows={false}
         data={sequenceQueryData}
         url="sequence"
+        isError={Boolean(isError)}
+        error={error}
       />
     </Table>
   )

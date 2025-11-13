@@ -1,4 +1,4 @@
-import { useEffect, useState, type ReactNode } from 'react'
+import { useEffect, useMemo, useState, type ReactNode } from 'react'
 import {
   type MRT_ColumnFiltersState,
   type MRT_ColumnDef,
@@ -12,7 +12,9 @@ import {
   MRT_Row,
   type MRT_FilterFn,
 } from 'material-react-table'
-import { Box, CircularProgress, Paper, Tooltip } from '@mui/material'
+import { Alert, Box, CircularProgress, Paper, Tooltip } from '@mui/material'
+import type { FetchBaseQueryError } from '@reduxjs/toolkit/query'
+import type { SerializedError } from '@reduxjs/toolkit'
 import type { FilterFn } from '@tanstack/table-core'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { ActionComponent } from './ActionComponent'
@@ -23,6 +25,7 @@ import '../../styles/TableView.css'
 import { TableToolBar } from './TableToolBar'
 import NotListedLocationIcon from '@mui/icons-material/NotListedLocation'
 import '../../styles/tableview/TableView.css'
+import { resolveErrorMessage, resolveErrorStatus } from './errorUtils'
 
 type TableStateInUrl = 'sorting' | 'columnfilters' | 'pagination'
 
@@ -54,6 +57,8 @@ export const TableView = <T extends MRT_RowData>({
   isFetching,
   filterFns,
   renderRowActionExtras,
+  isError,
+  error,
 }: {
   data: T[] | undefined
   columns: MRT_ColumnDef<T>[]
@@ -73,6 +78,8 @@ export const TableView = <T extends MRT_RowData>({
   enableColumnFilterModes?: boolean
   serverSidePagination?: boolean
   isFetching: boolean
+  isError?: boolean
+  error?: FetchBaseQueryError | SerializedError
   filterFns?: Record<string, MRT_FilterFn<T>>
   renderRowActionExtras?: ({ row }: { row: MRT_Row<T> }) => ReactNode
 }) => {
@@ -325,6 +332,13 @@ export const TableView = <T extends MRT_RowData>({
     // renderToolbarInternalActions: selectorFn ? renderCustomToolbarModalVersion : renderCustomToolbar,
   })
 
+  const errorStatus = useMemo(() => resolveErrorStatus(error), [error])
+
+  const errorMessage = useMemo(
+    () => resolveErrorMessage(errorStatus, error, isError),
+    [errorStatus, error, isError]
+  )
+
   // Load state from url only on first render
   useEffect(() => {
     if (selectorFn) return
@@ -356,7 +370,16 @@ export const TableView = <T extends MRT_RowData>({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [table, columnFilters, sorting])
 
-  if (!data) {
+  if (isError) {
+    const severity = errorStatus === 401 || errorStatus === 403 ? 'warning' : 'error'
+    return (
+      <Alert severity={severity} role="alert">
+        {errorMessage}
+      </Alert>
+    )
+  }
+
+  if (!data && isFetching) {
     return (
       <>
         <CircularProgress />
@@ -364,6 +387,10 @@ export const TableView = <T extends MRT_RowData>({
         {'Loading data...'}
       </>
     )
+  }
+
+  if (!data) {
+    return null
   }
 
   return (

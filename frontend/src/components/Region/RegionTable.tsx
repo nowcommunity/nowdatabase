@@ -5,7 +5,12 @@ import { Region } from '@/shared/types'
 import { TableView } from '../TableView/TableView'
 
 export const RegionTable = ({ selectorFn }: { selectorFn?: (id: Region) => void }) => {
-  const { data: reqionQueryData, isFetching } = useGetAllRegionsQuery()
+  const {
+    data: reqionQueryData,
+    isFetching,
+    isError,
+    error,
+  } = useGetAllRegionsQuery()
   const columns = useMemo<MRT_ColumnDef<Region>[]>(
     () => [
       {
@@ -33,6 +38,8 @@ export const RegionTable = ({ selectorFn }: { selectorFn?: (id: Region) => void 
       idFieldName="reg_coord_id"
       columns={columns}
       isFetching={isFetching}
+      isError={isError}
+      error={error}
       visibleColumns={visibleColumns}
       data={reqionQueryData}
       url="region"

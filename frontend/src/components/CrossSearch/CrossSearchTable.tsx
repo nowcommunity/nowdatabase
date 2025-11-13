@@ -8,7 +8,12 @@ import { LocalitiesMap } from '../Map/LocalitiesMap'
 
 export const CrossSearchTable = ({ selectorFn }: { selectorFn?: (newObject: CrossSearch) => void }) => {
   const { sqlLimit, sqlOffset, sqlColumnFilters, sqlOrderBy } = usePageContext()
-  const { data: crossSearchQueryData, isFetching } = useGetAllCrossSearchQuery({
+  const {
+    data: crossSearchQueryData,
+    isFetching,
+    isError,
+    error,
+  } = useGetAllCrossSearchQuery({
     limit: sqlLimit,
     offset: sqlOffset,
     columnFilters: sqlColumnFilters,
@@ -821,6 +826,8 @@ export const CrossSearchTable = ({ selectorFn }: { selectorFn?: (newObject: Cros
         enableColumnFilterModes={true}
         serverSidePagination={true}
         isCrossSearchTable={true}
+        isError={isError}
+        error={error}
       />
     </>
   )

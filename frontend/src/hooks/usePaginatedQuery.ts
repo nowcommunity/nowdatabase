@@ -236,8 +236,11 @@ export const usePaginatedQuery = <
     [transformedRows, metadata?.totalItems]
   )
 
+  const combinedIsError = Boolean(queryResult.isError) || Boolean(queryResult.error)
+
   return {
     ...queryResult,
+    isError: combinedIsError,
     data: decoratedRows,
     pagination: metadata,
   }
