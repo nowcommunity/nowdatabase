@@ -100,3 +100,4 @@ export const resetDatabase = async () => {
 export const resetDatabaseTimeout: number = 20000
 
 export const noPermError = { message: 'User not authorized for the requested resource or action' }
+export const unauthenticatedError = { message: 'User is not logged in' }

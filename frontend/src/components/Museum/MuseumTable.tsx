@@ -5,7 +5,7 @@ import { TableView } from '../TableView/TableView'
 import { Museum } from '@/shared/types'
 
 export const MuseumTable = ({ selectorFn }: { selectorFn?: (museum: Museum) => void }) => {
-  const { data: museumQueryData, isFetching } = useGetAllMuseumsQuery()
+  const { data: museumQueryData, isFetching, isError, error } = useGetAllMuseumsQuery()
 
   const columns = useMemo<MRT_ColumnDef<Museum>[]>(
     () => [
@@ -69,6 +69,8 @@ export const MuseumTable = ({ selectorFn }: { selectorFn?: (museum: Museum) => v
       idFieldName="museum"
       columns={columns}
       isFetching={isFetching}
+      isError={isError}
+      error={error}
       visibleColumns={visibleColumns}
       data={museums}
       url="museum"

@@ -21,8 +21,8 @@ import { TimeBoundTable } from './TimeBound/TimeBoundTable'
 import { TimeUnitTable } from './TimeUnit/TimeUnitTable'
 import { TimeUnitDetails } from './TimeUnit/TimeUnitDetails'
 import { ReferenceDetails } from './Reference/ReferenceDetails'
-import { PersonTable } from './Person/PersonTable'
-import { PersonDetails } from './Person/PersonDetails'
+import { PersonListPage } from '@/pages/PersonListPage'
+import { PersonDetailPage } from '@/pages/PersonDetailPage'
 import { ProjectTable } from './Project/ProjectTable'
 import { ProjectDetails } from './Project/ProjectDetails'
 import { RegionTable } from './Region/RegionTable'
@@ -168,8 +168,8 @@ export const personPage = (
   // allowedRoles, as the component has to be rendered for the user's own user-page.
   // This is ok because the requests should fail on backend anyways.
   <Page
-    tableView={<PersonTable />}
-    detailView={<PersonDetails />}
+    tableView={<PersonListPage />}
+    detailView={<PersonDetailPage />}
     viewName="person"
     idFieldName="initials"
     createTitle={(person: PersonDetailsType) => `${person.surname}`}

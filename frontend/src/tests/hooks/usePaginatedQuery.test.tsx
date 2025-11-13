@@ -59,4 +59,38 @@ describe('usePaginatedQuery', () => {
       pageSize: 2,
     })
   })
+
+  it('marks forbidden responses as errors without caching pagination metadata', () => {
+    let latestIsError: boolean | undefined
+    let latestError: unknown
+    let latestPagination: TablesState[string] | null | undefined
+
+    const useForbiddenQuery = () => ({
+      error: { status: 403, data: { message: 'Forbidden' } },
+      isError: true,
+      isFetching: false,
+    })
+
+    const TestComponent = () => {
+      const result = usePaginatedQuery<void, SequenceRow>(useForbiddenQuery, {
+        tableId: 'sequences',
+        queryArg: undefined,
+      })
+      latestIsError = result.isError
+      latestError = result.error
+      latestPagination = result.pagination
+      return null
+    }
+
+    render(
+      <Provider store={store}>
+        <TestComponent />
+      </Provider>
+    )
+
+    expect(latestIsError).toBe(true)
+    expect(latestError).toEqual({ status: 403, data: { message: 'Forbidden' } })
+    expect(latestPagination).toBeNull()
+    expect(store.getState().tables?.sequences).toBeUndefined()
+  })
 })

@@ -23,7 +23,12 @@ const decimalCount = (num: number) => {
 export const LocalityTable = ({ selectorFn }: { selectorFn?: (newObject: Locality) => void }) => {
   const [selectedLocality, setSelectedLocality] = useState<string | undefined>()
   const [modalOpen, setModalOpen] = useState<boolean>(false)
-  const { data: localitiesQueryData, isFetching: localitiesQueryIsFetching } = useGetAllLocalitiesQuery()
+  const {
+    data: localitiesQueryData,
+    isFetching: localitiesQueryIsFetching,
+    isError: localitiesQueryIsError,
+    error: localitiesQueryError,
+  } = useGetAllLocalitiesQuery()
   const [getLocalitySpeciesList, { isLoading }] = useGetLocalitySpeciesListMutation()
   const [filteredLocalities, setFilteredLocalities] = useState<SimplifiedLocality[]>()
   const columnFilters = usePageContext()
@@ -466,6 +471,8 @@ export const LocalityTable = ({ selectorFn }: { selectorFn?: (newObject: Localit
         idFieldName="lid"
         columns={columns}
         isFetching={localitiesQueryIsFetching}
+        isError={localitiesQueryIsError}
+        error={localitiesQueryError}
         visibleColumns={visibleColumns}
         data={localitiesQueryData}
         url="locality"

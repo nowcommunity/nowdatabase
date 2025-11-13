@@ -1,7 +1,7 @@
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from '@jest/globals'
 import { PersonDetailsType } from '../../../../frontend/src/shared/types'
 import { pool } from '../../utils/db'
-import { login, logout, noPermError, resetDatabase, resetDatabaseTimeout, send } from '../utils'
+import { login, logout, noPermError, resetDatabase, resetDatabaseTimeout, send, unauthenticatedError } from '../utils'
 import { editedPerson, existingPerson } from './data'
 
 let updatedPerson: PersonDetailsType | null = null
@@ -80,7 +80,7 @@ describe('Updating person works', () => {
     const { body: resultBodyNoPerm, status: resultStatusNoPerm } = await send('person/', 'PUT', {
       person: { initials: 'AD', first_name: 'Test first name 2' },
     })
-    expect(resultBodyNoPerm).toEqual(noPermError)
+    expect(resultBodyNoPerm).toEqual(unauthenticatedError)
     expect(resultStatusNoPerm).toEqual(401)
 
     await login('testEr')
@@ -88,14 +88,14 @@ describe('Updating person works', () => {
       person: { initials: 'AD', first_name: 'Test first name 2' },
     })
     expect(resultBodyEr).toEqual(noPermError)
-    expect(resultStatusEr).toEqual(401)
+    expect(resultStatusEr).toEqual(403)
 
     await login('testEu')
     const { body: resultBodyEu, status: resultStatusEu } = await send('person/', 'PUT', {
       person: { initials: 'AD', first_name: 'Test first name 2' },
     })
     expect(resultBodyEu).toEqual(noPermError)
-    expect(resultStatusEu).toEqual(401)
+    expect(resultStatusEu).toEqual(403)
   })
 
   it('Non-admin user updating their own information succeeds', async () => {

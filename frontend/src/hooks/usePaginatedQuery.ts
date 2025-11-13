@@ -34,12 +34,12 @@ type UsePaginatedQueryOptions<TQueryArg, TRaw, TMapped> = {
   manualPageSize?: number
 }
 
-type UnknownQueryResult<T> = {
+type UnknownQueryResult<T, TError = unknown> = {
   data?: T
   isFetching?: boolean
   isLoading?: boolean
   isError?: boolean
-  error?: unknown
+  error?: TError
   refetch?: () => unknown
 }
 
@@ -128,8 +128,10 @@ export const usePaginatedQuery = <
   TQueryArg,
   TRaw,
   TMapped = TRaw,
-  TResult extends UnknownQueryResult<ArrayWithFullCount<TRaw> | PaginatedEnvelope<TRaw>> = UnknownQueryResult<
-    ArrayWithFullCount<TRaw> | PaginatedEnvelope<TRaw>
+  TError = unknown,
+  TResult extends UnknownQueryResult<ArrayWithFullCount<TRaw> | PaginatedEnvelope<TRaw>, TError> = UnknownQueryResult<
+    ArrayWithFullCount<TRaw> | PaginatedEnvelope<TRaw>,
+    TError
   >,
 >(
   queryHook: QueryHook<TQueryArg, TResult>,
@@ -236,8 +238,11 @@ export const usePaginatedQuery = <
     [transformedRows, metadata?.totalItems]
   )
 
+  const combinedIsError = Boolean(queryResult.isError) || Boolean(queryResult.error)
+
   return {
     ...queryResult,
+    isError: combinedIsError,
     data: decoratedRows,
     pagination: metadata,
   }
