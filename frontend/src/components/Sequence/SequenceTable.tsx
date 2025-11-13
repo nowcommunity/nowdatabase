@@ -1,6 +1,8 @@
 import { useEffect, useMemo, useState } from 'react'
 import { type MRT_ColumnDef } from 'material-react-table'
 import { type SequenceQueryArgs, useGetSequencesQuery } from '@/redux/timeUnitReducer'
+import type { FetchBaseQueryError } from '@reduxjs/toolkit/query'
+import type { SerializedError } from '@reduxjs/toolkit'
 import { Sequence } from '@/shared/types'
 import { TableView } from '../TableView/TableView'
 import { Table } from '@/components/Table/Table'
@@ -27,12 +29,15 @@ export const SequenceTable = ({ selectorFn }: { selectorFn?: (id: Sequence) => v
     pagination,
     isError,
     error,
-  } = usePaginatedQuery<SequenceQueryArgs, Sequence>(useGetSequencesQuery, {
-    tableId: TABLE_ID,
-    queryArg,
-    manualPageIndex: pageIndex,
-    manualPageSize: pageSize,
-  })
+  } = usePaginatedQuery<SequenceQueryArgs, Sequence, Sequence, FetchBaseQueryError | SerializedError>(
+    useGetSequencesQuery,
+    {
+      tableId: TABLE_ID,
+      queryArg,
+      manualPageIndex: pageIndex,
+      manualPageSize: pageSize,
+    }
+  )
 
   useEffect(() => {
     if (!pagination) {
