@@ -79,7 +79,7 @@ export const ReferenceDetails = () => {
     try {
       await deleteMutation(parseInt(id!)).unwrap()
     } catch (error) {
-      const message = resolveDeleteErrorMessage(error ?? deleteError)
+      const message = resolveDeleteErrorMessage(error)
       notify(message, 'error')
     }
   }
