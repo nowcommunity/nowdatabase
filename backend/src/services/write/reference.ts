@@ -6,6 +6,16 @@ import { writeReferenceAuthors } from './author'
 import { writeReferenceJournal } from './journal'
 import Prisma from '../../../prisma/generated/now_test_client'
 
+const REFERENCE_HAS_UPDATES_ERROR_MESSAGE = 'The Reference with associated updates cannot be deleted.'
+
+class ConflictError extends Error {
+  declare status: number
+  constructor(message: string) {
+    super(message)
+    this.status = 409
+  }
+}
+
 export const writeReference = async (reference: EditDataType<ReferenceDetailsType>) => {
   const allowedColumns = getFieldsOfTables(['ref_ref', 'ref_authors', 'ref_journal'])
   const filteredReference = filterAllowedKeys(reference, allowedColumns) as Prisma.ref_ref
@@ -61,15 +71,39 @@ export const deleteReference = async (rid: number) => {
 
   if (!reference) throw new Error('Reference not found')
 
-  await nowDb.ref_authors.deleteMany({
-    where: { rid: rid },
-  })
-
   try {
-    await nowDb.ref_ref.delete({
-      where: { rid: rid },
+    await nowDb.$transaction(async prisma => {
+      const linkedUpdateCounts = await Promise.all([
+        prisma.now_lr.count({ where: { rid } }),
+        prisma.now_sr.count({ where: { rid } }),
+        prisma.now_br.count({ where: { rid } }),
+        prisma.now_tr.count({ where: { rid } }),
+        prisma.now_tur.count({ where: { rid } }),
+      ])
+
+      const hasLinkedUpdates = linkedUpdateCounts.some(count => count > 0)
+
+      if (hasLinkedUpdates) {
+        throw new ConflictError(REFERENCE_HAS_UPDATES_ERROR_MESSAGE)
+      }
+
+      await prisma.ref_authors.deleteMany({
+        where: { rid },
+      })
+
+      await prisma.ref_ref.delete({
+        where: { rid },
+      })
     })
   } catch (error) {
+    if (error instanceof ConflictError) {
+      throw error
+    }
+
+    if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2003') {
+      throw new ConflictError(REFERENCE_HAS_UPDATES_ERROR_MESSAGE)
+    }
+
     throw new Error('Failed to delete the reference')
   }
 }
