@@ -4,11 +4,7 @@ import userEvent from '@testing-library/user-event'
 import type { ReactNode } from 'react'
 
 import { LocalityTab } from '@/components/Locality/Tabs/LocalityTab'
-import {
-  DetailContext,
-  type DetailContextType,
-  modeOptionToMode,
-} from '@/components/DetailView/Context/DetailContext'
+import { DetailContext, type DetailContextType, modeOptionToMode } from '@/components/DetailView/Context/DetailContext'
 import type { EditDataType, Editable, LocalityDetailsType, LocalitySynonym } from '@/shared/types'
 
 const notifyMock = jest.fn()
@@ -29,7 +25,7 @@ jest.mock('@/components/DetailView/common/EditableTable', () => ({
 }))
 
 jest.mock('@/components/DetailView/common/EditingModal', () => {
-  const React = jest.requireActual('react') as typeof import('react')
+  const React = jest.requireActual<typeof import('react')>('react')
   const { useState } = React
 
   return {
@@ -55,9 +51,11 @@ jest.mock('@/components/DetailView/common/EditingModal', () => {
               {onSave && (
                 <button
                   type="button"
-                  onClick={async () => {
-                    const shouldClose = await onSave()
-                    if (shouldClose) setOpen(false)
+                  onClick={() => {
+                    if (!onSave) return
+                    void onSave().then(shouldClose => {
+                      if (shouldClose) setOpen(false)
+                    })
                   }}
                 >
                   Save
@@ -80,7 +78,7 @@ jest.mock('@/components/Map/SingleLocalityMap', () => ({
 }))
 
 jest.mock('@mui/material', () => {
-  const actual = jest.requireActual('@mui/material') as typeof import('@mui/material')
+  const actual = jest.requireActual<typeof import('@mui/material')>('@mui/material')
 
   return {
     ...actual,
@@ -92,55 +90,47 @@ type TestDetailContext = DetailContextType<LocalityDetailsType>
 
 type EditableSynonym = Editable<LocalitySynonym>
 
-const createSynonym = (
-  synonym: string,
-  overrides: Partial<EditableSynonym> = {}
-): EditableSynonym =>
-  ({
-    lid: 1001,
-    syn_id: 1,
-    synonym,
-    rowState: 'clean',
-    ...overrides,
-  } as EditableSynonym)
+const createSynonym = (synonym: string, overrides: Partial<EditableSynonym> = {}): EditableSynonym => ({
+  lid: 1001,
+  syn_id: 1,
+  synonym,
+  rowState: 'clean',
+  ...overrides,
+})
 
-const createEditData = (
-  synonyms: EditableSynonym[]
-): EditDataType<LocalityDetailsType> =>
+const createEditData = (synonyms: EditableSynonym[]): EditDataType<LocalityDetailsType> =>
   ({
     lid: 1001,
     now_syn_loc: synonyms,
-  } as EditDataType<LocalityDetailsType>)
+  }) as unknown as EditDataType<LocalityDetailsType>
 
-const createDetailContextValue = (
-  overrides: Partial<TestDetailContext>
-): TestDetailContext =>
-  ({
-    data: {} as LocalityDetailsType,
-    mode: modeOptionToMode.edit,
-    setMode: () => {},
-    editData: createEditData([]),
-    setEditData: () => {},
-    textField: () => <></>,
-    bigTextField: () => <></>,
-    dropdown: () => <></>,
-    dropdownWithSearch: () => <></>,
-    radioSelection: () => <></>,
-    validator: () => ({ name: '', error: null }),
-    fieldsWithErrors: {},
-    setFieldsWithErrors: () => {},
-    ...overrides,
-  }) as TestDetailContext
+const createDetailContextValue = (overrides: Partial<TestDetailContext>): TestDetailContext => ({
+  data: {} as LocalityDetailsType,
+  mode: modeOptionToMode.edit,
+  setMode: () => {},
+  editData: createEditData([]),
+  setEditData: () => {},
+  textField: () => <></>,
+  bigTextField: () => <></>,
+  dropdown: () => <></>,
+  dropdownWithSearch: () => <></>,
+  radioSelection: () => <></>,
+  validator: () => ({ name: '', error: null }),
+  fieldsWithErrors: {},
+  setFieldsWithErrors: () => {},
+  ...overrides,
+})
 
 type RenderOptions = {
   editData?: EditDataType<LocalityDetailsType>
 }
 
 const renderLocalityTab = ({ editData }: RenderOptions = {}) => {
-  const setEditData = jest.fn()
-  const contextValue = createDetailContextValue({
+  type SetEditData = TestDetailContext['setEditData']
+  const setEditData = jest.fn<SetEditData>()
+  const contextValue: TestDetailContext = createDetailContextValue({
     editData: editData ?? createEditData([]),
-    setEditData: setEditData as unknown as TestDetailContext['setEditData'],
+    setEditData,
   })
 
   render(
@@ -149,7 +139,7 @@ const renderLocalityTab = ({ editData }: RenderOptions = {}) => {
     </DetailContext.Provider>
   )
 
-  return { setEditData: setEditData as jest.MockedFunction<TestDetailContext['setEditData']> }
+  return { setEditData }
 }
 
 beforeEach(() => {
@@ -175,7 +165,7 @@ describe('LocalityTab synonyms modal', () => {
       expect(setEditData).toHaveBeenCalledTimes(1)
     })
 
-    const updatedEditData = setEditData.mock.calls[0][0] as EditDataType<LocalityDetailsType>
+    const updatedEditData = setEditData.mock.calls[0][0]
     const synonyms = updatedEditData.now_syn_loc as EditableSynonym[]
 
     expect(synonyms).toHaveLength(initialSynonyms.length + 1)
