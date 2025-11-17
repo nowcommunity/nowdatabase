@@ -52,6 +52,18 @@ describe('Deleting a reference', () => {
     expect(body.length).toEqual(0) //There should be no authors linked to the id of the ledeted reference
   })
 
+  it('fails when linked updates exist', async () => {
+    await login('testSu')
+
+    const { body, status } = await send<{ message: string }>('reference/10039', 'DELETE')
+
+    expect(status).toEqual(409)
+    expect(body).toEqual({ message: 'The Reference with associated updates cannot be deleted.' })
+
+    const { status: stillExistsStatus } = await send(`reference/10039`, 'GET')
+    expect(stillExistsStatus).toEqual(200)
+  })
+
   it('without permissions fails', async () => {
     logout()
     const deleteResultNoPerm = await send('reference/10039', 'DELETE')
