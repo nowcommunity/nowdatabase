@@ -1,3 +1,4 @@
+import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library'
 import { EditDataType, FixBigInt, ReferenceDetailsType } from '../../../../frontend/src/shared/types'
 import { getFieldsOfTables, nowDb } from '../../utils/db'
 import { getReferenceDetails } from '../reference'
@@ -100,7 +101,7 @@ export const deleteReference = async (rid: number) => {
       throw error
     }
 
-    if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2003') {
+    if (error instanceof PrismaClientKnownRequestError && error.code === 'P2003') {
       throw new ConflictError(REFERENCE_HAS_UPDATES_ERROR_MESSAGE)
     }
 
