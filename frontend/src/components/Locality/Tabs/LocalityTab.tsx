@@ -190,7 +190,7 @@ export const LocalityTab = () => {
               if (!trimmedValue) return 'Synonym is required'
               if (trimmedValue.length > 30) return 'Synonym must be 30 characters or fewer'
 
-              const duplicate = editData.now_syn_loc.some((existing: Editable<LocalitySynonym>) => {
+              const duplicate = editData.now_syn_loc.some(existing => {
                 if (existing.rowState === 'removed' || existing.rowState === 'cancelled') return false
                 return (existing.synonym ?? '').trim().toLowerCase() === trimmedValue.toLowerCase()
               })
