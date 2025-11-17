@@ -46,7 +46,7 @@ export const ReferenceDetails = () => {
   }
   const { isFetching, isError, data } = useGetReferenceDetailsQuery(id!, { skip: isNew })
   const [editReferenceRequest, { isLoading: mutationLoading }] = useEditReferenceMutation()
-  const [deleteMutation, { isSuccess: deleteSuccess, error: deleteError }] = useDeleteReferenceMutation()
+  const [deleteMutation, { isSuccess: deleteSuccess }] = useDeleteReferenceMutation()
   const { notify } = useNotify()
   const navigate = useNavigate()
   const { fallbackTarget } = useReturnNavigation({ fallback: '/reference' })
@@ -79,7 +79,7 @@ export const ReferenceDetails = () => {
     try {
       await deleteMutation(parseInt(id!)).unwrap()
     } catch (error) {
-      const message = resolveDeleteErrorMessage(error)
+      const message = resolveDeleteErrorMessage(error as FetchBaseQueryError | SerializedError | undefined)
       notify(message, 'error')
     }
   }
