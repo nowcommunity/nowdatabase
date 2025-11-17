@@ -5,12 +5,16 @@ import { MemoryRouter, Route, Routes } from 'react-router-dom'
 
 import { Notification, NotificationContextProvider } from '@/components/Notification'
 import { ReferenceDetails } from '@/components/Reference/ReferenceDetails'
-import { useDeleteReferenceMutation, useEditReferenceMutation, useGetReferenceDetailsQuery } from '@/redux/referenceReducer'
+import {
+  useDeleteReferenceMutation,
+  useEditReferenceMutation,
+  useGetReferenceDetailsQuery,
+} from '@/redux/referenceReducer'
 import type { ReferenceDetailsType } from '@/shared/types'
 
 jest.mock('@/components/DetailView/DetailView', () => ({
   DetailView: ({ deleteFunction }: { deleteFunction?: () => Promise<void> }) => (
-    <button onClick={() => deleteFunction && deleteFunction()}>Delete</button>
+    <button onClick={() => void deleteFunction?.()}>Delete</button>
   ),
 }))
 
@@ -58,10 +62,10 @@ jest.mock('@/components/Page', () => ({
   }),
 }))
 
-const conflictError = {
+const conflictError = Object.assign(new Error('The Reference with associated updates cannot be deleted.'), {
   status: 409,
   data: { message: 'The Reference with associated updates cannot be deleted.' },
-}
+})
 
 describe('ReferenceDetails deletion', () => {
   const originalConfirm = window.confirm

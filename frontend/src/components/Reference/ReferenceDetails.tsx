@@ -22,9 +22,7 @@ import type { SerializedError } from '@reduxjs/toolkit'
 const REFERENCE_DELETE_CONFLICT_MESSAGE = 'The Reference with associated updates cannot be deleted.'
 const GENERIC_DELETE_MESSAGE = 'Could not delete item. Error happened.'
 
-const resolveDeleteErrorMessage = (
-  error: FetchBaseQueryError | SerializedError | undefined
-): string => {
+const resolveDeleteErrorMessage = (error: FetchBaseQueryError | SerializedError | undefined): string => {
   if (error && 'status' in error) {
     const errorData = (error.data ?? {}) as { message?: string }
 
