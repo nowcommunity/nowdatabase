@@ -445,9 +445,9 @@ model now_mus {
 }
 
 model now_plr {
-  lid      Int      @default(0)
-  pid      Int      @default(0)
-  now_proj now_proj @relation(fields: [pid], references: [pid], onDelete: NoAction, onUpdate: NoAction, map: "now_plr_ibfk_1")
+  lid      Int
+  pid      Int
+  now_proj now_proj @relation(fields: [pid], references: [pid], onDelete: Cascade, onUpdate: NoAction, map: "now_plr_ibfk_1")
   now_loc  now_loc  @relation(fields: [lid], references: [lid], onDelete: Cascade, onUpdate: NoAction, map: "now_plr_ibfk_2")
 
   @@id([lid, pid])
