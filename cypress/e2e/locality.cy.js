@@ -507,3 +507,38 @@ describe('Deleting a locality', () => {
     cy.contains('Error loading data')
   })
 })
+
+describe('Linking projects to an existing locality', () => {
+  const localityId = 20920
+  const newProjectId = 14
+  const newProjectCode = 'WINE'
+
+  beforeEach('Login as admin and open projects tab', () => {
+    cy.login('testSu')
+    cy.visit(`/locality/${localityId}?tab=9`)
+    cy.contains('Lantian-Shuijiazui')
+  })
+
+  it('adds a project via the selector and removes it again', () => {
+    cy.contains(newProjectCode).should('not.exist')
+    cy.get('[id=edit-button]').click()
+    cy.contains('button', 'Select Project').click()
+    cy.get(`[data-cy=add-button-${newProjectId}]`).click()
+    cy.contains('button', 'Close').click()
+    cy.contains('td', newProjectCode).should('exist')
+
+    cy.addReferenceAndSave()
+    cy.contains('Edited item successfully.')
+    cy.contains(newProjectCode)
+
+    cy.get('[id=edit-button]').click()
+    cy.contains('td', newProjectCode)
+      .parents('tr')
+      .find('[data-testid=RemoveCircleOutlineIcon]')
+      .click()
+
+    cy.addReferenceAndSave()
+    cy.contains('Edited item successfully.')
+    cy.contains(newProjectCode).should('not.exist')
+  })
+})
