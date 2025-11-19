@@ -532,9 +532,7 @@ describe('Linking projects to an existing locality', () => {
     cy.contains(newProjectCode)
 
     cy.get('[id=edit-button]').click()
-    cy.contains('td', newProjectCode)
-      .parents('tr').find('[data-testid=RemoveCircleOutlineIcon]')
-      .click()
+    cy.contains('td', newProjectCode).parents('tr').find('[data-testid=RemoveCircleOutlineIcon]').click()
 
     cy.addReferenceAndSave()
     cy.contains('Edited item successfully.')
