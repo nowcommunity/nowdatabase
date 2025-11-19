@@ -2,7 +2,10 @@ import { Editable, LocalityProject } from '../../../../frontend/src/shared/types
 
 export const removeDuplicateProjectLinks = <
   T extends { pid: number; rowState?: Editable<LocalityProject>['rowState'] }
->(pendingLinks: T[], existingProjectIds: Set<number>) => {
+>(
+  pendingLinks: T[],
+  existingProjectIds: Set<number>,
+) => {
   const seenNew = new Set<number>()
   return pendingLinks.filter(link => {
     if (link.rowState === 'new') {
