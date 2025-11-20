@@ -53,8 +53,15 @@ Implement **exactly one task** from an approved feature plan.
 ✅ **Coding Requirements**
 
 ### Scope
-- Implement **only** the task above. No bonus features.  
-- Respect `files_touched`, `migrations`, `settings_changes`, `permissions`.  
+- Implement **only** the task above. No bonus features.
+- Respect `files_touched`, `migrations`, `settings_changes`, `permissions`.
+
+### Local lint/type-check checklist (run before returning output)
+- From repo root, run `npm run lint` and `npm run tsc`; for focused work use `npm run lint:backend` / `npm run lint:frontend` and `npm run tsc:backend` / `npm run tsc:frontend`.
+- If Cypress specs changed, run `npm run lint:cypress` to cover `cypress/e2e/**/*.cy.js` rules from `eslint.config.mjs`.
+- Ensure Prisma clients are generated (`npm run prisma`) so `tsc --noEmit` sees emitted types in backend utilities.
+- Common failure patterns to avoid: missing Prettier formatting, unused imports/variables in tests, missing async return types or implicit `any`, and stale `eslint-disable` directives.
+- Keep large fixtures/geojson assets out of type-checked paths; rely on `tsconfig`/ESLint ignores already defined (see `frontend/tsconfig.json`, `backend/tsconfig.json`, and `eslint.config.mjs`).
 
 ### Quality / Style
 - Follow ESLint + Prettier + TypeScript strict.  

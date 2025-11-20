@@ -4,13 +4,20 @@
     "outDir": "./build/",
     "module": "CommonJS",
     "moduleResolution": "node",
+    "baseUrl": ".",
     "strict": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,
     "esModuleInterop": true,
-    "noImplicitAny": true
+    "noImplicitAny": true,
+    "resolveJsonModule": true,
+    "skipLibCheck": true,
+    "types": ["node"],
+    "paths": {
+      "../../prisma/generated/now_log_test_client": ["./prisma/generated/now_log_test_client/default.ts"]
+    }
   },
   "include": ["src"]
 }
