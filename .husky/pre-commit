@@ -1,0 +1,13 @@
+#!/usr/bin/env sh
+
+if [ "$HUSKY_SKIP_CHECKS" = "1" ]; then
+  echo "Husky pre-commit checks skipped via HUSKY_SKIP_CHECKS."
+  exit 0
+fi
+
+command -v npm >/dev/null 2>&1 || {
+  echo "npm not found. Install dependencies before committing." >&2
+  exit 1
+}
+
+npm run lint && npm run tsc

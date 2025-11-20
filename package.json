@@ -60,7 +60,8 @@
     "config:anon:host": "sed -i -e \"s|nowdb-db-dev|nowdb-db-anon|g\" .anon.env",
     "config:anon:coordinator": "sed -i -e \"s|IZ|TEST-SU|g\" .anon.env",
     "config:dev": "cp -n .template.env .dev.env && npm run config:geonames -- .dev.env",
-    "config:geonames": "sed -i -e \"s|GEONAMES_USERNAME: \\\"\\\"|GEONAMES_USERNAME: $GEONAMES_USERNAME|g\""
+    "config:geonames": "sed -i -e \"s|GEONAMES_USERNAME: \\\"\\\"|GEONAMES_USERNAME: $GEONAMES_USERNAME|g\"",
+    "prepare": "husky"
   },
   "author": "",
   "devDependencies": {
@@ -74,6 +75,7 @@
     "eslint-plugin-mocha": "^10.5.0",
     "eslint-plugin-prettier": "^5.2.1",
     "globals": "^15.12.0",
+    "husky": "^9.1.7",
     "prettier": "^3.3.3",
     "supertest": "^7.0.0",
     "typescript": "^5.9.3"
