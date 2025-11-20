@@ -78,12 +78,19 @@ This section summarizes the overall architecture, structure, and technologies of
 
 ## Development Workflow & Tooling
 
-- TypeScript strict-mode throughout  
-- Code style enforced with **ESLint** and **Prettier**  
-- Backend and frontend run via Docker or parallel dev servers  
-- Database migrations managed with Prisma  
-- CI/CD pipelines ensure linting, testing, and build integrity  
-- All new features require code review, test coverage, and documentation updates  
+- TypeScript strict-mode throughout
+- Code style enforced with **ESLint** and **Prettier**
+- Backend and frontend run via Docker or parallel dev servers
+- Database migrations managed with Prisma
+- CI/CD pipelines ensure linting, testing, and build integrity
+- All new features require code review, test coverage, and documentation updates
+
+### Linting and Type-Checking Expectations
+- Run `npm run lint` and `npm run tsc` from the repo root before requesting review; use `npm run lint:backend` / `npm run lint:frontend` and `npm run tsc:backend` / `npm run tsc:frontend` when iterating in a single scope.
+- If Cypress specs are touched, run `npm run lint:cypress` to satisfy the dedicated ESLint rules in `eslint.config.mjs`.
+- Keep Prisma clients generated (`npm run prisma`) so TypeScript sees the emitted types referenced by backend utilities.
+- Typical CI failures to avoid: unchecked Prettier drift, unused imports/variables (especially in tests), missing async return types or implicit `any`, and stale `eslint-disable` directives.
+- Large fixtures or JSON assets (e.g., geodata) should remain excluded via `tsconfig.json`/`eslint.config.mjs` ignores; avoid importing them in type-checked code paths.
 
 ---
 
