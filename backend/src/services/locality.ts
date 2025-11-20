@@ -7,7 +7,6 @@ import {
   LocalitySpeciesDetailsType,
   Editable,
   SpeciesDetailsType,
-  LocalityProject,
 } from '../../../frontend/src/shared/types'
 import { removeDuplicateProjectLinks } from './utils/projectLinks'
 import { validateLocality } from '../../../frontend/src/shared/validators/locality'
@@ -318,6 +317,11 @@ export const filterDuplicateLocalityProjects = async (
   const localityDetails = await getLocalityDetails(locality.lid, user)
   if (!localityDetails) return locality.now_plr
 
+  const pendingWithProjectIds = locality.now_plr.filter(
+    (project): project is Editable<LocalityDetailsType['now_plr'][number]> & { pid: number } =>
+      project.pid !== undefined
+  )
+
   const existingProjectIds = new Set(localityDetails.now_plr.map(project => project.pid))
-  return removeDuplicateProjectLinks(locality.now_plr, existingProjectIds)
+  return removeDuplicateProjectLinks(pendingWithProjectIds, existingProjectIds)
 }
