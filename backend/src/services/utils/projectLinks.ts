@@ -4,7 +4,7 @@ export const removeDuplicateProjectLinks = <
   T extends {
     pid: number
     rowState?: Editable<LocalityProject>['rowState']
-  }
+  },
 >(
   pendingLinks: T[],
   existingProjectIds: Set<number>
