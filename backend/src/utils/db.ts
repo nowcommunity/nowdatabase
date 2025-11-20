@@ -1,14 +1,29 @@
 import { sleep } from './common'
 import { logger } from './logger'
 import { PrismaClient as NowClient } from '../../prisma/generated/now_test_client'
-import { PrismaClient as LogClient } from '../../prisma/generated/now_log_test_client'
+import { PrismaClient as LogClient } from '../../prisma/generated/now_log_test_client/default'
 import mariadb from 'mariadb'
 import { MARIADB_HOST, MARIADB_PASSWORD, DB_CONNECTION_LIMIT, MARIADB_USER, RUNNING_ENV } from './config'
 
 import { readFile } from 'fs/promises'
 import { PathLike } from 'fs'
 
-export const logDb = new LogClient()
+type LogRecord = Record<string, unknown> & {
+  luid?: number
+  suid?: number
+  buid?: number
+  tuid?: number
+}
+
+type LogModel = {
+  findMany: (...args: unknown[]) => Promise<LogRecord[]>
+  findFirst: (...args: unknown[]) => Promise<LogRecord | null>
+  fields: Record<string, unknown>
+}
+
+type LogPrismaClient = LogClient & { log: LogModel }
+
+export const logDb = new LogClient() as unknown as LogPrismaClient
 export const nowDb = new NowClient()
 
 export const getCrossSearchFields = () => {

@@ -22,7 +22,7 @@
     "noFallthroughCasesInSwitch": true,
     "noImplicitAny": true,
     "baseUrl": ".",
-    "types": ["node", "jest"],
+    "types": ["vite/client", "jest", "node"],
     "paths": {
       "@/*": ["./src/*"],
       "@components/*": ["./src/components/*"],
@@ -30,8 +30,8 @@
       "@shared/*": ["../shared/*"]
     }
   },
-  "include": ["src", "tests"],
-  "exclude": ["../backend/**/*", "./src/country_data/**"],
+  "include": ["src", "tests", "vite.config.ts", "jest.config.ts"],
+  "exclude": ["../backend/**/*", "./src/country_data/**", "node_modules", "dist"],
 
   "references": [{ "path": "./tsconfig.node.json" }]
 }
