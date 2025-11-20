@@ -45,7 +45,7 @@ const localitiesApi = api.injectEndpoints({
         const patchResult = dispatch(
           localitiesApi.util.updateQueryData('getLocalityDetails', locality.lid.toString(), draft => {
             draft.now_plr = sanitizeLocalityProjects(locality)
-          }),
+          })
         )
         try {
           await queryFulfilled

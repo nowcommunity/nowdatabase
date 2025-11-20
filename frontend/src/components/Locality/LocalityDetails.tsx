@@ -75,7 +75,7 @@ export const LocalityDetails = () => {
 
   const onWrite = async (
     editData: EditDataType<LocalityDetailsType>,
-    setEditData: (next: EditDataType<LocalityDetailsType>) => void,
+    setEditData: (next: EditDataType<LocalityDetailsType>) => void
   ) => {
     try {
       const { id } = await editLocalityRequest(editData).unwrap()

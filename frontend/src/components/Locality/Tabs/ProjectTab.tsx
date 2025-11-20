@@ -82,9 +82,7 @@ export const ProjectTab = () => {
           />
         </Box>
       )}
-      {isError && (
-        <Alert severity="error">Unable to fetch projects. Please try again later.</Alert>
-      )}
+      {isError && <Alert severity="error">Unable to fetch projects. Please try again later.</Alert>}
       <EditableTable<Editable<Project>, LocalityDetailsType>
         columns={columns.map(c => ({ ...c, accessorKey: `now_proj.${c.accessorKey}` }))}
         field="now_plr"
