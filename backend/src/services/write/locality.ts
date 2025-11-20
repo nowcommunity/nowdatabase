@@ -3,7 +3,7 @@ import { getHomininSkeletalRemains } from '../../../../frontend/src/shared/calcu
 import { NOW_DB_NAME } from '../../utils/config'
 import { WriteHandler } from './writeOperations/writeHandler'
 import { getFieldsOfTables } from '../../utils/db'
-import { getLocalityDetails, filterDuplicateLocalitySpecies } from '../locality'
+import { getLocalityDetails, filterDuplicateLocalitySpecies, filterDuplicateLocalityProjects } from '../locality'
 import { ActionType } from './writeOperations/types'
 import { makeListRemoved, fixRadioSelection } from './writeOperations/utils'
 
@@ -20,6 +20,7 @@ const getLocalityWriteHandler = (type: ActionType) => {
       'now_ss',
       'now_coll_meth',
       'now_syn_loc',
+      'now_plr',
       'now_lau',
       'now_sau',
     ]),
@@ -43,6 +44,7 @@ export const writeLocality = async (
   locality.stone_tool_cut_marks_on_bones = fixRadioSelection(locality.stone_tool_cut_marks_on_bones) as boolean
   locality.bipedal_footprints = fixRadioSelection(locality.bipedal_footprints) as boolean
   locality.stone_tool_technology = fixRadioSelection(locality.stone_tool_technology) as boolean
+  locality.now_plr = locality.now_plr ?? []
 
   const authorizer = user!.initials
 
@@ -52,6 +54,11 @@ export const writeLocality = async (
     const filteredLocalities = await filterDuplicateLocalitySpecies(locality, user)
     if (updateOrAdd === 'update' && filteredLocalities && filteredLocalities.length > 0) {
       locality.now_ls = filteredLocalities
+    }
+
+    const filteredProjects = await filterDuplicateLocalityProjects(locality, user)
+    if (filteredProjects) {
+      locality.now_plr = filteredProjects
     }
 
     if (updateOrAdd === 'add') {
@@ -77,6 +84,7 @@ export const writeLocality = async (
     await writeHandler.applyListChanges('now_ss', locality.now_ss, ['lid', 'sed_struct'])
     await writeHandler.applyListChanges('now_coll_meth', locality.now_coll_meth, ['lid', 'coll_meth'])
     await writeHandler.applyListChanges('now_syn_loc', locality.now_syn_loc, ['lid', 'syn_id'])
+    await writeHandler.applyListChanges('now_plr', locality.now_plr, ['lid', 'pid'])
 
     await writeHandler.logUpdatesAndComplete(authorizer, comment ?? '', references ?? [])
     return locality.lid

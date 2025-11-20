@@ -22,6 +22,8 @@ import { UpdateTab } from '../DetailView/common/UpdateTab'
 import { emptyLocality } from '../DetailView/common/defaultValues'
 import { useNotify } from '@/hooks/notification'
 import { useEffect } from 'react'
+import { FetchBaseQueryError } from '@reduxjs/toolkit/query'
+import { makeEditData } from '../DetailView/Context/DetailContext'
 
 export const LocalityDetails = () => {
   const { id } = useParams()
@@ -31,7 +33,7 @@ export const LocalityDetails = () => {
     document.title = 'New locality'
   }
   const [editLocalityRequest, { isLoading: mutationLoading }] = useEditLocalityMutation()
-  const { isFetching, isError, data } = useGetLocalityDetailsQuery(id!, {
+  const { isFetching, isError, data, refetch } = useGetLocalityDetailsQuery(id!, {
     skip: isNew,
   })
 
@@ -57,18 +59,44 @@ export const LocalityDetails = () => {
     await deleteMutation(parseInt(id!)).unwrap()
   }
 
-  const onWrite = async (editData: EditDataType<LocalityDetailsType>) => {
+  const formatValidationErrors = (error: ValidationErrors) =>
+    error.data.map(item => `${item.name}: ${item.error}`).join(', ')
+
+  const isFetchError = (error: unknown): error is FetchBaseQueryError =>
+    typeof error === 'object' && error !== null && 'status' in error
+
+  const isValidationError = (error: unknown): error is ValidationErrors => {
+    if (typeof error !== 'object' || error === null || !('data' in error) || !('status' in error)) {
+      return false
+    }
+    const possibleError = error as { data?: unknown }
+    return Array.isArray(possibleError.data)
+  }
+
+  const onWrite = async (
+    editData: EditDataType<LocalityDetailsType>,
+    setEditData: (next: EditDataType<LocalityDetailsType>) => void
+  ) => {
     try {
       const { id } = await editLocalityRequest(editData).unwrap()
+      if (!isNew) {
+        const refreshed = await refetch()
+        if (refreshed.data) {
+          setEditData(makeEditData(refreshed.data))
+        }
+      }
       setTimeout(() => navigate(`/locality/${id}`), 15)
       notify('Edited item successfully.')
     } catch (e) {
-      if (e && typeof e === 'object' && 'status' in e && e.status === 403) {
-        const error = e as ValidationErrors
-        notify('Following validators failed: ' + error.data.map(e => e.name).join(', '), 'error')
-      } else {
-        notify('Could not edit item. Error happened.', 'error')
+      if (isFetchError(e) && e.status === 403 && isValidationError(e.data)) {
+        notify('Following validators failed: ' + formatValidationErrors(e.data), 'error')
+        return
       }
+      if (isValidationError(e)) {
+        notify('Following validators failed: ' + formatValidationErrors(e), 'error')
+        return
+      }
+      notify('Could not edit item. Error happened.', 'error')
     }
   }
 
