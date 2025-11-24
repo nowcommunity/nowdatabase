@@ -1,49 +1,47 @@
-import globals from 'globals'
-import cypressPlugin from 'eslint-plugin-cypress/flat'
-import prettierPlugin from 'eslint-plugin-prettier/recommended'
-import mochaPlugin from 'eslint-plugin-mocha'
+import js from "@eslint/js";
+import globals from "globals";
+import tseslint from "typescript-eslint";
+import pluginReact from "eslint-plugin-react";
+import cypressPlugin from "eslint-plugin-cypress/flat";
+import { defineConfig } from "eslint/config";
 
-// NOTE: This config is only used for running ESLint on the Cypress tests. Frontend and backend use their own configs.
+const cypressRecommended = cypressPlugin.configs.recommended;
+const reactRecommended = pluginReact.configs.flat.recommended;
 
-const mochaRecommended = mochaPlugin.configs.flat.recommended
-const cypressRecommended = cypressPlugin.configs.recommended
-const mochaLanguageOptions = mochaRecommended.languageOptions ?? {}
-const cypressLanguageOptions = cypressRecommended.languageOptions ?? {}
-const mochaRules = mochaRecommended.rules ?? {}
-const cypressRules = cypressRecommended.rules ?? {}
-
-/** @type {import('eslint').Linter.Config[]} */
-export default [
+export default defineConfig([
   {
-    files: ['cypress/**/*.{cy,spec}.{js,ts,tsx}'],
-    ...mochaRecommended,
-    ...cypressRecommended,
-    rules: {
-      ...mochaRules,
-      ...cypressRules,
-      'mocha/no-mocha-arrows': 'off',
-      'mocha/no-skipped-tests': 'off',
-      'mocha/max-top-level-suites': 'off',
-      'mocha/no-top-level-hooks': 'off',
-      'mocha/no-sibling-hooks': 'off',
-    },
+    ...js.configs.recommended,
+    files: ["**/*.{js,mjs,cjs,ts,mts,cts,jsx,tsx}"],
     languageOptions: {
-      ...mochaLanguageOptions,
-      ...cypressLanguageOptions,
+      ...js.configs.recommended.languageOptions,
       globals: {
         ...globals.browser,
         ...globals.node,
+        ...(js.configs.recommended.languageOptions?.globals ?? {}),
       },
-      parserOptions: {
-        ecmaVersion: 'latest',
-        sourceType: 'module',
-      },
-    },
-    plugins: {
-      mocha: mochaPlugin,
-      cypress: cypressPlugin,
     },
   },
-
-  prettierPlugin,
-]
+  tseslint.configs.recommended,
+  {
+    ...reactRecommended,
+    settings: {
+      ...(reactRecommended.settings ?? {}),
+      react: {
+        version: "18.2",
+        ...(reactRecommended.settings?.react ?? {}),
+      },
+    },
+  },
+  {
+    ...cypressRecommended,
+    files: ["cypress/**/*.{cy,spec}.{js,ts,tsx}"],
+    languageOptions: {
+      ...cypressRecommended.languageOptions,
+      globals: {
+        ...globals.browser,
+        ...globals.node,
+        ...(cypressRecommended.languageOptions?.globals ?? {}),
+      },
+    },
+  },
+]);
