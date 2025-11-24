@@ -413,7 +413,19 @@ export const FieldWithTableSelection = <T extends object, ParentType extends obj
       inputProps={{ readOnly: true }}
     />
   )
-  return <DataValue<ParentType> field={targetField as keyof EditDataType<ParentType>} EditElement={editingComponent} />
+
+  const fallbackDisplayValue =
+    typeof displayValue === 'string' || typeof displayValue === 'number' ? displayValue : null
+
+  const effectiveDisplayValue = selectedDisplayValue ?? fallbackDisplayValue
+
+  return (
+    <DataValue<ParentType>
+      field={targetField as keyof EditDataType<ParentType>}
+      EditElement={editingComponent}
+      displayValue={effectiveDisplayValue}
+    />
+  )
 }
 
 export const TimeBoundSelection = ({

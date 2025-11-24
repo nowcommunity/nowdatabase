@@ -1,7 +1,12 @@
 import { describe, expect, it } from '@jest/globals'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { DetailContext, DetailContextType, modeOptionToMode } from '@/components/DetailView/Context/DetailContext'
+import {
+  DetailContext,
+  DetailContextType,
+  ModeOptions,
+  modeOptionToMode,
+} from '@/components/DetailView/Context/DetailContext'
 import { SequenceSelect } from './SequenceSelect'
 import { TimeUnitDetailsType } from '@/shared/types'
 import { ReactNode } from 'react'
@@ -30,9 +35,10 @@ jest.mock('./SequenceTable', () => ({
 type ContextWrapperProps = {
   children: ReactNode
   data?: Partial<TimeUnitDetailsType>
+  mode?: ModeOptions
 }
 
-const renderWithContext = ({ children, data }: ContextWrapperProps) => {
+const renderWithContext = ({ children, data, mode = 'edit' }: ContextWrapperProps) => {
   const timeUnit = {
     sequence: 1,
     tu_name: 'TU-1',
@@ -62,7 +68,7 @@ const renderWithContext = ({ children, data }: ContextWrapperProps) => {
 
   const contextValue: DetailContextType<TimeUnitDetailsType> = {
     data: timeUnit,
-    mode: modeOptionToMode.edit,
+    mode: modeOptionToMode[mode],
     setMode: () => undefined,
     editData: timeUnit,
     setEditData: () => undefined,
@@ -95,5 +101,11 @@ describe('SequenceSelect', () => {
     await user.click(screen.getByRole('button', { name: /open selector/i }))
 
     expect(screen.getByDisplayValue('Updated Sequence Display')).toBeTruthy()
+  })
+
+  it('shows display label in read mode for existing data', () => {
+    renderWithContext({ children: <SequenceSelect />, mode: 'read' })
+
+    expect(screen.getByText('Central Paratethys')).toBeTruthy()
   })
 })
