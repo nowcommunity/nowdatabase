@@ -6,6 +6,7 @@ import cypressPlugin from "eslint-plugin-cypress/flat";
 import { defineConfig } from "eslint/config";
 
 const cypressRecommended = cypressPlugin.configs.recommended;
+const reactRecommended = pluginReact.configs.flat.recommended;
 
 export default defineConfig([
   {
@@ -21,7 +22,16 @@ export default defineConfig([
     },
   },
   tseslint.configs.recommended,
-  pluginReact.configs.flat.recommended,
+  {
+    ...reactRecommended,
+    settings: {
+      ...(reactRecommended.settings ?? {}),
+      react: {
+        version: "18.2",
+        ...(reactRecommended.settings?.react ?? {}),
+      },
+    },
+  },
   {
     ...cypressRecommended,
     files: ["cypress/**/*.{cy,spec}.{js,ts,tsx}"],
