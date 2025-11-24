@@ -1,11 +1,11 @@
-import { SequenceDetailsType, TimeBound, TimeUnitDetailsType } from '@/shared/types'
-import { FieldWithTableSelection, TimeBoundSelection } from '@/components/DetailView/common/editingComponents'
+import { TimeBound, TimeUnitDetailsType } from '@/shared/types'
+import { TimeBoundSelection } from '@/components/DetailView/common/editingComponents'
 import { emptyOption } from '@/components/DetailView/common/misc'
 import { ArrayFrame, Grouped } from '@/components/DetailView/common/tabLayoutHelpers'
 import { useDetailContext } from '@/components/DetailView/Context/DetailContext'
-import { SequenceTable } from '@/components/Sequence/SequenceTable'
 import { Box } from '@mui/material'
 import { EditingForm, EditingFormField } from '@/components/DetailView/common/EditingForm'
+import { SequenceSelect } from '@/components/Sequence/SequenceSelect'
 
 export const TimeUnitTab = () => {
   const { textField, dropdown, data, editData, setEditData, fieldsWithErrors, mode } =
@@ -28,15 +28,7 @@ export const TimeUnitTab = () => {
   const timeUnit = [
     ['Name', textField('tu_display_name', { type: 'text', disabled: mode.new ? false : true })],
     ['Rank', dropdown('rank', rankOptions, 'Rank')],
-    [
-      'Sequence',
-      <FieldWithTableSelection<SequenceDetailsType, TimeUnitDetailsType>
-        key="sequence"
-        sourceField="sequence"
-        targetField="sequence"
-        selectorTable={<SequenceTable />}
-      />,
-    ],
+    ['Sequence', <SequenceSelect key="sequence" />],
     ['Comment', textField('tu_comment')],
   ]
 
