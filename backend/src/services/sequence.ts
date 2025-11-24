@@ -21,7 +21,7 @@ export const getAllSequences = async ({ limit, offset }: SequenceQueryOptions = 
   const sanitizedLimit = sanitizeLimit(limit)
   const sanitizedOffset = sanitizeOffset(offset)
 
-  const [rows, totalItems] = await Promise.all([
+  const [sequences, totalItems] = await Promise.all([
     nowDb.now_tu_sequence.findMany({
       skip: sanitizedOffset,
       take: sanitizedLimit,
@@ -31,6 +31,11 @@ export const getAllSequences = async ({ limit, offset }: SequenceQueryOptions = 
     }),
     nowDb.now_tu_sequence.count(),
   ])
+
+  const rows = sequences.map(sequence => ({
+    ...sequence,
+    display_value: sequence.seq_name,
+  }))
 
   return {
     rows,
