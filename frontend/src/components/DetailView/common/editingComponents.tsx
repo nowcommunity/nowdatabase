@@ -347,18 +347,32 @@ export const FieldWithTableSelection = <T extends object, ParentType extends obj
   sourceField,
   selectorTable,
   disabled,
+  displayValue,
+  getDisplayValue,
 }: {
   targetField: keyof ParentType
   sourceField: keyof T
   selectorTable: ReactElement
   disabled?: boolean
+  displayValue?: string | number | null
+  getDisplayValue?: (selected: T) => string | number | null | undefined
 }) => {
   const { editData, setEditData, validator, fieldsWithErrors, setFieldsWithErrors } = useDetailContext<ParentType>()
   const errorObject = validator(editData, targetField as keyof EditDataType<ParentType>)
   const { error } = errorObject
   const [open, setOpen] = useState(false)
+  const [selectedDisplayValue, setSelectedDisplayValue] = useState<string | number | null | undefined>(displayValue)
+
+  useEffect(() => {
+    setSelectedDisplayValue(displayValue)
+  }, [displayValue])
+
   const selectorFn = (selected: T) => {
     setEditData({ ...editData, [targetField]: selected[sourceField] })
+    const newDisplayValue = getDisplayValue ? getDisplayValue(selected) : selected[sourceField]
+    setSelectedDisplayValue(
+      typeof newDisplayValue === 'string' || typeof newDisplayValue === 'number' ? newDisplayValue : null
+    )
     setOpen(false)
   }
 
@@ -392,7 +406,7 @@ export const FieldWithTableSelection = <T extends object, ParentType extends obj
       size="small"
       error={!!error}
       helperText={error ?? ''}
-      value={editData[targetField as keyof EditDataType<ParentType>] ?? undefined}
+      value={selectedDisplayValue ?? editData[targetField as keyof EditDataType<ParentType>] ?? undefined}
       onClick={() => setOpen(true)}
       disabled={disabled}
       sx={{ backgroundColor: disabled ? 'grey' : '' }}
