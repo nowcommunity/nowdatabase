@@ -9,10 +9,16 @@ const cypressRecommended = cypressPlugin.configs.recommended;
 
 export default defineConfig([
   {
+    ...js.configs.recommended,
     files: ["**/*.{js,mjs,cjs,ts,mts,cts,jsx,tsx}"],
-    plugins: { js },
-    extends: ["js/recommended"],
-    languageOptions: { globals: { ...globals.browser, ...globals.node } },
+    languageOptions: {
+      ...js.configs.recommended.languageOptions,
+      globals: {
+        ...globals.browser,
+        ...globals.node,
+        ...(js.configs.recommended.languageOptions?.globals ?? {}),
+      },
+    },
   },
   tseslint.configs.recommended,
   pluginReact.configs.flat.recommended,
