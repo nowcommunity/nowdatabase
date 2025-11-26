@@ -36,6 +36,30 @@ const isForeignKeyConstraintError = (error: unknown) => {
   )
 }
 
+const DUPLICATE_ENTRY_ERROR_CODE = 'ER_DUP_ENTRY'
+const DUPLICATE_TIME_UNIT_MESSAGE = 'Time unit with the provided name already exists'
+
+export class DuplicateTimeUnitError extends Error {
+  declare status: number
+  code: 'duplicate_name'
+
+  constructor(message: string) {
+    super(message)
+    this.status = 409
+    this.code = 'duplicate_name'
+  }
+}
+
+const isDuplicateEntryError = (error: unknown) => {
+  return (
+    typeof error === 'object' &&
+    error !== null &&
+    'code' in error &&
+    typeof (error as { code: unknown }).code === 'string' &&
+    (error as { code: string }).code === DUPLICATE_ENTRY_ERROR_CODE
+  )
+}
+
 const assertTimeUnitIsNotInUse = async (id: string) => {
   const localityUsageCount = await nowDb.now_loc.count({
     where: {
@@ -45,6 +69,20 @@ const assertTimeUnitIsNotInUse = async (id: string) => {
 
   if (localityUsageCount > 0) {
     throw new ConflictError(TIME_UNIT_IN_USE_MESSAGE)
+  }
+}
+
+const assertTimeUnitNameIsUnique = async (displayName: string, existingId?: string) => {
+  const normalizedId = createTimeUnitId(displayName)
+  const existingTimeUnit = await nowDb.now_time_unit.findFirst({
+    where: {
+      OR: [{ tu_name: normalizedId }, { tu_display_name: displayName }],
+    },
+    select: { tu_name: true },
+  })
+
+  if (existingTimeUnit && (!existingId || existingTimeUnit.tu_name !== existingId)) {
+    throw new DuplicateTimeUnitError(DUPLICATE_TIME_UNIT_MESSAGE)
   }
 }
 
@@ -69,6 +107,10 @@ export const writeTimeUnit = async (
   const writeHandler = getTimeUnitWriteHandler(timeUnit.tu_name ? 'update' : 'add')
 
   const createdId = createTimeUnitId(timeUnit.tu_display_name!)
+
+  if (!timeUnit.tu_name) {
+    await assertTimeUnitNameIsUnique(timeUnit.tu_display_name!)
+  }
 
   try {
     await writeHandler.start()
@@ -103,7 +145,18 @@ export const writeTimeUnit = async (
 
     return { tu_name: timeUnit.tu_name, errorObject: undefined }
   } catch (e) {
-    await writeHandler.end()
+    if (writeHandler.connection) {
+      await writeHandler.end()
+    }
+
+    if (e instanceof DuplicateTimeUnitError) {
+      throw e
+    }
+
+    if (isDuplicateEntryError(e)) {
+      throw new DuplicateTimeUnitError(DUPLICATE_TIME_UNIT_MESSAGE)
+    }
+
     throw e
   }
 }

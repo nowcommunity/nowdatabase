@@ -58,6 +58,18 @@ describe('Creating new time unit', () => {
     })
   })
 
+  it('Creation fails with duplicate display name and returns structured error', async () => {
+    const duplicateResult = await send('time-unit', 'PUT', {
+      timeUnit: { ...newTimeUnitBasis },
+    })
+
+    expect(duplicateResult.status).toEqual(409)
+    expect(duplicateResult.body).toEqual({
+      message: 'Time unit with the provided name already exists',
+      code: 'duplicate_name',
+    })
+  })
+
   it('Creation fails without permissions', async () => {
     logout()
     const resultNoPerm = await send('time-unit', 'PUT', {
