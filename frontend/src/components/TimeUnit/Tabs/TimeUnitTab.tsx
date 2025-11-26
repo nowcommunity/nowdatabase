@@ -1,15 +1,59 @@
+import { useEffect, useMemo } from 'react'
 import { TimeBound, TimeUnitDetailsType } from '@/shared/types'
 import { TimeBoundSelection } from '@/components/DetailView/common/editingComponents'
 import { emptyOption } from '@/components/DetailView/common/misc'
 import { ArrayFrame, Grouped } from '@/components/DetailView/common/tabLayoutHelpers'
 import { useDetailContext } from '@/components/DetailView/Context/DetailContext'
-import { Box } from '@mui/material'
+import { Alert, Box } from '@mui/material'
 import { EditingForm, EditingFormField } from '@/components/DetailView/common/EditingForm'
 import { SequenceSelect } from '@/components/Sequence/SequenceSelect'
+import { useGetAllTimeUnitsQuery } from '@/redux/timeUnitReducer'
+import { skipToken } from '@reduxjs/toolkit/query'
+
+const DUPLICATE_NAME_FIELD = 'duplicateTimeUnitName'
+const DUPLICATE_NAME_MESSAGE = 'Time unit with this name already exists.'
+
+const normalizeTimeUnitName = (name: string | null | undefined) => (name ?? '').toLowerCase().replace(' ', '').trim()
 
 export const TimeUnitTab = () => {
-  const { textField, dropdown, data, editData, setEditData, fieldsWithErrors, mode } =
+  const { textField, dropdown, data, editData, setEditData, fieldsWithErrors, setFieldsWithErrors, mode } =
     useDetailContext<TimeUnitDetailsType>()
+
+  const { data: allTimeUnits } = useGetAllTimeUnitsQuery(mode.new ? undefined : skipToken)
+
+  const normalizedInputName = useMemo(() => normalizeTimeUnitName(editData.tu_display_name), [editData.tu_display_name])
+
+  const hasDuplicateName = useMemo(() => {
+    if (!mode.new || !allTimeUnits || !normalizedInputName) return false
+
+    return allTimeUnits.some(timeUnit => {
+      const normalizedDisplayName = normalizeTimeUnitName(timeUnit.tu_display_name)
+      const normalizedId = normalizeTimeUnitName(timeUnit.tu_name)
+
+      return normalizedInputName === normalizedDisplayName || normalizedInputName === normalizedId
+    })
+  }, [allTimeUnits, mode.new, normalizedInputName])
+
+  useEffect(() => {
+    setFieldsWithErrors(prevFieldsWithErrors => {
+      const duplicateErrorExists = DUPLICATE_NAME_FIELD in prevFieldsWithErrors
+
+      if (!mode.new || !hasDuplicateName) {
+        if (!duplicateErrorExists) return prevFieldsWithErrors
+
+        const { [DUPLICATE_NAME_FIELD]: _removed, ...remaining } = prevFieldsWithErrors
+        return remaining
+      }
+
+      const duplicateError = prevFieldsWithErrors[DUPLICATE_NAME_FIELD]
+      if (duplicateError?.error === DUPLICATE_NAME_MESSAGE) return prevFieldsWithErrors
+
+      return {
+        ...prevFieldsWithErrors,
+        [DUPLICATE_NAME_FIELD]: { name: 'duplicate_name', error: DUPLICATE_NAME_MESSAGE },
+      }
+    })
+  }, [hasDuplicateName, mode.new, setFieldsWithErrors])
 
   const rankOptions = [
     'Age',
@@ -68,6 +112,11 @@ export const TimeUnitTab = () => {
 
   return (
     <>
+      {hasDuplicateName && (
+        <Alert severity="warning" data-testid="duplicate-timeunit-warning">
+          {DUPLICATE_NAME_MESSAGE}
+        </Alert>
+      )}
       <ArrayFrame array={timeUnit} title="Time Unit" />
       <>
         <Grouped title="Upper Bound" error={'up_bnd' in fieldsWithErrors}>
