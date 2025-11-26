@@ -1,13 +1,8 @@
 import { EditDataType, TimeUnitDetailsType, ValidationErrors } from '@/shared/types'
 import { useNotify } from '@/hooks/notification'
 import { CircularProgress } from '@mui/material'
-import { useEffect } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import {
-  useDeleteTimeUnitMutation,
-  useEditTimeUnitMutation,
-  useGetTimeUnitDetailsQuery,
-} from '../../redux/timeUnitReducer'
+import { useEditTimeUnitMutation, useGetTimeUnitDetailsQuery } from '../../redux/timeUnitReducer'
 import { emptyTimeUnit } from '../DetailView/common/defaultValues'
 import { UpdateTab } from '../DetailView/common/UpdateTab'
 import { DetailView, TabType } from '../DetailView/DetailView'
@@ -15,6 +10,7 @@ import { LocalityTab } from './Tabs/LocalityTab'
 import { TimeUnitTab } from './Tabs/TimeUnitTab'
 import { validateTimeUnit } from '@/shared/validators/timeUnit'
 import { makeEditData } from '../DetailView/Context/DetailContext'
+import { useDeleteTimeUnit } from '@/hooks/useDeleteTimeUnit'
 
 export const TimeUnitDetails = () => {
   const { id } = useParams()
@@ -27,16 +23,9 @@ export const TimeUnitDetails = () => {
 
   const { notify } = useNotify()
   const navigate = useNavigate()
-  const [deleteMutation, { isSuccess: deleteSuccess, isError: deleteError }] = useDeleteTimeUnitMutation()
-
-  useEffect(() => {
-    if (deleteSuccess) {
-      notify('Deleted item successfully.')
-      navigate('/time-unit')
-    } else if (deleteError) {
-      notify('Could not delete item. Error happened.', 'error')
-    }
-  }, [deleteSuccess, deleteError, notify, navigate])
+  const { deleteTimeUnit } = useDeleteTimeUnit({
+    onSuccess: () => navigate('/time-unit'),
+  })
 
   if (isError) return <div>Error loading data</div>
   if (isLoading || isFetching || (!data && !isNew)) return <CircularProgress />
@@ -45,7 +34,7 @@ export const TimeUnitDetails = () => {
   }
 
   const deleteFunction = async () => {
-    await deleteMutation(id!).unwrap()
+    await deleteTimeUnit(id!)
   }
 
   const onWrite = async (

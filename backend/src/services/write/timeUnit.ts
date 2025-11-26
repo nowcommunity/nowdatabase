@@ -7,11 +7,46 @@ import {
 } from '../../../../frontend/src/shared/types'
 import { NOW_DB_NAME } from '../../utils/config'
 import { WriteHandler } from './writeOperations/writeHandler'
-import { getFieldsOfTables } from '../../utils/db'
+import { getFieldsOfTables, nowDb } from '../../utils/db'
 import { ActionType } from './writeOperations/types'
 import { getTimeUnitDetails } from '../timeUnit'
 import { checkTimeUnitCascade } from '../../utils/cascadeHandler'
 import { writeLocalityCascade } from './locality'
+
+export class ConflictError extends Error {
+  declare status: number
+  constructor(message: string) {
+    super(message)
+    this.status = 409
+  }
+}
+
+export const TIME_UNIT_IN_USE_MESSAGE =
+  'Cannot delete time unit because it is referenced by other records (e.g., localities or time bounds).'
+
+const FOREIGN_KEY_ERROR_CODES = ['ER_ROW_IS_REFERENCED', 'ER_ROW_IS_REFERENCED_2']
+
+const isForeignKeyConstraintError = (error: unknown) => {
+  return (
+    typeof error === 'object' &&
+    error !== null &&
+    'code' in error &&
+    typeof (error as { code: unknown }).code === 'string' &&
+    FOREIGN_KEY_ERROR_CODES.includes((error as { code: string }).code)
+  )
+}
+
+const assertTimeUnitIsNotInUse = async (id: string) => {
+  const localityUsageCount = await nowDb.now_loc.count({
+    where: {
+      OR: [{ bfa_max: id }, { bfa_min: id }],
+    },
+  })
+
+  if (localityUsageCount > 0) {
+    throw new ConflictError(TIME_UNIT_IN_USE_MESSAGE)
+  }
+}
 
 const getTimeUnitWriteHandler = (type: ActionType) => {
   return new WriteHandler({
@@ -76,13 +111,23 @@ export const writeTimeUnit = async (
 export const deleteTimeUnit = async (id: string, user: User) => {
   const timeUnit = await getTimeUnitDetails(id)
   if (!timeUnit) throw new Error('Time unit not found')
+
+  await assertTimeUnitIsNotInUse(id)
+
   const writeHandler = getTimeUnitWriteHandler('delete')
   try {
     await writeHandler.start()
     await writeHandler.deleteObject('now_time_unit', timeUnit, ['tu_name'])
     await writeHandler.logUpdatesAndComplete(user.initials)
   } catch (e) {
-    await writeHandler.end()
+    if (writeHandler.connection) {
+      await writeHandler.end()
+    }
+
+    if (isForeignKeyConstraintError(e)) {
+      throw new ConflictError(TIME_UNIT_IN_USE_MESSAGE)
+    }
+
     throw e
   }
 }
