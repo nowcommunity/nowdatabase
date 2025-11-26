@@ -14,22 +14,16 @@ const SUCCESS_MESSAGE = 'Deleted item successfully.'
 const extractErrorMessage = (error: unknown): string | undefined => {
   if (typeof error === 'string') return error
 
-  if (error && typeof error === 'object') {
-    if ('data' in error) {
-      const data = (error as FetchBaseQueryError).data
-      if (typeof data === 'string') return data
-      if (
-        data &&
-        typeof data === 'object' &&
-        'message' in data &&
-        typeof (data as { message?: unknown }).message === 'string'
-      ) {
-        return (data as { message: string }).message
-      }
-    }
-
-    if ('message' in error && typeof (error as { message?: unknown }).message === 'string') {
-      return (error as { message: string }).message
+  if (error && typeof error === 'object' && 'data' in error) {
+    const data = (error as FetchBaseQueryError).data
+    if (typeof data === 'string') return data
+    if (
+      data &&
+      typeof data === 'object' &&
+      'message' in data &&
+      typeof (data as { message?: unknown }).message === 'string'
+    ) {
+      return (data as { message: string }).message
     }
   }
 
