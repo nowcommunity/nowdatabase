@@ -8,6 +8,10 @@ import { TimeUnitDetails } from '@/components/TimeUnit/TimeUnitDetails'
 import { useDeleteTimeUnitMutation, useEditTimeUnitMutation, useGetTimeUnitDetailsQuery } from '@/redux/timeUnitReducer'
 import type { TimeUnitDetailsType } from '@/shared/types'
 
+jest.mock('lodash-es', () => ({
+  cloneDeep: (value: unknown) => value,
+}))
+
 jest.mock('@/components/DetailView/DetailView', () => ({
   DetailView: ({ deleteFunction }: { deleteFunction?: () => Promise<void> }) => (
     <button onClick={() => void deleteFunction?.()}>Delete</button>
