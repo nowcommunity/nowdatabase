@@ -1,4 +1,12 @@
 import { beforeEach, describe, expect, it, jest } from '@jest/globals'
+jest.mock('../../utils/config', () => ({ NOW_DB_NAME: 'test_now_db' }))
+jest.mock('../../utils/db', () => ({
+  nowDb: { now_loc: { count: jest.fn() } },
+  getFieldsOfTables: jest.fn(() => []),
+  logDb: { log: { fields: {} } },
+  pool: {},
+}))
+
 import { deleteTimeUnit, ConflictError, TIME_UNIT_IN_USE_MESSAGE } from '../../services/write/timeUnit'
 import { getTimeUnitDetails } from '../../services/timeUnit'
 import { nowDb } from '../../utils/db'
