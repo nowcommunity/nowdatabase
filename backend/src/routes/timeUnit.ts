@@ -15,7 +15,7 @@ import {
   validateEntireTimeUnit,
 } from '../services/timeUnit'
 import { getTimeBoundDetails, validateEntireTimeBound } from '../services/timeBound'
-import { deleteTimeUnit, writeTimeUnit } from '../services/write/timeUnit'
+import { ConflictError, deleteTimeUnit, writeTimeUnit } from '../services/write/timeUnit'
 import { fixBigInt } from '../utils/common'
 import { writeTimeBound } from '../services/write/timeBound'
 
@@ -118,8 +118,21 @@ router.put(
 
 router.delete('/:id', requireOneOf([Role.Admin, Role.EditUnrestricted]), async (req, res) => {
   const id = req.params.id
-  await deleteTimeUnit(id, req.user!)
-  res.status(200).send()
+
+  try {
+    await deleteTimeUnit(id, req.user!)
+    return res.status(200).send()
+  } catch (error) {
+    if (error instanceof ConflictError) {
+      return res.status(error.status).send({ message: error.message })
+    }
+
+    if (error instanceof Error && error.message === 'Time unit not found') {
+      return res.status(404).send({ message: error.message })
+    }
+
+    return res.status(500).send({ message: 'Failed to delete time unit' })
+  }
 })
 
 export default router

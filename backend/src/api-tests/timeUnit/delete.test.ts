@@ -2,6 +2,7 @@ import { beforeAll, beforeEach, afterAll, describe, it, expect } from '@jest/glo
 import { login, logout, send, resetDatabase, resetDatabaseTimeout } from '../utils'
 import { pool } from '../../utils/db'
 import { newTimeUnitBasis } from './data'
+import { TIME_UNIT_IN_USE_MESSAGE } from '../../services/write/timeUnit'
 
 describe('Deleting a time unit', () => {
   beforeAll(async () => {
@@ -29,7 +30,8 @@ describe('Deleting a time unit', () => {
 
   it('that is being used by another entity fails', async () => {
     const deleteResult = await send(`time-unit/bahean`, 'DELETE') // used by Lantian-Shuijiazui locality
-    expect(deleteResult.status).toEqual(500)
+    expect(deleteResult.status).toEqual(409)
+    expect(deleteResult.body).toEqual({ message: TIME_UNIT_IN_USE_MESSAGE })
     const getResult = await send(`time-unit/bahean`, 'GET')
     expect(getResult.status).toEqual(200) // Time Bound response status was not 200 after failed deletion
   })
