@@ -87,6 +87,26 @@ describe('TimeUnit creation duplicate name handling', () => {
     expect(finalizeButton.hasAttribute('disabled')).toBe(true)
   })
 
+  it('normalizes whitespace and punctuation when checking duplicates', async () => {
+    const existingTimeUnits = [{ tu_display_name: 'Existing Name', tu_name: 'existing_name' } as TimeUnit]
+    mockGetAllTimeUnitsQuery.mockReturnValue({ data: existingTimeUnits, isFetching: false, isLoading: false })
+
+    const { container } = renderTimeUnitCreation()
+
+    const nameInput = container.querySelector('input#tu_display_name-textfield') as HTMLInputElement
+
+    const user = userEvent.setup()
+
+    await user.type(nameInput, ' Existing   Name- ') // extra whitespace and punctuation
+
+    await waitFor(() => {
+      expect(screen.getByTestId('duplicate-timeunit-warning')).toBeTruthy()
+    })
+
+    const finalizeButton = await screen.findByRole('button', { name: /finalize entry/i })
+    expect(finalizeButton.hasAttribute('disabled')).toBe(true)
+  })
+
   it('enables finalize when the name is unique', async () => {
     const existingTimeUnits = [{ tu_display_name: 'Existing Name', tu_name: 'existingname' } as TimeUnit]
     mockGetAllTimeUnitsQuery.mockReturnValue({ data: existingTimeUnits, isFetching: false, isLoading: false })

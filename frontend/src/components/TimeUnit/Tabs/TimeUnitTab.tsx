@@ -13,7 +13,11 @@ import { skipToken } from '@reduxjs/toolkit/query'
 const DUPLICATE_NAME_FIELD = 'duplicateTimeUnitName'
 const DUPLICATE_NAME_MESSAGE = 'Time unit with this name already exists.'
 
-const normalizeTimeUnitName = (name: string | null | undefined) => (name ?? '').toLowerCase().replace(' ', '').trim()
+const normalizeTimeUnitName = (name: string | null | undefined) =>
+  (name ?? '')
+    .toLowerCase()
+    .trim()
+    .replace(/[\s_-]+/g, '')
 
 export const TimeUnitTab = () => {
   const { textField, dropdown, data, editData, setEditData, fieldsWithErrors, setFieldsWithErrors, mode } =
