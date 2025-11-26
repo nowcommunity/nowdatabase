@@ -106,4 +106,33 @@ describe('TimeUnit creation duplicate name handling', () => {
     const finalizeButton = await screen.findByRole('button', { name: /finalize entry/i })
     expect(finalizeButton.hasAttribute('disabled')).toBe(false)
   })
+
+  it('surfaces a backend duplicate name error', async () => {
+    mockGetAllTimeUnitsQuery.mockReturnValue({ data: [], isFetching: false, isLoading: false })
+    mockEditTimeUnitMutation.mockReturnValue({
+      unwrap: () =>
+        Promise.reject(
+          Object.assign(new Error('duplicate time unit'), {
+            status: 409,
+            data: { code: 'duplicate_name', message: 'Time unit with the provided name already exists' },
+          })
+        ),
+    })
+
+    const { container } = renderTimeUnitCreation()
+
+    const nameInput = container.querySelector('input#tu_display_name-textfield') as HTMLInputElement
+    const user = userEvent.setup()
+
+    await user.type(nameInput, 'New Unique Name')
+
+    const finalizeButton = await screen.findByRole('button', { name: /finalize entry/i })
+    await user.click(finalizeButton)
+
+    const completeButton = await screen.findByRole('button', { name: /complete and save/i })
+    await user.click(completeButton)
+
+    const duplicateWarning: HTMLElement = await screen.findByText(/Time unit with the provided name already exists/i)
+    expect(duplicateWarning.textContent ?? '').toContain('Time unit with the provided name already exists')
+  })
 })

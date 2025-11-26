@@ -11,6 +11,7 @@ import { TimeUnitTab } from './Tabs/TimeUnitTab'
 import { validateTimeUnit } from '@/shared/validators/timeUnit'
 import { makeEditData } from '../DetailView/Context/DetailContext'
 import { useDeleteTimeUnit } from '@/hooks/useDeleteTimeUnit'
+import { getApiErrorMessage, isDuplicateNameError } from '@/utils/api'
 
 export const TimeUnitDetails = () => {
   const { id } = useParams()
@@ -48,6 +49,11 @@ export const TimeUnitDetails = () => {
     } catch (e) {
       if (data) {
         setEditData(makeEditData(data))
+      }
+
+      if (isDuplicateNameError(e)) {
+        notify(getApiErrorMessage(e, 'Time unit with the provided name already exists'), 'warning')
+        return
       }
       if (
         e &&
