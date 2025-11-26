@@ -39,6 +39,12 @@ const isForeignKeyConstraintError = (error: unknown) => {
 const DUPLICATE_ENTRY_ERROR_CODE = 'ER_DUP_ENTRY'
 const DUPLICATE_TIME_UNIT_MESSAGE = 'Time unit with the provided name already exists'
 
+const normalizeTimeUnitName = (name: string) =>
+  name
+    .toLowerCase()
+    .replace(/[\s_-]+/g, '')
+    .trim()
+
 export class DuplicateTimeUnitError extends Error {
   declare status: number
   code: 'duplicate_name'
@@ -73,15 +79,24 @@ const assertTimeUnitIsNotInUse = async (id: string) => {
 }
 
 const assertTimeUnitNameIsUnique = async (displayName: string, existingId?: string) => {
-  const normalizedId = createTimeUnitId(displayName)
-  const existingTimeUnit = await nowDb.now_time_unit.findFirst({
-    where: {
-      OR: [{ tu_name: normalizedId }, { tu_display_name: displayName }],
-    },
-    select: { tu_name: true },
+  const normalizedName = normalizeTimeUnitName(displayName)
+
+  const timeUnits = await nowDb.now_time_unit.findMany({
+    select: { tu_name: true, tu_display_name: true },
   })
 
-  if (existingTimeUnit && (!existingId || existingTimeUnit.tu_name !== existingId)) {
+  const duplicate = timeUnits.find(timeUnit => {
+    const normalizedExistingId = normalizeTimeUnitName(timeUnit.tu_name)
+    const normalizedExistingDisplayName = normalizeTimeUnitName(timeUnit.tu_display_name)
+
+    if (existingId && timeUnit.tu_name === existingId) {
+      return false
+    }
+
+    return normalizedExistingId === normalizedName || normalizedExistingDisplayName === normalizedName
+  })
+
+  if (duplicate) {
     throw new DuplicateTimeUnitError(DUPLICATE_TIME_UNIT_MESSAGE)
   }
 }
@@ -96,7 +111,7 @@ const getTimeUnitWriteHandler = (type: ActionType) => {
   })
 }
 
-const createTimeUnitId = (displayName: string) => displayName.toLowerCase().replace(' ', '')
+const createTimeUnitId = (displayName: string) => normalizeTimeUnitName(displayName)
 
 export const writeTimeUnit = async (
   timeUnit: EditDataType<TimeUnitDetailsType>,
@@ -105,12 +120,9 @@ export const writeTimeUnit = async (
   authorizer: string
 ) => {
   const writeHandler = getTimeUnitWriteHandler(timeUnit.tu_name ? 'update' : 'add')
+  const createdId = timeUnit.tu_name ?? createTimeUnitId(timeUnit.tu_display_name!)
 
-  const createdId = createTimeUnitId(timeUnit.tu_display_name!)
-
-  if (!timeUnit.tu_name) {
-    await assertTimeUnitNameIsUnique(timeUnit.tu_display_name!)
-  }
+  await assertTimeUnitNameIsUnique(timeUnit.tu_display_name!, timeUnit.tu_name)
 
   try {
     await writeHandler.start()

@@ -36,7 +36,7 @@ describe('Creating new time unit', () => {
 
     it('Contains correct data', () => {
       const { tu_name, tu_display_name, tu_comment } = createdTimeUnit!
-      expect(tu_name).toEqual(newTimeUnitBasis.tu_display_name?.toLowerCase().replace(' ', '')) //'Name is different than expected'
+      expect(tu_name).toEqual(newTimeUnitBasis.tu_display_name?.toLowerCase().replace(/[\s_-]+/g, '')) //'Name is different than expected'
       expect(tu_display_name).toEqual(newTimeUnitBasis.tu_display_name) // 'Display name differs'
       expect(tu_comment).toEqual(newTimeUnitBasis.tu_comment) // 'Comment differs'
     })
@@ -61,6 +61,18 @@ describe('Creating new time unit', () => {
   it('Creation fails with duplicate display name and returns structured error', async () => {
     const duplicateResult = await send('time-unit', 'PUT', {
       timeUnit: { ...newTimeUnitBasis },
+    })
+
+    expect(duplicateResult.status).toEqual(409)
+    expect(duplicateResult.body).toEqual({
+      message: 'Time unit with the provided name already exists',
+      code: 'duplicate_name',
+    })
+  })
+
+  it('Creation fails when normalized name collides despite punctuation changes', async () => {
+    const duplicateResult = await send('time-unit', 'PUT', {
+      timeUnit: { ...newTimeUnitBasis, tu_display_name: 'Bahean-Test' },
     })
 
     expect(duplicateResult.status).toEqual(409)
