@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from 'react'
+import { useEffect } from 'react'
 import { TimeBound, TimeUnitDetailsType } from '@/shared/types'
 import { TimeBoundSelection } from '@/components/DetailView/common/editingComponents'
 import { emptyOption } from '@/components/DetailView/common/misc'
@@ -7,57 +7,60 @@ import { useDetailContext } from '@/components/DetailView/Context/DetailContext'
 import { Alert, Box } from '@mui/material'
 import { EditingForm, EditingFormField } from '@/components/DetailView/common/EditingForm'
 import { SequenceSelect } from '@/components/Sequence/SequenceSelect'
-import { useGetAllTimeUnitsQuery } from '@/redux/timeUnitReducer'
-import { skipToken } from '@reduxjs/toolkit/query'
+import { useTimeUnitNameAvailability } from '@/hooks/useTimeUnits'
 
 const DUPLICATE_NAME_FIELD = 'duplicateTimeUnitName'
 const DUPLICATE_NAME_MESSAGE = 'Time unit with this name already exists.'
-
-const normalizeTimeUnitName = (name: string | null | undefined) =>
-  (name ?? '')
-    .toLowerCase()
-    .trim()
-    .replace(/[\s_-]+/g, '')
+const DUPLICATE_CHECK_PENDING_FIELD = 'duplicateTimeUnitNamePending'
+const DUPLICATE_CHECK_PENDING_MESSAGE = 'Checking time unit name availability...'
 
 export const TimeUnitTab = () => {
   const { textField, dropdown, data, editData, setEditData, fieldsWithErrors, setFieldsWithErrors, mode } =
     useDetailContext<TimeUnitDetailsType>()
 
-  const { data: allTimeUnits } = useGetAllTimeUnitsQuery(mode.new ? undefined : skipToken)
-
-  const normalizedInputName = useMemo(() => normalizeTimeUnitName(editData.tu_display_name), [editData.tu_display_name])
-
-  const hasDuplicateName = useMemo(() => {
-    if (!mode.new || !allTimeUnits || !normalizedInputName) return false
-
-    return allTimeUnits.some(timeUnit => {
-      const normalizedDisplayName = normalizeTimeUnitName(timeUnit.tu_display_name)
-      const normalizedId = normalizeTimeUnitName(timeUnit.tu_name)
-
-      return normalizedInputName === normalizedDisplayName || normalizedInputName === normalizedId
-    })
-  }, [allTimeUnits, mode.new, normalizedInputName])
+  const { hasDuplicateName, isCheckingName, normalizedInputName } = useTimeUnitNameAvailability(
+    editData.tu_display_name,
+    data.tu_name
+  )
 
   useEffect(() => {
     setFieldsWithErrors(prevFieldsWithErrors => {
       const duplicateErrorExists = DUPLICATE_NAME_FIELD in prevFieldsWithErrors
+      const duplicateCheckPendingExists = DUPLICATE_CHECK_PENDING_FIELD in prevFieldsWithErrors
 
-      if (!mode.new || !hasDuplicateName) {
-        if (!duplicateErrorExists) return prevFieldsWithErrors
+      if (mode.read || !normalizedInputName) {
+        if (!duplicateErrorExists && !duplicateCheckPendingExists) return prevFieldsWithErrors
 
-        const { [DUPLICATE_NAME_FIELD]: _removed, ...remaining } = prevFieldsWithErrors
-        return remaining
+        const {
+          [DUPLICATE_NAME_FIELD]: _removedDuplicate,
+          [DUPLICATE_CHECK_PENDING_FIELD]: _removedPending,
+          ...rest
+        } = prevFieldsWithErrors
+        return rest
       }
 
-      const duplicateError = prevFieldsWithErrors[DUPLICATE_NAME_FIELD]
-      if (duplicateError?.error === DUPLICATE_NAME_MESSAGE) return prevFieldsWithErrors
-
-      return {
-        ...prevFieldsWithErrors,
-        [DUPLICATE_NAME_FIELD]: { name: 'duplicate_name', error: DUPLICATE_NAME_MESSAGE },
+      if (hasDuplicateName) {
+        return {
+          ...prevFieldsWithErrors,
+          [DUPLICATE_NAME_FIELD]: { name: 'duplicate_name', error: DUPLICATE_NAME_MESSAGE },
+        }
       }
+
+      const { [DUPLICATE_NAME_FIELD]: _removedDuplicate, ...rest } = prevFieldsWithErrors
+
+      if (isCheckingName) {
+        return {
+          ...rest,
+          [DUPLICATE_CHECK_PENDING_FIELD]: { name: 'duplicate_name', error: DUPLICATE_CHECK_PENDING_MESSAGE },
+        }
+      }
+
+      if (!duplicateCheckPendingExists) return rest
+
+      const { [DUPLICATE_CHECK_PENDING_FIELD]: _removedPending, ...remaining } = rest
+      return remaining
     })
-  }, [hasDuplicateName, mode.new, setFieldsWithErrors])
+  }, [hasDuplicateName, isCheckingName, mode.read, normalizedInputName, setFieldsWithErrors])
 
   const rankOptions = [
     'Age',
