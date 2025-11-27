@@ -166,4 +166,33 @@ describe('TimeUnit creation duplicate name handling', () => {
     const duplicateWarning: HTMLElement = await screen.findByText(/Time unit with the provided name already exists/i)
     expect(duplicateWarning.textContent ?? '').toContain('Time unit with the provided name already exists')
   })
+
+  it('sends null rank when "No value" is selected', async () => {
+    mockGetAllTimeUnitsQuery.mockReturnValue({ data: [], isFetching: false, isLoading: false })
+
+    const unwrapMock = jest.fn(() => Promise.resolve({ tu_name: 'saved-name' } as TimeUnitDetailsType))
+    let submittedPayload: unknown
+
+    mockEditTimeUnitMutation.mockImplementation(editData => {
+      submittedPayload = editData
+      return { unwrap: unwrapMock }
+    })
+
+    renderTimeUnitCreation()
+
+    const user = userEvent.setup()
+
+    const rankSelect = screen.getByLabelText('Rank')
+    await user.click(rankSelect)
+    await user.click(await screen.findByText('No value'))
+
+    const finalizeButton = await screen.findByRole('button', { name: /finalize entry/i })
+    await user.click(finalizeButton)
+
+    const completeButton = await screen.findByRole('button', { name: /complete and save/i })
+    await user.click(completeButton)
+
+    await waitFor(() => expect(unwrapMock).toHaveBeenCalled())
+    expect(submittedPayload).toMatchObject({ rank: null })
+  })
 })

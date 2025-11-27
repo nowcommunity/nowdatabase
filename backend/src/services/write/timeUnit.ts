@@ -113,23 +113,32 @@ const getTimeUnitWriteHandler = (type: ActionType) => {
 
 const createTimeUnitId = (displayName: string) => normalizeTimeUnitName(displayName)
 
+const normalizeRank = (rank: TimeUnitDetailsType['rank'] | undefined): TimeUnitDetailsType['rank'] | undefined => {
+  if (rank === '') return null
+  return rank
+}
+
 export const writeTimeUnit = async (
   timeUnit: EditDataType<TimeUnitDetailsType>,
   comment: string | undefined,
   references: Reference[] | undefined,
   authorizer: string
 ) => {
-  const writeHandler = getTimeUnitWriteHandler(timeUnit.tu_name ? 'update' : 'add')
-  const createdId = timeUnit.tu_name ?? createTimeUnitId(timeUnit.tu_display_name!)
+  const normalizedTimeUnit = { ...timeUnit, rank: normalizeRank(timeUnit.rank) }
 
-  await assertTimeUnitNameIsUnique(timeUnit.tu_display_name!, timeUnit.tu_name)
+  const writeHandler = getTimeUnitWriteHandler(normalizedTimeUnit.tu_name ? 'update' : 'add')
+  const createdId = normalizedTimeUnit.tu_name ?? createTimeUnitId(normalizedTimeUnit.tu_display_name!)
+
+  await assertTimeUnitNameIsUnique(normalizedTimeUnit.tu_display_name!, normalizedTimeUnit.tu_name)
 
   try {
     await writeHandler.start()
 
-    if (timeUnit.tu_name) {
-      await writeHandler.updateObject('now_time_unit', timeUnit, ['tu_name'])
-      const { cascadeErrors, calculatorErrors, localitiesToUpdate } = await checkTimeUnitCascade(timeUnit)
+    const timeUnitToPersist: EditDataType<TimeUnitDetailsType> = { ...normalizedTimeUnit }
+
+    if (timeUnitToPersist.tu_name) {
+      await writeHandler.updateObject('now_time_unit', timeUnitToPersist, ['tu_name'])
+      const { cascadeErrors, calculatorErrors, localitiesToUpdate } = await checkTimeUnitCascade(timeUnitToPersist)
 
       if (calculatorErrors.length > 0 || cascadeErrors.length > 0) {
         const calculatorErrorsString =
@@ -149,13 +158,13 @@ export const writeTimeUnit = async (
         }
       }
     } else {
-      timeUnit.tu_name = createTimeUnitId(timeUnit.tu_display_name!)
-      await writeHandler.createObject('now_time_unit', timeUnit, ['tu_name'])
+      timeUnitToPersist.tu_name = createTimeUnitId(timeUnitToPersist.tu_display_name!)
+      await writeHandler.createObject('now_time_unit', timeUnitToPersist, ['tu_name'])
     }
     writeHandler.idValue = createdId
     await writeHandler.logUpdatesAndComplete(authorizer, comment ?? '', references ?? [])
 
-    return { tu_name: timeUnit.tu_name, errorObject: undefined }
+    return { tu_name: timeUnitToPersist.tu_name, errorObject: undefined }
   } catch (e) {
     if (writeHandler.connection) {
       await writeHandler.end()

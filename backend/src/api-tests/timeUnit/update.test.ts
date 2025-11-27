@@ -72,6 +72,16 @@ describe('Time unit updating works', () => {
       expect(body.up_bnd).toEqual(existingTimeUnit.up_bnd)
       expect(body.low_bnd).toEqual(existingTimeUnit.low_bnd)
     })
+    it('Update request with empty rank clears rank value', async () => {
+      const { status } = await send<{ tu_name: string }>('time-unit', 'PUT', {
+        timeUnit: { ...existingTimeUnit, rank: '' },
+      })
+
+      expect(status).toBe(200)
+
+      const { body } = await send<TimeUnitDetailsType>(`time-unit/${existingTimeUnit.tu_name}`, 'GET')
+      expect(body.rank).toBeNull()
+    })
     it('Update logs are correct', async () => {
       // edit time unit to create a log update
       const { body: resultBody } = await send<{ tu_name: string }>('time-unit', 'PUT', {

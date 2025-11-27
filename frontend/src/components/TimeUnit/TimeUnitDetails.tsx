@@ -12,6 +12,7 @@ import { validateTimeUnit } from '@/shared/validators/timeUnit'
 import { makeEditData } from '../DetailView/Context/DetailContext'
 import { useDeleteTimeUnit } from '@/hooks/useDeleteTimeUnit'
 import { getApiErrorMessage, isDuplicateNameError } from '@/utils/api'
+import { useTimeUnitForm } from '@/hooks/useTimeUnitForm'
 
 export const TimeUnitDetails = () => {
   const { id } = useParams()
@@ -27,6 +28,7 @@ export const TimeUnitDetails = () => {
   const { deleteTimeUnit } = useDeleteTimeUnit({
     onSuccess: () => navigate('/time-unit'),
   })
+  const { normalizeRank } = useTimeUnitForm()
 
   if (isError) return <div>Error loading data</div>
   if (isLoading || isFetching || (!data && !isNew)) return <CircularProgress />
@@ -43,7 +45,8 @@ export const TimeUnitDetails = () => {
     setEditData: (editData: EditDataType<TimeUnitDetailsType>) => void
   ) => {
     try {
-      const { tu_name } = await editTimeUnitRequest(editData).unwrap()
+      const normalizedEditData = normalizeRank(editData)
+      const { tu_name } = await editTimeUnitRequest(normalizedEditData).unwrap()
       setTimeout(() => navigate(`/time-unit/${tu_name}`), 15)
       notify('Edited item successfully.')
     } catch (e) {
