@@ -55,6 +55,7 @@ router.put(
   async (req: Request<object, object, { timeUnit: EditDataType<TimeUnitDetailsType> & EditMetaData }>, res) => {
     try {
       const { comment, references, ...editedTimeUnit } = req.body.timeUnit
+      const normalizedTimeUnit = { ...editedTimeUnit, rank: editedTimeUnit.rank === '' ? null : editedTimeUnit.rank }
 
       let validationUpBound = undefined
       let validationLowBound = undefined
@@ -62,9 +63,9 @@ router.put(
       let newLowBoundId = undefined
 
       // new up bound has been created in time unit edit view
-      if (!editedTimeUnit.up_bnd && editedTimeUnit.up_bound) {
+      if (!normalizedTimeUnit.up_bnd && normalizedTimeUnit.up_bound) {
         const newUpBound = {
-          ...editedTimeUnit.up_bound,
+          ...normalizedTimeUnit.up_bound,
           now_bau: [],
           references: references,
         } as EditDataType<TimeBoundDetailsType> & EditMetaData
@@ -77,13 +78,13 @@ router.put(
         const { result } = await writeTimeBound(newUpBound, undefined, references, req.user!.initials)
         newUpBoundId = result
         validationUpBound = (await getTimeBoundDetails(newUpBoundId)) ?? undefined
-      } else if (editedTimeUnit.up_bnd) {
-        validationUpBound = (await getTimeBoundDetails(editedTimeUnit.up_bnd)) ?? undefined
+      } else if (normalizedTimeUnit.up_bnd !== undefined && normalizedTimeUnit.up_bnd !== null) {
+        validationUpBound = (await getTimeBoundDetails(normalizedTimeUnit.up_bnd)) ?? undefined
       }
 
       // new low bound has been created in time unit edit view
-      if (!editedTimeUnit.low_bnd && editedTimeUnit.low_bound) {
-        const newLowBound = { ...editedTimeUnit.low_bound, now_bau: [], references: references }
+      if (!normalizedTimeUnit.low_bnd && normalizedTimeUnit.low_bound) {
+        const newLowBound = { ...normalizedTimeUnit.low_bound, now_bau: [], references: references }
 
         const newLowBoundValidationErrors = await validateEntireTimeBound(newLowBound)
         if (newLowBoundValidationErrors.length > 0) {
@@ -93,15 +94,15 @@ router.put(
         const { result } = await writeTimeBound(newLowBound, undefined, references, req.user!.initials)
         newLowBoundId = result
         validationLowBound = (await getTimeBoundDetails(newLowBoundId)) ?? undefined
-      } else if (editedTimeUnit.low_bnd) {
-        validationLowBound = (await getTimeBoundDetails(editedTimeUnit.low_bnd)) ?? undefined
+      } else if (normalizedTimeUnit.low_bnd !== undefined && normalizedTimeUnit.low_bnd !== null) {
+        validationLowBound = (await getTimeBoundDetails(normalizedTimeUnit.low_bnd)) ?? undefined
       }
 
       const validationErrors = await validateEntireTimeUnit({
-        ...editedTimeUnit,
-        up_bnd: newUpBoundId ?? editedTimeUnit.up_bnd,
+        ...normalizedTimeUnit,
+        up_bnd: newUpBoundId ?? normalizedTimeUnit.up_bnd,
         up_bound: validationUpBound,
-        low_bnd: newLowBoundId ?? editedTimeUnit.low_bnd,
+        low_bnd: newLowBoundId ?? normalizedTimeUnit.low_bnd,
         low_bound: validationLowBound,
         references: references,
       })
@@ -110,9 +111,9 @@ router.put(
       }
       const { tu_name, errorObject } = await writeTimeUnit(
         {
-          ...editedTimeUnit,
-          up_bnd: newUpBoundId ?? editedTimeUnit.up_bnd,
-          low_bnd: newLowBoundId ?? editedTimeUnit.low_bnd,
+          ...normalizedTimeUnit,
+          up_bnd: newUpBoundId ?? normalizedTimeUnit.up_bnd,
+          low_bnd: newLowBoundId ?? normalizedTimeUnit.low_bnd,
         },
         comment,
         references,
