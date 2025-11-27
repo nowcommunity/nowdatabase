@@ -292,6 +292,55 @@ describe('Deleting a time unit', () => {
     cy.login('testSu')
   })
 
-  // TODO: Add test for deleting a time unit (this can be copy pasted from other e2e test files with minimal changes)
-  // Not done because time units that have linked localities cannot be deleted currently.
+  it('deletes a time unit that is not linked to any locality', () => {
+    const displayName = buildTimeUnitName('Deletable Time Unit')
+
+    cy.visit(`/time-unit/new`)
+    cy.get('[id=tu_display_name-textfield]').type(displayName)
+    cy.get('[id=sequence-tableselection]').first().click()
+    cy.get('[data-cy=add-button-ALMAAsianlandmammalage]').first().click()
+    cy.get('[id=up_bnd-tableselection]').first().click()
+    cy.get('[data-cy=add-button-11]').first().click()
+    cy.get('[id=low_bnd-tableselection]').first().click()
+    cy.get('[data-cy=add-button-14]').first().click()
+
+    cy.addReferenceAndSave()
+
+    cy.contains(displayName)
+    cy.contains('Creating new time-unit').should('not.exist')
+    cy.get('[id=delete-button]').should('be.visible')
+
+    cy.url().then(url => {
+      const slug = new URL(url).pathname.split('/').pop()
+      expect(slug, 'time unit slug').to.be.a('string').and.to.have.length.greaterThan(0)
+
+      const deletePath = `**/time-unit/${slug}`
+      cy.intercept('DELETE', deletePath).as('deleteTimeUnit')
+
+      cy.fixture('login').its('deleteTargets').then(deleteTargets => {
+        const confirmText = deleteTargets.find(target => target.entity === 'TimeUnit')
+          ?.confirmText
+        const expectedConfirm =
+          confirmText ||
+          'Are you sure you want to delete this item? This operation cannot be undone.'
+
+        cy.on('window:confirm', message => {
+          expect(message).to.eq(expectedConfirm)
+          return true
+        })
+
+        cy.get('[id=delete-button]').click()
+
+        cy.wait('@deleteTimeUnit').its('response.statusCode').should('be.oneOf', [200, 204])
+
+        cy.contains('Deleted item successfully.').should('be.visible')
+
+        cy.url().should('include', '/time-unit')
+        cy.contains(displayName).should('not.exist')
+
+        cy.visit(`/time-unit/${slug}`)
+        cy.contains('Error loading data')
+      })
+    })
+  })
 })

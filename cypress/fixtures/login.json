@@ -26,6 +26,13 @@
       "deleteButton": "[id=delete-button]",
       "confirmText": "Are you sure you want to delete this item? This operation cannot be undone.",
       "notes": "Reference detail view delete with confirm dialog"
+    },
+    {
+      "entity": "TimeUnit",
+      "path": "/time-unit/:id",
+      "deleteButton": "[id=delete-button]",
+      "confirmText": "Are you sure you want to delete this item? This operation cannot be undone.",
+      "notes": "Time unit detail delete; only allowed when not linked to a locality"
     }
   ]
 }
