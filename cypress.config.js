@@ -86,6 +86,10 @@ module.exports = defineConfig({
       return config
     },
     baseUrl: 'http://localhost:5173/',
+    specPattern: [
+      'cypress/e2e/**/*.cy.{js,jsx,ts,tsx}',
+      'cypress/e2e/**/*.spec.{js,jsx,ts,tsx}',
+    ],
   },
   env: {
     databaseResetUrl: "http://localhost:4000/test/reset-test-database",

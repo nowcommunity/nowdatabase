@@ -60,3 +60,17 @@ Your feedback is essential to improving the user experience—thank you for part
 
 ---
 
+## Cypress E2E Tests
+
+### Running the suite
+
+- **Local browsers:** `npm run test:e2e:local` (requires frontend at `http://localhost:5173` and API at `http://localhost:4000`).
+- **Headless via Docker (CI parity):** `npm run test:e2e` or `npm run test:ci:e2e` to execute inside the Cypress container image.
+- The default spec pattern now includes both `*.cy.*` and `*.spec.*` files under `cypress/e2e`, so the delete flow coverage in `cypress/e2e/delete.spec.ts` runs with the rest of the suite without extra flags.
+
+### Test data and reset steps
+
+- Ensure test configuration is present (`npm run config:test`) and start the test stack (e.g., `docker compose -f docker-compose.dev.yml up`).
+- The Cypress env variable `databaseResetUrl` points to `http://localhost:4000/test/reset-test-database` by default. Hitting this endpoint (for example with `curl http://localhost:4000/test/reset-test-database`) resets seeded data before running the suite.
+- When running inside Docker, the provided scripts already pass through the defaults; override with `CYPRESS_databaseResetUrl` if the API host/port differs.
+
