@@ -1,17 +1,15 @@
 import { beforeEach, describe, expect, it, jest } from '@jest/globals'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { MemoryRouter, Route, Routes, useLocation } from 'react-router-dom'
 import '@testing-library/jest-dom'
 import { skipToken } from '@reduxjs/toolkit/query'
 
-import { Notification, NotificationContextProvider } from '@/components/Notification'
-import { PageContextProvider } from '@/components/Page'
-import { TimeBoundDetails } from '@/components/TimeBound/TimeBoundDetails'
-import type { TimeBoundDetailsType, TimeUnit } from '@/shared/types'
+import { TimeUnitTab } from '@/components/TimeBound/Tabs/TimeUnitTab'
+import { DetailContext, type DetailContextType, modeOptionToMode } from '@/components/DetailView/Context/DetailContext'
+import type { EditDataType, TimeBoundDetailsType, TimeUnit } from '@/shared/types'
 
-jest.mock('@/shared/validators/timeBound', () => ({
-  validateTimeBound: () => ({ name: '', error: '' }),
+jest.mock('lodash-es', () => ({
+  cloneDeep: (value: unknown) => value,
 }))
 
 jest.mock('@/util/config', () => ({
@@ -20,20 +18,20 @@ jest.mock('@/util/config', () => ({
   ENV: 'test',
 }))
 
-jest.mock('@/components/DetailView/DetailBrowser', () => ({
-  DetailBrowser: () => <div data-testid="detail-browser" />,
+jest.mock('@/components/DetailView/common/SimpleTable', () => ({
+  SimpleTable: ({ data }: { data: TimeUnit[] }) => (
+    <div data-testid="simple-table">
+      {data.map(unit => (
+        <div key={unit.tu_name}>{unit.tu_display_name}</div>
+      ))}
+    </div>
+  ),
 }))
 
-const mockGetTimeBoundDetailsQuery = jest.fn()
 const mockGetTimeBoundTimeUnitsQuery = jest.fn()
-const mockEditTimeBoundMutation = jest.fn()
-const mockDeleteTimeBoundMutation = jest.fn()
 
 jest.mock('@/redux/timeBoundReducer', () => ({
-  useGetTimeBoundDetailsQuery: (...args: unknown[]) => mockGetTimeBoundDetailsQuery(...args),
   useGetTimeBoundTimeUnitsQuery: (...args: unknown[]) => mockGetTimeBoundTimeUnitsQuery(...args),
-  useEditTimeBoundMutation: () => [mockEditTimeBoundMutation, { isLoading: false }],
-  useDeleteTimeBoundMutation: () => [mockDeleteTimeBoundMutation, { isSuccess: false, isError: false }],
 }))
 
 const baseTimeBound: TimeBoundDetailsType = {
@@ -44,46 +42,35 @@ const baseTimeBound: TimeBoundDetailsType = {
   now_bau: [],
 } as unknown as TimeBoundDetailsType
 
-const renderTimeBound = (initialEntry: string) => {
-  let currentSearch = ''
+const createDetailContextValue = (overrides: Partial<DetailContextType<TimeBoundDetailsType>> = {}) =>
+  ({
+    data: baseTimeBound,
+    mode: modeOptionToMode.read,
+    setMode: () => {},
+    editData: { bid: 1 } as unknown as EditDataType<TimeBoundDetailsType>,
+    setEditData: () => {},
+    textField: () => <></>,
+    bigTextField: () => <></>,
+    dropdown: () => <></>,
+    dropdownWithSearch: () => <></>,
+    radioSelection: () => <></>,
+    validator: () => ({ name: '', error: null }),
+    fieldsWithErrors: {},
+    setFieldsWithErrors: () => {},
+    ...overrides,
+  }) as DetailContextType<TimeBoundDetailsType>
 
-  const LocationTracker = () => {
-    const location = useLocation()
-    currentSearch = location.search
-    return null
-  }
-
+const renderTimeUnitTab = (overrides: Partial<DetailContextType<TimeBoundDetailsType>> = {}) => {
+  const contextValue = createDetailContextValue(overrides)
   render(
-    <NotificationContextProvider>
-      <Notification />
-      <PageContextProvider<TimeBoundDetailsType>
-        editRights={{ new: true, edit: true, delete: true }}
-        idFieldName="bid"
-        viewName="time-bound"
-        createTitle={() => ''}
-        createSubtitle={() => ''}
-      >
-        <MemoryRouter initialEntries={[initialEntry]}>
-          <LocationTracker />
-          <Routes>
-            <Route element={<TimeBoundDetails />} path="/time-bound/:id" />
-          </Routes>
-        </MemoryRouter>
-      </PageContextProvider>
-    </NotificationContextProvider>
+    <DetailContext.Provider value={contextValue as unknown as DetailContextType<unknown>}>
+      <TimeUnitTab />
+    </DetailContext.Provider>
   )
-
-  return () => currentSearch
 }
 
 beforeEach(() => {
   jest.clearAllMocks()
-  mockGetTimeBoundDetailsQuery.mockReturnValue({
-    isLoading: false,
-    isFetching: false,
-    isError: false,
-    data: baseTimeBound,
-  })
   mockGetTimeBoundTimeUnitsQuery.mockReturnValue({
     data: [],
     isError: false,
@@ -94,8 +81,7 @@ beforeEach(() => {
 })
 
 describe('Time Units tab', () => {
-  it('loads time units when tab is selected and syncs tab query param', async () => {
-    const user = userEvent.setup()
+  it('loads time units when bound id is present', async () => {
     const timeUnits: TimeUnit[] = [
       {
         tu_name: 'TU1',
@@ -115,14 +101,11 @@ describe('Time Units tab', () => {
       refetch: jest.fn(),
     })
 
-    const getLocationSearch = renderTimeBound('/time-bound/1?tab=0')
-
-    await user.click(screen.getByRole('tab', { name: /time units/i }))
+    renderTimeUnitTab()
 
     expect(mockGetTimeBoundTimeUnitsQuery).toHaveBeenCalledWith(1)
     const unitRow = await screen.findByText('Sample Unit')
     expect(unitRow).toBeTruthy()
-    expect(getLocationSearch()).toBe('?tab=1')
   })
 
   it('shows retry controls when loading time units fails', async () => {
@@ -136,7 +119,7 @@ describe('Time Units tab', () => {
       refetch,
     })
 
-    renderTimeBound('/time-bound/1?tab=1')
+    renderTimeUnitTab()
 
     const errorAlert = await screen.findByTestId('time-units-error')
     expect(errorAlert).toBeTruthy()
@@ -146,7 +129,10 @@ describe('Time Units tab', () => {
   })
 
   it('displays guidance instead of fetching on new time bounds', async () => {
-    renderTimeBound('/time-bound/new?tab=1')
+    renderTimeUnitTab({
+      mode: modeOptionToMode.new,
+      data: { bid: undefined } as unknown as TimeBoundDetailsType,
+    })
 
     const guidance = await screen.findByTestId('time-units-disabled')
     expect(guidance).toBeTruthy()
