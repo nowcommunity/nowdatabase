@@ -34,6 +34,16 @@ Cypress.Commands.add('login', username => {
   cy.contains(`${username}`)
 })
 
+Cypress.Commands.add('loginAsDeleteCoordinator', () => {
+  cy.fixture('login').then(({ deleteCoordinator }) => {
+    cy.login(deleteCoordinator.username)
+  })
+})
+
+Cypress.Commands.add('deleteTargets', () => {
+  return cy.fixture('login').its('deleteTargets')
+})
+
 Cypress.Commands.add('pageForbidden', url => {
   cy.visit(url)
   cy.contains('Your user is not authorized to view this page.')
