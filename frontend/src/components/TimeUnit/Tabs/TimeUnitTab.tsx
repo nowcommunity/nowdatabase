@@ -1,15 +1,66 @@
+import { useEffect } from 'react'
 import { TimeBound, TimeUnitDetailsType } from '@/shared/types'
 import { TimeBoundSelection } from '@/components/DetailView/common/editingComponents'
 import { emptyOption } from '@/components/DetailView/common/misc'
 import { ArrayFrame, Grouped } from '@/components/DetailView/common/tabLayoutHelpers'
 import { useDetailContext } from '@/components/DetailView/Context/DetailContext'
-import { Box } from '@mui/material'
+import { Alert, Box } from '@mui/material'
 import { EditingForm, EditingFormField } from '@/components/DetailView/common/EditingForm'
 import { SequenceSelect } from '@/components/Sequence/SequenceSelect'
+import { useTimeUnitNameAvailability } from '@/hooks/useTimeUnits'
+
+const DUPLICATE_NAME_FIELD = 'duplicateTimeUnitName'
+const DUPLICATE_NAME_MESSAGE = 'Time unit with this name already exists.'
+const DUPLICATE_CHECK_PENDING_FIELD = 'duplicateTimeUnitNamePending'
+const DUPLICATE_CHECK_PENDING_MESSAGE = 'Checking time unit name availability...'
 
 export const TimeUnitTab = () => {
-  const { textField, dropdown, data, editData, setEditData, fieldsWithErrors, mode } =
+  const { textField, dropdown, data, editData, setEditData, fieldsWithErrors, setFieldsWithErrors, mode } =
     useDetailContext<TimeUnitDetailsType>()
+
+  const { hasDuplicateName, isCheckingName, normalizedInputName } = useTimeUnitNameAvailability(
+    editData.tu_display_name,
+    data.tu_name
+  )
+
+  useEffect(() => {
+    setFieldsWithErrors(prevFieldsWithErrors => {
+      const duplicateErrorExists = DUPLICATE_NAME_FIELD in prevFieldsWithErrors
+      const duplicateCheckPendingExists = DUPLICATE_CHECK_PENDING_FIELD in prevFieldsWithErrors
+
+      if (mode.read || !normalizedInputName) {
+        if (!duplicateErrorExists && !duplicateCheckPendingExists) return prevFieldsWithErrors
+
+        const {
+          [DUPLICATE_NAME_FIELD]: _removedDuplicate,
+          [DUPLICATE_CHECK_PENDING_FIELD]: _removedPending,
+          ...rest
+        } = prevFieldsWithErrors
+        return rest
+      }
+
+      if (hasDuplicateName) {
+        return {
+          ...prevFieldsWithErrors,
+          [DUPLICATE_NAME_FIELD]: { name: 'duplicate_name', error: DUPLICATE_NAME_MESSAGE },
+        }
+      }
+
+      const { [DUPLICATE_NAME_FIELD]: _removedDuplicate, ...rest } = prevFieldsWithErrors
+
+      if (isCheckingName) {
+        return {
+          ...rest,
+          [DUPLICATE_CHECK_PENDING_FIELD]: { name: 'duplicate_name', error: DUPLICATE_CHECK_PENDING_MESSAGE },
+        }
+      }
+
+      if (!duplicateCheckPendingExists) return rest
+
+      const { [DUPLICATE_CHECK_PENDING_FIELD]: _removedPending, ...remaining } = rest
+      return remaining
+    })
+  }, [hasDuplicateName, isCheckingName, mode.read, normalizedInputName, setFieldsWithErrors])
 
   const rankOptions = [
     'Age',
@@ -68,6 +119,11 @@ export const TimeUnitTab = () => {
 
   return (
     <>
+      {hasDuplicateName && (
+        <Alert severity="warning" data-testid="duplicate-timeunit-warning">
+          {DUPLICATE_NAME_MESSAGE}
+        </Alert>
+      )}
       <ArrayFrame array={timeUnit} title="Time Unit" />
       <>
         <Grouped title="Upper Bound" error={'up_bnd' in fieldsWithErrors}>
