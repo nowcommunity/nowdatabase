@@ -22,17 +22,25 @@ import { writeTimeBound } from '../services/write/timeBound'
 const router = Router()
 
 router.get('/all', async (_req, res) => {
-  const time_units = await getAllTimeUnits()
-  return res.status(200).send(time_units)
+  try {
+    const time_units = await getAllTimeUnits()
+    return res.status(200).send(time_units)
+  } catch (_error) {
+    return res.status(500).send({ message: 'Failed to fetch time units' })
+  }
 })
 
 router.get('/sequences', getSequences)
 
 router.get('/:id', async (req, res) => {
   const id = req.params.id
-  const timeUnit = await getTimeUnitDetails(id)
-  if (!timeUnit) return res.status(404).send()
-  return res.status(200).send(timeUnit)
+  try {
+    const timeUnit = await getTimeUnitDetails(id)
+    if (!timeUnit) return res.status(404).send({ message: 'Time unit not found' })
+    return res.status(200).send(timeUnit)
+  } catch (_error) {
+    return res.status(500).send({ message: 'Failed to fetch time unit' })
+  }
 })
 
 router.get('/localities/:id', async (req, res) => {

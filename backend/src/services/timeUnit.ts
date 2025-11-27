@@ -33,9 +33,9 @@ export const getAllTimeUnits = async () => {
     tu_name: item.tu_name,
     tu_display_name: item.tu_display_name,
     rank: item.rank,
-    low_bound: item.now_tu_bound_now_time_unit_low_bndTonow_tu_bound.age,
-    up_bound: item.now_tu_bound_now_time_unit_up_bndTonow_tu_bound.age,
-    seq_name: item.now_tu_sequence.seq_name,
+    low_bound: item.now_tu_bound_now_time_unit_low_bndTonow_tu_bound?.age ?? null,
+    up_bound: item.now_tu_bound_now_time_unit_up_bndTonow_tu_bound?.age ?? null,
+    seq_name: item.now_tu_sequence?.seq_name ?? null,
   }))
 }
 
