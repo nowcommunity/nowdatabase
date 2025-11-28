@@ -1,6 +1,15 @@
 import { api } from './api'
 import { Project, ProjectDetailsType } from '@/shared/types'
 
+export type CreateProjectPayload = {
+  projectCode: string
+  projectName: string
+  coordinatorUserId: number
+  projectStatus: string
+  recordStatus: boolean
+  memberUserIds?: number[]
+}
+
 const projectsApi = api.injectEndpoints({
   endpoints: builder => ({
     getAllProjects: builder.query<Project[], void>({
@@ -13,7 +22,14 @@ const projectsApi = api.injectEndpoints({
         url: `/project/${id}`,
       }),
     }),
+    createProject: builder.mutation<ProjectDetailsType, CreateProjectPayload>({
+      query: body => ({
+        url: `/projects`,
+        method: 'POST',
+        body,
+      }),
+    }),
   }),
 })
 
-export const { useGetAllProjectsQuery, useGetProjectDetailsQuery } = projectsApi
+export const { useGetAllProjectsQuery, useGetProjectDetailsQuery, useCreateProjectMutation } = projectsApi
