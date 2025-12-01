@@ -19,20 +19,16 @@ import {
   Typography,
 } from '@mui/material'
 import { Controller, useForm } from 'react-hook-form'
-import { recordStatusOptions, projectStatusOptions, type RecordStatusOption } from '@/hooks/useProjectsApi'
-
-export type UserOption = {
-  userId: number
-  label: string
-  initials: string
-}
+import { recordStatusOptions, projectStatusOptions } from '@/constants/projectStatus'
+import type { RecordStatusValue } from '@/constants/projectStatus'
+import type { UserOption } from '@/hooks/useUsersApi'
 
 export type ProjectFormValues = {
   projectCode: string
   projectName: string
   coordinatorUserId: number | null
   projectStatus: string
-  recordStatus: RecordStatusOption['value'] | ''
+  recordStatus: RecordStatusValue | ''
   memberUserIds: number[]
 }
 
@@ -169,9 +165,19 @@ export const ProjectForm = ({ users, onSubmit, isSubmitting = false, serverError
                   name="recordStatus"
                   rules={{ required: 'Record status is required' }}
                   render={({ field }) => (
-                    <Select {...field} labelId="record-status-label" label="Record Status" value={field.value ?? ''}>
+                    <Select
+                      {...field}
+                      labelId="record-status-label"
+                      label="Record Status"
+                      value={field.value === '' ? '' : String(field.value)}
+                      onChange={event => {
+                        const rawValue = event.target.value
+                        const mappedValue = rawValue === '' ? '' : rawValue === 'true'
+                        field.onChange(mappedValue)
+                      }}
+                    >
                       {recordStatusOptions.map(option => (
-                        <MenuItem key={option.label} value={option.value}>
+                        <MenuItem key={option.label} value={String(option.value)}>
                           {option.label}
                         </MenuItem>
                       ))}

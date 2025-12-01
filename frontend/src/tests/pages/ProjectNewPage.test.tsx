@@ -7,7 +7,7 @@ import { ProjectNewPage } from '@/pages/ProjectNewPage'
 import type { ProjectFormValues } from '@/components/Project/ProjectForm'
 
 const mockUseUser = jest.fn()
-const mockUseGetAllPersonsQuery = jest.fn()
+const mockUseUsersApi = jest.fn()
 const mockUseProjectsApi = jest.fn()
 const mockNotify = jest.fn()
 const mockNavigate = jest.fn()
@@ -16,8 +16,8 @@ jest.mock('@/hooks/user', () => ({
   useUser: () => mockUseUser(),
 }))
 
-jest.mock('@/redux/personReducer', () => ({
-  useGetAllPersonsQuery: (arg?: unknown) => mockUseGetAllPersonsQuery(arg),
+jest.mock('@/hooks/useUsersApi', () => ({
+  useUsersApi: (arg?: unknown) => mockUseUsersApi(arg),
 }))
 
 jest.mock('@/hooks/useProjectsApi', () => ({
@@ -36,18 +36,12 @@ jest.mock('react-router-dom', () => {
   }
 })
 
-type Person = {
-  initials: string
-  surname: string | null
-  first_name: string | null
-  user: { user_id: number; user_name: string | null; now_user_group?: string | null; last_login?: string | null }
-}
+type User = { userId: number; label: string; initials: string }
 
-const personFactory = (overrides: Partial<Person> = {}): Person => ({
+const userFactory = (overrides: Partial<User> = {}): User => ({
+  userId: 1,
+  label: 'Doe, Jane',
   initials: 'JD',
-  surname: 'Doe',
-  first_name: 'Jane',
-  user: { user_id: 1, user_name: 'jdoe', now_user_group: null, last_login: null },
   ...overrides,
 })
 
@@ -74,7 +68,7 @@ const renderWithRouter = () => {
 describe('ProjectNewPage', () => {
   beforeEach(() => {
     mockUseUser.mockReturnValue({ token: 'token-123', role: Role.Admin })
-    mockUseGetAllPersonsQuery.mockReturnValue({ data: [personFactory()], isLoading: false, isError: false })
+    mockUseUsersApi.mockReturnValue({ users: [userFactory()], isLoading: false, isError: false })
     mockUseProjectsApi.mockReturnValue({
       createProject: jest.fn(() => ({ unwrap: () => Promise.resolve({ pid: 42 }) })),
       isSubmitting: false,
@@ -110,14 +104,9 @@ describe('ProjectNewPage', () => {
       unwrap: () => Promise.resolve({ pid: 7, ...payload }),
     }))
     mockUseProjectsApi.mockReturnValue({ createProject, isSubmitting: false })
-    const otherPerson = personFactory({
-      initials: 'AS',
-      surname: 'Smith',
-      first_name: 'Alex',
-      user: { user_id: 2, user_name: 'asmith' },
-    })
-    mockUseGetAllPersonsQuery.mockReturnValue({
-      data: [personFactory(), otherPerson],
+    const otherUser = userFactory({ userId: 2, label: 'Smith, Alex', initials: 'AS' })
+    mockUseUsersApi.mockReturnValue({
+      users: [userFactory(), otherUser],
       isLoading: false,
       isError: false,
     })
@@ -147,7 +136,7 @@ describe('ProjectNewPage', () => {
         projectName: 'New Project',
         coordinatorUserId: 1,
         projectStatus: 'current',
-        recordStatus: false,
+        recordStatus: true,
         memberUserIds: [2],
       })
     })

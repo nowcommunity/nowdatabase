@@ -1,3 +1,4 @@
+import { PROJECT_STATUSES, type ProjectStatus, RECORD_STATUS_VALUES } from '../constants/status'
 import { nowDb } from '../utils/db'
 
 export class ValidationError extends Error {
@@ -13,7 +14,7 @@ export type CreateProjectInput = {
   projectCode: string
   projectName: string
   coordinatorUserId: number
-  projectStatus?: string | null
+  projectStatus?: ProjectStatus | null
   recordStatus?: boolean | null
   memberUserIds?: number[]
 }
@@ -50,6 +51,24 @@ const ensureValidMemberIds = (memberUserIds: unknown) => {
   return Array.from(new Set(numericIds))
 }
 
+const ensureValidProjectStatus = (value: unknown): ProjectStatus | null => {
+  if (value === undefined || value === null || value === '') return null
+  if (typeof value !== 'string' || !PROJECT_STATUSES.includes(value as ProjectStatus)) {
+    throw new ValidationError('Project status is invalid')
+  }
+
+  return value as ProjectStatus
+}
+
+const ensureValidRecordStatus = (value: unknown): boolean | null => {
+  if (value === undefined || value === null || value === '') return null
+  if (typeof value !== 'boolean' || !RECORD_STATUS_VALUES.includes(value)) {
+    throw new ValidationError('Record status is invalid')
+  }
+
+  return value
+}
+
 export const createProject = async ({
   projectCode,
   projectName,
@@ -62,6 +81,8 @@ export const createProject = async ({
   const proj_name = ensureNonEmptyString(projectName, 'Project name')
   const coordinatorId = ensureValidUserId(coordinatorUserId, 'Coordinator user ID')
   const uniqueMemberIds = ensureValidMemberIds(memberUserIds)
+  const validProjectStatus = ensureValidProjectStatus(projectStatus)
+  const validRecordStatus = ensureValidRecordStatus(recordStatus)
 
   const coordinator = await nowDb.com_people.findFirst({
     select: { initials: true },
@@ -88,8 +109,8 @@ export const createProject = async ({
       data: {
         proj_code,
         proj_name,
-        proj_status: projectStatus ?? null,
-        proj_records: recordStatus ?? null,
+        proj_status: validProjectStatus,
+        proj_records: validRecordStatus,
         contact: coordinator.initials,
         now_proj_people: members.length
           ? {

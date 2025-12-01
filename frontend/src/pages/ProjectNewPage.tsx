@@ -3,41 +3,19 @@ import { useNavigate } from 'react-router-dom'
 import { CircularProgress, Stack, Typography } from '@mui/material'
 
 import { PermissionDenied } from '@/components/PermissionDenied'
-import { ProjectForm, ProjectFormValues, UserOption } from '@/components/Project/ProjectForm'
+import { ProjectForm, ProjectFormValues } from '@/components/Project/ProjectForm'
 import { useUser } from '@/hooks/user'
 import { useNotify } from '@/hooks/notification'
-import { useGetAllPersonsQuery } from '@/redux/personReducer'
-import { Role, type PersonDetailsType } from '@/shared/types'
+import { useUsersApi } from '@/hooks/useUsersApi'
+import { Role } from '@/shared/types'
 import { useProjectsApi } from '@/hooks/useProjectsApi'
 import type { FetchBaseQueryError } from '@reduxjs/toolkit/query'
-
-type PersonWithUserId = PersonDetailsType & { user: NonNullable<PersonDetailsType['user']> & { user_id: number } }
-
-const hasUserId = (person: PersonDetailsType): person is PersonWithUserId => typeof person.user?.user_id === 'number'
-
-const formatUserLabel = ({
-  surname,
-  first_name,
-  user,
-}: {
-  surname: string | null
-  first_name: string | null
-  user?: { user_name: string | null }
-}) => {
-  if (surname) {
-    return `${surname}${first_name ? `, ${first_name}` : ''}`
-  }
-
-  if (user?.user_name) return user.user_name
-
-  return 'Unknown user'
-}
 
 export const ProjectNewPage = () => {
   const user = useUser()
   const navigate = useNavigate()
   const { notify } = useNotify()
-  const { data: persons, isLoading: personsLoading, isError: personsError } = useGetAllPersonsQuery()
+  const { users, isLoading: personsLoading, isError: personsError } = useUsersApi()
   const { createProject, isSubmitting } = useProjectsApi()
   const [submitError, setSubmitError] = useState<string | null>(null)
 
@@ -45,17 +23,7 @@ export const ProjectNewPage = () => {
     document.title = 'New project'
   }, [])
 
-  const userOptions: UserOption[] = useMemo(() => {
-    const personsWithUserIds: PersonWithUserId[] = (persons ?? []).filter(hasUserId)
-
-    return personsWithUserIds
-      .map(person => ({
-        userId: person.user.user_id,
-        label: formatUserLabel({ surname: person.surname, first_name: person.first_name, user: person.user }),
-        initials: person.initials,
-      }))
-      .sort((a, b) => a.label.localeCompare(b.label))
-  }, [persons])
+  const userOptions = useMemo(() => users, [users])
 
   if (!user.token) {
     return (
@@ -103,7 +71,7 @@ export const ProjectNewPage = () => {
         projectName: values.projectName.trim(),
         coordinatorUserId: values.coordinatorUserId!,
         projectStatus: values.projectStatus,
-        recordStatus: values.recordStatus === 'private',
+        recordStatus: values.recordStatus as boolean,
         memberUserIds: values.memberUserIds.length ? values.memberUserIds : undefined,
       }).unwrap()
 
