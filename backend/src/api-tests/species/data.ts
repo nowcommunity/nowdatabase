@@ -142,6 +142,22 @@ export const newSpeciesBasis: EditDataType<SpeciesDetailsType & EditMetaData> = 
   references: references,
 }
 
+export const cloneSpeciesData = () => {
+  const cloneReferences = newSpeciesBasis.references?.map(reference => ({
+    ...reference,
+    ref_journal: reference.ref_journal ? { ...reference.ref_journal } : undefined,
+    ref_authors: reference.ref_authors?.map(author => ({ ...author })),
+  }))
+
+  return {
+    ...newSpeciesBasis,
+    now_ls: newSpeciesBasis.now_ls.map(ls => ({ ...ls })),
+    com_taxa_synonym: [],
+    now_sau: [],
+    references: cloneReferences,
+  }
+}
+
 export const editedSpecies: EditDataType<SpeciesDetailsType & EditMetaData> = {
   species_id: 21426,
   sp_comment: 'Test comment',
