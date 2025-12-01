@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, jest } from '@jest/globals'
 import { MemoryRouter, Route, Routes, useLocation } from 'react-router-dom'
-import { render, screen, waitFor } from '@testing-library/react'
+import { act, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { Role } from '@/shared/types'
 import { ProjectNewPage } from '@/pages/ProjectNewPage'
@@ -86,12 +86,17 @@ describe('ProjectNewPage', () => {
   })
 
   it('requires required fields before submitting', async () => {
-    const user = userEvent.setup()
     renderWithRouter()
 
-    await user.click(screen.getByRole('button', { name: /create project/i }))
+    const form = document.querySelector('form')
+    expect(form).toBeTruthy()
+    act(() => {
+      fireEvent.submit(form as HTMLFormElement)
+    })
 
-    expect(await screen.findByText('Project code is required')).toBeTruthy()
+    await waitFor(() => {
+      expect(screen.getByText('Project code is required')).toBeTruthy()
+    })
     expect(screen.getByText('Project name is required')).toBeTruthy()
     expect(screen.getByText('Coordinator is required')).toBeTruthy()
     expect(screen.getByText('Project status is required')).toBeTruthy()
@@ -116,19 +121,26 @@ describe('ProjectNewPage', () => {
     await user.type(screen.getByLabelText('Project Code'), 'PRJ-001')
     await user.type(screen.getByLabelText('Project Name'), 'New Project')
 
-    await user.click(screen.getByLabelText('Coordinator'))
+    // Use combobox role for MUI Autocomplete components
+    const comboboxes = screen.getAllByRole('combobox')
+    // comboboxes order: Coordinator, Project Status, Record Status, Members
+    await user.click(comboboxes[0]) // Coordinator
     await user.click(screen.getByText('Doe, Jane'))
 
-    await user.click(screen.getByLabelText('Project Status'))
+    await user.click(comboboxes[1]) // Project Status
     await user.click(screen.getByRole('option', { name: 'Current' }))
 
-    await user.click(screen.getByLabelText('Record Status'))
+    await user.click(comboboxes[2]) // Record Status
     await user.click(screen.getByRole('option', { name: 'Public' }))
 
-    await user.click(screen.getByLabelText('Members'))
+    await user.click(comboboxes[3]) // Members
     await user.click(screen.getByText('Smith, Alex'))
 
-    await user.click(screen.getByRole('button', { name: /create project/i }))
+    const form = document.querySelector('form')
+    expect(form).toBeTruthy()
+    act(() => {
+      fireEvent.submit(form as HTMLFormElement)
+    })
 
     await waitFor(() => {
       expect(createProject).toHaveBeenCalledWith({

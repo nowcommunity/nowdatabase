@@ -7,6 +7,30 @@ import { ProjectDetails } from '@/components/Project/ProjectDetails'
 import { PageContext, PageContextType } from '@/components/Page'
 import { ProjectDetailsType } from '@/shared/types'
 
+jest.mock('lodash-es', () => ({
+  cloneDeep: (value: unknown) => value,
+}))
+
+jest.mock('@/util/config', () => ({
+  ENV: 'dev',
+  BACKEND_URL: 'http://localhost',
+  ENABLE_WRITE: true,
+}))
+
+// Mock DetailView to avoid loading the full component tree with Redux dependencies
+jest.mock('@/components/DetailView/DetailView', () => ({
+  DetailView: (props: { deleteFunction?: () => Promise<void> }) => {
+    const handleDelete = () => {
+      if (props.deleteFunction) void props.deleteFunction()
+    }
+    return (
+      <div data-testid="detail-view">
+        <button onClick={handleDelete}>Delete</button>
+      </div>
+    )
+  },
+}))
+
 const mockUseGetProjectDetailsQuery = jest.fn()
 const mockUseDeleteProjectMutation = jest.fn()
 const mockNotify = jest.fn()
