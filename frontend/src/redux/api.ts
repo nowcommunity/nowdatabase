@@ -71,6 +71,8 @@ export const api = createApi({
     'person',
     'persons',
     'author',
+    'project',
+    'projects',
     'geoname',
   ],
   baseQuery: baseQueryWithReauth,

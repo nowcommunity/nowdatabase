@@ -20,3 +20,31 @@ export const getProjectDetails = async (id: number) => {
   })
   return result
 }
+
+export const deleteProject = async (projectId: number) => {
+  const project = await nowDb.now_proj.findUnique({
+    where: { pid: projectId },
+  })
+
+  if (!project) return false
+
+  await nowDb.$transaction(async prisma => {
+    await prisma.now_proj_people.deleteMany({
+      where: { pid: projectId },
+    })
+
+    await prisma.now_psr.deleteMany({
+      where: { pid: projectId },
+    })
+
+    await prisma.now_plr.deleteMany({
+      where: { pid: projectId },
+    })
+
+    await prisma.now_proj.delete({
+      where: { pid: projectId },
+    })
+  })
+
+  return true
+}
