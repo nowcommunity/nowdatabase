@@ -1,7 +1,7 @@
 import { useNotify } from '@/hooks/notification'
 import { removeFirstLogin, useChangePasswordMutation } from '@/redux/userReducer'
-import { Button, Grid, TextField } from '@mui/material'
-import { useState } from 'react'
+import { Button, Grid, List, ListItem, ListItemText, TextField, Typography } from '@mui/material'
+import { useMemo, useState } from 'react'
 import { useDispatch } from 'react-redux'
 
 type ChangePasswordError = { status: number; data: { error: string } }
@@ -14,6 +14,14 @@ export const ChangePasswordForm = () => {
   const { notify } = useNotify()
   const sx = { display: 'flex', alignItems: 'center', width: '10em', fontWeight: 'bold' }
   const dispatch = useDispatch()
+
+  const passwordRequirements = useMemo(
+    () => [
+      'Password must be at least 8 characters long',
+      'Password must only contain characters a-z, A-Z, 0-9 and ^?$%&~!',
+    ],
+    []
+  )
 
   const changePassword = async () => {
     if (newPassword !== verifyPassword) {
@@ -71,6 +79,16 @@ export const ChangePasswordForm = () => {
           value={verifyPassword}
           onChange={event => setVerifyPassword(event.target.value)}
         />
+      </Grid>
+      <Grid container direction="column" sx={{ rowGap: '0.5em' }}>
+        <Typography variant="subtitle1">Password requirements</Typography>
+        <List dense sx={{ listStyleType: 'disc', pl: 4 }}>
+          {passwordRequirements.map(requirement => (
+            <ListItem key={requirement} sx={{ display: 'list-item', py: 0 }}>
+              <ListItemText primary={requirement} />
+            </ListItem>
+          ))}
+        </List>
       </Grid>
       <Grid container direction="row">
         <Grid item width="27em">
