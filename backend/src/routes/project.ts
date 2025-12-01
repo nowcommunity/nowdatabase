@@ -1,5 +1,5 @@
 import { Router } from 'express'
-import { getAllProjects, getProjectDetails } from '../services/project'
+import { deleteProject, getAllProjects, getProjectDetails } from '../services/project'
 import { requireOneOf } from '../middlewares/authorizer'
 import { Role } from '../../../frontend/src/shared/types'
 
@@ -15,6 +15,15 @@ router.get('/:id', requireOneOf([Role.Admin]), async (req, res) => {
   const project = await getProjectDetails(id)
   if (!project) return res.status(404).send()
   return res.status(200).send(project)
+})
+
+router.delete('/:id', requireOneOf([Role.Admin]), async (req, res) => {
+  const id = parseInt(req.params.id)
+  const deleted = await deleteProject(id)
+
+  if (!deleted) return res.status(404).send()
+
+  return res.status(200).send()
 })
 
 export default router

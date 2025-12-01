@@ -16,11 +16,13 @@ const projectsApi = api.injectEndpoints({
       query: () => ({
         url: `/project/all`,
       }),
+      providesTags: result => (result ? [{ type: 'projects' }] : []),
     }),
     getProjectDetails: builder.query<ProjectDetailsType, string>({
       query: id => ({
         url: `/project/${id}`,
       }),
+      providesTags: result => (result ? [{ type: 'project', id: result.pid }] : []),
     }),
     createProject: builder.mutation<ProjectDetailsType, CreateProjectPayload>({
       query: body => ({
@@ -28,8 +30,18 @@ const projectsApi = api.injectEndpoints({
         method: 'POST',
         body,
       }),
+      invalidatesTags: ['projects'],
+    }),
+    deleteProject: builder.mutation<void, number>({
+      query: pid => ({
+        url: `/project/${pid}`,
+        method: 'DELETE',
+      }),
+      invalidatesTags: (result, _error, pid) =>
+        typeof result !== 'undefined' ? [{ type: 'project', id: pid }, 'projects'] : [],
     }),
   }),
 })
 
-export const { useGetAllProjectsQuery, useGetProjectDetailsQuery, useCreateProjectMutation } = projectsApi
+export const { useGetAllProjectsQuery, useGetProjectDetailsQuery, useCreateProjectMutation, useDeleteProjectMutation } =
+  projectsApi
