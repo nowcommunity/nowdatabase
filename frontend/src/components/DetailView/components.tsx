@@ -5,7 +5,7 @@ import { useDetailContext } from './Context/DetailContext'
 import { EditDataType, Editable, Reference, Species } from '@/shared/types'
 import { useState, useEffect, Fragment } from 'react'
 import { referenceValidator } from '@/shared/validators/validator'
-import { checkSpeciesTaxonomy, convertSpeciesTaxonomyFields } from '../../util/taxonomyUtilities'
+import { checkSpeciesTaxonomy, convertSpeciesTaxonomyFields, hasTaxonomyChanges } from '../../util/taxonomyUtilities'
 import { useGetAllSpeciesQuery, useGetAllSynonymsQuery } from '@/redux/speciesReducer'
 import { useNotify } from '@/hooks/notification'
 import { countryBoundingBoxes } from '@/country_data/countryBoundingBoxes'
@@ -23,7 +23,7 @@ export const WriteButton = <T,>({
   taxonomy?: boolean
   hasStagingMode?: boolean
 }) => {
-  const { editData, setEditData, mode, setMode, validator, fieldsWithErrors, setFieldsWithErrors } =
+  const { data, editData, setEditData, mode, setMode, validator, fieldsWithErrors, setFieldsWithErrors } =
     useDetailContext<T>()
   const [loading, setLoading] = useState(false)
   const { notify } = useNotify()
@@ -114,25 +114,32 @@ export const WriteButton = <T,>({
   const writeWithTaxonomyCheck = () => {
     let speciesEditData: EditDataType<Species> | undefined = undefined
 
-    if (!mode.staging) {
-      if (!speciesData) {
-        notify('Could not fetch species to check taxonomy data.', 'error')
-        return
+    if (!mode.staging && taxonomy) {
+      const convertedEditData = convertSpeciesTaxonomyFields(editData as EditDataType<Species>)
+      const convertedOriginalData = convertSpeciesTaxonomyFields(data as EditDataType<Species>)
+      const taxonomyHasChanged = mode.new || hasTaxonomyChanges(convertedEditData, convertedOriginalData)
+
+      speciesEditData = convertedEditData
+
+      if (taxonomyHasChanged) {
+        if (!speciesData) {
+          notify('Could not fetch species to check taxonomy data.', 'error')
+          return
+        }
+        if (!synonymData) {
+          notify('Could not fetch synonyms to check taxonomy data.', 'error')
+          return
+        }
+        const errors = checkSpeciesTaxonomy(convertedEditData, speciesData, synonymData)
+        if (errors.size > 0) {
+          const errorMessage = [...errors].reduce((acc, currentError) => acc + `\n${currentError}`)
+          notify(errorMessage, 'error', null)
+          return
+        }
       }
-      if (!synonymData) {
-        notify('Could not fetch synonyms to check taxonomy data.', 'error')
-        return
-      }
-      // converts taxonomy fields to capitalized/lowercased
-      speciesEditData = convertSpeciesTaxonomyFields(editData as EditDataType<Species>)
-      const errors = checkSpeciesTaxonomy(speciesEditData, speciesData, synonymData)
-      if (errors.size > 0) {
-        const errorMessage = [...errors].reduce((acc, currentError) => acc + `\n${currentError}`)
-        notify(errorMessage, 'error', null)
-        return
-      }
+
       notify('', undefined, 0)
-      setEditData(speciesEditData as EditDataType<T>)
+      setEditData(convertedEditData as EditDataType<T>)
 
       if (hasStagingMode) {
         setMode(mode.new ? 'staging-new' : 'staging-edit')
