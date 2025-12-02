@@ -7,6 +7,15 @@ import { logDb, nowDb } from '../utils/db'
 import { getReferenceDetails } from './reference'
 import { buildPersonLookupByInitials, getPersonDisplayName, getPersonFromLookup } from './utils/person'
 
+const TAXONOMIC_FIELDS: Array<keyof Prisma.com_species> = ['genus_name', 'species_name', 'unique_identifier']
+
+const getTaxonomicValues = (editedFields: Partial<Prisma.com_species>, existingSpecies: Prisma.com_species | null) => {
+  return TAXONOMIC_FIELDS.reduce(
+    (acc, field) => ({ ...acc, [field]: editedFields[field] ?? existingSpecies?.[field] ?? null }),
+    {} as Pick<Prisma.com_species, (typeof TAXONOMIC_FIELDS)[number]>
+  )
+}
+
 type SpeciesSynonym = {
   syn_genus_name: string | null
   syn_species_name: string | null
@@ -187,5 +196,30 @@ export const validateEntireSpecies = async (editedFields: EditDataType<Prisma.co
   }
 
   if (error) errors.push({ name: 'references', error: error })
+
+  const existingSpecies = editedFields.species_id
+    ? await nowDb.com_species.findUnique({ where: { species_id: editedFields.species_id } })
+    : null
+  const taxonomicValues = getTaxonomicValues(editedFields, existingSpecies)
+  const hasAllTaxonomicValues =
+    taxonomicValues.genus_name && taxonomicValues.species_name && taxonomicValues.unique_identifier
+  const taxonomicChanged = existingSpecies
+    ? TAXONOMIC_FIELDS.some(field => taxonomicValues[field] !== existingSpecies[field])
+    : true
+
+  if (taxonomicChanged && hasAllTaxonomicValues) {
+    const duplicateSpecies = await nowDb.com_species.findFirst({
+      where: {
+        species_id: editedFields.species_id ? { not: editedFields.species_id } : undefined,
+        genus_name: taxonomicValues.genus_name,
+        species_name: taxonomicValues.species_name,
+        unique_identifier: taxonomicValues.unique_identifier,
+      },
+    })
+    if (duplicateSpecies) {
+      errors.push({ name: 'taxon', error: 'The taxon already exists in the database.' })
+    }
+  }
+
   return errors
 }

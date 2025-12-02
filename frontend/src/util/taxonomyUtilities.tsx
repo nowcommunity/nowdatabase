@@ -340,6 +340,22 @@ export const convertSpeciesTaxonomyFields = (species: EditDataType<Species>) => 
   return convertedSpecies as EditDataType<Species>
 }
 
+const TAXONOMY_FIELDS: Array<keyof Species> = [
+  'subclass_or_superorder_name',
+  'order_name',
+  'suborder_or_superfamily_name',
+  'family_name',
+  'subfamily_name',
+  'genus_name',
+  'species_name',
+  'unique_identifier',
+  'taxonomic_status',
+]
+
+export const hasTaxonomyChanges = (editedSpecies: EditDataType<Species>, originalSpecies: EditDataType<Species>) => {
+  return TAXONOMY_FIELDS.some(field => (editedSpecies[field] ?? '') !== (originalSpecies[field] ?? ''))
+}
+
 export const fixNullValuesInTaxonomyFields = (species: Species | SpeciesDetailsType) => {
   return {
     ...species,
