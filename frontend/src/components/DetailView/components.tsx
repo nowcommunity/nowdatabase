@@ -118,8 +118,15 @@ export const WriteButton = <T,>({
       const convertedEditData = convertSpeciesTaxonomyFields(editData as EditDataType<Species>)
       const convertedOriginalData = convertSpeciesTaxonomyFields(data as EditDataType<Species>)
       const taxonomyHasChanged = mode.new || hasTaxonomyChanges(convertedEditData, convertedOriginalData)
+      const sanitizedEditData =
+        'sp_comment' in convertedEditData
+          ? {
+              ...convertedEditData,
+              sp_comment: convertedEditData.sp_comment === '' ? null : convertedEditData.sp_comment,
+            }
+          : convertedEditData
 
-      speciesEditData = convertedEditData
+      speciesEditData = sanitizedEditData
 
       if (taxonomyHasChanged) {
         if (!speciesData) {
@@ -139,7 +146,7 @@ export const WriteButton = <T,>({
       }
 
       notify('', undefined, 0)
-      setEditData(convertedEditData as EditDataType<T>)
+      setEditData(sanitizedEditData as EditDataType<T>)
 
       if (hasStagingMode) {
         setMode(mode.new ? 'staging-new' : 'staging-edit')

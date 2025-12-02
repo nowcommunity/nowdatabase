@@ -87,10 +87,14 @@ const baseSpecies: Species = {
   locomo2: '',
   locomo3: '',
   sp_author: '',
-  sp_comment: '',
+  sp_comment: 'Existing comment',
 }
 
-const renderButton = (editData: EditDataType<Species>, onWrite = jest.fn(() => Promise.resolve())) => {
+const renderButton = (
+  editData: EditDataType<Species>,
+  onWrite = jest.fn(() => Promise.resolve()),
+  overrides?: Partial<DetailContextType<Species>>
+) => {
   mockUseDetailContext.mockReturnValue({
     data: baseSpecies,
     mode: modeEdit,
@@ -105,6 +109,7 @@ const renderButton = (editData: EditDataType<Species>, onWrite = jest.fn(() => P
     validator,
     fieldsWithErrors: {},
     setFieldsWithErrors: jest.fn(),
+    ...overrides,
   })
 
   mockUseGetAllSpeciesQuery.mockReturnValue({ data: [baseSpecies] } as never)
@@ -146,5 +151,21 @@ describe('WriteButton taxonomy handling', () => {
     })
     expect(onWrite).not.toHaveBeenCalled()
     expect(mockNotify).toHaveBeenCalledWith(expect.stringContaining('taxon already exists'), 'error', null)
+  })
+
+  it('converts a cleared comment field to null so it can be persisted', async () => {
+    const onWrite = jest.fn(() => Promise.resolve())
+    const setEditData = jest.fn()
+
+    renderButton({ ...baseSpecies, sp_comment: '' } as EditDataType<Species>, onWrite, { setEditData })
+
+    fireEvent.click(screen.getByRole('button', { name: /save changes/i }))
+
+    await waitFor(() => {
+      expect(onWrite).toHaveBeenCalledTimes(1)
+    })
+
+    expect(onWrite).toHaveBeenCalledWith(expect.objectContaining({ sp_comment: null }), expect.any(Function))
+    expect(setEditData).toHaveBeenCalledWith(expect.objectContaining({ sp_comment: null }))
   })
 })
