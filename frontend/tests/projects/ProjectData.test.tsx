@@ -109,6 +109,39 @@ describe('useProject', () => {
     })
   })
 
+  it('maps boolean-like record status strings correctly', () => {
+    const editData = {
+      ...baseProject,
+      proj_records: 'true',
+    } as unknown as EditDataType<ProjectDetailsType>
+
+    const payload = mapProjectEditDataToUpdatePayload(editData, [
+      { userId: 1, label: 'Doe, Jane', initials: 'JD' },
+      { userId: 2, label: 'Smith, Alex', initials: 'AS' },
+    ])
+
+    expect(payload?.recordStatus).toBe(true)
+  })
+
+  it('sends an empty member list when all members are removed', () => {
+    const editData = {
+      ...baseProject,
+      now_proj_people: [],
+    } as unknown as EditDataType<ProjectDetailsType>
+
+    const payload = mapProjectEditDataToUpdatePayload(editData, [{ userId: 1, label: 'Doe, Jane', initials: 'JD' }])
+
+    expect(payload).toEqual({
+      pid: 42,
+      projectCode: 'PRJ-42',
+      projectName: 'Demo Project',
+      coordinatorUserId: 1,
+      projectStatus: 'current',
+      recordStatus: true,
+      memberUserIds: [],
+    })
+  })
+
   it('returns null when coordinator cannot be matched to a user', () => {
     const payload = mapProjectEditDataToUpdatePayload(baseProject as EditDataType<ProjectDetailsType>, [
       { userId: 99, label: 'Other, Person', initials: 'XX' },

@@ -9,17 +9,20 @@ const findUserIdByInitials = (users: UserOption[], initials: string | null): num
   return match?.userId ?? null
 }
 
-const mapMembersToUserIds = (project: ProjectDetailsType, users: UserOption[]): number[] => {
-  const ids = project.now_proj_people
-    .map(member => {
-      const userIdFromRelation = member.com_people?.user?.user_id
-      if (typeof userIdFromRelation === 'number') return userIdFromRelation
-      return findUserIdByInitials(users, member.initials)
-    })
-    .filter((id): id is number => typeof id === 'number')
-
-  return Array.from(new Set(ids))
-}
+const mapMembersToUserIds = (project: ProjectDetailsType, users: UserOption[]): number[] =>
+  Array.from(
+    new Set(
+      project.now_proj_people
+        .map(member => {
+          const userIdFromPeople = (member.com_people as { user_id?: number } | undefined)?.user_id
+          const userIdFromRelation = member.com_people?.user?.user_id
+          if (typeof userIdFromPeople === 'number') return userIdFromPeople
+          if (typeof userIdFromRelation === 'number') return userIdFromRelation
+          return findUserIdByInitials(users, member.initials)
+        })
+        .filter((id): id is number => typeof id === 'number')
+    )
+  )
 
 export const projectToFormValues = (project: ProjectDetailsType, users: UserOption[]): ProjectFormValues => {
   const coordinatorUserId = findUserIdByInitials(users, project.contact)
@@ -61,6 +64,12 @@ export const mapProjectEditDataToUpdatePayload = (
   )
 
   const normalizeRecordStatus = (value: EditDataType<ProjectDetailsType>['proj_records']) => {
+    if (typeof value === 'string') {
+      const normalizedValue = (value as string).trim().toLowerCase()
+      if (normalizedValue === 'true') return true
+      if (normalizedValue === 'false') return false
+      return normalizedValue === 'true'
+    }
     if (typeof value === 'boolean') return value
     return Boolean(value)
   }
@@ -72,6 +81,6 @@ export const mapProjectEditDataToUpdatePayload = (
     coordinatorUserId,
     projectStatus: (editData.proj_status ?? '').toString(),
     recordStatus: normalizeRecordStatus(editData.proj_records),
-    memberUserIds: memberUserIds.length ? memberUserIds : undefined,
+    memberUserIds,
   }
 }

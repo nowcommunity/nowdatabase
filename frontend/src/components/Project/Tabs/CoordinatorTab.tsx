@@ -29,8 +29,8 @@ export const CoordinatorTab = () => {
       radioSelection(
         'proj_records',
         [
-          { value: 'false', display: 'Public' },
-          { value: 'true', display: 'Private' },
+          { value: 'true', display: 'Public' },
+          { value: 'false', display: 'Private' },
         ],
         'Record Status'
       ),
