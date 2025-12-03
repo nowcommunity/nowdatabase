@@ -19,6 +19,7 @@ import { Notification, NotificationContextProvider } from './components/Notifica
 import { EmailPage } from './components/EmailPage'
 import { Footer } from './Footer'
 import { ProjectNewPage } from './pages/ProjectNewPage'
+import { ProjectEditPage } from './pages/projects/ProjectEditPage'
 
 const App = () => {
   return (
@@ -43,6 +44,7 @@ const App = () => {
                   <Route element={regionPage} path="/region/:id?" />
                   <Route element={personPage} path="/person/:id?" />
                   <Route element={<ProjectNewPage />} path="/project/new" />
+                  <Route element={<ProjectEditPage />} path="/project/:id/edit" />
                   <Route element={projectPage} path="/project/:id?" />
                   <Route element={<EmailPage />} path="/email/" />
                   <Route element={<Login />} path="/login" />

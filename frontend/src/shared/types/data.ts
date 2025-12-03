@@ -28,7 +28,7 @@ export type MuseumLocalities = Prisma.com_mlist & { localities: Prisma.now_loc[]
 export type PersonDetailsType = Prisma.com_people & { user: Omit<Prisma.com_users, 'password, newpassword'> | null } & {
   now_user_group: string
 }
-export type ProjectPeople = Prisma.now_proj_people
+export type ProjectPeople = Prisma.now_proj_people & { com_people?: PersonDetailsType }
 export type ProjectDetailsType = Prisma.now_proj & { now_proj_people: Array<ProjectPeople> }
 export type Project = Prisma.now_proj
 export type Region = Prisma.now_reg_coord
