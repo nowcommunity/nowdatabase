@@ -35,6 +35,8 @@ The new version is not deployed yet.
 
 :memo: [Frontend](documentation/frontend/frontend.md) Explanation of the frontend logic and how to add views
 
+:bookmark_tabs: [Species synonym creation flow](documentation/backend/species_synonym_creation_flow.md) Backend write logic overview used by the synonym API tests
+
 :mag_right: [Validators](frontend/src/shared/validators/) The [readme](frontend/src/shared/validators/README.md) explains how validators are written
 
 :mag_right: [Class diagram](documentation/class_diagram.md) See the relations of relevant tables. Notice that it omits some unimportant tables and does not show most columns.
