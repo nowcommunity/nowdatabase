@@ -1,6 +1,7 @@
 import type { ProjectFormValues } from '@/components/Project/ProjectForm'
 import type { UserOption } from '@/hooks/useUsersApi'
-import type { ProjectDetailsType } from '@/shared/types'
+import type { EditDataType, ProjectDetailsType, ProjectPeople, RowState } from '@/shared/types'
+import type { UpdateProjectPayload } from '@/redux/projectReducer'
 
 const findUserIdByInitials = (users: UserOption[], initials: string | null): number | null => {
   if (!initials) return null
@@ -31,5 +32,46 @@ export const projectToFormValues = (project: ProjectDetailsType, users: UserOpti
     projectStatus: project.proj_status ?? '',
     recordStatus: project.proj_records ?? '',
     memberUserIds,
+  }
+}
+
+const isRemoved = (member: EditDataType<ProjectPeople>) => {
+  const state = (member as EditDataType<ProjectPeople> & { rowState?: RowState }).rowState
+  return state === 'removed' || state === 'cancelled'
+}
+
+export const mapProjectEditDataToUpdatePayload = (
+  editData: EditDataType<ProjectDetailsType>,
+  users: UserOption[]
+): UpdateProjectPayload | null => {
+  const coordinatorUserId = findUserIdByInitials(users, editData.contact ?? null)
+  if (!coordinatorUserId || typeof editData.pid !== 'number') return null
+
+  const memberUserIds = Array.from(
+    new Set(
+      (editData.now_proj_people ?? [])
+        .filter(member => !isRemoved(member))
+        .map(member => {
+          const userIdFromRelation = member.com_people?.user?.user_id
+          if (typeof userIdFromRelation === 'number') return userIdFromRelation
+          return findUserIdByInitials(users, member.initials ?? null)
+        })
+        .filter((id): id is number => typeof id === 'number' && id !== coordinatorUserId)
+    )
+  )
+
+  const normalizeRecordStatus = (value: EditDataType<ProjectDetailsType>['proj_records']) => {
+    if (typeof value === 'boolean') return value
+    return Boolean(value)
+  }
+
+  return {
+    pid: editData.pid,
+    projectCode: (editData.proj_code ?? '').trim(),
+    projectName: (editData.proj_name ?? '').trim(),
+    coordinatorUserId,
+    projectStatus: (editData.proj_status ?? '').toString(),
+    recordStatus: normalizeRecordStatus(editData.proj_records),
+    memberUserIds: memberUserIds.length ? memberUserIds : undefined,
   }
 }

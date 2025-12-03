@@ -4,7 +4,8 @@ import { renderHook } from '@testing-library/react'
 import { useProject } from '@/hooks/useProject'
 import { useUsersApi } from '@/hooks/useUsersApi'
 import { useGetProjectDetailsQuery } from '@/redux/projectsSlice'
-import type { ProjectDetailsType } from '@/shared/types'
+import { mapProjectEditDataToUpdatePayload } from '@/api/projectsApi'
+import type { EditDataType, ProjectDetailsType } from '@/shared/types'
 
 jest.mock('@/redux/projectsSlice')
 jest.mock('@/hooks/useUsersApi')
@@ -79,5 +80,40 @@ describe('useProject', () => {
     expect(result.current.isLoading).toBe(true)
     expect(result.current.isError).toBe(true)
     expect(result.current.initialValues).toBeNull()
+  })
+
+  it('maps edit data to update payload while dropping removed members', () => {
+    const editData = {
+      ...baseProject,
+      proj_records: 'false',
+      now_proj_people: [
+        { pid: 42, initials: 'JD', com_people: { user: { user_id: 1 } } },
+        { pid: 42, initials: 'AS', com_people: { user: { user_id: 2 } }, rowState: 'removed' },
+        { pid: 42, initials: 'MS', com_people: { user: { user_id: 3 } }, rowState: 'new' },
+      ],
+    } as unknown as EditDataType<ProjectDetailsType>
+
+    const payload = mapProjectEditDataToUpdatePayload(editData, [
+      { userId: 1, label: 'Doe, Jane', initials: 'JD' },
+      { userId: 3, label: 'Smith, Morgan', initials: 'MS' },
+    ])
+
+    expect(payload).toEqual({
+      pid: 42,
+      projectCode: 'PRJ-42',
+      projectName: 'Demo Project',
+      coordinatorUserId: 1,
+      projectStatus: 'current',
+      recordStatus: false,
+      memberUserIds: [3],
+    })
+  })
+
+  it('returns null when coordinator cannot be matched to a user', () => {
+    const payload = mapProjectEditDataToUpdatePayload(baseProject as EditDataType<ProjectDetailsType>, [
+      { userId: 99, label: 'Other, Person', initials: 'XX' },
+    ])
+
+    expect(payload).toBeNull()
   })
 })
