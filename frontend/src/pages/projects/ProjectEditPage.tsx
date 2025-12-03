@@ -1,14 +1,14 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { CircularProgress, Stack, Typography } from '@mui/material'
+import { Button, CircularProgress, Stack, Typography } from '@mui/material'
 
 import { PermissionDenied } from '@/components/PermissionDenied'
 import { ProjectForm, ProjectFormValues } from '@/components/Project/ProjectForm'
 import { useUser } from '@/hooks/user'
 import { useNotify } from '@/hooks/notification'
-import { useUsersApi } from '@/hooks/useUsersApi'
+import { useProject } from '@/hooks/useProject'
 import { Role } from '@/shared/types'
-import { useGetProjectDetailsQuery, useUpdateProjectMutation } from '@/redux/projectReducer'
+import { useUpdateProjectMutation } from '@/redux/projectReducer'
 import type { FetchBaseQueryError } from '@reduxjs/toolkit/query'
 
 export const ProjectEditPage = () => {
@@ -17,12 +17,7 @@ export const ProjectEditPage = () => {
   const user = useUser()
   const navigate = useNavigate()
   const { notify } = useNotify()
-  const { users, isLoading: personsLoading, isError: personsError } = useUsersApi()
-  const {
-    data: project,
-    isLoading: projectLoading,
-    isError: projectError,
-  } = useGetProjectDetailsQuery(id ?? '', { skip: !projectId })
+  const { project, initialValues, users, isLoading, isError, refetch } = useProject(projectId)
   const [updateProject, { isLoading: isUpdating }] = useUpdateProjectMutation()
   const [submitError, setSubmitError] = useState<string | null>(null)
 
@@ -31,33 +26,6 @@ export const ProjectEditPage = () => {
       document.title = `Edit project - ${project.proj_name ?? project.pid}`
     }
   }, [project])
-
-  const initialValues = useMemo(() => {
-    if (!project) {
-      return {
-        projectCode: '',
-        projectName: '',
-        coordinatorUserId: null,
-        projectStatus: '',
-        recordStatus: '' as const,
-        memberUserIds: [] as number[],
-      }
-    }
-
-    const coordinatorOption = users.find(option => option.initials === project.contact)
-    const memberIds = project.now_proj_people
-      .map(member => users.find(option => option.initials === member.initials)?.userId)
-      .filter((id): id is number => typeof id === 'number')
-
-    return {
-      projectCode: project.proj_code ?? '',
-      projectName: project.proj_name ?? '',
-      coordinatorUserId: coordinatorOption?.userId ?? null,
-      projectStatus: project.proj_status ?? '',
-      recordStatus: project.proj_records ?? ('' as const),
-      memberUserIds: memberIds,
-    }
-  }, [project, users])
 
   if (!user.token) {
     return (
@@ -79,7 +47,7 @@ export const ProjectEditPage = () => {
     )
   }
 
-  if (projectLoading || personsLoading) {
+  if (isLoading || !initialValues) {
     return (
       <Stack alignItems="center" justifyContent="center" spacing={2} sx={{ mt: 4 }}>
         <CircularProgress />
@@ -88,12 +56,22 @@ export const ProjectEditPage = () => {
     )
   }
 
-  if (projectError || !project || personsError) {
+  if (isError || !project || !initialValues) {
     return (
-      <PermissionDenied
-        title="Unable to load project"
-        message="We could not load the project or people data. Please try again later."
-      />
+      <Stack spacing={2} alignItems="center" sx={{ mt: 4 }}>
+        <PermissionDenied
+          title="Unable to load project"
+          message="We could not load the project or people data. Please try again later."
+        />
+        <Button
+          variant="contained"
+          onClick={() => {
+            void refetch()
+          }}
+        >
+          Retry
+        </Button>
+      </Stack>
     )
   }
 
