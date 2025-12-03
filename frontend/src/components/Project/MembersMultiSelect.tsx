@@ -180,8 +180,8 @@ const MembersMultiSelectDetail = () => {
       fieldName="now_proj_people"
       idFieldName="initials"
       selectedValues={editData.now_proj_people
-        .map(member => member.initials)
-        .filter((initial): initial is string => typeof initial === 'string')}
+        .map((member: ProjectMemberRow) => member.initials)
+        .filter((initial: string): initial is string => typeof initial === 'string')}
       editingAction={person =>
         setEditData({
           ...editData,

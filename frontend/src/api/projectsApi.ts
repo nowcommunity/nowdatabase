@@ -1,6 +1,6 @@
 import type { ProjectFormValues } from '@/components/Project/ProjectForm'
 import type { UserOption } from '@/hooks/useUsersApi'
-import type { ProjectDetailsType } from '@/shared/types'
+import type { ProjectDetailsType, ProjectPeople } from '@/shared/types'
 
 const findUserIdByInitials = (users: UserOption[], initials: string | null): number | null => {
   if (!initials) return null
@@ -10,12 +10,12 @@ const findUserIdByInitials = (users: UserOption[], initials: string | null): num
 
 const mapMembersToUserIds = (project: ProjectDetailsType, users: UserOption[]): number[] => {
   const ids = project.now_proj_people
-    .map(member => {
+    .map((member: ProjectPeople) => {
       const userIdFromRelation = member.com_people?.user?.user_id
       if (typeof userIdFromRelation === 'number') return userIdFromRelation
       return findUserIdByInitials(users, member.initials)
     })
-    .filter((id): id is number => typeof id === 'number')
+    .filter((id: number | null): id is number => typeof id === 'number')
 
   return Array.from(new Set(ids))
 }
