@@ -1,7 +1,6 @@
 import { useEffect, useMemo } from 'react'
 import {
   Alert,
-  Autocomplete,
   Box,
   Button,
   Card,
@@ -22,6 +21,8 @@ import { Controller, useForm } from 'react-hook-form'
 import { recordStatusOptions, projectStatusOptions } from '@/constants/projectStatus'
 import type { RecordStatusValue } from '@/constants/projectStatus'
 import type { UserOption } from '@/hooks/useUsersApi'
+import { CoordinatorSelect } from './CoordinatorSelect'
+import { MembersMultiSelect } from './MembersMultiSelect'
 
 export type ProjectFormValues = {
   projectCode: string
@@ -37,9 +38,30 @@ export type ProjectFormProps = {
   onSubmit: (values: ProjectFormValues) => Promise<void>
   isSubmitting?: boolean
   serverError?: string | null
+  initialValues?: Partial<ProjectFormValues>
+  submitLabel?: string
 }
 
-export const ProjectForm = ({ users, onSubmit, isSubmitting = false, serverError }: ProjectFormProps) => {
+export const ProjectForm = ({
+  users,
+  onSubmit,
+  isSubmitting = false,
+  serverError,
+  initialValues,
+  submitLabel,
+}: ProjectFormProps) => {
+  const defaultValues = useMemo(
+    () => ({
+      projectCode: initialValues?.projectCode ?? '',
+      projectName: initialValues?.projectName ?? '',
+      coordinatorUserId: initialValues?.coordinatorUserId ?? null,
+      projectStatus: initialValues?.projectStatus ?? '',
+      recordStatus: initialValues?.recordStatus ?? '',
+      memberUserIds: initialValues?.memberUserIds ?? [],
+    }),
+    [initialValues]
+  )
+
   const {
     control,
     register,
@@ -47,16 +69,14 @@ export const ProjectForm = ({ users, onSubmit, isSubmitting = false, serverError
     setValue,
     formState: { errors },
     watch,
+    reset,
   } = useForm<ProjectFormValues>({
-    defaultValues: {
-      projectCode: '',
-      projectName: '',
-      coordinatorUserId: null,
-      projectStatus: '',
-      recordStatus: '',
-      memberUserIds: [],
-    },
+    defaultValues,
   })
+
+  useEffect(() => {
+    reset(defaultValues)
+  }, [defaultValues, reset])
 
   const coordinatorId = watch('coordinatorUserId')
   const memberUserIds = watch('memberUserIds')
@@ -117,22 +137,17 @@ export const ProjectForm = ({ users, onSubmit, isSubmitting = false, serverError
                 name="coordinatorUserId"
                 rules={{ required: 'Coordinator is required' }}
                 render={({ field: { onChange, value } }) => (
-                  <Autocomplete
-                    value={users.find(user => user.userId === value) ?? null}
-                    onChange={(_event, option) => onChange(option?.userId ?? null)}
-                    options={users}
-                    getOptionLabel={option => option.label}
-                    renderInput={params => (
-                      <TextField
-                        {...params}
-                        label="Coordinator"
-                        required
-                        error={Boolean(errors.coordinatorUserId)}
-                        helperText={errors.coordinatorUserId?.message}
-                        disabled={isSubmitting}
-                      />
-                    )}
+                  <CoordinatorSelect
+                    users={users}
+                    value={value}
+                    onChange={onChange}
                     disabled={isSubmitting}
+                    error={
+                      typeof errors.coordinatorUserId?.message === 'string'
+                        ? errors.coordinatorUserId.message
+                        : undefined
+                    }
+                    helperText="Coordinator will be set as the main contact"
                   />
                 )}
               />
@@ -198,26 +213,13 @@ export const ProjectForm = ({ users, onSubmit, isSubmitting = false, serverError
             control={control}
             name="memberUserIds"
             render={({ field: { value, onChange } }) => (
-              <Autocomplete
-                multiple
-                options={filteredMembers}
-                value={filteredMembers.filter(option => value?.includes(option.userId))}
-                onChange={(_event, newValue) => onChange(newValue.map(option => option.userId))}
-                getOptionLabel={option => option.label}
-                renderTags={(tagValue, getTagProps) =>
-                  tagValue.map((option, index) => {
-                    const { key, ...chipProps } = getTagProps({ index })
-                    return (
-                      <Box component="span" key={key ?? option.userId} {...chipProps}>
-                        {option.label}
-                      </Box>
-                    )
-                  })
-                }
-                renderInput={params => (
-                  <TextField {...params} label="Members" placeholder="Select project members" disabled={isSubmitting} />
-                )}
+              <MembersMultiSelect
+                users={filteredMembers}
+                value={value ?? []}
+                onChange={onChange}
+                excludeUserIds={coordinatorId ? [coordinatorId] : []}
                 disabled={isSubmitting || !users.length}
+                helperText={coordinatorId ? 'Coordinator is excluded from member list' : undefined}
               />
             )}
           />
@@ -227,7 +229,7 @@ export const ProjectForm = ({ users, onSubmit, isSubmitting = false, serverError
           <Box display="flex" justifyContent="flex-end" gap={2} alignItems="center">
             {isSubmitting && <CircularProgress size={24} />}
             <Button variant="contained" type="submit" disabled={isSubmitting}>
-              Create Project
+              {submitLabel ?? 'Create Project'}
             </Button>
           </Box>
         </Stack>

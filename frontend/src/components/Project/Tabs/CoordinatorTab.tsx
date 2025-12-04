@@ -1,17 +1,17 @@
-import { ProjectDetailsType, ProjectPeople } from '@/shared/types'
+import { ProjectDetailsType } from '@/shared/types'
 import { useDetailContext } from '@/components/DetailView/Context/DetailContext'
-import { ArrayFrame, Grouped } from '@/components/DetailView/common/tabLayoutHelpers'
-import { MRT_ColumnDef } from 'material-react-table'
-import { EditableTable } from '@/components/DetailView/common/EditableTable'
+import { ArrayFrame } from '@/components/DetailView/common/tabLayoutHelpers'
+import { CoordinatorSelect } from '../CoordinatorSelect'
+import { MembersMultiSelect } from '../MembersMultiSelect'
 
 export const CoordinatorTab = () => {
-  const { editData, radioSelection, textField } = useDetailContext<ProjectDetailsType>()
+  const { radioSelection, textField } = useDetailContext<ProjectDetailsType>()
 
   const projectInformation = [
-    ['Project Id', textField('pid')],
+    ['Project Id', textField('pid', { type: 'text', readonly: true, disabled: true })],
     ['Project Code', textField('proj_code')],
     ['Project Name', textField('proj_name')],
-    ['Coordinator', textField('contact')],
+    ['Coordinator', <CoordinatorSelect key="coordinator-select" variant="detail" />],
     [
       'Project Status',
       radioSelection(
@@ -29,42 +29,18 @@ export const CoordinatorTab = () => {
       radioSelection(
         'proj_records',
         [
-          { value: 'false', display: 'Public' },
-          { value: 'true', display: 'Private' },
+          { value: 'true', display: 'Public' },
+          { value: 'false', display: 'Private' },
         ],
         'Record Status'
       ),
     ],
   ]
 
-  const people: MRT_ColumnDef<ProjectPeople>[] = [
-    {
-      accessorKey: 'com_people.surname',
-      header: 'Surname',
-    },
-    {
-      accessorKey: 'com_people.first_name',
-      header: 'First name',
-    },
-    {
-      accessorKey: 'com_people.organization',
-      header: 'Organization',
-    },
-  ]
-
-  // TODO: Selecting existing person
   return (
     <>
       <ArrayFrame half array={projectInformation} title="Project Information" />
-      <Grouped title="Project Members">
-        <EditableTable<ProjectPeople, ProjectDetailsType>
-          columns={people}
-          editTableData={editData.now_proj_people}
-          field="now_proj_people"
-          idFieldName="initials"
-          url="person"
-        />
-      </Grouped>
+      <MembersMultiSelect variant="detail" />
     </>
   )
 }

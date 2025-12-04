@@ -10,6 +10,8 @@ export type CreateProjectPayload = {
   memberUserIds?: number[]
 }
 
+export type UpdateProjectPayload = CreateProjectPayload & { pid: number }
+
 const projectsApi = api.injectEndpoints({
   endpoints: builder => ({
     getAllProjects: builder.query<Project[], void>({
@@ -32,6 +34,15 @@ const projectsApi = api.injectEndpoints({
       }),
       invalidatesTags: ['projects'],
     }),
+    updateProject: builder.mutation<ProjectDetailsType, UpdateProjectPayload>({
+      query: ({ pid, ...body }) => ({
+        url: `/projects/${pid}`,
+        method: 'PUT',
+        body,
+      }),
+      invalidatesTags: (result, _error, { pid }) =>
+        result ? [{ type: 'project', id: pid }, 'projects'] : ['projects'],
+    }),
     deleteProject: builder.mutation<void, number>({
       query: pid => ({
         url: `/project/${pid}`,
@@ -43,5 +54,10 @@ const projectsApi = api.injectEndpoints({
   }),
 })
 
-export const { useGetAllProjectsQuery, useGetProjectDetailsQuery, useCreateProjectMutation, useDeleteProjectMutation } =
-  projectsApi
+export const {
+  useGetAllProjectsQuery,
+  useGetProjectDetailsQuery,
+  useCreateProjectMutation,
+  useUpdateProjectMutation,
+  useDeleteProjectMutation,
+} = projectsApi
