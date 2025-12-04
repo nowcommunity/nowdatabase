@@ -149,4 +149,21 @@ describe('useProject', () => {
 
     expect(payload).toBeNull()
   })
+
+  it('keeps a single newly added member when building the payload', () => {
+    const editData = {
+      ...baseProject,
+      now_proj_people: [
+        { pid: 42, initials: 'JD', com_people: { user: { user_id: 1 } } },
+        { pid: 42, initials: 'AS', com_people: { user: { user_id: 2 } }, rowState: 'new' },
+      ],
+    } as unknown as EditDataType<ProjectDetailsType>
+
+    const payload = mapProjectEditDataToUpdatePayload(editData, [
+      { userId: 1, label: 'Doe, Jane', initials: 'JD' },
+      { userId: 2, label: 'Smith, Alex', initials: 'AS' },
+    ])
+
+    expect(payload?.memberUserIds).toEqual([1, 2])
+  })
 })
