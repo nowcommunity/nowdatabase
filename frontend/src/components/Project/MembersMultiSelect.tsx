@@ -169,11 +169,16 @@ const MembersMultiSelectDetail = () => {
   const { editData, setEditData, mode } = useDetailContext<ProjectDetailsType>()
   const { data: people, isError } = useGetAllPersonsQuery(mode.read ? skipToken : undefined)
 
+  const selectablePeople = useMemo(
+    () => (people ?? []).filter(person => typeof person.user?.user_id === 'number'),
+    [people]
+  )
+
   const selectingTable = (
     <SelectingTable<PersonDetailsType, ProjectDetailsType>
       buttonText="Select project members"
       dataCy="select-project-members"
-      data={people}
+      data={selectablePeople}
       columns={personColumns}
       title="People"
       isError={Boolean(isError)}

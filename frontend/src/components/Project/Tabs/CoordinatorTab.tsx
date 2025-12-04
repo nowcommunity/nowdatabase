@@ -8,7 +8,7 @@ export const CoordinatorTab = () => {
   const { radioSelection, textField } = useDetailContext<ProjectDetailsType>()
 
   const projectInformation = [
-    ['Project Id', textField('pid')],
+    ['Project Id', textField('pid', { type: 'text', readonly: true, disabled: true })],
     ['Project Code', textField('proj_code')],
     ['Project Name', textField('proj_name')],
     ['Coordinator', <CoordinatorSelect key="coordinator-select" variant="detail" />],
@@ -29,8 +29,8 @@ export const CoordinatorTab = () => {
       radioSelection(
         'proj_records',
         [
-          { value: 'false', display: 'Public' },
-          { value: 'true', display: 'Private' },
+          { value: 'true', display: 'Public' },
+          { value: 'false', display: 'Private' },
         ],
         'Record Status'
       ),
