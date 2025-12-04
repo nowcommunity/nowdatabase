@@ -28,7 +28,11 @@ export type MuseumLocalities = Prisma.com_mlist & { localities: Prisma.now_loc[]
 export type PersonDetailsType = Prisma.com_people & { user: Omit<Prisma.com_users, 'password, newpassword'> | null } & {
   now_user_group: string
 }
-export type ProjectPeople = Prisma.now_proj_people
+// allow components to attach the included person details and a UI-only row state
+export type ProjectPeople = Prisma.now_proj_people & {
+  com_people?: PersonDetailsType
+  rowState?: RowState
+}
 export type ProjectDetailsType = Prisma.now_proj & { now_proj_people: Array<ProjectPeople> }
 export type Project = Prisma.now_proj
 export type Region = Prisma.now_reg_coord
