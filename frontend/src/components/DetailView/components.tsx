@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { Button, Box, Typography, CircularProgress, Divider, alpha, List, ListItemText } from '@mui/material'
+import { Button, Box, Typography, CircularProgress, Divider, alpha, List, ListItemText, Tooltip } from '@mui/material'
 import SaveIcon from '@mui/icons-material/Save'
 import { useDetailContext } from './Context/DetailContext'
 import { EditDataType, Editable, Reference, Species } from '@/shared/types'
@@ -23,7 +23,7 @@ export const WriteButton = <T,>({
   taxonomy?: boolean
   hasStagingMode?: boolean
 }) => {
-  const { data, editData, setEditData, mode, setMode, validator, fieldsWithErrors, setFieldsWithErrors } =
+  const { data, editData, setEditData, mode, setMode, validator, fieldsWithErrors, setFieldsWithErrors, isDirty } =
     useDetailContext<T>()
   const [loading, setLoading] = useState(false)
   const { notify } = useNotify()
@@ -161,6 +161,13 @@ export const WriteButton = <T,>({
   }
 
   const handleWriteButtonClick = () => {
+    const dirtyBlocked = !mode.staging && !isDirty
+
+    if (dirtyBlocked) {
+      notify('Please make changes before finalizing the entry.', 'info')
+      return
+    }
+
     if (taxonomy) {
       setLoading(true)
       writeWithTaxonomyCheck()
@@ -190,46 +197,60 @@ export const WriteButton = <T,>({
         }}
         state={warningModalState}
       />
-      <Button
-        disabled={Object.keys(fieldsWithErrors).length > 0}
-        id="write-button"
-        sx={{ width: '20em' }}
-        onClick={() => {
-          // Check for out-of-boundness before saving
-
-          if (
-            !('dec_lat' in (editData as object)) ||
-            !('dec_long' in (editData as object)) ||
-            !('country' in (editData as object))
-          ) {
-            handleWriteButtonClick()
-            return
-          }
-
-          const localityObject = editData as unknown as { dec_lat: number; dec_long: number; country: string }
-          if (!isCoordinateOutOfBounds(localityObject.dec_lat, localityObject.dec_long, localityObject.country)) {
-            handleWriteButtonClick()
-            return
-          }
-
-          setWarningModalOpen(true)
-          setWarningModalState({
-            decLat: localityObject.dec_lat,
-            decLong: localityObject.dec_long,
-            // Guaranteed to exist by the isCoordinateOutOfBounds check above,
-            // as it will return false and return on no key found
-            boxes: boundingBoxSplit(countryBoundingBoxes[localityObject.country]),
-          })
-        }}
-        variant="contained"
+      <Tooltip
+        disableHoverListener={Object.keys(fieldsWithErrors).length === 0 && isDirty}
+        disableFocusListener={Object.keys(fieldsWithErrors).length === 0 && isDirty}
+        title={
+          Object.keys(fieldsWithErrors).length > 0
+            ? 'Resolve validation errors before saving.'
+            : isDirty
+              ? ''
+              : 'Make changes before finalizing the entry.'
+        }
       >
-        {loading ? (
-          <CircularProgress size="1.2em" sx={{ color: 'white', marginRight: '1em' }} />
-        ) : (
-          <SaveIcon style={{ marginRight: '0.5em' }} />
-        )}
-        {getButtonText()}
-      </Button>
+        <span>
+          <Button
+            disabled={Object.keys(fieldsWithErrors).length > 0 || (!mode.staging && !isDirty)}
+            id="write-button"
+            sx={{ width: '20em' }}
+            onClick={() => {
+              // Check for out-of-boundness before saving
+
+              if (
+                !('dec_lat' in (editData as object)) ||
+                !('dec_long' in (editData as object)) ||
+                !('country' in (editData as object))
+              ) {
+                handleWriteButtonClick()
+                return
+              }
+
+              const localityObject = editData as unknown as { dec_lat: number; dec_long: number; country: string }
+              if (!isCoordinateOutOfBounds(localityObject.dec_lat, localityObject.dec_long, localityObject.country)) {
+                handleWriteButtonClick()
+                return
+              }
+
+              setWarningModalOpen(true)
+              setWarningModalState({
+                decLat: localityObject.dec_lat,
+                decLong: localityObject.dec_long,
+                // Guaranteed to exist by the isCoordinateOutOfBounds check above,
+                // as it will return false and return on no key found
+                boxes: boundingBoxSplit(countryBoundingBoxes[localityObject.country]),
+              })
+            }}
+            variant="contained"
+          >
+            {loading ? (
+              <CircularProgress size="1.2em" sx={{ color: 'white', marginRight: '1em' }} />
+            ) : (
+              <SaveIcon style={{ marginRight: '0.5em' }} />
+            )}
+            {getButtonText()}
+          </Button>
+        </span>
+      </Tooltip>
     </>
   )
 }
