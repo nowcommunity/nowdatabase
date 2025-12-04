@@ -38,6 +38,7 @@ const mockUseGetAllSynonymsQuery = useGetAllSynonymsQuery as jest.MockedFunction
 const mockCheckSpeciesTaxonomy = checkSpeciesTaxonomy as jest.MockedFunction<typeof checkSpeciesTaxonomy>
 
 const modeEdit = { read: false, staging: false, new: false, option: 'edit' as const }
+const modeStagingEdit = { read: false, staging: true, new: false, option: 'staging-edit' as const }
 
 const textField: DetailContextType<Species>['textField'] = () => <span />
 const bigTextField: DetailContextType<Species>['bigTextField'] = () => <span />
@@ -197,5 +198,22 @@ describe('WriteButton taxonomy handling', () => {
 
     const button = screen.getByRole('button', { name: /save changes/i })
     expect((button as HTMLButtonElement).disabled).toBe(false)
+  })
+
+  it('blocks finalize handler and shows feedback when dirty flag is false', async () => {
+    const onWrite = jest.fn(() => Promise.resolve())
+
+    renderButton(baseSpecies as EditDataType<Species>, onWrite, {
+      isDirty: false,
+      mode: modeStagingEdit,
+    })
+
+    fireEvent.click(screen.getByRole('button', { name: /complete and save/i }))
+
+    await waitFor(() => {
+      expect(onWrite).not.toHaveBeenCalled()
+    })
+
+    expect(mockNotify).toHaveBeenCalledWith('Please make changes before finalizing the entry.', 'info')
   })
 })
