@@ -82,7 +82,7 @@ describe('useProject', () => {
     expect(result.current.initialValues).toBeNull()
   })
 
-  it('maps edit data to update payload while dropping removed members', () => {
+  it('maps edit data to update payload while dropping removed members and keeping coordinator if selected', () => {
     const editData = {
       ...baseProject,
       proj_records: 'false',
@@ -105,7 +105,7 @@ describe('useProject', () => {
       coordinatorUserId: 1,
       projectStatus: 'current',
       recordStatus: false,
-      memberUserIds: [3],
+      memberUserIds: [1, 3],
     })
   })
 

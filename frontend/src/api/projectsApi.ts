@@ -55,11 +55,13 @@ export const mapProjectEditDataToUpdatePayload = (
       (editData.now_proj_people ?? [])
         .filter(member => !isRemoved(member))
         .map(member => {
+          const userIdFromPeople = (member.com_people as { user_id?: number } | undefined)?.user_id
           const userIdFromRelation = member.com_people?.user?.user_id
+          if (typeof userIdFromPeople === 'number') return userIdFromPeople
           if (typeof userIdFromRelation === 'number') return userIdFromRelation
           return findUserIdByInitials(users, member.initials ?? null)
         })
-        .filter((id): id is number => typeof id === 'number' && id !== coordinatorUserId)
+        .filter((id): id is number => typeof id === 'number')
     )
   )
 
