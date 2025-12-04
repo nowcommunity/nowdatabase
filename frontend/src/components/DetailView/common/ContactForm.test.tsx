@@ -32,6 +32,7 @@ const createMockDetailContext = (reference: ReferenceDetailsType): DetailContext
   }
   const setMode: DetailContextType<ReferenceDetailsType>['setMode'] = () => undefined
   const setEditData: DetailContextType<ReferenceDetailsType>['setEditData'] = () => undefined
+  const resetEditData: DetailContextType<ReferenceDetailsType>['resetEditData'] = () => undefined
 
   return {
     data: reference,
@@ -39,6 +40,8 @@ const createMockDetailContext = (reference: ReferenceDetailsType): DetailContext
     setMode,
     editData: reference as EditDataType<ReferenceDetailsType>,
     setEditData,
+    isDirty: false,
+    resetEditData,
     textField,
     bigTextField,
     dropdown,
