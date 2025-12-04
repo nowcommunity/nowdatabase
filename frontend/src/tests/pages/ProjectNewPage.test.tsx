@@ -121,20 +121,18 @@ describe('ProjectNewPage', () => {
     await user.type(screen.getByLabelText('Project Code'), 'PRJ-001')
     await user.type(screen.getByLabelText('Project Name'), 'New Project')
 
-    // Use combobox role for MUI Autocomplete components
-    const comboboxes = screen.getAllByRole('combobox')
-    // comboboxes order: Coordinator, Project Status, Record Status, Members
-    await user.click(comboboxes[0]) // Coordinator
+    await user.click(screen.getByTestId('select-coordinator'))
     await user.click(screen.getByText('Doe, Jane'))
 
-    await user.click(comboboxes[1]) // Project Status
+    await user.click(screen.getByLabelText('Project Status'))
     await user.click(screen.getByRole('option', { name: 'Current' }))
 
-    await user.click(comboboxes[2]) // Record Status
+    await user.click(screen.getByLabelText('Record Status'))
     await user.click(screen.getByRole('option', { name: 'Public' }))
 
-    await user.click(comboboxes[3]) // Members
+    await user.click(screen.getByTestId('select-members'))
     await user.click(screen.getByText('Smith, Alex'))
+    await user.click(screen.getByRole('button', { name: /done/i }))
 
     const form = document.querySelector('form')
     expect(form).toBeTruthy()
