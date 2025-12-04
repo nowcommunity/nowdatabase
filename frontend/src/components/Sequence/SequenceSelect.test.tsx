@@ -72,6 +72,8 @@ const renderWithContext = ({ children, data, mode = 'edit' }: ContextWrapperProp
     setMode: () => undefined,
     editData: timeUnit,
     setEditData: () => undefined,
+    isDirty: false,
+    resetEditData: () => undefined,
     textField: () => <></>,
     bigTextField: () => <></>,
     dropdown: () => <></>,

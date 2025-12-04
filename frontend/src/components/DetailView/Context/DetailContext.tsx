@@ -1,7 +1,7 @@
 /* eslint-disable react-refresh/only-export-components */
 import { ReactNode, createContext, useState, JSX, useEffect, Context, useContext } from 'react'
 import { DropdownOption } from '../common/editingComponents'
-import { cloneDeep } from 'lodash-es'
+import { cloneDeep, isEqual } from 'lodash-es'
 import { ValidationObject } from '@/shared/validators/validator'
 import { EditDataType } from '@/shared/types'
 import {
@@ -83,6 +83,8 @@ export type DetailContextType<T> = {
   validator: (editData: EditDataType<T>, field: keyof EditDataType<T>) => ValidationObject
   fieldsWithErrors: FieldsWithErrorsType
   setFieldsWithErrors: SetFieldsWithErrorsType
+  isDirty: boolean
+  resetEditData: () => void
 }
 
 export const DetailContext = createContext<DetailContextType<unknown>>(null!)
@@ -98,17 +100,41 @@ export const DetailContextProvider = <T extends object>({
   contextState,
 }: {
   children: ReactNode | ReactNode[]
-  contextState: Omit<DetailContextType<T>, 'setEditData'>
+  contextState: Omit<DetailContextType<T>, 'setEditData' | 'isDirty' | 'resetEditData'>
 }) => {
+  const [initialEditData, setInitialEditData] = useState<EditDataType<T>>(makeEditData(contextState.data))
   const [editData, setEditData] = useState<EditDataType<T>>(makeEditData(contextState.data))
+  const [isDirty, setIsDirty] = useState(false)
 
-  useEffect(() => setEditData(makeEditData(contextState.data)), [contextState.data])
+  useEffect(() => {
+    const nextEditData = makeEditData(contextState.data)
+    setInitialEditData(nextEditData)
+    setEditData(nextEditData)
+    setIsDirty(false)
+  }, [contextState.data])
+
+  useEffect(() => {
+    setIsDirty(!isEqual(editData, initialEditData))
+  }, [editData, initialEditData])
+
+  const handleSetEditData = (data: unknown) => {
+    const newEditData = data as EditDataType<T>
+    setEditData(newEditData)
+    setIsDirty(!isEqual(newEditData, initialEditData))
+  }
+
+  const resetEditData = () => {
+    setEditData(initialEditData)
+    setIsDirty(false)
+  }
   return (
     <DetailContext.Provider
       value={{
         ...contextState,
         editData,
-        setEditData: (data: unknown) => setEditData(data as EditDataType<T>),
+        setEditData: handleSetEditData,
+        isDirty,
+        resetEditData,
         validator: (editData: unknown, fieldName: keyof EditDataType<T>) =>
           contextState.validator(editData as EditDataType<T>, fieldName),
       }}

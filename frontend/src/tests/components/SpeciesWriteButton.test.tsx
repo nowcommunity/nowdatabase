@@ -101,6 +101,8 @@ const renderButton = (
     setMode: jest.fn(),
     editData,
     setEditData: jest.fn(),
+    isDirty: false,
+    resetEditData: jest.fn(),
     textField,
     bigTextField,
     dropdown,

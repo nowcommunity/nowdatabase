@@ -53,6 +53,8 @@ const createDetailContextValue = (overrides: Partial<TestDetailContext> = {}): T
     setMode: () => {},
     editData: {} as TestDetailContext['editData'],
     setEditData: (() => {}) as TestDetailContext['setEditData'],
+    isDirty: false,
+    resetEditData: () => {},
     textField: (() => <></>) as TestDetailContext['textField'],
     bigTextField: (() => <></>) as TestDetailContext['bigTextField'],
     dropdown: (() => <></>) as TestDetailContext['dropdown'],

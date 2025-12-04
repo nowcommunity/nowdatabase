@@ -110,6 +110,8 @@ const createDetailContextValue = (overrides: Partial<TestDetailContext>): TestDe
   setMode: () => {},
   editData: createEditData([]),
   setEditData: () => {},
+  isDirty: false,
+  resetEditData: () => {},
   textField: () => <></>,
   bigTextField: () => <></>,
   dropdown: () => <></>,
