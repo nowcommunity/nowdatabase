@@ -1,4 +1,4 @@
-import { Box, Button, CircularProgress, IconButton, Menu, MenuItem, Tooltip } from '@mui/material'
+import { Box, Button, IconButton, Menu, MenuItem, Tooltip } from '@mui/material'
 import { MRT_RowData, MRT_ShowHideColumnsButton, MRT_TableInstance } from 'material-react-table'
 import { exportRows } from './helpers'
 import { ContactForm } from '../DetailView/common/ContactForm'
@@ -13,20 +13,16 @@ import { usePageContext } from '../Page'
 export const TableToolBar = <T extends MRT_RowData>({
   table,
   tableName,
-  combinedExport,
   kmlExport,
   svgExport,
-  exportIsLoading,
   isCrossSearchTable,
   selectorFn,
   showNewButton,
 }: {
   table: MRT_TableInstance<T>
   tableName: string
-  combinedExport?: (lids: number[]) => Promise<void>
   kmlExport?: (table: MRT_TableInstance<T>) => void
   svgExport?: (table: MRT_TableInstance<T>) => void
-  exportIsLoading?: boolean
   isCrossSearchTable?: boolean
   selectorFn?: (id: T) => void
   showNewButton?: boolean
@@ -117,31 +113,6 @@ export const TableToolBar = <T extends MRT_RowData>({
             >
               Export SVG map
             </MenuItem>
-          )}
-
-          {combinedExport && (
-            <Box>
-              <Tooltip
-                title={
-                  <span style={{ fontSize: 18 }}>
-                    Export&lsquo;s all localities filtered in the table below with all their species. The export is
-                    sorted by name. This may take up to a minute, so please wait without closing the browser or
-                    switching page. To export only localities use the &lsquo;Export table&lsquo; option above.
-                  </span>
-                }
-              >
-                <MenuItem
-                  onClick={() => {
-                    void combinedExport(table.getSortedRowModel().rows.map(d => d.original.lid as number))
-                    handleClose()
-                  }}
-                  disabled={exportIsLoading}
-                >
-                  Export localities with their species
-                </MenuItem>
-              </Tooltip>
-              {exportIsLoading && <CircularProgress />}
-            </Box>
           )}
         </Menu>
       </Box>
