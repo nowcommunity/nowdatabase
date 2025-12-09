@@ -1,24 +1,48 @@
+import { LocalitySpeciesDetailsType, SpeciesSynonym } from '@/shared/types'
+
 interface Props {
-  data: string[][] | null
+  data: LocalitySpeciesDetailsType[] | undefined
+}
+
+const formatSynonyms = (synonyms: SpeciesSynonym[], speciesComment: string | null) => {
+  const synonymText = synonyms
+    .map(({ syn_genus_name, syn_species_name, syn_comment }) => {
+      const name = [syn_genus_name, syn_species_name].filter(Boolean).join(' ')
+      if (!name && !syn_comment) return null
+      return [name, syn_comment].filter(Boolean).join(' – ')
+    })
+    .filter(Boolean)
+    .join('; ')
+
+  return [synonymText, speciesComment].filter(Boolean).join('; ')
 }
 
 export const SpeciesTable = ({ data }: Props) => {
   const columns = [
-    { label: 'Subclass or Superorder', index: 51 },
-    { label: 'Order', index: 48 },
-    { label: 'Suborder or Superfamily', index: 52 },
-    { label: 'Family', index: 49 },
-    { label: 'Subfamily or Tribe', index: 50 }, // ei datassa samalla nimellä (subfamily_name?)
-    { label: 'Genus', index: 53 },
-    { label: 'Species', index: 54 },
-    { label: 'Unique Identifier', index: 55 },
-    { label: 'Synonyms and synonym comments', index: 93 }, // datassa indexit 93, 94
-  ]
+    {
+      label: 'Subclass or Superorder',
+      accessor: (row: LocalitySpeciesDetailsType) => row.com_species.subclass_or_superorder_name,
+    },
+    { label: 'Order', accessor: (row: LocalitySpeciesDetailsType) => row.com_species.order_name },
+    {
+      label: 'Suborder or Superfamily',
+      accessor: (row: LocalitySpeciesDetailsType) => row.com_species.suborder_or_superfamily_name,
+    },
+    { label: 'Family', accessor: (row: LocalitySpeciesDetailsType) => row.com_species.family_name },
+    { label: 'Subfamily or Tribe', accessor: (row: LocalitySpeciesDetailsType) => row.com_species.subfamily_name },
+    { label: 'Genus', accessor: (row: LocalitySpeciesDetailsType) => row.com_species.genus_name },
+    { label: 'Species', accessor: (row: LocalitySpeciesDetailsType) => row.com_species.species_name },
+    { label: 'Unique Identifier', accessor: (row: LocalitySpeciesDetailsType) => row.com_species.unique_identifier },
+    {
+      label: 'Synonyms and synonym comments',
+      accessor: (row: LocalitySpeciesDetailsType) =>
+        formatSynonyms(row.com_species.com_taxa_synonym ?? [], row.com_species.sp_comment ?? null),
+    },
+  ] as const
 
-  const cleanValue = (val: string) => val.replace(/^"|"$/g, '')
-  const speciesData = data && data.length > 1 ? data.slice(1) : []
+  const speciesData = data ?? []
 
-  if (!speciesData || speciesData.length === 0) return <p>No species available.</p>
+  if (speciesData.length === 0) return <p>No species available.</p>
   return (
     <div className="species-table">
       <table>
@@ -30,10 +54,10 @@ export const SpeciesTable = ({ data }: Props) => {
           </tr>
         </thead>
         <tbody>
-          {speciesData.map((row, rowIndex) => (
-            <tr key={rowIndex}>
+          {speciesData.map(row => (
+            <tr key={row.com_species.species_id}>
               {columns.map(col => (
-                <td key={col.label}>{row[col.index] ? cleanValue(row[col.index]) : ''}</td>
+                <td key={col.label}>{col.accessor(row) ?? ''}</td>
               ))}
             </tr>
           ))}
