@@ -46,10 +46,8 @@ export const TableView = <T extends MRT_RowData>({
   tableRowAction,
   url,
   title,
-  combinedExport,
   kmlExport,
   svgExport,
-  exportIsLoading,
   isCrossSearchTable,
   clickableRows = true,
   enableColumnFilterModes,
@@ -69,10 +67,8 @@ export const TableView = <T extends MRT_RowData>({
   tableRowAction?: (row: T) => void
   url?: string
   title: string
-  combinedExport?: (lids: number[]) => Promise<void>
   kmlExport?: (table: MRT_TableInstance<T>) => void
   svgExport?: (table: MRT_TableInstance<T>) => void
-  exportIsLoading?: boolean
   isCrossSearchTable?: boolean
   clickableRows?: boolean
   enableColumnFilterModes?: boolean
@@ -398,10 +394,8 @@ export const TableView = <T extends MRT_RowData>({
           <TableToolBar<T>
             table={table}
             tableName={title}
-            combinedExport={combinedExport}
             kmlExport={kmlExport}
             svgExport={svgExport}
-            exportIsLoading={exportIsLoading}
             showNewButton={editRights.new && !selectorFn && title != 'Locality-Species-Cross-Search'}
             isCrossSearchTable={isCrossSearchTable}
           />

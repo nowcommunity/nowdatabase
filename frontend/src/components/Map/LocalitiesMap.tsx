@@ -168,11 +168,7 @@ export const LocalitiesMap = ({ localities, isFetching }: Props) => {
         onClose={() => setLocalityDetailsIsOpen(false)}
         returnButtonText="Return to map"
       >
-        <LocalityInfo
-          localityDetailsQueryData={localityDetailsQueryData}
-          detailsLoading={detailsLoading}
-          selectedLocality={selectedLocality}
-        />
+        <LocalityInfo localityDetailsQueryData={localityDetailsQueryData} detailsLoading={detailsLoading} />
       </SlidingModal>
     </>
   )

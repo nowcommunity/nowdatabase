@@ -1,9 +1,8 @@
 import { useEffect, useMemo, useState } from 'react'
 import { MRT_TableInstance, type MRT_ColumnDef, MRT_RowData } from 'material-react-table'
-import { useGetAllLocalitiesQuery, useGetLocalitySpeciesListMutation } from '../../redux/localityReducer'
+import { useGetAllLocalitiesQuery } from '../../redux/localityReducer'
 import { Locality, SimplifiedLocality } from '@/shared/types'
 import { TableView } from '../TableView/TableView'
-import { useNotify } from '@/hooks/notification'
 import { LocalitiesMap } from '../Map/LocalitiesMap'
 import { generateKml } from '@/util/kml'
 import { generateSvg } from '../Map/generateSvg'
@@ -29,10 +28,8 @@ export const LocalityTable = ({ selectorFn }: { selectorFn?: (newObject: Localit
     isError: localitiesQueryIsError,
     error: localitiesQueryError,
   } = useGetAllLocalitiesQuery()
-  const [getLocalitySpeciesList, { isLoading }] = useGetLocalitySpeciesListMutation()
   const [filteredLocalities, setFilteredLocalities] = useState<SimplifiedLocality[]>()
   const columnFilters = usePageContext()
-  const { notify } = useNotify()
 
   const handleLocalityRowActionClick = (row: Locality) => {
     setSelectedLocality(row.lid.toString())
@@ -411,28 +408,6 @@ export const LocalityTable = ({ selectorFn }: { selectorFn?: (newObject: Localit
     regional_culture_3: false,
   }
 
-  const combinedExport = async (lids: number[]) => {
-    if (isLoading) {
-      notify('Please wait for the last request to complete.', 'warning')
-      return
-    }
-
-    const limit = 99999999
-    if (lids.length > limit) {
-      notify(`Please filter the table more. Current rows: ${lids.length}. Limit: ${limit}`, 'error')
-      return
-    }
-    const result = await getLocalitySpeciesList(lids).unwrap()
-    const dataString = result.map(row => row.join(',')).join('\n')
-    const blob = new Blob([dataString], { type: 'text/csv' })
-    const url = URL.createObjectURL(blob)
-    const a = document.createElement('a')
-    a.href = url
-
-    a.download = `localities-with-species-${currentDateAsString()}.csv`
-    a.click()
-  }
-
   // Downloads a KML file of filtered localities.
   const kmlExport = <T extends MRT_RowData>(table: MRT_TableInstance<T>) => {
     const rowData: Locality[] = table.getPrePaginationRowModel().rows.map(row => row.original as unknown as Locality)
@@ -476,10 +451,8 @@ export const LocalityTable = ({ selectorFn }: { selectorFn?: (newObject: Localit
         visibleColumns={visibleColumns}
         data={localitiesQueryData}
         url="locality"
-        combinedExport={combinedExport}
         kmlExport={kmlExport}
         svgExport={svgExport}
-        exportIsLoading={isLoading}
         enableColumnFilterModes={true}
         tableRowAction={handleLocalityRowActionClick}
       />
