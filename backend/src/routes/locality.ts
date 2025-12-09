@@ -1,5 +1,10 @@
 import { Request, Router } from 'express'
-import { getAllLocalities, getLocalityDetails, validateEntireLocality } from '../services/locality'
+import {
+  getAllLocalities,
+  getLocalityDetails,
+  normalizeLocalityAges,
+  validateEntireLocality,
+} from '../services/locality'
 import { fixBigInt } from '../utils/common'
 import { EditDataType, EditMetaData, LocalityDetailsType, Role } from '../../../frontend/src/shared/types'
 import { requireOneOf } from '../middlewares/authorizer'
@@ -24,11 +29,12 @@ router.put(
   requireOneOf([Role.Admin, Role.EditUnrestricted]),
   async (req: Request<object, object, { locality: EditDataType<LocalityDetailsType> & EditMetaData }>, res) => {
     const { comment, references, ...editedLocality } = req.body.locality
-    const validationErrors = await validateEntireLocality({ ...editedLocality, references: references })
+    const normalizedLocality = normalizeLocalityAges(editedLocality)
+    const validationErrors = await validateEntireLocality({ ...normalizedLocality, references: references })
     if (validationErrors.length > 0) {
       return res.status(403).send(validationErrors)
     }
-    const result = await writeLocality(editedLocality, comment, references, req.user)
+    const result = await writeLocality(normalizedLocality, comment, references, req.user)
     return res.status(200).send({ id: result })
   }
 )
