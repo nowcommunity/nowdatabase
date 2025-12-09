@@ -1,5 +1,7 @@
 import { describe, expect, it, jest, beforeEach } from '@jest/globals'
 import { render, screen, waitFor, fireEvent } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
+import '@testing-library/jest-dom'
 import { WriteButton } from '@/components/DetailView/components'
 import { EditDataType, Species } from '@/shared/types'
 import { useDetailContext, type DetailContextType } from '@/components/DetailView/Context/DetailContext'
@@ -36,6 +38,7 @@ const mockUseGetAllSynonymsQuery = useGetAllSynonymsQuery as jest.MockedFunction
 const mockCheckSpeciesTaxonomy = checkSpeciesTaxonomy as jest.MockedFunction<typeof checkSpeciesTaxonomy>
 
 const modeEdit = { read: false, staging: false, new: false, option: 'edit' as const }
+const modeStagingEdit = { read: false, staging: true, new: false, option: 'staging-edit' as const }
 
 const textField: DetailContextType<Species>['textField'] = () => <span />
 const bigTextField: DetailContextType<Species>['bigTextField'] = () => <span />
@@ -101,6 +104,8 @@ const renderButton = (
     setMode: jest.fn(),
     editData,
     setEditData: jest.fn(),
+    isDirty: true,
+    resetEditData: jest.fn(),
     textField,
     bigTextField,
     dropdown,
@@ -167,5 +172,43 @@ describe('WriteButton taxonomy handling', () => {
 
     expect(onWrite).toHaveBeenCalledWith(expect.objectContaining({ sp_comment: null }), expect.any(Function))
     expect(setEditData).toHaveBeenCalledWith(expect.objectContaining({ sp_comment: null }))
+  })
+
+  it('disables the button when no edits have been made', () => {
+    renderButton(baseSpecies as EditDataType<Species>, jest.fn(), { isDirty: false })
+
+    const button = screen.getByRole('button', { name: /save changes/i })
+    expect((button as HTMLButtonElement).disabled).toBe(true)
+  })
+
+  it('shows helper tooltip when hovering the disabled button', async () => {
+    const user = userEvent.setup()
+    renderButton(baseSpecies as EditDataType<Species>, jest.fn(), { isDirty: false })
+
+    const button = screen.getByRole('button', { name: /save changes/i })
+    await user.hover(button)
+
+    await waitFor(() => {
+      expect(screen.getByText(/make changes before finalizing the entry/i)).toBeTruthy()
+    })
+  })
+
+  it('enables the button after edits have been made', () => {
+    renderButton(baseSpecies as EditDataType<Species>, jest.fn(), { isDirty: true })
+
+    const button = screen.getByRole('button', { name: /save changes/i })
+    expect((button as HTMLButtonElement).disabled).toBe(false)
+  })
+
+  it('disables the button in staging mode when no edits have been made', () => {
+    const onWrite = jest.fn(() => Promise.resolve())
+
+    renderButton(baseSpecies as EditDataType<Species>, onWrite, {
+      isDirty: false,
+      mode: modeStagingEdit,
+    })
+
+    const button = screen.getByRole('button', { name: /complete and save/i })
+    expect((button as HTMLButtonElement).disabled).toBe(true)
   })
 })

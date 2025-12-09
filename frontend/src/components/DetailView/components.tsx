@@ -1,9 +1,9 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { Button, Box, Typography, CircularProgress, Divider, alpha, List, ListItemText } from '@mui/material'
-import SaveIcon from '@mui/icons-material/Save'
+import { Button, Box, Typography, CircularProgress, Divider, alpha, List, ListItemText, Tooltip } from '@mui/material'
 import { useDetailContext } from './Context/DetailContext'
 import { EditDataType, Editable, Reference, Species } from '@/shared/types'
 import { useState, useEffect, Fragment } from 'react'
+import SaveIcon from '@mui/icons-material/Save'
 import { referenceValidator } from '@/shared/validators/validator'
 import { checkSpeciesTaxonomy, convertSpeciesTaxonomyFields, hasTaxonomyChanges } from '../../util/taxonomyUtilities'
 import { useGetAllSpeciesQuery, useGetAllSynonymsQuery } from '@/redux/speciesReducer'
@@ -12,6 +12,7 @@ import { countryBoundingBoxes } from '@/country_data/countryBoundingBoxes'
 import { boundingBoxSplit, isPointInBoxes } from '@/util/isPointInBox'
 import { OutOfBoundsWarningModal, OutOfBoundsWarningModalState } from './OutOfBoundsWarningModal'
 import { skipToken } from '@reduxjs/toolkit/query'
+import { finalizeEntry } from '@/services/entryApi'
 export { ReturnButton } from '@/components/common/ReturnButton'
 
 export const WriteButton = <T,>({
@@ -23,7 +24,7 @@ export const WriteButton = <T,>({
   taxonomy?: boolean
   hasStagingMode?: boolean
 }) => {
-  const { data, editData, setEditData, mode, setMode, validator, fieldsWithErrors, setFieldsWithErrors } =
+  const { data, editData, setEditData, mode, setMode, validator, fieldsWithErrors, setFieldsWithErrors, isDirty } =
     useDetailContext<T>()
   const [loading, setLoading] = useState(false)
   const { notify } = useNotify()
@@ -111,7 +112,7 @@ export const WriteButton = <T,>({
     // @ts-expect-error Reason: Typescript doesn't recognise that references do exist. Unable to find a way around it. Fix if extra time
   }, [mode, editData.references])
 
-  const writeWithTaxonomyCheck = () => {
+  const writeWithTaxonomyCheck = async () => {
     let speciesEditData: EditDataType<Species> | undefined = undefined
 
     if (!mode.staging && taxonomy) {
@@ -154,30 +155,37 @@ export const WriteButton = <T,>({
       }
     }
 
-    void onWrite((speciesEditData as EditDataType<T>) ?? editData, setEditData).then(() => {
-      setMode('read')
-      return
-    })
+    await onWrite((speciesEditData as EditDataType<T>) ?? editData, setEditData)
+    setMode('read')
   }
 
-  const handleWriteButtonClick = () => {
-    if (taxonomy) {
+  const handleWriteButtonClick = async () => {
+    const finalize = async () => {
+      if (taxonomy) {
+        setLoading(true)
+        await writeWithTaxonomyCheck()
+        setLoading(false)
+        return
+      }
+
+      if (!mode.staging && hasStagingMode) {
+        setMode(mode.new ? 'staging-new' : 'staging-edit')
+        return
+      }
+
       setLoading(true)
-      writeWithTaxonomyCheck()
-      setLoading(false)
-      return
-    }
-
-    if (!mode.staging && hasStagingMode) {
-      setMode(mode.new ? 'staging-new' : 'staging-edit')
-      return
-    }
-
-    setLoading(true)
-    void onWrite(editData, setEditData).then(() => {
+      await onWrite(editData, setEditData)
       setLoading(false)
       setMode('read')
+    }
+
+    const result = await finalizeEntry({
+      isDirty,
+      finalize,
+      onBlocked: () => notify('Please make changes before finalizing the entry.', 'info'),
     })
+
+    if (result.blocked) return
   }
 
   return (
@@ -190,46 +198,60 @@ export const WriteButton = <T,>({
         }}
         state={warningModalState}
       />
-      <Button
-        disabled={Object.keys(fieldsWithErrors).length > 0}
-        id="write-button"
-        sx={{ width: '20em' }}
-        onClick={() => {
-          // Check for out-of-boundness before saving
-
-          if (
-            !('dec_lat' in (editData as object)) ||
-            !('dec_long' in (editData as object)) ||
-            !('country' in (editData as object))
-          ) {
-            handleWriteButtonClick()
-            return
-          }
-
-          const localityObject = editData as unknown as { dec_lat: number; dec_long: number; country: string }
-          if (!isCoordinateOutOfBounds(localityObject.dec_lat, localityObject.dec_long, localityObject.country)) {
-            handleWriteButtonClick()
-            return
-          }
-
-          setWarningModalOpen(true)
-          setWarningModalState({
-            decLat: localityObject.dec_lat,
-            decLong: localityObject.dec_long,
-            // Guaranteed to exist by the isCoordinateOutOfBounds check above,
-            // as it will return false and return on no key found
-            boxes: boundingBoxSplit(countryBoundingBoxes[localityObject.country]),
-          })
-        }}
-        variant="contained"
+      <Tooltip
+        disableHoverListener={Object.keys(fieldsWithErrors).length === 0 && isDirty}
+        disableFocusListener={Object.keys(fieldsWithErrors).length === 0 && isDirty}
+        title={
+          Object.keys(fieldsWithErrors).length > 0
+            ? 'Resolve validation errors before saving.'
+            : isDirty
+              ? ''
+              : 'Make changes before finalizing the entry.'
+        }
       >
-        {loading ? (
-          <CircularProgress size="1.2em" sx={{ color: 'white', marginRight: '1em' }} />
-        ) : (
-          <SaveIcon style={{ marginRight: '0.5em' }} />
-        )}
-        {getButtonText()}
-      </Button>
+        <span>
+          <Button
+            disabled={Object.keys(fieldsWithErrors).length > 0 || !isDirty}
+            id="write-button"
+            sx={{ width: '20em' }}
+            onClick={() => {
+              // Check for out-of-boundness before saving
+
+              if (
+                !('dec_lat' in (editData as object)) ||
+                !('dec_long' in (editData as object)) ||
+                !('country' in (editData as object))
+              ) {
+                void handleWriteButtonClick()
+                return
+              }
+
+              const localityObject = editData as unknown as { dec_lat: number; dec_long: number; country: string }
+              if (!isCoordinateOutOfBounds(localityObject.dec_lat, localityObject.dec_long, localityObject.country)) {
+                void handleWriteButtonClick()
+                return
+              }
+
+              setWarningModalOpen(true)
+              setWarningModalState({
+                decLat: localityObject.dec_lat,
+                decLong: localityObject.dec_long,
+                // Guaranteed to exist by the isCoordinateOutOfBounds check above,
+                // as it will return false and return on no key found
+                boxes: boundingBoxSplit(countryBoundingBoxes[localityObject.country]),
+              })
+            }}
+            variant="contained"
+          >
+            {loading ? (
+              <CircularProgress size="1.2em" sx={{ color: 'white', marginRight: '1em' }} />
+            ) : (
+              <SaveIcon style={{ marginRight: '0.5em' }} />
+            )}
+            {getButtonText()}
+          </Button>
+        </span>
+      </Tooltip>
     </>
   )
 }
