@@ -211,7 +211,7 @@ export const WriteButton = <T,>({
       >
         <span>
           <Button
-            disabled={Object.keys(fieldsWithErrors).length > 0 || (!mode.staging && !isDirty)}
+            disabled={Object.keys(fieldsWithErrors).length > 0 || !isDirty}
             id="write-button"
             sx={{ width: '20em' }}
             onClick={() => {

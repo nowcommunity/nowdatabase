@@ -200,7 +200,7 @@ describe('WriteButton taxonomy handling', () => {
     expect((button as HTMLButtonElement).disabled).toBe(false)
   })
 
-  it('blocks finalize handler and shows feedback when dirty flag is false', async () => {
+  it('disables the button in staging mode when no edits have been made', () => {
     const onWrite = jest.fn(() => Promise.resolve())
 
     renderButton(baseSpecies as EditDataType<Species>, onWrite, {
@@ -208,12 +208,7 @@ describe('WriteButton taxonomy handling', () => {
       mode: modeStagingEdit,
     })
 
-    fireEvent.click(screen.getByRole('button', { name: /complete and save/i }))
-
-    await waitFor(() => {
-      expect(onWrite).not.toHaveBeenCalled()
-    })
-
-    expect(mockNotify).toHaveBeenCalledWith('Please make changes before finalizing the entry.', 'info')
+    const button = screen.getByRole('button', { name: /complete and save/i })
+    expect((button as HTMLButtonElement).disabled).toBe(true)
   })
 })
