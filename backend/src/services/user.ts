@@ -53,42 +53,40 @@ export const createTestUsers = async () => {
       user_name: 'testPl',
       now_user_group: 'pl',
     },
-  ]
+  ] as const
+
+  const passwordHash = await bcrypt.hash('test', 10)
   for (let i = 0; i < 10; i++) {
     try {
-      const passwordHash = await bcrypt.hash('test', 10)
       for (const testUser of testUsers) {
-        const existingUser = await nowDb.com_users.findFirst({
-          where: { ...testUser },
-        })
-        let userId
-        if (!existingUser) {
-          const createdUser = await nowDb.com_users.create({
-            data: {
-              user_name: testUser.user_name,
-              newpassword: passwordHash,
-              now_user_group: testUser.now_user_group,
-            },
-          })
-          userId = createdUser.user_id
-        } else {
-          userId = existingUser.user_id
-        }
         const initials = `TEST-${testUser.now_user_group.toUpperCase()}`
-        const existingPerson = await nowDb.com_people.findFirst({
-          where: { initials },
+
+        const user = await nowDb.com_users.upsert({
+          where: { user_name: testUser.user_name },
+          create: {
+            user_name: testUser.user_name,
+            newpassword: passwordHash,
+            now_user_group: testUser.now_user_group,
+          },
+          update: {
+            now_user_group: testUser.now_user_group,
+            newpassword: passwordHash,
+          },
+          select: { user_id: true },
         })
-        if (existingPerson) {
-          logger.info(`User ${testUser.user_name} already exists, continuing`)
-          continue
-        }
-        await nowDb.com_people.create({
-          data: {
-            user_id: userId,
+
+        await nowDb.com_people.upsert({
+          where: { initials },
+          create: {
+            user_id: user.user_id,
             initials,
           },
+          update: {
+            user_id: user.user_id,
+          },
         })
-        logger.info(`User ${testUser.user_name} created`)
+
+        logger.info(`User ${testUser.user_name} ensured for tests`)
       }
       await createDraftLocality()
       return
