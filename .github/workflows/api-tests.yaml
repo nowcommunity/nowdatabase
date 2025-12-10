@@ -28,6 +28,28 @@ jobs:
       - name: 'Start containers'
         run: npm run start:anon:api -- --wait -d
 
+      - name: 'Wait for MariaDB readiness'
+        env:
+          HEALTH_RETRIES: 30
+        run: |
+          MARIADB_ROOT_PASSWORD=$(sed -n 's/^MARIADB_ROOT_PASSWORD:[[:space:]]*//p' .anon.env)
+
+          if [ -z "$MARIADB_ROOT_PASSWORD" ]; then
+            echo "MARIADB_ROOT_PASSWORD not set in .anon.env"
+            exit 1
+          fi
+
+          for attempt in $(seq 1 "$HEALTH_RETRIES"); do
+            if docker compose -f docker-compose.anon.yml exec -T db-anon sh -c "mariadb-admin --protocol=TCP --user=root --password=$MARIADB_ROOT_PASSWORD ping --silent"; then
+              echo "MariaDB is accepting connections"
+              break
+            fi
+            echo "MariaDB not ready yet (attempt $attempt/$HEALTH_RETRIES), waiting 5s..."
+            sleep 5
+          done
+
+          docker compose -f docker-compose.anon.yml exec -T db-anon sh -c "mariadb --protocol=TCP --user=root --password=$MARIADB_ROOT_PASSWORD now_test -e 'SELECT COUNT(*) FROM com_species LIMIT 1;'"
+
       - name: Run api-tests
         run: npm run test:ci:api
 
