@@ -19,6 +19,32 @@ import { logDb, nowDb } from '../utils/db'
 import { buildPersonLookupByInitials, getPersonDisplayName, getPersonFromLookup } from './utils/person'
 import { getReferenceDetails } from './reference'
 
+const normalizeNumberField = (value: unknown) => {
+  if (typeof value === 'string') {
+    const parsed = parseFloat(value)
+    if (!Number.isNaN(parsed)) return parsed
+  }
+
+  return value
+}
+
+const normalizeFraction = (value: unknown) => {
+  if (typeof value === 'string') {
+    const trimmed = value.trim()
+    return trimmed === '' ? null : trimmed
+  }
+
+  return value
+}
+
+export const normalizeLocalityAges = (locality: EditDataType<LocalityDetailsType>) => ({
+  ...locality,
+  max_age: normalizeNumberField(locality.max_age) as EditDataType<LocalityDetailsType>['max_age'],
+  min_age: normalizeNumberField(locality.min_age) as EditDataType<LocalityDetailsType>['min_age'],
+  frac_max: normalizeFraction(locality.frac_max) as EditDataType<LocalityDetailsType>['frac_max'],
+  frac_min: normalizeFraction(locality.frac_min) as EditDataType<LocalityDetailsType>['frac_min'],
+})
+
 const getIdsOfUsersProjects = async (user: User) => {
   const usersProjects = await nowDb.now_proj_people.findMany({
     where: { initials: user.initials },

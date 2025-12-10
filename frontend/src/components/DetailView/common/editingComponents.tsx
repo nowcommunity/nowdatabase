@@ -506,6 +506,7 @@ export const BasisForAgeSelection = ({
   const { error } = errorObject
   const [open, setOpen] = useState(false)
   const [currentBasisForAge, setCurrentBasisForAge] = useState<TimeUnit>()
+  const normalizedFraction = fraction || null
 
   if (timeUnit && !currentBasisForAge) {
     // this converts the time unit from TimeUnitDetailsType to TimeUnit, so it can be used properly
@@ -525,13 +526,21 @@ export const BasisForAgeSelection = ({
     if (targetField === 'bfa_min') {
       setEditData({
         ...editData,
-        min_age: calculateLocalityMinAge(Number(selected['up_bound']), Number(selected['low_bound']), String(fraction)),
+        min_age: calculateLocalityMinAge(
+          Number(selected['up_bound']),
+          Number(selected['low_bound']),
+          normalizedFraction
+        ),
         [targetField]: selected['tu_name'],
       })
     } else if (targetField === 'bfa_max') {
       setEditData({
         ...editData,
-        max_age: calculateLocalityMaxAge(Number(selected['up_bound']), Number(selected['low_bound']), String(fraction)),
+        max_age: calculateLocalityMaxAge(
+          Number(selected['up_bound']),
+          Number(selected['low_bound']),
+          normalizedFraction
+        ),
         [targetField]: selected['tu_name'],
       })
     } else {
@@ -547,7 +556,7 @@ export const BasisForAgeSelection = ({
         min_age: calculateLocalityMinAge(
           Number(currentBasisForAge['up_bound']),
           Number(currentBasisForAge['low_bound']),
-          fraction ?? null
+          normalizedFraction
         ),
       })
     } else if (targetField === 'bfa_max' && currentBasisForAge) {
@@ -556,12 +565,12 @@ export const BasisForAgeSelection = ({
         max_age: calculateLocalityMaxAge(
           Number(currentBasisForAge['up_bound']),
           Number(currentBasisForAge['low_bound']),
-          fraction ?? null
+          normalizedFraction
         ),
       })
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [fraction])
+  }, [fraction, normalizedFraction])
 
   useEffect(() => {
     checkFieldErrors(String(targetField), errorObject, fieldsWithErrors, setFieldsWithErrors)
