@@ -17,7 +17,9 @@ export const GEONAMES_USERNAME = process.env.GEONAMES_USERNAME as string
     prod    = production with real data
 */
 const allowedRunningEnvs = ['dev', 'staging', 'prod'] as const
-export const RUNNING_ENV = (process.env.VITE_RUNNING_ENV as (typeof allowedRunningEnvs)[number]) ?? 'prod'
+const NODE_ENV = process.env.NODE_ENV
+const runningEnvFromEnv = process.env.VITE_RUNNING_ENV as (typeof allowedRunningEnvs)[number] | undefined
+export const RUNNING_ENV = runningEnvFromEnv ?? (NODE_ENV === 'test' ? 'dev' : 'prod')
 if (!allowedRunningEnvs.includes(RUNNING_ENV)) throw new Error('Invalid RUNNING_ENV')
 
 // Enable write operations. If this is not set to 'true', all write (create, update, delete) operations except for allowed ones (like user/login) are disabled.
