@@ -28,9 +28,8 @@ jobs:
       - name: 'Start containers'
         run: npm run start:anon:api -- --wait -d
 
-      - name: 'Wait for MariaDB readiness'
-        env:
-          HEALTH_RETRIES: 30
+      - name: 'Load MariaDB root password'
+        id: load-mariadb-password
         run: |
           MARIADB_ROOT_PASSWORD=$(sed -n 's/^MARIADB_ROOT_PASSWORD:[[:space:]]*//p' .anon.env)
 
@@ -39,6 +38,12 @@ jobs:
             exit 1
           fi
 
+          echo "MARIADB_ROOT_PASSWORD=$MARIADB_ROOT_PASSWORD" >> "$GITHUB_ENV"
+
+      - name: 'Wait for MariaDB readiness'
+        env:
+          HEALTH_RETRIES: 30
+        run: |
           for attempt in $(seq 1 "$HEALTH_RETRIES"); do
             if docker compose -f docker-compose.anon.yml exec -T db-anon sh -c "mariadb-admin --protocol=TCP --user=root --password=$MARIADB_ROOT_PASSWORD ping --silent"; then
               echo "MariaDB is accepting connections"
@@ -49,6 +54,11 @@ jobs:
           done
 
           docker compose -f docker-compose.anon.yml exec -T db-anon sh -c "mariadb --protocol=TCP --user=root --password=$MARIADB_ROOT_PASSWORD now_test -e 'SELECT COUNT(*) FROM com_species LIMIT 1;'"
+
+      - name: 'Reset MariaDB test data'
+        run: |
+          docker compose -f docker-compose.anon.yml exec -T db-anon sh -c "mariadb --protocol=TCP --user=root --password=$MARIADB_ROOT_PASSWORD now_test < /docker-entrypoint-initdb.d/sqlfiles/now_test.sql"
+          docker compose -f docker-compose.anon.yml exec -T db-anon sh -c "mariadb --protocol=TCP --user=root --password=$MARIADB_ROOT_PASSWORD now_log_test < /docker-entrypoint-initdb.d/sqlfiles/now_log_test.sql"
 
       - name: Run api-tests
         run: npm run test:ci:api
