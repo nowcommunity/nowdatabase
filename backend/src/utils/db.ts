@@ -136,6 +136,12 @@ export const resetTestDb = async () => {
   await connNow.end()
   await connLog.end()
 
+  // Ensure the seeded databases also contain the test users the API tests rely on
+  // for authentication and authorization. Using a dynamic import prevents a
+  // circular dependency between this module and the user service.
+  const { createTestUsers } = await import('../services/user')
+  await createTestUsers()
+
   return
 }
 
