@@ -19,6 +19,7 @@ import type { FilterFn } from '@tanstack/table-core'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { ActionComponent } from './ActionComponent'
 import { usePageContext } from '../Page'
+import { TableHelp } from '../table'
 import { useUser } from '@/hooks/user'
 import { defaultPagination, defaultPaginationSmall } from '@/common'
 import '../../styles/TableView.css'
@@ -391,14 +392,26 @@ export const TableView = <T extends MRT_RowData>({
       {user && (
         <div className="table-top-row">
           {title && <Box className="title">{title}</Box>}
-          <TableToolBar<T>
-            table={table}
-            tableName={title}
-            kmlExport={kmlExport}
-            svgExport={svgExport}
-            showNewButton={editRights.new && !selectorFn && title != 'Locality-Species-Cross-Search'}
-            isCrossSearchTable={isCrossSearchTable}
-          />
+          <Box display="flex" alignItems="center" gap={1}>
+            {!isCrossSearchTable && (
+              <TableHelp
+                showFiltering
+                showSorting
+                showMultiSorting={!serverSidePagination}
+                showColumnVisibility
+                showExport
+              />
+            )}
+            <TableToolBar<T>
+              table={table}
+              tableName={title}
+              kmlExport={kmlExport}
+              svgExport={svgExport}
+              showNewButton={editRights.new && !selectorFn && title != 'Locality-Species-Cross-Search'}
+              isCrossSearchTable={isCrossSearchTable}
+              selectorFn={selectorFn}
+            />
+          </Box>
         </div>
       )}
       <MaterialReactTable table={table} />
