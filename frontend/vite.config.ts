@@ -21,6 +21,7 @@ export default defineConfig({
   ],
   resolve: {
     alias: [
+      { find: '@components/table', replacement: path.resolve(__dirname, './src/components/table') },
       { find: '@', replacement: path.resolve(__dirname, './src/') },
       { find: '@components', replacement: path.resolve(__dirname, './src/components') },
       { find: '@util', replacement: path.resolve(__dirname, './src/util') },
