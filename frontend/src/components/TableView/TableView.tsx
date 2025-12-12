@@ -393,15 +393,13 @@ export const TableView = <T extends MRT_RowData>({
         <div className="table-top-row">
           {title && <Box className="title">{title}</Box>}
           <Box display="flex" alignItems="center" gap={1}>
-            {!isCrossSearchTable && (
-              <TableHelp
-                showFiltering
-                showSorting
-                showMultiSorting={!serverSidePagination}
-                showColumnVisibility
-                showExport
-              />
-            )}
+            <TableHelp
+              showFiltering
+              showSorting
+              showMultiSorting={!serverSidePagination}
+              showColumnVisibility
+              showExport
+            />
             <TableToolBar<T>
               table={table}
               tableName={title}

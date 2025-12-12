@@ -102,8 +102,8 @@ describe('TableView table help integration', () => {
     expect(getByText(/Export the current table data using the export menu/i)).toBeTruthy()
   })
 
-  it('omits table help on cross search tables', () => {
-    const { queryByRole } = render(
+  it('shows applicable help text on cross search tables', () => {
+    const { getByRole, getByText, queryByText } = render(
       <TableView<TestRow>
         title="Cross Search"
         idFieldName="id"
@@ -117,6 +117,12 @@ describe('TableView table help integration', () => {
       />
     )
 
-    expect(queryByRole('button', { name: /table help/i })).toBeNull()
+    fireEvent.click(getByRole('button', { name: /table help/i }))
+
+    expect(getByText(/Click a column header to sort ascending\/descending by that column./i)).toBeTruthy()
+    expect(getByText(/Filter rows using the column filter icons or quick search where available./i)).toBeTruthy()
+    expect(getByText(/Use the column visibility menu to show or hide columns that matter to you./i)).toBeTruthy()
+    expect(queryByText(/multi-column sorting/i)).toBeNull()
+    expect(getByText(/Export the current table data using the export menu/i)).toBeTruthy()
   })
 })
