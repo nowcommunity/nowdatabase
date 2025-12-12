@@ -24,7 +24,7 @@
     "baseUrl": ".",
     "types": ["vite/client", "jest", "node"],
     "paths": {
-      "@components/table": ["./src/components/table"],
+      "@components/Table": ["./src/components/table"],
       "@/*": ["./src/*"],
       "@components/*": ["./src/components/*"],
       "@util/*": ["./src/util/*"],
