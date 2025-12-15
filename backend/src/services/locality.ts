@@ -197,6 +197,18 @@ export const getLocalityDetails = async (id: number, user: User | undefined) => 
           com_mlist: true,
         },
       },
+      now_time_unit_now_loc_bfa_minTonow_time_unit: {
+        select: {
+          tu_display_name: true,
+          tu_name: true,
+        },
+      },
+      now_time_unit_now_loc_bfa_maxTonow_time_unit: {
+        select: {
+          tu_display_name: true,
+          tu_name: true,
+        },
+      },
       now_ls: {
         include: {
           com_species: true,
@@ -259,7 +271,23 @@ export const getLocalityDetails = async (id: number, user: User | undefined) => 
     }
   }
 
-  return JSON.parse(fixBigInt(result)!) as LocalityDetailsType
+  const {
+    now_time_unit_now_loc_bfa_minTonow_time_unit: minTimeUnit,
+    now_time_unit_now_loc_bfa_maxTonow_time_unit: maxTimeUnit,
+    ...locality
+  } = result
+
+  const localityWithTimeUnitDisplayValues = {
+    ...locality,
+    bfa_min_time_unit: minTimeUnit
+      ? { tu_name: minTimeUnit.tu_name, tu_display_name: minTimeUnit.tu_display_name }
+      : null,
+    bfa_max_time_unit: maxTimeUnit
+      ? { tu_name: maxTimeUnit.tu_name, tu_display_name: maxTimeUnit.tu_display_name }
+      : null,
+  }
+
+  return JSON.parse(fixBigInt(localityWithTimeUnitDisplayValues)!) as LocalityDetailsType
 }
 
 // also validates possible new species that were added to this locality

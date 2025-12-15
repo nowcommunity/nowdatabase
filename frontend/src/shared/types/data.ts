@@ -43,6 +43,8 @@ export type LocalitySynonym = Prisma.now_syn_loc
 export type SpeciesSynonym = Prisma.com_taxa_synonym
 export type SpeciesListSynonym = Pick<SpeciesSynonym, 'syn_genus_name' | 'syn_species_name'>
 export type LocalityMuseum = Prisma.now_mus & { com_mlist: Museum }
+export type TimeUnitDisplayValue = Pick<Prisma.now_time_unit, 'tu_display_name' | 'tu_name'>
+
 export type LocalityDetailsType = Prisma.now_loc & {
   now_mus: Array<LocalityMuseum>
 } & {
@@ -53,7 +55,10 @@ export type LocalityDetailsType = Prisma.now_loc & {
   now_ss: SedimentaryStructure[]
 } & {
   now_coll_meth: CollectingMethod[]
-} & { now_lau: Array<LocalityUpdate> }
+} & { now_lau: Array<LocalityUpdate> } & {
+  bfa_min_time_unit: TimeUnitDisplayValue | null
+  bfa_max_time_unit: TimeUnitDisplayValue | null
+}
 export type UpdateLog = LogPrisma.log
 export type Locality = {
   lid: number
