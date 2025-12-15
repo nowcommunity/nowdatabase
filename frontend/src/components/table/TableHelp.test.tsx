@@ -39,10 +39,10 @@ describe('TableHelp', () => {
     const button = screen.getByRole('button', { name: /table help/i })
 
     expect(button.getAttribute('aria-label')).toBe('Open table help')
-    
+
     // aria-describedby should be undefined when popover is closed
     expect(button.getAttribute('aria-describedby')).toBeNull()
-    
+
     // When popover is open, aria-describedby should be set
     fireEvent.click(button)
     expect(button.getAttribute('aria-describedby')).toBe('table-help-popover')
