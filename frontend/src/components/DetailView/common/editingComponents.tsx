@@ -493,12 +493,14 @@ export const BasisForAgeSelection = ({
   timeUnit,
   selectorTable,
   disabled,
+  displayValue,
 }: {
   targetField: keyof LocalityDetailsType
   fraction: string | null | undefined
   timeUnit?: TimeUnitDetailsType
   selectorTable: ReactElement
   disabled?: boolean
+  displayValue?: string | null
 }) => {
   const { editData, setEditData, validator, fieldsWithErrors, setFieldsWithErrors } =
     useDetailContext<LocalityDetailsType>()
@@ -605,5 +607,7 @@ export const BasisForAgeSelection = ({
       inputProps={{ readOnly: true }}
     />
   )
-  return <DataValue<LocalityDetailsType> field={targetField} EditElement={editingComponent} />
+  return (
+    <DataValue<LocalityDetailsType> field={targetField} EditElement={editingComponent} displayValue={displayValue} />
+  )
 }
