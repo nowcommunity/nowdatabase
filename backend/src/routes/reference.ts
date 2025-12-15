@@ -7,6 +7,7 @@ import {
   getReferenceJournals,
   getReferenceLocalities,
   getReferenceSpecies,
+  buildReferenceDisplayLabelMap,
   validateEntireReference,
   getAuthorsOfReference,
   getJournalById,
@@ -77,7 +78,10 @@ router.put(
   requireOneOf([Role.Admin, Role.EditUnrestricted]),
   async (req: Request<object, object, { reference: EditDataType<ReferenceDetailsType> & EditMetaData }>, res) => {
     const { ...editedReference } = req.body.reference
-    const validationErrors = validateEntireReference(editedReference)
+    const referenceTypes = await getReferenceTypes()
+    const displayLabelMap = buildReferenceDisplayLabelMap(referenceTypes)
+
+    const validationErrors = validateEntireReference(editedReference, { displayLabelMap })
     if (validationErrors.length > 0) {
       return res.status(403).send(validationErrors)
     }
