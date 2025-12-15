@@ -116,6 +116,8 @@ export const emptyLocality = {
   now_coll_meth: [],
   now_plr: [],
   now_lau: [],
+  bfa_min_time_unit: null,
+  bfa_max_time_unit: null,
 } as unknown as LocalityDetailsType
 
 export const emptySpecies = {

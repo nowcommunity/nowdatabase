@@ -29,6 +29,14 @@ describe('Creating new locality works', () => {
     createdLocality = body
   })
 
+  it('Includes display values for basis for age time units', () => {
+    expect(createdLocality?.bfa_min_time_unit?.tu_name).toEqual(newLocalityBasis.bfa_min)
+    expect(createdLocality?.bfa_min_time_unit?.tu_display_name).toEqual('Bahean')
+
+    expect(createdLocality?.bfa_max_time_unit?.tu_name).toEqual(newLocalityBasis.bfa_max)
+    expect(createdLocality?.bfa_max_time_unit?.tu_display_name).toEqual('Bahean')
+  })
+
   it('Contains correct data', () => {
     const { loc_name, now_ls, stone_tool_cut_marks_on_bones, bipedal_footprints, stone_tool_technology } =
       createdLocality!

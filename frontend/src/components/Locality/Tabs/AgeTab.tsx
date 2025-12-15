@@ -9,11 +9,14 @@ import { skipToken } from '@reduxjs/toolkit/query'
 import { CircularProgress } from '@mui/material'
 
 export const AgeTab = () => {
-  const { textField, radioSelection, dropdown, bigTextField, editData, setEditData } =
+  const { textField, radioSelection, dropdown, bigTextField, editData, setEditData, data } =
     useDetailContext<LocalityDetailsType>()
 
   const { data: bfaMinData, isFetching: bfaMinFetching } = useGetTimeUnitDetailsQuery(editData.bfa_min || skipToken)
   const { data: bfaMaxData, isFetching: bfaMaxFetching } = useGetTimeUnitDetailsQuery(editData.bfa_max || skipToken)
+
+  const minTimeUnitDisplay = data.bfa_min_time_unit?.tu_display_name
+  const maxTimeUnitDisplay = data.bfa_max_time_unit?.tu_display_name
 
   if (bfaMinFetching || bfaMaxFetching) return <CircularProgress />
 
@@ -108,6 +111,7 @@ export const AgeTab = () => {
         timeUnit={bfaMinData}
         selectorTable={<TimeUnitTable clickableRows={false} />}
         disabled={minAgeTimeUnitDisabled}
+        displayValue={minTimeUnitDisplay}
       />,
       dropdown('frac_min', fracOptions, 'Minimum fraction', minAgeTimeUnitDisabled),
     ],
@@ -122,6 +126,7 @@ export const AgeTab = () => {
         timeUnit={bfaMaxData}
         selectorTable={<TimeUnitTable />}
         disabled={maxAgeTimeUnitDisabled}
+        displayValue={maxTimeUnitDisplay}
       />,
       dropdown('frac_max', fracOptions, 'Maximum fraction', maxAgeTimeUnitDisabled),
     ],
