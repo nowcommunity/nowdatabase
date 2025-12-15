@@ -8,12 +8,17 @@ import {
   useEditReferenceMutation,
   useGetReferenceDetailsQuery,
   useDeleteReferenceMutation,
+  useGetReferenceTypesQuery,
 } from '@/redux/referenceReducer'
 import { EditDataType, ReferenceDetailsType, ValidationErrors } from '@/shared/types'
 import { emptyReference } from '../DetailView/common/defaultValues'
-import { validateReference } from '@/shared/validators/reference'
+import {
+  createReferenceValidatorWithLabels,
+  ReferenceFieldDisplayNames,
+  ReferenceDisplayLabelMap,
+} from '@/shared/validators/reference'
 import { useNotify } from '@/hooks/notification'
-import { useEffect } from 'react'
+import { useEffect, useMemo } from 'react'
 import { createReferenceTitle } from './referenceFormatting'
 import { useReturnNavigation } from '@/hooks/useReturnNavigation'
 import type { FetchBaseQueryError } from '@reduxjs/toolkit/query'
@@ -50,6 +55,28 @@ export const ReferenceDetails = () => {
   const { notify } = useNotify()
   const navigate = useNavigate()
   const { fallbackTarget } = useReturnNavigation({ fallback: '/reference' })
+  const { data: referenceTypes } = useGetReferenceTypesQuery()
+
+  const referenceFieldDisplayLabelMap = useMemo(() => {
+    if (!referenceTypes) return undefined
+
+    return referenceTypes.reduce((acc, referenceType) => {
+      const labelsForType = referenceType.ref_field_name.reduce<ReferenceFieldDisplayNames>((typeLabels, field) => {
+        if (field.field_name && field.ref_field_name) {
+          typeLabels[field.field_name as keyof ReferenceFieldDisplayNames] = field.ref_field_name
+        }
+
+        return typeLabels
+      }, {})
+
+      return { ...acc, [referenceType.ref_type_id]: labelsForType }
+    }, {} as ReferenceDisplayLabelMap)
+  }, [referenceTypes])
+
+  const referenceValidator = useMemo(
+    () => createReferenceValidatorWithLabels(referenceFieldDisplayLabelMap),
+    [referenceFieldDisplayLabelMap]
+  )
 
   useEffect(() => {
     if (deleteSuccess) {
@@ -105,7 +132,7 @@ export const ReferenceDetails = () => {
       isNew={isNew}
       data={isNew ? emptyReference : data!}
       onWrite={onWrite}
-      validator={validateReference}
+      validator={referenceValidator}
       deleteFunction={deleteFunction}
     />
   )
