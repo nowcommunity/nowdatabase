@@ -97,8 +97,7 @@ export const resetDatabase = async () => {
   await send('test/reset-test-database', 'GET')
 }
 
-export const resetDatabaseTimeout: number = 1200000  // 120 seconds
-
+export const resetDatabaseTimeout: number = 1200000 // 120 seconds
 
 export const noPermError = { message: 'User not authorized for the requested resource or action' }
 export const unauthenticatedError = { message: 'User is not logged in' }
