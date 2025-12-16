@@ -21,6 +21,7 @@ import { Controller, useForm } from 'react-hook-form'
 import { recordStatusOptions, projectStatusOptions } from '@/constants/projectStatus'
 import type { RecordStatusValue } from '@/constants/projectStatus'
 import type { UserOption } from '@/hooks/useUsersApi'
+import { useUnsavedChangesPrompt } from '@/hooks/useUnsavedChangesPrompt'
 import { CoordinatorSelect } from './CoordinatorSelect'
 import { MembersMultiSelect } from './MembersMultiSelect'
 
@@ -67,12 +68,14 @@ export const ProjectForm = ({
     register,
     handleSubmit,
     setValue,
-    formState: { errors },
+    formState: { errors, isDirty },
     watch,
     reset,
   } = useForm<ProjectFormValues>({
     defaultValues,
   })
+
+  const { setDirty } = useUnsavedChangesPrompt(isDirty)
 
   useEffect(() => {
     reset(defaultValues)
@@ -94,6 +97,8 @@ export const ProjectForm = ({
 
   const submitHandler = handleSubmit(async values => {
     await onSubmit(values)
+    reset(values)
+    setDirty(false)
   })
 
   return (

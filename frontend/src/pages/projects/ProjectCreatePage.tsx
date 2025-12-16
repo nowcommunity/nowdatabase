@@ -4,6 +4,7 @@ import { CircularProgress, Stack, Typography } from '@mui/material'
 
 import { PermissionDenied } from '@/components/PermissionDenied'
 import { ProjectForm, ProjectFormValues } from '@/components/Project/ProjectForm'
+import { UnsavedChangesProvider } from '@/components/UnsavedChangesProvider'
 import { useUser } from '@/hooks/user'
 import { useNotify } from '@/hooks/notification'
 import { useUsersApi } from '@/hooks/useUsersApi'
@@ -94,22 +95,24 @@ export const ProjectCreatePage = () => {
   }
 
   return (
-    <Stack spacing={3} sx={{ maxWidth: 900, margin: '0 auto' }}>
-      <Typography variant="h4" component="h1">
-        Create Project
-      </Typography>
-      <Typography color="text.secondary">
-        Provide project information and choose the coordinator and members from existing users.
-      </Typography>
+    <UnsavedChangesProvider>
+      <Stack spacing={3} sx={{ maxWidth: 900, margin: '0 auto' }}>
+        <Typography variant="h4" component="h1">
+          Create Project
+        </Typography>
+        <Typography color="text.secondary">
+          Provide project information and choose the coordinator and members from existing users.
+        </Typography>
 
-      <ProjectForm
-        users={userOptions}
-        onSubmit={handleSubmit}
-        isSubmitting={isSubmitting}
-        serverError={submitError}
-        submitLabel="Create Project"
-      />
-    </Stack>
+        <ProjectForm
+          users={userOptions}
+          onSubmit={handleSubmit}
+          isSubmitting={isSubmitting}
+          serverError={submitError}
+          submitLabel="Create Project"
+        />
+      </Stack>
+    </UnsavedChangesProvider>
   )
 }
 
