@@ -1,8 +1,16 @@
 import { nowDb } from '../utils/db'
 import { EditDataType, ReferenceDetailsType } from '../../../frontend/src/shared/types'
 import { ValidationObject } from '../../../frontend/src/shared/validators/validator'
-import { validateReference } from '../../../frontend/src/shared/validators/reference'
-import Prisma from '../../prisma/generated/now_test_client'
+import {
+  ReferenceDisplayLabelMap,
+  ReferenceFieldDisplayNames,
+  validateReference,
+} from '../../../frontend/src/shared/validators/reference'
+import type { ref_ref } from '../../prisma/generated/now_test_client'
+
+type ReferenceTypeFieldName = { field_name: string | null; ref_field_name: string | null }
+
+export type ReferenceTypeWithFieldNames = { ref_type_id: number; ref_field_name: ReferenceTypeFieldName[] }
 
 export const getAllReferences = async () => {
   const result = await nowDb.ref_ref.findMany({
@@ -90,9 +98,31 @@ export const getReferenceSpecies = async (id: string) => {
   return result
 }
 
-export const getReferenceTypes = async () => {
+export const getReferenceTypes = async (): Promise<ReferenceTypeWithFieldNames[]> => {
   const referenceTypes = await nowDb.ref_ref_type.findMany({ include: { ref_field_name: true } })
   return referenceTypes
+}
+
+export const buildReferenceDisplayLabelMap = (
+  referenceTypes: ReferenceTypeWithFieldNames[]
+): ReferenceDisplayLabelMap => {
+  const labelMap: ReferenceDisplayLabelMap = {}
+
+  referenceTypes.forEach(referenceType => {
+    const labelsForType = referenceType.ref_field_name.reduce<ReferenceFieldDisplayNames>((typeLabels, field) => {
+      if (field.field_name && field.ref_field_name) {
+        typeLabels[field.field_name as keyof ReferenceFieldDisplayNames] = field.ref_field_name
+      }
+
+      return typeLabels
+    }, {})
+
+    if (Object.keys(labelsForType).length > 0) {
+      labelMap[referenceType.ref_type_id] = labelsForType
+    }
+  })
+
+  return labelMap
 }
 
 export const getReferenceAuthors = async () => {
@@ -140,14 +170,14 @@ export const getReferenceJournals = async () => {
   return referenceJournalTypes
 }
 
-export const validateEntireReference = (editedFields: EditDataType<Prisma.ref_ref>) => {
-  const keys = Object.keys(editedFields)
+export const validateEntireReference = (
+  editedFields: EditDataType<ref_ref>,
+  options?: { displayLabelMap?: ReferenceDisplayLabelMap }
+) => {
+  const keys = Object.keys(editedFields as Record<string, unknown>) as (keyof EditDataType<ReferenceDetailsType>)[]
   const errors: ValidationObject[] = []
   for (const key of keys) {
-    const error = validateReference(
-      editedFields as EditDataType<ReferenceDetailsType>,
-      key as keyof ReferenceDetailsType
-    )
+    const error = validateReference(editedFields as EditDataType<ReferenceDetailsType>, key, options)
     if (error.error) errors.push(error)
   }
   return errors

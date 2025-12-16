@@ -88,9 +88,30 @@ const dateCheck: (dateString: string) => ValidationError = (dateString: string) 
   return null
 }
 
+export type ReferenceFieldDisplayNames = Partial<Record<keyof EditDataType<ReferenceDetailsType>, string>>
+
+export type ReferenceDisplayLabelMap = Partial<Record<number, ReferenceFieldDisplayNames>>
+
+type ReferenceValidationOptions = {
+  displayLabelMap?: ReferenceDisplayLabelMap
+}
+
+const getDisplayLabels = (
+  fields: (keyof EditDataType<ReferenceDetailsType>)[],
+  refTypeId: number | null,
+  displayLabelMap?: ReferenceDisplayLabelMap
+) => {
+  if (!refTypeId || !displayLabelMap?.[refTypeId]) return fields.map(field => String(field))
+
+  const labelMap = displayLabelMap[refTypeId]
+
+  return fields.map(field => labelMap?.[field] ?? String(field))
+}
+
 const orCheck = (
   data: EditDataType<ReferenceDetailsType>,
-  fieldName: keyof EditDataType<ReferenceDetailsType>
+  fieldName: keyof EditDataType<ReferenceDetailsType>,
+  options?: ReferenceValidationOptions
 ): ValidationError => {
   let fields: (keyof EditDataType<ReferenceDetailsType>)[] = []
 
@@ -118,42 +139,44 @@ const orCheck = (
   })
 
   if (!hasValue) {
-    return `At least one of the following fields is required: ${fields.join(', ')}`
+    const displayLabels = getDisplayLabels(fields, data.ref_type_id ?? null, options?.displayLabelMap)
+    return `At least one of the following fields is required: ${displayLabels.join(', ')}`
   }
   return null
 }
 
 export const validateReference = (
   editData: EditDataType<ReferenceDetailsType>,
-  fieldName: keyof EditDataType<ReferenceDetailsType>
+  fieldName: keyof EditDataType<ReferenceDetailsType>,
+  options?: ReferenceValidationOptions
 ) => {
   const validators: Validators<Partial<EditDataType<ReferenceDetailsType>>> = {
     title_primary: {
       name: 'title_primary',
       useEditData: true,
       miscCheck: (obj: object) => {
-        return orCheck(obj as EditDataType<ReferenceDetailsType>, (fieldName = 'title_primary'))
+        return orCheck(obj as EditDataType<ReferenceDetailsType>, 'title_primary', options)
       },
     },
     title_secondary: {
       name: 'title_secondary',
       useEditData: true,
       miscCheck: (obj: object) => {
-        return orCheck(obj as EditDataType<ReferenceDetailsType>, (fieldName = 'title_secondary'))
+        return orCheck(obj as EditDataType<ReferenceDetailsType>, 'title_secondary', options)
       },
     },
     title_series: {
       name: 'title_series',
       useEditData: true,
       miscCheck: (obj: object) => {
-        return orCheck(obj as EditDataType<ReferenceDetailsType>, (fieldName = 'title_series'))
+        return orCheck(obj as EditDataType<ReferenceDetailsType>, 'title_series', options)
       },
     },
     gen_notes: {
       name: 'gen_notes',
       useEditData: true,
       miscCheck: (obj: object) => {
-        return orCheck(obj as EditDataType<ReferenceDetailsType>, (fieldName = 'gen_notes'))
+        return orCheck(obj as EditDataType<ReferenceDetailsType>, 'gen_notes', options)
       },
     },
     ref_type_id: {
@@ -216,3 +239,8 @@ export const validateReference = (
 
   return validator<EditDataType<ReferenceDetailsType>>(validators, editData, fieldName)
 }
+
+export const createReferenceValidatorWithLabels =
+  (displayLabelMap?: ReferenceDisplayLabelMap) =>
+  (editData: EditDataType<ReferenceDetailsType>, fieldName: keyof EditDataType<ReferenceDetailsType>) =>
+    validateReference(editData, fieldName, { displayLabelMap })
