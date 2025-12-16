@@ -2,7 +2,14 @@ import { useSearchParams } from 'react-router-dom'
 import { Box, Button, Paper, Stack, Tab, Tabs, useTheme } from '@mui/material'
 import EditIcon from '@mui/icons-material/Edit'
 import { useEffect, useState, JSX } from 'react'
-import { DetailContextProvider, ModeOptions, ModeType, makeEditData, modeOptionToMode } from './Context/DetailContext'
+import {
+  DetailContextProvider,
+  ModeOptions,
+  ModeType,
+  makeEditData,
+  modeOptionToMode,
+  useDetailContext,
+} from './Context/DetailContext'
 import {
   DropdownOption,
   DropdownOptionValue,
@@ -53,6 +60,40 @@ export type FieldsWithErrorsType = { [field: string]: ValidationObject }
 export type SetFieldsWithErrorsType = (
   updaterFn: (prevFieldsWithErrors: FieldsWithErrorsType) => FieldsWithErrorsType
 ) => void
+
+const EditToggleButton = <T,>({
+  canEdit,
+  isInitiallyNew,
+  setFieldsWithErrors,
+}: {
+  canEdit: boolean
+  isInitiallyNew: boolean
+  setFieldsWithErrors: SetFieldsWithErrorsType
+}) => {
+  const { mode, setMode, resetEditData } = useDetailContext<T>()
+
+  if (!canEdit || isInitiallyNew) return null
+
+  const handleClick = () => {
+    if (!mode.read) {
+      resetEditData()
+      setFieldsWithErrors(() => ({}))
+    }
+
+    setMode(!mode.read ? 'read' : 'edit')
+  }
+
+  return (
+    <Button
+      id="edit-button"
+      onClick={handleClick}
+      variant={mode.read ? 'contained' : 'outlined'}
+      style={{ width: '8em' }}
+    >
+      <EditIcon style={{ marginRight: '0.5em' }} /> {mode.read ? 'Edit' : 'Cancel edit'}
+    </Button>
+  )
+}
 
 export const DetailView = <T extends object>({
   tabs,
@@ -214,16 +255,11 @@ export const DetailView = <T extends object>({
           </Box>
           <Box sx={{ display: 'flex' }} gap={1}>
             {!isPersonPage && !isNew && <ContactForm<T> buttonText="Contact" />}
-            {editRights.edit && !mode.staging && !initialState.mode.new && (
-              <Button
-                id="edit-button"
-                onClick={() => setMode(!mode.read ? 'read' : 'edit')}
-                variant={mode.read ? 'contained' : 'outlined'}
-                style={{ width: '8em' }}
-              >
-                <EditIcon style={{ marginRight: '0.5em' }} /> {mode.read ? 'Edit' : 'Cancel edit'}
-              </Button>
-            )}
+            <EditToggleButton<T>
+              canEdit={!!editRights.edit && !mode.staging}
+              isInitiallyNew={initialState.mode.new}
+              setFieldsWithErrors={setFieldsWithErrors}
+            />
             {editRights.delete && !isNew && !isUserPage && (
               <Button
                 id="delete-button"
