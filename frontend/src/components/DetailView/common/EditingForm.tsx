@@ -1,11 +1,19 @@
-import { Box, TextField } from '@mui/material'
+import { Box, MenuItem, TextField } from '@mui/material'
 import { EditingModal } from './EditingModal'
 import { useForm } from 'react-hook-form'
 import { Editable, EditDataType } from '@/shared/types'
 import { useDetailContext } from '../Context/DetailContext'
 import { useEffect } from 'react'
 
-export type EditingFormField = { name: string; label: string; required?: boolean; type?: 'number' | 'string' }
+export type EditingFormSelectOption = { value: string | number; label: string }
+
+export type EditingFormField = {
+  name: string
+  label: string
+  required?: boolean
+  type?: 'number' | 'string'
+  selectOptions?: EditingFormSelectOption[]
+}
 
 /* 
 Renders a button, that will open EditingModal, which can be used
@@ -71,16 +79,24 @@ export const EditingForm = <T extends object, ParentType extends object>({
           <TextField
             key={field.name}
             slotProps={{ inputLabel: { shrink: true } }}
+            select={!!field.selectOptions}
             {...register(field.name, {
               required: field.required ? 'This field is required' : false,
-              ...(field.type === 'number' && {
-                pattern: { value: /^(0|[1-9]\d*)(\.\d+)?$/, message: 'Value must be a valid number' },
-              }),
+              ...(field.type === 'number' &&
+                !field.selectOptions && {
+                  pattern: { value: /^(0|[1-9]\d*)(\.\d+)?$/, message: 'Value must be a valid number' },
+                }),
             })}
             error={!!errors[field.name]}
             helperText={errors[field.name]?.message}
             {...{ label: field.label, required: field.required }}
-          />
+          >
+            {field.selectOptions?.map(option => (
+              <MenuItem key={option.value} value={option.value}>
+                {option.label}
+              </MenuItem>
+            ))}
+          </TextField>
         ))}
       </Box>
     </EditingModal>

@@ -7,7 +7,7 @@ import {
   SpeciesDetailsType,
 } from '@/shared/types'
 import { EditableTable } from '@/components/DetailView/common/EditableTable'
-import { EditingForm } from '@/components/DetailView/common/EditingForm'
+import { EditingForm, type EditingFormField } from '@/components/DetailView/common/EditingForm'
 import { SelectingTable } from '@/components/DetailView/common/SelectingTable'
 import { Grouped } from '@/components/DetailView/common/tabLayoutHelpers'
 import { useDetailContext } from '@/components/DetailView/Context/DetailContext'
@@ -25,6 +25,7 @@ import { validateSpecies } from '@/shared/validators/species'
 import { smallSpeciesTableColumns } from '@/common'
 import { useState } from 'react'
 import { SynonymsModal } from '@/components/Species/SynonymsModal'
+import { taxonStatusSelectOptions } from '@/constants/taxonStatusOptions'
 
 export const SpeciesTab = () => {
   const { mode, editData, setEditData } = useDetailContext<LocalityDetailsType>()
@@ -177,7 +178,7 @@ export const SpeciesTab = () => {
       header: 'Author',
     },
   ]
-  const formFields: { name: string; label: string; required?: boolean }[] = [
+  const formFields: EditingFormField[] = [
     { name: 'order_name', label: 'Order', required: true },
     { name: 'family_name', label: 'Family', required: true },
     { name: 'genus_name', label: 'Genus', required: true },
@@ -186,7 +187,7 @@ export const SpeciesTab = () => {
     { name: 'suborder_or_superfamily_name', label: 'Suborder or Superfamily' },
     { name: 'subfamily_name', label: 'Subfamily or Tribe' },
     { name: 'unique_identifier', label: 'Unique Identifier', required: true },
-    { name: 'taxonomic_status', label: 'Taxon status' },
+    { name: 'taxonomic_status', label: 'Taxon status', selectOptions: taxonStatusSelectOptions },
     { name: 'sp_comment', label: 'Comment' },
     { name: 'sp_author', label: 'Author' },
   ]

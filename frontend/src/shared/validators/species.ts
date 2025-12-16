@@ -94,8 +94,12 @@ export const validateSpecies = (
     taxonomic_status: {
       name: 'Taxonomic Status',
       asString: (taxonomicStatus: string) => {
-        if (!taxonStatusOptions.slice(1).includes(taxonomicStatus) && taxonomicStatus !== '')
-          return `Taxonomic Status must be one of the following (or left empty): ${taxonStatusOptions.slice(1).join(', ')}.`
+        const allowedTaxonStatuses = taxonStatusOptions
+          .slice(1)
+          .filter((option): option is string => typeof option === 'string')
+
+        if (!allowedTaxonStatuses.includes(taxonomicStatus) && taxonomicStatus !== '')
+          return `Taxonomic Status must be one of the following (or left empty): ${allowedTaxonStatuses.join(', ')}.`
         return
       },
     },
