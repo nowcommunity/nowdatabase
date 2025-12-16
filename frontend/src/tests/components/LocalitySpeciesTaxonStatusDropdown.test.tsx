@@ -10,6 +10,7 @@ import {
 import type { EditDataType, LocalityDetailsType } from '@/shared/types'
 import { useGetAllSpeciesQuery } from '@/redux/speciesReducer'
 import { useNotify } from '@/hooks/notification'
+import { taxonStatusSelectLabels } from '@/constants/taxonStatusOptions'
 
 jest.mock('@/components/DetailView/Context/DetailContext', () => ({
   useDetailContext: jest.fn(),
@@ -86,11 +87,17 @@ describe('SpeciesTab taxon status dropdown', () => {
     const taxonStatusField = screen.getByLabelText(/taxon status/i)
     await user.click(taxonStatusField)
 
-    const noValueOption = await screen.findByRole('option', { name: /no value/i })
-    const nowSynonymOption = await screen.findByRole('option', { name: /now synonym/i })
+    const taxonStatusOptions = await screen.findAllByRole('option')
+    const optionLabels = taxonStatusOptions.map(option => option.textContent)
+
+    expect(optionLabels).toEqual(taxonStatusSelectLabels)
+
+    const noValueOption = taxonStatusOptions.find(option => option.textContent === 'No value')
+    const nowSynonymOption = taxonStatusOptions.find(option => option.textContent === 'NOW synonym')
 
     expect(noValueOption).toBeDefined()
-    await user.click(nowSynonymOption)
+    expect(nowSynonymOption).toBeDefined()
+    await user.click(nowSynonymOption!)
 
     await user.type(screen.getByLabelText(/^order$/i), 'Carnivora')
     await user.type(screen.getByLabelText(/^family$/i), 'Felidae')
