@@ -16,3 +16,7 @@ Ensure the "Return to table" button in detail views respects the originating Upd
 - End-to-end flow: `npx cypress run --spec cypress/e2e/updateLogNavigation.cy.ts` (requires the application and database running locally).
 
 Record any deviations in the QA log and link failures to the associated test artifacts.
+
+## Routing & Unsaved Changes
+
+For guidance on the data router setup and enabling unsaved-change prompts for new forms, see [`docs/routing.md`](./docs/routing.md).
