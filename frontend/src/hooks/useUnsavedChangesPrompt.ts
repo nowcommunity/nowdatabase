@@ -17,11 +17,13 @@ export const useUnsavedChangesPrompt = (isDirty: boolean, { message }: UseUnsave
 
   useEffect(() => {
     setDirty(isDirty)
+  }, [isDirty, setDirty])
 
+  useEffect(() => {
     return () => {
       setDirty(false)
     }
-  }, [isDirty, setDirty])
+  }, [setDirty])
 
   useEffect(() => {
     if (!message) {
