@@ -26,6 +26,8 @@ import { EditDataType } from '@/shared/types'
 import { usePageContext } from '../Page'
 import { ContactForm } from './common/ContactForm'
 import { useSyncTabSearch } from '@/hooks/useSyncTabSearch'
+import { useUnsavedChangesPrompt } from '@/hooks/useUnsavedChangesPrompt'
+import { UnsavedChangesProvider } from '../UnsavedChangesProvider'
 
 export type TabType = {
   title: string
@@ -239,46 +241,55 @@ export const DetailView = <T extends object>({
     </>
   )
 
+  const UnsavedChangesTracker = () => {
+    const { isDirty, mode } = useDetailContext<T>()
+    useUnsavedChangesPrompt(!mode.read && isDirty)
+    return null
+  }
+
   return (
-    <Stack rowGap={2}>
-      <DetailContextProvider contextState={initialState}>
-        {!isUserPage && (
-          <Box>
-            <DetailBrowser<T> />
+    <UnsavedChangesProvider>
+      <Stack rowGap={2}>
+        <DetailContextProvider contextState={initialState}>
+          <UnsavedChangesTracker />
+          {!isUserPage && (
+            <Box>
+              <DetailBrowser<T> />
+            </Box>
+          )}
+          <Box
+            sx={{ display: 'flex', justifyContent: 'space-between', alignContent: 'space-between', marginTop: 'auto' }}
+          >
+            <Box sx={{ display: 'flex' }} gap={3}>
+              {!isUserPage && <ReturnButton />}
+            </Box>
+            <Box sx={{ display: 'flex' }} gap={1}>
+              {!isPersonPage && !isNew && <ContactForm<T> buttonText="Contact" />}
+              <EditToggleButton<T>
+                canEdit={!!editRights.edit && !mode.staging}
+                isInitiallyNew={initialState.mode.new}
+                setFieldsWithErrors={setFieldsWithErrors}
+              />
+              {editRights.delete && !isNew && !isUserPage && (
+                <Button
+                  id="delete-button"
+                  onClick={onDelete}
+                  variant="contained"
+                  sx={{ width: '8em', color: 'white' }}
+                  color="error"
+                >
+                  Delete
+                </Button>
+              )}
+              {!mode.read && Object.keys(fieldsWithErrors).length > 0 && <ErrorBox />}
+              {(!mode.read || initialState.mode.new) && onWrite && (
+                <WriteButton onWrite={onWrite} taxonomy={taxonomy} hasStagingMode={hasStagingMode} />
+              )}
+            </Box>
           </Box>
-        )}
-        <Box
-          sx={{ display: 'flex', justifyContent: 'space-between', alignContent: 'space-between', marginTop: 'auto' }}
-        >
-          <Box sx={{ display: 'flex' }} gap={3}>
-            {!isUserPage && <ReturnButton />}
-          </Box>
-          <Box sx={{ display: 'flex' }} gap={1}>
-            {!isPersonPage && !isNew && <ContactForm<T> buttonText="Contact" />}
-            <EditToggleButton<T>
-              canEdit={!!editRights.edit && !mode.staging}
-              isInitiallyNew={initialState.mode.new}
-              setFieldsWithErrors={setFieldsWithErrors}
-            />
-            {editRights.delete && !isNew && !isUserPage && (
-              <Button
-                id="delete-button"
-                onClick={onDelete}
-                variant="contained"
-                sx={{ width: '8em', color: 'white' }}
-                color="error"
-              >
-                Delete
-              </Button>
-            )}
-            {!mode.read && Object.keys(fieldsWithErrors).length > 0 && <ErrorBox />}
-            {(!mode.read || initialState.mode.new) && onWrite && (
-              <WriteButton onWrite={onWrite} taxonomy={taxonomy} hasStagingMode={hasStagingMode} />
-            )}
-          </Box>
-        </Box>
-        {mode.staging ? stagingView : tabView}
-      </DetailContextProvider>
-    </Stack>
+          {mode.staging ? stagingView : tabView}
+        </DetailContextProvider>
+      </Stack>
+    </UnsavedChangesProvider>
   )
 }
