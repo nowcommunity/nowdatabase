@@ -1,4 +1,4 @@
-import { ProjectCreatePage } from './projects/ProjectCreatePage'
+import { ProjectCreatePage } from '@/components/Project/ProjectCreatePage'
 
 export const ProjectNewPage = ProjectCreatePage
 
