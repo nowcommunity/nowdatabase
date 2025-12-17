@@ -15,4 +15,5 @@ export default {
     '^@shared/(.*)$': '<rootDir>/shared/$1',
   },
   testEnvironment: 'jsdom',
+  setupFilesAfterEnv: ['<rootDir>/src/tests/setup.ts'],
 }
