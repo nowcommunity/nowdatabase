@@ -30,6 +30,12 @@ This section summarizes the overall architecture, structure, and technologies of
 - Containerization / DevOps: Docker / Docker Compose setup for local dev and multi-service orchestration  
 - Environment / config: `.env` files, environment variables, and `.template.env` for defaults  
 
+### Frontend structure conventions
+- **Pages (`frontend/src/pages/`)** are thin route-level shells. Keep them minimal: set metadata (e.g., `document.title`), read router params, and render feature components.
+- **Feature components (`frontend/src/components/<Feature>/`)** hold the reusable UI and logic for a domain area (e.g., project create/edit flows, forms, selectors).
+- Co-locate supporting pieces (e.g., `CoordinatorSelect`, `MembersMultiSelect`, `ProjectForm`) under the feature folder and import them into pages as needed.
+- Example: `frontend/src/components/Project/ProjectCreatePage.tsx` and `ProjectEditPage.tsx` implement the flows, while `frontend/src/pages/ProjectNewPage.tsx` or `frontend/src/pages/projects/ProjectCreatePage.tsx` remain thin wrappers for routing compatibility.
+
 ## Repository Structure (expected layout)
 
 ```

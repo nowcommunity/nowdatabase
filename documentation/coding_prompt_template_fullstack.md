@@ -55,6 +55,7 @@ Implement **exactly one task** from an approved feature plan.
 ### Scope
 - Implement **only** the task above. No bonus features.
 - Respect `files_touched`, `migrations`, `settings_changes`, `permissions`.
+- Place **route-level pages** in `frontend/src/pages/` as thin wrappers. Keep reusable UI/logic in `frontend/src/components/<Feature>/` (e.g., project create/edit flows live under `components/Project/` and pages import/render them).
 
 ### Local lint/type-check checklist (run before returning output)
 - From repo root, run `npm run lint` and `npm run tsc`; for focused work use `npm run lint:backend` / `npm run lint:frontend` and `npm run tsc:backend` / `npm run tsc:frontend`.
