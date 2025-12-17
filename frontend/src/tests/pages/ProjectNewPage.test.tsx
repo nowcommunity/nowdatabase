@@ -1,5 +1,7 @@
+import React from 'react'
 import { beforeEach, describe, expect, it, jest } from '@jest/globals'
-import { MemoryRouter, Route, Routes, useLocation } from 'react-router-dom'
+import '@testing-library/jest-dom'
+import { Link, MemoryRouter, Route, RouterProvider, Routes, createMemoryRouter, useLocation } from 'react-router-dom'
 import { act, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { Role } from '@/shared/types'
@@ -49,10 +51,10 @@ const renderWithRouter = () => {
   const Wrapper = () => {
     const location = useLocation()
     return (
-      <>
+      <React.Fragment>
         <div data-testid="location">{location.pathname}</div>
         <ProjectNewPage />
-      </>
+      </React.Fragment>
     )
   }
 
@@ -63,6 +65,27 @@ const renderWithRouter = () => {
       </Routes>
     </MemoryRouter>
   )
+}
+
+const renderWithDataRouter = () => {
+  const router = createMemoryRouter(
+    [
+      {
+        path: '/project/new',
+        element: (
+          <React.Fragment>
+            <ProjectNewPage />
+            <Link to="/other">Go elsewhere</Link>
+          </React.Fragment>
+        ),
+      },
+      { path: '/other', element: <div>Other page</div> },
+    ],
+    { initialEntries: ['/project/new'] }
+  )
+
+  render(<RouterProvider router={router} />)
+  return router
 }
 
 describe('ProjectNewPage', () => {
@@ -153,6 +176,48 @@ describe('ProjectNewPage', () => {
 
     await waitFor(() => {
       expect(mockNavigate).toHaveBeenCalledWith('/project/7')
+    })
+  })
+
+  it('shows a prompt when attempting to leave a dirty form and stays on cancel', async () => {
+    const user = userEvent.setup()
+    const router = renderWithDataRouter()
+
+    await user.type(screen.getByLabelText('Project Code'), 'PRJ-002')
+
+    await user.click(screen.getByRole('link', { name: /go elsewhere/i }))
+
+    await screen.findByRole('dialog')
+    expect(screen.getByRole('dialog')).toBeDefined()
+
+    await user.click(screen.getByRole('button', { name: /stay on page/i }))
+
+    expect(router.state.location.pathname).toBe('/project/new')
+  })
+
+  it('allows navigation when the user confirms leaving a dirty form', async () => {
+    const user = userEvent.setup()
+    const router = renderWithDataRouter()
+
+    await user.type(screen.getByLabelText('Project Code'), 'PRJ-003')
+
+    await user.click(screen.getByRole('link', { name: /go elsewhere/i }))
+
+    await user.click(await screen.findByRole('button', { name: /leave page/i }))
+
+    await waitFor(() => {
+      expect(router.state.location.pathname).toBe('/other')
+    })
+  })
+
+  it('navigates without prompting when the form is clean', async () => {
+    const user = userEvent.setup()
+    const router = renderWithDataRouter()
+
+    await user.click(screen.getByRole('link', { name: /go elsewhere/i }))
+
+    await waitFor(() => {
+      expect(router.state.location.pathname).toBe('/other')
     })
   })
 })

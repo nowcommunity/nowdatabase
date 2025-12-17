@@ -4,6 +4,7 @@ import { Button, CircularProgress, Stack, Typography } from '@mui/material'
 
 import { PermissionDenied } from '@/components/PermissionDenied'
 import { ProjectForm, ProjectFormValues } from '@/components/Project/ProjectForm'
+import { UnsavedChangesProvider } from '@/components/UnsavedChangesProvider'
 import { useUser } from '@/hooks/user'
 import { useNotify } from '@/hooks/notification'
 import { useProject } from '@/hooks/useProject'
@@ -109,21 +110,23 @@ export const ProjectEditPage = () => {
   }
 
   return (
-    <Stack spacing={3} sx={{ maxWidth: 900, margin: '0 auto' }}>
-      <Typography variant="h4" component="h1">
-        Edit Project
-      </Typography>
-      <Typography color="text.secondary">Update project information, coordinator, and members.</Typography>
+    <UnsavedChangesProvider>
+      <Stack spacing={3} sx={{ maxWidth: 900, margin: '0 auto' }}>
+        <Typography variant="h4" component="h1">
+          Edit Project
+        </Typography>
+        <Typography color="text.secondary">Update project information, coordinator, and members.</Typography>
 
-      <ProjectForm
-        users={users}
-        onSubmit={handleSubmit}
-        isSubmitting={isUpdating}
-        serverError={submitError}
-        initialValues={initialValues}
-        submitLabel="Save Changes"
-      />
-    </Stack>
+        <ProjectForm
+          users={users}
+          onSubmit={handleSubmit}
+          isSubmitting={isUpdating}
+          serverError={submitError}
+          initialValues={initialValues}
+          submitLabel="Save Changes"
+        />
+      </Stack>
+    </UnsavedChangesProvider>
   )
 }
 
