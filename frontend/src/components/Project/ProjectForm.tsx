@@ -96,9 +96,14 @@ export const ProjectForm = ({
   }, [coordinatorId, memberUserIds, setValue])
 
   const submitHandler = handleSubmit(async values => {
-    await onSubmit(values)
-    reset(values)
     setDirty(false)
+    try {
+      await onSubmit(values)
+      reset(values)
+    } catch (error) {
+      setDirty(true)
+      throw error
+    }
   })
 
   return (
