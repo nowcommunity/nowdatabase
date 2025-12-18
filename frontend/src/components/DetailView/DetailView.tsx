@@ -1,7 +1,7 @@
 import { useSearchParams } from 'react-router-dom'
 import { Box, Button, Paper, Stack, Tab, Tabs, useTheme } from '@mui/material'
 import EditIcon from '@mui/icons-material/Edit'
-import { useEffect, useState, JSX } from 'react'
+import { useState, JSX } from 'react'
 import {
   DetailContextProvider,
   ModeOptions,
@@ -134,28 +134,6 @@ export const DetailView = <T extends object>({
   const [fieldsWithErrors, setFieldsWithErrors] = useState<FieldsWithErrorsType>({})
   const [tab, setTab] = useState(getUrl())
   useSyncTabSearch(tab)
-
-  // asks user for confirmation before leaving or refreshing a page with potential unsaved changes
-  // does not work if user navigates away using browser back or forward buttons,
-  // or navigates to another page using the navigation bar. (See issue #911)
-  useEffect(() => {
-    const handleBeforeUnload = (event: BeforeUnloadEvent) => {
-      event.preventDefault()
-    }
-    if (
-      [
-        modeOptionToMode['edit'],
-        modeOptionToMode['new'],
-        modeOptionToMode['staging-edit'],
-        modeOptionToMode['staging-new'],
-      ].includes(mode)
-    ) {
-      window.addEventListener('beforeunload', handleBeforeUnload)
-    }
-    return () => {
-      window.removeEventListener('beforeunload', handleBeforeUnload)
-    }
-  }, [mode])
 
   const setMode = (newMode: ModeOptions) => {
     setModeState(modeOptionToMode[newMode])
