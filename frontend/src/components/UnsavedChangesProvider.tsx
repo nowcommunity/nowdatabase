@@ -29,9 +29,10 @@ export const UnsavedChangesProvider = ({
 
   const handleConfirm = useCallback(() => {
     if (blocker.state === 'blocked') {
+      setDirty(false)
       blocker.proceed?.()
     }
-  }, [blocker])
+  }, [blocker, setDirty])
 
   const handleCancel = useCallback(() => {
     if (blocker.state === 'blocked') {
