@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState, type ReactNode } from 'react'
+import { useCallback, useEffect, useMemo, useState, type ReactNode } from 'react'
 import { useBlocker } from 'react-router-dom'
 
 import { UnsavedChangesDialog } from './UnsavedChangesDialog'
@@ -21,7 +21,8 @@ export const UnsavedChangesProvider = ({
   const [message, setMessage] = useState(defaultMessage)
 
   const blocker = useBlocker(isDirty)
-  const showDialog = blocker.state === 'blocked'
+  const isSamePathNavigation = blocker.state === 'blocked' && blocker.location?.pathname === window.location.pathname
+  const showDialog = blocker.state === 'blocked' && !isSamePathNavigation
 
   const resetMessage = useCallback(() => {
     setMessage(defaultMessage)
@@ -39,6 +40,13 @@ export const UnsavedChangesProvider = ({
       blocker.reset?.()
     }
   }, [blocker])
+
+  useEffect(() => {
+    const proceed = blocker.proceed as (() => void) | undefined
+    if (isSamePathNavigation && proceed) {
+      proceed()
+    }
+  }, [blocker, isSamePathNavigation])
 
   const value = useMemo(
     () => ({
