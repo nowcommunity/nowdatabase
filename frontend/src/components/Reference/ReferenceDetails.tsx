@@ -43,7 +43,11 @@ const resolveDeleteErrorMessage = (error: FetchBaseQueryError | SerializedError 
   return GENERIC_DELETE_MESSAGE
 }
 
-export const ReferenceDetails = () => {
+export const ReferenceDetails = ({
+  wrapWithUnsavedChangesProvider = true,
+}: {
+  wrapWithUnsavedChangesProvider?: boolean
+} = {}) => {
   const { id } = useParams()
   const isNew = id === 'new'
   if (isNew) {
@@ -134,6 +138,7 @@ export const ReferenceDetails = () => {
       onWrite={onWrite}
       validator={referenceValidator}
       deleteFunction={deleteFunction}
+      wrapWithUnsavedChangesProvider={wrapWithUnsavedChangesProvider}
     />
   )
 }

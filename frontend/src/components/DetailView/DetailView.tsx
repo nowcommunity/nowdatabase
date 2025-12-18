@@ -108,6 +108,7 @@ export const DetailView = <T extends object>({
   taxonomy = false,
   hasStagingMode = false,
   deleteFunction,
+  wrapWithUnsavedChangesProvider = true,
 }: {
   tabs: TabType[]
   data: T
@@ -119,6 +120,7 @@ export const DetailView = <T extends object>({
   taxonomy?: boolean
   hasStagingMode?: boolean
   deleteFunction?: () => Promise<void>
+  wrapWithUnsavedChangesProvider?: boolean
 }) => {
   const [searchParams] = useSearchParams()
   const theme = useTheme()
@@ -247,49 +249,53 @@ export const DetailView = <T extends object>({
     return null
   }
 
-  return (
-    <UnsavedChangesProvider>
-      <Stack rowGap={2}>
-        <DetailContextProvider contextState={initialState}>
-          <UnsavedChangesTracker />
-          {!isUserPage && (
-            <Box>
-              <DetailBrowser<T> />
-            </Box>
-          )}
-          <Box
-            sx={{ display: 'flex', justifyContent: 'space-between', alignContent: 'space-between', marginTop: 'auto' }}
-          >
-            <Box sx={{ display: 'flex' }} gap={3}>
-              {!isUserPage && <ReturnButton />}
-            </Box>
-            <Box sx={{ display: 'flex' }} gap={1}>
-              {!isPersonPage && !isNew && <ContactForm<T> buttonText="Contact" />}
-              <EditToggleButton<T>
-                canEdit={!!editRights.edit && !mode.staging}
-                isInitiallyNew={initialState.mode.new}
-                setFieldsWithErrors={setFieldsWithErrors}
-              />
-              {editRights.delete && !isNew && !isUserPage && (
-                <Button
-                  id="delete-button"
-                  onClick={onDelete}
-                  variant="contained"
-                  sx={{ width: '8em', color: 'white' }}
-                  color="error"
-                >
-                  Delete
-                </Button>
-              )}
-              {!mode.read && Object.keys(fieldsWithErrors).length > 0 && <ErrorBox />}
-              {(!mode.read || initialState.mode.new) && onWrite && (
-                <WriteButton onWrite={onWrite} taxonomy={taxonomy} hasStagingMode={hasStagingMode} />
-              )}
-            </Box>
+  const content = (
+    <Stack rowGap={2}>
+      <DetailContextProvider contextState={initialState}>
+        <UnsavedChangesTracker />
+        {!isUserPage && (
+          <Box>
+            <DetailBrowser<T> />
           </Box>
-          {mode.staging ? stagingView : tabView}
-        </DetailContextProvider>
-      </Stack>
-    </UnsavedChangesProvider>
+        )}
+        <Box
+          sx={{ display: 'flex', justifyContent: 'space-between', alignContent: 'space-between', marginTop: 'auto' }}
+        >
+          <Box sx={{ display: 'flex' }} gap={3}>
+            {!isUserPage && <ReturnButton />}
+          </Box>
+          <Box sx={{ display: 'flex' }} gap={1}>
+            {!isPersonPage && !isNew && <ContactForm<T> buttonText="Contact" />}
+            <EditToggleButton<T>
+              canEdit={!!editRights.edit && !mode.staging}
+              isInitiallyNew={initialState.mode.new}
+              setFieldsWithErrors={setFieldsWithErrors}
+            />
+            {editRights.delete && !isNew && !isUserPage && (
+              <Button
+                id="delete-button"
+                onClick={onDelete}
+                variant="contained"
+                sx={{ width: '8em', color: 'white' }}
+                color="error"
+              >
+                Delete
+              </Button>
+            )}
+            {!mode.read && Object.keys(fieldsWithErrors).length > 0 && <ErrorBox />}
+            {(!mode.read || initialState.mode.new) && onWrite && (
+              <WriteButton onWrite={onWrite} taxonomy={taxonomy} hasStagingMode={hasStagingMode} />
+            )}
+          </Box>
+        </Box>
+        {mode.staging ? stagingView : tabView}
+      </DetailContextProvider>
+    </Stack>
   )
+
+  if (!wrapWithUnsavedChangesProvider) {
+    return content
+  }
+
+  return <UnsavedChangesProvider>{content}</UnsavedChangesProvider>
 }

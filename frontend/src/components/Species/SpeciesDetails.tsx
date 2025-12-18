@@ -18,7 +18,11 @@ import { useNotify } from '@/hooks/notification'
 import { useEffect, useState } from 'react'
 import { fixNullValuesInTaxonomyFields } from '@/util/taxonomyUtilities'
 
-export const SpeciesDetails = () => {
+export const SpeciesDetails = ({
+  wrapWithUnsavedChangesProvider = true,
+}: {
+  wrapWithUnsavedChangesProvider?: boolean
+} = {}) => {
   const { id } = useParams()
   const isNew = id === 'new'
   if (isNew) {
@@ -120,6 +124,7 @@ export const SpeciesDetails = () => {
       hasStagingMode
       validator={validateSpecies}
       deleteFunction={deleteFunction}
+      wrapWithUnsavedChangesProvider={wrapWithUnsavedChangesProvider}
     />
   )
 }
