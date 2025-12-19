@@ -117,7 +117,7 @@ describe('useUnsavedChangesPrompt', () => {
     expect(beforeUnloadHandler).toBeDefined()
 
     const event = {
-      preventDefault: jest.fn(),
+      preventDefault: jest.fn<(this: void) => void>(),
       returnValue: '',
     } as unknown as BeforeUnloadEvent
     const preventDefaultSpy = event.preventDefault as jest.MockedFunction<() => void>
