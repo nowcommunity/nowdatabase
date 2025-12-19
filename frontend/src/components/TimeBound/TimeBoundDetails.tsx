@@ -15,7 +15,11 @@ import { BoundTab } from './Tabs/BoundTab'
 import { TimeUnitTab } from './Tabs/TimeUnitTab.tsx'
 import { validateTimeBound } from '@/shared/validators/timeBound'
 
-export const TimeBoundDetails = () => {
+export const TimeBoundDetails = ({
+  wrapWithUnsavedChangesProvider = true,
+}: {
+  wrapWithUnsavedChangesProvider?: boolean
+} = {}) => {
   const { id } = useParams()
   const isNew = id === 'new'
   if (isNew) {
@@ -105,6 +109,7 @@ export const TimeBoundDetails = () => {
       onWrite={onWrite}
       validator={validateTimeBound}
       deleteFunction={deleteFunction}
+      wrapWithUnsavedChangesProvider={wrapWithUnsavedChangesProvider}
     />
   )
 }

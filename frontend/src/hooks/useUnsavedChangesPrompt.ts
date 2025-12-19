@@ -34,5 +34,21 @@ export const useUnsavedChangesPrompt = (isDirty: boolean, { message }: UseUnsave
     return () => resetMessage()
   }, [message, resetMessage, setMessage])
 
+  useEffect(() => {
+    if (!isDirty) {
+      return undefined
+    }
+
+    const beforeUnloadHandler = (event: BeforeUnloadEvent) => {
+      event.preventDefault()
+      event.returnValue = message ?? context.message
+    }
+
+    window.addEventListener('beforeunload', beforeUnloadHandler)
+    return () => {
+      window.removeEventListener('beforeunload', beforeUnloadHandler)
+    }
+  }, [context.message, isDirty, message])
+
   return context
 }

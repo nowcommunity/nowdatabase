@@ -1,7 +1,7 @@
 /* eslint-disable react-refresh/only-export-components */
 import { ReactNode, createContext, useState, JSX, useEffect, Context, useContext } from 'react'
 import { DropdownOption } from '../common/editingComponents'
-import { cloneDeep, isEqual } from 'lodash-es'
+import { cloneDeep, isEqualWith } from 'lodash-es'
 import { ValidationObject } from '@/shared/validators/validator'
 import { EditDataType } from '@/shared/types'
 import {
@@ -106,6 +106,12 @@ export const DetailContextProvider = <T extends object>({
   const [editData, setEditData] = useState<EditDataType<T>>(makeEditData(contextState.data))
   const [isDirty, setIsDirty] = useState(false)
 
+  const compareValues = (value: unknown, other: unknown) => {
+    const isEmpty = (input: unknown) => input === '' || input === null || input === undefined
+    if (isEmpty(value) && isEmpty(other)) return true
+    return undefined
+  }
+
   useEffect(() => {
     const nextEditData = makeEditData(contextState.data)
     setInitialEditData(nextEditData)
@@ -114,13 +120,13 @@ export const DetailContextProvider = <T extends object>({
   }, [contextState.data])
 
   useEffect(() => {
-    setIsDirty(!isEqual(editData, initialEditData))
+    setIsDirty(!isEqualWith(editData, initialEditData, compareValues))
   }, [editData, initialEditData])
 
   const handleSetEditData = (data: unknown) => {
     const newEditData = data as EditDataType<T>
     setEditData(newEditData)
-    setIsDirty(!isEqual(newEditData, initialEditData))
+    setIsDirty(!isEqualWith(newEditData, initialEditData, compareValues))
   }
 
   const resetEditData = () => {

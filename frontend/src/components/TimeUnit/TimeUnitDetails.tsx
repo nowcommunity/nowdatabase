@@ -14,7 +14,11 @@ import { useDeleteTimeUnit } from '@/hooks/useDeleteTimeUnit'
 import { getApiErrorMessage, isDuplicateNameError } from '@/utils/api'
 import { useTimeUnitForm } from '@/hooks/useTimeUnitForm'
 
-export const TimeUnitDetails = () => {
+export const TimeUnitDetails = ({
+  wrapWithUnsavedChangesProvider = true,
+}: {
+  wrapWithUnsavedChangesProvider?: boolean
+} = {}) => {
   const { id } = useParams()
   const isNew = id === 'new'
   if (isNew) {
@@ -108,6 +112,7 @@ export const TimeUnitDetails = () => {
       onWrite={onWrite}
       validator={validateTimeUnit}
       deleteFunction={deleteFunction}
+      wrapWithUnsavedChangesProvider={wrapWithUnsavedChangesProvider}
     />
   )
 }

@@ -32,27 +32,30 @@ import { FrontPage } from './FrontPage'
 import { MuseumTable } from './Museum/MuseumTable'
 import { MuseumDetails } from './Museum/MuseumDetails'
 import { createReferenceSubtitle, createReferenceTitle } from './Reference/referenceFormatting'
+import { UnsavedChangesProvider } from './UnsavedChangesProvider'
 
 const noRights: EditRights = {}
 const fullRights: EditRights = { new: true, edit: true, delete: true }
 const limitedRights: EditRights = { new: true, edit: true }
 
 export const localityPage = (
-  <Page
-    tableView={<LocalityTable />}
-    detailView={<LocalityDetails />}
-    viewName="locality"
-    idFieldName="lid"
-    createTitle={(loc: LocalityDetailsType) => `${loc.lid} ${loc.loc_name}, ${loc.country}`}
-    createSubtitle={(loc: LocalityDetailsType) =>
-      `${loc.dms_lat}, ${loc.dms_long}\n${loc.max_age} Ma (${loc.bfa_max}) – ${loc.min_age} Ma (${loc.bfa_min})`
-    }
-    getEditRights={(user: UserState, id: string | number) => {
-      if ([Role.Admin, Role.EditUnrestricted].includes(user.role)) return fullRights
-      if (user.role === Role.EditRestricted && user.localities.includes(id as number)) return limitedRights
-      return noRights
-    }}
-  />
+  <UnsavedChangesProvider>
+    <Page
+      tableView={<LocalityTable />}
+      detailView={<LocalityDetails wrapWithUnsavedChangesProvider={false} />}
+      viewName="locality"
+      idFieldName="lid"
+      createTitle={(loc: LocalityDetailsType) => `${loc.lid} ${loc.loc_name}, ${loc.country}`}
+      createSubtitle={(loc: LocalityDetailsType) =>
+        `${loc.dms_lat}, ${loc.dms_long}\n${loc.max_age} Ma (${loc.bfa_max}) – ${loc.min_age} Ma (${loc.bfa_min})`
+      }
+      getEditRights={(user: UserState, id: string | number) => {
+        if ([Role.Admin, Role.EditUnrestricted].includes(user.role)) return fullRights
+        if (user.role === Role.EditRestricted && user.localities.includes(id as number)) return limitedRights
+        return noRights
+      }}
+    />
+  </UnsavedChangesProvider>
 )
 
 export const frontPage = <FrontPage />
@@ -76,91 +79,101 @@ export const crossSearchPage = (
 )
 
 export const speciesPage = (
-  <Page
-    tableView={<SpeciesTable />}
-    detailView={<SpeciesDetails />}
-    viewName="species"
-    idFieldName="species_id"
-    createTitle={(species: SpeciesDetailsType) =>
-      `${species.species_id} ${species.genus_name} ${species.species_name}` + `\n${species.unique_identifier}`
-    }
-    createSubtitle={(species: SpeciesDetailsType) =>
-      `Order ${species.order_name}` +
-      `\nFamily ${species.family_name}` +
-      `\nSubfamily or Tribe ${species.subfamily_name}`
-    }
-    getEditRights={(user: UserState) => {
-      if ([Role.Admin, Role.EditUnrestricted].includes(user.role)) return fullRights
-      if (user.role === Role.EditRestricted) return limitedRights
-      return noRights
-    }}
-  />
+  <UnsavedChangesProvider>
+    <Page
+      tableView={<SpeciesTable />}
+      detailView={<SpeciesDetails wrapWithUnsavedChangesProvider={false} />}
+      viewName="species"
+      idFieldName="species_id"
+      createTitle={(species: SpeciesDetailsType) =>
+        `${species.species_id} ${species.genus_name} ${species.species_name}` + `\n${species.unique_identifier}`
+      }
+      createSubtitle={(species: SpeciesDetailsType) =>
+        `Order ${species.order_name}` +
+        `\nFamily ${species.family_name}` +
+        `\nSubfamily or Tribe ${species.subfamily_name}`
+      }
+      getEditRights={(user: UserState) => {
+        if ([Role.Admin, Role.EditUnrestricted].includes(user.role)) return fullRights
+        if (user.role === Role.EditRestricted) return limitedRights
+        return noRights
+      }}
+    />
+  </UnsavedChangesProvider>
 )
 
 export const museumPage = (
-  <Page
-    tableView={<MuseumTable />}
-    detailView={<MuseumDetails />}
-    viewName="museum"
-    idFieldName="museum"
-    createTitle={(museum: Museum) => `${museum.institution}`}
-    createSubtitle={(museum: Museum) => `${museum.city ? `${museum.city}, ` : ''}${museum.country}`}
-    getEditRights={(user: UserState, id: string | number) => {
-      if ([Role.Admin, Role.EditUnrestricted].includes(user.role)) return fullRights
-      if (user.role === Role.EditRestricted && user.localities.includes(id as number)) return limitedRights
-      return noRights
-    }}
-  />
+  <UnsavedChangesProvider>
+    <Page
+      tableView={<MuseumTable />}
+      detailView={<MuseumDetails wrapWithUnsavedChangesProvider={false} />}
+      viewName="museum"
+      idFieldName="museum"
+      createTitle={(museum: Museum) => `${museum.institution}`}
+      createSubtitle={(museum: Museum) => `${museum.city ? `${museum.city}, ` : ''}${museum.country}`}
+      getEditRights={(user: UserState, id: string | number) => {
+        if ([Role.Admin, Role.EditUnrestricted].includes(user.role)) return fullRights
+        if (user.role === Role.EditRestricted && user.localities.includes(id as number)) return limitedRights
+        return noRights
+      }}
+    />
+  </UnsavedChangesProvider>
 )
 
 export const referencePage = (
-  <Page
-    tableView={<ReferenceTable />}
-    detailView={<ReferenceDetails />}
-    viewName="reference"
-    idFieldName="rid"
-    createTitle={createReferenceTitle}
-    createSubtitle={createReferenceSubtitle}
-    getEditRights={(user: UserState) => {
-      if ([Role.Admin, Role.EditUnrestricted].includes(user.role)) return fullRights
-      if (user.role === Role.EditRestricted) return { new: true }
-      return noRights
-    }}
-  />
+  <UnsavedChangesProvider>
+    <Page
+      tableView={<ReferenceTable />}
+      detailView={<ReferenceDetails wrapWithUnsavedChangesProvider={false} />}
+      viewName="reference"
+      idFieldName="rid"
+      createTitle={createReferenceTitle}
+      createSubtitle={createReferenceSubtitle}
+      getEditRights={(user: UserState) => {
+        if ([Role.Admin, Role.EditUnrestricted].includes(user.role)) return fullRights
+        if (user.role === Role.EditRestricted) return { new: true }
+        return noRights
+      }}
+    />
+  </UnsavedChangesProvider>
 )
 
 export const timeUnitPage = (
-  <Page
-    tableView={<TimeUnitTable />}
-    detailView={<TimeUnitDetails />}
-    viewName="time-unit"
-    idFieldName="tu_name"
-    createTitle={(tu: TimeUnitDetailsType) => `${tu.tu_display_name}${tu.tu_comment ? ` - ${tu.tu_comment}` : ''}`}
-    createSubtitle={(tu: TimeUnitDetailsType) =>
-      `${tu.up_bound?.age} Ma \u2013 ${tu.low_bound?.age} Ma` +
-      `\n${tu.now_tu_sequence.seq_name}` +
-      ` (${tu.rank ? tu.rank : 'No rank'})`
-    }
-    getEditRights={(user: UserState) => {
-      if ([Role.Admin, Role.EditUnrestricted].includes(user.role)) return fullRights
-      return noRights
-    }}
-  />
+  <UnsavedChangesProvider>
+    <Page
+      tableView={<TimeUnitTable />}
+      detailView={<TimeUnitDetails wrapWithUnsavedChangesProvider={false} />}
+      viewName="time-unit"
+      idFieldName="tu_name"
+      createTitle={(tu: TimeUnitDetailsType) => `${tu.tu_display_name}${tu.tu_comment ? ` - ${tu.tu_comment}` : ''}`}
+      createSubtitle={(tu: TimeUnitDetailsType) =>
+        `${tu.up_bound?.age} Ma \u2013 ${tu.low_bound?.age} Ma` +
+        `\n${tu.now_tu_sequence.seq_name}` +
+        ` (${tu.rank ? tu.rank : 'No rank'})`
+      }
+      getEditRights={(user: UserState) => {
+        if ([Role.Admin, Role.EditUnrestricted].includes(user.role)) return fullRights
+        return noRights
+      }}
+    />
+  </UnsavedChangesProvider>
 )
 
 export const timeBoundPage = (
-  <Page
-    allowedRoles={[Role.Admin, Role.EditUnrestricted]}
-    tableView={<TimeBoundTable />}
-    detailView={<TimeBoundDetails />}
-    viewName="time-bound"
-    idFieldName="bid"
-    createTitle={(tb: TimeBoundDetailsType) => `${tb.bid} ${tb.b_name}`}
-    getEditRights={(user: UserState) => {
-      if ([Role.Admin, Role.EditUnrestricted].includes(user.role)) return fullRights
-      return noRights
-    }}
-  />
+  <UnsavedChangesProvider>
+    <Page
+      allowedRoles={[Role.Admin, Role.EditUnrestricted]}
+      tableView={<TimeBoundTable />}
+      detailView={<TimeBoundDetails wrapWithUnsavedChangesProvider={false} />}
+      viewName="time-bound"
+      idFieldName="bid"
+      createTitle={(tb: TimeBoundDetailsType) => `${tb.bid} ${tb.b_name}`}
+      getEditRights={(user: UserState) => {
+        if ([Role.Admin, Role.EditUnrestricted].includes(user.role)) return fullRights
+        return noRights
+      }}
+    />
+  </UnsavedChangesProvider>
 )
 
 export const personPage = (
