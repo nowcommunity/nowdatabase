@@ -116,8 +116,11 @@ describe('useUnsavedChangesPrompt', () => {
 
     expect(beforeUnloadHandler).toBeDefined()
 
-    const event = new Event('beforeunload') as BeforeUnloadEvent
-    const preventDefaultSpy = jest.spyOn(event, 'preventDefault')
+    const event = {
+      preventDefault: jest.fn(),
+      returnValue: '',
+    } as unknown as BeforeUnloadEvent
+    const preventDefaultSpy = event.preventDefault as jest.MockedFunction<() => void>
 
     act(() => {
       beforeUnloadHandler?.(event)
