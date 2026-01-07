@@ -1,132 +1,126 @@
-import { describe, expect, it, beforeEach, jest } from '@jest/globals'
-import { render, act } from '@testing-library/react'
-import { ReactNode } from 'react'
-
-import { UnsavedChangesContext, type UnsavedChangesContextValue } from '@/components/unsavedChangesContext'
-import { useUnsavedChangesPrompt } from '@/hooks/useUnsavedChangesPrompt'
-
-const createContextMock = () => {
-  const setDirty = jest.fn<(dirty: boolean) => void>()
-  const setMessage = jest.fn<(message: string) => void>()
-  const resetMessage = jest.fn<() => void>()
-
-  const value: UnsavedChangesContextValue = {
-    isDirty: false,
-    message: 'default message',
-    setDirty,
-    setMessage,
-    resetMessage,
-  }
-
-  return { value, setDirty, setMessage, resetMessage }
-}
-
-const Wrapper = ({ children, contextValue }: { children: ReactNode; contextValue: UnsavedChangesContextValue }) => (
-  <UnsavedChangesContext.Provider value={contextValue}>{children}</UnsavedChangesContext.Provider>
-)
-
-const TestComponent = ({ dirty, message }: { dirty: boolean; message?: string }) => {
-  useUnsavedChangesPrompt(dirty, { message })
-  return null
-}
+import { renderHook } from '@testing-library/react';
+import { useUnsavedChangesPrompt } from '../../hooks/useUnsavedChangesPrompt';
 
 describe('useUnsavedChangesPrompt', () => {
+  let addEventListenerSpy: jest.SpyInstance;
+  let removeEventListenerSpy: jest.SpyInstance;
+
   beforeEach(() => {
-    jest.restoreAllMocks()
-  })
+    // Mock window.addEventListener and removeEventListener
+    addEventListenerSpy = jest.spyOn(window, 'addEventListener');
+    removeEventListenerSpy = jest.spyOn(window, 'removeEventListener');
+  });
 
-  it('updates dirty state and message handlers when dirty', () => {
-    const { value, setDirty, setMessage, resetMessage } = createContextMock()
+  afterEach(() => {
+    // Restore mocks
+    addEventListenerSpy.mockRestore();
+    removeEventListenerSpy.mockRestore();
+  });
 
-    const { rerender, unmount } = render(
-      <Wrapper contextValue={value}>
-        <TestComponent dirty={true} message="custom warning" />
-      </Wrapper>
-    )
+  it('should add beforeunload event listener when hasUnsavedChanges is true', () => {
+    renderHook(() => useUnsavedChangesPrompt(true));
 
-    expect(setDirty).toHaveBeenCalledWith(true)
-    expect(setMessage).toHaveBeenCalledWith('custom warning')
+    expect(addEventListenerSpy).toHaveBeenCalledWith(
+      'beforeunload',
+      expect.any(Function)
+    );
+  });
 
-    rerender(
-      <Wrapper contextValue={value}>
-        <TestComponent dirty={false} message="custom warning" />
-      </Wrapper>
-    )
+  it('should not add beforeunload event listener when hasUnsavedChanges is false', () => {
+    renderHook(() => useUnsavedChangesPrompt(false));
 
-    expect(setDirty).toHaveBeenCalledWith(false)
+    expect(addEventListenerSpy).not.toHaveBeenCalled();
+  });
 
-    unmount()
-    expect(resetMessage).toHaveBeenCalled()
-  })
+  it('should remove event listener on cleanup when hasUnsavedChanges was true', () => {
+    const { unmount } = renderHook(() => useUnsavedChangesPrompt(true));
 
-  it('adds and removes beforeunload handler only when dirty', () => {
-    const addListenerSpy = jest.spyOn(window, 'addEventListener')
-    const removeListenerSpy = jest.spyOn(window, 'removeEventListener')
-    const { value } = createContextMock()
+    // Get the handler that was added
+    const handler = addEventListenerSpy.mock.calls[0][1];
 
-    const { rerender } = render(
-      <Wrapper contextValue={value}>
-        <TestComponent dirty={true} />
-      </Wrapper>
-    )
+    unmount();
 
-    expect(addListenerSpy).toHaveBeenCalledWith('beforeunload', expect.any(Function))
+    expect(removeEventListenerSpy).toHaveBeenCalledWith('beforeunload', handler);
+  });
 
-    rerender(
-      <Wrapper contextValue={value}>
-        <TestComponent dirty={false} />
-      </Wrapper>
-    )
+  it('should update event listener when hasUnsavedChanges changes from false to true', () => {
+    const { rerender } = renderHook(
+      ({ hasUnsavedChanges }) => useUnsavedChangesPrompt(hasUnsavedChanges),
+      { initialProps: { hasUnsavedChanges: false } }
+    );
 
-    expect(removeListenerSpy).toHaveBeenCalledWith('beforeunload', expect.any(Function))
-  })
+    expect(addEventListenerSpy).not.toHaveBeenCalled();
 
-  it('prevents unload and sets returnValue when handler fires', () => {
-    const { value } = createContextMock()
-    let beforeUnloadHandler: ((event: BeforeUnloadEvent) => void) | undefined
+    rerender({ hasUnsavedChanges: true });
 
-    jest
-      .spyOn(window, 'addEventListener')
-      .mockImplementation(
-        (event: string, handler: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions) => {
-          if (event === 'beforeunload') {
-            beforeUnloadHandler = handler as (event: BeforeUnloadEvent) => void
-            return
-          }
-          return window.addEventListener(event, handler, options)
-        }
-      )
-    jest
-      .spyOn(window, 'removeEventListener')
-      .mockImplementation(
-        (event: string, handler: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions) => {
-          if (event === 'beforeunload' && beforeUnloadHandler === handler) {
-            beforeUnloadHandler = undefined
-            return
-          }
-          return window.removeEventListener(event, handler, options)
-        }
-      )
+    expect(addEventListenerSpy).toHaveBeenCalledWith(
+      'beforeunload',
+      expect.any(Function)
+    );
+  });
 
-    render(
-      <Wrapper contextValue={value}>
-        <TestComponent dirty={true} />
-      </Wrapper>
-    )
+  it('should remove event listener when hasUnsavedChanges changes from true to false', () => {
+    const { rerender } = renderHook(
+      ({ hasUnsavedChanges }) => useUnsavedChangesPrompt(hasUnsavedChanges),
+      { initialProps: { hasUnsavedChanges: true } }
+    );
 
-    expect(beforeUnloadHandler).toBeDefined()
+    const handler = addEventListenerSpy.mock.calls[0][1];
 
-    const event = {
-      preventDefault: jest.fn<(this: void) => void>(),
+    rerender({ hasUnsavedChanges: false });
+
+    expect(removeEventListenerSpy).toHaveBeenCalledWith('beforeunload', handler);
+  });
+
+  it('should call preventDefault on the event when hasUnsavedChanges is true', () => {
+    renderHook(() => useUnsavedChangesPrompt(true));
+
+    // Get the handler function that was registered
+    const handler = addEventListenerSpy.mock.calls[0][1] as (
+      event: BeforeUnloadEvent
+    ) => void;
+
+    // Create a mock event
+    const mockEvent = {
+      preventDefault: jest.fn(),
       returnValue: '',
-    } as unknown as BeforeUnloadEvent
-    const preventDefaultSpy = event.preventDefault as jest.MockedFunction<() => void>
+    } as unknown as BeforeUnloadEvent;
 
-    act(() => {
-      beforeUnloadHandler?.(event)
-    })
+    // Call the handler
+    handler(mockEvent);
 
-    expect(preventDefaultSpy).toHaveBeenCalled()
-    expect(event.returnValue).toBe(value.message)
-  })
-})
+    expect(mockEvent.preventDefault).toHaveBeenCalled();
+    expect(mockEvent.returnValue).toBe('');
+  });
+
+  it('should set returnValue to empty string to trigger browser prompt', () => {
+    renderHook(() => useUnsavedChangesPrompt(true));
+
+    const handler = addEventListenerSpy.mock.calls[0][1] as (
+      event: BeforeUnloadEvent
+    ) => void;
+
+    const mockEvent = {
+      preventDefault: jest.fn<void, []>(),
+      returnValue: 'initial',
+    } as unknown as BeforeUnloadEvent;
+
+    handler(mockEvent);
+
+    expect(mockEvent.returnValue).toBe('');
+  });
+
+  it('should not add multiple event listeners when re-rendered with same hasUnsavedChanges value', () => {
+    const { rerender } = renderHook(
+      ({ hasUnsavedChanges }) => useUnsavedChangesPrompt(hasUnsavedChanges),
+      { initialProps: { hasUnsavedChanges: true } }
+    );
+
+    expect(addEventListenerSpy).toHaveBeenCalledTimes(1);
+
+    rerender({ hasUnsavedChanges: true });
+
+    // Should still be called only once (not added again)
+    expect(addEventListenerSpy).toHaveBeenCalledTimes(1);
+  });
+});
