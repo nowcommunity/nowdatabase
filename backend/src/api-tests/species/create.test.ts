@@ -75,16 +75,7 @@ describe('Creating new species works', () => {
     expect(resultWithRef.status).toEqual(200)
   })
 
-  it('Creation fails without permissions', async () => {
-    logout()
-
-    const result = await send('species', 'PUT', {
-      species: { ...newSpeciesBasis, comment: 'species test' },
-    })
-    expect(result.status).toEqual(403)
-  })
-
-  it('Creation fails without permissions', async () => {
+  it('Creation fails without permissions for non-authenticated and non-privileged users', async () => {
     logout()
     const result1 = await send('species', 'PUT', {
       species: { ...newSpeciesBasis, comment: 'species test' },
