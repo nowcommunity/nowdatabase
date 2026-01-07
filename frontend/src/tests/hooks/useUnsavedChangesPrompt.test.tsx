@@ -33,7 +33,7 @@ describe('useUnsavedChangesPrompt', () => {
     const { unmount } = renderHook(() => useUnsavedChangesPrompt(true))
 
     // Get the handler that was added
-    const handler = addEventListenerSpy.mock.calls[0][1] as (event: BeforeUnloadEvent) => void
+    const handler = addEventListenerSpy.mock.calls[0]?.[1] as (event: BeforeUnloadEvent) => void
 
     unmount()
 
@@ -41,12 +41,9 @@ describe('useUnsavedChangesPrompt', () => {
   })
 
   it('should update event listener when hasUnsavedChanges changes from false to true', () => {
-    const { rerender } = renderHook(
-      ({ hasUnsavedChanges }) => useUnsavedChangesPrompt(hasUnsavedChanges),
-      {
-        initialProps: { hasUnsavedChanges: false },
-      },
-    )
+    const { rerender } = renderHook(({ hasUnsavedChanges }) => useUnsavedChangesPrompt(hasUnsavedChanges), {
+      initialProps: { hasUnsavedChanges: false },
+    })
 
     expect(addEventListenerSpy).not.toHaveBeenCalled()
 
@@ -56,14 +53,11 @@ describe('useUnsavedChangesPrompt', () => {
   })
 
   it('should remove event listener when hasUnsavedChanges changes from true to false', () => {
-    const { rerender } = renderHook(
-      ({ hasUnsavedChanges }) => useUnsavedChangesPrompt(hasUnsavedChanges),
-      {
-        initialProps: { hasUnsavedChanges: true },
-      },
-    )
+    const { rerender } = renderHook(({ hasUnsavedChanges }) => useUnsavedChangesPrompt(hasUnsavedChanges), {
+      initialProps: { hasUnsavedChanges: true },
+    })
 
-    const handler = addEventListenerSpy.mock.calls[0][1] as (event: BeforeUnloadEvent) => void
+    const handler = addEventListenerSpy.mock.calls[0]?.[1] as (event: BeforeUnloadEvent) => void
 
     rerender({ hasUnsavedChanges: false })
 
@@ -74,7 +68,7 @@ describe('useUnsavedChangesPrompt', () => {
     renderHook(() => useUnsavedChangesPrompt(true))
 
     // Get the handler function that was registered
-    const handler = addEventListenerSpy.mock.calls[0][1] as (event: BeforeUnloadEvent) => void
+    const handler = addEventListenerSpy.mock.calls[0]?.[1] as (event: BeforeUnloadEvent) => void
 
     // Create a mock event
     const mockEvent = {
@@ -85,6 +79,7 @@ describe('useUnsavedChangesPrompt', () => {
     // Call the handler
     handler(mockEvent)
 
+    // eslint-disable-next-line @typescript-eslint/unbound-method
     expect(mockEvent.preventDefault).toHaveBeenCalled()
     expect(mockEvent.returnValue).toBe('')
   })
@@ -92,7 +87,7 @@ describe('useUnsavedChangesPrompt', () => {
   it('should set returnValue to empty string to trigger browser prompt', () => {
     renderHook(() => useUnsavedChangesPrompt(true))
 
-    const handler = addEventListenerSpy.mock.calls[0][1] as (event: BeforeUnloadEvent) => void
+    const handler = addEventListenerSpy.mock.calls[0]?.[1] as (event: BeforeUnloadEvent) => void
 
     const mockEvent = {
       preventDefault: jest.fn<void, []>(),
@@ -105,12 +100,9 @@ describe('useUnsavedChangesPrompt', () => {
   })
 
   it('should not add multiple event listeners when re-rendered with same hasUnsavedChanges value', () => {
-    const { rerender } = renderHook(
-      ({ hasUnsavedChanges }) => useUnsavedChangesPrompt(hasUnsavedChanges),
-      {
-        initialProps: { hasUnsavedChanges: true },
-      },
-    )
+    const { rerender } = renderHook(({ hasUnsavedChanges }) => useUnsavedChangesPrompt(hasUnsavedChanges), {
+      initialProps: { hasUnsavedChanges: true },
+    })
 
     expect(addEventListenerSpy).toHaveBeenCalledTimes(1)
 
