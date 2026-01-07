@@ -1,8 +1,6 @@
-import { PrismaClient } from '@prisma/client';
+import { testPrisma as prisma } from './prisma';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
-
-const prisma = new PrismaClient();
 
 interface TestUser {
   id: string;
