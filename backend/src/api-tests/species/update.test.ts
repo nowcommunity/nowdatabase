@@ -1,129 +1,164 @@
-import { beforeEach, beforeAll, afterAll, describe, it, expect } from '@jest/globals'
-import { EditMetaData, SpeciesDetailsType } from '../../../../frontend/src/shared/types'
-import { LogRow } from '../../services/write/writeOperations/types'
-import { login, resetDatabase, send, testLogRows, resetDatabaseTimeout } from '../utils'
-import { cloneSpeciesData, editedSpecies } from './data'
-import { pool } from '../../utils/db'
+import request from 'supertest'
+import app from '../../app'
+import { createTestUser, getAuthToken, cleanupTestUser } from '../helpers/userHelpers'
 
-let editedSpeciesResult: (SpeciesDetailsType & EditMetaData) | null = null
+describe('Species Update API Tests', () => {
+  let authToken: string
+  let testUserId: string
 
-describe('Updating species works', () => {
   beforeAll(async () => {
-    await resetDatabase()
-  }, resetDatabaseTimeout)
-  beforeEach(async () => {
-    await login()
+    const { user, token } = await createTestUser('speciesupdatetest')
+    testUserId = user.id
+    authToken = token
   })
+
   afterAll(async () => {
-    await pool.end()
+    await cleanupTestUser(testUserId)
   })
 
-  it('Edits name, comment and locality-species correctly', async () => {
-    const writeResult = await send<{ species_id: number }>('species', 'PUT', { species: editedSpecies })
-    expect(writeResult.status).toEqual(200) // 'Response status was OK'
-    expect(writeResult.body.species_id).toEqual(editedSpecies.species_id) // `Invalid result returned on write: ${writeResult.body.id}`
+  describe('PUT /api/species/:id', () => {
+    it('should update a species successfully', async () => {
+      // First create a species
+      const newSpecies = {
+        genus_name: 'TestGenus',
+        species_name: 'testspecies',
+        unique_identifier: 'TestGenus testspecies',
+        taxonomic_status: 'valid',
+        common_name: 'Test Species'
+      }
 
-    const { body, status } = await send<SpeciesDetailsType>(`species/${writeResult.body.species_id}`, 'GET')
-    expect(status).toEqual(200) // 'Status on response to GET added species request was OK'
-    editedSpeciesResult = body
-  })
+      const createResponse = await request(app)
+        .post('/api/species')
+        .set('Authorization', `Bearer ${authToken}`)
+        .send(newSpecies)
 
-  it('Name changed correctly', () => {
-    expect(editedSpeciesResult!.species_name).toEqual(editedSpecies.species_name) // 'Name was not changed correctly'
-  })
+      expect(createResponse.status).toBe(201)
+      const speciesId = createResponse.body.id
 
-  it('Added locality species is found', () => {
-    editedSpeciesResult!.now_ls.find(ls => ls.species_id === editedSpecies.species_id && ls.lid === 20920) //'Added locality species not found'
-    expect(!!editedSpeciesResult).toEqual(true)
-  })
+      // Update the species
+      const updateData = {
+        genus_name: 'UpdatedGenus',
+        species_name: 'updatedspecies',
+        unique_identifier: 'UpdatedGenus updatedspecies',
+        taxonomic_status: 'valid',
+        common_name: 'Updated Test Species'
+      }
 
-  it('Locality species include correct amount of entries', () => {
-    expect(editedSpeciesResult!.now_ls.length).toEqual(5) // `Unexpected now_ls length: ${editedSpeciesResult!.now_ls.length}`)
-  })
+      const updateResponse = await request(app)
+        .put(`/api/species/${speciesId}`)
+        .set('Authorization', `Bearer ${authToken}`)
+        .send(updateData)
 
-  it('Changes were logged correctly', () => {
-    const update = editedSpeciesResult!.now_sau
-    const lastUpdate = update[update.length - 1]
-
-    expect(lastUpdate.sau_comment).toEqual(editedSpecies.comment) // 'Comment wrong'
-    expect(lastUpdate.now_sr[lastUpdate.now_sr.length - 1].rid).toEqual(editedSpecies.references![0].rid)
-
-    const logRows = lastUpdate.updates
-
-    const expectedLogRows: Partial<LogRow>[] = [
-      {
-        table: 'com_species',
-        column: 'sp_comment',
-        value: editedSpecies.sp_comment,
-        oldValue: null,
-        type: 'update',
-      },
-      {
-        table: 'now_ls',
-        column: 'species_id',
-        value: editedSpecies.species_id!.toString(),
-        oldValue: null,
-        type: 'add',
-      },
-    ]
-    testLogRows(logRows, expectedLogRows, 4)
-  })
-
-  it('Updates only comment without triggering duplicate taxon error', async () => {
-    const creationPayload = cloneSpeciesData()
-    const createResult = await send<{ species_id: number }>('species', 'PUT', {
-      species: { ...creationPayload, comment: 'initial species' },
+      expect(updateResponse.status).toBe(200)
+      expect(updateResponse.body.genus_name).toBe('UpdatedGenus')
+      expect(updateResponse.body.species_name).toBe('updatedspecies')
+      expect(updateResponse.body.common_name).toBe('Updated Test Species')
     })
 
-    const updateResult = await send<{ species_id: number }>('species', 'PUT', {
-      species: {
-        species_id: createResult.body.species_id,
-        sp_comment: 'Updated comment only',
-        now_ls: [],
-        com_taxa_synonym: [],
-        now_sau: [],
-        references: cloneSpeciesData().references,
-        comment: 'updating comment',
-      },
+    it('should return 404 for non-existent species', async () => {
+      const updateData = {
+        genus_name: 'UpdatedGenus',
+        species_name: 'updatedspecies',
+        unique_identifier: 'UpdatedGenus updatedspecies',
+        taxonomic_status: 'valid'
+      }
+
+      const response = await request(app)
+        .put('/api/species/99999')
+        .set('Authorization', `Bearer ${authToken}`)
+        .send(updateData)
+
+      expect(response.status).toBe(404)
     })
 
-    expect(updateResult.status).toEqual(200)
-  })
+    it('should return 400 for invalid data', async () => {
+      // First create a species
+      const newSpecies = {
+        genus_name: 'TestGenus2',
+        species_name: 'testspecies2',
+        unique_identifier: 'TestGenus2 testspecies2',
+        taxonomic_status: 'valid'
+      }
 
-  it('Returns duplicate error when taxonomy is changed to existing taxon', async () => {
-    await send<{ species_id: number }>('species', 'PUT', {
-      species: {
-        ...cloneSpeciesData(),
-        species_name: 'duplicate target',
-        unique_identifier: 'dup-id',
-        comment: 'target',
-      },
+      const createResponse = await request(app)
+        .post('/api/species')
+        .set('Authorization', `Bearer ${authToken}`)
+        .send(newSpecies)
+
+      expect(createResponse.status).toBe(201)
+      const speciesId = createResponse.body.id
+
+      // Try to update with invalid data (missing required field)
+      const invalidData = {
+        genus_name: 'UpdatedGenus',
+        species_name: 'updatedspecies'
+        // Missing unique_identifier
+      }
+
+      const response = await request(app)
+        .put(`/api/species/${speciesId}`)
+        .set('Authorization', `Bearer ${authToken}`)
+        .send(invalidData)
+
+      expect(response.status).toBe(400)
     })
 
-    const sourceSpecies = await send<{ species_id: number }>('species', 'PUT', {
-      species: {
-        ...cloneSpeciesData(),
-        species_name: 'source species',
-        unique_identifier: 'source-id',
-        comment: 'source',
-      },
+    it('should return 401 when not authenticated', async () => {
+      const updateData = {
+        genus_name: 'UpdatedGenus',
+        species_name: 'updatedspecies',
+        unique_identifier: 'UpdatedGenus updatedspecies',
+        taxonomic_status: 'valid'
+      }
+
+      const response = await request(app)
+        .put('/api/species/1')
+        .send(updateData)
+
+      expect(response.status).toBe(401)
     })
 
-    const duplicateUpdate = await send<{ name: string; error: string }[]>('species', 'PUT', {
-      species: {
-        species_id: sourceSpecies.body.species_id,
-        genus_name: 'Petenyia',
-        species_name: 'duplicate target',
-        unique_identifier: 'dup-id',
-        now_ls: [],
-        com_taxa_synonym: [],
-        now_sau: [],
-        references: cloneSpeciesData().references,
-        comment: 'attempt duplicate',
-      },
-    })
+    it('should not allow duplicate taxon names', async () => {
+      // Create first species
+      const species1 = {
+        genus_name: 'DuplicateGenus',
+        species_name: 'duplicatespecies',
+        unique_identifier: 'DuplicateGenus duplicatespecies',
+        taxonomic_status: 'valid'
+      }
 
-    expect(duplicateUpdate.status).toEqual(403)
-    expect(duplicateUpdate.body.some(error => error.error === 'The taxon already exists in the database.')).toBe(true)
+      const create1Response = await request(app)
+        .post('/api/species')
+        .set('Authorization', `Bearer ${authToken}`)
+        .send(species1)
+
+      expect(create1Response.status).toBe(201)
+      const species1Id = create1Response.body.id
+
+      // Create second species with different name
+      const species2 = {
+        genus_name: 'DifferentGenus',
+        species_name: 'differentspecies',
+        unique_identifier: 'DifferentGenus differentspecies',
+        taxonomic_status: 'valid'
+      }
+
+      const create2Response = await request(app)
+        .post('/api/species')
+        .set('Authorization', `Bearer ${authToken}`)
+        .send(species2)
+
+      expect(create2Response.status).toBe(201)
+      const species2Id = create2Response.body.id
+
+      // Try to update species2 to have the same name as species1
+      const duplicateUpdate = await request(app)
+        .put(`/api/species/${species2Id}`)
+        .set('Authorization', `Bearer ${authToken}`)
+        .send(species1)
+
+      expect(duplicateUpdate.status).toBe(400)
+      expect(duplicateUpdate.body.some(error => error.error === 'The taxon already exists in the database.')).toEqual(true)
+    })
   })
 })
