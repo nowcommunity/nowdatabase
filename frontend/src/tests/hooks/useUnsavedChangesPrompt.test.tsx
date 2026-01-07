@@ -33,9 +33,7 @@ describe('useUnsavedChangesPrompt', () => {
     const { unmount } = renderHook(() => useUnsavedChangesPrompt(true))
 
     // Get the handler that was added
-    const handler = addEventListenerSpy.mock.calls[0][1] as (
-      event: BeforeUnloadEvent,
-    ) => void
+    const handler = addEventListenerSpy.mock.calls[0][1] as (event: BeforeUnloadEvent) => void
 
     unmount()
 
@@ -65,9 +63,7 @@ describe('useUnsavedChangesPrompt', () => {
       },
     )
 
-    const handler = addEventListenerSpy.mock.calls[0][1] as (
-      event: BeforeUnloadEvent,
-    ) => void
+    const handler = addEventListenerSpy.mock.calls[0][1] as (event: BeforeUnloadEvent) => void
 
     rerender({ hasUnsavedChanges: false })
 
@@ -78,9 +74,7 @@ describe('useUnsavedChangesPrompt', () => {
     renderHook(() => useUnsavedChangesPrompt(true))
 
     // Get the handler function that was registered
-    const handler = addEventListenerSpy.mock.calls[0][1] as (
-      event: BeforeUnloadEvent,
-    ) => void
+    const handler = addEventListenerSpy.mock.calls[0][1] as (event: BeforeUnloadEvent) => void
 
     // Create a mock event
     const mockEvent = {
@@ -98,9 +92,7 @@ describe('useUnsavedChangesPrompt', () => {
   it('should set returnValue to empty string to trigger browser prompt', () => {
     renderHook(() => useUnsavedChangesPrompt(true))
 
-    const handler = addEventListenerSpy.mock.calls[0][1] as (
-      event: BeforeUnloadEvent,
-    ) => void
+    const handler = addEventListenerSpy.mock.calls[0][1] as (event: BeforeUnloadEvent) => void
 
     const mockEvent = {
       preventDefault: jest.fn<void, []>(),
