@@ -9,7 +9,11 @@ import { Museum, EditDataType, ValidationErrors } from '@/shared/types'
 import { LocalityTab } from './Tabs/LocalityTab'
 import { useNotify } from '@/hooks/notification'
 
-export const MuseumDetails = () => {
+export const MuseumDetails = ({
+  wrapWithUnsavedChangesProvider = true,
+}: {
+  wrapWithUnsavedChangesProvider?: boolean
+} = {}) => {
   const { id } = useParams()
   const isNew = id === 'new'
   const { isError, isFetching, data } = useGetMuseumDetailsQuery(id!, {
@@ -55,6 +59,7 @@ export const MuseumDetails = () => {
       isNew={isNew}
       validator={validateMuseum}
       deleteFunction={undefined}
+      wrapWithUnsavedChangesProvider={wrapWithUnsavedChangesProvider}
     />
   )
 }

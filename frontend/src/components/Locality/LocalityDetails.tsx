@@ -25,7 +25,11 @@ import { useEffect } from 'react'
 import { FetchBaseQueryError } from '@reduxjs/toolkit/query'
 import { makeEditData } from '../DetailView/Context/DetailContext'
 
-export const LocalityDetails = () => {
+export const LocalityDetails = ({
+  wrapWithUnsavedChangesProvider = true,
+}: {
+  wrapWithUnsavedChangesProvider?: boolean
+} = {}) => {
   const { id } = useParams()
   const navigate = useNavigate()
   const isNew = id === 'new'
@@ -156,6 +160,7 @@ export const LocalityDetails = () => {
       validator={validateLocality}
       deleteFunction={deleteFunction}
       hasStagingMode
+      wrapWithUnsavedChangesProvider={wrapWithUnsavedChangesProvider}
     />
   )
 }
