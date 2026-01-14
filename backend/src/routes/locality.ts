@@ -32,6 +32,12 @@ router.put(
     const normalizedLocality = normalizeLocalityAges(editedLocality)
     const validationErrors = await validateEntireLocality({ ...normalizedLocality, references: references })
     if (validationErrors.length > 0) {
+      const hasCollectingMethodError = validationErrors.some(
+        validationError => validationError.name === 'now_coll_meth' && validationError.error
+      )
+      if (hasCollectingMethodError) {
+        return res.status(400).send(validationErrors)
+      }
       return res.status(403).send(validationErrors)
     }
     const result = await writeLocality(normalizedLocality, comment, references, req.user)
