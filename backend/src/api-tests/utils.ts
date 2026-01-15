@@ -95,6 +95,7 @@ export const testLogRows = (logRows: UpdateLog[], expectedLogRows: Partial<LogRo
 
 export const resetDatabase = async () => {
   await send('test/reset-test-database', 'GET')
+  await send('test/create-test-users', 'GET')
 }
 
 export const resetDatabaseTimeout: number = 1200000 // 120 seconds

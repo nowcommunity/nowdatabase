@@ -73,6 +73,13 @@ export const createTestUsers = async () => {
           userId = createdUser.user_id
         } else {
           userId = existingUser.user_id
+          await nowDb.com_users.update({
+            where: { user_id: userId },
+            data: {
+              newpassword: passwordHash,
+              now_user_group: testUser.now_user_group,
+            },
+          })
         }
         const initials = `TEST-${testUser.now_user_group.toUpperCase()}`
         const existingPerson = await nowDb.com_people.findFirst({
