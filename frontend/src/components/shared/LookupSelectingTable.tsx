@@ -13,12 +13,24 @@ type LookupSelectingTableProps<TValue extends MRT_RowData, TEditData extends obj
   idFieldName: keyof TValue
   selectedValues: string[]
   buildItem: (value: TValue, editData: EditDataType<TEditData>) => TItem
+  paginationPlacement?: 'top' | 'bottom' | 'both'
 }
 
 export const LookupSelectingTable = <TValue extends MRT_RowData, TEditData extends object, TItem>(
   props: LookupSelectingTableProps<TValue, TEditData, TItem>
 ) => {
-  const { buttonText, title, isError, data, columns, fieldName, idFieldName, selectedValues, buildItem } = props
+  const {
+    buttonText,
+    title,
+    isError,
+    data,
+    columns,
+    fieldName,
+    idFieldName,
+    selectedValues,
+    buildItem,
+    paginationPlacement = 'both',
+  } = props
 
   const appendItem = useAppendDetailArray<TEditData, TValue, TItem>(fieldName, buildItem)
 
@@ -33,6 +45,7 @@ export const LookupSelectingTable = <TValue extends MRT_RowData, TEditData exten
       idFieldName={idFieldName}
       editingAction={appendItem}
       selectedValues={selectedValues}
+      paginationPlacement={paginationPlacement}
     />
   )
 }
