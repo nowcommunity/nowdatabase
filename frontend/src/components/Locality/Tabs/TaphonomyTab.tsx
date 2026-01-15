@@ -4,12 +4,12 @@ import { Grouped, ArrayFrame, HalfFrames } from '@/components/DetailView/common/
 import { MRT_ColumnDef } from 'material-react-table'
 import { EditableTable } from '@/components/DetailView/common/EditableTable'
 import { emptyOption } from '@/components/DetailView/common/misc'
-import { SelectingTable } from '@/components/DetailView/common/SelectingTable'
+import { LookupSelectingTable } from '@/components/shared/LookupSelectingTable'
 import { useGetAllCollectingMethodValuesQuery } from '@/redux/collectingMethodValuesReducer'
 import { skipToken } from '@reduxjs/toolkit/query'
 
 export const TaphonomyTab = () => {
-  const { textField, dropdown, mode, editData, setEditData } = useDetailContext<LocalityDetailsType>()
+  const { textField, dropdown, mode, editData } = useDetailContext<LocalityDetailsType>()
   const { data: collectingMethodValues, isError } = useGetAllCollectingMethodValuesQuery(
     mode.read ? skipToken : undefined
   )
@@ -149,7 +149,7 @@ export const TaphonomyTab = () => {
       <HalfFrames>
         <Grouped title="Collecting Methods">
           {!mode.read && (
-            <SelectingTable<CollectingMethodValues, LocalityDetailsType>
+            <LookupSelectingTable<CollectingMethodValues, LocalityDetailsType, CollectingMethod>
               buttonText="Select collecting method"
               isError={isError}
               columns={selectingTableColumns}
@@ -157,15 +157,11 @@ export const TaphonomyTab = () => {
               title="Collecting methods"
               fieldName="now_coll_meth"
               idFieldName="coll_meth_value"
-              editingAction={(newMethod: CollectingMethodValues) => {
-                setEditData({
-                  ...editData,
-                  now_coll_meth: [
-                    ...editData.now_coll_meth,
-                    { lid: editData.lid!, coll_meth: newMethod.coll_meth_value, rowState: 'new' },
-                  ],
-                })
-              }}
+              buildItem={(newMethod, editDataValue) => ({
+                lid: editDataValue.lid as number,
+                coll_meth: newMethod.coll_meth_value,
+                rowState: 'new',
+              })}
               selectedValues={editData.now_coll_meth.map(method => method.coll_meth ?? '')}
             />
           )}
