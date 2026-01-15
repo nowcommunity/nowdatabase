@@ -58,6 +58,7 @@ export const TableView = <T extends MRT_RowData>({
   renderRowActionExtras,
   isError,
   error,
+  paginationPlacement,
 }: {
   data: T[] | undefined
   columns: MRT_ColumnDef<T>[]
@@ -79,6 +80,7 @@ export const TableView = <T extends MRT_RowData>({
   error?: FetchBaseQueryError | SerializedError
   filterFns?: Record<string, MRT_FilterFn<T>>
   renderRowActionExtras?: ({ row }: { row: MRT_Row<T> }) => ReactNode
+  paginationPlacement?: 'top' | 'bottom' | 'both'
 }) => {
   const location = useLocation()
   const {
@@ -307,7 +309,7 @@ export const TableView = <T extends MRT_RowData>({
     manualSorting: serverSidePagination,
     rowCount: rowCount,
     autoResetPageIndex: false,
-    positionPagination: selectorFn ? 'top' : 'both',
+    positionPagination: paginationPlacement ?? (selectorFn ? 'top' : 'both'),
     paginationDisplayMode: 'pages',
     muiTablePaperProps: {
       elevation: 0,

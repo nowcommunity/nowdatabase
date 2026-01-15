@@ -24,6 +24,7 @@ export const SelectingTable = <T extends MRT_RowData, ParentType extends object>
   selectedValues,
   isError,
   useObject,
+  paginationPlacement,
 }: {
   dataCy?: string
   buttonText: string
@@ -37,6 +38,7 @@ export const SelectingTable = <T extends MRT_RowData, ParentType extends object>
   selectedValues?: string[]
   isError: boolean
   useObject?: boolean
+  paginationPlacement?: 'top' | 'bottom' | 'both'
 }) => {
   const { editData, setEditData } = useDetailContext<ParentType>()
 
@@ -85,6 +87,7 @@ export const SelectingTable = <T extends MRT_RowData, ParentType extends object>
           idFieldName={idFieldName}
           clickableRows={false}
           tableRowAction={tableRowAction}
+          paginationPlacement={paginationPlacement}
         />
       ) : (
         <CircularProgress />

@@ -17,6 +17,7 @@ export type ActivityStatistic = { year: number; month: number; surname: string }
 export type SpeciesType = FixBigInt<Prisma.com_species>
 export type SedimentaryStructureValues = Prisma.now_ss_values
 export type CollectingMethod = Prisma.now_coll_meth
+export type CollectingMethodValues = Prisma.now_coll_meth_values
 export type LocalityProject = Prisma.now_plr & { now_proj: Prisma.now_proj }
 export type LocalitySpecies = FixBigInt<Prisma.now_ls> & { com_species: SpeciesType }
 export type LocalitySpeciesDetailsType = FixBigInt<Prisma.now_ls> & { com_species: SpeciesDetailsType }

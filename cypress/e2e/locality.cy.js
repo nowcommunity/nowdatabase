@@ -430,6 +430,22 @@ describe('Editing a locality', () => {
     cy.get('[data-value=""]').click()
     cy.get('[id=max_age-textfield]').should('have.value', '15.97')
   })
+
+  it('adds collecting methods from the selector and persists them', () => {
+    cy.visit(`/locality/20920?tab=4`)
+    cy.contains('Lantian-Shuijiazui')
+    cy.get('[id=edit-button]').click()
+
+    cy.contains('Select collecting method').click()
+    cy.get('[data-cy=add-button-wet_screen]').click()
+    cy.contains('button', 'Close').click()
+
+    cy.addReferenceAndSave()
+    cy.contains('Edited item successfully.')
+
+    cy.visit(`/locality/20920?tab=4`)
+    cy.contains('wet_screen')
+  })
 })
 
 describe('Locality table filtering', () => {
