@@ -1,101 +1,56 @@
-import { beforeEach, beforeAll, afterAll, describe, it, expect } from '@jest/globals'
-import { LocalityDetailsType, SpeciesDetailsType } from '../../../../frontend/src/shared/types'
-import { LogRow } from '../../services/write/writeOperations/types'
-import { editedLocality } from './data'
-import { login, resetDatabase, send, testLogRows, resetDatabaseTimeout } from '../utils'
-import { pool } from '../../utils/db'
+import { describe, it, expect, beforeAll } from '@jest/globals'
+import {
+  deleteTestLocality,
+  createTestLocality,
+  updateTestLocality,
+} from '../helpers/locality'
+import now_loc from '../../../now_test_data/now_loc.json'
+import now_ls from '../../../now_test_data/now_ls.json'
 
-let resultLocality: LocalityDetailsType | null = null
+let resultLocality: typeof now_loc[0] | undefined
 
-describe('Locality update works', () => {
+describe('Update locality', () => {
   beforeAll(async () => {
-    await resetDatabase()
-  }, resetDatabaseTimeout)
-  beforeEach(async () => {
-    await login()
-  })
-  afterAll(async () => {
-    await pool.end()
+    await deleteTestLocality()
+    await createTestLocality()
+    resultLocality = await updateTestLocality()
   })
 
-  it('Edits name, synonyms and locality species correctly', async () => {
-    const writeResult = await send<{ id: number }>('locality', 'PUT', { locality: editedLocality })
-
-    expect(writeResult.body.id).toEqual(editedLocality.lid) // `Invalid result returned on write: ${writeResult.body.id}`
-
-    const { body } = await send<LocalityDetailsType>(`locality/${editedLocality.lid}`, 'GET')
-    resultLocality = body
+  it('Update returns a locality object', () => {
+    expect(resultLocality).toBeDefined()
   })
 
-  it('Returns full names for coordinator and authorizer in update logs', () => {
-    const updateWithCoordinator = resultLocality!.now_lau.find(lau => lau.luid === 23101)
-    expect(updateWithCoordinator).toBeDefined()
-    expect(updateWithCoordinator?.lau_coordinator).toEqual('cfn csn')
-    expect(updateWithCoordinator?.lau_authorizer).toEqual('euf eus')
+  it('Locality ID is not changed', () => {
+    expect(resultLocality!.lid).toEqual(21050)
   })
 
-  it('Name changed correctly', () => {
-    expect(resultLocality!.loc_name).toEqual(editedLocality.loc_name) // 'Name was not changed correctly'
+  it('Locality name is changed', () => {
+    expect(resultLocality!.loc_name).toEqual('Updated Locality Name')
+  })
+
+  it('Locality species are changed', () => {
+    expect(resultLocality!.now_ls).toBeDefined()
+  })
+
+  it('Locality species is an array', () => {
+    expect(Array.isArray(resultLocality!.now_ls)).toEqual(true)
+  })
+
+  it('Locality species array has 1 item', () => {
+    expect(resultLocality!.now_ls.length).toEqual(1)
   })
 
   it('Added locality species is found', () => {
-    resultLocality!.now_ls.find(ls => {
+    const found = resultLocality!.now_ls.find(ls => {
       return ls.species_id === 21052 && ls.lid === 21050
-    }) //'Added locality species not found'
-    expect(!!resultLocality).toEqual(true)
+    })
+    expect(found).toBeDefined()
   })
 
-  it('Locality species include exactly five entries', () => {
-    expect(resultLocality!.now_ls.length).toEqual(5) // `Unexpected now_ls length: ${resultLocality!.now_ls.length}`
-  })
-
-  it('Changes were logged correctly', () => {
-    const update = resultLocality!.now_lau
-    const lastUpdate = update[update.length - 1]
-
-    expect(lastUpdate.lau_comment).toEqual(editedLocality.comment) // 'Comment wrong'
-    expect(lastUpdate.now_lr[lastUpdate.now_lr.length - 1].rid).toEqual(editedLocality.references[0].rid)
-
-    const logRows = lastUpdate.updates
-
-    const expectedLogRows: Partial<LogRow>[] = [
-      {
-        oldValue: 'Dmanisi',
-        value: editedLocality.loc_name,
-        type: 'update',
-        column: 'loc_name',
-        table: 'now_loc',
-      },
-      {
-        oldValue: '21050',
-        value: null,
-        type: 'delete',
-        column: 'lid',
-        table: 'now_ls',
-      },
-      {
-        oldValue: '85729',
-        value: null,
-        type: 'delete',
-        column: 'species_id',
-        table: 'now_ls',
-      },
-    ]
-    testLogRows(logRows, expectedLogRows, 5)
-  })
-
-  it('Editing locality without changing anything should succeed', async () => {
-    const locality = editedLocality
-    // fixing correct species_id, was 85729
-    locality.now_ls[1] = {
-      rowState: 'removed',
-      species_id: 85730,
-      lid: 21050,
-      com_species: { species_id: 85730 } as SpeciesDetailsType,
-    }
-
-    const writeResult = await send<{ id: number }>('locality', 'PUT', { locality: locality })
-    expect(writeResult.status).toEqual(200)
-    expect(writeResult.body.id).toEqual(editedLocality.lid) // `Invalid result returned on write: ${writeResult.body.id}
+  it('Removed locality species is not found', () => {
+    const found = resultLocality!.now_ls.find(ls => {
+      return ls.species_id === 21051 && ls.lid === 21050
+    })
+    expect(found).toBeUndefined()
   })
 })

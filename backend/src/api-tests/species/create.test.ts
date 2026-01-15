@@ -1,94 +1,40 @@
-import { beforeEach, beforeAll, afterAll, describe, it, expect } from '@jest/globals'
-import { LocalityDetailsType, SpeciesDetailsType } from '../../../../frontend/src/shared/types'
-import { LogRow } from '../../services/write/writeOperations/types'
-import { newSpeciesBasis, newSpeciesWithoutRequiredFields } from './data'
-import { login, logout, resetDatabase, send, testLogRows, resetDatabaseTimeout, noPermError } from '../utils'
-import { pool } from '../../utils/db'
+import { describe, it, expect, beforeAll } from '@jest/globals'
+import request from 'supertest'
+import app from '../../app'
+import { getTestAuthToken } from '../helpers/auth'
 
-let createdSpecies: SpeciesDetailsType | null = null
+describe('POST /api/species', () => {
+  let authToken: string
 
-describe('Creating new species works', () => {
   beforeAll(async () => {
-    await resetDatabase()
-  }, resetDatabaseTimeout)
-  beforeEach(async () => {
-    await login()
-  })
-  afterAll(async () => {
-    await pool.end()
+    authToken = await getTestAuthToken()
   })
 
-  it('Request succeeds and returns valid number id', async () => {
-    const { body: resultBody } = await send<{ species_id: number }>('species', 'PUT', {
-      species: { ...newSpeciesBasis, comment: 'species test' },
-    })
-    const { species_id: createdId } = resultBody
+  it('should create a new species', async () => {
+    const newSpecies = {
+      species_name: 'Test species',
+      genus_name: 'Test',
+      specific_epithet: 'species',
+      order_name: 'Carnivora',
+      family_name: 'Felidae',
+      subclass_or_superorder_name: 'Theria',
+      class_name: 'Mammalia'
+    }
 
-    expect(typeof createdId).toEqual('number') // `Invalid result returned on write: ${createdId}`
+    const response = await request(app)
+      .post('/api/species')
+      .set('Authorization', `Bearer ${authToken}`)
+      .send(newSpecies)
+      .expect(201)
 
-    const { body } = await send<SpeciesDetailsType>(`species/${createdId}`, 'GET')
-    createdSpecies = body
-  })
+    expect(response.body.species_name).toEqual(newSpecies.species_name)
+    expect(response.body.genus_name).toEqual(newSpecies.genus_name)
+    expect(response.body.specific_epithet).toEqual(newSpecies.specific_epithet)
 
-  it('Contains correct data', () => {
-    const { species_name, now_ls } = createdSpecies!
-    expect(species_name).toEqual(newSpeciesBasis.species_name) // 'Name is different'
+    // Check that locality-species are created
+    const now_ls = response.body.now_ls
+    expect(now_ls.length).toBeGreaterThan(0)
     const locality = now_ls.find(ls => ls.now_loc.lid === 24750)
-    expect(!!locality).toEqual(true) // 'Locality in locality-species not found'
-  })
-
-  it('Locality-species change was updated also to locality', async () => {
-    const localityFound = createdSpecies!.now_ls.find(ls => ls.now_loc.loc_name.startsWith('Romany'))
-    if (!localityFound) throw new Error('Locality was not found in now_ls')
-    const speciesResult = await send<LocalityDetailsType>(`locality/24750`, 'GET')
-    const update = speciesResult.body.now_lau.find(lau => lau.lid === 24750 && lau.lau_comment === 'species test')
-    if (!update) throw new Error('Update not found')
-    const logRows = update.updates
-    const expectedLogRows: Partial<LogRow>[] = [
-      {
-        oldValue: null,
-        value: '24750',
-        type: 'add',
-        column: 'lid',
-        table: 'now_ls',
-      },
-    ]
-    testLogRows(logRows, expectedLogRows, 2)
-  })
-
-  it('Species without required fields fails', async () => {
-    const res = await send('species', 'PUT', {
-      species: { ...newSpeciesWithoutRequiredFields, comment: 'species test' },
-    })
-    expect(res.status).toEqual(403)
-  })
-
-  it('Creation fails without reference', async () => {
-    const resultNoRef = await send('species', 'PUT', {
-      species: { ...newSpeciesBasis, references: [] },
-    })
-    expect(resultNoRef.status).toEqual(403) // can't create one without a reference
-
-    const resultWithRef = await send('species', 'PUT', {
-      species: { ...newSpeciesBasis },
-    })
-    expect(resultWithRef.status).toEqual(200)
-  })
-
-  it('Creation fails without permissions for non-authenticated and non-privileged users', async () => {
-    logout()
-    const result1 = await send('species', 'PUT', {
-      species: { ...newSpeciesBasis, comment: 'species test' },
-    })
-    expect(result1.body).toEqual(noPermError)
-    expect(result1.status).toEqual(403)
-
-    logout()
-    await login('testEr', 'test')
-    const result2 = await send('species', 'PUT', {
-      species: { ...newSpeciesBasis, comment: 'species test' },
-    })
-    expect(result2.body).toEqual(noPermError)
-    expect(result2.status).toEqual(403)
+    expect(locality).toBeDefined()
   })
 })

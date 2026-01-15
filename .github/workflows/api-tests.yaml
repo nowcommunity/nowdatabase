@@ -28,6 +28,18 @@ jobs:
       - name: 'Start containers'
         run: npm run start:anon:api -- --wait -d
 
+      - name: Wait for MariaDB to be ready
+        run: |
+          echo "Waiting for MariaDB to be ready..."
+          for i in {1..30}; do
+            if docker exec nowdb-db-anon mariadb -h localhost -u now_test -pnow_test -e "SELECT 1;" >/dev/null 2>&1; then
+              echo "MariaDB is ready!"
+              break
+            fi
+            echo "Waiting for MariaDB... ($i/30)"
+            sleep 2
+          done
+
       - name: Run api-tests
         run: npm run test:ci:api
 

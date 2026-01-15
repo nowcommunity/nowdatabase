@@ -2,6 +2,7 @@ module.exports = {
     testPathIgnorePatterns: [
         "<rootDir>/build",
         "<rootDir>/node_modules",
+        "<rootDir>/../src/api-tests",
     ],
     collectCoverageFrom: [
         "./src/**",
