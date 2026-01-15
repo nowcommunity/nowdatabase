@@ -5,6 +5,10 @@ import { Role } from '../../../frontend/src/shared/types'
 
 const router = Router()
 
-router.get('/all', requireOneOf([Role.Admin, Role.EditUnrestricted]), getAllCollectingMethodValuesHandler)
+router.get(
+  '/all',
+  requireOneOf([Role.Admin, Role.EditUnrestricted, Role.EditRestricted]),
+  getAllCollectingMethodValuesHandler
+)
 
 export default router
