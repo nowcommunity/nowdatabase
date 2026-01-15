@@ -1,7 +1,7 @@
 import { Editable, LocalityDetailsType, SedimentaryStructure, SedimentaryStructureValues } from '@/shared/types'
 import { EditableTable } from '@/components/DetailView/common/EditableTable'
 import { emptyOption } from '@/components/DetailView/common/misc'
-import { SelectingTable } from '@/components/DetailView/common/SelectingTable'
+import { LookupSelectingTable } from '@/components/shared/LookupSelectingTable'
 import { ArrayFrame, HalfFrames, Grouped } from '@/components/DetailView/common/tabLayoutHelpers'
 import { useDetailContext } from '@/components/DetailView/Context/DetailContext'
 import { useGetAllSedimentaryStructuresQuery } from '@/redux/sedimentaryStructureReducer'
@@ -9,7 +9,7 @@ import { skipToken } from '@reduxjs/toolkit/query'
 import { MRT_ColumnDef } from 'material-react-table'
 
 export const LithologyTab = () => {
-  const { mode, textField, dropdown, editData, setEditData, bigTextField } = useDetailContext<LocalityDetailsType>()
+  const { mode, textField, dropdown, editData, bigTextField } = useDetailContext<LocalityDetailsType>()
   const { data: sedimentaryStructuresData, isError } = useGetAllSedimentaryStructuresQuery(
     mode.read ? skipToken : undefined
   )
@@ -186,24 +186,21 @@ export const LithologyTab = () => {
       <HalfFrames>
         <Grouped title="Sedimentary Structure & Taphonomic Detail">
           {!mode.read && (
-            <>
-              <SelectingTable<SedimentaryStructureValues, LocalityDetailsType>
-                buttonText="Select Sedimentary structure"
-                isError={isError}
-                columns={selectingTableColumns}
-                data={sedimentaryStructuresData}
-                title="Sedimentary structures"
-                fieldName="now_ss"
-                idFieldName="ss_value"
-                editingAction={(newSed: SedimentaryStructureValues) => {
-                  setEditData({
-                    ...editData,
-                    now_ss: [...editData.now_ss, { lid: editData.lid!, sed_struct: newSed.ss_value, rowState: 'new' }],
-                  })
-                }}
-                selectedValues={editData.now_ss.map(ss => ss.sed_struct ?? '')} // TODO ss.sed_struct may be null. is empty string ok default?
-              />
-            </>
+            <LookupSelectingTable<SedimentaryStructureValues, LocalityDetailsType, SedimentaryStructure>
+              buttonText="Select Sedimentary structure"
+              isError={isError}
+              columns={selectingTableColumns}
+              data={sedimentaryStructuresData}
+              title="Sedimentary structures"
+              fieldName="now_ss"
+              idFieldName="ss_value"
+              buildItem={(newSed, editDataValue) => ({
+                lid: editDataValue.lid as number,
+                sed_struct: newSed.ss_value,
+                rowState: 'new',
+              })}
+              selectedValues={editData.now_ss.map(ss => ss.sed_struct ?? '')} // TODO ss.sed_struct may be null. is empty string ok default?
+            />
           )}
           <EditableTable<Editable<SedimentaryStructure>, LocalityDetailsType> columns={columns} field="now_ss" />
         </Grouped>

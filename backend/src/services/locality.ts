@@ -6,6 +6,7 @@ import {
   Role,
   LocalitySpeciesDetailsType,
   Editable,
+  CollectingMethod,
   SpeciesDetailsType,
 } from '../../../frontend/src/shared/types'
 import { removeDuplicateProjectLinks } from './utils/projectLinks'
@@ -16,6 +17,7 @@ import Prisma from '../../prisma/generated/now_test_client'
 import { AccessError } from '../middlewares/authorizer'
 import { fixBigInt } from '../utils/common'
 import { logDb, nowDb } from '../utils/db'
+import { validateCollectingMethodValues } from '../utils/validation/collectingMethodValues'
 import { buildPersonLookupByInitials, getPersonDisplayName, getPersonFromLookup } from './utils/person'
 import { getReferenceDetails } from './reference'
 
@@ -327,6 +329,12 @@ export const validateEntireLocality = async (editedFields: EditDataType<Prisma.n
   }
 
   if (error) errors.push({ name: 'references', error: error })
+  if ('now_coll_meth' in editedFields) {
+    const collectingMethodError = await validateCollectingMethodValues(
+      editedFields.now_coll_meth as Array<Editable<CollectingMethod>> | undefined
+    )
+    if (collectingMethodError) errors.push(collectingMethodError)
+  }
   return errors
 }
 

@@ -202,6 +202,7 @@ model now_br {
   @@index([rid], map: "now_test_tr_FKIndex2")
 }
 
+/// Collecting method entries associated with a locality.
 model now_coll_meth {
   lid       Int     @default(0)
   coll_meth String  @db.VarChar(21)
@@ -211,6 +212,7 @@ model now_coll_meth {
   @@index([lid], map: "now_test_coll_meth_FKIndex1")
 }
 
+/// Valid collecting method values for locality edits.
 model now_coll_meth_values {
   coll_meth_value String @id @db.VarChar(21)
 }

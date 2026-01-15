@@ -1,14 +1,18 @@
-import { Editable, LocalityDetailsType, CollectingMethod } from '@/shared/types'
+import { Editable, LocalityDetailsType, CollectingMethod, CollectingMethodValues } from '@/shared/types'
 import { useDetailContext } from '@/components/DetailView/Context/DetailContext'
 import { Grouped, ArrayFrame, HalfFrames } from '@/components/DetailView/common/tabLayoutHelpers'
 import { MRT_ColumnDef } from 'material-react-table'
 import { EditableTable } from '@/components/DetailView/common/EditableTable'
-import { EditingForm } from '@/components/DetailView/common/EditingForm'
 import { emptyOption } from '@/components/DetailView/common/misc'
+import { LookupSelectingTable } from '@/components/shared/LookupSelectingTable'
+import { useGetAllCollectingMethodValuesQuery } from '@/redux/collectingMethodValuesReducer'
+import { skipToken } from '@reduxjs/toolkit/query'
 
 export const TaphonomyTab = () => {
-  const { textField, dropdown } = useDetailContext<LocalityDetailsType>()
-  const { mode } = useDetailContext<LocalityDetailsType>()
+  const { textField, dropdown, mode, editData } = useDetailContext<LocalityDetailsType>()
+  const { data: collectingMethodValues, isError } = useGetAllCollectingMethodValuesQuery(
+    mode.read ? skipToken : undefined
+  )
 
   const assemblageFormationOptions = [
     emptyOption,
@@ -128,13 +132,12 @@ export const TaphonomyTab = () => {
     },
   ]
 
-  const editingForm = (
-    <EditingForm
-      formFields={[{ name: 'coll_meth', label: 'Collection method', required: true }]}
-      buttonText="Add collecting method"
-      arrayFieldName="now_coll_meth"
-    />
-  )
+  const selectingTableColumns: MRT_ColumnDef<CollectingMethodValues>[] = [
+    {
+      accessorKey: 'coll_meth_value',
+      header: 'Collection method',
+    },
+  ]
 
   return (
     <>
@@ -145,7 +148,23 @@ export const TaphonomyTab = () => {
 
       <HalfFrames>
         <Grouped title="Collecting Methods">
-          {!mode.read && editingForm}
+          {!mode.read && (
+            <LookupSelectingTable<CollectingMethodValues, LocalityDetailsType, CollectingMethod>
+              buttonText="Select collecting method"
+              isError={isError}
+              columns={selectingTableColumns}
+              data={collectingMethodValues}
+              title="Collecting methods"
+              fieldName="now_coll_meth"
+              idFieldName="coll_meth_value"
+              buildItem={(newMethod, editDataValue) => ({
+                lid: editDataValue.lid as number,
+                coll_meth: newMethod.coll_meth_value,
+                rowState: 'new',
+              })}
+              selectedValues={editData.now_coll_meth.map(method => method.coll_meth ?? '')}
+            />
+          )}
           <EditableTable<Editable<CollectingMethod>, LocalityDetailsType> columns={columns} field="now_coll_meth" />
         </Grouped>
         <></>
