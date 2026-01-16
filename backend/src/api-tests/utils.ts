@@ -60,6 +60,9 @@ export const setToken = (newToken: string) => (token = newToken)
 export const login = async (username: string = 'testSu', password: string = 'test') => {
   // Login and set token
   const result = await send<{ token: string }>('user/login', 'POST', { username, password })
+  if (!result.body.token || result.status !== 200) {
+    throw new Error(`Login failed for ${username}: ${result.status}`)
+  }
   token = result.body.token
 }
 
