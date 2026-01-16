@@ -7,7 +7,7 @@
     "dev": "npx tsx watch --clear-screen=false src/index.ts",
     "build": "tsc",
     "test:api": "jest ./src/api-tests --runInBand --coverage --config jest-config.js --detectOpenHandles --forceExit --silent",
-    "test:unit": "DOTENV_CONFIG_PATH=../.test.env jest src/unit-tests --coverage --config jest-config.js --detectOpenHandles --forceExit --silent",
+    "test:unit": "DOTENV_CONFIG_PATH=../.test.env jest src/unit-tests --coverage --config jest-config.js --detectOpenHandles --forceExit --silent --setupFiles dotenv/config",
     "test:api:local": "DOTENV_CONFIG_PATH=../.test.env npm run test:api -- --setupFiles dotenv/config",
     "start": "node build/index.js",
     "lint": "eslint --report-unused-disable-directives --max-warnings 0",
