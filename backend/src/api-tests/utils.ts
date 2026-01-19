@@ -60,6 +60,9 @@ export const setToken = (newToken: string) => (token = newToken)
 export const login = async (username: string = 'testSu', password: string = 'test') => {
   // Login and set token
   const result = await send<{ token: string }>('user/login', 'POST', { username, password })
+  if (!result.body.token || result.status !== 200) {
+    throw new Error(`Login failed for ${username}: ${result.status}`)
+  }
   token = result.body.token
 }
 
@@ -95,6 +98,7 @@ export const testLogRows = (logRows: UpdateLog[], expectedLogRows: Partial<LogRo
 
 export const resetDatabase = async () => {
   await send('test/reset-test-database', 'GET')
+  await send('test/create-test-users', 'GET')
 }
 
 export const resetDatabaseTimeout: number = 1200000 // 120 seconds

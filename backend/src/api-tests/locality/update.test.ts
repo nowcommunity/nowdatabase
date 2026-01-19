@@ -21,9 +21,11 @@ describe('Locality update works', () => {
   it('Edits name, synonyms and locality species correctly', async () => {
     const writeResult = await send<{ id: number }>('locality', 'PUT', { locality: editedLocality })
 
+    expect(writeResult.status).toEqual(200)
     expect(writeResult.body.id).toEqual(editedLocality.lid) // `Invalid result returned on write: ${writeResult.body.id}`
 
-    const { body } = await send<LocalityDetailsType>(`locality/${editedLocality.lid}`, 'GET')
+    const { body, status } = await send<LocalityDetailsType>(`locality/${editedLocality.lid}`, 'GET')
+    expect(status).toEqual(200)
     resultLocality = body
   })
 

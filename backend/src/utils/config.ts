@@ -52,5 +52,7 @@ const requiredEnvs = {
 }
 
 const missingEnvs = Object.entries(requiredEnvs).filter(([, value]) => value === undefined)
-if (missingEnvs.length > 0)
+const isJestEnvironment = process.env.JEST_WORKER_ID !== undefined
+if (missingEnvs.length > 0 && !isJestEnvironment) {
   throw new Error(`Missing environment variables: ${missingEnvs.map(env => env[0]).join(', ')}`)
+}
