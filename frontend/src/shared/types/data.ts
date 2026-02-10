@@ -21,7 +21,14 @@ export type CollectingMethodValues = Prisma.now_coll_meth_values
 export type LocalityProject = Prisma.now_plr & { now_proj: Prisma.now_proj }
 export type LocalitySpecies = FixBigInt<Prisma.now_ls> & { com_species: SpeciesType }
 export type LocalitySpeciesDetailsType = FixBigInt<Prisma.now_ls> & { com_species: SpeciesDetailsType }
-export type SpeciesLocality = FixBigInt<Prisma.now_ls> & { now_loc: Prisma.now_loc }
+export type SpeciesLocality = FixBigInt<Prisma.now_ls> & {
+  now_loc: Prisma.now_loc
+  // Explicitly required in the Species locality payload because MW Score is
+  // calculated client-side from these values in the Locality-Species table.
+  mw_scale_min: number | null
+  mw_scale_max: number | null
+  mw_value: number | null
+}
 export type LocalityUpdate = Prisma.now_lau & { now_lr: LocalityReference[] } & { updates: UpdateLog[] }
 export type SpeciesUpdate = Prisma.now_sau & { now_sr: SpeciesReference[] } & { updates: UpdateLog[] }
 export type Museum = Omit<Prisma.com_mlist, 'used_morph' | 'used_now' | 'used_gene'>
