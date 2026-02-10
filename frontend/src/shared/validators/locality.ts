@@ -4,6 +4,9 @@ import { validCountries } from './countryList'
 
 const pollenFields = ['pers_pollen_ap', 'pers_pollen_nap', 'pers_pollen_other'] as const
 
+export const pollenTotalValidationError =
+  'Combined Arboreal (AP%), Non-arboreal (NAP%), and Other pollen (OP%) must be less than or equal to 100'
+
 const validatePollenPercentage = (name: string, num: number) => {
   if (!Number.isInteger(num)) return `${name} must be an integer value`
   if (num < 0 || num > 100) return `${name} must be between 0 and 100`
@@ -17,9 +20,7 @@ const validatePollenRecordTotal = (editData: Partial<EditDataType<LocalityDetail
 
   const total = values.reduce((sum, value) => sum + value, 0)
 
-  if (total > 100) {
-    return 'Combined Arboreal (AP%), Non-arboreal (NAP%), and Other pollen (OP%) must be less than or equal to 100'
-  }
+  if (total > 100) return pollenTotalValidationError
 
   return
 }
