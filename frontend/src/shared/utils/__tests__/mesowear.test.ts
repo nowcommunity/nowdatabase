@@ -6,11 +6,16 @@ describe('calculateNormalizedMesowearScore', () => {
     expect(calculateNormalizedMesowearScore(1, 5, 3)).toBe('50.00')
   })
 
-  it('returns null for null or empty values', () => {
+  it('returns 0.00 when reported value equals scale minimum', () => {
+    expect(calculateNormalizedMesowearScore(2, 6, 2)).toBe('0.00')
+  })
+
+  it('returns null for null/empty/invalid inputs', () => {
     expect(calculateNormalizedMesowearScore(null, 5, 3)).toBeNull()
     expect(calculateNormalizedMesowearScore(1, null, 3)).toBeNull()
     expect(calculateNormalizedMesowearScore(1, 5, null)).toBeNull()
     expect(calculateNormalizedMesowearScore('', 5, 3)).toBeNull()
+    expect(calculateNormalizedMesowearScore(Number.NaN, 5, 3)).toBeNull()
   })
 
   it('returns null when reported value is below scale minimum', () => {
@@ -22,7 +27,8 @@ describe('calculateNormalizedMesowearScore', () => {
     expect(calculateNormalizedMesowearScore(5, 4, 6)).toBe('100.00')
   })
 
-  it('returns null for values outside 0-100 after normalization', () => {
+  it('preserves legacy truncation behavior around upper bound checks', () => {
+    expect(calculateNormalizedMesowearScore(1, 2, 2.004)).toBe('100.40')
     expect(calculateNormalizedMesowearScore(1, 2, 4)).toBeNull()
   })
 })
