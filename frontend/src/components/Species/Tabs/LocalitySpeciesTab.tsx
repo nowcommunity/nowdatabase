@@ -7,6 +7,7 @@ import { Box, TextField } from '@mui/material'
 import { MRT_ColumnDef, MRT_Row } from 'material-react-table'
 import { matchesCountryOrContinent } from '@/shared/validators/countryContinents'
 import { useForm } from 'react-hook-form'
+import { calculateNormalizedMesowearScore } from '@/shared/utils/mesowear'
 
 const hasMesowearScoreInputs = (row: SpeciesLocality) => {
   return (
@@ -117,10 +118,16 @@ export const LocalitySpeciesTab = () => {
       header: 'MW Score',
       Cell: ({ row }: { row: MRT_Row<SpeciesLocality> }) => {
         if (!hasMesowearScoreInputs(row.original)) {
-          return <Box color="warning.main">MW fields missing</Box>
+          return <Box />
         }
 
-        return <Box>not implemented</Box>
+        const score = calculateNormalizedMesowearScore(
+          row.original.mw_scale_min,
+          row.original.mw_scale_max,
+          row.original.mw_value
+        )
+
+        return <Box>{score ?? ''}</Box>
       },
     },
     {
