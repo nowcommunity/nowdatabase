@@ -241,3 +241,31 @@ export const editedLocality = {
   comment: 'Test update',
   references: [references[0]],
 }
+
+export const invalidPollenCreateLocality = {
+  ...newLocalityBasis,
+  pers_pollen_ap: 20.5,
+  pers_pollen_nap: 40,
+  pers_pollen_other: 30,
+}
+
+export const invalidPollenTotalCreateLocality = {
+  ...newLocalityBasis,
+  pers_pollen_ap: 40,
+  pers_pollen_nap: 50,
+  pers_pollen_other: 20,
+}
+
+export const invalidPollenUpdateLocality = {
+  ...editedLocality,
+  pers_pollen_ap: 101,
+  pers_pollen_nap: 0,
+  pers_pollen_other: 0,
+}
+
+export const invalidPollenTotalUpdateLocality = {
+  ...editedLocality,
+  pers_pollen_ap: 30,
+  pers_pollen_nap: 40,
+  pers_pollen_other: 40,
+}

@@ -1,7 +1,8 @@
 import { beforeEach, beforeAll, afterAll, describe, it, expect } from '@jest/globals'
 import { Locality, LocalityDetailsType, SpeciesDetailsType } from '../../../../frontend/src/shared/types'
 import { LogRow } from '../../services/write/writeOperations/types'
-import { newLocalityBasis } from './data'
+import { ValidationObject } from '../../../../frontend/src/shared/validators/validator'
+import { invalidPollenCreateLocality, invalidPollenTotalCreateLocality, newLocalityBasis } from './data'
 import { login, logout, resetDatabase, send, testLogRows, resetDatabaseTimeout, noPermError } from '../utils'
 import { pool } from '../../utils/db'
 
@@ -86,6 +87,39 @@ describe('Creating new locality works', () => {
       locality: { ...newLocalityBasis },
     })
     expect(resultWithRef.status).toEqual(200)
+  })
+
+  it('Creation fails with invalid pollen percentages', async () => {
+    const { body, status } = await send<ValidationObject[]>('locality', 'PUT', {
+      locality: invalidPollenCreateLocality,
+    })
+
+    expect(status).toEqual(403)
+    expect(body).toEqual(
+      expect.arrayContaining([
+        {
+          name: 'Arboreal pollen (AP%)',
+          error: 'Arboreal pollen (AP%) must be an integer value',
+        },
+      ])
+    )
+  })
+
+  it('Creation fails when pollen total exceeds 100', async () => {
+    const { body, status } = await send<ValidationObject[]>('locality', 'PUT', {
+      locality: invalidPollenTotalCreateLocality,
+    })
+
+    expect(status).toEqual(403)
+    expect(body).toEqual(
+      expect.arrayContaining([
+        {
+          name: 'Arboreal pollen (AP%)',
+          error:
+            'Combined Arboreal (AP%), Non-arboreal (NAP%), and Other pollen (OP%) must be less than or equal to 100',
+        },
+      ])
+    )
   })
 
   it('Species update also logged correctly', async () => {

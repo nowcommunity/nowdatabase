@@ -294,10 +294,32 @@ export const getLocalityDetails = async (id: number, user: User | undefined) => 
 
 // also validates possible new species that were added to this locality
 export const validateEntireLocality = async (editedFields: EditDataType<Prisma.now_loc> & EditMetaData) => {
+  const localityForValidation = { ...editedFields }
+
+  if (localityForValidation.lid) {
+    const existingPollenValues = await nowDb.now_loc.findUnique({
+      where: { lid: localityForValidation.lid },
+      select: {
+        pers_pollen_ap: true,
+        pers_pollen_nap: true,
+        pers_pollen_other: true,
+      },
+    })
+
+    if (existingPollenValues) {
+      localityForValidation.pers_pollen_ap ??= existingPollenValues.pers_pollen_ap
+      localityForValidation.pers_pollen_nap ??= existingPollenValues.pers_pollen_nap
+      localityForValidation.pers_pollen_other ??= existingPollenValues.pers_pollen_other
+    }
+  }
+
   const keys = Object.keys(editedFields)
   const errors: ValidationObject[] = []
   for (const key of keys) {
-    const error = validateLocality(editedFields as EditDataType<LocalityDetailsType>, key as keyof LocalityDetailsType)
+    const error = validateLocality(
+      localityForValidation as EditDataType<LocalityDetailsType>,
+      key as keyof LocalityDetailsType
+    )
     if (error.error) errors.push(error)
   }
   if ('now_ls' in editedFields) {

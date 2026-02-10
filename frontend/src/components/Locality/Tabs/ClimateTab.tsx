@@ -1,10 +1,12 @@
+import { Alert } from '@mui/material'
 import { LocalityDetailsType } from '@/shared/types'
 import { emptyOption } from '@/components/DetailView/common/misc'
 import { ArrayFrame, HalfFrames } from '@/components/DetailView/common/tabLayoutHelpers'
 import { useDetailContext } from '@/components/DetailView/Context/DetailContext'
+import { pollenTotalValidationError } from '@/shared/validators/locality'
 
 export const ClimateTab = () => {
-  const { textField, dropdown, bigTextField } = useDetailContext<LocalityDetailsType>()
+  const { textField, dropdown, bigTextField, editData, validator } = useDetailContext<LocalityDetailsType>()
 
   const climateTypeOptions = [
     emptyOption,
@@ -127,10 +129,14 @@ export const ClimateTab = () => {
   ]
 
   const pollenRecord = [
-    ['Arboreal pollen (AP%)', textField('pers_pollen_ap')],
-    ['Non-arboreal pollen (NAP%)', textField('pers_pollen_nap')],
-    ['Other pollen (OP%)', textField('pers_pollen_other')],
+    ['Arboreal pollen (AP%)', textField('pers_pollen_ap', { type: 'number' })],
+    ['Non-arboreal pollen (NAP%)', textField('pers_pollen_nap', { type: 'number' })],
+    ['Other pollen (OP%)', textField('pers_pollen_other', { type: 'number' })],
   ]
+
+  const pollenTotalError = ['pers_pollen_ap', 'pers_pollen_nap', 'pers_pollen_other']
+    .map(field => validator(editData, field as keyof LocalityDetailsType).error)
+    .find(error => error === pollenTotalValidationError)
 
   return (
     <>
@@ -144,7 +150,14 @@ export const ClimateTab = () => {
       </HalfFrames>
       <HalfFrames>
         <ArrayFrame half array={plantSites} title="Plant Sites" />
-        <ArrayFrame half array={pollenRecord} title="Pollen Record" />
+        <>
+          <ArrayFrame half array={pollenRecord} title="Pollen Record" />
+          {pollenTotalError && (
+            <Alert sx={{ marginTop: 1 }} severity="error">
+              {pollenTotalValidationError}
+            </Alert>
+          )}
+        </>
       </HalfFrames>
     </>
   )
