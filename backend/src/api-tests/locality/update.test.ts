@@ -1,7 +1,8 @@
 import { beforeEach, beforeAll, afterAll, describe, it, expect } from '@jest/globals'
 import { LocalityDetailsType, SpeciesDetailsType } from '../../../../frontend/src/shared/types'
 import { LogRow } from '../../services/write/writeOperations/types'
-import { editedLocality } from './data'
+import { ValidationObject } from '../../../../frontend/src/shared/validators/validator'
+import { editedLocality, invalidPollenTotalUpdateLocality, invalidPollenUpdateLocality } from './data'
 import { login, resetDatabase, send, testLogRows, resetDatabaseTimeout } from '../utils'
 import { pool } from '../../utils/db'
 
@@ -82,6 +83,39 @@ describe('Locality update works', () => {
       },
     ]
     testLogRows(logRows, expectedLogRows, 5)
+  })
+
+  it('Update fails when pollen values are out of range', async () => {
+    const { body, status } = await send<ValidationObject[]>('locality', 'PUT', {
+      locality: invalidPollenUpdateLocality,
+    })
+
+    expect(status).toEqual(403)
+    expect(body).toEqual(
+      expect.arrayContaining([
+        {
+          name: 'Arboreal pollen (AP%)',
+          error: 'Arboreal pollen (AP%) must be between 0 and 100',
+        },
+      ])
+    )
+  })
+
+  it('Update fails when pollen total exceeds 100', async () => {
+    const { body, status } = await send<ValidationObject[]>('locality', 'PUT', {
+      locality: invalidPollenTotalUpdateLocality,
+    })
+
+    expect(status).toEqual(403)
+    expect(body).toEqual(
+      expect.arrayContaining([
+        {
+          name: 'Arboreal pollen (AP%)',
+          error:
+            'Combined Arboreal (AP%), Non-arboreal (NAP%), and Other pollen (OP%) must be less than or equal to 100',
+        },
+      ])
+    )
   })
 
   it('Editing locality without changing anything should succeed', async () => {
