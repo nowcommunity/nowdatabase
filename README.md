@@ -45,3 +45,12 @@ The new version is not deployed yet.
 
 **DeepWiki documentation for the NOW database can be found here:** 
 [![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/nowcommunity/nowdatabase)
+
+---
+
+### Reviewer notes: Locality climate pollen validation
+
+- Locality pollen fields (`pers_pollen_ap`, `pers_pollen_nap`, `pers_pollen_other`) now require integer values in the range `0...100`.
+- Shared locality validation enforces combined pollen constraint `AP + NAP + OP <= 100` and surfaces the same message in form validation feedback.
+- Backend locality write validation now evaluates pollen totals with full update context so partial updates cannot bypass the combined-value rule.
+- API tests include invalid create/update pollen payload coverage for non-integer, out-of-range, and total-above-100 cases.
