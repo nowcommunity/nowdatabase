@@ -2,6 +2,28 @@ import { EditDataType, LocalityDetailsType } from '../types'
 import { Validators, validator } from './validator'
 import { validCountries } from './countryList'
 
+const pollenFields = ['pers_pollen_ap', 'pers_pollen_nap', 'pers_pollen_other'] as const
+
+const validatePollenPercentage = (name: string, num: number) => {
+  if (!Number.isInteger(num)) return `${name} must be an integer value`
+  if (num < 0 || num > 100) return `${name} must be between 0 and 100`
+  return
+}
+
+const validatePollenRecordTotal = (editData: Partial<EditDataType<LocalityDetailsType>>) => {
+  const values = pollenFields
+    .map(fieldName => editData[fieldName])
+    .filter((value): value is number => typeof value === 'number')
+
+  const total = values.reduce((sum, value) => sum + value, 0)
+
+  if (total > 100) {
+    return 'Combined Arboreal (AP%), Non-arboreal (NAP%), and Other pollen (OP%) must be less than or equal to 100'
+  }
+
+  return
+}
+
 export const validateLocality = (
   editData: EditDataType<LocalityDetailsType>,
   fieldName: keyof EditDataType<LocalityDetailsType>
@@ -118,6 +140,42 @@ export const validateLocality = (
       required: true,
       asNumber: (num: number) => {
         if (num < -180 || num > 180) return 'Must be between -180 and 180'
+        return
+      },
+    },
+    pers_pollen_ap: {
+      name: 'Arboreal pollen (AP%)',
+      asNumber: (num: number) => {
+        const valueError = validatePollenPercentage('Arboreal pollen (AP%)', num)
+        if (valueError) return valueError
+
+        const totalError = validatePollenRecordTotal(editData)
+        if (totalError) return totalError
+
+        return
+      },
+    },
+    pers_pollen_nap: {
+      name: 'Non-arboreal pollen (NAP%)',
+      asNumber: (num: number) => {
+        const valueError = validatePollenPercentage('Non-arboreal pollen (NAP%)', num)
+        if (valueError) return valueError
+
+        const totalError = validatePollenRecordTotal(editData)
+        if (totalError) return totalError
+
+        return
+      },
+    },
+    pers_pollen_other: {
+      name: 'Other pollen (OP%)',
+      asNumber: (num: number) => {
+        const valueError = validatePollenPercentage('Other pollen (OP%)', num)
+        if (valueError) return valueError
+
+        const totalError = validatePollenRecordTotal(editData)
+        if (totalError) return totalError
+
         return
       },
     },
