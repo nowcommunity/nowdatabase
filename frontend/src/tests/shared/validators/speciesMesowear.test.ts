@@ -38,6 +38,20 @@ describe('validateSpecies mesowear scale/value constraints', () => {
     expect(result.error).toBe('Reported Value cannot be negative.')
   })
 
+  it('rejects Reported Value outside Scale Minimum/Maximum range', () => {
+    const belowMin = validateSpecies(
+      createSpeciesEditData({ mw_scale_min: 2, mw_scale_max: 6, mw_value: 1 }),
+      'mw_value'
+    )
+    expect(belowMin.error).toBe('Reported Value must be between Scale Minimum and Scale Maximum.')
+
+    const aboveMax = validateSpecies(
+      createSpeciesEditData({ mw_scale_min: 2, mw_scale_max: 6, mw_value: 7 }),
+      'mw_value'
+    )
+    expect(aboveMax.error).toBe('Reported Value must be between Scale Minimum and Scale Maximum.')
+  })
+
   it('accepts valid non-negative and ordered values', () => {
     const min = validateSpecies(createSpeciesEditData({ mw_scale_min: 1, mw_scale_max: 5 }), 'mw_scale_min')
     const max = validateSpecies(createSpeciesEditData({ mw_scale_min: 1, mw_scale_max: 5 }), 'mw_scale_max')

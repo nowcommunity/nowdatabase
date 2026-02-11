@@ -126,6 +126,10 @@ export const validateSpecies = (
       name: 'Reported Value',
       asNumber: (value: number) => {
         if (value < 0) return 'Reported Value cannot be negative.'
+        if (typeof editData.mw_scale_min === 'number' && value < editData.mw_scale_min)
+          return 'Reported Value must be between Scale Minimum and Scale Maximum.'
+        if (typeof editData.mw_scale_max === 'number' && value > editData.mw_scale_max)
+          return 'Reported Value must be between Scale Minimum and Scale Maximum.'
         return
       },
     },
