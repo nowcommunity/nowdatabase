@@ -103,6 +103,32 @@ export const validateSpecies = (
         return
       },
     },
+
+    mw_scale_min: {
+      name: 'Scale Minimum',
+      asNumber: (value: number) => {
+        if (value < 0) return 'Scale Minimum cannot be negative.'
+        if (typeof editData.mw_scale_max === 'number' && value > editData.mw_scale_max)
+          return 'Scale Minimum cannot be greater than Scale Maximum.'
+        return
+      },
+    },
+    mw_scale_max: {
+      name: 'Scale Maximum',
+      asNumber: (value: number) => {
+        if (value < 0) return 'Scale Maximum cannot be negative.'
+        if (typeof editData.mw_scale_min === 'number' && value < editData.mw_scale_min)
+          return 'Scale Maximum cannot be less than Scale Minimum.'
+        return
+      },
+    },
+    mw_value: {
+      name: 'Reported Value',
+      asNumber: (value: number) => {
+        if (value < 0) return 'Reported Value cannot be negative.'
+        return
+      },
+    },
     unique_identifier: {
       name: 'Unique Identifier',
       required: true,

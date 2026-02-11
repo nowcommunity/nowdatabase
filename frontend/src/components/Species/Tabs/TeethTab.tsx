@@ -5,7 +5,7 @@ import { useDetailContext } from '@/components/DetailView/Context/DetailContext'
 import { calculateNormalizedMesowearScore } from '@/shared/utils/mesowear'
 
 export const TeethTab = () => {
-  const { dropdown, textField, data } = useDetailContext<SpeciesDetailsType>()
+  const { dropdown, textField, data, editData } = useDetailContext<SpeciesDetailsType>()
 
   const getCtValue = (fct: null | string) => (fct === null || fct === '' ? '-' : fct)
   const formCt = (arr: Array<null | string>) => arr.map(val => getCtValue(val)).join('')
@@ -143,7 +143,10 @@ export const TeethTab = () => {
     ['Scale Minimum', textField('mw_scale_min', { type: 'number' })],
     ['Scale Maximum', textField('mw_scale_max', { type: 'number' })],
     ['Reported Value', textField('mw_value', { type: 'number' })],
-    ['Normalized score', calculateNormalizedMesowearScore(data.mw_scale_min, data.mw_scale_max, data.mw_value)],
+    [
+      'Normalized score',
+      calculateNormalizedMesowearScore(editData.mw_scale_min, editData.mw_scale_max, editData.mw_value),
+    ],
     ['Microwear'],
     ['Type', dropdown('microwear', microwearOptions, 'Type')],
   ]
