@@ -2,33 +2,15 @@ import { SpeciesDetailsType } from '@/shared/types'
 import { emptyOption } from '@/components/DetailView/common/misc'
 import { ArrayFrame, HalfFrames } from '@/components/DetailView/common/tabLayoutHelpers'
 import { useDetailContext } from '@/components/DetailView/Context/DetailContext'
+import { calculateNormalizedMesowearScore } from '@/shared/utils/mesowear'
 
 export const TeethTab = () => {
-  const { dropdown, textField, data } = useDetailContext<SpeciesDetailsType>()
+  const { dropdown, textField, data, editData } = useDetailContext<SpeciesDetailsType>()
 
   const getCtValue = (fct: null | string) => (fct === null || fct === '' ? '-' : fct)
   const formCt = (arr: Array<null | string>) => arr.map(val => getCtValue(val)).join('')
 
   const functionalCrownType = formCt([data.fct_al, data.fct_ol, data.fct_sf, data.fct_ot, data.fct_cm])
-
-  const calculateNormalizedMesowearScore = () => {
-    // Normalized mesowear score: [0-100] -- Scale: max - min -- Display value is calculated (value - min) / scale * 100 => (value - min) / (max - min) * 100
-    let mesowear_score
-
-    const mw_scale_min = data.mw_scale_min
-    const mw_scale_max = data.mw_scale_max
-    const mw_value = data.mw_value
-
-    if (mw_scale_min === null || mw_scale_max === null || mw_value === null) return null
-
-    const scale = mw_scale_max - mw_scale_min <= 0 ? 1 : mw_scale_max - mw_scale_min
-    const value = mw_value - mw_scale_min < 0 ? 0 : mw_value - mw_scale_min
-
-    if (mw_value >= mw_scale_min) mesowear_score = (value / scale) * 100
-    else return null
-
-    return mesowear_score < 0 || mesowear_score > 100 ? null : mesowear_score.toFixed(2)
-  }
 
   const developmentalCrownType = formCt([
     data.cusp_shape,
@@ -161,7 +143,10 @@ export const TeethTab = () => {
     ['Scale Minimum', textField('mw_scale_min', { type: 'number' })],
     ['Scale Maximum', textField('mw_scale_max', { type: 'number' })],
     ['Reported Value', textField('mw_value', { type: 'number' })],
-    ['Normalized score', calculateNormalizedMesowearScore()],
+    [
+      'Normalized score',
+      calculateNormalizedMesowearScore(editData.mw_scale_min, editData.mw_scale_max, editData.mw_value),
+    ],
     ['Microwear'],
     ['Type', dropdown('microwear', microwearOptions, 'Type')],
   ]

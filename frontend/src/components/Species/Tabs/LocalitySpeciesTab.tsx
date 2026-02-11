@@ -4,9 +4,21 @@ import { EditingModal } from '@/components/DetailView/common/EditingModal'
 import { Grouped } from '@/components/DetailView/common/tabLayoutHelpers'
 import { useDetailContext } from '@/components/DetailView/Context/DetailContext'
 import { Box, TextField } from '@mui/material'
-import { MRT_ColumnDef } from 'material-react-table'
+import { MRT_ColumnDef, MRT_Row } from 'material-react-table'
 import { matchesCountryOrContinent } from '@/shared/validators/countryContinents'
 import { useForm } from 'react-hook-form'
+import { calculateNormalizedMesowearScore } from '@/shared/utils/mesowear'
+
+const hasMesowearScoreInputs = (row: SpeciesLocality) => {
+  return (
+    'mw_scale_min' in row &&
+    'mw_scale_max' in row &&
+    'mw_value' in row &&
+    row.mw_scale_min !== undefined &&
+    row.mw_scale_max !== undefined &&
+    row.mw_value !== undefined
+  )
+}
 
 export const LocalitySpeciesTab = () => {
   const { mode } = useDetailContext<SpeciesDetailsType>()
@@ -104,7 +116,19 @@ export const LocalitySpeciesTab = () => {
     },
     {
       header: 'MW Score',
-      Cell: () => <Box>not implemented</Box>,
+      Cell: ({ row }: { row: MRT_Row<SpeciesLocality> }) => {
+        if (!hasMesowearScoreInputs(row.original)) {
+          return <Box />
+        }
+
+        const score = calculateNormalizedMesowearScore(
+          row.original.mw_scale_min,
+          row.original.mw_scale_max,
+          row.original.mw_value
+        )
+
+        return <Box>{score ?? ''}</Box>
+      },
     },
     {
       accessorKey: 'microwear',
