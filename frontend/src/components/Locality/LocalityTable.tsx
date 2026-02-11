@@ -19,6 +19,13 @@ const decimalCount = (num: number) => {
   return 0
 }
 
+const formatWithMaxThreeDecimals = (value: number) => {
+  if (decimalCount(value) > 3) {
+    return value.toFixed(3)
+  }
+  return value
+}
+
 export const LocalityTable = ({ selectorFn }: { selectorFn?: (newObject: Locality) => void }) => {
   const [selectedLocality, setSelectedLocality] = useState<string | undefined>()
   const [modalOpen, setModalOpen] = useState<boolean>(false)
@@ -89,12 +96,14 @@ export const LocalityTable = ({ selectorFn }: { selectorFn?: (newObject: Localit
         header: 'Dec lat',
         filterVariant: 'range',
         enableColumnFilterModes: false,
+        Cell: ({ cell }) => formatWithMaxThreeDecimals(cell.getValue() as number),
       },
       {
         accessorKey: 'dec_long',
         header: 'Dec long',
         filterVariant: 'range',
         enableColumnFilterModes: false,
+        Cell: ({ cell }) => formatWithMaxThreeDecimals(cell.getValue() as number),
       },
       {
         accessorKey: 'altitude',
@@ -106,13 +115,7 @@ export const LocalityTable = ({ selectorFn }: { selectorFn?: (newObject: Localit
         header: 'Max age',
         filterVariant: 'range',
         enableColumnFilterModes: false,
-        Cell: ({ cell }) => {
-          const cellVal = cell.getValue() as number
-          if (decimalCount(cellVal) > 3) {
-            return cellVal.toFixed(3)
-          }
-          return cellVal
-        },
+        Cell: ({ cell }) => formatWithMaxThreeDecimals(cell.getValue() as number),
       },
       {
         id: 'bfa_max',
@@ -136,13 +139,7 @@ export const LocalityTable = ({ selectorFn }: { selectorFn?: (newObject: Localit
         header: 'Min age',
         filterVariant: 'range',
         enableColumnFilterModes: false,
-        Cell: ({ cell }) => {
-          const cellVal = cell.getValue() as number
-          if (decimalCount(cellVal) > 3) {
-            return cellVal.toFixed(3)
-          }
-          return cellVal
-        },
+        Cell: ({ cell }) => formatWithMaxThreeDecimals(cell.getValue() as number),
       },
       {
         id: 'bfa_min',
