@@ -6,6 +6,21 @@ import { useGetAllCrossSearchQuery, useGetAllCrossSearchLocalitiesQuery } from '
 import { usePageContext } from '../Page'
 import { LocalitiesMap } from '../Map/LocalitiesMap'
 
+const decimalCount = (num: number) => {
+  const numAsString = num.toString()
+  if (numAsString.includes('.')) {
+    return numAsString.split('.')[1].length
+  }
+  return 0
+}
+
+const formatWithMaxThreeDecimals = (value: number): number | string => {
+  if (decimalCount(value) > 3) {
+    return value.toFixed(3)
+  }
+  return value
+}
+
 export const CrossSearchTable = ({ selectorFn }: { selectorFn?: (newObject: CrossSearch) => void }) => {
   const { sqlLimit, sqlOffset, sqlColumnFilters, sqlOrderBy } = usePageContext()
   const {
@@ -56,12 +71,14 @@ export const CrossSearchTable = ({ selectorFn }: { selectorFn?: (newObject: Cros
         header: 'Dec lat',
         filterVariant: 'range',
         enableColumnFilterModes: false,
+        Cell: ({ cell }) => formatWithMaxThreeDecimals(cell.getValue() as number),
       },
       {
         accessorKey: 'dec_long',
         header: 'Dec long',
         filterVariant: 'range',
         enableColumnFilterModes: false,
+        Cell: ({ cell }) => formatWithMaxThreeDecimals(cell.getValue() as number),
       },
       {
         accessorKey: 'altitude',
