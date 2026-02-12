@@ -19,7 +19,7 @@ const decimalCount = (num: number) => {
   return 0
 }
 
-const formatWithMaxThreeDecimals = (value: number) => {
+const formatWithMaxThreeDecimals = (value: number): number | string => {
   if (decimalCount(value) > 3) {
     return value.toFixed(3)
   }
