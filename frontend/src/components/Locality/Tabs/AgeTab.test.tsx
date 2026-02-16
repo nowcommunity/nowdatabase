@@ -163,4 +163,34 @@ describe('AgeTab', () => {
     expect(screen.getByLabelText<HTMLInputElement>('bfa_min_abs').value).toBe('AAR')
     expect(screen.getByLabelText<HTMLInputElement>('bfa_max_abs').value).toBe('C14')
   })
+
+  it('restores time_unit values after a composite ↔ time_unit round-trip', async () => {
+    const user = userEvent.setup()
+
+    render(
+      <ContextWrapper>
+        <AgeTab />
+      </ContextWrapper>
+    )
+
+    await user.click(screen.getByRole('button', { name: 'Composite' }))
+
+    await user.clear(screen.getByLabelText('min_age'))
+    await user.type(screen.getByLabelText('min_age'), '3.1')
+    await user.clear(screen.getByLabelText('max_age'))
+    await user.type(screen.getByLabelText('max_age'), '3.9')
+
+    await user.click(screen.getByRole('button', { name: 'Time unit' }))
+    await user.click(screen.getByRole('button', { name: 'Composite' }))
+
+    expect(screen.getByLabelText<HTMLInputElement>('min_age').value).toBe('3.1')
+    expect(screen.getByLabelText<HTMLInputElement>('max_age').value).toBe('3.9')
+
+    await user.click(screen.getByRole('button', { name: 'Time unit' }))
+
+    expect(screen.getByLabelText<HTMLInputElement>('min_age').value).toBe('10')
+    expect(screen.getByLabelText<HTMLInputElement>('max_age').value).toBe('20')
+    expect(screen.getByLabelText<HTMLInputElement>('bfa_min').value).toBe('tu-min-initial')
+    expect(screen.getByLabelText<HTMLInputElement>('bfa_max').value).toBe('tu-max-initial')
+  })
 })
