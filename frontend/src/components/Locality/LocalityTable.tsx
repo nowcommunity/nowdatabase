@@ -6,31 +6,11 @@ import { TableView } from '../TableView/TableView'
 import { LocalitiesMap } from '../Map/LocalitiesMap'
 import { generateKml } from '@/util/kml'
 import { generateSvg } from '../Map/generateSvg'
+import { formatWithMaxThreeDecimals } from '@/util/numberFormatting'
 import { usePageContext } from '../Page'
 import { LocalitySynonymsModal } from './LocalitySynonymsModal'
 import { currentDateAsString } from '@/shared/currentDateAsString'
 import { matchesCountryOrContinent } from '@/shared/validators/countryContinents'
-
-const decimalCount = (num: number) => {
-  const numAsString = num.toString()
-  if (numAsString.includes('.')) {
-    return numAsString.split('.')[1].length
-  }
-  return 0
-}
-
-const formatWithMaxThreeDecimals = (value: unknown): number | string => {
-  const numericValue = typeof value === 'number' ? value : typeof value === 'string' ? Number(value) : Number.NaN
-  if (!Number.isFinite(numericValue)) {
-    return ''
-  }
-
-  if (decimalCount(numericValue) > 3) {
-    return numericValue.toFixed(3)
-  }
-
-  return numericValue
-}
 
 export const LocalityTable = ({ selectorFn }: { selectorFn?: (newObject: Locality) => void }) => {
   const [selectedLocality, setSelectedLocality] = useState<string | undefined>()

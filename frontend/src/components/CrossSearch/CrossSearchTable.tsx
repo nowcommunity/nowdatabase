@@ -5,27 +5,7 @@ import { TableView } from '../TableView/TableView'
 import { useGetAllCrossSearchQuery, useGetAllCrossSearchLocalitiesQuery } from '@/redux/crossSearchReducer'
 import { usePageContext } from '../Page'
 import { LocalitiesMap } from '../Map/LocalitiesMap'
-
-const decimalCount = (num: number) => {
-  const numAsString = num.toString()
-  if (numAsString.includes('.')) {
-    return numAsString.split('.')[1].length
-  }
-  return 0
-}
-
-const formatWithMaxThreeDecimals = (value: unknown): number | string => {
-  const numericValue = typeof value === 'number' ? value : typeof value === 'string' ? Number(value) : Number.NaN
-  if (!Number.isFinite(numericValue)) {
-    return ''
-  }
-
-  if (decimalCount(numericValue) > 3) {
-    return numericValue.toFixed(3)
-  }
-
-  return numericValue
-}
+import { formatWithMaxThreeDecimals } from '@/util/numberFormatting'
 
 export const CrossSearchTable = ({ selectorFn }: { selectorFn?: (newObject: CrossSearch) => void }) => {
   const { sqlLimit, sqlOffset, sqlColumnFilters, sqlOrderBy } = usePageContext()
