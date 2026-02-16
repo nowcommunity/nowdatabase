@@ -80,6 +80,8 @@ describe('LocalityTable numeric cell formatting', () => {
     expect(decLatCell?.({ cell: { getValue: () => 12.34567 } })).toBe('12.346')
     expect(decLatCell?.({ cell: { getValue: () => 12.3 } })).toBe(12.3)
     expect(decLongCell?.({ cell: { getValue: () => -55 } })).toBe(-55)
+
+    expect(decLongCell?.({ cell: { getValue: () => '-96.7166667' } })).toBe('-96.717')
   })
 
   it('keeps max_age/min_age formatting behavior unchanged', () => {

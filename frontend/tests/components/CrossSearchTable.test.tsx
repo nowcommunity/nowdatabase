@@ -137,5 +137,6 @@ describe('CrossSearchTable column configuration', () => {
     expect(decLatColumn?.Cell?.({ cell: { getValue: () => 12.34567 } })).toBe('12.346')
     expect(decLatColumn?.Cell?.({ cell: { getValue: () => 12.3 } })).toBe(12.3)
     expect(decLongColumn?.Cell?.({ cell: { getValue: () => -55 } })).toBe(-55)
+    expect(decLongColumn?.Cell?.({ cell: { getValue: () => '-96.7166667' } })).toBe('-96.717')
   })
 })

@@ -14,11 +14,17 @@ const decimalCount = (num: number) => {
   return 0
 }
 
-const formatWithMaxThreeDecimals = (value: number): number | string => {
-  if (decimalCount(value) > 3) {
-    return value.toFixed(3)
+const formatWithMaxThreeDecimals = (value: unknown): number | string => {
+  const numericValue = typeof value === 'number' ? value : typeof value === 'string' ? Number(value) : Number.NaN
+  if (!Number.isFinite(numericValue)) {
+    return ''
   }
-  return value
+
+  if (decimalCount(numericValue) > 3) {
+    return numericValue.toFixed(3)
+  }
+
+  return numericValue
 }
 
 export const CrossSearchTable = ({ selectorFn }: { selectorFn?: (newObject: CrossSearch) => void }) => {
