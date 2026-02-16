@@ -58,7 +58,7 @@ export type DetailContextType<T> = {
   mode: ModeType
   setMode: (newMode: ModeOptions) => void
   editData: EditDataType<T>
-  setEditData: (editData: EditDataType<T>) => void
+  setEditData: SetEditDataType<T>
   textField: (field: keyof EditDataType<T>, options?: TextFieldOptions) => JSX.Element
   bigTextField: (field: keyof EditDataType<T>) => JSX.Element
   dropdown: (
@@ -86,6 +86,8 @@ export type DetailContextType<T> = {
   isDirty: boolean
   resetEditData: () => void
 }
+
+export type SetEditDataType<T> = (editData: EditDataType<T>) => void
 
 export const DetailContext = createContext<DetailContextType<unknown>>(null!)
 
