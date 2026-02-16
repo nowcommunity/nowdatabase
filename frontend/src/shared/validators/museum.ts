@@ -21,7 +21,6 @@ export const validateMuseum = (editData: EditDataType<Museum>, fieldName: keyof 
       required: true,
       asString: museumCode => {
         if (museumCode.indexOf(' ') !== -1) return 'Museum code must not contain a space'
-        if (museumCode.toUpperCase() !== museumCode) return 'Museum code must only contains uppercase characters'
         return null
       },
     },

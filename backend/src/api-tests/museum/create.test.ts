@@ -37,6 +37,23 @@ describe('Creating new museum works', () => {
     expect(institution).toEqual('Australian Museum') // 'Institution name is different'
   })
 
+  it('Creation succeeds with mixed-case museum code containing a dash', async () => {
+    const { body: resultBody, status: getReqStatus } = await send<{ museum: string }>('museum/', 'PUT', {
+      museum: { ...newMuseumBasis, museum: 'MNHN-Bol' },
+    })
+
+    expect(getReqStatus).toEqual(200)
+    expect(resultBody.museum).toEqual('MNHN-Bol')
+  })
+
+  it('Creation fails when museum code differs only by case', async () => {
+    const { body: resultBody, status: getReqStatus } = await send<{ message: string; code: string }>('museum/', 'PUT', {
+      museum: { ...newMuseumBasis, museum: 'MNHN-BOL' },
+    })
+
+    expect(getReqStatus).toEqual(409)
+    expect(resultBody.code).toEqual('duplicate_museum_code')
+  })
   it('Creation fails with empty museum code', async () => {
     const { body: resultBody, status: getReqStatus } = await send('museum/', 'PUT', {
       museum: { ...newMuseumBasis, museum: null },

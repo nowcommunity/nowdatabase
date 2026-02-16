@@ -3,7 +3,7 @@ import { getAllMuseums, getMuseumDetails, validateEntireMuseum } from '../servic
 import { fixBigInt } from '../utils/common'
 import { requireOneOf } from '../middlewares/authorizer'
 import { Role, EditDataType, EditMetaData, Museum } from '../../../frontend/src/shared/types'
-import { writeMuseum } from '../services/write/museum'
+import { DuplicateMuseumCodeError, writeMuseum } from '../services/write/museum'
 
 const router = Router()
 
@@ -23,13 +23,21 @@ router.put(
   '/',
   requireOneOf([Role.Admin]),
   async (req: Request<object, object, { museum: EditDataType<Museum> & EditMetaData }>, res) => {
-    const { ...editedMuseum } = req.body.museum
-    const validationErrors = validateEntireMuseum({ ...editedMuseum })
-    if (validationErrors.length > 0) {
-      return res.status(403).send(validationErrors)
+    try {
+      const { ...editedMuseum } = req.body.museum
+      const validationErrors = validateEntireMuseum({ ...editedMuseum })
+      if (validationErrors.length > 0) {
+        return res.status(403).send(validationErrors)
+      }
+      const museum = await writeMuseum(editedMuseum)
+      return res.status(200).send({ museum })
+    } catch (error) {
+      if (error instanceof DuplicateMuseumCodeError) {
+        return res.status(error.status).send({ message: error.message, code: error.code })
+      }
+
+      return res.status(500).send({ message: 'Failed to write museum' })
     }
-    const museum = await writeMuseum(editedMuseum)
-    return res.status(200).send({ museum })
   }
 )
 
