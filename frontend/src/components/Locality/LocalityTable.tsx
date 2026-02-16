@@ -6,18 +6,11 @@ import { TableView } from '../TableView/TableView'
 import { LocalitiesMap } from '../Map/LocalitiesMap'
 import { generateKml } from '@/util/kml'
 import { generateSvg } from '../Map/generateSvg'
+import { formatWithMaxThreeDecimals } from '@/util/numberFormatting'
 import { usePageContext } from '../Page'
 import { LocalitySynonymsModal } from './LocalitySynonymsModal'
 import { currentDateAsString } from '@/shared/currentDateAsString'
 import { matchesCountryOrContinent } from '@/shared/validators/countryContinents'
-
-const decimalCount = (num: number) => {
-  const numAsString = num.toString()
-  if (numAsString.includes('.')) {
-    return numAsString.split('.')[1].length
-  }
-  return 0
-}
 
 export const LocalityTable = ({ selectorFn }: { selectorFn?: (newObject: Locality) => void }) => {
   const [selectedLocality, setSelectedLocality] = useState<string | undefined>()
@@ -89,12 +82,14 @@ export const LocalityTable = ({ selectorFn }: { selectorFn?: (newObject: Localit
         header: 'Dec lat',
         filterVariant: 'range',
         enableColumnFilterModes: false,
+        Cell: ({ cell }) => formatWithMaxThreeDecimals(cell.getValue() as number),
       },
       {
         accessorKey: 'dec_long',
         header: 'Dec long',
         filterVariant: 'range',
         enableColumnFilterModes: false,
+        Cell: ({ cell }) => formatWithMaxThreeDecimals(cell.getValue() as number),
       },
       {
         accessorKey: 'altitude',
@@ -106,13 +101,7 @@ export const LocalityTable = ({ selectorFn }: { selectorFn?: (newObject: Localit
         header: 'Max age',
         filterVariant: 'range',
         enableColumnFilterModes: false,
-        Cell: ({ cell }) => {
-          const cellVal = cell.getValue() as number
-          if (decimalCount(cellVal) > 3) {
-            return cellVal.toFixed(3)
-          }
-          return cellVal
-        },
+        Cell: ({ cell }) => formatWithMaxThreeDecimals(cell.getValue() as number),
       },
       {
         id: 'bfa_max',
@@ -136,13 +125,7 @@ export const LocalityTable = ({ selectorFn }: { selectorFn?: (newObject: Localit
         header: 'Min age',
         filterVariant: 'range',
         enableColumnFilterModes: false,
-        Cell: ({ cell }) => {
-          const cellVal = cell.getValue() as number
-          if (decimalCount(cellVal) > 3) {
-            return cellVal.toFixed(3)
-          }
-          return cellVal
-        },
+        Cell: ({ cell }) => formatWithMaxThreeDecimals(cell.getValue() as number),
       },
       {
         id: 'bfa_min',

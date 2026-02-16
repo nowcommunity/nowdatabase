@@ -5,6 +5,7 @@ import { TableView } from '../TableView/TableView'
 import { useGetAllCrossSearchQuery, useGetAllCrossSearchLocalitiesQuery } from '@/redux/crossSearchReducer'
 import { usePageContext } from '../Page'
 import { LocalitiesMap } from '../Map/LocalitiesMap'
+import { formatWithMaxThreeDecimals } from '@/util/numberFormatting'
 
 export const CrossSearchTable = ({ selectorFn }: { selectorFn?: (newObject: CrossSearch) => void }) => {
   const { sqlLimit, sqlOffset, sqlColumnFilters, sqlOrderBy } = usePageContext()
@@ -56,12 +57,14 @@ export const CrossSearchTable = ({ selectorFn }: { selectorFn?: (newObject: Cros
         header: 'Dec lat',
         filterVariant: 'range',
         enableColumnFilterModes: false,
+        Cell: ({ cell }) => formatWithMaxThreeDecimals(cell.getValue() as number),
       },
       {
         accessorKey: 'dec_long',
         header: 'Dec long',
         filterVariant: 'range',
         enableColumnFilterModes: false,
+        Cell: ({ cell }) => formatWithMaxThreeDecimals(cell.getValue() as number),
       },
       {
         accessorKey: 'altitude',

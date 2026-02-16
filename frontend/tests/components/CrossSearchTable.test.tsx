@@ -17,6 +17,7 @@ type MockedColumn = {
   id?: string
   accessorKey?: string
   accessorFn?: (row: CrossSearchRow) => unknown
+  Cell?: (props: { cell: { getValue: () => unknown } }) => unknown
 }
 
 type MockedTableViewProps = {
@@ -124,5 +125,18 @@ describe('CrossSearchTable column configuration', () => {
     })
 
     expect(accessorFn?.(sample)).toBe('S1234')
+  })
+
+  it('formats coordinates with a maximum of three decimals for consistency with Locality table', () => {
+    const decLatColumn = (capturedProps?.columns ?? []).find(column => column?.accessorKey === 'dec_lat')
+    const decLongColumn = (capturedProps?.columns ?? []).find(column => column?.accessorKey === 'dec_long')
+
+    expect(typeof decLatColumn?.Cell).toBe('function')
+    expect(typeof decLongColumn?.Cell).toBe('function')
+
+    expect(decLatColumn?.Cell?.({ cell: { getValue: () => 12.34567 } })).toBe('12.346')
+    expect(decLatColumn?.Cell?.({ cell: { getValue: () => 12.3 } })).toBe(12.3)
+    expect(decLongColumn?.Cell?.({ cell: { getValue: () => -55 } })).toBe(-55)
+    expect(decLongColumn?.Cell?.({ cell: { getValue: () => '-96.7166667' } })).toBe('-96.717')
   })
 })

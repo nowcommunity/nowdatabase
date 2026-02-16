@@ -30,6 +30,18 @@ import { resolveErrorMessage, resolveErrorStatus } from './errorUtils'
 
 type TableStateInUrl = 'sorting' | 'columnfilters' | 'pagination'
 
+const isEmptyFilterValue = (value: unknown): boolean => {
+  if (Array.isArray(value)) {
+    return value.every(item => item === '' || item === null || item === undefined)
+  }
+
+  return value === '' || value === null || value === undefined
+}
+
+const sanitizeColumnFilters = (filters: MRT_ColumnFiltersState): MRT_ColumnFiltersState => {
+  return filters.filter(filter => !isEmptyFilterValue(filter.value))
+}
+
 /*
   TableView takes in the data and columns of a table, and handles
   rendering the actual table and saving & loading its state via url.
@@ -104,7 +116,7 @@ export const TableView = <T extends MRT_RowData>({
   useEffect(() => {
     setSqlLimit(pagination.pageSize)
     setSqlOffset(pagination.pageIndex * pagination.pageSize)
-    setSqlColumnFilters(columnFilters)
+    setSqlColumnFilters(sanitizeColumnFilters(columnFilters))
     setSqlOrderBy(sorting)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pagination, columnFilters, sorting])
@@ -201,7 +213,8 @@ export const TableView = <T extends MRT_RowData>({
 
   const muiTableBodyRowProps = ({ row }: { row: MRT_Row<T> }) => ({
     onClick: () => {
-      const columnFilterToUrl = `columnfilters=${JSON.stringify(columnFilters)}`
+      const sanitizedFilters = sanitizeColumnFilters(columnFilters)
+      const columnFilterToUrl = `columnfilters=${JSON.stringify(sanitizedFilters)}`
       const sortingToUrl = `sorting=${JSON.stringify(sorting)}`
       const paginationToUrl = `pagination=${JSON.stringify(pagination)}`
       setPreviousTableUrls([
@@ -347,7 +360,8 @@ export const TableView = <T extends MRT_RowData>({
   // Save state to url whenever it changes
   useEffect(() => {
     if (selectorFn) return
-    const columnFilterToUrl = `columnfilters=${JSON.stringify(columnFilters)}`
+    const sanitizedFilters = sanitizeColumnFilters(columnFilters)
+    const columnFilterToUrl = `columnfilters=${JSON.stringify(sanitizedFilters)}`
     const sortingToUrl = `sorting=${JSON.stringify(sorting)}`
     const paginationToUrl = `pagination=${JSON.stringify(pagination)}`
     navigate(`${location.pathname}?&${columnFilterToUrl}&${sortingToUrl}&${paginationToUrl}`, {
