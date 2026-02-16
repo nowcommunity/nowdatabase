@@ -29,12 +29,21 @@ export const validateLocality = (
   editData: EditDataType<LocalityDetailsType>,
   fieldName: keyof EditDataType<LocalityDetailsType>
 ) => {
+  const isAbsoluteDatingMethod = editData.date_meth === 'absolute'
+  const isTimeUnitDatingMethod = editData.date_meth === 'time_unit'
+  const isCompositeDatingMethod = editData.date_meth === 'composite'
+
+  const minUsesAbsoluteBasis = !!editData.bfa_min_abs
+  const minUsesTimeUnitBasis = !!editData.bfa_min
+  const maxUsesAbsoluteBasis = !!editData.bfa_max_abs
+  const maxUsesTimeUnitBasis = !!editData.bfa_max
+
   const compositeDatingMethodNoBases =
-    editData.date_meth === 'composite' &&
-    !editData.bfa_min &&
-    !editData.bfa_min_abs &&
-    !editData.bfa_max &&
-    !editData.bfa_max_abs
+    isCompositeDatingMethod &&
+    !minUsesTimeUnitBasis &&
+    !minUsesAbsoluteBasis &&
+    !maxUsesTimeUnitBasis &&
+    !maxUsesAbsoluteBasis
 
   const compositeDatingMethodRequiredText = 'One age row must follow the rules for Absolute, the other for Time Unit'
 
@@ -65,8 +74,7 @@ export const validateLocality = (
     bfa_min_abs: {
       name: 'Basis for age (Absolute, min)',
       required: () => {
-        if (editData.date_meth === 'absolute' || (editData.date_meth === 'composite' && !!editData.bfa_max))
-          return 'This field is required'
+        if (isAbsoluteDatingMethod || (isCompositeDatingMethod && maxUsesTimeUnitBasis)) return 'This field is required'
         if (compositeDatingMethodNoBases) return compositeDatingMethodRequiredText
         return
       },
@@ -74,8 +82,7 @@ export const validateLocality = (
     bfa_max_abs: {
       name: 'Basis for age (Absolute, max)',
       required: () => {
-        if (editData.date_meth === 'absolute' || (editData.date_meth === 'composite' && !!editData.bfa_min))
-          return 'This field is required'
+        if (isAbsoluteDatingMethod || (isCompositeDatingMethod && minUsesTimeUnitBasis)) return 'This field is required'
         if (compositeDatingMethodNoBases) return compositeDatingMethodRequiredText
         return
       },
@@ -83,8 +90,7 @@ export const validateLocality = (
     bfa_min: {
       name: 'Basis for age (Time unit, min)',
       required: () => {
-        if (editData.date_meth === 'time_unit' || (editData.date_meth === 'composite' && !!editData.bfa_max_abs))
-          return 'This field is required'
+        if (isTimeUnitDatingMethod || (isCompositeDatingMethod && maxUsesAbsoluteBasis)) return 'This field is required'
         if (compositeDatingMethodNoBases) return compositeDatingMethodRequiredText
         return
       },
@@ -92,8 +98,7 @@ export const validateLocality = (
     bfa_max: {
       name: 'Basis for age (Time unit, max)',
       required: () => {
-        if (editData.date_meth === 'time_unit' || (editData.date_meth === 'composite' && !!editData.bfa_min_abs))
-          return 'This field is required'
+        if (isTimeUnitDatingMethod || (isCompositeDatingMethod && minUsesAbsoluteBasis)) return 'This field is required'
         if (compositeDatingMethodNoBases) return compositeDatingMethodRequiredText
         return
       },

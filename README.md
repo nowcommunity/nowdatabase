@@ -54,3 +54,10 @@ The new version is not deployed yet.
 - Shared locality validation enforces combined pollen constraint `AP + NAP + OP <= 100` and surfaces the same message in form validation feedback.
 - Backend locality write validation now evaluates pollen totals with full update context so partial updates cannot bypass the combined-value rule.
 - API tests include invalid create/update pollen payload coverage for non-integer, out-of-range, and total-above-100 cases.
+
+### Reviewer notes: Locality age method persistence
+
+- In Locality edit mode, the Age tab now preserves method-specific values when switching Dating method between `Time unit`, `Absolute`, and `Composite`.
+- Switching methods restores previously entered age values (e.g., `min_age`, `max_age`, basis/fraction selections) instead of clearing them.
+- Locality age validation now evaluates required basis fields against the currently active dating method, while allowing preserved values from other methods to remain in draft state.
+- See [documentation/CHANGELOG.md](documentation/CHANGELOG.md) for release-level tracking.

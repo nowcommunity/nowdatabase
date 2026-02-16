@@ -61,6 +61,45 @@ const Wrapper = ({ children }: { children: ReactNode }) => {
   )
 }
 
+const FractionUpdateWrapper = () => {
+  const initialEditData = {
+    min_age: 10,
+    max_age: 20,
+    frac_min: '',
+    bfa_min: '',
+  } as unknown as EditDataType<LocalityDetailsType>
+
+  const [editData, setEditData] = useState<EditDataType<LocalityDetailsType>>(initialEditData)
+
+  const contextValue: DetailContextType<LocalityDetailsType> = {
+    data: initialEditData as unknown as LocalityDetailsType,
+    mode: modeOptionToMode.edit,
+    setMode: () => undefined,
+    editData,
+    setEditData,
+    isDirty: false,
+    resetEditData: () => setEditData(initialEditData),
+    textField: () => <></>,
+    bigTextField: () => <></>,
+    dropdown: () => <></>,
+    dropdownWithSearch: () => <></>,
+    radioSelection: () => <></>,
+    validator: () => ({ name: '', error: null }),
+    fieldsWithErrors: {},
+    setFieldsWithErrors: () => undefined,
+  }
+
+  return (
+    <DetailContext.Provider value={contextValue as DetailContextType<unknown>}>
+      <div data-testid="min-age">{editData.min_age}</div>
+      <button type="button" onClick={() => setEditData({ ...editData, frac_min: '1:2' })}>
+        set fraction 1:2
+      </button>
+      <BasisForAgeSelection targetField="bfa_min" fraction={editData.frac_min} selectorTable={<SelectorTable />} />
+    </DetailContext.Provider>
+  )
+}
+
 describe('BasisForAgeSelection', () => {
   it('keeps minimum age populated when selecting a time unit without a fraction', async () => {
     const user = userEvent.setup()
@@ -81,6 +120,25 @@ describe('BasisForAgeSelection', () => {
       const updatedBasisField = screen.getByRole<HTMLInputElement>('textbox')
       expect(minAge.textContent).toContain('45')
       expect(updatedBasisField.value).toBe('abdounian')
+    })
+  })
+
+  it('recalculates minimum age when fraction changes after selecting a time unit', async () => {
+    const user = userEvent.setup()
+
+    render(<FractionUpdateWrapper />)
+
+    await user.click(screen.getByRole('textbox'))
+    await user.click(screen.getByRole('button', { name: /choose time unit/i }))
+
+    await waitFor(() => {
+      expect(screen.getByTestId('min-age').textContent).toContain('45')
+    })
+
+    await user.click(screen.getByRole('button', { name: /set fraction 1:2/i }))
+
+    await waitFor(() => {
+      expect(screen.getByTestId('min-age').textContent).toContain('42.5')
     })
   })
 })

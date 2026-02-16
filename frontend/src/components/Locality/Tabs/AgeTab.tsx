@@ -1,19 +1,74 @@
-import { LocalityDetailsType } from '@/shared/types'
+import { EditDataType, LocalityDetailsType } from '@/shared/types'
 import { BasisForAgeSelection } from '@/components/DetailView/common/editingComponents'
 import { emptyOption } from '@/components/DetailView/common/misc'
 import { ArrayFrame, HalfFrames } from '@/components/DetailView/common/tabLayoutHelpers'
-import { useDetailContext } from '@/components/DetailView/Context/DetailContext'
+import { makeEditData, useDetailContext } from '@/components/DetailView/Context/DetailContext'
 import { TimeUnitTable } from '@/components/TimeUnit/TimeUnitTable'
 import { useGetTimeUnitDetailsQuery } from '@/redux/timeUnitReducer'
 import { skipToken } from '@reduxjs/toolkit/query'
 import { CircularProgress } from '@mui/material'
+import { useEffect, useState } from 'react'
+
+type LocalityDatingMethod = 'time_unit' | 'absolute' | 'composite'
+
+type AgeFields = Pick<
+  EditDataType<LocalityDetailsType>,
+  'min_age' | 'bfa_min_abs' | 'bfa_min' | 'frac_min' | 'max_age' | 'bfa_max_abs' | 'bfa_max' | 'frac_max'
+>
+
+type AgeDraftsByMethod = Record<LocalityDatingMethod, AgeFields>
+
+const emptyAgeFields = (): AgeFields => ({
+  min_age: undefined,
+  bfa_min_abs: '',
+  bfa_min: '',
+  frac_min: '',
+  max_age: undefined,
+  bfa_max_abs: '',
+  bfa_max: '',
+  frac_max: '',
+})
+
+const getAgeFields = (editData: EditDataType<LocalityDetailsType>): AgeFields => ({
+  min_age: editData.min_age,
+  bfa_min_abs: editData.bfa_min_abs,
+  bfa_min: editData.bfa_min,
+  frac_min: editData.frac_min,
+  max_age: editData.max_age,
+  bfa_max_abs: editData.bfa_max_abs,
+  bfa_max: editData.bfa_max,
+  frac_max: editData.frac_max,
+})
+
+const toDatingMethod = (value: number | string | boolean | undefined): LocalityDatingMethod | null => {
+  if (value === 'time_unit' || value === 'absolute' || value === 'composite') return value
+  return null
+}
+
+const initializeDrafts = (editData: EditDataType<LocalityDetailsType>): AgeDraftsByMethod => {
+  const drafts = {
+    time_unit: emptyAgeFields(),
+    absolute: emptyAgeFields(),
+    composite: emptyAgeFields(),
+  }
+
+  const dateMethod = toDatingMethod(editData.date_meth)
+  if (!dateMethod) return drafts
+
+  return { ...drafts, [dateMethod]: getAgeFields(editData) }
+}
 
 export const AgeTab = () => {
   const { textField, radioSelection, dropdown, bigTextField, editData, setEditData, data } =
     useDetailContext<LocalityDetailsType>()
+  const [ageDraftsByMethod, setAgeDraftsByMethod] = useState<AgeDraftsByMethod>(() => initializeDrafts(editData))
 
   const { data: bfaMinData, isFetching: bfaMinFetching } = useGetTimeUnitDetailsQuery(editData.bfa_min || skipToken)
   const { data: bfaMaxData, isFetching: bfaMaxFetching } = useGetTimeUnitDetailsQuery(editData.bfa_max || skipToken)
+
+  useEffect(() => {
+    setAgeDraftsByMethod(initializeDrafts(makeEditData(data)))
+  }, [data])
 
   const minTimeUnitDisplay = data.bfa_min_time_unit?.tu_display_name
   const maxTimeUnitDisplay = data.bfa_max_time_unit?.tu_display_name
@@ -50,19 +105,24 @@ export const AgeTab = () => {
   ]
 
   const handleDateMethChange = (value: number | string | boolean) => {
-    // this is to satisfy type requirements of handleSetEditData
-    if (typeof value !== 'string') return
+    const nextDateMethod = toDatingMethod(value)
+    if (!nextDateMethod) return
+
+    const currentDateMethod = toDatingMethod(editData.date_meth)
+    const nextDrafts = { ...ageDraftsByMethod }
+
+    if (currentDateMethod) {
+      nextDrafts[currentDateMethod] = getAgeFields(editData)
+    }
+
+    const restoredFields = nextDrafts[nextDateMethod] ?? emptyAgeFields()
+
+    setAgeDraftsByMethod(nextDrafts)
+
     setEditData({
       ...editData,
-      date_meth: value,
-      min_age: undefined,
-      bfa_min_abs: '',
-      bfa_min: '',
-      frac_min: '',
-      max_age: undefined,
-      bfa_max_abs: '',
-      bfa_max: '',
-      frac_max: '',
+      date_meth: nextDateMethod,
+      ...restoredFields,
     })
   }
 
