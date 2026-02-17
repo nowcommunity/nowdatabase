@@ -1,20 +1,13 @@
 import { EditDataType, RowState } from '@/shared/types'
 import { CircularProgress, Box, Button } from '@mui/material'
-import {
-  type MRT_ColumnDef,
-  type MRT_RowData,
-  MaterialReactTable,
-  MRT_Row,
-  MRT_PaginationState,
-} from 'material-react-table'
+import { type MRT_ColumnDef, type MRT_Row, type MRT_RowData } from 'material-react-table'
 import { useDetailContext } from '../Context/DetailContext'
 import RemoveCircleOutlineIcon from '@mui/icons-material/RemoveCircleOutline'
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline'
-import { useState, useEffect } from 'react'
+import { useEffect } from 'react'
 import { checkFieldErrors } from './checkFieldErrors'
 import { ActionComponent } from '@/components/TableView/ActionComponent'
-
-const defaultPagination: MRT_PaginationState = { pageIndex: 0, pageSize: 15 }
+import { DetailTabTable } from './DetailTabTable'
 
 const getNewState = (state: RowState): RowState => {
   if (!state || state === 'clean') return 'removed'
@@ -47,7 +40,6 @@ export const EditableTable = <
   idFieldName?: keyof T
   url?: string
 }) => {
-  const [pagination, setPagination] = useState<MRT_PaginationState>(defaultPagination)
   const { editData, setEditData, mode, data, validator, fieldsWithErrors, setFieldsWithErrors } =
     useDetailContext<ParentType>()
   const errorObject = validator(editData, field)
@@ -100,14 +92,16 @@ export const EditableTable = <
     return null // code shouldn't get here!
   }
 
-  const actionRowProps = () => {
+  const resolveRenderRowActions = () => {
     if (mode.read && (!idFieldName || !url)) {
-      return {}
-    } else if (mode.read && idFieldName && url) {
-      return { enableRowActions: true, renderRowActions: linkToDetails }
-    } else {
-      return { enableRowActions: true, renderRowActions: actionRow }
+      return undefined
     }
+
+    if (mode.read && idFieldName && url) {
+      return linkToDetails
+    }
+
+    return actionRow
   }
 
   const rowStateToColor = (state: RowState | undefined) => {
@@ -132,18 +126,15 @@ export const EditableTable = <
   }
 
   return (
-    <MaterialReactTable
-      {...actionRowProps()}
+    <DetailTabTable<T>
+      mode="edit"
       columns={columns}
       data={getData()}
       enableTopToolbar={false}
       enableColumnActions={false}
       enableSorting={false}
-      enablePagination={true}
-      onPaginationChange={setPagination}
-      positionPagination="both"
-      paginationDisplayMode="pages"
-      state={{ density: 'compact', pagination }}
+      enableRowActions={Boolean(resolveRenderRowActions())}
+      renderRowActions={resolveRenderRowActions()}
       muiTableBodyRowProps={({ row }: { row: MRT_Row<T> }) => ({
         sx: { backgroundColor: rowStateToColor(row.original.rowState) },
       })}
