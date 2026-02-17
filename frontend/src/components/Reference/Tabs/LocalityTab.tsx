@@ -2,7 +2,7 @@ import { ReferenceDetailsType } from '@/shared/types'
 import { useGetReferenceLocalitiesQuery } from '@/redux/referenceReducer'
 import { CircularProgress } from '@mui/material'
 import { useDetailContext } from '@/components/DetailView/Context/DetailContext'
-import { SimpleTable } from '@/components/DetailView/common/SimpleTable'
+import { DetailTabTable } from '@/components/DetailView/common/DetailTabTable'
 
 export const LocalityTab = () => {
   const { data } = useDetailContext<ReferenceDetailsType>()
@@ -30,5 +30,18 @@ export const LocalityTab = () => {
     },
   ]
 
-  return <SimpleTable columns={columns} data={localitiesData} idFieldName="lid" url="locality" />
+  return (
+    <DetailTabTable
+      mode="read"
+      title="Reference Localities"
+      columns={columns}
+      data={localitiesData}
+      idFieldName="lid"
+      url="locality"
+      isFetching={false}
+      enableColumnFilterModes={true}
+      clickableRows={true}
+      paginationPlacement="bottom"
+    />
+  )
 }

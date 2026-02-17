@@ -1,4 +1,4 @@
-import { SimpleTable } from '@/components/DetailView/common/SimpleTable'
+import { DetailTabTable } from '@/components/DetailView/common/DetailTabTable'
 import { useDetailContext } from '@/components/DetailView/Context/DetailContext'
 import { MuseumLocalities } from '@/shared/types'
 
@@ -34,5 +34,18 @@ export const LocalityTab = ({ isNew }: { isNew: boolean }) => {
     return <div>Link localities to this museum by editing a locality and navigating to the museum tab there.</div>
   }
 
-  return <SimpleTable columns={columns} data={data.localities} idFieldName="lid" url="locality" />
+  return (
+    <DetailTabTable
+      mode="read"
+      title="Museum Localities"
+      columns={columns}
+      data={data.localities}
+      idFieldName="lid"
+      url="locality"
+      isFetching={false}
+      enableColumnFilterModes={true}
+      clickableRows={true}
+      paginationPlacement="bottom"
+    />
+  )
 }

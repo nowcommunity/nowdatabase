@@ -4,7 +4,7 @@ import { Alert, Button, CircularProgress, Stack } from '@mui/material'
 import { skipToken } from '@reduxjs/toolkit/query'
 import { useDetailContext } from '@/components/DetailView/Context/DetailContext'
 import { MRT_ColumnDef } from 'material-react-table'
-import { SimpleTable } from '@/components/DetailView/common/SimpleTable'
+import { DetailTabTable } from '@/components/DetailView/common/DetailTabTable'
 
 export const TimeUnitTab = () => {
   const { data, mode } = useDetailContext<TimeBoundDetailsType>()
@@ -62,11 +62,17 @@ export const TimeUnitTab = () => {
   ]
 
   return (
-    <SimpleTable<TimeUnit, TimeBoundDetailsType>
+    <DetailTabTable<TimeUnit>
+      mode="read"
+      title="Time Units"
       columns={columns}
       data={timeUnitsData}
       idFieldName="tu_name"
       url="time-unit"
+      isFetching={false}
+      enableColumnFilterModes={true}
+      clickableRows={true}
+      paginationPlacement="bottom"
     />
   )
 }

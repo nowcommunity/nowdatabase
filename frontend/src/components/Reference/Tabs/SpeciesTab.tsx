@@ -2,8 +2,11 @@ import { ReferenceDetailsType } from '@/shared/types'
 import { useGetReferenceSpeciesQuery } from '@/redux/referenceReducer'
 import { CircularProgress } from '@mui/material'
 import { useDetailContext } from '@/components/DetailView/Context/DetailContext'
-import { SimpleTable } from '@/components/DetailView/common/SimpleTable'
-import { applyDefaultSpeciesOrdering, hasActiveSortingInSearch } from '@/components/DetailView/common/DetailTabTable'
+import {
+  applyDefaultSpeciesOrdering,
+  DetailTabTable,
+  hasActiveSortingInSearch,
+} from '@/components/DetailView/common/DetailTabTable'
 import { useLocation } from 'react-router-dom'
 
 export const SpeciesTab = () => {
@@ -53,5 +56,18 @@ export const SpeciesTab = () => {
     skip: hasActiveSortingInSearch(location.search),
   })
 
-  return <SimpleTable columns={columns} data={sortedSpeciesData} idFieldName="species_id" url="species" />
+  return (
+    <DetailTabTable
+      mode="read"
+      title="Reference Species"
+      columns={columns}
+      data={sortedSpeciesData}
+      idFieldName="species_id"
+      url="species"
+      isFetching={false}
+      enableColumnFilterModes={true}
+      clickableRows={true}
+      paginationPlacement="bottom"
+    />
+  )
 }

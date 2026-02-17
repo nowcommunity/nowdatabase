@@ -2,7 +2,7 @@ import { TimeUnitDetailsType } from '@/shared/types'
 import { useGetTimeUnitLocalitiesQuery } from '@/redux/timeUnitReducer'
 import { CircularProgress } from '@mui/material'
 import { useDetailContext } from '@/components/DetailView/Context/DetailContext'
-import { SimpleTable } from '@/components/DetailView/common/SimpleTable'
+import { DetailTabTable } from '@/components/DetailView/common/DetailTabTable'
 
 export const LocalityTab = () => {
   const { data } = useDetailContext<TimeUnitDetailsType>()
@@ -39,5 +39,18 @@ export const LocalityTab = () => {
     },
   ]
 
-  return <SimpleTable columns={columns} data={modifiedData} idFieldName="lid" url="locality" />
+  return (
+    <DetailTabTable
+      mode="read"
+      title="Time Unit Localities"
+      columns={columns}
+      data={modifiedData}
+      idFieldName="lid"
+      url="locality"
+      isFetching={false}
+      enableColumnFilterModes={true}
+      clickableRows={true}
+      paginationPlacement="bottom"
+    />
+  )
 }
