@@ -23,17 +23,33 @@ import {
 import { useNotify } from '@/hooks/notification'
 import { validateSpecies } from '@/shared/validators/species'
 import { smallSpeciesTableColumns } from '@/common'
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { SynonymsModal } from '@/components/Species/SynonymsModal'
 import { taxonStatusSelectOptions } from '@/constants/taxonStatusOptions'
+import { applyDefaultSpeciesOrdering, hasActiveSortingInSearch } from '@/components/DetailView/common/DetailTabTable'
+import { useLocation } from 'react-router-dom'
 
 export const SpeciesTab = () => {
   const { mode, editData, setEditData } = useDetailContext<LocalityDetailsType>()
+  const location = useLocation()
   const { data: speciesData, isError } = useGetAllSpeciesQuery(mode.read ? skipToken : undefined)
   const { notify } = useNotify()
   const [replacedValues, setReplacedValues] = useState<EditDataType<Species> | undefined>()
   const [selectedSpecies, setSelectedSpecies] = useState<string | undefined>()
   const [modalOpen, setModalOpen] = useState<boolean>(false)
+
+  const hasUrlSorting = hasActiveSortingInSearch(location.search)
+
+  const sortedSpeciesData = useMemo(() => {
+    return applyDefaultSpeciesOrdering(speciesData, { skip: hasUrlSorting })
+  }, [hasUrlSorting, speciesData])
+
+  const sortedLocalitySpeciesData = useMemo(() => {
+    return applyDefaultSpeciesOrdering(editData.now_ls as unknown as LocalitySpecies[], {
+      prefix: 'com_species',
+      skip: hasUrlSorting,
+    })
+  }, [editData.now_ls, hasUrlSorting])
 
   const handleRowActionClick = (row: Species) => {
     setSelectedSpecies(row.species_id.toString())
@@ -46,7 +62,7 @@ export const SpeciesTab = () => {
         dataCy="copy_existing_taxonomy_button"
         buttonText="Copy existing taxonomy"
         title="Copy existing taxonomy"
-        data={speciesData}
+        data={sortedSpeciesData}
         isError={isError}
         columns={smallSpeciesTableColumns}
         fieldName="order_name" // this doesn't do anything here but is required
@@ -223,7 +239,7 @@ export const SpeciesTab = () => {
           />
           <SelectingTable<Species, LocalityDetailsType>
             buttonText="Select Species"
-            data={speciesData}
+            data={sortedSpeciesData}
             title="Species"
             isError={isError}
             columns={speciesColumns}
@@ -251,6 +267,7 @@ export const SpeciesTab = () => {
       <EditableTable<LocalitySpecies, LocalityDetailsType>
         columns={localitySpeciesColumns}
         field="now_ls"
+        visible_data={sortedLocalitySpeciesData}
         idFieldName="species_id"
         url="species"
       />

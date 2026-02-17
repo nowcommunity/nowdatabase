@@ -1,7 +1,7 @@
 import { describe, expect, it, jest, beforeEach } from '@jest/globals'
 import '@testing-library/jest-dom'
 import { render, screen } from '@testing-library/react'
-import { DetailTabTable } from './DetailTabTable'
+import { applyDefaultSpeciesOrdering, DetailTabTable, hasActiveSortingInSearch } from './DetailTabTable'
 
 const tableViewMock = jest.fn<(props: Record<string, unknown>) => JSX.Element>()
 const useMaterialReactTableMock = jest.fn<(options: Record<string, unknown>) => Record<string, unknown>>()
@@ -75,5 +75,37 @@ describe('DetailTabTable', () => {
         enablePagination: true,
       })
     )
+  })
+})
+
+describe('default species ordering helpers', () => {
+  it('applies fallback species ordering when sorting is not active', () => {
+    const rows = [
+      { order_name: 'Rodentia', family_name: 'Muridae', genus_name: 'Mus', species_name: 'musculus' },
+      { order_name: 'Artiodactyla', family_name: 'Bovidae', genus_name: 'Bos', species_name: 'taurus' },
+      { order_name: 'Artiodactyla', family_name: 'Cervidae', genus_name: 'Cervus', species_name: 'elaphus' },
+    ]
+
+    const ordered = applyDefaultSpeciesOrdering(rows)
+
+    expect(ordered?.map(row => `${row.order_name}:${row.family_name}:${row.genus_name}:${row.species_name}`)).toEqual([
+      'Artiodactyla:Bovidae:Bos:taurus',
+      'Artiodactyla:Cervidae:Cervus:elaphus',
+      'Rodentia:Muridae:Mus:musculus',
+    ])
+  })
+
+  it('does not apply fallback ordering when explicit sorting exists in url', () => {
+    const search = '?sorting=' + encodeURIComponent(JSON.stringify([{ id: 'species_name', desc: true }]))
+    expect(hasActiveSortingInSearch(search)).toBe(true)
+
+    const rows = [
+      { order_name: 'Rodentia', family_name: 'Muridae', genus_name: 'Mus', species_name: 'musculus' },
+      { order_name: 'Artiodactyla', family_name: 'Bovidae', genus_name: 'Bos', species_name: 'taurus' },
+    ]
+
+    const ordered = applyDefaultSpeciesOrdering(rows, { skip: hasActiveSortingInSearch(search) })
+
+    expect(ordered).toBe(rows)
   })
 })

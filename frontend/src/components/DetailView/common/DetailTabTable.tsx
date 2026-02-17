@@ -13,6 +13,81 @@ import { TableView } from '@/components/TableView/TableView'
 
 const defaultEditPagination: MRT_PaginationState = { pageIndex: 0, pageSize: 15 }
 
+const speciesDefaultSortFields = ['order_name', 'family_name', 'genus_name', 'species_name'] as const
+
+const getNestedValue = (row: MRT_RowData, path: string): unknown => {
+  return path.split('.').reduce<unknown>((acc, segment) => {
+    if (typeof acc !== 'object' || acc === null || !(segment in acc)) {
+      return undefined
+    }
+
+    return (acc as Record<string, unknown>)[segment]
+  }, row)
+}
+
+const normalizeSortValue = (value: unknown): string => {
+  if (value === null || value === undefined) {
+    return ''
+  }
+
+  if (typeof value === 'string') {
+    return value.toLocaleLowerCase()
+  }
+
+  if (typeof value === 'number' || typeof value === 'boolean' || typeof value === 'bigint') {
+    return `${value}`.toLocaleLowerCase()
+  }
+
+  return ''
+}
+
+// eslint-disable-next-line react-refresh/only-export-components
+export const hasActiveSortingInSearch = (search: string): boolean => {
+  const params = new URLSearchParams(search)
+  const rawSorting = params.get('sorting')
+
+  if (!rawSorting) {
+    return false
+  }
+
+  try {
+    const parsed = JSON.parse(rawSorting) as unknown
+    return Array.isArray(parsed) && parsed.length > 0
+  } catch {
+    return false
+  }
+}
+
+// eslint-disable-next-line react-refresh/only-export-components
+export const applyDefaultSpeciesOrdering = <T extends MRT_RowData>(
+  rows: T[] | undefined,
+  options?: { prefix?: string; skip?: boolean }
+): T[] | undefined => {
+  if (!rows) {
+    return undefined
+  }
+
+  if (options?.skip) {
+    return rows
+  }
+
+  const fields = speciesDefaultSortFields.map(field => (options?.prefix ? `${options.prefix}.${field}` : field))
+
+  return [...rows].sort((leftRow, rightRow) => {
+    for (const field of fields) {
+      const left = normalizeSortValue(getNestedValue(leftRow as MRT_RowData, field))
+      const right = normalizeSortValue(getNestedValue(rightRow as MRT_RowData, field))
+
+      const compared = left.localeCompare(right)
+      if (compared !== 0) {
+        return compared
+      }
+    }
+
+    return 0
+  })
+}
+
 type ReadOrSelectMode = 'read' | 'select'
 
 type DetailTabTableReadSelectProps<T extends MRT_RowData> = {

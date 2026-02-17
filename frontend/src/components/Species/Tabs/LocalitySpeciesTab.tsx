@@ -8,6 +8,9 @@ import { MRT_ColumnDef, MRT_Row } from 'material-react-table'
 import { matchesCountryOrContinent } from '@/shared/validators/countryContinents'
 import { useForm } from 'react-hook-form'
 import { calculateNormalizedMesowearScore } from '@/shared/utils/mesowear'
+import { applyDefaultSpeciesOrdering, hasActiveSortingInSearch } from '@/components/DetailView/common/DetailTabTable'
+import { useLocation } from 'react-router-dom'
+import { useMemo } from 'react'
 
 const hasMesowearScoreInputs = (row: SpeciesLocality) => {
   return (
@@ -21,11 +24,22 @@ const hasMesowearScoreInputs = (row: SpeciesLocality) => {
 }
 
 export const LocalitySpeciesTab = () => {
-  const { mode } = useDetailContext<SpeciesDetailsType>()
+  const { mode, data, editData } = useDetailContext<SpeciesDetailsType>()
+  const location = useLocation()
   const {
     register,
     formState: { errors },
   } = useForm()
+
+  const sortedLocalitySpeciesRows = useMemo(() => {
+    const sourceRows = (mode.read ? data.now_ls : editData.now_ls) as unknown as Editable<SpeciesLocality>[]
+
+    return (
+      applyDefaultSpeciesOrdering(sourceRows, {
+        skip: hasActiveSortingInSearch(location.search),
+      }) ?? sourceRows
+    )
+  }, [data.now_ls, editData.now_ls, location.search, mode.read])
 
   const columns: MRT_ColumnDef<SpeciesLocality>[] = [
     {
@@ -200,7 +214,11 @@ export const LocalitySpeciesTab = () => {
   return (
     <Grouped title="Locality-Species Information">
       {!mode.read && editingModal}
-      <EditableTable<Editable<SpeciesLocality>, SpeciesDetailsType> columns={columns} field="now_ls" />
+      <EditableTable<Editable<SpeciesLocality>, SpeciesDetailsType>
+        columns={columns}
+        field="now_ls"
+        visible_data={sortedLocalitySpeciesRows}
+      />
     </Grouped>
   )
 }
