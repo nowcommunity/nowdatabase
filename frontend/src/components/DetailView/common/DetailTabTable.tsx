@@ -10,6 +10,10 @@ import {
   useMaterialReactTable,
 } from 'material-react-table'
 import { TableView } from '@/components/TableView/TableView'
+import { TableToolBar } from '@/components/TableView/TableToolBar'
+import { Box } from '@mui/material'
+import { TableHelp } from '@components/Table'
+import { useUser } from '@/hooks/user'
 
 const defaultEditPagination: MRT_PaginationState = { pageIndex: 0, pageSize: 15 }
 
@@ -121,6 +125,7 @@ type DetailTabTableEditProps<T extends MRT_RowData> = {
   enableRowActions?: boolean
   renderRowActions?: MRT_TableOptions<T>['renderRowActions']
   muiTableBodyRowProps?: MRT_TableOptions<T>['muiTableBodyRowProps']
+  tableName?: string
 }
 
 type DetailTabTableProps<T extends MRT_RowData> = DetailTabTableReadSelectProps<T> | DetailTabTableEditProps<T>
@@ -188,8 +193,10 @@ const DetailTabEditableTable = <T extends MRT_RowData>({
   enableRowActions = false,
   renderRowActions,
   muiTableBodyRowProps,
+  tableName = 'table',
 }: DetailTabTableEditProps<T>) => {
   const [pagination, setPagination] = useState<MRT_PaginationState>(paginationState ?? defaultEditPagination)
+  const user = useUser()
 
   const resolvedPagination = paginationState ?? pagination
   const handlePaginationChange: MRT_TableOptions<T>['onPaginationChange'] = onPaginationChange ?? setPagination
@@ -197,7 +204,7 @@ const DetailTabEditableTable = <T extends MRT_RowData>({
   const table = useMaterialReactTable({
     columns,
     data,
-    enableTopToolbar,
+    enableTopToolbar: false,
     enableColumnActions,
     enableSorting,
     enablePagination: true,
@@ -210,7 +217,19 @@ const DetailTabEditableTable = <T extends MRT_RowData>({
     muiTableBodyRowProps,
   })
 
-  return <MaterialReactTable table={table} />
+  return (
+    <Box>
+      {enableTopToolbar && user && (
+        <div className="table-top-row">
+          <Box display="flex" alignItems="center" gap={1}>
+            <TableHelp showFiltering showSorting showMultiSorting showColumnVisibility showExport />
+            <TableToolBar<T> table={table} tableName={tableName} hideLeftButtons={true} />
+          </Box>
+        </div>
+      )}
+      <MaterialReactTable table={table} />
+    </Box>
+  )
 }
 
 export type { DetailTabTableProps, DetailTabTableReadSelectProps, DetailTabTableEditProps }

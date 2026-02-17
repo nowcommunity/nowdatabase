@@ -18,6 +18,7 @@ export const TableToolBar = <T extends MRT_RowData>({
   isCrossSearchTable,
   selectorFn,
   showNewButton,
+  hideLeftButtons,
 }: {
   table: MRT_TableInstance<T>
   tableName: string
@@ -26,6 +27,7 @@ export const TableToolBar = <T extends MRT_RowData>({
   isCrossSearchTable?: boolean
   selectorFn?: (id: T) => void
   showNewButton?: boolean
+  hideLeftButtons?: boolean
 }) => {
   const { previousTableUrls, setPreviousTableUrls } = usePageContext<T>()
   const location = useLocation()
@@ -40,7 +42,7 @@ export const TableToolBar = <T extends MRT_RowData>({
 
   return (
     <div className="table-tool-bar">
-      {!selectorFn && (
+      {!selectorFn && !hideLeftButtons && (
         <Box className="left-buttons">
           <ContactForm<T> buttonText="Contact" noContext={true} />
 

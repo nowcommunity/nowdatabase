@@ -424,6 +424,7 @@ export const TableView = <T extends MRT_RowData>({
               showNewButton={editRights.new && !selectorFn && title != 'Locality-Species-Cross-Search'}
               isCrossSearchTable={isCrossSearchTable}
               selectorFn={selectorFn}
+              hideLeftButtons={false}
             />
           </Box>
         </div>
