@@ -82,6 +82,7 @@ export const LocalityTab = () => {
       <EditableTable<Editable<Locality>, SpeciesDetailsType>
         columns={columns.map(c => ({ ...c, accessorKey: `now_loc.${c.accessorKey}` }))}
         field="now_ls"
+        enableAdvancedTableControls={true}
         idFieldName="lid"
         url="locality"
       />

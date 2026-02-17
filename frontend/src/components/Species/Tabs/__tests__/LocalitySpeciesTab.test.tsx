@@ -20,6 +20,7 @@ jest.mock('@/components/DetailView/Context/DetailContext', () => ({
 type EditableTableProps = {
   columns: MRT_ColumnDef<SpeciesLocality>[]
   field: string
+  enableAdvancedTableControls?: boolean
 }
 
 const editableTableMock = jest.fn<(props: EditableTableProps) => JSX.Element>()
@@ -57,6 +58,11 @@ describe('LocalitySpeciesTab MW Score rendering', () => {
     jest.clearAllMocks()
     mockUseDetailContext.mockReturnValue({ mode: modeOptionToMode.read } as never)
     render(<LocalitySpeciesTab />)
+  })
+
+  it('enables advanced controls for editable locality-species rows', () => {
+    const editableTableProps = editableTableMock.mock.calls[0]?.[0]
+    expect(editableTableProps?.enableAdvancedTableControls).toBe(true)
   })
 
   it('renders normalized score with 2 decimals for valid inputs', () => {

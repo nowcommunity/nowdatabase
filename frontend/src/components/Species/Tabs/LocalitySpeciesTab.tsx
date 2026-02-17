@@ -218,6 +218,7 @@ export const LocalitySpeciesTab = () => {
         columns={columns}
         field="now_ls"
         visible_data={sortedLocalitySpeciesRows}
+        enableAdvancedTableControls={true}
       />
     </Grouped>
   )

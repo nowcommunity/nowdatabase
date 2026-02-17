@@ -268,6 +268,7 @@ export const SpeciesTab = () => {
         columns={localitySpeciesColumns}
         field="now_ls"
         visible_data={sortedLocalitySpeciesData}
+        enableAdvancedTableControls={true}
         idFieldName="species_id"
         url="species"
       />

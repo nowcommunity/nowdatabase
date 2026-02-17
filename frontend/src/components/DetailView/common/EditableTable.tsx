@@ -27,6 +27,7 @@ export const EditableTable = <
   visible_data, // use some filtered data instead of the actual data. Allows you to hide some rows. But be careful that the data is in the right format
   useDefinedIndex = false, // Control whether to use the defined index or static index. The index data needs to have a key named 'index'.
   useObject = false,
+  enableAdvancedTableControls = false,
   idFieldName,
   url,
 }: {
@@ -37,6 +38,7 @@ export const EditableTable = <
   visible_data?: Array<T>
   useDefinedIndex?: boolean
   useObject?: boolean
+  enableAdvancedTableControls?: boolean
   idFieldName?: keyof T
   url?: string
 }) => {
@@ -130,9 +132,9 @@ export const EditableTable = <
       mode="edit"
       columns={columns}
       data={getData()}
-      enableTopToolbar={false}
-      enableColumnActions={false}
-      enableSorting={false}
+      enableTopToolbar={enableAdvancedTableControls}
+      enableColumnActions={enableAdvancedTableControls}
+      enableSorting={enableAdvancedTableControls}
       enableRowActions={Boolean(resolveRenderRowActions())}
       renderRowActions={resolveRenderRowActions()}
       muiTableBodyRowProps={({ row }: { row: MRT_Row<T> }) => ({

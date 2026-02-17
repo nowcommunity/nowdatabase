@@ -86,6 +86,7 @@ export const ProjectTab = () => {
       <EditableTable<Editable<Project>, LocalityDetailsType>
         columns={columns.map(c => ({ ...c, accessorKey: `now_proj.${c.accessorKey}` }))}
         field="now_plr"
+        enableAdvancedTableControls={true}
         idFieldName="pid"
         url="project"
       />
