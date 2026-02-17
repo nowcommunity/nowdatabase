@@ -18,6 +18,7 @@ import { getTimeBoundDetails, validateEntireTimeBound } from '../services/timeBo
 import { ConflictError, DuplicateTimeUnitError, deleteTimeUnit, writeTimeUnit } from '../services/write/timeUnit'
 import { fixBigInt } from '../utils/common'
 import { writeTimeBound } from '../services/write/timeBound'
+import { parseTabListQuery } from '../services/tabularQuery'
 
 const router = Router()
 
@@ -45,7 +46,17 @@ router.get('/:id', async (req, res) => {
 
 router.get('/localities/:id', async (req, res) => {
   const id = req.params.id
-  const localities = await getTimeUnitLocalities(id)
+  const parsedQuery = parseTabListQuery({
+    query: req.query,
+    allowedSortingColumns: ['loc_name', 'country', 'max_age', 'min_age', 'lid'],
+    defaultSorting: [{ id: 'loc_name', desc: false }],
+  })
+
+  if (!parsedQuery.ok) {
+    return res.status(400).send({ message: 'Invalid query parameters', errors: parsedQuery.errors })
+  }
+
+  const localities = await getTimeUnitLocalities(id, parsedQuery.options)
   return res.status(200).send(fixBigInt(localities))
 })
 

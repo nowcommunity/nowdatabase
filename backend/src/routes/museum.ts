@@ -4,6 +4,7 @@ import { fixBigInt } from '../utils/common'
 import { requireOneOf } from '../middlewares/authorizer'
 import { Role, EditDataType, EditMetaData, Museum } from '../../../frontend/src/shared/types'
 import { DuplicateMuseumCodeError, writeMuseum } from '../services/write/museum'
+import { parseTabListQuery } from '../services/tabularQuery'
 
 const router = Router()
 
@@ -14,7 +15,17 @@ router.get('/all', async (_req, res) => {
 
 router.get('/:id', async (req, res) => {
   const id = req.params.id
-  const museum = await getMuseumDetails(id)
+  const parsedQuery = parseTabListQuery({
+    query: req.query,
+    allowedSortingColumns: ['loc_name', 'country', 'max_age', 'min_age', 'lid'],
+    defaultSorting: [{ id: 'loc_name', desc: false }],
+  })
+
+  if (!parsedQuery.ok) {
+    return res.status(400).send({ message: 'Invalid query parameters', errors: parsedQuery.errors })
+  }
+
+  const museum = await getMuseumDetails(id, parsedQuery.options)
   if (!museum) return res.status(404).send()
   return res.status(200).send(fixBigInt(museum))
 })

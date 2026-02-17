@@ -9,6 +9,7 @@ import {
 } from '../services/timeBound'
 import { deleteTimeBound, writeTimeBound } from '../services/write/timeBound'
 import { fixBigInt } from '../utils/common'
+import { parseTabListQuery } from '../services/tabularQuery'
 
 const router = Router()
 
@@ -26,7 +27,21 @@ router.get('/:id', async (req, res) => {
 
 router.get('/time-units/:id', async (req, res) => {
   const id = parseInt(req.params.id)
-  const timeUnits = await getTimeBoundTimeUnits(id)
+  const parsedQuery = parseTabListQuery({
+    query: req.query,
+    allowedSortingColumns: ['tu_name', 'tu_display_name', 'rank', 'sequence', 'tu_comment', 'up_bnd', 'low_bnd'],
+    defaultSorting: [
+      { id: 'rank', desc: false },
+      { id: 'sequence', desc: false },
+      { id: 'tu_name', desc: false },
+    ],
+  })
+
+  if (!parsedQuery.ok) {
+    return res.status(400).send({ message: 'Invalid query parameters', errors: parsedQuery.errors })
+  }
+
+  const timeUnits = await getTimeBoundTimeUnits(id, parsedQuery.options)
   return res.status(200).send(fixBigInt(timeUnits))
 })
 

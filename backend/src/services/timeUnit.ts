@@ -4,6 +4,7 @@ import { ValidationObject, referenceValidator } from '../../../frontend/src/shar
 import { validateTimeUnit } from '../../../frontend/src/shared/validators/timeUnit'
 import { getReferenceDetails } from './reference'
 import { buildPersonLookupByInitials, getPersonDisplayName, getPersonFromLookup } from './utils/person'
+import { TabListQueryOptions } from './tabularQuery'
 
 export const getAllTimeUnits = async () => {
   const result = await nowDb.now_time_unit.findMany({
@@ -96,10 +97,17 @@ export const getTimeUnitDetails = async (id: string) => {
   return { ...rest, low_bound, up_bound }
 }
 
-export const getTimeUnitLocalities = async (id: string) => {
+export const getTimeUnitLocalities = async (id: string, options?: TabListQueryOptions) => {
   // TODO: Check if user has access
+  const orderBy = options?.sorting.map(sort => ({
+    [sort.id]: sort.desc ? 'desc' : 'asc',
+  }))
+
   const result = await nowDb.now_loc.findMany({
     where: { OR: [{ bfa_max: id }, { bfa_min: id }] },
+    orderBy,
+    skip: options?.skip,
+    take: options?.take,
   })
   return result
 }

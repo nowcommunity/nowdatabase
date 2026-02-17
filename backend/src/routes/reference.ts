@@ -16,6 +16,7 @@ import { requireOneOf } from '../middlewares/authorizer'
 import { Role, EditMetaData, ReferenceDetailsType, EditDataType } from '../../../frontend/src/shared/types'
 import { deleteReference, writeReference } from '../services/write/reference'
 import { fixBigInt } from '../utils/common'
+import { parseTabListQuery } from '../services/tabularQuery'
 
 const router = Router()
 
@@ -63,13 +64,38 @@ router.get('/:id', async (req, res) => {
 
 router.get('/localities/:id', async (req, res) => {
   const id = req.params.id
-  const localities = await getReferenceLocalities(id)
+  const parsedQuery = parseTabListQuery({
+    query: req.query,
+    allowedSortingColumns: ['loc_name', 'country', 'max_age', 'min_age', 'lid'],
+    defaultSorting: [{ id: 'loc_name', desc: false }],
+  })
+
+  if (!parsedQuery.ok) {
+    return res.status(400).send({ message: 'Invalid query parameters', errors: parsedQuery.errors })
+  }
+
+  const localities = await getReferenceLocalities(id, parsedQuery.options)
   return res.status(200).send(fixBigInt(localities))
 })
 
 router.get('/species/:id', async (req, res) => {
   const id = req.params.id
-  const species = await getReferenceSpecies(id)
+  const parsedQuery = parseTabListQuery({
+    query: req.query,
+    allowedSortingColumns: ['order_name', 'family_name', 'genus_name', 'species_name', 'species_id'],
+    defaultSorting: [
+      { id: 'order_name', desc: false },
+      { id: 'family_name', desc: false },
+      { id: 'genus_name', desc: false },
+      { id: 'species_name', desc: false },
+    ],
+  })
+
+  if (!parsedQuery.ok) {
+    return res.status(400).send({ message: 'Invalid query parameters', errors: parsedQuery.errors })
+  }
+
+  const species = await getReferenceSpecies(id, parsedQuery.options)
   return res.status(200).send(fixBigInt(species))
 })
 
