@@ -13,3 +13,6 @@
 
 ### Added
 - Species table Genus and Species filters now also match synonym names (syn_genus_name and syn_species_name) returned with each species record.
+- Added backend validation for tab-list query params (`sorting`, `pagination`, `limit/offset`, `columnfilters`) with structured `400` errors on invalid inputs for Reference, Time Unit, Time Bound, and Museum detail-tab endpoints.
+- Added tab-list API integration coverage for invalid sorting/filter payloads and pagination behavior, plus read-only Project tab unit coverage that verifies edit-only controls stay hidden without edit rights.
+- Added rollout documentation for unified `DetailTabTable` behavior, migration checklist, and known server/client filtering constraints.

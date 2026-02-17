@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, it, jest } from '@jest/globals'
 import { fireEvent, render, screen } from '@testing-library/react'
+import { skipToken } from '@reduxjs/toolkit/query'
 import { ProjectTab } from '../ProjectTab'
 import { useDetailContext, modeOptionToMode } from '@/components/DetailView/Context/DetailContext'
 import { useGetAllProjectsQuery } from '@/redux/projectReducer'
@@ -69,6 +70,20 @@ describe('ProjectTab selection regression', () => {
       now_plr: [{ lid: 1, pid: 100, now_proj: { pid: 100, proj_name: 'Project Alpha' }, rowState: 'new' }],
     })
     expect(screen.getByTestId('editable-table').getAttribute('data-advanced')).toBe('true')
+  })
+
+  it('hides edit-only project selector for read-only users', () => {
+    mockUsePageContext.mockReturnValue({ editRights: { edit: false, new: false } } as never)
+    mockUseDetailContext.mockReturnValue({
+      mode: modeOptionToMode.read,
+      editData: { lid: 1, now_plr: [] },
+      setEditData,
+    } as never)
+
+    render(<ProjectTab />)
+
+    expect(screen.queryByRole('button', { name: /select project/i })).toBeNull()
+    expect(mockUseGetAllProjectsQuery).toHaveBeenCalledWith(skipToken)
   })
 
   it('shows duplicate warning when selected project already exists', () => {

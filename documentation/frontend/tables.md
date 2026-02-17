@@ -139,3 +139,42 @@ For every paginated table with a selector:
 | Buttons never disable | `isLoading` not forwarded | Pass `isFetching || isLoading` from the query result to the `<Table>` component. |
 
 Keep this guide updated as new pagination utilities or patterns land in the codebase.
+
+
+## Unified DetailTabTable behavior (post-migration)
+
+Detail tabs migrated to `DetailTabTable` now share the same interaction baseline:
+
+- Column sorting via header click (ascending/descending).
+- Shift-click multi-column sorting.
+- Per-column filter popovers and quick search where column filter variants are enabled.
+- Column visibility toggle menu.
+- CSV export action for migrated tab tables.
+
+### Known exceptions and constraints
+
+- Endpoints listed in backend tab-list validation currently reject non-empty server-side `columnfilters` payloads; filtering remains client-side for those datasets.
+- Edit-only mutation actions (select existing, add new, remove/re-add) are only rendered when detail mode and page edit rights allow mutation.
+- Read-only viewers retain navigation and table interaction controls but do not see mutation controls.
+
+## Rollout checklist for tab migrations
+
+Use this checklist whenever migrating a remaining tab list/table to `DetailTabTable`:
+
+1. **Primitive migration**
+   - Replace direct `SimpleTable`/`TableView` usage with `DetailTabTable` in the target tab.
+   - Preserve row click navigation and return-stack behavior.
+2. **Query semantics**
+   - Ensure endpoint supports validated `sorting` and pagination (`pagination` or `limit/offset`).
+   - If server-side column filters are unsupported, confirm client-side filtering remains enabled in the table.
+3. **Permission parity**
+   - Verify read-only roles cannot access edit controls.
+   - Verify editors can still perform select/add/remove/re-add flows.
+4. **Regression checks**
+   - Confirm URL-provided sorting overrides defaults.
+   - Confirm default species ordering applies when no explicit sorting is set.
+   - Confirm export reflects current sorted/filtered/visible table state where supported.
+5. **QA gates**
+   - Run lint/typecheck at root.
+   - Run frontend unit tests for touched tabs.
+   - Run selected Cypress smoke coverage for navigation and read vs edit visibility.
