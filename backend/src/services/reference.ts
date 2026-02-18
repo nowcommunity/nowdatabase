@@ -6,7 +6,8 @@ import {
   ReferenceFieldDisplayNames,
   validateReference,
 } from '../../../frontend/src/shared/validators/reference'
-import type { ref_ref } from '../../prisma/generated/now_test_client'
+import { type ref_ref } from '../../prisma/generated/now_test_client'
+import { TabListQueryOptions } from './tabularQuery'
 
 type ReferenceTypeFieldName = { field_name: string | null; ref_field_name: string | null }
 
@@ -65,8 +66,12 @@ export const getReferenceDetails = async (id: number) => {
 }
 
 // Fetch localities that have been updated by the given reference id
-export const getReferenceLocalities = async (id: string) => {
+export const getReferenceLocalities = async (id: string, options?: TabListQueryOptions) => {
   // TODO: Check if user has access
+  const orderBy = options?.sorting.map(sort => ({
+    [sort.id]: sort.desc ? 'desc' : 'asc',
+  }))
+
   const result = await nowDb.now_loc.findMany({
     where: {
       now_lau: {
@@ -77,13 +82,20 @@ export const getReferenceLocalities = async (id: string) => {
         },
       },
     },
+    orderBy,
+    skip: options?.skip,
+    take: options?.take,
   })
   return result
 }
 
 // Fetch species that have been updated by the given reference id
-export const getReferenceSpecies = async (id: string) => {
+export const getReferenceSpecies = async (id: string, options?: TabListQueryOptions) => {
   // TODO: Check if user has access
+  const orderBy = options?.sorting.map(sort => ({
+    [sort.id]: sort.desc ? 'desc' : 'asc',
+  }))
+
   const result = await nowDb.com_species.findMany({
     where: {
       now_sau: {
@@ -94,6 +106,9 @@ export const getReferenceSpecies = async (id: string) => {
         },
       },
     },
+    orderBy,
+    skip: options?.skip,
+    take: options?.take,
   })
   return result
 }

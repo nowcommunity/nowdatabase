@@ -5,6 +5,7 @@ import Prisma from '../../prisma/generated/now_test_client'
 import { ValidationObject, referenceValidator } from '../../../frontend/src/shared/validators/validator'
 import { getReferenceDetails } from './reference'
 import { buildPersonLookupByInitials, getPersonDisplayName, getPersonFromLookup } from './utils/person'
+import { TabListQueryOptions } from './tabularQuery'
 
 export const getAllTimeBounds = async () => {
   const result = await nowDb.now_tu_bound.findMany({
@@ -67,10 +68,15 @@ export const getTimeBoundDetails = async (id: number) => {
   return result
 }
 
-export const getTimeBoundTimeUnits = async (id: number) => {
+export const getTimeBoundTimeUnits = async (id: number, options?: TabListQueryOptions) => {
   // TODO: Check if user has access
+  const orderBy = options?.sorting.map(sort => ({ [sort.id]: sort.desc ? 'desc' : 'asc' }))
+
   const result = await nowDb.now_time_unit.findMany({
     where: { OR: [{ up_bnd: id }, { low_bnd: id }] },
+    orderBy,
+    skip: options?.skip,
+    take: options?.take,
   })
   return result
 }

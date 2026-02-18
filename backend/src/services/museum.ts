@@ -1,15 +1,16 @@
 import { Locality, Museum, EditDataType, EditMetaData } from '../../../frontend/src/shared/types'
 import { nowDb } from '../utils/db'
 import { ValidationObject } from '../../../frontend/src/shared/validators/validator'
-import Prisma from '../../prisma/generated/now_test_client'
+import type Prisma from '../../prisma/generated/now_test_client'
 import { validateMuseum } from '../../../frontend/src/shared/validators/museum'
+import { TabListQueryOptions } from './tabularQuery'
 
 export const getAllMuseums = async () => {
   const result = await nowDb.com_mlist.findMany({})
   return result
 }
 
-export const getMuseumDetails = async (id: string) => {
+export const getMuseumDetails = async (id: string, options?: TabListQueryOptions) => {
   const museum = await nowDb.com_mlist.findUnique({
     where: { museum: id },
   })
@@ -22,6 +23,10 @@ export const getMuseumDetails = async (id: string) => {
   })
 
   const localityIds = localityLinks.map(link => link.lid)
+
+  const orderBy = options?.sorting.map(sort => ({
+    [sort.id]: sort.desc ? 'desc' : 'asc',
+  }))
 
   const localitiesResult = await nowDb.now_loc.findMany({
     where: { lid: { in: localityIds } },
@@ -80,6 +85,9 @@ export const getMuseumDetails = async (id: string) => {
         select: { synonym: true },
       },
     },
+    orderBy,
+    skip: options?.skip,
+    take: options?.take,
   })
 
   const localities: Locality[] = localitiesResult.map(locality => {

@@ -1,6 +1,6 @@
 import { MRT_ColumnDef, MRT_RowData } from 'material-react-table'
 import { EditingModal } from './EditingModal'
-import { TableView } from '@/components/TableView/TableView'
+import { DetailTabTable } from './DetailTabTable'
 import { useDetailContext } from '../Context/DetailContext'
 import { useMemo } from 'react'
 import { Box, CircularProgress } from '@mui/material'
@@ -77,7 +77,8 @@ export const SelectingTable = <T extends MRT_RowData, ParentType extends object>
   return (
     <EditingModal buttonText={buttonText} dataCy={dataCy}>
       {data ? (
-        <TableView<T>
+        <DetailTabTable<T>
+          mode="select"
           data={filteredData}
           columns={columns}
           title={title}

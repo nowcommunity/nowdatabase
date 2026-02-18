@@ -2,6 +2,59 @@
 
 This guide explains how to build paginated tables in the NOW Database frontend, especially when you need to transform API rows with a `selectorFn` before rendering.
 
+## Detail tab table inventory (audit baseline)
+
+The matrix below inventories current detail-tab table/list implementations under:
+
+- `frontend/src/components/Locality/Tabs/*`
+- `frontend/src/components/Species/Tabs/*`
+- `frontend/src/components/Reference/Tabs/*`
+- `frontend/src/components/TimeUnit/Tabs/*`
+- `frontend/src/components/TimeBound/Tabs/*`
+- `frontend/src/components/Museum/Tabs/*`
+
+Legend:
+
+- **Primitive**: `SimpleTable`, `EditableTable`, `SelectingTable`, `LookupSelectingTable`, or direct `TableView` usage.
+- **Data source**:
+  - `API-driven`: tab issues a query hook in the tab component.
+  - `Context-driven`: table rows come from detail context payload (`data`/`editData`) and are rendered client-side.
+  - `Mixed`: selection is API-driven while edited/read table rows are context-driven.
+- **Edit-mode actions** summarize current mutation UX.
+
+### User-requested URLs (explicit coverage)
+
+| URL | Tab component | Primitive(s) | Data source | Edit-mode actions |
+| --- | --- | --- | --- | --- |
+| `/locality/10003?tab=2` (Locality/Species) | `Locality/Tabs/SpeciesTab.tsx` | `SelectingTable` + `EditableTable` | Mixed | Add new species form, copy taxonomy selector, select existing species, remove/re-add linked rows via `rowState` in editable table. |
+| `/locality/10006?tab=8` (Locality/Museums) | `Locality/Tabs/MuseumTab.tsx` | `SelectingTable` + `EditableTable` | Mixed | Select museum from lookup list, add link to `now_mus`, remove/re-add linked rows via editable table actions. |
+| `/locality/10003?tab=9` (Locality/Projects) | `Locality/Tabs/ProjectTab.tsx` | `SelectingTable` + `EditableTable` | Mixed | Select project from API list, duplicate guard message, remove/re-add project links via editable table actions. |
+| `/species/10001?tab=6` (Species/Localities) | `Species/Tabs/LocalityTab.tsx` | `SelectingTable` + `EditableTable` | Mixed | Select locality and append to `now_ls`, remove/re-add links via editable table actions. |
+| `/species/10001?tab=7` (Species/Locality Species) | `Species/Tabs/LocalitySpeciesTab.tsx` | `EditableTable` | Context-driven | "Add new Locality Species" modal is present (TODO save path), row remove/re-add handled by editable table actions. |
+| `/reference/10029?tab=1` (Reference/Localities) | `Reference/Tabs/LocalityTab.tsx` | `SimpleTable` | API-driven | No edit actions (read-only linked list with row navigation). |
+| `/reference/10029?tab=2` (Reference/Species) | `Reference/Tabs/SpeciesTab.tsx` | `SimpleTable` | API-driven | No edit actions (read-only linked list with row navigation). |
+| `/time-unit/agenian?tab=1` (Time Unit/Localities) | `TimeUnit/Tabs/LocalityTab.tsx` | `SimpleTable` | API-driven (+ client transform for checkmark/X columns) | No edit actions. |
+| `/time-bound/9?tab=1` (Time Bound/Time Units) | `TimeBound/Tabs/TimeUnitTab.tsx` | `SimpleTable` | API-driven | No edit actions. |
+| `/museum/APM?tab=0` (Museum/Localities) | `Museum/Tabs/LocalityTab.tsx` | `SimpleTable` | Context-driven (museum details payload) | No edit actions in this tab; guidance text shown for linking via Locality edit flow. |
+
+### Additional table/list tabs in audited folders
+
+| Component | Primitive(s) | Data source | Edit-mode actions |
+| --- | --- | --- | --- |
+| `Locality/Tabs/TaphonomyTab.tsx` | `LookupSelectingTable` + `EditableTable` | Mixed | Select collecting methods from lookup API and manage linked rows through editable row actions. |
+| `Locality/Tabs/LithologyTab.tsx` | `LookupSelectingTable` + `EditableTable` | Mixed | Select sedimentary structures from lookup API and manage links via editable row actions. |
+| `Locality/Tabs/LocalityTab.tsx` | `EditableTable` | Context-driven | Manage locality synonyms through editable row actions. |
+| `Species/Tabs/SynonymTab.tsx` | `EditableTable` | Context-driven | Add/edit/remove synonym rows on species detail payload. |
+| `Species/Tabs/TaxonomyTab.tsx` | `SelectingTable` | API-driven | Copy taxonomy from an existing species into taxonomy form fields. |
+| `Reference/Tabs/AuthorTab.tsx` | `SelectingTable` + `EditableTable` | Mixed | Select/add authors and manage relation rows in edit mode. |
+| `Reference/Tabs/JournalTab.tsx` | `SelectingTable` + `EditableTable` | Mixed | Select/add journals and manage relation rows in edit mode. |
+
+### Current DRY opportunity notes
+
+- `SimpleTable` and `EditableTable` currently disable advanced column/table interactions (sorting/column actions/filtering parity with `TableView` is not present).
+- The dominant repeating pattern in edit tabs is **selector table + editable linked table**, which is a suitable extraction target for a shared detail-tab table abstraction.
+- User-requested parity work should prioritize the ten explicitly listed URLs first, then roll over to additional table tabs listed above.
+
 ## Core building blocks
 
 | Concern | Implementation |
@@ -86,3 +139,42 @@ For every paginated table with a selector:
 | Buttons never disable | `isLoading` not forwarded | Pass `isFetching || isLoading` from the query result to the `<Table>` component. |
 
 Keep this guide updated as new pagination utilities or patterns land in the codebase.
+
+
+## Unified DetailTabTable behavior (post-migration)
+
+Detail tabs migrated to `DetailTabTable` now share the same interaction baseline:
+
+- Column sorting via header click (ascending/descending).
+- Shift-click multi-column sorting.
+- Per-column filter popovers and quick search where column filter variants are enabled.
+- Column visibility toggle menu.
+- CSV export action for migrated tab tables.
+
+### Known exceptions and constraints
+
+- Endpoints listed in backend tab-list validation currently reject non-empty server-side `columnfilters` payloads; filtering remains client-side for those datasets.
+- Edit-only mutation actions (select existing, add new, remove/re-add) are only rendered when detail mode and page edit rights allow mutation.
+- Read-only viewers retain navigation and table interaction controls but do not see mutation controls.
+
+## Rollout checklist for tab migrations
+
+Use this checklist whenever migrating a remaining tab list/table to `DetailTabTable`:
+
+1. **Primitive migration**
+   - Replace direct `SimpleTable`/`TableView` usage with `DetailTabTable` in the target tab.
+   - Preserve row click navigation and return-stack behavior.
+2. **Query semantics**
+   - Ensure endpoint supports validated `sorting` and pagination (`pagination` or `limit/offset`).
+   - If server-side column filters are unsupported, confirm client-side filtering remains enabled in the table.
+3. **Permission parity**
+   - Verify read-only roles cannot access edit controls.
+   - Verify editors can still perform select/add/remove/re-add flows.
+4. **Regression checks**
+   - Confirm URL-provided sorting overrides defaults.
+   - Confirm default species ordering applies when no explicit sorting is set.
+   - Confirm export reflects current sorted/filtered/visible table state where supported.
+5. **QA gates**
+   - Run lint/typecheck at root.
+   - Run frontend unit tests for touched tabs.
+   - Run selected Cypress smoke coverage for navigation and read vs edit visibility.

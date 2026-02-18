@@ -2,10 +2,16 @@ import { ReferenceDetailsType } from '@/shared/types'
 import { useGetReferenceSpeciesQuery } from '@/redux/referenceReducer'
 import { CircularProgress } from '@mui/material'
 import { useDetailContext } from '@/components/DetailView/Context/DetailContext'
-import { SimpleTable } from '@/components/DetailView/common/SimpleTable'
+import {
+  applyDefaultSpeciesOrdering,
+  DetailTabTable,
+  hasActiveSortingInSearch,
+} from '@/components/DetailView/common/DetailTabTable'
+import { useLocation } from 'react-router-dom'
 
 export const SpeciesTab = () => {
   const { data } = useDetailContext<ReferenceDetailsType>()
+  const location = useLocation()
   const { data: speciesData, isError } = useGetReferenceSpeciesQuery(encodeURIComponent(data.rid))
 
   if (isError) return 'Error loading Species.'
@@ -46,5 +52,22 @@ export const SpeciesTab = () => {
     },
   ]
 
-  return <SimpleTable columns={columns} data={speciesData} idFieldName="species_id" url="species" />
+  const sortedSpeciesData = applyDefaultSpeciesOrdering(speciesData, {
+    skip: hasActiveSortingInSearch(location.search),
+  })
+
+  return (
+    <DetailTabTable
+      mode="read"
+      title="Reference Species"
+      columns={columns}
+      data={sortedSpeciesData}
+      idFieldName="species_id"
+      url="species"
+      isFetching={false}
+      enableColumnFilterModes={true}
+      clickableRows={true}
+      paginationPlacement="bottom"
+    />
+  )
 }

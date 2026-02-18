@@ -58,6 +58,7 @@ export const MuseumTab = () => {
       <EditableTable<Editable<Museum>, LocalityDetailsType>
         columns={columns.map(col => ({ ...col, accessorKey: `com_mlist.${col.accessorKey}` }))}
         field="now_mus"
+        enableAdvancedTableControls={true}
         idFieldName="museum"
         url="museum"
       />
