@@ -20,7 +20,7 @@ export const NavBar = () => {
   const pages: LinkDefinition[] = [
     { title: 'Localities', url: '/locality' },
     { title: 'Species', url: '/species' },
-    { title: 'Locality-Species', url: '/crosssearch' },
+    { title: 'Occurrences', url: '/crosssearch' },
     { title: 'References', url: '/reference' },
     { title: 'Time Units', url: '/time-unit' },
     { title: 'Time Bounds', url: '/time-bound', allowedRoles: [Role.Admin, Role.EditUnrestricted] },
