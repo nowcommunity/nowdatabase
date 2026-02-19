@@ -2,6 +2,7 @@ import { describe, expect, it, jest } from '@jest/globals'
 import { render, screen } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 import { NavBar } from './NavBar'
+import { occurrenceLabels } from '@/constants/occurrenceLabels'
 import { Role } from '@/shared/types'
 
 jest.mock('react-redux', () => ({
@@ -33,6 +34,6 @@ describe('NavBar', () => {
       </MemoryRouter>
     )
 
-    expect(screen.getByText('Occurrences')).toBeTruthy()
+    expect(screen.getByText(occurrenceLabels.plural)).toBeTruthy()
   })
 })

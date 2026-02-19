@@ -5,6 +5,7 @@ import type { MRT_ColumnDef, MRT_Row } from 'material-react-table'
 import { LocalitySpeciesTab } from '@/components/Species/Tabs/LocalitySpeciesTab'
 import { modeOptionToMode, useDetailContext } from '@/components/DetailView/Context/DetailContext'
 import type { SpeciesLocality } from '@/shared/types'
+import { occurrenceLabels } from '@/constants/occurrenceLabels'
 
 jest.mock('@/components/DetailView/Context/DetailContext', () => ({
   useDetailContext: jest.fn(),
@@ -77,8 +78,8 @@ describe('LocalitySpeciesTab MW Score rendering', () => {
     const grouped = document.querySelector('[data-testid="grouped"]')
     const editingModal = document.querySelector('[data-testid="editing-modal"]')
 
-    expect(grouped?.getAttribute('data-title')).toBe('Occurrence Information')
-    expect(editingModal?.getAttribute('data-button-text')).toBe('Add new Occurrence')
+    expect(grouped?.getAttribute('data-title')).toBe(occurrenceLabels.informationSectionTitle)
+    expect(editingModal?.getAttribute('data-button-text')).toBe(occurrenceLabels.addNewButton)
   })
 
   it('renders normalized score with 2 decimals for valid inputs', () => {

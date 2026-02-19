@@ -17,6 +17,7 @@ import { emptySpecies } from '../DetailView/common/defaultValues'
 import { useNotify } from '@/hooks/notification'
 import { useEffect, useState } from 'react'
 import { fixNullValuesInTaxonomyFields } from '@/util/taxonomyUtilities'
+import { occurrenceLabels } from '@/constants/occurrenceLabels'
 
 export const SpeciesDetails = ({
   wrapWithUnsavedChangesProvider = true,
@@ -105,7 +106,7 @@ export const SpeciesDetails = ({
       content: <LocalityTab />,
     },
     {
-      title: 'Occurrences',
+      title: occurrenceLabels.plural,
       content: <LocalitySpeciesTab />,
     },
     {
