@@ -9,6 +9,7 @@ import { useNotify } from '@/hooks/notification'
 import PersonIcon from '@mui/icons-material/Person'
 import '../styles/NavBar.css'
 import { LinkDefinition, NavBarLink } from './NavBarLink'
+import { occurrenceLabels } from '@/constants/occurrenceLabels'
 
 import logo from '../resource/nowlogo.jpg'
 
@@ -20,7 +21,7 @@ export const NavBar = () => {
   const pages: LinkDefinition[] = [
     { title: 'Localities', url: '/locality' },
     { title: 'Species', url: '/species' },
-    { title: 'Locality-Species', url: '/crosssearch' },
+    { title: occurrenceLabels.plural, url: '/occurrence' },
     { title: 'References', url: '/reference' },
     { title: 'Time Units', url: '/time-unit' },
     { title: 'Time Bounds', url: '/time-bound', allowedRoles: [Role.Admin, Role.EditUnrestricted] },

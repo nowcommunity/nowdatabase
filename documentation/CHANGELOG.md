@@ -2,6 +2,7 @@
 
 ## Unreleased
 ### Changed
+- UI terminology now uses Occurrence/Occurrences instead of Locality-Species in user-facing captions; backend/database contracts remain unchanged (including `now_ls`).
 - Repositioned table row action icons to the right edge, tightened spacing, and added aria labels so Locality, Species, and related tables reclaim horizontal room while keeping tooltips and restriction markers accessible.
 - Species detail Locality-Species tab now renders MW Score as a computed, read-only display field based on mw_scale_min, mw_scale_max, and mw_value instead of a placeholder value.
 

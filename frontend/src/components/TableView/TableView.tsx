@@ -421,7 +421,7 @@ export const TableView = <T extends MRT_RowData>({
               tableName={title}
               kmlExport={kmlExport}
               svgExport={svgExport}
-              showNewButton={editRights.new && !selectorFn && title != 'Locality-Species-Cross-Search'}
+              showNewButton={editRights.new && !selectorFn && !isCrossSearchTable}
               isCrossSearchTable={isCrossSearchTable}
               selectorFn={selectorFn}
               hideLeftButtons={false}

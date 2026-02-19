@@ -9,6 +9,7 @@ import { useEffect, useRef } from 'react'
 import mapSvg from '../resource/map.svg'
 import logo from '../resource/nowlogo.jpg'
 import '../styles/FrontPage.css'
+import { occurrenceLabels } from '@/constants/occurrenceLabels'
 
 export const FrontPage = () => {
   const mapContainerRef = useRef<HTMLDivElement | null>(null)
@@ -72,7 +73,7 @@ export const FrontPage = () => {
           <b>Species</b> {statisticsQueryData && statisticsQueryData.speciesCount}
         </span>
         <span>
-          <b>Locality-species</b> {statisticsQueryData && statisticsQueryData.localitySpeciesCount}
+          <b>{occurrenceLabels.plural}</b> {statisticsQueryData && statisticsQueryData.localitySpeciesCount}
         </span>
       </div>
       <div className="map-container" ref={mapContainerRef}>

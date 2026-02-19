@@ -11,6 +11,7 @@ import { calculateNormalizedMesowearScore } from '@/shared/utils/mesowear'
 import { applyDefaultSpeciesOrdering, hasActiveSortingInSearch } from '@/components/DetailView/common/DetailTabTable'
 import { useLocation } from 'react-router-dom'
 import { useMemo } from 'react'
+import { occurrenceLabels } from '@/constants/occurrenceLabels'
 
 const hasMesowearScoreInputs = (row: SpeciesLocality) => {
   return (
@@ -197,7 +198,7 @@ export const LocalitySpeciesTab = () => {
   }
 
   const editingModal = (
-    <EditingModal buttonText="Add new Locality Species" onSave={onSave}>
+    <EditingModal buttonText={occurrenceLabels.addNewButton} onSave={onSave}>
       <Box sx={{ display: 'flex', flexDirection: 'column', gap: '1em' }}>
         <TextField {...register('now_loc.name', { required: true })} label="Locality" />
         <TextField {...register('now_loc.country', { required: true })} label="Country" />
@@ -212,7 +213,7 @@ export const LocalitySpeciesTab = () => {
   )
 
   return (
-    <Grouped title="Locality-Species Information">
+    <Grouped title={occurrenceLabels.informationSectionTitle}>
       {!mode.read && editingModal}
       <EditableTable<Editable<SpeciesLocality>, SpeciesDetailsType>
         columns={columns}

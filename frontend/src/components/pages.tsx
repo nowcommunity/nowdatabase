@@ -64,7 +64,7 @@ export const crossSearchPage = (
   <Page
     tableView={<CrossSearchTable />}
     detailView={<LocalityDetails />}
-    viewName="crosssearch"
+    viewName="occurrence"
     idFieldName="lid"
     createTitle={(loc: LocalityDetailsType) => `${loc.lid} ${loc.loc_name}, ${loc.country}`}
     createSubtitle={(loc: LocalityDetailsType) =>

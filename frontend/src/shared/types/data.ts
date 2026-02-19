@@ -24,7 +24,7 @@ export type LocalitySpeciesDetailsType = FixBigInt<Prisma.now_ls> & { com_specie
 export type SpeciesLocality = FixBigInt<Prisma.now_ls> & {
   now_loc: Prisma.now_loc
   // Explicitly required in the Species locality payload because MW Score is
-  // calculated client-side from these values in the Locality-Species table.
+  // calculated client-side from these values in the occurrence table.
   mw_scale_min: number | null
   mw_scale_max: number | null
   mw_value: number | null

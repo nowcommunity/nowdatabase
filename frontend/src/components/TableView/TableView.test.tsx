@@ -110,7 +110,7 @@ describe('TableView table help integration', () => {
         columns={[{ header: 'Name', accessorKey: 'name' }]}
         visibleColumns={{ name: true }}
         data={[{ id: '1', name: 'Alpha', full_count: 1 }]}
-        url="crosssearch"
+        url="occurrence"
         isFetching={false}
         isCrossSearchTable
         serverSidePagination

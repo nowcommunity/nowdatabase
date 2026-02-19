@@ -6,6 +6,7 @@ import { useGetAllCrossSearchQuery, useGetAllCrossSearchLocalitiesQuery } from '
 import { usePageContext } from '../Page'
 import { LocalitiesMap } from '../Map/LocalitiesMap'
 import { formatWithMaxThreeDecimals } from '@/util/numberFormatting'
+import { occurrenceLabels } from '@/constants/occurrenceLabels'
 
 export const CrossSearchTable = ({ selectorFn }: { selectorFn?: (newObject: CrossSearch) => void }) => {
   const { sqlLimit, sqlOffset, sqlColumnFilters, sqlOrderBy } = usePageContext()
@@ -817,7 +818,7 @@ export const CrossSearchTable = ({ selectorFn }: { selectorFn?: (newObject: Cros
     <>
       <LocalitiesMap localities={localitiesData} isFetching={localitiesFetching || isFetching} />
       <TableView<CrossSearch>
-        title="Locality-Species-Cross-Search"
+        title={occurrenceLabels.crossSearchTitle}
         selectorFn={selectorFn}
         checkRowRestriction={checkRowRestriction}
         idFieldName="lid_now_loc"
@@ -825,7 +826,7 @@ export const CrossSearchTable = ({ selectorFn }: { selectorFn?: (newObject: Cros
         isFetching={isFetching}
         visibleColumns={visibleColumns}
         data={crossSearchQueryData}
-        url="crosssearch"
+        url="occurrence"
         enableColumnFilterModes={true}
         serverSidePagination={true}
         isCrossSearchTable={true}

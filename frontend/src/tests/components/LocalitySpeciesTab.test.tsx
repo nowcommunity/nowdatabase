@@ -5,6 +5,7 @@ import { LocalitySpeciesTab } from '@/components/Species/Tabs/LocalitySpeciesTab
 import { modeOptionToMode, useDetailContext } from '@/components/DetailView/Context/DetailContext'
 import type { SpeciesLocality } from '@/shared/types'
 import type { MRT_ColumnDef, MRT_Row } from 'material-react-table'
+import { occurrenceLabels } from '@/constants/occurrenceLabels'
 
 jest.mock('@/components/DetailView/Context/DetailContext', () => ({
   useDetailContext: jest.fn(),
@@ -30,11 +31,19 @@ jest.mock('@/components/DetailView/common/EditableTable', () => ({
 }))
 
 jest.mock('@/components/DetailView/common/EditingModal', () => ({
-  EditingModal: ({ children }: { children: ReactNode }) => <div>{children}</div>,
+  EditingModal: ({ children, buttonText }: { children: ReactNode; buttonText: string }) => (
+    <div data-testid="editing-modal" data-button-text={buttonText}>
+      {children}
+    </div>
+  ),
 }))
 
 jest.mock('@/components/DetailView/common/tabLayoutHelpers', () => ({
-  Grouped: ({ children }: { children: ReactNode }) => <div>{children}</div>,
+  Grouped: ({ children, title }: { children: ReactNode; title: string }) => (
+    <div data-testid="grouped" data-title={title}>
+      {children}
+    </div>
+  ),
 }))
 
 const mockUseDetailContext = useDetailContext as jest.MockedFunction<typeof useDetailContext>
@@ -80,5 +89,15 @@ describe('LocalitySpeciesTab MW score prerequisites', () => {
 
     const cellResult = cellRenderer?.({ row })
     expect(cellResult).toBeTruthy()
+  })
+
+  it('uses occurrence terminology in grouped heading and modal button', () => {
+    render(<LocalitySpeciesTab />)
+
+    const grouped = document.querySelector('[data-testid="grouped"]')
+    const editingModal = document.querySelector('[data-testid="editing-modal"]')
+
+    expect(grouped?.getAttribute('data-title')).toBe(occurrenceLabels.informationSectionTitle)
+    expect(editingModal?.getAttribute('data-button-text')).toBe(occurrenceLabels.addNewButton)
   })
 })
