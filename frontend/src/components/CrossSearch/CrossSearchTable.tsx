@@ -817,7 +817,7 @@ export const CrossSearchTable = ({ selectorFn }: { selectorFn?: (newObject: Cros
     <>
       <LocalitiesMap localities={localitiesData} isFetching={localitiesFetching || isFetching} />
       <TableView<CrossSearch>
-        title="Occurrence-Cross-Search"
+        title="Occurrence Cross-Search"
         selectorFn={selectorFn}
         checkRowRestriction={checkRowRestriction}
         idFieldName="lid_now_loc"

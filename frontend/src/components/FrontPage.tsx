@@ -72,7 +72,7 @@ export const FrontPage = () => {
           <b>Species</b> {statisticsQueryData && statisticsQueryData.speciesCount}
         </span>
         <span>
-          <b>Locality-species</b> {statisticsQueryData && statisticsQueryData.localitySpeciesCount}
+          <b>Occurrences</b> {statisticsQueryData && statisticsQueryData.localitySpeciesCount}
         </span>
       </div>
       <div className="map-container" ref={mapContainerRef}>

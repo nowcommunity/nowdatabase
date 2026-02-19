@@ -105,7 +105,7 @@ export const SpeciesDetails = ({
       content: <LocalityTab />,
     },
     {
-      title: 'Locality Species',
+      title: 'Occurrences',
       content: <LocalitySpeciesTab />,
     },
     {

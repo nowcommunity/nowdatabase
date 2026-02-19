@@ -31,11 +31,19 @@ jest.mock('@/components/DetailView/common/EditableTable', () => ({
 }))
 
 jest.mock('@/components/DetailView/common/EditingModal', () => ({
-  EditingModal: ({ children }: { children: ReactNode }) => <div>{children}</div>,
+  EditingModal: ({ children, buttonText }: { children: ReactNode; buttonText: string }) => (
+    <div data-testid="editing-modal" data-button-text={buttonText}>
+      {children}
+    </div>
+  ),
 }))
 
 jest.mock('@/components/DetailView/common/tabLayoutHelpers', () => ({
-  Grouped: ({ children }: { children: ReactNode }) => <div>{children}</div>,
+  Grouped: ({ children, title }: { children: ReactNode; title: string }) => (
+    <div data-testid="grouped" data-title={title}>
+      {children}
+    </div>
+  ),
 }))
 
 const mockUseDetailContext = useDetailContext as jest.MockedFunction<typeof useDetailContext>
@@ -63,6 +71,14 @@ describe('LocalitySpeciesTab MW Score rendering', () => {
   it('enables advanced controls for editable locality-species rows', () => {
     const editableTableProps = editableTableMock.mock.calls[0]?.[0]
     expect(editableTableProps?.enableAdvancedTableControls).toBe(true)
+  })
+
+  it('uses occurrence terminology in modal button and group heading', () => {
+    const grouped = document.querySelector('[data-testid="grouped"]')
+    const editingModal = document.querySelector('[data-testid="editing-modal"]')
+
+    expect(grouped?.getAttribute('data-title')).toBe('Occurrence Information')
+    expect(editingModal?.getAttribute('data-button-text')).toBe('Add new Occurrence')
   })
 
   it('renders normalized score with 2 decimals for valid inputs', () => {
