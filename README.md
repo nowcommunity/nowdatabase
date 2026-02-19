@@ -61,3 +61,11 @@ The new version is not deployed yet.
 - Switching methods restores previously entered age values (e.g., `min_age`, `max_age`, basis/fraction selections) instead of clearing them.
 - Locality age validation now evaluates required basis fields against the currently active dating method, while allowing preserved values from other methods to remain in draft state.
 - See [documentation/CHANGELOG.md](documentation/CHANGELOG.md) for release-level tracking.
+
+
+### Reviewer notes: Occurrence terminology update
+
+- User-facing UI captions now use **Occurrence/Occurrences** in navigation, cross-search, and Species detail surfaces.
+- This is a presentation-only rename: backend/database identifiers are unchanged, including the `now_ls` table and related API payload fields.
+- See `frontend/src/constants/occurrenceLabels.ts` for centralized frontend label constants and `frontend/tests/locality-species-ui-label-inventory.md` for inventory coverage.
+

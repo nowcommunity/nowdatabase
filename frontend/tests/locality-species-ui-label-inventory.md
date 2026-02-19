@@ -49,6 +49,7 @@ These are not user-facing captions and are intentionally excluded from UI wordin
 
 ## Validation Notes
 
+- Database table and backend contracts remain unchanged (`now_ls` is not renamed in this feature).
 - Search terms used: `Locality-Species`, `Locality Species`, `Locality-species`, `Locality-Species-Cross-Search`, `locality-species`.
 - Coverage scope: `frontend/src/**` and `frontend/tests/**`.
 - Result: all discovered user-visible captions are listed above and tagged with singular/plural replacement intent.
