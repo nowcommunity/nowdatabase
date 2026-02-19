@@ -1,7 +1,7 @@
 export const occurrenceLabels = {
   singular: 'Occurrence',
   plural: 'Occurrences',
-  crossSearchTitle: 'Occurrence Cross-Search',
-  informationSectionTitle: 'Occurrence Information',
+  crossSearchTitle: 'Occurrences',
+  informationSectionTitle: 'Occurrences',
   addNewButton: 'Add new Occurrence',
 } as const

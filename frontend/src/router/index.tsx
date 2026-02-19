@@ -24,6 +24,7 @@ const router = createBrowserRouter([
     element: <App />,
     children: [
       { index: true, element: frontPage },
+      { path: 'occurrence/:id?', element: crossSearchPage },
       { path: 'crosssearch/:id?', element: crossSearchPage },
       { path: 'locality/:id?', element: localityPage },
       { path: 'species/:id?', element: speciesPage },

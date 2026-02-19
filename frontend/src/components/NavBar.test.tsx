@@ -9,6 +9,18 @@ jest.mock('react-redux', () => ({
   useDispatch: () => jest.fn(),
 }))
 
+jest.mock('../redux/userReducer', () => ({
+  clearUser: () => ({ type: 'user/clearUser' }),
+}))
+
+jest.mock('../redux/api', () => ({
+  api: {
+    util: {
+      resetApiState: () => ({ type: 'api/resetApiState' }),
+    },
+  },
+}))
+
 jest.mock('@/hooks/user', () => ({
   useUser: () => ({
     token: null,

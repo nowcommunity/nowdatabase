@@ -21,7 +21,7 @@ export const NavBar = () => {
   const pages: LinkDefinition[] = [
     { title: 'Localities', url: '/locality' },
     { title: 'Species', url: '/species' },
-    { title: occurrenceLabels.plural, url: '/crosssearch' },
+    { title: occurrenceLabels.plural, url: '/occurrence' },
     { title: 'References', url: '/reference' },
     { title: 'Time Units', url: '/time-unit' },
     { title: 'Time Bounds', url: '/time-bound', allowedRoles: [Role.Admin, Role.EditUnrestricted] },
