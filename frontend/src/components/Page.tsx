@@ -108,9 +108,13 @@ export const Page = <T extends Record<string, unknown>>({
   allowedRoles?: Role[]
   getEditRights: (user: UserState, id: string | number) => EditRights
 }) => {
-  const { id } = useParams()
+  const params = useParams()
+  const { id, lid } = params
+  const speciesId = params.speciesId
+  const hasDetailParams = Boolean(id || (lid && speciesId))
+  const editId = id ?? lid ?? ''
   const user = useUser()
-  const editRights = ENABLE_WRITE && user ? getEditRights(user, id!) : {}
+  const editRights = ENABLE_WRITE && user ? getEditRights(user, editId) : {}
   if ((id === 'new' && !editRights.new) || (allowedRoles && !allowedRoles.includes(user.role)))
     return <Box>Your user is not authorized to view this page.</Box>
   return (
@@ -121,7 +125,7 @@ export const Page = <T extends Record<string, unknown>>({
       createTitle={createTitle}
       createSubtitle={createSubtitle ? createSubtitle : () => ''}
     >
-      {id ? detailView : tableView}
+      {hasDetailParams ? detailView : tableView}
     </PageContextProvider>
   )
 }
