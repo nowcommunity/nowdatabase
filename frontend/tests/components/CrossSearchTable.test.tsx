@@ -23,6 +23,7 @@ type MockedColumn = {
 type MockedTableViewProps = {
   data: CrossSearchRow[] | undefined
   columns?: MockedColumn[]
+  getDetailPath?: (row: CrossSearchRow) => string
 }
 
 const mockTableView = jest.fn((props: MockedTableViewProps) => {
@@ -127,6 +128,15 @@ describe('CrossSearchTable column configuration', () => {
     expect(accessorFn?.(sample)).toBe('S1234')
   })
 
+  it('builds composite-key occurrence detail paths for row navigation', () => {
+    expect(typeof capturedProps?.getDetailPath).toBe('function')
+
+    const path = capturedProps?.getDetailPath?.(
+      createCrossSearch({ lid_now_loc: 20920, species_id_com_species: 21052 })
+    )
+
+    expect(path).toBe('/occurrence/20920/21052')
+  })
   it('formats coordinates with a maximum of three decimals for consistency with Locality table', () => {
     const decLatColumn = (capturedProps?.columns ?? []).find(column => column?.accessorKey === 'dec_lat')
     const decLongColumn = (capturedProps?.columns ?? []).find(column => column?.accessorKey === 'dec_long')

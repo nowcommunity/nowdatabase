@@ -821,6 +821,7 @@ export const CrossSearchTable = ({ selectorFn }: { selectorFn?: (newObject: Cros
         title={occurrenceLabels.crossSearchTitle}
         selectorFn={selectorFn}
         checkRowRestriction={checkRowRestriction}
+        getDetailPath={row => `/occurrence/${row.lid_now_loc}/${row.species_id_com_species}`}
         idFieldName="lid_now_loc"
         columns={columns}
         isFetching={isFetching}

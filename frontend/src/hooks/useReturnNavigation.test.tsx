@@ -68,6 +68,17 @@ describe('useReturnNavigation', () => {
     expect(result.current.fallbackTarget).toBe('/reference')
   })
 
+  it('falls back to /occurrence from a composite occurrence detail path when viewName is unavailable', () => {
+    mockPageContext.viewName = ''
+
+    const wrapper = ({ children }: { children: ReactNode }) => (
+      <MemoryRouter initialEntries={[{ pathname: '/occurrence/20920/21052' }]}>{children}</MemoryRouter>
+    )
+
+    const { result } = renderHook(() => useReturnNavigation(), { wrapper })
+
+    expect(result.current.fallbackTarget).toBe('/occurrence')
+  })
   it('prefers an explicit fallback option', () => {
     const wrapper = ({ children }: { children: ReactNode }) => (
       <MemoryRouter initialEntries={['/reference/123']}>{children}</MemoryRouter>
