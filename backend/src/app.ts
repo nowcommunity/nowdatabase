@@ -30,6 +30,7 @@ import { requireOneOf } from './middlewares/authorizer'
 import { Role } from './../../frontend/src/shared/types'
 import { blockWriteRequests } from './middlewares/misc'
 import testRouter from './routes/test'
+import occurrenceRouter from './routes/occurrence'
 
 const app = express()
 
@@ -52,6 +53,7 @@ app.use('/email', emailLimiter)
 
 app.use('/user', userRouter)
 app.use('/crosssearch', crossSearchRouter)
+app.use('/occurrence', occurrenceRouter)
 app.use('/locality', localityRouter)
 app.use('/locality-species', localitySpeciesRouter)
 app.use('/species', speciesRouter)
