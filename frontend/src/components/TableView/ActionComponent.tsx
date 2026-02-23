@@ -14,6 +14,7 @@ export const ActionComponent = <T extends MRT_RowData>({
   url,
   selectorFn,
   tableRowAction,
+  getDetailPath,
 }: {
   row: MRT_Row<T>
   idFieldName: keyof T
@@ -21,6 +22,7 @@ export const ActionComponent = <T extends MRT_RowData>({
   url: string | undefined
   selectorFn?: (id: T) => void
   tableRowAction?: (row: T) => void
+  getDetailPath?: (row: T) => string
 }) => {
   const navigate = useNavigate()
   const { previousTableUrls, setPreviousTableUrls } = usePageContext()
@@ -82,7 +84,8 @@ export const ActionComponent = <T extends MRT_RowData>({
     }
 
     setPreviousTableUrls([...previousTableUrls, `${location.pathname}?tab=${searchParams.get('tab')}`])
-    navigate(`/${url}/${id}`)
+    const detailPath = getDetailPath ? getDetailPath(row.original) : `/${url}/${id}`
+    navigate(detailPath)
   }
 
   return (

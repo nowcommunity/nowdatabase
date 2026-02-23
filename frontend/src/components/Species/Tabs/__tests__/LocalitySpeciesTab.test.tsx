@@ -22,6 +22,9 @@ type EditableTableProps = {
   columns: MRT_ColumnDef<SpeciesLocality>[]
   field: string
   enableAdvancedTableControls?: boolean
+  idFieldName?: string
+  url?: string
+  getDetailPath?: (row: SpeciesLocality) => string
 }
 
 const editableTableMock = jest.fn<(props: EditableTableProps) => JSX.Element>()
@@ -72,6 +75,15 @@ describe('LocalitySpeciesTab MW Score rendering', () => {
   it('enables advanced controls for editable locality-species rows', () => {
     const editableTableProps = editableTableMock.mock.calls[0]?.[0]
     expect(editableTableProps?.enableAdvancedTableControls).toBe(true)
+  })
+
+  it('builds occurrence detail paths using lid and species_id', () => {
+    const editableTableProps = editableTableMock.mock.calls[0]?.[0]
+    const path = editableTableProps?.getDetailPath?.({ lid: 20920, species_id: 21052 } as SpeciesLocality)
+
+    expect(editableTableProps?.idFieldName).toBe('lid')
+    expect(editableTableProps?.url).toBe('occurrence')
+    expect(path).toBe('/occurrence/20920/21052')
   })
 
   it('uses occurrence terminology in modal button and group heading', () => {

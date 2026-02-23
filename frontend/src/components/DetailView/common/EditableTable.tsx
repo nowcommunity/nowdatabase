@@ -5,6 +5,8 @@ import { useDetailContext } from '../Context/DetailContext'
 import RemoveCircleOutlineIcon from '@mui/icons-material/RemoveCircleOutline'
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline'
 import { useEffect } from 'react'
+import { useLocation, useNavigate, useSearchParams } from 'react-router-dom'
+import { usePageContext } from '@/components/Page'
 import { checkFieldErrors } from './checkFieldErrors'
 import { ActionComponent } from '@/components/TableView/ActionComponent'
 import { DetailTabTable } from './DetailTabTable'
@@ -30,6 +32,7 @@ export const EditableTable = <
   enableAdvancedTableControls = false,
   idFieldName,
   url,
+  getDetailPath,
 }: {
   tableData?: Array<T> | null
   editTableData?: Array<EditDataType<T>> | null
@@ -41,9 +44,15 @@ export const EditableTable = <
   enableAdvancedTableControls?: boolean
   idFieldName?: keyof T
   url?: string
+  getDetailPath?: (row: T) => string
 }) => {
   const { editData, setEditData, mode, data, validator, fieldsWithErrors, setFieldsWithErrors } =
     useDetailContext<ParentType>()
+
+  const navigate = useNavigate()
+  const location = useLocation()
+  const [searchParams] = useSearchParams()
+  const { previousTableUrls, setPreviousTableUrls } = usePageContext()
   const errorObject = validator(editData, field)
 
   useEffect(() => {
@@ -89,8 +98,13 @@ export const EditableTable = <
     )
   }
 
+  const resolveDetailPath = (row: T) => {
+    if (getDetailPath) return getDetailPath(row)
+    return `/${url}/${String(row[idFieldName as keyof T] ?? '')}`
+  }
+
   const linkToDetails = ({ row }: { row: MRT_Row<T> }) => {
-    if (idFieldName && url) return <ActionComponent {...{ row, idFieldName, url }} />
+    if (idFieldName && url) return <ActionComponent {...{ row, idFieldName, url, getDetailPath }} />
     return null // code shouldn't get here!
   }
 
@@ -138,7 +152,16 @@ export const EditableTable = <
       enableRowActions={Boolean(resolveRenderRowActions())}
       renderRowActions={resolveRenderRowActions()}
       muiTableBodyRowProps={({ row }: { row: MRT_Row<T> }) => ({
-        sx: { backgroundColor: rowStateToColor(row.original.rowState) },
+        onClick: () => {
+          if (mode.read && idFieldName && url && getDetailPath) {
+            setPreviousTableUrls([...previousTableUrls, `${location.pathname}?tab=${searchParams.get('tab')}`])
+            navigate(resolveDetailPath(row.original))
+          }
+        },
+        sx: {
+          backgroundColor: rowStateToColor(row.original.rowState),
+          cursor: mode.read && idFieldName && url && getDetailPath ? 'pointer' : undefined,
+        },
       })}
     />
   )

@@ -220,6 +220,9 @@ export const LocalitySpeciesTab = () => {
         field="now_ls"
         visible_data={sortedLocalitySpeciesRows}
         enableAdvancedTableControls={true}
+        idFieldName="lid"
+        url="occurrence"
+        getDetailPath={row => `/occurrence/${row.lid}/${row.species_id}`}
       />
     </Grouped>
   )
