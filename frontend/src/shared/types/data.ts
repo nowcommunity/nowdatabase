@@ -66,6 +66,7 @@ export type OccurrenceDetailsType = {
   do18_max: number | null
   do18_min: number | null
   do18_stdev: number | null
+  now_oau: OccurrenceUpdate[]
 }
 
 export type LocalityUpdate = Prisma.now_lau & { now_lr: LocalityReference[] } & { updates: UpdateLog[] }
@@ -517,6 +518,15 @@ export type TimeUnitReference = Prisma.now_tr & { ref_ref: ReferenceOfUpdate }
 export type TimeBoundReference = Prisma.now_br & { ref_ref: ReferenceOfUpdate }
 
 export type AnyReference = LocalityReference | SpeciesReference | TimeUnitReference | TimeBoundReference
+
+export type OccurrenceUpdate = {
+  occ_date: Date | null
+  occ_authorizer: string
+  occ_coordinator: string
+  occ_comment: string
+  references: AnyReference[]
+  updates: UpdateLog[]
+}
 
 export type ReferenceJournalType = {
   journal_id?: number

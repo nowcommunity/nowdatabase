@@ -48,6 +48,7 @@ const emptyOccurrence: OccurrenceDetailsType = {
   do18_max: null,
   do18_min: null,
   do18_stdev: null,
+  now_oau: [],
 }
 
 export const OccurrenceDetails = () => {
@@ -67,7 +68,7 @@ export const OccurrenceDetails = () => {
     { title: 'Isotopes', content: <OccurrenceIsotopeTab /> },
     {
       title: 'Updates',
-      content: <UpdateTab prefix="occ" placeholderMessage="Updates tab placeholder. Implementation is pending." />,
+      content: <UpdateTab prefix="occ" refFieldName="references" updatesFieldName="now_oau" />,
     },
   ]
 

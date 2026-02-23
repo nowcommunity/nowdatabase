@@ -65,6 +65,7 @@ describe('OccurrenceDetails', () => {
         do18_max: null,
         do18_min: null,
         do18_stdev: null,
+        now_oau: [],
       },
       isLoading: false,
       isError: false,
