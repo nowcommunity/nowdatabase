@@ -155,7 +155,9 @@ export const EditableTable = <
         onClick: () => {
           if (mode.read && idFieldName && url && getDetailPath) {
             setPreviousTableUrls([...previousTableUrls, `${location.pathname}?tab=${searchParams.get('tab')}`])
-            navigate(resolveDetailPath(row.original))
+            navigate(resolveDetailPath(row.original), {
+              state: { returnTo: `${location.pathname}${location.search}` },
+            })
           }
         },
         sx: {

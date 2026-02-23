@@ -85,7 +85,7 @@ export const ActionComponent = <T extends MRT_RowData>({
 
     setPreviousTableUrls([...previousTableUrls, `${location.pathname}?tab=${searchParams.get('tab')}`])
     const detailPath = getDetailPath ? getDetailPath(row.original) : `/${url}/${id}`
-    navigate(detailPath)
+    navigate(detailPath, { state: { returnTo: `${location.pathname}${location.search}` } })
   }
 
   return (

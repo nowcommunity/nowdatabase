@@ -230,7 +230,9 @@ export const TableView = <T extends MRT_RowData>({
         ...previousTableUrls,
         `${location.pathname}?&${columnFilterToUrl}&${sortingToUrl}&${paginationToUrl}`,
       ])
-      navigate(resolveDetailPath(row.original))
+      navigate(resolveDetailPath(row.original), {
+        state: { returnTo: `${location.pathname}${location.search}` },
+      })
     },
     sx: {
       cursor: 'pointer',
@@ -301,7 +303,9 @@ export const TableView = <T extends MRT_RowData>({
                       ...previousTableUrls,
                       `${location.pathname}?&${columnFilterToUrl}&${sortingToUrl}&${paginationToUrl}`,
                     ])
-                    navigate(resolveDetailPath(row.original))
+                    navigate(resolveDetailPath(row.original), {
+                      state: { returnTo: `${location.pathname}${location.search}` },
+                    })
                   }}
                   size="small"
                   sx={{ p: 0.5 }}
