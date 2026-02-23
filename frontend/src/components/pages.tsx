@@ -33,6 +33,7 @@ import { MuseumTable } from './Museum/MuseumTable'
 import { MuseumDetails } from './Museum/MuseumDetails'
 import { createReferenceSubtitle, createReferenceTitle } from './Reference/referenceFormatting'
 import { UnsavedChangesProvider } from './UnsavedChangesProvider'
+import { OccurrenceDetails } from './Occurrence/OccurrenceDetails'
 
 const noRights: EditRights = {}
 const fullRights: EditRights = { new: true, edit: true, delete: true }
@@ -63,7 +64,7 @@ export const frontPage = <FrontPage />
 export const crossSearchPage = (
   <Page
     tableView={<CrossSearchTable />}
-    detailView={<LocalityDetails />}
+    detailView={<OccurrenceDetails />}
     viewName="occurrence"
     idFieldName="lid"
     createTitle={(loc: LocalityDetailsType) => `${loc.lid} ${loc.loc_name}, ${loc.country}`}
