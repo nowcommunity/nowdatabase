@@ -30,7 +30,6 @@ export const OccurrenceWearTab = () => {
             ['MW scale min', toText(data.mw_scale_min)],
             ['MW scale max', toText(data.mw_scale_max)],
             ['MW value', toText(data.mw_value)],
-            ['Body mass', toText(data.body_mass)],
           ]}
         />,
       ]}
