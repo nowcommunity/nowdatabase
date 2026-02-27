@@ -65,8 +65,15 @@ export const generateOccurrenceDetailSql = (lid: number, speciesId: number) => {
       now_loc.loc_status,
       now_loc.loc_name,
       now_loc.country,
+      now_loc.dms_lat,
+      now_loc.dms_long,
+      now_loc.max_age,
+      now_loc.min_age,
+      now_loc.bfa_max,
+      now_loc.bfa_min,
       com_species.genus_name,
-      com_species.species_name
+      com_species.species_name,
+      com_species.unique_identifier
     FROM now_ls
     INNER JOIN now_loc ON now_ls.lid = now_loc.lid
     INNER JOIN com_species ON now_ls.species_id = com_species.species_id
