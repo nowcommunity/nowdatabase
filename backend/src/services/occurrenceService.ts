@@ -33,6 +33,18 @@ export const parseOccurrenceRouteParams = (lid: string, speciesId: string) => {
   return { lid: parsedLid, speciesId: parsedSpeciesId }
 }
 
+export const ensureOccurrenceEditAccess = async (lid: number, user: User) => {
+  if ([Role.Admin, Role.EditUnrestricted].includes(user.role)) return
+
+  if (user.role === Role.EditRestricted) {
+    const allowedLocalities = await getAllowedLocalities(user)
+    if (!allowedLocalities.includes(lid)) throw new AccessError()
+    return
+  }
+
+  throw new AccessError()
+}
+
 type OccurrenceLogRow = Record<string, unknown> & {
   pk_data: string
   table_name: string
@@ -227,10 +239,7 @@ export const getOccurrenceByCompositeKey = async (lid: number, speciesId: number
 
   if (occurrence.loc_status) {
     if (!user) throw new AccessError()
-    if (![Role.Admin, Role.EditUnrestricted].includes(user.role)) {
-      const allowedLocalities = await getAllowedLocalities(user)
-      if (!allowedLocalities.includes(lid)) throw new AccessError()
-    }
+    await ensureOccurrenceEditAccess(lid, user)
   }
 
   const occurrenceUpdates = await getOccurrenceUpdates(lid, speciesId)
