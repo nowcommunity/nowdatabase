@@ -68,11 +68,17 @@ export const crossSearchPage = (
     detailView={<OccurrenceDetails />}
     viewName="occurrence"
     idFieldName="lid"
-    createTitle={(occurrence: OccurrenceDetailsType) =>
-      `${occurrence.lid} ${occurrence.loc_name}, ${occurrence.country}\n${occurrence.genus_name} ${occurrence.species_name}`
-    }
+    createTitle={(occurrence: OccurrenceDetailsType) => {
+      const speciesDisplay = occurrence.unique_identifier
+        ? occurrence.unique_identifier
+        : `${occurrence.genus_name} ${occurrence.species_name}`.trim()
+
+      return `${occurrence.lid} ${occurrence.loc_name}, ${occurrence.country}
+${speciesDisplay} (species_id: ${occurrence.species_id})`
+    }}
     createSubtitle={(occurrence: OccurrenceDetailsType) =>
-      `${occurrence.max_age ?? '?'} Ma (${occurrence.bfa_max ?? '?'}) – ${occurrence.min_age ?? '?'} Ma (${occurrence.bfa_min ?? '?'})`
+      `${occurrence.dms_lat ?? ''}, ${occurrence.dms_long ?? ''}
+${occurrence.max_age ?? ''} Ma (${occurrence.bfa_max ?? ''}) – ${occurrence.min_age ?? ''} Ma (${occurrence.bfa_min ?? ''})`
     }
     getEditRights={(user: UserState, id: string | number) => {
       if ([Role.Admin, Role.EditUnrestricted].includes(user.role)) return fullRights
