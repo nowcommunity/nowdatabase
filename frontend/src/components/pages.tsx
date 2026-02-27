@@ -69,9 +69,12 @@ export const crossSearchPage = (
     viewName="occurrence"
     idFieldName="lid"
     createTitle={(occurrence: OccurrenceDetailsType) => {
-      const speciesDisplay = occurrence.unique_identifier
-        ? occurrence.unique_identifier
-        : `${occurrence.genus_name} ${occurrence.species_name}`.trim()
+      const genusSpecies = `${occurrence.genus_name} ${occurrence.species_name}`.trim()
+      const hasUsefulUniqueIdentifier =
+        !!occurrence.unique_identifier &&
+        occurrence.unique_identifier.trim() !== '-' &&
+        occurrence.unique_identifier.trim() !== ''
+      const speciesDisplay = genusSpecies || (hasUsefulUniqueIdentifier ? occurrence.unique_identifier : '-')
 
       return `${occurrence.lid} ${occurrence.loc_name}, ${occurrence.country}
 ${speciesDisplay} (species_id: ${occurrence.species_id})`
