@@ -10,7 +10,7 @@ import { BACKEND_URL } from '../util/config'
 import { RootState } from './store'
 import { clearUser, setToken } from './userReducer'
 import { QueryReturnValue } from 'node_modules/@reduxjs/toolkit/dist/query/baseQueryTypes'
-import { OccurrenceDetailsType } from '@/shared/types'
+import { EditableOccurrenceData, OccurrenceDetailsType } from '@/shared/types'
 
 const baseQuery = fetchBaseQuery({
   baseUrl: BACKEND_URL,
@@ -89,7 +89,18 @@ const occurrenceApi = api.injectEndpoints({
       }),
       providesTags: result => (result ? [{ type: 'occurrence', id: `${result.lid}-${result.species_id}` }] : []),
     }),
+    editOccurrence: builder.mutation<
+      OccurrenceDetailsType,
+      { lid: number; speciesId: number; occurrence: EditableOccurrenceData }
+    >({
+      query: ({ lid, speciesId, occurrence }) => ({
+        url: `/occurrence/${lid}/${speciesId}`,
+        method: 'PUT',
+        body: { occurrence },
+      }),
+      invalidatesTags: (_result, _error, { lid, speciesId }) => [{ type: 'occurrence', id: `${lid}-${speciesId}` }],
+    }),
   }),
 })
 
-export const { useGetOccurrenceDetailsQuery } = occurrenceApi
+export const { useGetOccurrenceDetailsQuery, useEditOccurrenceMutation } = occurrenceApi

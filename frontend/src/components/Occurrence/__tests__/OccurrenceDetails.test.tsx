@@ -76,7 +76,9 @@ describe('OccurrenceDetails', () => {
       },
       isLoading: false,
       isError: false,
+      isSaving: false,
       refetch: jest.fn(() => Promise.resolve(undefined)),
+      saveOccurrence: jest.fn(() => Promise.resolve({ lid: 1, species_id: 2 } as never)),
     })
 
     render(

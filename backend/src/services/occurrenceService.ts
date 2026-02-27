@@ -1,4 +1,5 @@
-import { AnyReference, Role, User } from '../../../frontend/src/shared/types'
+import { AnyReference, EditableOccurrenceData, Role, User } from '../../../frontend/src/shared/types'
+import { validateOccurrence } from '../../../frontend/src/shared/validators/occurrence'
 import { AccessError } from '../middlewares/authorizer'
 import { logDb, nowDb } from '../utils/db'
 import { buildPersonLookupByInitials, getPersonDisplayName, getPersonFromLookup } from './utils/person'
@@ -31,6 +32,31 @@ export const parseOccurrenceRouteParams = (lid: string, speciesId: string) => {
   }
 
   return { lid: parsedLid, speciesId: parsedSpeciesId }
+}
+
+export const ensureOccurrenceEditAccess = async (lid: number, user: User) => {
+  if ([Role.Admin, Role.EditUnrestricted].includes(user.role)) return
+
+  if (user.role === Role.EditRestricted) {
+    const allowedLocalities = await getAllowedLocalities(user)
+    if (!allowedLocalities.includes(lid)) throw new AccessError()
+    return
+  }
+
+  throw new AccessError()
+}
+
+export const validateOccurrencePayload = (payload: EditableOccurrenceData) => {
+  const validationErrors = (Object.keys(payload) as Array<keyof EditableOccurrenceData>)
+    .map(fieldName => validateOccurrence(payload, fieldName))
+    .filter(validation => !!validation.error)
+
+  if (validationErrors.length > 0) {
+    const details = validationErrors.map(validation => `${validation.name}: ${validation.error}`).join('; ')
+    const error = new Error(details) as Error & { status: number }
+    error.status = 400
+    throw error
+  }
 }
 
 type OccurrenceLogRow = Record<string, unknown> & {
@@ -227,10 +253,7 @@ export const getOccurrenceByCompositeKey = async (lid: number, speciesId: number
 
   if (occurrence.loc_status) {
     if (!user) throw new AccessError()
-    if (![Role.Admin, Role.EditUnrestricted].includes(user.role)) {
-      const allowedLocalities = await getAllowedLocalities(user)
-      if (!allowedLocalities.includes(lid)) throw new AccessError()
-    }
+    await ensureOccurrenceEditAccess(lid, user)
   }
 
   const occurrenceUpdates = await getOccurrenceUpdates(lid, speciesId)
