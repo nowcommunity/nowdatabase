@@ -28,6 +28,59 @@ const generateWhereClause = (showAll: boolean, allowedLocalities: Array<number>,
   else return Prisma.sql`WHERE ${userCheck} AND ${columnFilterCheck}`
 }
 
+export const generateOccurrenceDetailSql = (lid: number, speciesId: number) => {
+  return Prisma.sql`
+    SELECT
+      now_ls.lid,
+      now_ls.species_id,
+      now_ls.nis,
+      now_ls.pct,
+      now_ls.quad,
+      now_ls.mni,
+      now_ls.qua,
+      now_ls.id_status,
+      now_ls.orig_entry,
+      now_ls.source_name,
+      now_ls.body_mass,
+      now_ls.mesowear,
+      now_ls.mw_or_high,
+      now_ls.mw_or_low,
+      now_ls.mw_cs_sharp,
+      now_ls.mw_cs_round,
+      now_ls.mw_cs_blunt,
+      now_ls.mw_scale_min,
+      now_ls.mw_scale_max,
+      now_ls.mw_value,
+      now_ls.microwear,
+      now_ls.dc13_mean,
+      now_ls.dc13_n,
+      now_ls.dc13_max,
+      now_ls.dc13_min,
+      now_ls.dc13_stdev,
+      now_ls.do18_mean,
+      now_ls.do18_n,
+      now_ls.do18_max,
+      now_ls.do18_min,
+      now_ls.do18_stdev,
+      now_loc.loc_status,
+      now_loc.loc_name,
+      now_loc.country,
+      now_loc.dms_lat,
+      now_loc.dms_long,
+      now_loc.max_age,
+      now_loc.min_age,
+      now_loc.bfa_max,
+      now_loc.bfa_min,
+      com_species.genus_name,
+      com_species.species_name,
+      com_species.unique_identifier
+    FROM now_ls
+    INNER JOIN now_loc ON now_ls.lid = now_loc.lid
+    INNER JOIN com_species ON now_ls.species_id = com_species.species_id
+    WHERE now_ls.lid = ${lid} AND now_ls.species_id = ${speciesId}
+    LIMIT 1
+  `
+}
 // change name
 export const generateCrossSearchSql = (
   showAll: boolean,

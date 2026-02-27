@@ -1,4 +1,4 @@
-import { createBrowserRouter } from 'react-router-dom'
+import { Navigate, createBrowserRouter } from 'react-router-dom'
 import App from '../App'
 import { Login } from '../components/Login'
 import { EmailPage } from '../components/EmailPage'
@@ -24,7 +24,9 @@ const router = createBrowserRouter([
     element: <App />,
     children: [
       { index: true, element: frontPage },
-      { path: 'occurrence/:id?', element: crossSearchPage },
+      { path: 'occurrence/:lid/:speciesId', element: crossSearchPage },
+      { path: 'occurrence/:id', element: <Navigate to="/occurrence" replace /> },
+      { path: 'occurrence', element: crossSearchPage },
       { path: 'crosssearch/:id?', element: crossSearchPage },
       { path: 'locality/:id?', element: localityPage },
       { path: 'species/:id?', element: speciesPage },

@@ -4,6 +4,7 @@ import {
   LocalityDetailsType,
   TimeBoundDetailsType,
   PersonDetailsType,
+  OccurrenceDetailsType,
   ProjectDetailsType,
   RegionDetails as RegionDetailsType,
   Role,
@@ -33,6 +34,7 @@ import { MuseumTable } from './Museum/MuseumTable'
 import { MuseumDetails } from './Museum/MuseumDetails'
 import { createReferenceSubtitle, createReferenceTitle } from './Reference/referenceFormatting'
 import { UnsavedChangesProvider } from './UnsavedChangesProvider'
+import { OccurrenceDetails } from './Occurrence/OccurrenceDetails'
 
 const noRights: EditRights = {}
 const fullRights: EditRights = { new: true, edit: true, delete: true }
@@ -63,12 +65,23 @@ export const frontPage = <FrontPage />
 export const crossSearchPage = (
   <Page
     tableView={<CrossSearchTable />}
-    detailView={<LocalityDetails />}
+    detailView={<OccurrenceDetails />}
     viewName="occurrence"
     idFieldName="lid"
-    createTitle={(loc: LocalityDetailsType) => `${loc.lid} ${loc.loc_name}, ${loc.country}`}
-    createSubtitle={(loc: LocalityDetailsType) =>
-      `${loc.dms_lat}, ${loc.dms_long}` + `\n${loc.max_age} Ma (${loc.bfa_max}) – ${loc.min_age} Ma (${loc.bfa_min})`
+    createTitle={(occurrence: OccurrenceDetailsType) => {
+      const genusSpecies = `${occurrence.genus_name} ${occurrence.species_name}`.trim()
+      const hasUsefulUniqueIdentifier =
+        !!occurrence.unique_identifier &&
+        occurrence.unique_identifier.trim() !== '-' &&
+        occurrence.unique_identifier.trim() !== ''
+      const speciesDisplay = genusSpecies || (hasUsefulUniqueIdentifier ? occurrence.unique_identifier : '-')
+
+      return `${occurrence.lid} ${occurrence.loc_name}, ${occurrence.country}
+${speciesDisplay} (species_id: ${occurrence.species_id})`
+    }}
+    createSubtitle={(occurrence: OccurrenceDetailsType) =>
+      `${occurrence.dms_lat ?? ''}, ${occurrence.dms_long ?? ''}
+${occurrence.max_age ?? ''} Ma (${occurrence.bfa_max ?? ''}) – ${occurrence.min_age ?? ''} Ma (${occurrence.bfa_min ?? ''})`
     }
     getEditRights={(user: UserState, id: string | number) => {
       if ([Role.Admin, Role.EditUnrestricted].includes(user.role)) return fullRights

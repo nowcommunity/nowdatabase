@@ -29,6 +29,53 @@ export type SpeciesLocality = FixBigInt<Prisma.now_ls> & {
   mw_scale_max: number | null
   mw_value: number | null
 }
+export type OccurrenceDetailsType = {
+  lid: number
+  species_id: number
+  loc_status: boolean | null
+  loc_name: string
+  country: string
+  genus_name: string
+  species_name: string
+  unique_identifier: string | null
+  dms_lat: string | null
+  dms_long: string | null
+  bfa_max: string | null
+  bfa_min: string | null
+  max_age: number | null
+  min_age: number | null
+  nis: number | null
+  pct: number | null
+  quad: number | null
+  mni: number | null
+  qua: string | null
+  id_status: string | null
+  orig_entry: string | null
+  source_name: string | null
+  body_mass: number | null
+  mesowear: string | null
+  mw_or_high: number | null
+  mw_or_low: number | null
+  mw_cs_sharp: number | null
+  mw_cs_round: number | null
+  mw_cs_blunt: number | null
+  mw_scale_min: number | null
+  mw_scale_max: number | null
+  mw_value: number | null
+  microwear: string | null
+  dc13_mean: number | null
+  dc13_n: number | null
+  dc13_max: number | null
+  dc13_min: number | null
+  dc13_stdev: number | null
+  do18_mean: number | null
+  do18_n: number | null
+  do18_max: number | null
+  do18_min: number | null
+  do18_stdev: number | null
+  now_oau: OccurrenceUpdate[]
+}
+
 export type LocalityUpdate = Prisma.now_lau & { now_lr: LocalityReference[] } & { updates: UpdateLog[] }
 export type SpeciesUpdate = Prisma.now_sau & { now_sr: SpeciesReference[] } & { updates: UpdateLog[] }
 export type Museum = Omit<Prisma.com_mlist, 'used_morph' | 'used_now' | 'used_gene'>
@@ -478,6 +525,15 @@ export type TimeUnitReference = Prisma.now_tr & { ref_ref: ReferenceOfUpdate }
 export type TimeBoundReference = Prisma.now_br & { ref_ref: ReferenceOfUpdate }
 
 export type AnyReference = LocalityReference | SpeciesReference | TimeUnitReference | TimeBoundReference
+
+export type OccurrenceUpdate = {
+  occ_date: Date | null
+  occ_authorizer: string
+  occ_coordinator: string
+  occ_comment: string
+  references: AnyReference[]
+  updates: UpdateLog[]
+}
 
 export type ReferenceJournalType = {
   journal_id?: number

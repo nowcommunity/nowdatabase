@@ -12,7 +12,7 @@ import {
   MRT_Row,
   type MRT_FilterFn,
 } from 'material-react-table'
-import { Alert, Box, CircularProgress, Paper, Tooltip } from '@mui/material'
+import { Alert, Box, CircularProgress, IconButton, Paper, Tooltip } from '@mui/material'
 import type { FetchBaseQueryError } from '@reduxjs/toolkit/query'
 import type { SerializedError } from '@reduxjs/toolkit'
 import type { FilterFn } from '@tanstack/table-core'
@@ -25,6 +25,8 @@ import { defaultPagination, defaultPaginationSmall } from '@/common'
 import '../../styles/TableView.css'
 import { TableToolBar } from './TableToolBar'
 import NotListedLocationIcon from '@mui/icons-material/NotListedLocation'
+import ManageSearchIcon from '@mui/icons-material/ManageSearch'
+import PolicyIcon from '@mui/icons-material/Policy'
 import '../../styles/tableview/TableView.css'
 import { resolveErrorMessage, resolveErrorStatus } from './errorUtils'
 
@@ -57,6 +59,7 @@ export const TableView = <T extends MRT_RowData>({
   checkRowRestriction,
   selectorFn,
   tableRowAction,
+  getDetailPath,
   url,
   title,
   kmlExport,
@@ -79,6 +82,7 @@ export const TableView = <T extends MRT_RowData>({
   checkRowRestriction?: (row: T) => boolean
   selectorFn?: (id: T) => void
   tableRowAction?: (row: T) => void
+  getDetailPath?: (row: T) => string
   url?: string
   title: string
   kmlExport?: (table: MRT_TableInstance<T>) => void
@@ -211,6 +215,11 @@ export const TableView = <T extends MRT_RowData>({
     else rowCount = data.length
   }
 
+  const resolveDetailPath = (row: T) => {
+    if (getDetailPath) return getDetailPath(row)
+    return `/${url}/${row[idFieldName] as string | number}`
+  }
+
   const muiTableBodyRowProps = ({ row }: { row: MRT_Row<T> }) => ({
     onClick: () => {
       const sanitizedFilters = sanitizeColumnFilters(columnFilters)
@@ -221,7 +230,9 @@ export const TableView = <T extends MRT_RowData>({
         ...previousTableUrls,
         `${location.pathname}?&${columnFilterToUrl}&${sortingToUrl}&${paginationToUrl}`,
       ])
-      navigate(`/${url}/${row.original[idFieldName]}`)
+      navigate(resolveDetailPath(row.original), {
+        state: { returnTo: `${location.pathname}${location.search}` },
+      })
     },
     sx: {
       cursor: 'pointer',
@@ -272,9 +283,45 @@ export const TableView = <T extends MRT_RowData>({
       const showSynonymIndicator = Boolean(row.original.has_synonym)
       const showNoLocalityIndicator = Boolean(row.original.has_no_locality)
 
+      const hasCustomDetailPath = Boolean(getDetailPath && !selectorFn && !tableRowAction)
+
       return (
         <Box className="row-actions-column">
-          <ActionComponent {...{ selectorFn, url, checkRowRestriction, row, idFieldName }} />
+          {hasCustomDetailPath ? (
+            <Box display="flex" alignItems="center" gap={0.5}>
+              <Tooltip placement="top" title="View details">
+                <IconButton
+                  aria-label="View details"
+                  data-cy={`details-button-${String(row.original[idFieldName])}`}
+                  onClick={event => {
+                    event.stopPropagation()
+                    const sanitizedFilters = sanitizeColumnFilters(columnFilters)
+                    const columnFilterToUrl = `columnfilters=${JSON.stringify(sanitizedFilters)}`
+                    const sortingToUrl = `sorting=${JSON.stringify(sorting)}`
+                    const paginationToUrl = `pagination=${JSON.stringify(pagination)}`
+                    setPreviousTableUrls([
+                      ...previousTableUrls,
+                      `${location.pathname}?&${columnFilterToUrl}&${sortingToUrl}&${paginationToUrl}`,
+                    ])
+                    navigate(resolveDetailPath(row.original), {
+                      state: { returnTo: `${location.pathname}${location.search}` },
+                    })
+                  }}
+                  size="small"
+                  sx={{ p: 0.5 }}
+                >
+                  <ManageSearchIcon fontSize="small" />
+                </IconButton>
+              </Tooltip>
+              {checkRowRestriction && checkRowRestriction(row.original) && (
+                <Tooltip placement="top" title="This item has restricted visibility">
+                  <PolicyIcon aria-label="Restricted visibility indicator" color="primary" fontSize="medium" />
+                </Tooltip>
+              )}
+            </Box>
+          ) : (
+            <ActionComponent {...{ selectorFn, url, checkRowRestriction, row, idFieldName }} />
+          )}
           {showSynonymIndicator && (
             <ActionComponent
               {...{

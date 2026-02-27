@@ -16,12 +16,24 @@ export const UpdateTab = <T, UpdateType extends MRT_RowData & { updates: UpdateL
   prefix,
   refFieldName,
   updatesFieldName,
+  placeholderMessage,
 }: {
   prefix: string
-  refFieldName: keyof UpdateType
-  updatesFieldName: keyof T
+  refFieldName?: keyof UpdateType
+  updatesFieldName?: keyof T
+  placeholderMessage?: string
 }) => {
   const { data } = useDetailContext<T>()
+
+  if (placeholderMessage) {
+    return (
+      <Grouped title="Updates">
+        <Box>{placeholderMessage}</Box>
+      </Grouped>
+    )
+  }
+
+  if (!refFieldName || !updatesFieldName) return null
 
   const columns: MRT_ColumnDef<UpdateType>[] = [
     {

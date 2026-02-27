@@ -54,6 +54,11 @@ export const useReturnNavigation = ({ fallback }: UseReturnNavigationOptions = {
     }
 
     const path = location.pathname
+
+    if (/^\/occurrence\/[^/]+\/[^/]+$/.test(path)) {
+      return '/occurrence'
+    }
+
     const secondSlashIndex = path.indexOf('/', 1)
     if (secondSlashIndex === -1) {
       return path || '/'

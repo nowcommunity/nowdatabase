@@ -10,6 +10,7 @@ import { BACKEND_URL } from '../util/config'
 import { RootState } from './store'
 import { clearUser, setToken } from './userReducer'
 import { QueryReturnValue } from 'node_modules/@reduxjs/toolkit/dist/query/baseQueryTypes'
+import { OccurrenceDetailsType } from '@/shared/types'
 
 const baseQuery = fetchBaseQuery({
   baseUrl: BACKEND_URL,
@@ -74,7 +75,21 @@ export const api = createApi({
     'project',
     'projects',
     'geoname',
+    'occurrence',
   ],
   baseQuery: baseQueryWithReauth,
   endpoints: () => ({}),
 })
+
+const occurrenceApi = api.injectEndpoints({
+  endpoints: builder => ({
+    getOccurrenceDetails: builder.query<OccurrenceDetailsType, { lid: number; speciesId: number }>({
+      query: ({ lid, speciesId }) => ({
+        url: `/occurrence/${lid}/${speciesId}`,
+      }),
+      providesTags: result => (result ? [{ type: 'occurrence', id: `${result.lid}-${result.species_id}` }] : []),
+    }),
+  }),
+})
+
+export const { useGetOccurrenceDetailsQuery } = occurrenceApi
