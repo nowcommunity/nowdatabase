@@ -4,6 +4,7 @@ import {
   LocalityDetailsType,
   TimeBoundDetailsType,
   PersonDetailsType,
+  OccurrenceDetailsType,
   ProjectDetailsType,
   RegionDetails as RegionDetailsType,
   Role,
@@ -67,9 +68,11 @@ export const crossSearchPage = (
     detailView={<OccurrenceDetails />}
     viewName="occurrence"
     idFieldName="lid"
-    createTitle={(loc: LocalityDetailsType) => `${loc.lid} ${loc.loc_name}, ${loc.country}`}
-    createSubtitle={(loc: LocalityDetailsType) =>
-      `${loc.dms_lat}, ${loc.dms_long}` + `\n${loc.max_age} Ma (${loc.bfa_max}) – ${loc.min_age} Ma (${loc.bfa_min})`
+    createTitle={(occurrence: OccurrenceDetailsType) =>
+      `${occurrence.lid} ${occurrence.loc_name}, ${occurrence.country}\n${occurrence.genus_name} ${occurrence.species_name}`
+    }
+    createSubtitle={(occurrence: OccurrenceDetailsType) =>
+      `${occurrence.max_age ?? '?'} Ma (${occurrence.bfa_max ?? '?'}) – ${occurrence.min_age ?? '?'} Ma (${occurrence.bfa_min ?? '?'})`
     }
     getEditRights={(user: UserState, id: string | number) => {
       if ([Role.Admin, Role.EditUnrestricted].includes(user.role)) return fullRights

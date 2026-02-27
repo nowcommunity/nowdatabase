@@ -37,6 +37,10 @@ export type OccurrenceDetailsType = {
   country: string
   genus_name: string
   species_name: string
+  bfa_max: string | null
+  bfa_min: string | null
+  max_age: number | null
+  min_age: number | null
   nis: number | null
   pct: number | null
   quad: number | null
