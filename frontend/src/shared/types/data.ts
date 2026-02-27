@@ -76,6 +76,38 @@ export type OccurrenceDetailsType = {
   now_oau: OccurrenceUpdate[]
 }
 
+export type OccurrenceEditableField =
+  | 'nis'
+  | 'pct'
+  | 'quad'
+  | 'mni'
+  | 'qua'
+  | 'id_status'
+  | 'orig_entry'
+  | 'source_name'
+  | 'body_mass'
+  | 'mesowear'
+  | 'mw_or_high'
+  | 'mw_or_low'
+  | 'mw_cs_sharp'
+  | 'mw_cs_round'
+  | 'mw_cs_blunt'
+  | 'mw_scale_min'
+  | 'mw_scale_max'
+  | 'mw_value'
+  | 'microwear'
+  | 'dc13_mean'
+  | 'dc13_n'
+  | 'dc13_max'
+  | 'dc13_min'
+  | 'dc13_stdev'
+  | 'do18_mean'
+  | 'do18_n'
+  | 'do18_max'
+  | 'do18_min'
+  | 'do18_stdev'
+
+export type EditableOccurrenceData = Partial<Pick<OccurrenceDetailsType, OccurrenceEditableField>>
 export type LocalityUpdate = Prisma.now_lau & { now_lr: LocalityReference[] } & { updates: UpdateLog[] }
 export type SpeciesUpdate = Prisma.now_sau & { now_sr: SpeciesReference[] } & { updates: UpdateLog[] }
 export type Museum = Omit<Prisma.com_mlist, 'used_morph' | 'used_now' | 'used_gene'>

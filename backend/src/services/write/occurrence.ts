@@ -1,9 +1,9 @@
-import { OccurrenceDetailsType, Role, User } from '../../../../frontend/src/shared/types'
+import { EditableOccurrenceData, OccurrenceEditableField, Role, User } from '../../../../frontend/src/shared/types'
 import { AccessError } from '../../middlewares/authorizer'
 import { nowDb } from '../../utils/db'
-import { ensureOccurrenceEditAccess } from '../occurrenceService'
+import { ensureOccurrenceEditAccess, validateOccurrencePayload } from '../occurrenceService'
 
-const editableOccurrenceFields = [
+const editableOccurrenceFields: OccurrenceEditableField[] = [
   'nis',
   'pct',
   'quad',
@@ -33,9 +33,7 @@ const editableOccurrenceFields = [
   'do18_max',
   'do18_min',
   'do18_stdev',
-] as const
-
-export type EditableOccurrenceData = Partial<Pick<OccurrenceDetailsType, (typeof editableOccurrenceFields)[number]>>
+]
 
 type OccurrenceUpdateData = Record<string, unknown> & { body_mass?: bigint | null }
 
@@ -90,6 +88,8 @@ export const updateOccurrenceByCompositeKey = async (
   if (!existingOccurrence) {
     return null
   }
+
+  validateOccurrencePayload(editedOccurrence)
 
   const updatedOccurrence = await nowDb.now_ls.update({
     where: {

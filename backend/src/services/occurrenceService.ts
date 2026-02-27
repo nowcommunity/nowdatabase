@@ -1,4 +1,5 @@
-import { AnyReference, Role, User } from '../../../frontend/src/shared/types'
+import { AnyReference, EditableOccurrenceData, Role, User } from '../../../frontend/src/shared/types'
+import { validateOccurrence } from '../../../frontend/src/shared/validators/occurrence'
 import { AccessError } from '../middlewares/authorizer'
 import { logDb, nowDb } from '../utils/db'
 import { buildPersonLookupByInitials, getPersonDisplayName, getPersonFromLookup } from './utils/person'
@@ -43,6 +44,19 @@ export const ensureOccurrenceEditAccess = async (lid: number, user: User) => {
   }
 
   throw new AccessError()
+}
+
+export const validateOccurrencePayload = (payload: EditableOccurrenceData) => {
+  const validationErrors = (Object.keys(payload) as Array<keyof EditableOccurrenceData>)
+    .map(fieldName => validateOccurrence(payload, fieldName))
+    .filter(validation => !!validation.error)
+
+  if (validationErrors.length > 0) {
+    const details = validationErrors.map(validation => `${validation.name}: ${validation.error}`).join('; ')
+    const error = new Error(details) as Error & { status: number }
+    error.status = 400
+    throw error
+  }
 }
 
 type OccurrenceLogRow = Record<string, unknown> & {
