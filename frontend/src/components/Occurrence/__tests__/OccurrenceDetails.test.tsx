@@ -8,6 +8,10 @@ jest.mock('@/hooks/useOccurrenceDetails', () => ({
   useOccurrenceDetails: jest.fn(),
 }))
 
+jest.mock('@/hooks/notification', () => ({
+  useNotify: () => ({ notify: jest.fn(), setMessage: jest.fn() }),
+}))
+
 jest.mock('../Tabs/OccurrenceCoreTab', () => ({ OccurrenceCoreTab: () => <div>Core tab</div> }))
 jest.mock('../Tabs/OccurrenceWearTab', () => ({ OccurrenceWearTab: () => <div>Wear tab</div> }))
 jest.mock('../Tabs/OccurrenceIsotopeTab', () => ({ OccurrenceIsotopeTab: () => <div>Isotope tab</div> }))

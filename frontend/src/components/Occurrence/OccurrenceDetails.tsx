@@ -6,10 +6,17 @@ import { OccurrenceCoreTab } from './Tabs/OccurrenceCoreTab'
 import { OccurrenceWearTab } from './Tabs/OccurrenceWearTab'
 import { OccurrenceIsotopeTab } from './Tabs/OccurrenceIsotopeTab'
 import { useOccurrenceDetails } from '@/hooks/useOccurrenceDetails'
-import { OccurrenceDetailsType } from '@/shared/types'
+import { EditDataType, EditableOccurrenceData, OccurrenceDetailsType, ValidationErrors } from '@/shared/types'
+import { validateOccurrence } from '@/shared/validators/occurrence'
+import { useNotify } from '@/hooks/notification'
 import { ValidationObject } from '@/shared/validators/validator'
 
-const validateOccurrence = (): ValidationObject => ({ error: null, name: '' })
+const validateOccurrenceDetail = (
+  editData: EditDataType<OccurrenceDetailsType>,
+  fieldName: keyof EditDataType<OccurrenceDetailsType>
+): ValidationObject => {
+  return validateOccurrence(editData as EditableOccurrenceData, fieldName as keyof EditableOccurrenceData)
+}
 
 const emptyOccurrence: OccurrenceDetailsType = {
   lid: 0,
@@ -62,12 +69,25 @@ export const OccurrenceDetails = () => {
   const { lid, speciesId } = useParams()
   const parsedLid = lid ? parseInt(lid, 10) : null
   const parsedSpeciesId = speciesId ? parseInt(speciesId, 10) : null
-  const { occurrence, isLoading, isError } = useOccurrenceDetails(parsedLid, parsedSpeciesId)
+  const { occurrence, isLoading, isSaving, isError, saveOccurrence } = useOccurrenceDetails(parsedLid, parsedSpeciesId)
+  const { notify } = useNotify()
 
   if (isError) return <div>Error loading occurrence data</div>
-  if (isLoading || !occurrence) return <CircularProgress />
+  if (isLoading || isSaving || !occurrence) return <CircularProgress />
 
   document.title = `Occurrence - ${occurrence.lid}/${occurrence.species_id}`
+
+  const onWrite = async (editData: EditDataType<OccurrenceDetailsType>) => {
+    try {
+      await saveOccurrence(editData)
+      notify('Saved occurrence entry successfully.')
+    } catch (e) {
+      const error = e as ValidationErrors
+      const message =
+        error.data?.map(validationError => validationError.error).join(', ') ?? 'Could not save occurrence entry.'
+      notify(message, 'error')
+    }
+  }
 
   const tabs: TabType[] = [
     { title: 'Core', content: <OccurrenceCoreTab /> },
@@ -83,7 +103,8 @@ export const OccurrenceDetails = () => {
     <DetailView<OccurrenceDetailsType>
       tabs={tabs}
       data={occurrence ?? emptyOccurrence}
-      validator={validateOccurrence}
+      validator={validateOccurrenceDetail}
+      onWrite={onWrite}
     />
   )
 }
