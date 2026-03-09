@@ -51,7 +51,7 @@ const getOccurrenceWriteHandler = () => {
     dbName: NOW_DB_NAME,
     table: 'now_loc',
     idColumn: 'lid',
-    allowedColumns: getFieldsOfTables(['now_ls', 'now_lau', 'now_lr']),
+    allowedColumns: getFieldsOfTables(['now_ls', 'now_lau', 'now_sau', 'now_lr']),
     type: 'update',
   })
 }
