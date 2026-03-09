@@ -86,6 +86,7 @@ export const OccurrenceDetails = () => {
       const message =
         error.data?.map(validationError => validationError.error).join(', ') ?? 'Could not save occurrence entry.'
       notify(message, 'error')
+      throw e
     }
   }
 

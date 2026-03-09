@@ -46,7 +46,37 @@ describe('validateOccurrence', () => {
     )
     expect(validateOccurrence(payload, 'mw_scale_max').error).toBe('Scale Maximum cannot be less than Scale Minimum.')
     expect(validateOccurrence(payload, 'mw_value').error).toBe(
-      'Reported Value must be between Scale Minimum and Scale Maximum.'
+      'MW value must be between Scale Minimum and Scale Maximum.'
     )
+  })
+
+  it('enforces isotope min/max ordering', () => {
+    const payload: EditableOccurrenceData = {
+      dc13_min: 5,
+      dc13_max: 4,
+      do18_min: 9,
+      do18_max: 8,
+    }
+
+    expect(validateOccurrence(payload, 'dc13_min').error).toBe('δ13C min cannot be greater than δ13C max.')
+    expect(validateOccurrence(payload, 'dc13_max').error).toBe('δ13C min cannot be greater than δ13C max.')
+    expect(validateOccurrence(payload, 'do18_min').error).toBe('δ18O min cannot be greater than δ18O max.')
+    expect(validateOccurrence(payload, 'do18_max').error).toBe('δ18O min cannot be greater than δ18O max.')
+  })
+
+  it('requires positive decimals for requested fields', () => {
+    const payload: EditableOccurrenceData = {
+      mw_value: -1,
+      dc13_mean: -0.1,
+      dc13_stdev: 0,
+      do18_mean: -2.5,
+      do18_stdev: 0,
+    }
+
+    expect(validateOccurrence(payload, 'mw_value').error).toBe('MW value must be a positive decimal number.')
+    expect(validateOccurrence(payload, 'dc13_mean').error).toBe('δ13C Mean must be a positive decimal number.')
+    expect(validateOccurrence(payload, 'dc13_stdev').error).toBe('δ13C Stdev must be a positive decimal number.')
+    expect(validateOccurrence(payload, 'do18_mean').error).toBe('δ18O Mean must be a positive decimal number.')
+    expect(validateOccurrence(payload, 'do18_stdev').error).toBe('δ18O Stdev must be a positive decimal number.')
   })
 })

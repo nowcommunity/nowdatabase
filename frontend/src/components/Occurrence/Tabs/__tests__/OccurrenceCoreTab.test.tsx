@@ -62,7 +62,7 @@ describe('OccurrenceCoreTab', () => {
     expect(counts?.array.some(row => row[0] === 'Quantity' && row[1] === 'Abundant')).toBe(true)
 
     expect(size?.title).toBe('Size')
-    expect(size?.array).toEqual([['Body mass', '100']])
+    expect(size?.array).toEqual([['Body Mass (g)', '100']])
   })
 
   it('renders editable controls in edit mode including ID status and Quantity dropdowns', () => {

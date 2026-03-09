@@ -47,7 +47,9 @@ export const OccurrenceCoreTab = () => {
         ]}
       </HalfFrames>
       <ArrayFrame
-        array={[['Body mass', mode.read ? toText(sourceData.body_mass) : textField('body_mass', { type: 'number' })]]}
+        array={[
+          ['Body Mass (g)', mode.read ? toText(sourceData.body_mass) : textField('body_mass', { type: 'number' })],
+        ]}
         title="Size"
       />
     </>

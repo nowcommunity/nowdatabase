@@ -24,7 +24,12 @@ const validatePositiveInteger = (name: string, value: number) => {
 }
 
 const validatePositiveDecimal = (name: string, value: number) => {
-  if (!Number.isFinite(value) || value <= 0) return `${name} must be a positive number.`
+  if (!Number.isFinite(value) || value <= 0) return `${name} must be a positive decimal number.`
+  return
+}
+
+const validateDecimalNumber = (name: string, value: number) => {
+  if (!Number.isFinite(value)) return `${name} must be a valid decimal number.`
   return
 }
 
@@ -82,26 +87,62 @@ export const validateOccurrence = (editData: EditableOccurrenceData, fieldName: 
       },
     },
     mw_value: {
-      name: 'Reported Value',
+      name: 'MW value',
       asNumber: value => {
-        const positivityError = validatePositiveInteger('Reported Value', value)
+        const positivityError = validatePositiveDecimal('MW value', value)
         if (positivityError) return positivityError
         if (hasNumericValue(editData.mw_scale_min) && value < editData.mw_scale_min)
-          return 'Reported Value must be between Scale Minimum and Scale Maximum.'
+          return 'MW value must be between Scale Minimum and Scale Maximum.'
         if (hasNumericValue(editData.mw_scale_max) && value > editData.mw_scale_max)
-          return 'Reported Value must be between Scale Minimum and Scale Maximum.'
+          return 'MW value must be between Scale Minimum and Scale Maximum.'
         return
       },
     },
     pct: { name: 'Percent', asNumber: value => validatePositiveDecimal('Percent', value) },
-    dc13_mean: { name: 'δ13C Mean', asNumber: value => validatePositiveInteger('δ13C Mean', value) },
-    dc13_max: { name: 'δ13C Max', asNumber: value => validatePositiveInteger('δ13C Max', value) },
-    dc13_min: { name: 'δ13C Min', asNumber: value => validatePositiveInteger('δ13C Min', value) },
-    dc13_stdev: { name: 'δ13C Stdev', asNumber: value => validatePositiveInteger('δ13C Stdev', value) },
-    do18_mean: { name: 'δ18O Mean', asNumber: value => validatePositiveInteger('δ18O Mean', value) },
-    do18_max: { name: 'δ18O Max', asNumber: value => validatePositiveInteger('δ18O Max', value) },
-    do18_min: { name: 'δ18O Min', asNumber: value => validatePositiveInteger('δ18O Min', value) },
-    do18_stdev: { name: 'δ18O Stdev', asNumber: value => validatePositiveInteger('δ18O Stdev', value) },
+    dc13_mean: { name: 'δ13C Mean', asNumber: value => validatePositiveDecimal('δ13C Mean', value) },
+    dc13_max: {
+      name: 'δ13C Max',
+      asNumber: value => {
+        const numberError = validateDecimalNumber('δ13C Max', value)
+        if (numberError) return numberError
+        if (hasNumericValue(editData.dc13_min) && editData.dc13_min > value)
+          return 'δ13C min cannot be greater than δ13C max.'
+        return
+      },
+    },
+    dc13_min: {
+      name: 'δ13C Min',
+      asNumber: value => {
+        const numberError = validateDecimalNumber('δ13C Min', value)
+        if (numberError) return numberError
+        if (hasNumericValue(editData.dc13_max) && value > editData.dc13_max)
+          return 'δ13C min cannot be greater than δ13C max.'
+        return
+      },
+    },
+    dc13_stdev: { name: 'δ13C Stdev', asNumber: value => validatePositiveDecimal('δ13C Stdev', value) },
+    do18_mean: { name: 'δ18O Mean', asNumber: value => validatePositiveDecimal('δ18O Mean', value) },
+    do18_max: {
+      name: 'δ18O Max',
+      asNumber: value => {
+        const numberError = validateDecimalNumber('δ18O Max', value)
+        if (numberError) return numberError
+        if (hasNumericValue(editData.do18_min) && editData.do18_min > value)
+          return 'δ18O min cannot be greater than δ18O max.'
+        return
+      },
+    },
+    do18_min: {
+      name: 'δ18O Min',
+      asNumber: value => {
+        const numberError = validateDecimalNumber('δ18O Min', value)
+        if (numberError) return numberError
+        if (hasNumericValue(editData.do18_max) && value > editData.do18_max)
+          return 'δ18O min cannot be greater than δ18O max.'
+        return
+      },
+    },
+    do18_stdev: { name: 'δ18O Stdev', asNumber: value => validatePositiveDecimal('δ18O Stdev', value) },
   }
 
   return validator<EditableOccurrenceData>(validators, editData, fieldName)
