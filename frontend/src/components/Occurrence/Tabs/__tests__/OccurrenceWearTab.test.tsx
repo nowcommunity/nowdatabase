@@ -51,8 +51,8 @@ describe('OccurrenceWearTab', () => {
 
     const [mesowearFrame, microwearFrame] = capturedArrayFrameProps
 
-    expect(mesowearFrame?.array.some(row => row[0] === 'Mesowear' && row[1] === 'bil')).toBe(true)
-    expect(microwearFrame?.array.some(row => row[0] === 'Microwear' && row[1] === 'pit_dom')).toBe(true)
+    expect(mesowearFrame?.array.some(row => row[0] === 'Mesowear' && row[1] === 'Abrasion-dominated')).toBe(true)
+    expect(microwearFrame?.array.some(row => row[0] === 'Microwear' && row[1] === 'Pits predominant')).toBe(true)
   })
 
   it('renders editable dropdowns for mesowear and microwear in edit mode', () => {

@@ -105,6 +105,7 @@ export const OccurrenceDetails = () => {
       data={occurrence ?? emptyOccurrence}
       validator={validateOccurrenceDetail}
       onWrite={onWrite}
+      hasStagingMode
     />
   )
 }

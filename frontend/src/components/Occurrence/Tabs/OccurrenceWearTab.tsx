@@ -1,7 +1,7 @@
 import { useDetailContext } from '@/components/DetailView/Context/DetailContext'
 import { ArrayFrame, HalfFrames } from '@/components/DetailView/common/tabLayoutHelpers'
 import { OccurrenceDetailsType } from '@/shared/types'
-import { mesowearOptions, microwearOptions } from '../constants'
+import { formatMesowear, formatMicrowear, mesowearOptions, microwearOptions } from '../constants'
 
 const toText = (value: string | number | null | undefined) =>
   value === null || value === undefined || value === '' ? '-' : String(value)
@@ -17,7 +17,10 @@ export const OccurrenceWearTab = () => {
           key="mesowear"
           title="Mesowear"
           array={[
-            ['Mesowear', mode.read ? toText(sourceData.mesowear) : dropdown('mesowear', mesowearOptions, 'Mesowear')],
+            [
+              'Mesowear',
+              mode.read ? formatMesowear(sourceData.mesowear) : dropdown('mesowear', mesowearOptions, 'Mesowear'),
+            ],
             ['MW OR High', mode.read ? toText(sourceData.mw_or_high) : textField('mw_or_high', { type: 'number' })],
             ['MW OR Low', mode.read ? toText(sourceData.mw_or_low) : textField('mw_or_low', { type: 'number' })],
             ['MW CS Sharp', mode.read ? toText(sourceData.mw_cs_sharp) : textField('mw_cs_sharp', { type: 'number' })],
@@ -31,7 +34,7 @@ export const OccurrenceWearTab = () => {
           array={[
             [
               'Microwear',
-              mode.read ? toText(sourceData.microwear) : dropdown('microwear', microwearOptions, 'Microwear'),
+              mode.read ? formatMicrowear(sourceData.microwear) : dropdown('microwear', microwearOptions, 'Microwear'),
             ],
             [
               'MW scale min',

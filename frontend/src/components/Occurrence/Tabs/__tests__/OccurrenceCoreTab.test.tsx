@@ -25,7 +25,7 @@ const baseOccurrence = {
   species_id: 2,
   genus_name: 'Genus',
   species_name: 'species',
-  id_status: 'certain',
+  id_status: 'genus id uncertain',
   orig_entry: 'orig',
   source_name: 'src',
   nis: 10,
@@ -55,7 +55,7 @@ describe('OccurrenceCoreTab', () => {
     const [identification, counts, size] = capturedArrayFrameProps
 
     expect(identification?.title).toBe('Identification')
-    expect(identification?.array.some(row => row[0] === 'Original entry' && row[1] === 'orig')).toBe(true)
+    expect(identification?.array.some(row => row[0] === 'Additional Information' && row[1] === 'orig')).toBe(true)
     expect(identification?.array.some(row => row[0] === 'Source name' && row[1] === 'src')).toBe(true)
 
     expect(counts?.title).toBe('Occurrence counts')
