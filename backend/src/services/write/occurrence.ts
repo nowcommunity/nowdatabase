@@ -1,7 +1,16 @@
-import { EditableOccurrenceData, OccurrenceEditableField, Role, User } from '../../../../frontend/src/shared/types'
+import {
+  EditMetaData,
+  EditableOccurrenceData,
+  OccurrenceEditableField,
+  Reference,
+  Role,
+  User,
+} from '../../../../frontend/src/shared/types'
 import { AccessError } from '../../middlewares/authorizer'
-import { nowDb } from '../../utils/db'
+import { getFieldsOfTables, nowDb } from '../../utils/db'
+import { NOW_DB_NAME } from '../../utils/config'
 import { ensureOccurrenceEditAccess, validateOccurrencePayload } from '../occurrenceService'
+import { WriteHandler } from './writeOperations/writeHandler'
 
 const editableOccurrenceFields: OccurrenceEditableField[] = [
   'nis',
@@ -35,7 +44,17 @@ const editableOccurrenceFields: OccurrenceEditableField[] = [
   'do18_stdev',
 ]
 
-type OccurrenceUpdateData = Record<string, unknown> & { body_mass?: bigint | null }
+type OccurrenceUpdateData = Record<string, unknown> & { body_mass?: bigint | null; lid: number; species_id: number }
+
+const getOccurrenceWriteHandler = () => {
+  return new WriteHandler({
+    dbName: NOW_DB_NAME,
+    table: 'now_loc',
+    idColumn: 'lid',
+    allowedColumns: getFieldsOfTables(['now_ls', 'now_lau', 'now_lr']),
+    type: 'update',
+  })
+}
 
 export const pickEditableOccurrenceData = (payload: EditableOccurrenceData): EditableOccurrenceData => {
   return editableOccurrenceFields.reduce<EditableOccurrenceData>((acc, fieldName) => {
@@ -46,28 +65,35 @@ export const pickEditableOccurrenceData = (payload: EditableOccurrenceData): Edi
   }, {})
 }
 
-const buildOccurrenceUpdateData = (payload: EditableOccurrenceData): OccurrenceUpdateData => {
+const buildOccurrenceUpdateData = (
+  lid: number,
+  speciesId: number,
+  payload: EditableOccurrenceData
+): OccurrenceUpdateData => {
   const pickedData = pickEditableOccurrenceData(payload)
 
-  return Object.entries(pickedData).reduce<OccurrenceUpdateData>((acc, [field, value]) => {
-    if (field === 'body_mass') {
-      if (typeof value === 'number') {
-        acc.body_mass = BigInt(Math.trunc(value))
-      } else if (value === null) {
-        acc.body_mass = null
+  return Object.entries(pickedData).reduce<OccurrenceUpdateData>(
+    (acc, [field, value]) => {
+      if (field === 'body_mass') {
+        if (typeof value === 'number') {
+          acc.body_mass = BigInt(Math.trunc(value))
+        } else if (value === null) {
+          acc.body_mass = null
+        }
+        return acc
       }
-      return acc
-    }
 
-    acc[field] = value
-    return acc
-  }, {})
+      acc[field] = value
+      return acc
+    },
+    { lid, species_id: speciesId }
+  )
 }
 
 export const updateOccurrenceByCompositeKey = async (
   lid: number,
   speciesId: number,
-  editedOccurrence: EditableOccurrenceData,
+  editedOccurrence: EditableOccurrenceData & EditMetaData,
   user?: User
 ) => {
   if (!user || ![Role.Admin, Role.EditUnrestricted, Role.EditRestricted].includes(user.role)) {
@@ -89,17 +115,32 @@ export const updateOccurrenceByCompositeKey = async (
     return null
   }
 
-  validateOccurrencePayload(editedOccurrence)
+  const { comment, references, ...editablePayload } = editedOccurrence
+  validateOccurrencePayload(editablePayload)
 
-  const updatedOccurrence = await nowDb.now_ls.update({
+  const writeHandler = getOccurrenceWriteHandler()
+
+  try {
+    await writeHandler.start()
+    writeHandler.idValue = lid
+
+    await writeHandler.updateObject('now_ls', buildOccurrenceUpdateData(lid, speciesId, editablePayload), [
+      'lid',
+      'species_id',
+    ])
+
+    await writeHandler.logUpdatesAndComplete(user.initials, comment ?? '', (references ?? []) as Reference[])
+  } catch (error) {
+    await writeHandler.end()
+    throw error
+  }
+
+  return await nowDb.now_ls.findUnique({
     where: {
       lid_species_id: {
         lid,
         species_id: speciesId,
       },
     },
-    data: buildOccurrenceUpdateData(editedOccurrence),
   })
-
-  return updatedOccurrence
 }

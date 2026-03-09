@@ -1,7 +1,7 @@
 import { Request, Response } from 'express'
 import { getOccurrenceByCompositeKey, parseOccurrenceRouteParams } from '../services/occurrenceService'
 import { fixBigInt } from '../utils/common'
-import { EditableOccurrenceData } from '../../../frontend/src/shared/types'
+import { EditMetaData, EditableOccurrenceData } from '../../../frontend/src/shared/types'
 import { updateOccurrenceByCompositeKey } from '../services/write/occurrence'
 
 type OccurrenceRouteParams = {
@@ -21,12 +21,12 @@ export const getOccurrenceDetail = async (req: Request<OccurrenceRouteParams>, r
 }
 
 export const updateOccurrenceDetail = async (
-  req: Request<OccurrenceRouteParams, object, { occurrence?: EditableOccurrenceData }>,
+  req: Request<OccurrenceRouteParams, object, { occurrence?: EditableOccurrenceData & EditMetaData }>,
   res: Response
 ) => {
   const { lid, speciesId } = parseOccurrenceRouteParams(req.params.lid, req.params.speciesId)
 
-  const occurrencePayload: EditableOccurrenceData = req.body.occurrence ?? {}
+  const occurrencePayload: EditableOccurrenceData & EditMetaData = req.body.occurrence ?? {}
   const updatedOccurrence = await updateOccurrenceByCompositeKey(lid, speciesId, occurrencePayload, req.user)
 
   if (!updatedOccurrence) {

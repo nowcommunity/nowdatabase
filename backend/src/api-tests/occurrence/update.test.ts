@@ -21,7 +21,7 @@ describe('Occurrence update endpoint', () => {
         qua: 'a',
         mesowear: 'bil',
         microwear: 'pit_dom',
-        mw_scale_min: 0,
+        mw_scale_min: 1,
         mw_scale_max: 5,
         mw_value: 3,
       },
