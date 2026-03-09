@@ -44,7 +44,7 @@ const editableOccurrenceFields: OccurrenceEditableField[] = [
   'do18_stdev',
 ]
 
-type OccurrenceUpdateData = Record<string, unknown> & { body_mass?: bigint | null; lid: number; species_id: number }
+type OccurrenceUpdateData = Record<string, unknown> & { body_mass?: number | null; lid: number; species_id: number }
 
 const getOccurrenceWriteHandler = () => {
   return new WriteHandler({
@@ -76,7 +76,7 @@ const buildOccurrenceUpdateData = (
     (acc, [field, value]) => {
       if (field === 'body_mass') {
         if (typeof value === 'number') {
-          acc.body_mass = BigInt(Math.trunc(value))
+          acc.body_mass = Math.trunc(value)
         } else if (value === null) {
           acc.body_mass = null
         }
