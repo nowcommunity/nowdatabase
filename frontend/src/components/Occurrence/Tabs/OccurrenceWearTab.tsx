@@ -1,7 +1,13 @@
 import { useDetailContext } from '@/components/DetailView/Context/DetailContext'
 import { ArrayFrame, HalfFrames } from '@/components/DetailView/common/tabLayoutHelpers'
 import { OccurrenceDetailsType } from '@/shared/types'
-import { formatMesowear, formatMicrowear, mesowearOptions, microwearOptions } from '../constants'
+import {
+  calculateNormalizedMesowearScore,
+  formatMesowear,
+  formatMicrowear,
+  mesowearOptions,
+  microwearOptions,
+} from '../constants'
 
 const toText = (value: string | number | null | undefined) =>
   value === null || value === undefined || value === '' ? '-' : String(value)
@@ -9,6 +15,12 @@ const toText = (value: string | number | null | undefined) =>
 export const OccurrenceWearTab = () => {
   const { data, editData, mode, textField, dropdown } = useDetailContext<OccurrenceDetailsType>()
   const sourceData = mode.read ? data : editData
+  const normalizedScore = calculateNormalizedMesowearScore(
+    sourceData.mw_value,
+    sourceData.mw_scale_min,
+    sourceData.mw_scale_max
+  )
+  const normalizedScoreText = normalizedScore === null ? '-' : normalizedScore.toFixed(2)
 
   return (
     <HalfFrames>
@@ -28,25 +40,36 @@ export const OccurrenceWearTab = () => {
             ['MW CS Blunt', mode.read ? toText(sourceData.mw_cs_blunt) : textField('mw_cs_blunt', { type: 'number' })],
           ]}
         />,
-        <ArrayFrame
-          key="microwear"
-          title="Microwear"
-          array={[
-            [
-              'Microwear',
-              mode.read ? formatMicrowear(sourceData.microwear) : dropdown('microwear', microwearOptions, 'Microwear'),
-            ],
-            [
-              'MW scale min',
-              mode.read ? toText(sourceData.mw_scale_min) : textField('mw_scale_min', { type: 'number' }),
-            ],
-            [
-              'MW scale max',
-              mode.read ? toText(sourceData.mw_scale_max) : textField('mw_scale_max', { type: 'number' }),
-            ],
-            ['MW value', mode.read ? toText(sourceData.mw_value) : textField('mw_value', { type: 'number' })],
-          ]}
-        />,
+        <div key="wear-score-and-microwear">
+          <ArrayFrame
+            key="mesowear-score"
+            title="Mesowear score"
+            array={[
+              [
+                'MW scale min',
+                mode.read ? toText(sourceData.mw_scale_min) : textField('mw_scale_min', { type: 'number' }),
+              ],
+              [
+                'MW scale max',
+                mode.read ? toText(sourceData.mw_scale_max) : textField('mw_scale_max', { type: 'number' }),
+              ],
+              ['MW value', mode.read ? toText(sourceData.mw_value) : textField('mw_value', { type: 'number' })],
+              ['Normalized Score', normalizedScoreText],
+            ]}
+          />
+          <ArrayFrame
+            key="microwear"
+            title="Microwear"
+            array={[
+              [
+                'Microwear',
+                mode.read
+                  ? formatMicrowear(sourceData.microwear)
+                  : dropdown('microwear', microwearOptions, 'Microwear'),
+              ],
+            ]}
+          />
+        </div>,
       ]}
     </HalfFrames>
   )

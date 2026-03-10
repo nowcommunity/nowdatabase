@@ -49,10 +49,11 @@ describe('OccurrenceWearTab', () => {
 
     render(<OccurrenceWearTab />)
 
-    const [mesowearFrame, microwearFrame] = capturedArrayFrameProps
+    const [mesowearFrame, mesowearScoreFrame, microwearFrame] = capturedArrayFrameProps
 
     expect(mesowearFrame?.array.some(row => row[0] === 'Mesowear' && row[1] === 'Abrasion-dominated')).toBe(true)
     expect(microwearFrame?.array.some(row => row[0] === 'Microwear' && row[1] === 'Pits predominant')).toBe(true)
+    expect(mesowearScoreFrame?.array.some(row => row[0] === 'Normalized Score' && row[1] === '50.00')).toBe(true)
   })
 
   it('renders editable dropdowns for mesowear and microwear in edit mode', () => {
@@ -69,7 +70,7 @@ describe('OccurrenceWearTab', () => {
 
     render(<OccurrenceWearTab />)
 
-    const [mesowearFrame, microwearFrame] = capturedArrayFrameProps
+    const [mesowearFrame, mesowearScoreFrame, microwearFrame] = capturedArrayFrameProps
 
     expect(dropdown).toHaveBeenCalledWith('mesowear', expect.any(Array), 'Mesowear')
     expect(dropdown).toHaveBeenCalledWith('microwear', expect.any(Array), 'Microwear')
@@ -78,5 +79,7 @@ describe('OccurrenceWearTab', () => {
     expect(textField).toHaveBeenCalledWith('mw_scale_min', { type: 'number' })
     expect(textField).toHaveBeenCalledWith('mw_scale_max', { type: 'number' })
     expect(textField).toHaveBeenCalledWith('mw_value', { type: 'number' })
+    expect(mesowearScoreFrame?.title).toBe('Mesowear score')
+    expect(microwearFrame?.array).toEqual([['Microwear', 'dropdown-control']])
   })
 })

@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, it, jest } from '@jest/globals'
 import { render } from '@testing-library/react'
+import { MemoryRouter } from 'react-router-dom'
 import type { ReactNode } from 'react'
 import { OccurrenceCoreTab } from '../OccurrenceCoreTab'
 import { useDetailContext } from '@/components/DetailView/Context/DetailContext'
@@ -23,6 +24,8 @@ const mockUseDetailContext = useDetailContext as jest.MockedFunction<typeof useD
 const baseOccurrence = {
   lid: 1,
   species_id: 2,
+  loc_name: 'Test locality',
+  family_name: 'Test family',
   genus_name: 'Genus',
   species_name: 'species',
   id_status: 'genus id uncertain',
@@ -50,11 +53,17 @@ describe('OccurrenceCoreTab', () => {
       dropdown: jest.fn(),
     } as never)
 
-    render(<OccurrenceCoreTab />)
+    render(
+      <MemoryRouter>
+        <OccurrenceCoreTab />
+      </MemoryRouter>
+    )
 
     const [identification, counts, size] = capturedArrayFrameProps
 
     expect(identification?.title).toBe('Identification')
+    expect(identification?.array.some(row => row[0] === 'Locality')).toBe(true)
+    expect(identification?.array.some(row => row[0] === 'Family' && row[1] === 'Test family')).toBe(true)
     expect(identification?.array.some(row => row[0] === 'Additional Information' && row[1] === 'orig')).toBe(true)
     expect(identification?.array.some(row => row[0] === 'Source name' && row[1] === 'src')).toBe(true)
 
@@ -77,7 +86,11 @@ describe('OccurrenceCoreTab', () => {
       dropdown,
     } as never)
 
-    render(<OccurrenceCoreTab />)
+    render(
+      <MemoryRouter>
+        <OccurrenceCoreTab />
+      </MemoryRouter>
+    )
 
     const [identification, counts] = capturedArrayFrameProps
 

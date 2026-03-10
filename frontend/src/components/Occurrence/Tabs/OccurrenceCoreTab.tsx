@@ -1,6 +1,7 @@
 import { useDetailContext } from '@/components/DetailView/Context/DetailContext'
 import { ArrayFrame, HalfFrames } from '@/components/DetailView/common/tabLayoutHelpers'
 import { OccurrenceDetailsType } from '@/shared/types'
+import { Link } from 'react-router-dom'
 import { formatIdStatus, formatQuantity, idStatusOptions, quantityOptions } from '../constants'
 
 const toText = (value: string | number | null | undefined) =>
@@ -18,8 +19,13 @@ export const OccurrenceCoreTab = () => {
             key="identification"
             title="Identification"
             array={[
-              ['Locality ID', toText(data.lid)],
-              ['Species ID', toText(data.species_id)],
+              [
+                'Locality',
+                <Link key={`locality-${data.lid}`} to={`/locality/${data.lid}`}>
+                  {toText(data.loc_name)}
+                </Link>,
+              ],
+              ['Family', toText(data.family_name)],
               ['Genus', toText(data.genus_name)],
               ['Species', toText(data.species_name)],
               [

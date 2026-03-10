@@ -12,7 +12,7 @@ jest.mock('@/hooks/notification', () => ({
   useNotify: () => ({ notify: jest.fn(), setMessage: jest.fn() }),
 }))
 
-jest.mock('../Tabs/OccurrenceCoreTab', () => ({ OccurrenceCoreTab: () => <div>Core tab</div> }))
+jest.mock('../Tabs/OccurrenceCoreTab', () => ({ OccurrenceCoreTab: () => <div>Occurrence tab</div> }))
 jest.mock('../Tabs/OccurrenceWearTab', () => ({ OccurrenceWearTab: () => <div>Wear tab</div> }))
 jest.mock('../Tabs/OccurrenceIsotopeTab', () => ({ OccurrenceIsotopeTab: () => <div>Isotope tab</div> }))
 jest.mock('@/components/DetailView/common/UpdateTab', () => ({ UpdateTab: () => <div>Updates placeholder</div> }))
@@ -39,6 +39,7 @@ describe('OccurrenceDetails', () => {
         loc_name: 'Loc',
         country: 'Country',
         genus_name: 'Genus',
+        family_name: 'Family',
         species_name: 'species',
         unique_identifier: null,
         dms_lat: null,
@@ -93,6 +94,6 @@ describe('OccurrenceDetails', () => {
       </MemoryRouter>
     )
 
-    expect(screen.getByTestId('occurrence-detail-view').textContent).toBe('Core|Wear|Isotopes|Updates')
+    expect(screen.getByTestId('occurrence-detail-view').textContent).toBe('Occurrence|Wear|Isotopes|Updates')
   })
 })

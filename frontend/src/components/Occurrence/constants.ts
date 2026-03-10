@@ -97,3 +97,17 @@ export const formatIdStatus = (value: string | null | undefined) => formatDropdo
 export const formatQuantity = (value: string | null | undefined) => formatDropdownValue(value, quantityDisplayByValue)
 export const formatMesowear = (value: string | null | undefined) => formatDropdownValue(value, mesowearDisplayByValue)
 export const formatMicrowear = (value: string | null | undefined) => formatDropdownValue(value, microwearDisplayByValue)
+
+export const calculateNormalizedMesowearScore = (
+  value: number | null | undefined,
+  min: number | null | undefined,
+  max: number | null | undefined
+) => {
+  if (value === null || value === undefined || min === null || min === undefined || max === null || max === undefined)
+    return null
+
+  const scale = max - min
+  if (scale <= 0) return null
+
+  return ((value - min) / scale) * 100
+}

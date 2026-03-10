@@ -25,6 +25,7 @@ const emptyOccurrence: OccurrenceDetailsType = {
   loc_name: '',
   country: '',
   genus_name: '',
+  family_name: null,
   species_name: '',
   unique_identifier: null,
   dms_lat: null,
@@ -91,7 +92,7 @@ export const OccurrenceDetails = () => {
   }
 
   const tabs: TabType[] = [
-    { title: 'Core', content: <OccurrenceCoreTab /> },
+    { title: 'Occurrence', content: <OccurrenceCoreTab /> },
     { title: 'Wear', content: <OccurrenceWearTab /> },
     { title: 'Isotopes', content: <OccurrenceIsotopeTab /> },
     {

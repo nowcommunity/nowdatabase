@@ -36,6 +36,7 @@ export type OccurrenceDetailsType = {
   loc_name: string
   country: string
   genus_name: string
+  family_name: string | null
   species_name: string
   unique_identifier: string | null
   dms_lat: string | null
