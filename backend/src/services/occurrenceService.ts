@@ -1,4 +1,5 @@
-import { AnyReference, Role, User } from '../../../frontend/src/shared/types'
+import { AnyReference, EditableOccurrenceData, Role, User } from '../../../frontend/src/shared/types'
+import { validateOccurrence } from '../../../frontend/src/shared/validators/occurrence'
 import { AccessError } from '../middlewares/authorizer'
 import { logDb, nowDb } from '../utils/db'
 import { buildPersonLookupByInitials, getPersonDisplayName, getPersonFromLookup } from './utils/person'
@@ -31,6 +32,31 @@ export const parseOccurrenceRouteParams = (lid: string, speciesId: string) => {
   }
 
   return { lid: parsedLid, speciesId: parsedSpeciesId }
+}
+
+export const ensureOccurrenceEditAccess = async (lid: number, user: User) => {
+  if ([Role.Admin, Role.EditUnrestricted].includes(user.role)) return
+
+  if (user.role === Role.EditRestricted) {
+    const allowedLocalities = await getAllowedLocalities(user)
+    if (!allowedLocalities.includes(lid)) throw new AccessError()
+    return
+  }
+
+  throw new AccessError()
+}
+
+export const validateOccurrencePayload = (payload: EditableOccurrenceData) => {
+  const validationErrors = (Object.keys(payload) as Array<keyof EditableOccurrenceData>)
+    .map(fieldName => validateOccurrence(payload, fieldName))
+    .filter(validation => !!validation.error)
+
+  if (validationErrors.length > 0) {
+    const details = validationErrors.map(validation => `${validation.name}: ${validation.error}`).join('; ')
+    const error = new Error(details) as Error & { status: number }
+    error.status = 400
+    throw error
+  }
 }
 
 type OccurrenceLogRow = Record<string, unknown> & {
@@ -77,6 +103,49 @@ type OccurrenceUpdate = {
   occ_comment: string
   references: AnyReference[]
   updates: OccurrenceLogRow[]
+}
+
+const buildUpdateSignature = (update: OccurrenceUpdate) => {
+  const updateRows = update.updates
+    .map(
+      row =>
+        `${row.table_name}|${row.pk_data}|${String(row['column_name'])}|${String(row['new_data'])}|${String(row['old_data'])}|${String(row['log_action'])}`
+    )
+    .sort()
+    .join('||')
+
+  const date = update.occ_date ? new Date(update.occ_date).toISOString() : ''
+
+  return `${date}|${update.occ_authorizer}|${update.occ_coordinator}|${update.occ_comment}|${updateRows}`
+}
+
+const deduplicateOccurrenceUpdates = (updates: OccurrenceUpdate[]) => {
+  const deduplicated = new Map<string, OccurrenceUpdate>()
+
+  for (const update of updates) {
+    const signature = buildUpdateSignature(update)
+    const existing = deduplicated.get(signature)
+
+    if (!existing) {
+      deduplicated.set(signature, update)
+      continue
+    }
+
+    const references = [...existing.references, ...update.references]
+    const uniqueByRid = new Map<number, AnyReference>()
+
+    for (const reference of references) {
+      const rid = (reference as { rid?: number }).rid
+      if (typeof rid === 'number') uniqueByRid.set(rid, reference)
+    }
+
+    deduplicated.set(signature, {
+      ...existing,
+      references: Array.from(uniqueByRid.values()),
+    })
+  }
+
+  return Array.from(deduplicated.values())
 }
 
 const getOccurrenceUpdates = async (lid: number, speciesId: number) => {
@@ -133,7 +202,7 @@ const getOccurrenceUpdates = async (lid: number, speciesId: number) => {
     ...speciesUpdates.flatMap(update => [update.sau_authorizer, update.sau_coordinator]),
   ])
 
-  const occurrenceUpdates: OccurrenceUpdate[] = [
+  const occurrenceUpdates = deduplicateOccurrenceUpdates([
     ...localityUpdates.map(update => ({
       occ_date: update.lau_date,
       occ_authorizer: getPersonDisplayName(
@@ -162,7 +231,7 @@ const getOccurrenceUpdates = async (lid: number, speciesId: number) => {
       references: update.now_sr as unknown as AnyReference[],
       updates: nowLsLogs.filter(logRow => logRow.suid === update.suid),
     })),
-  ]
+  ])
 
   return occurrenceUpdates.sort((a, b) => {
     const timeA = a.occ_date ? new Date(a.occ_date).getTime() : 0
@@ -180,6 +249,7 @@ export const getOccurrenceByCompositeKey = async (lid: number, speciesId: number
       loc_name: string
       country: string
       genus_name: string
+      family_name: string | null
       species_name: string
       unique_identifier: string | null
       dms_lat: string | null
@@ -227,10 +297,7 @@ export const getOccurrenceByCompositeKey = async (lid: number, speciesId: number
 
   if (occurrence.loc_status) {
     if (!user) throw new AccessError()
-    if (![Role.Admin, Role.EditUnrestricted].includes(user.role)) {
-      const allowedLocalities = await getAllowedLocalities(user)
-      if (!allowedLocalities.includes(lid)) throw new AccessError()
-    }
+    await ensureOccurrenceEditAccess(lid, user)
   }
 
   const occurrenceUpdates = await getOccurrenceUpdates(lid, speciesId)

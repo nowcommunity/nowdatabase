@@ -37,6 +37,7 @@ export type WriteItem = {
   table: AllowedTables
   type: ActionType
   items: Item[]
+  ids?: Array<{ column: string; value: DbValue }>
 }
 
 // Possible types of values that are read from db or written in there. BigInt is handled as number.
