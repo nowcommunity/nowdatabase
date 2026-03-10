@@ -32,10 +32,20 @@ export const logAllUpdates = async (
     throw new Error(`No id column found for ${targetTable}`)
   }
 
-  const getSecondaryPkData = (table: AllowedTables, items: Item[]) => {
+  const getSecondaryPkData = (
+    table: AllowedTables,
+    items: Item[],
+    ids?: Array<{ column: string; value: string | number | null | boolean }>
+  ) => {
     if (table === tableName) return ''
-    const secondaryId = items.find(item => item.column === getIdColumn(table))?.value
-    if (!secondaryId) throw new Error(`No id value found for ${table}`)
+    const idColumn = getIdColumn(table)
+    const secondaryId =
+      items.find(item => item.column === idColumn)?.value ?? ids?.find(id => id.column === idColumn)?.value
+
+    if (secondaryId === undefined || secondaryId === null || secondaryId === '') {
+      throw new Error(`No id value found for ${table}`)
+    }
+
     return `${secondaryId.toString().length}.${secondaryId};`
   }
 
@@ -50,7 +60,7 @@ export const logAllUpdates = async (
           .map(item => ({
             ...item,
             type: writeItem.type,
-            pkData: `${id.toString().length}.${id};${getSecondaryPkData(writeItem.table, writeItem.items)}`,
+            pkData: `${id.toString().length}.${id};${getSecondaryPkData(writeItem.table, writeItem.items, writeItem.ids)}`,
           }))
       ),
     }
@@ -68,8 +78,9 @@ export const logAllUpdates = async (
       // if we are editing now_loc and this entry is triggered by now_ls (entry for com_species),
       // the id will be "species_id", not "lid".
       const idColumn = getIdColumn(targetTable)
-      const secondaryId = writeListItem.items.find(item => item.column === idColumn)?.value as string | number
-      if (!secondaryId)
+      const secondaryId = (writeListItem.items.find(item => item.column === idColumn)?.value ??
+        writeListItem.ids?.find(id => id.column === idColumn)?.value) as string | number | null | undefined
+      if (secondaryId === undefined || secondaryId === null || secondaryId === '')
         throw new Error(`Error when creating update entries: id not found for targetTable: ${targetTable}`)
       if (!secondaryUpdateEntries[targetTable]) secondaryUpdateEntries[targetTable] = {}
       const pkData = `${id.toString().length}.${id};${secondaryId.toString().length}.${secondaryId};`

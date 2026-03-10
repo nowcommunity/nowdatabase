@@ -62,7 +62,12 @@ export class WriteHandler extends DatabaseHandler {
       fieldsToWrite.push({ column, value: fixedValue, oldValue, table })
     }
 
-    this.writeList.push({ table, type: 'update', items: fieldsToWrite.map(item => ({ ...item, table })) })
+    this.writeList.push({
+      table,
+      type: 'update',
+      items: fieldsToWrite.map(item => ({ ...item, table })),
+      ids: ids.map(id => ({ ...id })),
+    })
     if (fieldsToWrite.length === 0) return
     return await super.update(table, fieldsToWrite, ids)
   }
