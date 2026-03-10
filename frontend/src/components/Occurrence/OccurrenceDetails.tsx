@@ -6,9 +6,9 @@ import { OccurrenceCoreTab } from './Tabs/OccurrenceCoreTab'
 import { OccurrenceWearTab } from './Tabs/OccurrenceWearTab'
 import { OccurrenceIsotopeTab } from './Tabs/OccurrenceIsotopeTab'
 import { useOccurrenceDetails } from '@/hooks/useOccurrenceDetails'
-import { EditDataType, EditableOccurrenceData, OccurrenceDetailsType, ValidationErrors } from '@/shared/types'
+import { EditDataType, EditableOccurrenceData, OccurrenceDetailsType } from '@/shared/types'
 import { validateOccurrence } from '@/shared/validators/occurrence'
-import { useNotify } from '@/hooks/notification'
+import { getErrorMessage, useNotify } from '@/hooks/notification'
 import { ValidationObject } from '@/shared/validators/validator'
 
 const validateOccurrenceDetail = (
@@ -81,13 +81,10 @@ export const OccurrenceDetails = () => {
   const onWrite = async (editData: EditDataType<OccurrenceDetailsType>) => {
     try {
       await saveOccurrence(editData)
-      notify('Saved occurrence entry successfully.')
-    } catch (e) {
-      const error = e as ValidationErrors
-      const message =
-        error.data?.map(validationError => validationError.error).join(', ') ?? 'Could not save occurrence entry.'
-      notify(message, 'error')
-      throw e
+      notify('Occurrence entry finalized successfully.')
+    } catch (error) {
+      notify(getErrorMessage(error, 'Could not finalize occurrence entry.'), 'error')
+      throw error
     }
   }
 
