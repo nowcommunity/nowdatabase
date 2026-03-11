@@ -2,7 +2,12 @@ import { beforeEach, beforeAll, afterAll, describe, it, expect } from '@jest/glo
 import { Locality, LocalityDetailsType, SpeciesDetailsType } from '../../../../frontend/src/shared/types'
 import { LogRow } from '../../services/write/writeOperations/types'
 import { ValidationObject } from '../../../../frontend/src/shared/validators/validator'
-import { invalidPollenCreateLocality, invalidPollenTotalCreateLocality, newLocalityBasis } from './data'
+import {
+  invalidEstimateTempCreateLocality,
+  invalidPollenCreateLocality,
+  invalidPollenTotalCreateLocality,
+  newLocalityBasis,
+} from './data'
 import { login, logout, resetDatabase, send, testLogRows, resetDatabaseTimeout, noPermError } from '../utils'
 import { pool } from '../../utils/db'
 
@@ -117,6 +122,23 @@ describe('Creating new locality works', () => {
           name: 'Arboreal pollen (AP%)',
           error:
             'Combined Arboreal (AP%), Non-arboreal (NAP%), and Other pollen (OP%) must be less than or equal to 100',
+        },
+      ])
+    )
+  })
+
+
+  it('Creation fails when estimate temperature is out of range', async () => {
+    const { body, status } = await send<ValidationObject[]>('locality', 'PUT', {
+      locality: invalidEstimateTempCreateLocality,
+    })
+
+    expect(status).toEqual(403)
+    expect(body).toEqual(
+      expect.arrayContaining([
+        {
+          name: 'Estimated temperature',
+          error: 'Estimated temperature must be between -999.9 and 999.9',
         },
       ])
     )

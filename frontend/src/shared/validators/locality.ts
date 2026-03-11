@@ -6,6 +6,7 @@ const pollenFields = ['pers_pollen_ap', 'pers_pollen_nap', 'pers_pollen_other'] 
 
 export const pollenTotalValidationError =
   'Combined Arboreal (AP%), Non-arboreal (NAP%), and Other pollen (OP%) must be less than or equal to 100'
+export const estimateTempRangeValidationError = 'Estimated temperature must be between -999.9 and 999.9'
 
 const validatePollenPercentage = (name: string, num: number) => {
   if (!Number.isInteger(num)) return `${name} must be an integer value`
@@ -182,6 +183,13 @@ export const validateLocality = (
         const totalError = validatePollenRecordTotal(editData)
         if (totalError) return totalError
 
+        return
+      },
+    },
+    estimate_temp: {
+      name: 'Estimated temperature',
+      asNumber: (num: number) => {
+        if (num <= -1000 || num >= 1000) return estimateTempRangeValidationError
         return
       },
     },
