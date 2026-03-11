@@ -44,7 +44,7 @@ export const TimeUnitTab = () => {
       header: 'Name',
     },
     {
-      accessorFn: ({ up_bound }) => (up_bound === data.bid ? 'Upper' : 'Lower'),
+      accessorFn: ({ up_bound }) => (Number(up_bound) === boundId ? 'Upper' : 'Lower'),
       header: 'Upper/Lower',
     },
     {
