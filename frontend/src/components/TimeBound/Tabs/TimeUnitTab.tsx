@@ -1,4 +1,10 @@
 import { TimeUnit, TimeBoundDetailsType } from '@/shared/types'
+
+type TimeBoundTabTimeUnit = TimeUnit & {
+  up_bnd?: number | string | null
+  low_bnd?: number | string | null
+  sequence?: string | null
+}
 import { useGetTimeBoundTimeUnitsQuery } from '@/redux/timeBoundReducer'
 import { Alert, Button, CircularProgress, Stack } from '@mui/material'
 import { skipToken } from '@reduxjs/toolkit/query'
@@ -34,7 +40,7 @@ export const TimeUnitTab = () => {
 
   if (isLoading || isFetching || !timeUnitsData) return <CircularProgress />
 
-  const columns: MRT_ColumnDef<TimeUnit>[] = [
+  const columns: MRT_ColumnDef<TimeBoundTabTimeUnit>[] = [
     {
       accessorKey: 'tu_name',
       header: 'ID',
@@ -44,7 +50,16 @@ export const TimeUnitTab = () => {
       header: 'Name',
     },
     {
-      accessorFn: ({ up_bound }) => (up_bound === data.bid ? 'Upper' : 'Lower'),
+      accessorFn: timeUnit => {
+        const upperBoundId = Number(timeUnit.up_bnd ?? timeUnit.up_bound)
+        const lowerBoundId = Number(timeUnit.low_bnd ?? timeUnit.low_bound)
+
+        if (boundId === null) return ''
+        if (upperBoundId === boundId) return 'Upper'
+        if (lowerBoundId === boundId) return 'Lower'
+
+        return 'Unknown'
+      },
       header: 'Upper/Lower',
     },
     {
@@ -52,7 +67,7 @@ export const TimeUnitTab = () => {
       header: 'Rank',
     },
     {
-      accessorKey: 'sequence',
+      accessorFn: ({ sequence, seq_name }) => sequence ?? seq_name ?? '',
       header: 'Sequence',
     },
     {
@@ -62,7 +77,7 @@ export const TimeUnitTab = () => {
   ]
 
   return (
-    <DetailTabTable<TimeUnit>
+    <DetailTabTable<TimeBoundTabTimeUnit>
       mode="read"
       title="Time Units"
       columns={columns}
