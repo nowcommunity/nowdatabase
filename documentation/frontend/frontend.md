@@ -58,6 +58,15 @@ Instead of calling the `setFieldsWithErrors` function directly with the new erro
 
 This ensures that when multiple components try to update the state at the same time, they don't overwrite each other. The react documentation goes into more detail: https://react.dev/reference/react/useState#updating-state-based-on-the-previous-state
 
+
+**Decimal fields and runtime type caveat**
+
+Some DB fields use MariaDB `DECIMAL` and are represented as `Decimal` in Prisma-level TypeScript types (for example `estimate_temp` in `frontend/src/shared/types/data.ts`). In runtime data sent to the frontend, these values are JSON-serialized via Decimal.js `toJSON()`, so they arrive as strings (for example `"5.1"`).
+
+- Keep this mismatch in mind when adding UI logic for decimal fields.
+- Prefer explicit parsing/conversion at usage points if numeric operations are required.
+- `estimate_temp` additionally has validator bounds to avoid DB errors from out-of-range values (`-999.9` to `999.9`).
+
 **Detailed documentation for editingComponents**
 
 - [RadioSelector](./components/editingComponents/RadioSelector.md)

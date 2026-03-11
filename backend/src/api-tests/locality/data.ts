@@ -256,6 +256,17 @@ export const invalidPollenTotalCreateLocality = {
   pers_pollen_other: 20,
 }
 
+
+export const invalidEstimateTempCreateLocality = {
+  ...newLocalityBasis,
+  estimate_temp: 1000,
+}
+
+export const invalidEstimateTempUpdateLocality = {
+  ...editedLocality,
+  estimate_temp: -1000,
+}
+
 export const invalidPollenUpdateLocality = {
   ...editedLocality,
   pers_pollen_ap: 101,
