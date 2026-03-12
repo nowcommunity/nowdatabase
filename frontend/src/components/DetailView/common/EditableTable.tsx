@@ -84,7 +84,9 @@ export const EditableTable = <
           index = visibleIndex
         } else if (idFieldName) {
           const rowId = row.original[idFieldName]
-          const idMatchIndex = items.findIndex(item => (item as unknown as Record<string, unknown>)[String(idFieldName)] === rowId)
+          const idMatchIndex = items.findIndex(
+            item => (item as unknown as Record<string, unknown>)[String(idFieldName)] === rowId
+          )
           if (idMatchIndex >= 0) {
             index = idMatchIndex
           }
