@@ -44,12 +44,19 @@ export const SpeciesTab = () => {
     return applyDefaultSpeciesOrdering(speciesData, { skip: hasUrlSorting })
   }, [hasUrlSorting, speciesData])
 
+  const indexedLocalitySpeciesData = useMemo(() => {
+    return (editData.now_ls as unknown as LocalitySpecies[]).map((localitySpecies, index) => ({
+      ...localitySpecies,
+      index,
+    }))
+  }, [editData.now_ls])
+
   const sortedLocalitySpeciesData = useMemo(() => {
-    return applyDefaultSpeciesOrdering(editData.now_ls as unknown as LocalitySpecies[], {
+    return applyDefaultSpeciesOrdering(indexedLocalitySpeciesData, {
       prefix: 'com_species',
       skip: hasUrlSorting,
     })
-  }, [editData.now_ls, hasUrlSorting])
+  }, [indexedLocalitySpeciesData, hasUrlSorting])
 
   const handleRowActionClick = (row: Species) => {
     setSelectedSpecies(row.species_id.toString())
@@ -271,6 +278,7 @@ export const SpeciesTab = () => {
         enableAdvancedTableControls={true}
         idFieldName="species_id"
         url="species"
+        useDefinedIndex={true}
       />
     </Grouped>
   )
