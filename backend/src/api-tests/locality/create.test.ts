@@ -127,7 +127,6 @@ describe('Creating new locality works', () => {
     )
   })
 
-
   it('Creation fails when estimate temperature is out of range', async () => {
     const { body, status } = await send<ValidationObject[]>('locality', 'PUT', {
       locality: invalidEstimateTempCreateLocality,

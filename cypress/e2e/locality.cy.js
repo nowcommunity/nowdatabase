@@ -144,6 +144,40 @@ describe('Adding species in Locality -> Species tab for an existing locality', (
     cy.contains('Genus Amblycoptus belongs to family Soricidae, not Bovidae.')
   })
 
+
+  it('minus action only marks the clicked species row as removed', () => {
+    cy.visit(`/locality/20920?tab=2`)
+    cy.contains('Lantian-Shuijiazui')
+    cy.get('[id=edit-button]').click()
+
+    cy.get('tbody tr').should('have.length.greaterThan', 1)
+
+    cy.get('tbody tr')
+      .eq(0)
+      .find('td')
+      .eq(3)
+      .invoke('text')
+      .then(firstSpeciesRaw => {
+        const firstSpecies = firstSpeciesRaw.trim()
+
+        cy.get('tbody tr')
+          .eq(1)
+          .find('td')
+          .eq(3)
+          .invoke('text')
+          .then(secondSpeciesRaw => {
+            const secondSpecies = secondSpeciesRaw.trim()
+
+            cy.contains('tbody tr', firstSpecies).within(() => {
+              cy.get('button').first().click()
+            })
+
+            cy.contains('tbody tr', firstSpecies).should('have.css', 'background-color', 'rgb(255, 204, 203)')
+            cy.contains('tbody tr', secondSpecies).should('not.have.css', 'background-color', 'rgb(255, 204, 203)')
+          })
+      })
+  })
+
   it('does not work through "copy species taxonomy" button if nothing is changed', () => {
     cy.visit(`/locality/20920?tab=2`)
     cy.contains('Lantian-Shuijiazui')

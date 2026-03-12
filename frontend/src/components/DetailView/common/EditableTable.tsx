@@ -67,15 +67,35 @@ export const EditableTable = <
 
     // uses either 'row.original.index' or 'staticRowIndex' based on 'useDefinedIndex'
     const rowClicked = () => {
-      let index = useDefinedIndex ? row.original.index : staticRowIndex
-      if (index === undefined) return
       let items: Array<EditDataType<T>>
       if (useObject) {
         items = [editData[field]]
-        index = 0
       } else {
         items = [...editData[field]]
       }
+
+      let index = useDefinedIndex ? row.original.index : staticRowIndex
+
+      if (!useObject) {
+        const visibleRow = row.original as EditDataType<T>
+        const visibleIndex = items.findIndex(item => item === visibleRow)
+
+        if (visibleIndex >= 0) {
+          index = visibleIndex
+        } else if (idFieldName) {
+          const rowId = row.original[idFieldName]
+          const idMatchIndex = items.findIndex(
+            item => (item as unknown as Record<string, unknown>)[String(idFieldName)] === rowId
+          )
+          if (idMatchIndex >= 0) {
+            index = idMatchIndex
+          }
+        }
+      } else {
+        index = 0
+      }
+
+      if (index === undefined) return
 
       if (items[index].rowState === 'new') {
         items.splice(index, 1)

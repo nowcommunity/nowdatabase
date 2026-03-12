@@ -123,7 +123,6 @@ describe('Locality update works', () => {
     )
   })
 
-
   it('Update fails when estimate temperature is out of range', async () => {
     const { body, status } = await send<ValidationObject[]>('locality', 'PUT', {
       locality: invalidEstimateTempUpdateLocality,
