@@ -35,6 +35,15 @@ export const UpdateTab = <T, UpdateType extends MRT_RowData & { updates: UpdateL
 
   if (!refFieldName || !updatesFieldName) return null
 
+  const updates = data[updatesFieldName]
+  if (!Array.isArray(updates)) {
+    return (
+      <Grouped title="Updates">
+        <Box>No updates available.</Box>
+      </Grouped>
+    )
+  }
+
   const columns: MRT_ColumnDef<UpdateType>[] = [
     {
       accessorKey: `${prefix}_date`,
@@ -73,7 +82,7 @@ export const UpdateTab = <T, UpdateType extends MRT_RowData & { updates: UpdateL
 
   return (
     <Grouped title="Updates">
-      <SimpleTable columns={columns} data={data[updatesFieldName] as UpdateType[]} />
+      <SimpleTable columns={columns} data={updates as UpdateType[]} />
     </Grouped>
   )
 }

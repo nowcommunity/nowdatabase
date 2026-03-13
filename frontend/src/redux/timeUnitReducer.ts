@@ -13,6 +13,56 @@ type SequenceQueryResult = {
   offset?: number
 }
 
+type TimeUnitValidationErrorItem = {
+  name: string
+  error: string
+}
+
+type TimeUnitCascadeError = {
+  name?: string
+  cascadeErrors?: string
+  calculatorErrors?: string
+}
+
+const isObject = (value: unknown): value is Record<string, unknown> => typeof value === 'object' && value !== null
+
+export const formatTimeUnitWriteError = (error: unknown): string | null => {
+  if (!isObject(error) || !('status' in error) || !('data' in error)) {
+    return null
+  }
+
+  const status = error.status
+  if (status !== 403) {
+    return null
+  }
+
+  const payload = error.data
+  if (Array.isArray(payload)) {
+    const validationErrors = payload.filter(
+      (item): item is TimeUnitValidationErrorItem =>
+        isObject(item) && typeof item.name === 'string' && typeof item.error === 'string'
+    )
+
+    if (validationErrors.length === 0) {
+      return null
+    }
+
+    return `Following validators failed: ${validationErrors.map(item => `${item.name}: ${item.error}`).join(', ')}`
+  }
+
+  if (isObject(payload)) {
+    const cascadePayload = payload as TimeUnitCascadeError
+    const messages = [cascadePayload.cascadeErrors, cascadePayload.calculatorErrors].filter(
+      (message): message is string => typeof message === 'string' && message.trim() !== ''
+    )
+    if (messages.length > 0) {
+      return messages.join(' ')
+    }
+  }
+
+  return null
+}
+
 const timeunitsApi = api.injectEndpoints({
   endpoints: builder => ({
     getAllTimeUnits: builder.query<TimeUnit[], void>({
