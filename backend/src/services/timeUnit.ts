@@ -112,6 +112,30 @@ export const getTimeUnitLocalities = async (id: string, options?: TabListQueryOp
   return result
 }
 
+export const validateTimeUnitBoundReferences = (
+  editedFields: EditDataType<TimeUnitDetailsType>,
+  validationUpBound: TimeUnitDetailsType['up_bound'] | undefined,
+  validationLowBound: TimeUnitDetailsType['low_bound'] | undefined
+): ValidationObject[] => {
+  const errors: ValidationObject[] = []
+
+  if (editedFields.up_bnd !== undefined && editedFields.up_bnd !== null && !validationUpBound) {
+    errors.push({
+      name: 'Upper Bound',
+      error: `Upper bound with ID ${editedFields.up_bnd} does not exist`,
+    })
+  }
+
+  if (editedFields.low_bnd !== undefined && editedFields.low_bnd !== null && !validationLowBound) {
+    errors.push({
+      name: 'Lower Bound',
+      error: `Lower bound with ID ${editedFields.low_bnd} does not exist`,
+    })
+  }
+
+  return errors
+}
+
 export const validateEntireTimeUnit = async (editedFields: EditDataType<TimeUnitDetailsType> & EditMetaData) => {
   const keys = Object.keys(editedFields)
   const messages: ValidationObject[] = []

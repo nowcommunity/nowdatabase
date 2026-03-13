@@ -7,6 +7,26 @@ import { pool } from '../../utils/db'
 
 let createdTimeUnit: TimeUnitDetailsType | null = null
 
+const hasStructuredErrorPayload = (resultBody: unknown) => {
+  if (Array.isArray(resultBody)) {
+    return resultBody.some(item => {
+      if (typeof item !== 'object' || item === null) {
+        return false
+      }
+      const objectItem = item as Record<string, unknown>
+
+      return typeof objectItem.name === 'string' && (typeof objectItem.error === 'string' || objectItem.error === null)
+    })
+  }
+
+  if (typeof resultBody === 'object' && resultBody !== null) {
+    const objectBody = resultBody as Record<string, unknown>
+    return typeof objectBody.message === 'string' || Array.isArray(objectBody.cascadeErrors)
+  }
+
+  return false
+}
+
 describe('Creating new time unit', () => {
   beforeAll(async () => {
     await resetDatabase()
@@ -168,8 +188,25 @@ describe('Creating new time unit', () => {
       })
 
       expect(getReqStatus).toEqual(403)
+      expect(getReqStatus).not.toEqual(500)
+      expect(hasStructuredErrorPayload(resultBody)).toBe(true)
       const { tu_name: createdId } = resultBody
       expect(typeof createdId).toEqual('undefined')
+    })
+
+    it('Invalid upper and lower bound ids return structured non-500 error payload', async () => {
+      const { body: resultBody, status: getReqStatus } = await send<{ tu_name: string }>('time-unit', 'PUT', {
+        timeUnit: {
+          ...newTimeUnitBasis,
+          tu_display_name: 'invalid both bounds',
+          up_bnd: 40000,
+          low_bnd: 30000,
+        },
+      })
+
+      expect(getReqStatus).toEqual(403)
+      expect(getReqStatus).not.toEqual(500)
+      expect(hasStructuredErrorPayload(resultBody)).toBe(true)
     })
   })
 })
