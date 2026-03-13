@@ -29,7 +29,10 @@ export const validateTimeUnit = (editData: EditDataType<TimeUnitDetailsType>, fi
     },
     up_bound: {
       name: 'Upper Bound',
-      required: true,
+      required: () =>
+        editData.up_bnd !== undefined && editData.up_bnd !== null
+          ? `Upper bound with ID ${editData.up_bnd} does not exist`
+          : 'This field is required',
       miscCheck: () => {
         if (editData.low_bound && editData.low_bound.age! === editData.up_bound!.age!) {
           return 'Upper bound age cannot be the same as lower bound age'
@@ -42,7 +45,10 @@ export const validateTimeUnit = (editData: EditDataType<TimeUnitDetailsType>, fi
     },
     low_bound: {
       name: 'Lower Bound',
-      required: true,
+      required: () =>
+        editData.low_bnd !== undefined && editData.low_bnd !== null
+          ? `Lower bound with ID ${editData.low_bnd} does not exist`
+          : 'This field is required',
       miscCheck: () => {
         if (editData.up_bound && editData.up_bound.age! === editData.low_bound!.age!) {
           return 'Lower bound age cannot be the same as upper bound age'
