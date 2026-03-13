@@ -16,7 +16,13 @@ import {
   validateTimeUnitBoundReferences,
 } from '../services/timeUnit'
 import { getTimeBoundDetails, validateEntireTimeBound } from '../services/timeBound'
-import { ConflictError, DuplicateTimeUnitError, deleteTimeUnit, writeTimeUnit } from '../services/write/timeUnit'
+import {
+  ConflictError,
+  DuplicateTimeUnitError,
+  InvalidBoundReferenceError,
+  deleteTimeUnit,
+  writeTimeUnit,
+} from '../services/write/timeUnit'
 import { fixBigInt } from '../utils/common'
 import { writeTimeBound } from '../services/write/timeBound'
 import { parseTabListQuery } from '../services/tabularQuery'
@@ -149,6 +155,10 @@ router.put(
     } catch (error) {
       if (error instanceof DuplicateTimeUnitError) {
         return res.status(error.status).send({ message: error.message, code: error.code })
+      }
+
+      if (error instanceof InvalidBoundReferenceError) {
+        return res.status(error.status).send(error.validationErrors)
       }
 
       return res.status(500).send({ message: 'Failed to write time unit' })
