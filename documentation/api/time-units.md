@@ -33,6 +33,37 @@ Only the relevant editable fields are shown above; the full payload mirrors the 
 
 - `403 Forbidden` – Standard validation errors. Response matches the existing validator error array or cascade error object.
 
+#### Missing Time Bound reference (guarded non-500 response)
+
+When `up_bnd` and/or `low_bnd` references do not exist, the API now returns a deterministic client error instead of an internal server error.
+
+- Status: `403 Forbidden`
+- Response body example (single invalid bound):
+
+```json
+[
+  {
+    "name": "Lower Bound",
+    "error": "Lower bound with ID 30000 does not exist"
+  }
+]
+```
+
+- Response body example (both invalid):
+
+```json
+[
+  {
+    "name": "Upper Bound",
+    "error": "Upper bound with ID 40000 does not exist"
+  },
+  {
+    "name": "Lower Bound",
+    "error": "Lower bound with ID 30000 does not exist"
+  }
+]
+```
+
 ### Duplicate Name Response
 
 - `409 Conflict` – A time unit with the same normalized name already exists.
