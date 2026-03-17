@@ -10,11 +10,14 @@ import {
 import type { EditDataType } from '@/shared/types'
 
 jest.mock('lodash-es', () => ({
-  cloneDeep: (value: unknown) => value,
+  cloneDeep: <T,>(value: T) => structuredClone(value),
   isEqual: (a: unknown, b: unknown) => JSON.stringify(a) === JSON.stringify(b),
 }))
 
 type TestData = { name: string; count: number }
+type NestedTestData = {
+  now_ls: Array<{ species_id: number; rowState?: string }>
+}
 
 type TestContextState = {
   data: TestData
@@ -35,6 +38,25 @@ const TestConsumer = () => {
   )
 }
 
+const NestedTestConsumer = () => {
+  const { editData, setEditData, isDirty } = useDetailContext<NestedTestData>()
+
+  return (
+    <div>
+      <span data-testid="dirty-state">{isDirty ? 'dirty' : 'clean'}</span>
+      <button
+        onClick={() => {
+          const items = [...editData.now_ls]
+          items[0].rowState = 'removed'
+          setEditData({ ...editData, now_ls: items })
+        }}
+      >
+        Remove species
+      </button>
+    </div>
+  )
+}
+
 const createProvider = (state: TestContextState) => (
   <DetailContextProvider
     contextState={{
@@ -51,6 +73,27 @@ const createProvider = (state: TestContextState) => (
     }}
   >
     <TestConsumer />
+  </DetailContextProvider>
+)
+
+const createNestedProvider = (data: NestedTestData) => (
+  <DetailContextProvider
+    contextState={{
+      data,
+      mode: modeOptionToMode.edit,
+      setMode: () => undefined,
+      editData: data as EditDataType<NestedTestData>,
+      textField: () => <></>,
+      bigTextField: () => <></>,
+      dropdown: () => <></>,
+      dropdownWithSearch: () => <></>,
+      radioSelection: () => <></>,
+      validator,
+      fieldsWithErrors: {},
+      setFieldsWithErrors: () => {},
+    }}
+  >
+    <NestedTestConsumer />
   </DetailContextProvider>
 )
 
@@ -95,5 +138,26 @@ describe('DetailContext dirty state tracking', () => {
     rerender(createProvider(updatedState))
 
     expect(screen.getByTestId('dirty-state').textContent).toBe('clean')
+  })
+
+  it('tracks nested row-state edits after data reloads', async () => {
+    const user = userEvent.setup()
+    const initialData: NestedTestData = {
+      now_ls: [{ species_id: 1 }],
+    }
+
+    const { rerender } = render(createNestedProvider(initialData))
+
+    rerender(
+      createNestedProvider({
+        now_ls: [{ species_id: 2 }],
+      })
+    )
+
+    expect(screen.getByTestId('dirty-state').textContent).toBe('clean')
+
+    await user.click(screen.getByRole('button', { name: /remove species/i }))
+
+    expect(screen.getByTestId('dirty-state').textContent).toBe('dirty')
   })
 })

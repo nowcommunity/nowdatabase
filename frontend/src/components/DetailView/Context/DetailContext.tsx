@@ -117,7 +117,7 @@ export const DetailContextProvider = <T extends object>({
   useEffect(() => {
     const nextEditData = makeEditData(contextState.data)
     setInitialEditData(nextEditData)
-    setEditData(nextEditData)
+    setEditData(cloneDeep(nextEditData))
     setIsDirty(false)
   }, [contextState.data])
 
@@ -132,7 +132,7 @@ export const DetailContextProvider = <T extends object>({
   }
 
   const resetEditData = () => {
-    setEditData(initialEditData)
+    setEditData(cloneDeep(initialEditData))
     setIsDirty(false)
   }
   return (
