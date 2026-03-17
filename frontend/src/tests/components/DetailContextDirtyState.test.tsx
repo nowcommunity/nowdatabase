@@ -10,7 +10,7 @@ import {
 import type { EditDataType } from '@/shared/types'
 
 jest.mock('lodash-es', () => ({
-  cloneDeep: (value: unknown) => JSON.parse(JSON.stringify(value)),
+  cloneDeep: <T,>(value: T) => structuredClone(value),
   isEqual: (a: unknown, b: unknown) => JSON.stringify(a) === JSON.stringify(b),
 }))
 
