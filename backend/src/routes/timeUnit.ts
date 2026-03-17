@@ -13,9 +13,16 @@ import {
   getTimeUnitDetails,
   getTimeUnitLocalities,
   validateEntireTimeUnit,
+  validateTimeUnitBoundReferences,
 } from '../services/timeUnit'
 import { getTimeBoundDetails, validateEntireTimeBound } from '../services/timeBound'
-import { ConflictError, DuplicateTimeUnitError, deleteTimeUnit, writeTimeUnit } from '../services/write/timeUnit'
+import {
+  ConflictError,
+  DuplicateTimeUnitError,
+  InvalidBoundReferenceError,
+  deleteTimeUnit,
+  writeTimeUnit,
+} from '../services/write/timeUnit'
 import { fixBigInt } from '../utils/common'
 import { writeTimeBound } from '../services/write/timeBound'
 import { parseTabListQuery } from '../services/tabularQuery'
@@ -109,22 +116,33 @@ router.put(
         validationLowBound = (await getTimeBoundDetails(normalizedTimeUnit.low_bnd)) ?? undefined
       }
 
-      const validationErrors = await validateEntireTimeUnit({
+      const preparedTimeUnit = {
         ...normalizedTimeUnit,
         up_bnd: newUpBoundId ?? normalizedTimeUnit.up_bnd,
         up_bound: validationUpBound,
         low_bnd: newLowBoundId ?? normalizedTimeUnit.low_bnd,
         low_bound: validationLowBound,
         references: references,
-      })
+      }
+
+      const boundReferenceValidationErrors = validateTimeUnitBoundReferences(
+        preparedTimeUnit,
+        validationUpBound,
+        validationLowBound
+      )
+      if (boundReferenceValidationErrors.length > 0) {
+        return res.status(403).send(boundReferenceValidationErrors)
+      }
+
+      const validationErrors = await validateEntireTimeUnit(preparedTimeUnit)
       if (validationErrors.length > 0) {
         return res.status(403).send(validationErrors)
       }
       const { tu_name, errorObject } = await writeTimeUnit(
         {
-          ...normalizedTimeUnit,
-          up_bnd: newUpBoundId ?? normalizedTimeUnit.up_bnd,
-          low_bnd: newLowBoundId ?? normalizedTimeUnit.low_bnd,
+          ...preparedTimeUnit,
+          up_bound: undefined,
+          low_bound: undefined,
         },
         comment,
         references,
@@ -137,6 +155,10 @@ router.put(
     } catch (error) {
       if (error instanceof DuplicateTimeUnitError) {
         return res.status(error.status).send({ message: error.message, code: error.code })
+      }
+
+      if (error instanceof InvalidBoundReferenceError) {
+        return res.status(error.status).send(error.validationErrors)
       }
 
       return res.status(500).send({ message: 'Failed to write time unit' })

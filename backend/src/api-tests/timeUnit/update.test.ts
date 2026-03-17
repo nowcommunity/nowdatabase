@@ -10,6 +10,26 @@ const existingTimeUnit: EditDataType<TimeUnitDetailsType & EditMetaData> = {
   tu_name: 'baheantest',
 }
 
+const hasStructuredErrorPayload = (resultBody: unknown) => {
+  if (Array.isArray(resultBody)) {
+    return resultBody.some(item => {
+      if (typeof item !== 'object' || item === null) {
+        return false
+      }
+      const objectItem = item as Record<string, unknown>
+
+      return typeof objectItem.name === 'string' && (typeof objectItem.error === 'string' || objectItem.error === null)
+    })
+  }
+
+  if (typeof resultBody === 'object' && resultBody !== null) {
+    const objectBody = resultBody as Record<string, unknown>
+    return typeof objectBody.message === 'string' || Array.isArray(objectBody.cascadeErrors)
+  }
+
+  return false
+}
+
 describe('Time unit updating works', () => {
   beforeAll(async () => {
     await resetDatabase()
@@ -182,8 +202,25 @@ describe('Time unit updating works', () => {
       })
 
       expect(getReqStatus).toEqual(403)
+      expect(getReqStatus).not.toEqual(500)
+      expect(hasStructuredErrorPayload(resultBody)).toBe(true)
       const { tu_name: createdId } = resultBody
       expect(typeof createdId).toEqual('undefined')
+      const { body } = await send<TimeUnitDetailsType>(`time-unit/${existingTimeUnit.tu_name}`, 'GET')
+      expect(body.tu_display_name).toEqual(existingTimeUnit.tu_display_name)
+      expect(body.up_bnd).toEqual(existingTimeUnit.up_bnd)
+      expect(body.low_bnd).toEqual(existingTimeUnit.low_bnd)
+    })
+
+    it('Updating to nonexisting upper and lower bounds returns structured non-500 error payload', async () => {
+      const { body: resultBody, status: getReqStatus } = await send<{ tu_name: string }>('time-unit', 'PUT', {
+        timeUnit: { ...newTimeUnitBasis, up_bnd: 40000, low_bnd: 30000 },
+      })
+
+      expect(getReqStatus).toEqual(403)
+      expect(getReqStatus).not.toEqual(500)
+      expect(hasStructuredErrorPayload(resultBody)).toBe(true)
+
       const { body } = await send<TimeUnitDetailsType>(`time-unit/${existingTimeUnit.tu_name}`, 'GET')
       expect(body.tu_display_name).toEqual(existingTimeUnit.tu_display_name)
       expect(body.up_bnd).toEqual(existingTimeUnit.up_bnd)

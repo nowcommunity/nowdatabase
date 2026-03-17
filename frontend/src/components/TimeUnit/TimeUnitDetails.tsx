@@ -1,8 +1,12 @@
-import { EditDataType, TimeUnitDetailsType, ValidationErrors } from '@/shared/types'
+import { EditDataType, TimeUnitDetailsType } from '@/shared/types'
 import { useNotify } from '@/hooks/notification'
 import { CircularProgress } from '@mui/material'
 import { useNavigate, useParams } from 'react-router-dom'
-import { useEditTimeUnitMutation, useGetTimeUnitDetailsQuery } from '../../redux/timeUnitReducer'
+import {
+  formatTimeUnitWriteError,
+  useEditTimeUnitMutation,
+  useGetTimeUnitDetailsQuery,
+} from '../../redux/timeUnitReducer'
 import { emptyTimeUnit } from '../DetailView/common/defaultValues'
 import { UpdateTab } from '../DetailView/common/UpdateTab'
 import { DetailView, TabType } from '../DetailView/DetailView'
@@ -62,29 +66,13 @@ export const TimeUnitDetails = ({
         notify(getApiErrorMessage(e, 'Time unit with the provided name already exists'), 'warning')
         return
       }
-      if (
-        e &&
-        typeof e === 'object' &&
-        'status' in e &&
-        e.status === 403 &&
-        'data' in e &&
-        e.data &&
-        typeof e.data === 'object'
-      ) {
-        if ('name' in e.data) {
-          if ('cascadeErrors' in e.data && e.data.cascadeErrors !== '') {
-            notify(e.data.cascadeErrors as string, 'error', null)
-          }
-          if ('calculatorErrors' in e.data && e.data.calculatorErrors !== '') {
-            notify(e.data.calculatorErrors as string, 'error', null)
-          }
-        } else {
-          const error = e as ValidationErrors
-          notify('Following validators failed: ' + error.data.map(e => e.name).join(', '), 'error')
-        }
-      } else {
-        notify('Could not edit item. Uncaught error happened.', 'error')
+      const parsedErrorMessage = formatTimeUnitWriteError(e)
+      if (parsedErrorMessage) {
+        notify(parsedErrorMessage, 'error', null)
+        return
       }
+
+      notify('Could not edit item. Uncaught error happened.', 'error')
     }
   }
 

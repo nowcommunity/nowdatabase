@@ -13,6 +13,7 @@
 - Locality age validation now enforces required age-basis rules against the active dating method while tolerating preserved values from non-active methods.
 - Locality -> Species (`/locality/:id?tab=2`) edit-mode minus action now consistently targets the clicked species row when table ordering differs from source data, preventing incorrect red highlight on other rows.
 - Added Cypress regression coverage in `cypress/e2e/locality.cy.js` to verify row-action remove state is applied only to the clicked species row.
+- Time Unit write failures with non-existent `up_bnd`/`low_bnd` now return structured `403` validation payloads (including Prisma FK guardrail mapping) instead of internal `500` errors.
 
 ### Added
 - Species table Genus and Species filters now also match synonym names (syn_genus_name and syn_species_name) returned with each species record.

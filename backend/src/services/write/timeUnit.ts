@@ -12,12 +12,24 @@ import { ActionType } from './writeOperations/types'
 import { getTimeUnitDetails } from '../timeUnit'
 import { checkTimeUnitCascade } from '../../utils/cascadeHandler'
 import { writeLocalityCascade } from './locality'
+import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library'
 
 export class ConflictError extends Error {
   declare status: number
   constructor(message: string) {
     super(message)
     this.status = 409
+  }
+}
+
+export class InvalidBoundReferenceError extends Error {
+  declare status: number
+  validationErrors: { name: string; error: string }[]
+
+  constructor(message: string, validationErrors: { name: string; error: string }[]) {
+    super(message)
+    this.status = 403
+    this.validationErrors = validationErrors
   }
 }
 
@@ -33,6 +45,22 @@ const isForeignKeyConstraintError = (error: unknown) => {
     'code' in error &&
     typeof (error as { code: unknown }).code === 'string' &&
     FOREIGN_KEY_ERROR_CODES.includes((error as { code: string }).code)
+  )
+}
+
+const FOREIGN_KEY_REFERENCE_MISSING_ERROR_CODES = ['ER_NO_REFERENCED_ROW', 'ER_NO_REFERENCED_ROW_2']
+
+const isForeignKeyReferenceMissingError = (error: unknown) => {
+  if (error instanceof PrismaClientKnownRequestError) {
+    return error.code === 'P2003'
+  }
+
+  return (
+    typeof error === 'object' &&
+    error !== null &&
+    'code' in error &&
+    typeof (error as { code: unknown }).code === 'string' &&
+    FOREIGN_KEY_REFERENCE_MISSING_ERROR_CODES.includes((error as { code: string }).code)
   )
 }
 
@@ -176,6 +204,15 @@ export const writeTimeUnit = async (
 
     if (isDuplicateEntryError(e)) {
       throw new DuplicateTimeUnitError(DUPLICATE_TIME_UNIT_MESSAGE)
+    }
+
+    if (isForeignKeyReferenceMissingError(e)) {
+      throw new InvalidBoundReferenceError('One or more referenced time bounds do not exist', [
+        {
+          name: 'bounds',
+          error: 'One or more referenced time bounds do not exist',
+        },
+      ])
     }
 
     throw e
