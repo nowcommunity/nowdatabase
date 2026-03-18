@@ -72,6 +72,9 @@ Implement **exactly one task** from an approved feature plan.
 - For RTK Query or `fetchBaseQuery`, ensure the Jest environment provides `fetch`, `Request`, `Response`, and any methods the library expects such as `clone()`.
 - For selects and MUI form controls, ensure test defaults are valid values (`''` instead of `undefined` for empty select state) so tests do not hide warnings that would fail CI logs later.
 - Wrap programmatic router transitions and similar async state changes in `act(...)`, and verify that timers, notifications, and async navigation do not leave open handles.
+- Keep hooks lint-safe in both production and test-support code: never call React hooks conditionally; if behavior depends on context availability, restructure with a wrapper component or another hook-safe pattern.
+- Do not pass promise-returning functions directly to DOM event props when the target expects `void`; wrap them with `void someAsyncCall()` or an equivalent lint-safe adapter.
+- Treat test mocks and setup files as first-class code: remove unnecessary type assertions, satisfy `require-await` / `no-unsafe-return`, and keep mock/helper files Prettier-clean.
 
 ### Quality / Style
 - Follow ESLint + Prettier + TypeScript strict.  
@@ -111,6 +114,7 @@ Implement **exactly one task** from an approved feature plan.
 - Frontend tests mock API calls and simulate user flows.  
 - Frontend test updates must verify the real render path is reachable before asserting controls; if a shared component stays in loading/error state, fix the harness rather than forcing the assertion.
 - If Jest config is modified, confirm the change does not break unrelated suites by changing module resolution, transform mode, or global mocks.
+- Lint and type-check test-support files too, including `src/tests/setup.ts` and `src/tests/mocks/*`; do not assume helper files are exempt from strict frontend rules.
 
 **Docs / CI**
 - Update `.env.template`, README sections, and API docs when specified.  
@@ -225,6 +229,7 @@ JWT_SECRET="replace_me"
 - Add new packages unless listed in `packages`.  
 - Bypass lint / type rules or CI checks.  
 - Add broad temporary Jest workarounds such as global module remaps, disabled caches, or wide transform exceptions unless you also verify they are truly necessary and safe for unrelated suites.
+- Silence hooks or async-handler lint errors by bypassing the rule instead of restructuring the code safely.
 
 ---
 
@@ -234,6 +239,7 @@ JWT_SECRET="replace_me"
 - Backend & frontend tests pass.  
 - Frontend tests have the correct Provider/router/context wrappers, and async router actions are wrapped in `act(...)` where needed.
 - Jest/browser shims are minimal and compatible with Vite config, ESM dependencies, RTK Query, and asset imports used by the changed code.
+- Production, test, and test-support files all satisfy hooks rules, async-handler rules, strict TypeScript linting, and Prettier.
 - Prisma migrations exist if `migrations:true`.  
 - Role-based permissions verified.  
 - Docs and `.env.template` updated if required.  

@@ -106,6 +106,8 @@ This section summarizes the overall architecture, structure, and technologies of
 - If shared components pull in expensive or unrelated subtrees, plan to mock those subtrees in tests rather than weakening production code or adding wide Jest exceptions.
 - Add a verification task for React Testing Library async behavior: wrap programmatic navigation or router state changes in `act(...)`, and assert against user-visible UI after async transitions settle.
 - Add a teardown-check task whenever timers, notifications, RTK Query, or router transitions are involved, so the plan explicitly looks for open handles and console noise, not only red test failures.
+- When frontend hooks are involved, plan for hook-order safety explicitly: no conditional React hook calls in production components, even when supporting optional test/runtime environments.
+- When test doubles include click handlers or mock browser APIs, plan for lint-safe implementations too: avoid promise-returning event handlers when a void callback is expected, and keep Jest/browser polyfills compatible with strict ESLint rules (`require-await`, unsafe returns, unnecessary assertions, Prettier).
 
 ---
 
@@ -192,6 +194,7 @@ Provide a **machine-readable JSON array** of granular tasks like:
 - **Security:** Use parameterized queries (via Prisma) and sanitize user inputs.
 - **Rollback:** Feature-flag critical changes for safe deployment.
 - **Test Regressions:** Avoid broad Jest config changes that can alter unrelated suites. Prefer the smallest production fix or the narrowest test-specific shim that resolves the real incompatibility.
+- **Lint Regressions:** Test helpers and polyfills must satisfy the same ESLint/Prettier rules as production code, especially hooks rules, async handler rules, and strict TypeScript linting in support files.
 
 ---
 
@@ -209,6 +212,7 @@ Provide a **machine-readable JSON array** of granular tasks like:
 - [ ] Code passes linting and type checks
 - [ ] Frontend tests include the required providers/router/context and do not rely on missing app runtime state
 - [ ] Jest compatibility issues (`import.meta.env`, ESM packages, assets, RTK Query/fetch, timers) are handled with narrow fixes
+- [ ] Frontend support code and test doubles pass hooks, async-handler, strict TypeScript, and Prettier lint rules
 - [ ] Database migrations are applied and reversible
 - [ ] Role-based permissions verified
 - [ ] Documentation and changelog updated

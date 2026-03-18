@@ -53,6 +53,9 @@ When changing frontend code or frontend tests, Codex must proactively apply thes
 - Use `act(...)` for programmatic router navigation or other async state transitions when needed.
 - Ensure select fields use valid empty values such as `''` rather than `undefined`.
 - Avoid introducing runtime circular imports between Redux API modules, reducers, and store setup.
+- Keep React hooks lint-safe at all times: do not call hooks conditionally in production components or test-support code.
+- Do not attach promise-returning functions directly to DOM event props when a void callback is expected; wrap them in a lint-safe handler.
+- Treat `src/tests/setup.ts` and `src/tests/mocks/*` as strict frontend code, not throwaway helpers: they must satisfy ESLint, Prettier, and TypeScript rules too.
 
 ## Validation Expectations
 
@@ -89,4 +92,3 @@ When tradeoffs appear, prefer:
 - Be concise and practical.
 - Mention files changed, validation performed, and any unresolved risk.
 - If a task was only partially verifiable locally, say so clearly.
-
