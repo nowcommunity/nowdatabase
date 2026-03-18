@@ -2,10 +2,12 @@ import { beforeEach, describe, expect, it, jest } from '@jest/globals'
 import { MemoryRouter, Route, Routes, useParams } from 'react-router-dom'
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import { Provider } from 'react-redux'
 
 import { ProjectDetails } from '@/components/Project/ProjectDetails'
 import { PageContext, PageContextType } from '@/components/Page'
 import { ProjectDetailsType } from '@/shared/types'
+import { store } from '@/redux/store'
 
 jest.mock('lodash-es', () => ({
   cloneDeep: (value: unknown) => value,
@@ -40,6 +42,7 @@ let deleteProjectMock: jest.Mock
 jest.mock('@/redux/projectReducer', () => ({
   useGetProjectDetailsQuery: (id: string) => mockUseGetProjectDetailsQuery(id),
   useDeleteProjectMutation: () => mockUseDeleteProjectMutation(),
+  useUpdateProjectMutation: () => [jest.fn(), { isLoading: false }],
 }))
 
 jest.mock('@/hooks/notification', () => ({
@@ -92,13 +95,15 @@ const Wrapper = () => {
 
 const renderWithProviders = () => {
   render(
-    <PageContext.Provider value={pageContextValue}>
-      <MemoryRouter initialEntries={['/project/5']}>
-        <Routes>
-          <Route path="/project/:id" element={<Wrapper />} />
-        </Routes>
-      </MemoryRouter>
-    </PageContext.Provider>
+    <Provider store={store}>
+      <PageContext.Provider value={pageContextValue}>
+        <MemoryRouter initialEntries={['/project/5']}>
+          <Routes>
+            <Route path="/project/:id" element={<Wrapper />} />
+          </Routes>
+        </MemoryRouter>
+      </PageContext.Provider>
+    </Provider>
   )
 }
 
