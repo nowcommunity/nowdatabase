@@ -16,25 +16,6 @@ jest.mock('@/components/DetailView/common/ContactForm', () => ({
   ContactForm: () => <div data-testid="contact-form" />,
 }))
 
-jest.mock('@/components/DetailView/components', () => {
-  const actual = jest.requireActual<typeof import('@/components/DetailView/components')>(
-    '@/components/DetailView/components'
-  )
-  const { useNavigate } = jest.requireActual<typeof import('react-router-dom')>('react-router-dom')
-
-  return {
-    ...actual,
-    ReturnButton: () => {
-      const navigate = useNavigate()
-      return (
-        <button type="button" onClick={() => navigate('/time-unit')}>
-          Return to table
-        </button>
-      )
-    },
-  }
-})
-
 const timeUnitData = {
   tu_name: 'old_tu',
   tu_display_name: 'Old TU',
@@ -138,14 +119,14 @@ describe('DetailView unsaved changes prompt', () => {
 
     await user.click(screen.getByRole('button', { name: /edit/i }))
     await user.click(screen.getByRole('button', { name: /change upper age/i }))
-    await user.click(screen.getByRole('button', { name: /return to table/i }))
+    await router.navigate('/time-unit')
 
     await screen.findByRole('dialog')
     await user.click(screen.getByRole('button', { name: /stay on page/i }))
 
     expect(router.state.location.pathname).toBe('/time-unit/old_tu')
 
-    await user.click(screen.getByRole('button', { name: /return to table/i }))
+    await router.navigate('/time-unit')
     await user.click(await screen.findByRole('button', { name: /leave page/i }))
 
     await waitFor(() => {

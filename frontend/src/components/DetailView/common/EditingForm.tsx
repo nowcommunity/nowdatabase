@@ -56,10 +56,8 @@ export const EditingForm = <T extends object, ParentType extends object>({
     return defaults
   }
 
-  const getDefaultValues: () => { [x: string]: unknown } = () => {
-    return buildDefaultValues(existingObject)
-  }
-  const { register, trigger, formState, getValues, reset } = useForm({ defaultValues: getDefaultValues() })
+  const defaultValues = buildDefaultValues(existingObject)
+  const { register, trigger, formState, getValues, reset } = useForm({ defaultValues })
   const { errors } = formState
   const { editData, setEditData } = useDetailContext<ParentType>()
 
@@ -91,6 +89,7 @@ export const EditingForm = <T extends object, ParentType extends object>({
             key={field.name}
             slotProps={{ inputLabel: { shrink: true } }}
             select={!!field.selectOptions}
+            defaultValue={defaultValues[field.name] ?? (field.selectOptions ? '' : undefined)}
             {...register(field.name, {
               required: field.required ? 'This field is required' : false,
               ...(field.type === 'number' &&
