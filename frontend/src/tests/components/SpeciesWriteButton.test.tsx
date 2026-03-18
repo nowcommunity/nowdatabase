@@ -1,6 +1,5 @@
 import { describe, expect, it, jest, beforeEach } from '@jest/globals'
 import { render, screen, waitFor, fireEvent } from '@testing-library/react'
-import userEvent from '@testing-library/user-event'
 import '@testing-library/jest-dom'
 import { WriteButton } from '@/components/DetailView/components'
 import { EditDataType, Species } from '@/shared/types'

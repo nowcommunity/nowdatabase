@@ -44,16 +44,27 @@ export const EditingForm = <T extends object, ParentType extends object>({
   replacedValues?: T | undefined
   copyTaxonomyButton?: JSX.Element | undefined
 }) => {
+  const buildDefaultValues = (values?: T) => {
+    const defaults = (values ? { ...values } : {}) as Record<string, unknown>
+
+    for (const field of formFields) {
+      if (field.selectOptions && defaults[field.name] === undefined) {
+        defaults[field.name] = ''
+      }
+    }
+
+    return defaults
+  }
+
   const getDefaultValues: () => { [x: string]: unknown } = () => {
-    if (!existingObject) return {}
-    return existingObject
+    return buildDefaultValues(existingObject)
   }
   const { register, trigger, formState, getValues, reset } = useForm({ defaultValues: getDefaultValues() })
   const { errors } = formState
   const { editData, setEditData } = useDetailContext<ParentType>()
 
   useEffect(() => {
-    if (replacedValues) reset(replacedValues)
+    if (replacedValues) reset(buildDefaultValues(replacedValues))
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [replacedValues])
 

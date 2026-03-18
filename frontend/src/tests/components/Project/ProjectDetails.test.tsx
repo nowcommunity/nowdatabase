@@ -33,8 +33,13 @@ jest.mock('@/components/DetailView/DetailView', () => ({
   },
 }))
 
+jest.mock('@/components/Project/Tabs/CoordinatorTab', () => ({
+  CoordinatorTab: () => <div data-testid="coordinator-tab" />,
+}))
+
 const mockUseGetProjectDetailsQuery = jest.fn()
 const mockUseDeleteProjectMutation = jest.fn()
+const mockUseUsersApi = jest.fn()
 const mockNotify = jest.fn()
 const mockNavigate = jest.fn()
 let deleteProjectMock: jest.Mock
@@ -47,6 +52,10 @@ jest.mock('@/redux/projectReducer', () => ({
 
 jest.mock('@/hooks/notification', () => ({
   useNotify: () => ({ notify: mockNotify }),
+}))
+
+jest.mock('@/hooks/useUsersApi', () => ({
+  useUsersApi: () => mockUseUsersApi(),
 }))
 
 jest.mock('react-router-dom', () => {
@@ -112,6 +121,7 @@ describe('ProjectDetails', () => {
     mockUseGetProjectDetailsQuery.mockReturnValue({ data: baseProject, isLoading: false, isError: false })
     deleteProjectMock = jest.fn(() => ({ unwrap: () => Promise.resolve() }))
     mockUseDeleteProjectMutation.mockReturnValue([deleteProjectMock, { isLoading: false }])
+    mockUseUsersApi.mockReturnValue({ users: [], isLoading: false, isError: false })
     mockNotify.mockReset()
     mockNavigate.mockReset()
     window.confirm = jest.fn(() => true) as unknown as typeof window.confirm
@@ -120,7 +130,7 @@ describe('ProjectDetails', () => {
   it('deletes the project and navigates back to the list', async () => {
     renderWithProviders()
 
-    const deleteButton = screen.getByRole('button', { name: /delete/i })
+    const deleteButton = await screen.findByRole('button', { name: /delete/i })
     await userEvent.click(deleteButton)
 
     await waitFor(() => {

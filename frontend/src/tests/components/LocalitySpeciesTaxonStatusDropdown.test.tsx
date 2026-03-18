@@ -3,6 +3,7 @@ import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MemoryRouter } from 'react-router-dom'
 import { Provider } from 'react-redux'
+import { useState, type ReactNode } from 'react'
 import { SpeciesTab } from '@/components/Locality/Tabs/SpeciesTab'
 import {
   useDetailContext,
@@ -33,6 +34,44 @@ jest.mock('@/redux/speciesReducer', () => ({
 
 jest.mock('@/hooks/notification', () => ({
   useNotify: jest.fn(),
+}))
+
+jest.mock('@/components/DetailView/common/EditingModal', () => ({
+  EditingModal: ({
+    buttonText,
+    children,
+    onSave,
+  }: {
+    buttonText: string
+    children: ReactNode
+    onSave?: () => Promise<boolean>
+  }) => {
+    const [open, setOpen] = useState(false)
+
+    return (
+      <div>
+        <button type="button" onClick={() => setOpen(true)}>
+          {buttonText}
+        </button>
+        {open ? (
+          <div>
+            {children}
+            {onSave ? (
+              <button
+                type="button"
+                onClick={async () => {
+                  const shouldClose = await onSave()
+                  if (shouldClose) setOpen(false)
+                }}
+              >
+                Save
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+      </div>
+    )
+  },
 }))
 
 jest.mock('@/components/DetailView/common/EditableTable', () => ({

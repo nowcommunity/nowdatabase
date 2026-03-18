@@ -12,6 +12,10 @@ import { useDetailContext } from '@/components/DetailView/Context/DetailContext'
 import type { TimeUnitDetailsType } from '@/shared/types'
 import { store } from '@/redux/store'
 
+jest.mock('@/components/DetailView/common/ContactForm', () => ({
+  ContactForm: () => <div data-testid="contact-form" />,
+}))
+
 const timeUnitData = {
   tu_name: 'old_tu',
   tu_display_name: 'Old TU',
