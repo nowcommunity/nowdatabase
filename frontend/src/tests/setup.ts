@@ -20,6 +20,10 @@ if (typeof global.Response === 'undefined') {
   } as typeof Response
 }
 
+if (typeof global.fetch === 'undefined') {
+  global.fetch = jest.fn(async () => new Response(null, { status: 200 })) as typeof fetch
+}
+
 if (typeof global.structuredClone === 'undefined') {
   global.structuredClone = (<T,>(value: T) => JSON.parse(JSON.stringify(value)) as T) as typeof structuredClone
 }
