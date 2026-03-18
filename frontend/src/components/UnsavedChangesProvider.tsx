@@ -1,5 +1,5 @@
-import { useCallback, useEffect, useMemo, useState, type ReactNode } from 'react'
-import { useBlocker } from 'react-router-dom'
+import { useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react'
+import { UNSAFE_DataRouterContext, useBlocker } from 'react-router-dom'
 
 import { UnsavedChangesDialog } from './UnsavedChangesDialog'
 import { UnsavedChangesContext } from './unsavedChangesContext'
@@ -12,6 +12,13 @@ type UnsavedChangesProviderProps = {
 
 const DEFAULT_MESSAGE = 'You have unsaved changes. Do you want to leave this page without saving?'
 
+const unblockedState = {
+  state: 'unblocked' as const,
+  proceed: undefined,
+  reset: undefined,
+  location: undefined,
+}
+
 export const UnsavedChangesProvider = ({
   children,
   defaultMessage = DEFAULT_MESSAGE,
@@ -19,8 +26,9 @@ export const UnsavedChangesProvider = ({
 }: UnsavedChangesProviderProps) => {
   const [isDirty, setDirty] = useState(false)
   const [message, setMessage] = useState(defaultMessage)
+  const dataRouterContext = useContext(UNSAFE_DataRouterContext)
 
-  const blocker = useBlocker(isDirty)
+  const blocker = dataRouterContext ? useBlocker(isDirty) : unblockedState
   const isSamePathNavigation = blocker.state === 'blocked' && blocker.location?.pathname === window.location.pathname
   const showDialog = blocker.state === 'blocked' && !isSamePathNavigation
 
