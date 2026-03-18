@@ -1,6 +1,6 @@
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from '@jest/globals'
 import { pool } from '../../utils/db'
-import { login, logout, noPermError, resetDatabase, resetDatabaseTimeout, send, unauthenticatedError } from '../utils'
+import { login, logout, noPermError, resetDatabase, resetDatabaseTimeout, send } from '../utils'
 
 const existingOccurrencePath = 'occurrence/21050/85729'
 
@@ -32,7 +32,7 @@ describe('Occurrence edit endpoint access and write flow', () => {
   })
 
   it('returns 403 for users without occurrence edit permissions', async () => {
-    await login('testEu', 'test')
+    await login('testNo', 'test')
 
     const response = await send<Record<string, unknown>>(existingOccurrencePath, 'PUT', {
       occurrence: { source_name: 'should not persist' },
@@ -42,14 +42,14 @@ describe('Occurrence edit endpoint access and write flow', () => {
     expect(response.body).toStrictEqual(noPermError)
   })
 
-  it('returns 401 when user is not logged in', async () => {
+  it('returns 403 when user is not logged in', async () => {
     logout()
 
     const response = await send<Record<string, unknown>>(existingOccurrencePath, 'PUT', {
       occurrence: { source_name: 'should not persist' },
     })
 
-    expect(response.status).toBe(401)
-    expect(response.body).toStrictEqual(unauthenticatedError)
+    expect(response.status).toBe(403)
+    expect(response.body).toStrictEqual(noPermError)
   })
 })

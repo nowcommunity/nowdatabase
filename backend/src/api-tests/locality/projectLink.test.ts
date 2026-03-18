@@ -1,22 +1,19 @@
 import { afterAll, beforeEach, describe, expect, it } from '@jest/globals'
 import { EditDataType, LocalityDetailsType } from '../../../../frontend/src/shared/types'
-import { editedLocality } from './data'
 import { login, resetDatabase, resetDatabaseTimeout, send, noPermError } from '../utils'
 import { pool } from '../../utils/db'
 
 const TEST_PROJECT_ID = 35
-const localityId = editedLocality.lid
+const localityId = 21050
 
-const cloneEditedLocality = () => structuredClone(editedLocality)
-
-const buildLocalityPayload = (projectIds: number[]) => {
-  const payload = cloneEditedLocality() as unknown as EditDataType<LocalityDetailsType> & {
+const buildLocalityPayload = async (projectIds: number[]) => {
+  const localityResponse = await send<LocalityDetailsType>(`locality/${localityId}`, 'GET')
+  const payload = structuredClone(localityResponse.body) as EditDataType<LocalityDetailsType> & {
     now_plr?: Array<{ lid: number; pid: number; rowState: 'new' }>
   }
-  const lid = payload.lid ?? localityId
 
   payload.now_plr = projectIds.map(pid => ({
-    lid,
+    lid: localityId,
     pid,
     rowState: 'new' as const,
   }))
@@ -35,7 +32,7 @@ describe('Locality project links', () => {
 
   it('adds a project to a locality and exposes it via the API', async () => {
     await login()
-    const payload = buildLocalityPayload([TEST_PROJECT_ID])
+    const payload = await buildLocalityPayload([TEST_PROJECT_ID])
 
     const result = await send<{ id: number }>('locality', 'PUT', { locality: payload })
     expect(result.status).toEqual(200)
@@ -48,7 +45,7 @@ describe('Locality project links', () => {
 
   it('rejects users without project edit permissions', async () => {
     await login('testEr')
-    const payload = buildLocalityPayload([TEST_PROJECT_ID])
+    const payload = await buildLocalityPayload([TEST_PROJECT_ID])
 
     const result = await send('locality', 'PUT', { locality: payload })
     expect(result.status).toEqual(403)
@@ -57,12 +54,12 @@ describe('Locality project links', () => {
 
   it('ignores duplicate additions of the same project', async () => {
     await login()
-    const duplicatePayload = buildLocalityPayload([TEST_PROJECT_ID, TEST_PROJECT_ID])
+    const duplicatePayload = await buildLocalityPayload([TEST_PROJECT_ID, TEST_PROJECT_ID])
 
     const firstResult = await send<{ id: number }>('locality', 'PUT', { locality: duplicatePayload })
     expect(firstResult.status).toEqual(200)
 
-    const duplicateAttempt = buildLocalityPayload([TEST_PROJECT_ID])
+    const duplicateAttempt = await buildLocalityPayload([TEST_PROJECT_ID])
     const secondResult = await send<{ id: number }>('locality', 'PUT', { locality: duplicateAttempt })
     expect(secondResult.status).toEqual(200)
 

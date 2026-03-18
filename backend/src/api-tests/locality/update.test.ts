@@ -1,5 +1,5 @@
 import { beforeEach, beforeAll, afterAll, describe, it, expect } from '@jest/globals'
-import { LocalityDetailsType, SpeciesDetailsType } from '../../../../frontend/src/shared/types'
+import { LocalityDetailsType } from '../../../../frontend/src/shared/types'
 import { LogRow } from '../../services/write/writeOperations/types'
 import { ValidationObject } from '../../../../frontend/src/shared/validators/validator'
 import {
@@ -13,14 +13,21 @@ import { pool } from '../../utils/db'
 
 let resultLocality: LocalityDetailsType | null = null
 
+const buildEditedLocalityPayload = async () => {
+  const { body: currentLocality } = await send<LocalityDetailsType>(`locality/${editedLocality.lid}`, 'GET')
+
+  return {
+    ...currentLocality,
+    ...editedLocality,
+  }
+}
+
 describe('Locality update works', () => {
   beforeAll(async () => {
     await resetDatabase()
   }, resetDatabaseTimeout)
   beforeEach(async () => {
-    await resetDatabase()
     await login()
-    resultLocality = null
   })
   afterAll(async () => {
     await pool.end()
@@ -28,7 +35,8 @@ describe('Locality update works', () => {
 
   describe('with a successful locality update applied', () => {
     beforeEach(async () => {
-      const writeResult = await send<{ id: number }>('locality', 'PUT', { locality: editedLocality })
+      const localityPayload = await buildEditedLocalityPayload()
+      const writeResult = await send<{ id: number }>('locality', 'PUT', { locality: localityPayload })
 
       expect(writeResult.status).toEqual(200)
       expect(writeResult.body.id).toEqual(editedLocality.lid) // `Invalid result returned on write: ${writeResult.body.id}`
@@ -100,8 +108,9 @@ describe('Locality update works', () => {
   })
 
   it('Update fails when pollen values are out of range', async () => {
+    const localityPayload = { ...(await buildEditedLocalityPayload()), ...invalidPollenUpdateLocality }
     const { body, status } = await send<ValidationObject[]>('locality', 'PUT', {
-      locality: invalidPollenUpdateLocality,
+      locality: localityPayload,
     })
 
     expect(status).toEqual(403)
@@ -116,8 +125,9 @@ describe('Locality update works', () => {
   })
 
   it('Update fails when pollen total exceeds 100', async () => {
+    const localityPayload = { ...(await buildEditedLocalityPayload()), ...invalidPollenTotalUpdateLocality }
     const { body, status } = await send<ValidationObject[]>('locality', 'PUT', {
-      locality: invalidPollenTotalUpdateLocality,
+      locality: localityPayload,
     })
 
     expect(status).toEqual(403)
@@ -133,8 +143,9 @@ describe('Locality update works', () => {
   })
 
   it('Update fails when estimate temperature is out of range', async () => {
+    const localityPayload = { ...(await buildEditedLocalityPayload()), ...invalidEstimateTempUpdateLocality }
     const { body, status } = await send<ValidationObject[]>('locality', 'PUT', {
-      locality: invalidEstimateTempUpdateLocality,
+      locality: localityPayload,
     })
 
     expect(status).toEqual(403)
@@ -149,7 +160,7 @@ describe('Locality update works', () => {
   })
 
   it('Editing locality without changing anything should succeed', async () => {
-    const locality = editedLocality
+    const locality = await buildEditedLocalityPayload()
     const writeResult = await send<{ id: number }>('locality', 'PUT', { locality: locality })
     expect(writeResult.status).toEqual(200)
     expect(writeResult.body.id).toEqual(editedLocality.lid) // `Invalid result returned on write: ${writeResult.body.id}

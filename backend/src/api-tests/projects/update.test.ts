@@ -50,7 +50,7 @@ describe('PUT /projects/:id', () => {
     await login('testSu', 'test')
 
     const createResult = await send<{ pid: number }>('projects', 'POST', {
-      projectCode: 'PRJ-INVALID',
+      projectCode: 'PRJ-INV1',
       projectName: 'Project Invalid Members',
       coordinatorUserId: 163,
     })
