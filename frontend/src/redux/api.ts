@@ -7,9 +7,8 @@ import {
   FetchBaseQueryMeta,
 } from '@reduxjs/toolkit/query/react'
 import { BACKEND_URL } from '../util/config'
-import { RootState } from './store'
-import { clearUser, setToken } from './userReducer'
-import { QueryReturnValue } from 'node_modules/@reduxjs/toolkit/dist/query/baseQueryTypes'
+import type { RootState } from './store'
+import type { QueryReturnValue } from '@reduxjs/toolkit/dist/query/baseQueryTypes'
 import { EditableOccurrenceData, OccurrenceDetailsType } from '@/shared/types'
 
 const baseQuery = fetchBaseQuery({
@@ -37,10 +36,10 @@ const baseQueryWithReauth: BaseQueryFn<string | FetchArgs, unknown, FetchBaseQue
       extraOptions
     )) as QueryReturnValue<{ token: string }, FetchBaseQueryError, FetchBaseQueryMeta>
     if (refreshedToken?.data?.token) {
-      api.dispatch(setToken(refreshedToken.data.token))
+      api.dispatch({ type: 'user/setToken', payload: refreshedToken.data.token })
       result = await baseQuery(args, api, extraOptions)
     } else {
-      api.dispatch(clearUser())
+      api.dispatch({ type: 'user/clearUser' })
       localStorage.clear()
       window.location.replace('/login?expired=true')
     }
