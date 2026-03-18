@@ -1,5 +1,7 @@
 // Polyfill for React Router's data router in Jest environment
 // See: https://github.com/remix-run/react-router/discussions/9851
+import '@testing-library/jest-dom'
+
 if (typeof global.Request === 'undefined') {
   global.Request = class Request {
     constructor(
@@ -16,4 +18,8 @@ if (typeof global.Response === 'undefined') {
       public init?: ResponseInit
     ) {}
   } as typeof Response
+}
+
+if (typeof global.structuredClone === 'undefined') {
+  global.structuredClone = (<T,>(value: T) => JSON.parse(JSON.stringify(value)) as T) as typeof structuredClone
 }

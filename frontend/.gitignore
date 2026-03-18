@@ -12,6 +12,7 @@ lerna-debug.log*
 node_modules
 dist
 dist-ssr
+.jest-cache
 *.local
 
 # Editor directories and files
