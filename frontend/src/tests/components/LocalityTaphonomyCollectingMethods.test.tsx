@@ -1,10 +1,12 @@
 import { beforeEach, describe, expect, it, jest } from '@jest/globals'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import { MemoryRouter } from 'react-router-dom'
 
 import { TaphonomyTab } from '@/components/Locality/Tabs/TaphonomyTab'
 import { DetailContext, type DetailContextType, modeOptionToMode } from '@/components/DetailView/Context/DetailContext'
 import type { CollectingMethodValues, EditDataType, LocalityDetailsType } from '@/shared/types'
+import { PageContext, type PageContextType } from '@/components/Page'
 
 const selectingTableMock = jest.fn()
 
@@ -58,13 +60,37 @@ const createDetailContextValue = (overrides: Partial<DetailContextType<LocalityD
     ...overrides,
   }) as DetailContextType<LocalityDetailsType>
 
+const pageContextValue: PageContextType<unknown> = {
+  idList: [],
+  setIdList: jest.fn(),
+  idFieldName: 'lid',
+  viewName: 'locality',
+  previousTableUrls: [],
+  setPreviousTableUrls: jest.fn(),
+  createTitle: () => '',
+  createSubtitle: () => '',
+  editRights: { edit: true, delete: true },
+  sqlLimit: 20,
+  sqlOffset: 0,
+  sqlColumnFilters: [],
+  sqlOrderBy: [],
+  setSqlLimit: jest.fn(),
+  setSqlOffset: jest.fn(),
+  setSqlColumnFilters: jest.fn(),
+  setSqlOrderBy: jest.fn(),
+}
+
 const renderTaphonomyTab = (overrides: Partial<DetailContextType<LocalityDetailsType>> = {}) => {
   const contextValue = createDetailContextValue(overrides)
 
   render(
-    <DetailContext.Provider value={contextValue as unknown as DetailContextType<unknown>}>
-      <TaphonomyTab />
-    </DetailContext.Provider>
+    <MemoryRouter>
+      <PageContext.Provider value={pageContextValue}>
+        <DetailContext.Provider value={contextValue as unknown as DetailContextType<unknown>}>
+          <TaphonomyTab />
+        </DetailContext.Provider>
+      </PageContext.Provider>
+    </MemoryRouter>
   )
 
   return contextValue
