@@ -3,7 +3,7 @@ import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MemoryRouter } from 'react-router-dom'
 import { Provider } from 'react-redux'
-import { useState, type ChangeEvent, type ReactNode } from 'react'
+import { useRef, useState, type ReactNode } from 'react'
 import { SpeciesTab } from '@/components/Locality/Tabs/SpeciesTab'
 import {
   useDetailContext,
@@ -45,15 +45,7 @@ jest.mock('@/components/DetailView/common/EditingForm', () => ({
     editAction?: (value: Record<string, unknown>) => void
   }) => {
     const [open, setOpen] = useState(false)
-    const [values, setValues] = useState<Record<string, unknown>>({
-      unique_identifier: '-',
-      taxonomic_status: '',
-    })
-
-    const handleChange = (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-      const { name, value } = event.target
-      setValues(current => ({ ...current, [name]: value }))
-    }
+    const formRef = useRef<HTMLDivElement>(null)
 
     return (
       <div>
@@ -61,26 +53,26 @@ jest.mock('@/components/DetailView/common/EditingForm', () => ({
           {buttonText}
         </button>
         {open ? (
-          <div>
+          <div ref={formRef}>
             <label>
               Order
-              <input name="order_name" value={String(values.order_name ?? '')} onChange={handleChange} />
+              <input name="order_name" defaultValue="" />
             </label>
             <label>
               Family
-              <input name="family_name" value={String(values.family_name ?? '')} onChange={handleChange} />
+              <input name="family_name" defaultValue="" />
             </label>
             <label>
               Genus
-              <input name="genus_name" value={String(values.genus_name ?? '')} onChange={handleChange} />
+              <input name="genus_name" defaultValue="" />
             </label>
             <label>
               Species
-              <input name="species_name" value={String(values.species_name ?? '')} onChange={handleChange} />
+              <input name="species_name" defaultValue="" />
             </label>
             <label>
               Taxon status
-              <select name="taxonomic_status" value={String(values.taxonomic_status ?? '')} onChange={handleChange}>
+              <select name="taxonomic_status" defaultValue="">
                 {taxonStatusSelectLabels.map(label => (
                   <option key={label} value={label === 'No value' ? '' : label}>
                     {label}
@@ -91,6 +83,15 @@ jest.mock('@/components/DetailView/common/EditingForm', () => ({
             <button
               type="button"
               onClick={() => {
+                const fields = formRef.current?.querySelectorAll('input, select') ?? []
+                const values = Array.from(fields).reduce<Record<string, unknown>>(
+                  (acc, field) => {
+                    acc[field.getAttribute('name') ?? ''] = (field as HTMLInputElement | HTMLSelectElement).value
+                    return acc
+                  },
+                  { unique_identifier: '-', taxonomic_status: '' }
+                )
+
                 editAction?.(values)
                 setOpen(false)
               }}
@@ -248,7 +249,7 @@ describe('SpeciesTab taxon status dropdown', () => {
 
     expect(noValueOption).toBeDefined()
     expect(nowSynonymOption).toBeDefined()
-    await user.click(nowSynonymOption!)
+    await user.selectOptions(taxonStatusField, 'NOW synonym')
 
     await user.type(screen.getByLabelText(/^order$/i), 'Carnivora')
     await user.type(screen.getByLabelText(/^family$/i), 'Felidae')

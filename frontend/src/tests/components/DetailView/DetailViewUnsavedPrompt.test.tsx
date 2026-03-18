@@ -11,22 +11,29 @@ import { NotificationContextProvider } from '@/components/Notification'
 import { useDetailContext } from '@/components/DetailView/Context/DetailContext'
 import type { TimeUnitDetailsType } from '@/shared/types'
 import { store } from '@/redux/store'
-import { useReturnNavigation } from '@/hooks/useReturnNavigation'
 
 jest.mock('@/components/DetailView/common/ContactForm', () => ({
   ContactForm: () => <div data-testid="contact-form" />,
 }))
 
-jest.mock('@/components/common/ReturnButton', () => ({
-  ReturnButton: () => {
-    const { navigateBack } = useReturnNavigation()
-    return (
-      <button type="button" onClick={navigateBack}>
-        Return to table
-      </button>
-    )
-  },
-}))
+jest.mock('@/components/DetailView/components', () => {
+  const actual = jest.requireActual<typeof import('@/components/DetailView/components')>(
+    '@/components/DetailView/components'
+  )
+  const { useNavigate } = jest.requireActual<typeof import('react-router-dom')>('react-router-dom')
+
+  return {
+    ...actual,
+    ReturnButton: () => {
+      const navigate = useNavigate()
+      return (
+        <button type="button" onClick={() => navigate('/time-unit')}>
+          Return to table
+        </button>
+      )
+    },
+  }
+})
 
 const timeUnitData = {
   tu_name: 'old_tu',

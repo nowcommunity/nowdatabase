@@ -56,16 +56,22 @@ jest.mock('@/components/DetailView/common/tabLayoutHelpers', () => ({
 }))
 
 const mockUseDetailContext = useDetailContext as jest.MockedFunction<typeof useDetailContext>
-const baseContextValue = {
+type MockDetailContextValue = {
+  data: { now_ls: unknown[] }
+  editData: { now_ls: unknown[] }
+  mode: typeof modeOptionToMode.read
+}
+
+const baseContextValue: MockDetailContextValue = {
   data: { now_ls: [] },
   editData: { now_ls: [] },
   mode: modeOptionToMode.read,
-} as never
+}
 
 describe('LocalitySpeciesTab MW score prerequisites', () => {
   beforeEach(() => {
     jest.clearAllMocks()
-    mockUseDetailContext.mockReturnValue(baseContextValue)
+    mockUseDetailContext.mockReturnValue(baseContextValue as never)
   })
 
   it('passes MW scale/value columns and MW Score cell can read values from row data', () => {
@@ -105,9 +111,10 @@ describe('LocalitySpeciesTab MW score prerequisites', () => {
 
   it('uses occurrence terminology in grouped heading and modal button', () => {
     mockUseDetailContext.mockReturnValue({
-      ...baseContextValue,
+      data: { now_ls: [] },
+      editData: { now_ls: [] },
       mode: modeOptionToMode.edit,
-    })
+    } as never)
 
     render(<LocalitySpeciesTab />)
 
