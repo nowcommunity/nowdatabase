@@ -22,6 +22,7 @@ const getLocalityWriteHandler = (type: ActionType) => {
       'now_syn_loc',
       'now_plr',
       'now_lau',
+      'now_lr',
       'now_sau',
     ]),
     type,
