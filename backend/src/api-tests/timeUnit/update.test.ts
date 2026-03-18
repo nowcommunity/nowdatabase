@@ -33,17 +33,16 @@ const hasStructuredErrorPayload = (resultBody: unknown) => {
 describe('Time unit updating works', () => {
   beforeAll(async () => {
     await resetDatabase()
-    await login()
-    await send<{ tu_name: string }>('time-unit', 'PUT', {
-      timeUnit: { ...newTimeUnitBasis },
-    })
   }, resetDatabaseTimeout)
   beforeEach(async () => {
+    await resetDatabase()
     await login()
-    // create the existing time unit that is edited
-    await send<{ tu_name: string }>('time-unit', 'PUT', {
-      timeUnit: { tu_name: 'baheantest', ...newTimeUnitBasis },
+    const setupResult = await send<{ tu_name: string }>('time-unit', 'PUT', {
+      timeUnit: { ...newTimeUnitBasis },
     })
+
+    expect(setupResult.status).toEqual(200)
+    expect(setupResult.body.tu_name).toEqual('baheantest')
   })
   afterAll(async () => {
     await pool.end()
@@ -51,30 +50,24 @@ describe('Time unit updating works', () => {
 
   describe('Time unit updates with valid data', () => {
     it('Update request with valid time unit succeeds and returns valid number id', async () => {
-      const { body: resultBody } = await send<{ tu_name: string }>('time-unit', 'PUT', {
+      const { status } = await send<{ tu_name: string }>('time-unit', 'PUT', {
         timeUnit: editedTimeUnit,
       })
-      const { tu_name: existingId } = resultBody
 
-      expect(typeof existingId).toEqual('string')
-      expect(existingId).toEqual('baheantest')
-
-      const { body } = await send<TimeUnitDetailsType>(`time-unit/${existingId}`, 'GET')
+      expect(status).toEqual(200)
+      const { body } = await send<TimeUnitDetailsType>(`time-unit/${existingTimeUnit.tu_name}`, 'GET')
       expect(body.tu_display_name).toEqual(existingTimeUnit.tu_display_name)
       expect(body.sequence).toEqual(editedTimeUnit.sequence)
       expect(body.up_bnd).toEqual(existingTimeUnit.up_bnd)
       expect(body.low_bnd).toEqual(existingTimeUnit.low_bnd)
     })
     it('Update request that does not change anything works', async () => {
-      const { body: resultBody } = await send<{ tu_name: string }>('time-unit', 'PUT', {
+      const { status } = await send<{ tu_name: string }>('time-unit', 'PUT', {
         timeUnit: existingTimeUnit,
       })
 
-      const { tu_name: existingId } = resultBody
-      expect(typeof existingId).toEqual('string')
-      expect(existingId).toEqual('baheantest')
-
-      const { body } = await send<TimeUnitDetailsType>(`time-unit/${existingId}`, 'GET')
+      expect(status).toEqual(200)
+      const { body } = await send<TimeUnitDetailsType>(`time-unit/${existingTimeUnit.tu_name}`, 'GET')
       expect(body.tu_display_name).toEqual(existingTimeUnit.tu_display_name)
       expect(body.up_bnd).toEqual(existingTimeUnit.up_bnd)
       expect(body.low_bnd).toEqual(existingTimeUnit.low_bnd)
@@ -104,11 +97,12 @@ describe('Time unit updating works', () => {
     })
     it('Update logs are correct', async () => {
       // edit time unit to create a log update
-      const { body: resultBody } = await send<{ tu_name: string }>('time-unit', 'PUT', {
+      const { status } = await send<{ tu_name: string }>('time-unit', 'PUT', {
         timeUnit: editedTimeUnit,
       })
-      const { tu_name: createdId } = resultBody
-      const { body: createdTimeUnit } = await send<TimeUnitDetailsType>(`time-unit/${createdId}`, 'GET')
+      expect(status).toEqual(200)
+
+      const { body: createdTimeUnit } = await send<TimeUnitDetailsType>(`time-unit/${existingTimeUnit.tu_name}`, 'GET')
       const lastUpdate = createdTimeUnit.now_tau[createdTimeUnit.now_tau.length - 1]
       expect(lastUpdate.tau_comment).toEqual(editedTimeUnit.comment) // 'Comment is correct'
       const logRows = lastUpdate.updates

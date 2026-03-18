@@ -18,76 +18,85 @@ describe('Locality update works', () => {
     await resetDatabase()
   }, resetDatabaseTimeout)
   beforeEach(async () => {
+    await resetDatabase()
     await login()
+    resultLocality = null
   })
   afterAll(async () => {
     await pool.end()
   })
 
-  it('Edits name, synonyms and locality species correctly', async () => {
-    const writeResult = await send<{ id: number }>('locality', 'PUT', { locality: editedLocality })
+  describe('with a successful locality update applied', () => {
+    beforeEach(async () => {
+      const writeResult = await send<{ id: number }>('locality', 'PUT', { locality: editedLocality })
 
-    expect(writeResult.body.id).toEqual(editedLocality.lid) // `Invalid result returned on write: ${writeResult.body.id}`
+      expect(writeResult.status).toEqual(200)
+      expect(writeResult.body.id).toEqual(editedLocality.lid) // `Invalid result returned on write: ${writeResult.body.id}`
 
-    const { body } = await send<LocalityDetailsType>(`locality/${editedLocality.lid}`, 'GET')
-    resultLocality = body
-  })
+      const { body } = await send<LocalityDetailsType>(`locality/${editedLocality.lid}`, 'GET')
+      resultLocality = body
+    })
 
-  it('Returns full names for coordinator and authorizer in update logs', () => {
-    const updateWithCoordinator = resultLocality!.now_lau.find(lau => lau.luid === 23101)
-    expect(updateWithCoordinator).toBeDefined()
-    expect(updateWithCoordinator?.lau_coordinator).toEqual('cfn csn')
-    expect(updateWithCoordinator?.lau_authorizer).toEqual('euf eus')
-  })
+    it('Edits name, synonyms and locality species correctly', () => {
+      expect(resultLocality?.lid).toEqual(editedLocality.lid)
+    })
 
-  it('Name changed correctly', () => {
-    expect(resultLocality!.loc_name).toEqual(editedLocality.loc_name) // 'Name was not changed correctly'
-  })
+    it('Returns full names for coordinator and authorizer in update logs', () => {
+      const updateWithCoordinator = resultLocality!.now_lau.find(lau => lau.luid === 23101)
+      expect(updateWithCoordinator).toBeDefined()
+      expect(updateWithCoordinator?.lau_coordinator).toEqual('cfn csn')
+      expect(updateWithCoordinator?.lau_authorizer).toEqual('euf eus')
+    })
 
-  it('Added locality species is found', () => {
-    resultLocality!.now_ls.find(ls => {
-      return ls.species_id === 21052 && ls.lid === 21050
-    }) //'Added locality species not found'
-    expect(!!resultLocality).toEqual(true)
-  })
+    it('Name changed correctly', () => {
+      expect(resultLocality!.loc_name).toEqual(editedLocality.loc_name) // 'Name was not changed correctly'
+    })
 
-  it('Locality species include exactly five entries', () => {
-    expect(resultLocality!.now_ls.length).toEqual(5) // `Unexpected now_ls length: ${resultLocality!.now_ls.length}`
-  })
+    it('Added locality species is found', () => {
+      resultLocality!.now_ls.find(ls => {
+        return ls.species_id === 21052 && ls.lid === 21050
+      }) //'Added locality species not found'
+      expect(!!resultLocality).toEqual(true)
+    })
 
-  it('Changes were logged correctly', () => {
-    const update = resultLocality!.now_lau
-    const lastUpdate = update[update.length - 1]
+    it('Locality species include exactly five entries', () => {
+      expect(resultLocality!.now_ls.length).toEqual(5) // `Unexpected now_ls length: ${resultLocality!.now_ls.length}`
+    })
 
-    expect(lastUpdate.lau_comment).toEqual(editedLocality.comment) // 'Comment wrong'
-    expect(lastUpdate.now_lr[lastUpdate.now_lr.length - 1].rid).toEqual(editedLocality.references[0].rid)
+    it('Changes were logged correctly', () => {
+      const update = resultLocality!.now_lau
+      const lastUpdate = update[update.length - 1]
 
-    const logRows = lastUpdate.updates
+      expect(lastUpdate.lau_comment).toEqual(editedLocality.comment) // 'Comment wrong'
+      expect(lastUpdate.now_lr[lastUpdate.now_lr.length - 1].rid).toEqual(editedLocality.references[0].rid)
 
-    const expectedLogRows: Partial<LogRow>[] = [
-      {
-        oldValue: 'Dmanisi',
-        value: editedLocality.loc_name,
-        type: 'update',
-        column: 'loc_name',
-        table: 'now_loc',
-      },
-      {
-        oldValue: '21050',
-        value: null,
-        type: 'delete',
-        column: 'lid',
-        table: 'now_ls',
-      },
-      {
-        oldValue: '85729',
-        value: null,
-        type: 'delete',
-        column: 'species_id',
-        table: 'now_ls',
-      },
-    ]
-    testLogRows(logRows, expectedLogRows, 5)
+      const logRows = lastUpdate.updates
+
+      const expectedLogRows: Partial<LogRow>[] = [
+        {
+          oldValue: 'Dmanisi',
+          value: editedLocality.loc_name,
+          type: 'update',
+          column: 'loc_name',
+          table: 'now_loc',
+        },
+        {
+          oldValue: '21050',
+          value: null,
+          type: 'delete',
+          column: 'lid',
+          table: 'now_ls',
+        },
+        {
+          oldValue: '85730',
+          value: null,
+          type: 'delete',
+          column: 'species_id',
+          table: 'now_ls',
+        },
+      ]
+      testLogRows(logRows, expectedLogRows, 5)
+    })
   })
 
   it('Update fails when pollen values are out of range', async () => {
@@ -141,14 +150,6 @@ describe('Locality update works', () => {
 
   it('Editing locality without changing anything should succeed', async () => {
     const locality = editedLocality
-    // fixing correct species_id, was 85729
-    locality.now_ls[1] = {
-      rowState: 'removed',
-      species_id: 85730,
-      lid: 21050,
-      com_species: { species_id: 85730 } as SpeciesDetailsType,
-    }
-
     const writeResult = await send<{ id: number }>('locality', 'PUT', { locality: locality })
     expect(writeResult.status).toEqual(200)
     expect(writeResult.body.id).toEqual(editedLocality.lid) // `Invalid result returned on write: ${writeResult.body.id}

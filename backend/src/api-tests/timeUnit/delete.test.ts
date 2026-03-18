@@ -9,6 +9,7 @@ describe('Deleting a time unit', () => {
     await resetDatabase()
   }, resetDatabaseTimeout)
   beforeEach(async () => {
+    await resetDatabase()
     await login()
   })
   afterAll(async () => {
@@ -16,9 +17,10 @@ describe('Deleting a time unit', () => {
   })
 
   it('that is not used anywhere succeeds', async () => {
-    const { body: resultBody } = await send<{ tu_name: string }>('time-unit', 'PUT', {
+    const { body: resultBody, status } = await send<{ tu_name: string }>('time-unit', 'PUT', {
       timeUnit: newTimeUnitBasis,
     })
+    expect(status).toEqual(200)
     const { tu_name: createdId } = resultBody
     expect(typeof createdId).toEqual('string') // `Invalid result returned on write: ${createdId}`)
 

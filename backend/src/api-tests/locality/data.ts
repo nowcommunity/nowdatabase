@@ -227,9 +227,9 @@ export const editedLocality = {
     },
     {
       rowState: 'removed',
-      species_id: 85729,
+      species_id: 85730,
       lid: 21050,
-      com_species: { species_id: 85729 } as SpeciesDetailsType,
+      com_species: { species_id: 85730 } as SpeciesDetailsType,
     },
   ],
   projects: [],

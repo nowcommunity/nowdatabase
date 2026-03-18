@@ -12,7 +12,9 @@ describe('Updating species works', () => {
     await resetDatabase()
   }, resetDatabaseTimeout)
   beforeEach(async () => {
+    await resetDatabase()
     await login()
+    editedSpeciesResult = null
   })
   afterAll(async () => {
     await pool.end()
@@ -112,9 +114,12 @@ describe('Updating species works', () => {
     const duplicateUpdate = await send<{ name: string; error: string }[]>('species', 'PUT', {
       species: {
         species_id: sourceSpecies.body.species_id,
+        order_name: 'Eulipotyphla',
+        family_name: 'Soricidae',
         genus_name: 'Petenyia',
         species_name: 'duplicate target',
         unique_identifier: 'dup-id',
+        taxonomic_status: '',
         now_ls: [],
         com_taxa_synonym: [],
         now_sau: [],

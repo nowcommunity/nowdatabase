@@ -8,6 +8,7 @@ describe('Occurrence update endpoint', () => {
   }, resetDatabaseTimeout)
 
   beforeEach(async () => {
+    await resetDatabase()
     await login()
   })
 
@@ -16,7 +17,7 @@ describe('Occurrence update endpoint', () => {
   })
 
   it('updates an occurrence by composite key', async () => {
-    const response = await send<Record<string, unknown>>('occurrence/20920/21052', 'PUT', {
+    const response = await send<Record<string, unknown>>('occurrence/21050/85729', 'PUT', {
       occurrence: {
         qua: 'a',
         mesowear: 'bil',
@@ -33,7 +34,7 @@ describe('Occurrence update endpoint', () => {
   })
 
   it('returns 400 for invalid dropdown values', async () => {
-    const response = await send<Record<string, unknown>>('occurrence/20920/21052', 'PUT', {
+    const response = await send<Record<string, unknown>>('occurrence/21050/85729', 'PUT', {
       occurrence: {
         qua: 'invalid',
         mesowear: 'invalid',
@@ -46,7 +47,7 @@ describe('Occurrence update endpoint', () => {
   })
 
   it('returns 400 for inconsistent mesowear scale values', async () => {
-    const response = await send<Record<string, unknown>>('occurrence/20920/21052', 'PUT', {
+    const response = await send<Record<string, unknown>>('occurrence/21050/85729', 'PUT', {
       occurrence: {
         mw_scale_min: 10,
         mw_scale_max: 5,

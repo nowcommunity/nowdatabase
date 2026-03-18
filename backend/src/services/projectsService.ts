@@ -67,8 +67,8 @@ export const createProject = async ({
   recordStatus,
   memberUserIds,
 }: CreateProjectInput) => {
-  const proj_code = ensureNonEmptyString(projectCode, 'Project code')
-  const proj_name = ensureNonEmptyString(projectName, 'Project name')
+  const proj_code = ensureNonEmptyString(projectCode, 'Project code', 10)
+  const proj_name = ensureNonEmptyString(projectName, 'Project name', 80)
   const coordinatorId = ensureValidUserId(coordinatorUserId, 'Coordinator user ID')
   const uniqueMemberIds = ensureValidMemberIds(memberUserIds)
   const validProjectStatus = ensureValidProjectStatusValue(projectStatus)
@@ -113,8 +113,12 @@ export const updateProject = async (
     throw new NotFoundError('Project not found')
   }
 
-  const proj_code = projectCode ? ensureNonEmptyString(projectCode, 'Project code') : existingProject.proj_code
-  const proj_name = projectName ? ensureNonEmptyString(projectName, 'Project name') : existingProject.proj_name
+  const proj_code = projectCode
+    ? ensureNonEmptyString(projectCode, 'Project code', 10)
+    : existingProject.proj_code
+  const proj_name = projectName
+    ? ensureNonEmptyString(projectName, 'Project name', 80)
+    : existingProject.proj_name
   const validProjectStatus = ensureValidProjectStatusValue(projectStatus ?? existingProject.proj_status)
   const validRecordStatus = ensureValidRecordStatusValue(recordStatus ?? existingProject.proj_records)
 
