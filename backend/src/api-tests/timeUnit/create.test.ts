@@ -78,7 +78,7 @@ describe('Creating new time unit', () => {
           table: 'now_time_unit',
           column: 'tu_display_name',
           oldValue: null,
-          value: successTimeUnitBasis.tu_display_name!,
+          value: successTimeUnitBasis.tu_display_name,
           type: 'add',
         },
       ]
