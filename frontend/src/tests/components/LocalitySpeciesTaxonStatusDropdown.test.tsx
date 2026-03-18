@@ -2,6 +2,7 @@ import { describe, expect, it, jest, beforeEach } from '@jest/globals'
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MemoryRouter } from 'react-router-dom'
+import { Provider } from 'react-redux'
 import { SpeciesTab } from '@/components/Locality/Tabs/SpeciesTab'
 import {
   useDetailContext,
@@ -13,6 +14,7 @@ import { useGetAllSpeciesQuery } from '@/redux/speciesReducer'
 import { useNotify } from '@/hooks/notification'
 import { taxonStatusSelectLabels } from '@/constants/taxonStatusOptions'
 import { PageContext, type PageContextType } from '@/components/Page'
+import { store } from '@/redux/store'
 
 jest.mock('@/components/DetailView/Context/DetailContext', () => ({
   useDetailContext: jest.fn(),
@@ -31,6 +33,18 @@ jest.mock('@/redux/speciesReducer', () => ({
 
 jest.mock('@/hooks/notification', () => ({
   useNotify: jest.fn(),
+}))
+
+jest.mock('@/components/DetailView/common/EditableTable', () => ({
+  EditableTable: () => <div data-testid="editable-table" />,
+}))
+
+jest.mock('@/components/DetailView/common/SelectingTable', () => ({
+  SelectingTable: ({ buttonText }: { buttonText: string }) => <button type="button">{buttonText}</button>,
+}))
+
+jest.mock('@/components/Species/SynonymsModal', () => ({
+  SynonymsModal: () => null,
 }))
 
 jest.mock('@/util/taxonomyUtilities', () => ({
@@ -103,11 +117,13 @@ describe('SpeciesTab taxon status dropdown', () => {
     const user = userEvent.setup()
 
     render(
-      <MemoryRouter>
-        <PageContext.Provider value={pageContextValue}>
-          <SpeciesTab />
-        </PageContext.Provider>
-      </MemoryRouter>
+      <Provider store={store}>
+        <MemoryRouter>
+          <PageContext.Provider value={pageContextValue}>
+            <SpeciesTab />
+          </PageContext.Provider>
+        </MemoryRouter>
+      </Provider>
     )
 
     await user.click(screen.getByRole('button', { name: /add new species/i }))

@@ -7,6 +7,14 @@ import type { SpeciesLocality } from '@/shared/types'
 import type { MRT_ColumnDef, MRT_Row } from 'material-react-table'
 import { occurrenceLabels } from '@/constants/occurrenceLabels'
 
+jest.mock('react-router-dom', () => {
+  const actual = jest.requireActual<typeof import('react-router-dom')>('react-router-dom')
+  return {
+    ...actual,
+    useLocation: () => ({ pathname: '/species/1', search: '', hash: '', state: null, key: 'test' }),
+  }
+})
+
 jest.mock('@/components/DetailView/Context/DetailContext', () => ({
   useDetailContext: jest.fn(),
   modeOptionToMode: {

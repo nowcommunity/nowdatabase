@@ -2,11 +2,13 @@ import { beforeEach, describe, expect, it, jest } from '@jest/globals'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MemoryRouter } from 'react-router-dom'
+import { Provider } from 'react-redux'
 
 import { TaphonomyTab } from '@/components/Locality/Tabs/TaphonomyTab'
 import { DetailContext, type DetailContextType, modeOptionToMode } from '@/components/DetailView/Context/DetailContext'
 import type { CollectingMethodValues, EditDataType, LocalityDetailsType } from '@/shared/types'
 import { PageContext, type PageContextType } from '@/components/Page'
+import { store } from '@/redux/store'
 
 const selectingTableMock = jest.fn()
 
@@ -84,13 +86,15 @@ const renderTaphonomyTab = (overrides: Partial<DetailContextType<LocalityDetails
   const contextValue = createDetailContextValue(overrides)
 
   render(
-    <MemoryRouter>
-      <PageContext.Provider value={pageContextValue}>
-        <DetailContext.Provider value={contextValue as unknown as DetailContextType<unknown>}>
-          <TaphonomyTab />
-        </DetailContext.Provider>
-      </PageContext.Provider>
-    </MemoryRouter>
+    <Provider store={store}>
+      <MemoryRouter>
+        <PageContext.Provider value={pageContextValue}>
+          <DetailContext.Provider value={contextValue as unknown as DetailContextType<unknown>}>
+            <TaphonomyTab />
+          </DetailContext.Provider>
+        </PageContext.Provider>
+      </MemoryRouter>
+    </Provider>
   )
 
   return contextValue

@@ -6,6 +6,7 @@ import { Provider } from 'react-redux'
 
 import { DetailView, TabType } from '@/components/DetailView/DetailView'
 import { PageContext, PageContextType } from '@/components/Page'
+import { NotificationContextProvider } from '@/components/Notification'
 import { useDetailContext } from '@/components/DetailView/Context/DetailContext'
 import { TimeUnitDetailsType } from '@/shared/types'
 import { store } from '@/redux/store'
@@ -81,17 +82,19 @@ describe('DetailView cancel edit behavior for Time Unit', () => {
 
     render(
       <Provider store={store}>
-        <PageContext.Provider value={pageContextValue}>
-          <MemoryRouter initialEntries={[`/time-unit/${timeUnitData.tu_name}`]}>
-            <DetailView<TimeUnitDetailsType>
-              tabs={tabs}
-              data={timeUnitData}
-              validator={() => ({ name: 'noop', error: null })}
-              onWrite={onWrite}
-              hasStagingMode
-            />
-          </MemoryRouter>
-        </PageContext.Provider>
+        <NotificationContextProvider>
+          <PageContext.Provider value={pageContextValue}>
+            <MemoryRouter initialEntries={[`/time-unit/${timeUnitData.tu_name}`]}>
+              <DetailView<TimeUnitDetailsType>
+                tabs={tabs}
+                data={timeUnitData}
+                validator={() => ({ name: 'noop', error: null })}
+                onWrite={onWrite}
+                hasStagingMode
+              />
+            </MemoryRouter>
+          </PageContext.Provider>
+        </NotificationContextProvider>
       </Provider>
     )
 

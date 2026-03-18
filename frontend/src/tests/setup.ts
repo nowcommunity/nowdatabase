@@ -13,10 +13,34 @@ if (typeof global.Request === 'undefined') {
 
 if (typeof global.Response === 'undefined') {
   global.Response = class Response {
+    public status: number
+    public ok: boolean
+
     constructor(
       public body?: BodyInit | null,
       public init?: ResponseInit
-    ) {}
+    ) {
+      this.status = init?.status ?? 200
+      this.ok = this.status >= 200 && this.status < 300
+    }
+
+    async json() {
+      if (typeof this.body === 'string') {
+        return JSON.parse(this.body)
+      }
+      return this.body
+    }
+
+    async text() {
+      if (typeof this.body === 'string') {
+        return this.body
+      }
+      return this.body == null ? '' : JSON.stringify(this.body)
+    }
+
+    clone() {
+      return new global.Response(this.body, this.init)
+    }
   } as typeof Response
 }
 

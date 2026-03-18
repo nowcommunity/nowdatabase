@@ -7,6 +7,7 @@ import { Provider } from 'react-redux'
 
 import { DetailView, type TabType } from '@/components/DetailView/DetailView'
 import { PageContext, type PageContextType } from '@/components/Page'
+import { NotificationContextProvider } from '@/components/Notification'
 import { useDetailContext } from '@/components/DetailView/Context/DetailContext'
 import type { TimeUnitDetailsType } from '@/shared/types'
 import { store } from '@/redux/store'
@@ -82,14 +83,16 @@ const renderWithRouter = () => {
       {
         path: '/time-unit/:id',
         element: (
-          <PageContext.Provider value={pageContextValue}>
-            <DetailView<TimeUnitDetailsType>
-              tabs={tabs}
-              data={timeUnitData}
-              validator={() => ({ name: 'noop', error: null })}
-              onWrite={onWrite}
-            />
-          </PageContext.Provider>
+          <NotificationContextProvider>
+            <PageContext.Provider value={pageContextValue}>
+              <DetailView<TimeUnitDetailsType>
+                tabs={tabs}
+                data={timeUnitData}
+                validator={() => ({ name: 'noop', error: null })}
+                onWrite={onWrite}
+              />
+            </PageContext.Provider>
+          </NotificationContextProvider>
         ),
       },
       { path: '/time-unit', element: <div>Table view</div> },

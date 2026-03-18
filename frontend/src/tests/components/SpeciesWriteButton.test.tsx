@@ -182,11 +182,13 @@ describe('WriteButton taxonomy handling', () => {
   })
 
   it('shows helper tooltip when hovering the disabled button', async () => {
-    const user = userEvent.setup()
     renderButton(baseSpecies as EditDataType<Species>, jest.fn(), { isDirty: false })
 
     const button = screen.getByRole('button', { name: /save changes/i })
-    await user.hover(button)
+    const tooltipTrigger = button.parentElement
+
+    expect(tooltipTrigger).toBeTruthy()
+    fireEvent.mouseOver(tooltipTrigger!)
 
     await waitFor(() => {
       expect(screen.getByText(/make changes before finalizing the entry/i)).toBeTruthy()

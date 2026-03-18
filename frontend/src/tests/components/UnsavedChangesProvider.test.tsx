@@ -3,6 +3,7 @@ import { describe, expect, it, beforeEach, jest } from '@jest/globals'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { useContext, useEffect } from 'react'
+import { RouterProvider, createMemoryRouter } from 'react-router-dom'
 
 import { UnsavedChangesProvider } from '@/components/UnsavedChangesProvider'
 import { UnsavedChangesContext } from '@/components/unsavedChangesContext'
@@ -49,11 +50,21 @@ const renderWithProvider = (blocker: MockedBlocker, setDirtyOnMount = true) => {
     }
     return blocker as unknown as ReturnType<typeof useBlocker>
   })
-  return render(
-    <UnsavedChangesProvider>
-      <TestConsumer setDirtyOnMount={setDirtyOnMount} />
-    </UnsavedChangesProvider>
+  const router = createMemoryRouter(
+    [
+      {
+        path: '/',
+        element: (
+          <UnsavedChangesProvider>
+            <TestConsumer setDirtyOnMount={setDirtyOnMount} />
+          </UnsavedChangesProvider>
+        ),
+      },
+    ],
+    { initialEntries: ['/'] }
   )
+
+  return render(<RouterProvider router={router} />)
 }
 
 describe('UnsavedChangesProvider', () => {
