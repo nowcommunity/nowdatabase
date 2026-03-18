@@ -1,6 +1,7 @@
 import { describe, expect, it, jest, beforeEach } from '@jest/globals'
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import { MemoryRouter } from 'react-router-dom'
 import { SpeciesTab } from '@/components/Locality/Tabs/SpeciesTab'
 import {
   useDetailContext,
@@ -11,6 +12,7 @@ import type { EditDataType, LocalityDetailsType } from '@/shared/types'
 import { useGetAllSpeciesQuery } from '@/redux/speciesReducer'
 import { useNotify } from '@/hooks/notification'
 import { taxonStatusSelectLabels } from '@/constants/taxonStatusOptions'
+import { PageContext, type PageContextType } from '@/components/Page'
 
 jest.mock('@/components/DetailView/Context/DetailContext', () => ({
   useDetailContext: jest.fn(),
@@ -50,6 +52,26 @@ const mockUseNotify = useNotify as jest.MockedFunction<typeof useNotify>
 
 const setEditData = jest.fn()
 
+const pageContextValue: PageContextType<unknown> = {
+  idList: [],
+  setIdList: jest.fn(),
+  idFieldName: 'lid',
+  viewName: 'locality',
+  previousTableUrls: [],
+  setPreviousTableUrls: jest.fn(),
+  createTitle: () => '',
+  createSubtitle: () => '',
+  editRights: { edit: true, delete: true },
+  sqlLimit: 20,
+  sqlOffset: 0,
+  sqlColumnFilters: [],
+  sqlOrderBy: [],
+  setSqlLimit: jest.fn(),
+  setSqlOffset: jest.fn(),
+  setSqlColumnFilters: jest.fn(),
+  setSqlOrderBy: jest.fn(),
+}
+
 const createContextValue = (): DetailContextType<LocalityDetailsType> => ({
   data: { lid: 1, now_ls: [] } as unknown as LocalityDetailsType,
   mode: modeOptionToMode.edit,
@@ -80,7 +102,13 @@ describe('SpeciesTab taxon status dropdown', () => {
   it('renders taxon status as a dropdown and submits the selected value', async () => {
     const user = userEvent.setup()
 
-    render(<SpeciesTab />)
+    render(
+      <MemoryRouter>
+        <PageContext.Provider value={pageContextValue}>
+          <SpeciesTab />
+        </PageContext.Provider>
+      </MemoryRouter>
+    )
 
     await user.click(screen.getByRole('button', { name: /add new species/i }))
 
