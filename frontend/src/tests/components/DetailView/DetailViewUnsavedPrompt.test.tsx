@@ -3,11 +3,13 @@ import '@testing-library/jest-dom'
 import { RouterProvider, createMemoryRouter } from 'react-router-dom'
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import { Provider } from 'react-redux'
 
 import { DetailView, type TabType } from '@/components/DetailView/DetailView'
 import { PageContext, type PageContextType } from '@/components/Page'
 import { useDetailContext } from '@/components/DetailView/Context/DetailContext'
 import type { TimeUnitDetailsType } from '@/shared/types'
+import { store } from '@/redux/store'
 
 const timeUnitData = {
   tu_name: 'old_tu',
@@ -95,7 +97,11 @@ const renderWithRouter = () => {
     { initialEntries: ['/time-unit/old_tu'] }
   )
 
-  render(<RouterProvider router={router} />)
+  render(
+    <Provider store={store}>
+      <RouterProvider router={router} />
+    </Provider>
+  )
   return router
 }
 
