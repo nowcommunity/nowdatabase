@@ -1,7 +1,7 @@
 import { describe, expect, it, jest } from '@jest/globals'
 import '@testing-library/jest-dom'
 import { RouterProvider, createMemoryRouter } from 'react-router-dom'
-import { render, screen, waitFor } from '@testing-library/react'
+import { act, render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { Provider } from 'react-redux'
 
@@ -119,14 +119,18 @@ describe('DetailView unsaved changes prompt', () => {
 
     await user.click(screen.getByRole('button', { name: /edit/i }))
     await user.click(screen.getByRole('button', { name: /change upper age/i }))
-    await router.navigate('/time-unit')
+    await act(async () => {
+      await router.navigate('/time-unit')
+    })
 
     await screen.findByRole('dialog')
     await user.click(screen.getByRole('button', { name: /stay on page/i }))
 
     expect(router.state.location.pathname).toBe('/time-unit/old_tu')
 
-    await router.navigate('/time-unit')
+    await act(async () => {
+      await router.navigate('/time-unit')
+    })
     await user.click(await screen.findByRole('button', { name: /leave page/i }))
 
     await waitFor(() => {
