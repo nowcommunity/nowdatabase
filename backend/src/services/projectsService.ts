@@ -113,12 +113,8 @@ export const updateProject = async (
     throw new NotFoundError('Project not found')
   }
 
-  const proj_code = projectCode
-    ? ensureNonEmptyString(projectCode, 'Project code', 10)
-    : existingProject.proj_code
-  const proj_name = projectName
-    ? ensureNonEmptyString(projectName, 'Project name', 80)
-    : existingProject.proj_name
+  const proj_code = projectCode ? ensureNonEmptyString(projectCode, 'Project code', 10) : existingProject.proj_code
+  const proj_name = projectName ? ensureNonEmptyString(projectName, 'Project name', 80) : existingProject.proj_name
   const validProjectStatus = ensureValidProjectStatusValue(projectStatus ?? existingProject.proj_status)
   const validRecordStatus = ensureValidRecordStatusValue(recordStatus ?? existingProject.proj_records)
 

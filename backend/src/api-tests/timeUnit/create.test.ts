@@ -64,7 +64,7 @@ describe('Creating new time unit', () => {
 
     it('Contains correct data', () => {
       const { tu_name, tu_display_name, tu_comment } = createdTimeUnit!
-      expect(tu_name).toEqual(successTimeUnitBasis.tu_display_name?.toLowerCase().replace(/[\s_-]+/g, '')) //'Name is different than expected'
+      expect(tu_name).toEqual(successTimeUnitBasis.tu_display_name.toLowerCase().replace(/[\s_-]+/g, '')) //'Name is different than expected'
       expect(tu_display_name).toEqual(successTimeUnitBasis.tu_display_name) // 'Display name differs'
       expect(tu_comment).toEqual(successTimeUnitBasis.tu_comment) // 'Comment differs'
     })
