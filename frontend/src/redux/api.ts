@@ -6,10 +6,15 @@ import {
   FetchBaseQueryError,
   FetchBaseQueryMeta,
 } from '@reduxjs/toolkit/query/react'
-import type { QueryReturnValue } from '@reduxjs/toolkit/query'
 import { BACKEND_URL } from '../util/config'
 import type { RootState } from './store'
 import { EditableOccurrenceData, OccurrenceDetailsType } from '@/shared/types'
+
+type RefreshTokenResult = {
+  data?: { token?: string }
+  error?: FetchBaseQueryError
+  meta?: FetchBaseQueryMeta
+}
 
 const baseQuery = fetchBaseQuery({
   baseUrl: BACKEND_URL,
@@ -34,7 +39,7 @@ const baseQueryWithReauth: BaseQueryFn<string | FetchArgs, unknown, FetchBaseQue
       { url: '/refreshToken', method: 'POST', body: { token } },
       api,
       extraOptions
-    )) as QueryReturnValue<{ token: string }, FetchBaseQueryError, FetchBaseQueryMeta>
+    )) as RefreshTokenResult
     if (refreshedToken?.data?.token) {
       api.dispatch({ type: 'user/setToken', payload: refreshedToken.data.token })
       result = await baseQuery(args, api, extraOptions)
