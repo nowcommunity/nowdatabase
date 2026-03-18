@@ -41,6 +41,7 @@ jest.mock('@/components/DetailView/common/EditableTable', () => ({
 jest.mock('@/components/DetailView/common/EditingModal', () => ({
   EditingModal: ({ children, buttonText }: { children: ReactNode; buttonText: string }) => (
     <div data-testid="editing-modal" data-button-text={buttonText}>
+      <span>{buttonText}</span>
       {children}
     </div>
   ),
@@ -103,12 +104,16 @@ describe('LocalitySpeciesTab MW score prerequisites', () => {
   })
 
   it('uses occurrence terminology in grouped heading and modal button', () => {
+    mockUseDetailContext.mockReturnValue({
+      ...baseContextValue,
+      mode: modeOptionToMode.edit,
+    })
+
     render(<LocalitySpeciesTab />)
 
     const grouped = document.querySelector('[data-testid="grouped"]')
-    const editingModal = document.querySelector('[data-testid="editing-modal"]')
 
     expect(grouped?.getAttribute('data-title')).toBe(occurrenceLabels.informationSectionTitle)
-    expect(editingModal?.getAttribute('data-button-text')).toBe(occurrenceLabels.addNewButton)
+    expect(document.body.textContent).toContain(occurrenceLabels.addNewButton)
   })
 })

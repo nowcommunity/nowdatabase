@@ -3,7 +3,7 @@ import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MemoryRouter } from 'react-router-dom'
 import { Provider } from 'react-redux'
-import { useState, type ReactNode } from 'react'
+import { useState, type ChangeEvent, type ReactNode } from 'react'
 import { SpeciesTab } from '@/components/Locality/Tabs/SpeciesTab'
 import {
   useDetailContext,
@@ -34,6 +34,74 @@ jest.mock('@/redux/speciesReducer', () => ({
 
 jest.mock('@/hooks/notification', () => ({
   useNotify: jest.fn(),
+}))
+
+jest.mock('@/components/DetailView/common/EditingForm', () => ({
+  EditingForm: ({
+    buttonText,
+    editAction,
+  }: {
+    buttonText: string
+    editAction?: (value: Record<string, unknown>) => void
+  }) => {
+    const [open, setOpen] = useState(false)
+    const [values, setValues] = useState<Record<string, unknown>>({
+      unique_identifier: '-',
+      taxonomic_status: '',
+    })
+
+    const handleChange = (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+      const { name, value } = event.target
+      setValues(current => ({ ...current, [name]: value }))
+    }
+
+    return (
+      <div>
+        <button type="button" onClick={() => setOpen(true)}>
+          {buttonText}
+        </button>
+        {open ? (
+          <div>
+            <label>
+              Order
+              <input name="order_name" value={String(values.order_name ?? '')} onChange={handleChange} />
+            </label>
+            <label>
+              Family
+              <input name="family_name" value={String(values.family_name ?? '')} onChange={handleChange} />
+            </label>
+            <label>
+              Genus
+              <input name="genus_name" value={String(values.genus_name ?? '')} onChange={handleChange} />
+            </label>
+            <label>
+              Species
+              <input name="species_name" value={String(values.species_name ?? '')} onChange={handleChange} />
+            </label>
+            <label>
+              Taxon status
+              <select name="taxonomic_status" value={String(values.taxonomic_status ?? '')} onChange={handleChange}>
+                {taxonStatusSelectLabels.map(label => (
+                  <option key={label} value={label === 'No value' ? '' : label}>
+                    {label}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <button
+              type="button"
+              onClick={() => {
+                editAction?.(values)
+                setOpen(false)
+              }}
+            >
+              Save
+            </button>
+          </div>
+        ) : null}
+      </div>
+    )
+  },
 }))
 
 jest.mock('@/components/DetailView/common/EditingModal', () => ({
