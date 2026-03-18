@@ -5,8 +5,8 @@ import {
   fetchBaseQuery,
   FetchBaseQueryError,
   FetchBaseQueryMeta,
-  QueryReturnValue,
 } from '@reduxjs/toolkit/query/react'
+import type { QueryReturnValue } from '@reduxjs/toolkit/query'
 import { BACKEND_URL } from '../util/config'
 import type { RootState } from './store'
 import { EditableOccurrenceData, OccurrenceDetailsType } from '@/shared/types'
