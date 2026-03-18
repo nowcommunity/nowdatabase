@@ -24,18 +24,18 @@ if (typeof global.Response === 'undefined') {
       this.ok = this.status >= 200 && this.status < 300
     }
 
-    async json() {
+    json(): Promise<unknown> {
       if (typeof this.body === 'string') {
-        return JSON.parse(this.body)
+        return Promise.resolve(JSON.parse(this.body) as unknown)
       }
-      return this.body
+      return Promise.resolve(this.body)
     }
 
-    async text() {
+    text(): Promise<string> {
       if (typeof this.body === 'string') {
-        return this.body
+        return Promise.resolve(this.body)
       }
-      return this.body == null ? '' : JSON.stringify(this.body)
+      return Promise.resolve(this.body == null ? '' : JSON.stringify(this.body))
     }
 
     clone() {
@@ -45,9 +45,9 @@ if (typeof global.Response === 'undefined') {
 }
 
 if (typeof global.fetch === 'undefined') {
-  global.fetch = jest.fn(async () => new Response(null, { status: 200 })) as typeof fetch
+  global.fetch = jest.fn(() => Promise.resolve(new Response(null, { status: 200 }))) as typeof fetch
 }
 
 if (typeof global.structuredClone === 'undefined') {
-  global.structuredClone = (<T,>(value: T) => JSON.parse(JSON.stringify(value)) as T) as typeof structuredClone
+  global.structuredClone = (<T>(value: T) => JSON.parse(JSON.stringify(value)) as T) as typeof structuredClone
 }

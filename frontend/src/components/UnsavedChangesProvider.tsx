@@ -19,6 +19,24 @@ const unblockedState = {
   location: undefined,
 }
 
+type BlockerState = typeof unblockedState | ReturnType<typeof useBlocker>
+
+const BlockerBridge = ({
+  shouldBlock,
+  onChange,
+}: {
+  shouldBlock: boolean
+  onChange: (blocker: ReturnType<typeof useBlocker>) => void
+}) => {
+  const blocker = useBlocker(shouldBlock)
+
+  useEffect(() => {
+    onChange(blocker)
+  }, [blocker, onChange])
+
+  return null
+}
+
 export const UnsavedChangesProvider = ({
   children,
   defaultMessage = DEFAULT_MESSAGE,
@@ -26,9 +44,9 @@ export const UnsavedChangesProvider = ({
 }: UnsavedChangesProviderProps) => {
   const [isDirty, setDirty] = useState(false)
   const [message, setMessage] = useState(defaultMessage)
+  const [blocker, setBlocker] = useState<BlockerState>(unblockedState)
   const dataRouterContext = useContext(UNSAFE_DataRouterContext)
 
-  const blocker = dataRouterContext ? useBlocker(isDirty) : unblockedState
   const isSamePathNavigation = blocker.state === 'blocked' && blocker.location?.pathname === window.location.pathname
   const showDialog = blocker.state === 'blocked' && !isSamePathNavigation
 
@@ -50,6 +68,12 @@ export const UnsavedChangesProvider = ({
   }, [blocker])
 
   useEffect(() => {
+    if (!dataRouterContext) {
+      setBlocker(unblockedState)
+    }
+  }, [dataRouterContext])
+
+  useEffect(() => {
     const proceed = blocker.proceed as (() => void) | undefined
     if (isSamePathNavigation && proceed) {
       proceed()
@@ -69,6 +93,7 @@ export const UnsavedChangesProvider = ({
 
   return (
     <UnsavedChangesContext.Provider value={value}>
+      {dataRouterContext ? <BlockerBridge shouldBlock={isDirty} onChange={setBlocker} /> : null}
       {children}
       <UnsavedChangesDialog
         open={showDialog}

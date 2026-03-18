@@ -128,9 +128,10 @@ jest.mock('@/components/DetailView/common/EditingModal', () => ({
             {onSave ? (
               <button
                 type="button"
-                onClick={async () => {
-                  const shouldClose = await onSave()
-                  if (shouldClose) setOpen(false)
+                onClick={() => {
+                  void onSave().then(shouldClose => {
+                    if (shouldClose) setOpen(false)
+                  })
                 }}
               >
                 Save
