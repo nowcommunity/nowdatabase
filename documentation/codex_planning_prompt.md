@@ -99,6 +99,14 @@ This section summarizes the overall architecture, structure, and technologies of
 - Typical CI failures to avoid: unchecked Prettier drift, unused imports/variables (especially in tests), missing async return types or implicit `any`, and stale `eslint-disable` directives.
 - Large fixtures or JSON assets (e.g., geodata) should remain excluded via `tsconfig.json`/`eslint.config.mjs` ignores; avoid importing them in type-checked code paths.
 
+### Frontend Unit-Test Planning Guardrails
+- When a feature touches shared frontend infrastructure such as `DetailView`, `EditableTable`, `DetailTabTable`, `UnsavedChangesProvider`, Redux API slices, or route-aware components, include explicit test-harness tasks in the plan.
+- For each affected test, identify the required runtime context up front: `Provider` for Redux hooks, `MemoryRouter` or `createMemoryRouter` for router hooks, `PageContext` for detail/table helpers, and notification/dialog providers where hooks read context directly.
+- Treat Vite-specific config (`import.meta.env`), ESM-only dependencies, and asset imports as Jest compatibility risks. Prefer narrow test-only shims or stable local abstractions over broad global remaps.
+- If shared components pull in expensive or unrelated subtrees, plan to mock those subtrees in tests rather than weakening production code or adding wide Jest exceptions.
+- Add a verification task for React Testing Library async behavior: wrap programmatic navigation or router state changes in `act(...)`, and assert against user-visible UI after async transitions settle.
+- Add a teardown-check task whenever timers, notifications, RTK Query, or router transitions are involved, so the plan explicitly looks for open handles and console noise, not only red test failures.
+
 ---
 
 # Codex Prompt for NOW Database Full-Stack Development
@@ -135,6 +143,7 @@ Implementation should cover all layers of the stack:
 - **Routing & State Management:** Add routes with React Router and handle global state with Redux Toolkit or React context.
 - **Auth & Permissions:** Use middleware to enforce role-based permissions. Hide or disable UI for unauthorized users.
 - **Testing:** Use **Jest** + **@testing-library/react** for frontend tests, and **Mocha** + **supertest** for backend API tests. Add end-to-end coverage with **Cypress** if needed.
+  Frontend test planning must call out required providers, router mode, module mocks, and Jest/Vite compatibility for each changed area.
 - **Documentation & Deployment:** Update `.env` templates, Docker Compose, and internal documentation if configuration changes are needed.
 
 ---
@@ -182,6 +191,7 @@ Provide a **machine-readable JSON array** of granular tasks like:
 - **Error Handling:** Ensure API returns structured errors. Show clear messages in UI.
 - **Security:** Use parameterized queries (via Prisma) and sanitize user inputs.
 - **Rollback:** Feature-flag critical changes for safe deployment.
+- **Test Regressions:** Avoid broad Jest config changes that can alter unrelated suites. Prefer the smallest production fix or the narrowest test-specific shim that resolves the real incompatibility.
 
 ---
 
@@ -197,6 +207,8 @@ Provide a **machine-readable JSON array** of granular tasks like:
 - [ ] All acceptance criteria met
 - [ ] Unit, integration, and E2E tests pass
 - [ ] Code passes linting and type checks
+- [ ] Frontend tests include the required providers/router/context and do not rely on missing app runtime state
+- [ ] Jest compatibility issues (`import.meta.env`, ESM packages, assets, RTK Query/fetch, timers) are handled with narrow fixes
 - [ ] Database migrations are applied and reversible
 - [ ] Role-based permissions verified
 - [ ] Documentation and changelog updated

@@ -64,6 +64,15 @@ Implement **exactly one task** from an approved feature plan.
 - Common failure patterns to avoid: missing Prettier formatting, unused imports/variables in tests, missing async return types or implicit `any`, and stale `eslint-disable` directives.
 - Keep large fixtures/geojson assets out of type-checked paths; rely on `tsconfig`/ESLint ignores already defined (see `frontend/tsconfig.json`, `backend/tsconfig.json`, and `eslint.config.mjs`).
 
+### Frontend unit-test checklist (mandatory when frontend code or frontend tests change)
+- Before changing Jest config, first check whether the failure is really caused by missing test runtime context. Components using Redux hooks must render inside `<Provider>`. Components using `useNavigate`, `useLocation`, `useBlocker`, or route loaders must render inside the correct router (`MemoryRouter` vs `createMemoryRouter` + `RouterProvider`).
+- If a component depends on app-specific contexts such as page/detail/notification providers, supply those providers in the test harness or mock the smallest unrelated subtree that requires them.
+- Prefer narrow fixes over global Jest hacks. Do not broadly remap application modules unless the task explicitly requires it. For `import.meta.env`, ESM-only libraries, assets, or browser APIs, use a dedicated Jest tsconfig, focused moduleNameMapper entries, or a small test stub.
+- When shared UI pulls in unrelated heavy subtrees, mock those subtrees in the test to keep the assertion focused. Do not weaken production behavior just to satisfy a unit test unless the production dependency is itself accidental.
+- For RTK Query or `fetchBaseQuery`, ensure the Jest environment provides `fetch`, `Request`, `Response`, and any methods the library expects such as `clone()`.
+- For selects and MUI form controls, ensure test defaults are valid values (`''` instead of `undefined` for empty select state) so tests do not hide warnings that would fail CI logs later.
+- Wrap programmatic router transitions and similar async state changes in `act(...)`, and verify that timers, notifications, and async navigation do not leave open handles.
+
 ### Quality / Style
 - Follow ESLint + Prettier + TypeScript strict.  
 - Typed interfaces / DTOs for all API payloads.  
@@ -83,6 +92,7 @@ Implement **exactly one task** from an approved feature plan.
 - Follow atomic layout (`components/`, `pages/`, `redux/`, `hooks/`).  
 - Integrate with Redux slices for data fetching (Axios or fetch via async thunks).  
 - Ensure ARIA labels, keyboard navigation, and responsive design.  
+- Avoid introducing new runtime circular dependencies between Redux slices, API modules, and store setup. Prefer `import type` for type-only dependencies and keep API modules free of store/reducer runtime imports when possible.
 
 **Database**
 - Schema changes via Prisma migrations (`prisma migrate dev`).  
@@ -99,6 +109,8 @@ Implement **exactly one task** from an approved feature plan.
 - Aim for > 80 % coverage for changed modules.  
 - Backend tests mock Prisma or use test DB.  
 - Frontend tests mock API calls and simulate user flows.  
+- Frontend test updates must verify the real render path is reachable before asserting controls; if a shared component stays in loading/error state, fix the harness rather than forcing the assertion.
+- If Jest config is modified, confirm the change does not break unrelated suites by changing module resolution, transform mode, or global mocks.
 
 **Docs / CI**
 - Update `.env.template`, README sections, and API docs when specified.  
@@ -212,6 +224,7 @@ JWT_SECRET="replace_me"
 - Change unrelated files.  
 - Add new packages unless listed in `packages`.  
 - Bypass lint / type rules or CI checks.  
+- Add broad temporary Jest workarounds such as global module remaps, disabled caches, or wide transform exceptions unless you also verify they are truly necessary and safe for unrelated suites.
 
 ---
 
@@ -219,6 +232,8 @@ JWT_SECRET="replace_me"
 - All acceptance criteria met.  
 - TypeScript compiles without errors.  
 - Backend & frontend tests pass.  
+- Frontend tests have the correct Provider/router/context wrappers, and async router actions are wrapped in `act(...)` where needed.
+- Jest/browser shims are minimal and compatible with Vite config, ESM dependencies, RTK Query, and asset imports used by the changed code.
 - Prisma migrations exist if `migrations:true`.  
 - Role-based permissions verified.  
 - Docs and `.env.template` updated if required.  
