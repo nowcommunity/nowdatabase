@@ -12,6 +12,8 @@ export default {
   moduleNameMapper: {
     '^.+\\.css$': '<rootDir>/src/tests/mocks/styleMock.ts',
     '^.+\\.(svg|png|jpe?g|gif|webp)$': '<rootDir>/src/tests/mocks/fileMock.ts',
+    '^@/util/config$': '<rootDir>/src/tests/mocks/config.ts',
+    '^\\.\\.?/util/config$': '<rootDir>/src/tests/mocks/config.ts',
     '^@/(.*)$': '<rootDir>/src/$1',
     '^@components/Table$': '<rootDir>/src/components/table',
     '^@components/(.*)$': '<rootDir>/src/components/$1',
