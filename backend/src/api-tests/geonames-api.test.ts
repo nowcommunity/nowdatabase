@@ -6,8 +6,8 @@ import { pool } from '../utils/db'
 const buildGeonamesResponse = (names: string[]): GeonamesJSON => ({
   totalResultsCount: names.length,
   geonames: names.map((name, index) => ({
-    adminCode1: 'test-admin',
-    lng: `${24.9 + index}`,
+    adminCode01: 'test-admin',
+    lng: 24.9 + index,
     geonameId: 1000 + index,
     toponymName: name,
     countryId: '1',
@@ -22,7 +22,7 @@ const buildGeonamesResponse = (names: string[]): GeonamesJSON => ({
     countryName: 'Finland',
     fcodeName: 'populated place',
     adminName1: 'Uusimaa',
-    lat: `${60.1 + index}`,
+    lat: 60.1 + index,
     fcode: 'PPL',
   })),
 })
@@ -33,27 +33,29 @@ const getRequestUrl = (input: string | URL | Request) => {
   return input.url
 }
 
+const createMockResponse = (body: GeonamesJSON) =>
+  ({
+    json: () => body,
+  }) as unknown as Response
+
 describe('Getting data from Geonames-API', () => {
   beforeEach(() => {
     jest.spyOn(global, 'fetch').mockImplementation((input: string | URL | Request) => {
       const url = getRequestUrl(input)
 
       if (url.includes('Kumpula')) {
-        return Promise.resolve({
-          json: () =>
-            buildGeonamesResponse(['Kumpula', 'Kumpulantie', 'Kumpulanlaakso', 'Kumpulanmaki', 'Kumpula park']),
-        } as Response)
+        return Promise.resolve(
+          createMockResponse(
+            buildGeonamesResponse(['Kumpula', 'Kumpulantie', 'Kumpulanlaakso', 'Kumpulanmaki', 'Kumpula park'])
+          )
+        )
       }
 
       if (url.includes('Tursola')) {
-        return Promise.resolve({
-          json: () => buildGeonamesResponse(['Tursola', 'Tursola village']),
-        } as Response)
+        return Promise.resolve(createMockResponse(buildGeonamesResponse(['Tursola', 'Tursola village'])))
       }
 
-      return Promise.resolve({
-        json: () => buildGeonamesResponse([]),
-      } as Response)
+      return Promise.resolve(createMockResponse(buildGeonamesResponse([])))
     })
   })
 
