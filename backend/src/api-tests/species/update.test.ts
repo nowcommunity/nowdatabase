@@ -103,8 +103,9 @@ describe('Updating species works', () => {
       species: {
         ...cloneSpeciesData(),
         genus_name: 'DuplicateTestGenus',
-        species_name: 'duplicate target',
+        species_name: 'duplicatetarget',
         unique_identifier: 'dup-id',
+        now_ls: [],
         comment: 'target',
       },
     })
@@ -114,8 +115,9 @@ describe('Updating species works', () => {
       species: {
         ...cloneSpeciesData(),
         genus_name: 'DuplicateTestGenus',
-        species_name: 'source species',
+        species_name: 'sourcespecies',
         unique_identifier: 'source-id',
+        now_ls: [],
         comment: 'source',
       },
     })
@@ -127,7 +129,7 @@ describe('Updating species works', () => {
         order_name: 'Eulipotyphla',
         family_name: 'Soricidae',
         genus_name: 'DuplicateTestGenus',
-        species_name: 'duplicate target',
+        species_name: 'duplicatetarget',
         unique_identifier: 'dup-id',
         taxonomic_status: '',
         now_ls: [],
