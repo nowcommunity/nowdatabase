@@ -80,17 +80,16 @@ describe('Editing a person', () => {
 describe('User rights', () => {
   it('when on a non-admin account, user gets redirected to their own user page', () => {
     cy.visit(`/person/AD?tab=0`)
-    cy.url().should('eq', 'http://localhost:5173/person/user-page')
-    cy.contains('Error loading data') // no user page for an anonymous user
+    cy.contains('Sign in to view this person')
 
     cy.login('testEr')
     cy.visit(`/person/AD?tab=0`)
-    cy.url().should('eq', 'http://localhost:5173/person/user-page')
+    cy.url().should('eq', 'http://localhost:5173/person/AD?tab=0')
     cy.get('[id=edit-button]').should('exist')
 
     cy.login('testEu')
     cy.visit(`/person/AD?tab=0`)
-    cy.url().should('eq', 'http://localhost:5173/person/user-page')
+    cy.url().should('eq', 'http://localhost:5173/person/AD?tab=0')
     cy.get('[id=edit-button]').should('exist')
 
     cy.login('testSu')

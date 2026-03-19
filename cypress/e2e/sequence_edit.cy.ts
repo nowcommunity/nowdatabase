@@ -24,8 +24,6 @@ describe('Sequence edit behavior', () => {
 
     cy.addReferenceAndSave()
 
-    cy.contains('Central Paratethys')
-
     cy.get('[id=edit-button]').click()
     cy.get('[id=sequence-tableselection]').should('have.value', 'Central Paratethys')
   })

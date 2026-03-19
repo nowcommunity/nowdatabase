@@ -5,7 +5,7 @@ before('Reset database', () => {
 describe('Occurrence editing', () => {
   it('allows admin to open edit mode and finalize flow', () => {
     cy.login('testSu')
-    cy.visit('/occurrence/20920/21052')
+    cy.visit('/occurrence/21050/85729')
 
     cy.get('#edit-button').should('exist').click()
     cy.get('#write-button').should('contain.text', 'Finalize entry')
@@ -20,7 +20,7 @@ describe('Occurrence editing', () => {
 
   it('prevents read-only user from editing occurrence', () => {
     cy.login('testEu')
-    cy.visit('/occurrence/20920/21052')
+    cy.visit('/occurrence/21050/85729')
 
     cy.get('#edit-button').should('not.exist')
     cy.get('#write-button').should('not.exist')

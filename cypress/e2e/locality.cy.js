@@ -505,6 +505,36 @@ describe("Locality's coordinate selection map works", () => {
   })
 
   it('Map view and location search work', () => {
+    cy.intercept('POST', '**/geonames-api', req => {
+      const locationName = String(req.body?.locationName ?? '')
+
+      if (locationName === 'abcdefg') {
+        req.reply({ statusCode: 200, body: { locations: [] } })
+        return
+      }
+
+      if (locationName === 'Kumpula') {
+        req.reply({
+          statusCode: 200,
+          body: {
+            locations: [
+              {
+                name: 'Kumpula',
+                adminName1: 'Central Finland',
+                countryName: 'Finland',
+                fclName: 'area',
+                lat: 63.05484,
+                lng: 24.75291,
+              },
+            ],
+          },
+        })
+        return
+      }
+
+      req.reply({ statusCode: 200, body: { locations: [] } })
+    }).as('geonamesSearch')
+
     cy.visit(`/locality/20920?tab=1`)
     cy.get('[id=edit-button]').click()
     cy.contains('Choose a country').parent().type('Finland')
@@ -520,10 +550,12 @@ describe("Locality's coordinate selection map works", () => {
     cy.get('[id=geonames-search-button]').should('be.disabled')
     cy.get('[id=geonames-search-textfield]').type('abcdefg')
     cy.get('[id=geonames-search-button]').click()
+    cy.wait('@geonamesSearch').its('response.statusCode').should('eq', 200)
     cy.contains('No results found')
     cy.get('[id=geonames-search-textfield]').clear()
     cy.get('[id=geonames-search-textfield]').type('Kumpula')
     cy.get('[id=geonames-search-textfield]').type('{enter}')
+    cy.wait('@geonamesSearch').its('response.statusCode').should('eq', 200)
     cy.contains('Central Finland').first().click() // first item on the list
     cy.contains('Latitude: 63.05484, Longitude: 24.75291')
     cy.contains('Save').click()
@@ -558,14 +590,15 @@ describe('Deleting a locality', () => {
 })
 
 describe('Linking projects to an existing locality', () => {
-  const localityId = 20920
+  const localityId = 21050
   const newProjectId = 14
   const newProjectCode = 'WINE'
 
   beforeEach('Login as admin and open projects tab', () => {
+    cy.resetDatabase()
     cy.login('testSu')
     cy.visit(`/locality/${localityId}?tab=9`)
-    cy.contains('Lantian-Shuijiazui')
+    cy.contains('Dmanisi')
   })
 
   it('adds a project via the selector and removes it again', () => {
