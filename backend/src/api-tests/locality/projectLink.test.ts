@@ -2,13 +2,13 @@ import { afterAll, beforeEach, describe, expect, it } from '@jest/globals'
 import { EditDataType, LocalityDetailsType } from '../../../../frontend/src/shared/types'
 import { login, resetDatabase, resetDatabaseTimeout, send, noPermError } from '../utils'
 import { pool } from '../../utils/db'
-import { editedLocality } from './data'
+import { editedLocality, newLocalityBasis } from './data'
 
 const TEST_PROJECT_ID = 35
 const localityId = 21050
 
 const buildLocalityPayload = (projectIds: number[]) => {
-  const payload = { ...editedLocality } as EditDataType<LocalityDetailsType> & {
+  const payload = { ...newLocalityBasis, ...editedLocality, lid: localityId } as EditDataType<LocalityDetailsType> & {
     now_plr?: Array<{ lid: number; pid: number; rowState: 'new' }>
   }
 
