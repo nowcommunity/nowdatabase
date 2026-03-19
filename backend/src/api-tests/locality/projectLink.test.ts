@@ -1,22 +1,19 @@
 import { afterAll, beforeEach, describe, expect, it } from '@jest/globals'
 import { EditDataType, LocalityDetailsType } from '../../../../frontend/src/shared/types'
-import { editedLocality } from './data'
 import { login, resetDatabase, resetDatabaseTimeout, send, noPermError } from '../utils'
 import { pool } from '../../utils/db'
+import { editedLocality } from './data'
 
 const TEST_PROJECT_ID = 35
-const localityId = editedLocality.lid
-
-const cloneEditedLocality = () => structuredClone(editedLocality)
+const localityId = 21050
 
 const buildLocalityPayload = (projectIds: number[]) => {
-  const payload = cloneEditedLocality() as EditDataType<LocalityDetailsType> & {
+  const payload = { ...editedLocality } as EditDataType<LocalityDetailsType> & {
     now_plr?: Array<{ lid: number; pid: number; rowState: 'new' }>
   }
-  const lid = payload.lid ?? localityId
 
   payload.now_plr = projectIds.map(pid => ({
-    lid,
+    lid: localityId,
     pid,
     rowState: 'new' as const,
   }))

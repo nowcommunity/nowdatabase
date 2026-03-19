@@ -56,30 +56,47 @@ export class DatabaseHandler {
     return { values: items.map(item => item.value), columns: items.map(item => item.column) }
   }
 
+  buildIdResult<T>(items: DbWriteItem[], returnColumns?: string[], insertId?: unknown) {
+    if (!returnColumns || returnColumns.length === 0) {
+      return {} as T
+    }
+
+    const result: Record<string, DbValue> = {}
+
+    for (const column of returnColumns) {
+      const existingItem = items.find(item => item.column === column && item.value !== undefined)
+      if (existingItem) {
+        result[column] = existingItem.value
+        continue
+      }
+
+      if (typeof insertId === 'number') {
+        result[column] = insertId
+      }
+    }
+
+    return result as T
+  }
+
   async insert<T>(table: AllowedTables, items: DbWriteItem[], returnColumns?: string[]) {
-    const returnString = returnColumns ? `RETURNING ${returnColumns.join(', ')}` : ''
     const { columns, values } = this.getValuesAndColumns(items)
-    const returnValue = await this.executeQuery<T | Array<T> | { insertId?: number }>(
-      `INSERT INTO ${this.dbName}.${table} (${columns.map(column => this.checkColumn(column)).join(', ')}) VALUES (${values.map(() => '?').join(', ')}) ${returnString}`,
+    const returnValue = await this.executeQuery<{ insertId?: number } | Array<{ insertId?: number }>>(
+      `INSERT INTO ${this.dbName}.${table} (${columns.map(column => this.checkColumn(column)).join(', ')}) VALUES (${values.map(() => '?').join(', ')})`,
       values
     )
 
     if (Array.isArray(returnValue)) {
-      return returnValue[0]
+      const firstRow = returnValue[0]
+      if (firstRow && returnColumns?.every(column => column in firstRow)) {
+        return firstRow as T
+      }
     }
 
-    if (
-      returnColumns &&
-      returnColumns.length === 1 &&
-      typeof returnValue === 'object' &&
-      returnValue !== null &&
-      'insertId' in returnValue &&
-      typeof returnValue.insertId === 'number'
-    ) {
-      return { [returnColumns[0]]: returnValue.insertId } as T
-    }
+    const insertId = Array.isArray(returnValue)
+      ? (returnValue as unknown as { insertId?: unknown }).insertId
+      : returnValue.insertId
 
-    return returnValue as T
+    return this.buildIdResult<T>(items, returnColumns, insertId)
   }
 
   async update(table: AllowedTables, items: DbWriteItem[], ids: DbWriteItem[]) {
@@ -99,11 +116,8 @@ export class DatabaseHandler {
   async delete(table: AllowedTables, ids: DbWriteItem[], returnColumns?: string[]) {
     const { columns: idColumns, values: idValues } = this.getValuesAndColumns(ids)
     const whereClause = this.createWhereClause(idColumns)
-    const returningClause = returnColumns?.join(' ,') ?? `${idColumns.join(', ')}`
-    return await this.executeQuery(
-      `DELETE FROM ${this.dbName}.${table} WHERE ${whereClause} RETURNING ${returningClause}`,
-      idValues
-    )
+    await this.executeQuery(`DELETE FROM ${this.dbName}.${table} WHERE ${whereClause}`, idValues)
+    return this.buildIdResult(ids, returnColumns ?? idColumns)
   }
 
   async select<T>(table: AllowedTables, columns: string[], ids: DbWriteItem[]) {

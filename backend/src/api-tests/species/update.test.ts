@@ -99,30 +99,34 @@ describe('Updating species works', () => {
   })
 
   it('Returns duplicate error when taxonomy is changed to existing taxon', async () => {
-    await send<{ species_id: number }>('species', 'PUT', {
+    const duplicateTarget = await send<{ species_id: number }>('species', 'PUT', {
       species: {
         ...cloneSpeciesData(),
+        genus_name: 'DuplicateTestGenus',
         species_name: 'duplicate target',
         unique_identifier: 'dup-id',
         comment: 'target',
       },
     })
+    expect(duplicateTarget.status).toEqual(200)
 
     const sourceSpecies = await send<{ species_id: number }>('species', 'PUT', {
       species: {
         ...cloneSpeciesData(),
+        genus_name: 'DuplicateTestGenus',
         species_name: 'source species',
         unique_identifier: 'source-id',
         comment: 'source',
       },
     })
+    expect(sourceSpecies.status).toEqual(200)
 
     const duplicateUpdate = await send<{ name: string; error: string }[]>('species', 'PUT', {
       species: {
         species_id: sourceSpecies.body.species_id,
         order_name: 'Eulipotyphla',
         family_name: 'Soricidae',
-        genus_name: 'Petenyia',
+        genus_name: 'DuplicateTestGenus',
         species_name: 'duplicate target',
         unique_identifier: 'dup-id',
         taxonomic_status: '',
