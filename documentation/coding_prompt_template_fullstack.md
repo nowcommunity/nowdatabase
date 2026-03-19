@@ -63,6 +63,7 @@ Implement **exactly one task** from an approved feature plan.
 - Ensure Prisma clients are generated (`npm run prisma`) so `tsc --noEmit` sees emitted types in backend utilities.
 - Common failure patterns to avoid: missing Prettier formatting, unused imports/variables in tests, missing async return types or implicit `any`, and stale `eslint-disable` directives.
 - Keep large fixtures/geojson assets out of type-checked paths; rely on `tsconfig`/ESLint ignores already defined (see `frontend/tsconfig.json`, `backend/tsconfig.json`, and `eslint.config.mjs`).
+- For backend API-test work, prefer targeted validation while iterating, for example `cd backend && npm run test:api:local -- --runTestsByPath <file>`, and capture the real backend error before making another speculative fix.
 
 ### Frontend unit-test checklist (mandatory when frontend code or frontend tests change)
 - Before changing Jest config, first check whether the failure is really caused by missing test runtime context. Components using Redux hooks must render inside `<Provider>`. Components using `useNavigate`, `useLocation`, `useBlocker`, or route loaders must render inside the correct router (`MemoryRouter` vs `createMemoryRouter` + `RouterProvider`).
@@ -75,6 +76,17 @@ Implement **exactly one task** from an approved feature plan.
 - Keep hooks lint-safe in both production and test-support code: never call React hooks conditionally; if behavior depends on context availability, restructure with a wrapper component or another hook-safe pattern.
 - Do not pass promise-returning functions directly to DOM event props when the target expects `void`; wrap them with `void someAsyncCall()` or an equivalent lint-safe adapter.
 - Treat test mocks and setup files as first-class code: remove unnecessary type assertions, satisfy `require-await` / `no-unsafe-return`, and keep mock/helper files Prettier-clean.
+
+### Backend API-test checklist (mandatory when backend code or backend API tests change)
+- Prefer deterministic backend tests. Do not leave API tests dependent on live external services, network access, or unstable third-party result counts. Mock outbound integrations such as Geonames at the test boundary.
+- Use seeded ids and fixture values that are actually present in the checked-in test SQL. If a test depends on seed data, verify those ids/rows before changing expectations.
+- When changing shared backend write helpers, assume the blast radius is large. Check how the change affects generated ids, update-log entry creation, reference join rows, and metadata stripping across locality/species/time-unit/time-bound flows.
+- Strip helper-only metadata before generic persistence utilities. Route/test payloads may include fields such as `comment`, `references`, `up_bound`, `low_bound`, or UI-only helper objects that must not be treated as DB columns.
+- Do not assume MariaDB insert behavior matches Postgres-style `RETURNING`. Use id handling that matches the actual driver/runtime in this repository.
+- For update tests, decide whether the endpoint expects a sparse patch payload or a broader valid entity snapshot. Use a known-valid baseline fixture when full-state validation is required, but avoid replaying unrelated edits in later idempotency checks.
+- Keep backend assertions focused on the behavior under test. Avoid brittle exact totals for audit rows or seeded counts unless those totals are the explicit contract.
+- If a second write in a test is meant to be idempotent, make that follow-up payload narrow enough that it does not replay unrelated additions/removals and trigger a different server path.
+- Backend test files themselves must satisfy ESLint, Prettier, and TypeScript rules; treat fetch mocks, response doubles, and debug helpers as production-quality code.
 
 ### Quality / Style
 - Follow ESLint + Prettier + TypeScript strict.  
@@ -111,6 +123,7 @@ Implement **exactly one task** from an approved feature plan.
 - Add tests only if `test_plan` indicates them.  
 - Aim for > 80 % coverage for changed modules.  
 - Backend tests mock Prisma or use test DB.  
+- Backend API tests should mock third-party HTTP dependencies and avoid live-service assumptions.  
 - Frontend tests mock API calls and simulate user flows.  
 - Frontend test updates must verify the real render path is reachable before asserting controls; if a shared component stays in loading/error state, fix the harness rather than forcing the assertion.
 - If Jest config is modified, confirm the change does not break unrelated suites by changing module resolution, transform mode, or global mocks.
@@ -239,6 +252,8 @@ JWT_SECRET="replace_me"
 - Backend & frontend tests pass.  
 - Frontend tests have the correct Provider/router/context wrappers, and async router actions are wrapped in `act(...)` where needed.
 - Jest/browser shims are minimal and compatible with Vite config, ESM dependencies, RTK Query, and asset imports used by the changed code.
+- Backend API tests use stable fixtures, deterministic generated-id handling, and mocked external integrations where applicable.
+- Backend write paths do not leak helper metadata into shared DB utilities.
 - Production, test, and test-support files all satisfy hooks rules, async-handler rules, strict TypeScript linting, and Prettier.
 - Prisma migrations exist if `migrations:true`.  
 - Role-based permissions verified.  

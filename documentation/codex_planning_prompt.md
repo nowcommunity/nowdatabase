@@ -109,6 +109,25 @@ This section summarizes the overall architecture, structure, and technologies of
 - When frontend hooks are involved, plan for hook-order safety explicitly: no conditional React hook calls in production components, even when supporting optional test/runtime environments.
 - When test doubles include click handlers or mock browser APIs, plan for lint-safe implementations too: avoid promise-returning event handlers when a void callback is expected, and keep Jest/browser polyfills compatible with strict ESLint rules (`require-await`, unsafe returns, unnecessary assertions, Prettier).
 
+### Backend API-Test Planning Guardrails
+- When backend work touches write flows, audit logging, reference joins, or test fixtures, include an explicit API-test impact review in the plan before changing code. Decide whether the failure is more likely caused by:
+  - a real backend regression,
+  - stale seeded test data,
+  - an environment-dependent external call,
+  - or a brittle assertion.
+- For write-path changes, inspect shared helpers before patching many tests. In this repository, generic DB writers, update-log creation, generated-id handling, and metadata stripping can affect many suites at once.
+- Plan to strip non-persistent helper fields from backend write payloads before they reach shared persistence utilities. Examples include `comment`, `references`, computed helper objects, and route-only helper fields such as `up_bound` / `low_bound`.
+- When tests rely on generated ids, plan to verify how MariaDB actually returns insert metadata in this codebase instead of assuming `RETURNING` or a particular driver response shape.
+- If an API test touches an external integration such as Geonames, plan to mock the outbound call in the test rather than depending on the real service, network availability, or unstable result counts.
+- If a backend update endpoint validates broad entity state, plan the test payload carefully:
+  - use a known-valid baseline fixture when full-state validation is required,
+  - but avoid blindly replaying fetched entity state if it reintroduces seeded legacy values that fail modern validation.
+- Add a task to verify whether assertions are too strict for the current contract, especially:
+  - total audit-log row counts,
+  - exact seeded fixture counts,
+  - or assumptions that a second idempotent write replays the same unrelated changes.
+- If local reproduction is difficult, plan one narrow debug path to capture the real backend exception before applying speculative fixes.
+
 ---
 
 # Codex Prompt for NOW Database Full-Stack Development
@@ -146,6 +165,7 @@ Implementation should cover all layers of the stack:
 - **Auth & Permissions:** Use middleware to enforce role-based permissions. Hide or disable UI for unauthorized users.
 - **Testing:** Use **Jest** + **@testing-library/react** for frontend tests, and **Mocha** + **supertest** for backend API tests. Add end-to-end coverage with **Cypress** if needed.
   Frontend test planning must call out required providers, router mode, module mocks, and Jest/Vite compatibility for each changed area.
+  Backend test planning must call out fixture source, generated-id expectations, external-service mocking, and whether update/audit assertions are intentionally narrow or broad.
 - **Documentation & Deployment:** Update `.env` templates, Docker Compose, and internal documentation if configuration changes are needed.
 
 ---
@@ -195,6 +215,7 @@ Provide a **machine-readable JSON array** of granular tasks like:
 - **Rollback:** Feature-flag critical changes for safe deployment.
 - **Test Regressions:** Avoid broad Jest config changes that can alter unrelated suites. Prefer the smallest production fix or the narrowest test-specific shim that resolves the real incompatibility.
 - **Lint Regressions:** Test helpers and polyfills must satisfy the same ESLint/Prettier rules as production code, especially hooks rules, async handler rules, and strict TypeScript linting in support files.
+- **API Test Regressions:** Avoid backend API tests that depend on live third-party services, overly specific seed-state assumptions, or exact audit-row totals unless the task explicitly verifies those behaviors.
 
 ---
 
@@ -213,6 +234,8 @@ Provide a **machine-readable JSON array** of granular tasks like:
 - [ ] Frontend tests include the required providers/router/context and do not rely on missing app runtime state
 - [ ] Jest compatibility issues (`import.meta.env`, ESM packages, assets, RTK Query/fetch, timers) are handled with narrow fixes
 - [ ] Frontend support code and test doubles pass hooks, async-handler, strict TypeScript, and Prettier lint rules
+- [ ] Backend API tests use deterministic fixtures, generated-id assumptions are verified, and external integrations are mocked when appropriate
+- [ ] Backend write flows strip helper-only metadata before shared persistence utilities
 - [ ] Database migrations are applied and reversible
 - [ ] Role-based permissions verified
 - [ ] Documentation and changelog updated
