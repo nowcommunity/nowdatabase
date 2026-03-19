@@ -80,21 +80,22 @@ export class DatabaseHandler {
 
   async insert<T>(table: AllowedTables, items: DbWriteItem[], returnColumns?: string[]) {
     const { columns, values } = this.getValuesAndColumns(items)
-    const returnValue = await this.executeQuery<{ insertId?: number } | Array<{ insertId?: number }>>(
+    await this.executeQuery(
       `INSERT INTO ${this.dbName}.${table} (${columns.map(column => this.checkColumn(column)).join(', ')}) VALUES (${values.map(() => '?').join(', ')})`,
       values
     )
 
-    if (Array.isArray(returnValue)) {
-      const firstRow = returnValue[0]
-      if (firstRow && returnColumns?.every(column => column in firstRow)) {
-        return firstRow as T
-      }
+    const allReturnColumnsProvided =
+      returnColumns?.every(column => items.some(item => item.column === column && item.value !== undefined)) ?? false
+
+    if (allReturnColumnsProvided) {
+      return this.buildIdResult<T>(items, returnColumns)
     }
 
-    const insertId = Array.isArray(returnValue)
-      ? (returnValue as unknown as { insertId?: unknown }).insertId
-      : returnValue.insertId
+    const lastInsertIdResult = await this.executeQuery<Array<{ insertId?: number; 'LAST_INSERT_ID()'?: number }>>(
+      'SELECT LAST_INSERT_ID() AS insertId'
+    )
+    const insertId = lastInsertIdResult[0]?.insertId ?? lastInsertIdResult[0]?.['LAST_INSERT_ID()']
 
     return this.buildIdResult<T>(items, returnColumns, insertId)
   }
