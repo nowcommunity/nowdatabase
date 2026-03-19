@@ -1,5 +1,5 @@
 before('Reset database', () => {
-  cy.request(Cypress.env('databaseResetUrl'))
+  cy.resetDatabase()
 })
 
 describe('Occurrence editing', () => {

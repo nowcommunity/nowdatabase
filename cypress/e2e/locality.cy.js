@@ -1,5 +1,5 @@
 before('Reset database', () => {
-  cy.request(Cypress.env('databaseResetUrl'))
+  cy.resetDatabase()
 })
 
 describe('Adding species in Locality -> Species tab for an existing locality', () => {
@@ -143,7 +143,6 @@ describe('Adding species in Locality -> Species tab for an existing locality', (
     cy.contains('Save').click()
     cy.contains('Genus Amblycoptus belongs to family Soricidae, not Bovidae.')
   })
-
 
   it('minus action only marks the clicked species row as removed', () => {
     cy.visit(`/locality/20920?tab=2`)

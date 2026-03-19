@@ -25,13 +25,16 @@
 // Cypress.Commands.overwrite('visit', (originalFn, url, options) => { ... })
 
 Cypress.Commands.add('login', username => {
-  cy.clearLocalStorage()
+  cy.clearAllLocalStorage()
+  cy.clearAllSessionStorage()
+  cy.clearCookies()
+  cy.intercept('POST', '**/user/login').as('loginRequest')
   cy.visit('/login')
-  cy.get('[data-cy="login-button"]', { timeout: 10000 }).should('be.visible').click()
-  cy.get('[data-cy="username-basic"]').type(username)
-  cy.get('[data-cy="password-basic"]').type('test')
-  cy.get('[data-cy="login-button"]').click()
-  cy.contains(`${username}`)
+  cy.get('[data-cy="username-basic"]', { timeout: 10000 }).should('be.visible').clear().type(username)
+  cy.get('[data-cy="password-basic"]').should('be.visible').clear().type('test', { log: false })
+  cy.get('[data-cy="login-button"]').should('be.visible').click()
+  cy.wait('@loginRequest').its('response.statusCode').should('eq', 200)
+  cy.location('pathname', { timeout: 10000 }).should('not.eq', '/login')
 })
 
 Cypress.Commands.add('loginAsDeleteCoordinator', () => {
@@ -50,7 +53,8 @@ Cypress.Commands.add('pageForbidden', url => {
 })
 
 Cypress.Commands.add('resetDatabase', () => {
-  cy.task('resetDatabase')
+  cy.task('waitForDbHealthy')
+  cy.request(Cypress.env('databaseResetUrl')).its('status').should('eq', 200)
 })
 
 // use this once you have edited some data and want to save it

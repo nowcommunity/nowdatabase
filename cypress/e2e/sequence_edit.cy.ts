@@ -2,8 +2,7 @@
 
 describe('Sequence edit behavior', () => {
   before('Wait for database and reset state', () => {
-    cy.task('waitForDbHealthy')
-    cy.request(Cypress.env('databaseResetUrl'))
+    cy.resetDatabase()
   })
 
   beforeEach('Login as admin', () => {

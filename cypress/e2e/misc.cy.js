@@ -26,7 +26,7 @@ const doesNotHaveStagingMode = viewUrl => {
 }
 
 before('Reset database', () => {
-  cy.request(Cypress.env('databaseResetUrl'))
+  cy.resetDatabase()
 })
 
 describe('Test individual features across the app', () => {

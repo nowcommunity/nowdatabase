@@ -1,5 +1,5 @@
 before('Reset database', () => {
-  cy.request(Cypress.env('databaseResetUrl'))
+  cy.resetDatabase()
 })
 
 describe('Change password form validates passwords correctly and shows errors to the user', () => {
