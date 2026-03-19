@@ -18,7 +18,9 @@ describe('Locality update works', () => {
     await resetDatabase()
   }, resetDatabaseTimeout)
   beforeEach(async () => {
+    await resetDatabase()
     await login()
+    resultLocality = null
   })
   afterAll(async () => {
     await pool.end()

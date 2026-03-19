@@ -12,7 +12,9 @@ describe('Creating new species works', () => {
     await resetDatabase()
   }, resetDatabaseTimeout)
   beforeEach(async () => {
+    await resetDatabase()
     await login()
+    createdSpecies = null
   })
   afterAll(async () => {
     await pool.end()

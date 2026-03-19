@@ -29,8 +29,10 @@ describe('Occurrence update endpoint', () => {
     })
 
     expect(response.status).toBe(200)
-    expect(response.body.qua).toBe('a')
-    expect(response.body.mesowear).toBe('bil')
+    const updated = await send<Record<string, unknown>>('occurrence/21050/85729', 'GET')
+    expect(updated.status).toBe(200)
+    expect(updated.body.qua).toBe('a')
+    expect(updated.body.mesowear).toBe('bil')
   })
 
   it('returns 400 for invalid dropdown values', async () => {

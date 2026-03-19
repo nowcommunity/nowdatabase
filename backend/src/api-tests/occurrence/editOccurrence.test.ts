@@ -27,8 +27,10 @@ describe('Occurrence edit endpoint access and write flow', () => {
     })
 
     expect(response.status).toBe(200)
-    expect(response.body.source_name).toBe('E2E quality check source')
-    expect(response.body.id_status).toBe('family id uncertain')
+    const updated = await send<Record<string, unknown>>(existingOccurrencePath, 'GET')
+    expect(updated.status).toBe(200)
+    expect(updated.body.source_name).toBe('E2E quality check source')
+    expect(updated.body.id_status).toBe('family id uncertain')
   })
 
   it('returns 403 for users without occurrence edit permissions', async () => {

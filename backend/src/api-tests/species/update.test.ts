@@ -12,7 +12,9 @@ describe('Updating species works', () => {
     await resetDatabase()
   }, resetDatabaseTimeout)
   beforeEach(async () => {
+    await resetDatabase()
     await login()
+    editedSpeciesResult = null
   })
   afterAll(async () => {
     await pool.end()
