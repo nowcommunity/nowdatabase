@@ -6,7 +6,8 @@ before('Reset database', () => {
 })
 
 describe('Creating a time unit', () => {
-  beforeEach('Login as admin', () => {
+  beforeEach('Reset database and login as admin', () => {
+    cy.resetDatabase()
     cy.login('testSu')
   })
 
@@ -23,7 +24,7 @@ describe('Creating a time unit', () => {
 
     cy.addReferenceAndSave()
     cy.contains(displayName)
-    cy.contains('ALMAAsianlandmammalage')
+    cy.contains('ALMA, Asian land mammal age')
     cy.contains('C2N-o')
     cy.contains('C2N-y')
     cy.contains('Creating new time-unit').should('not.exist')
@@ -127,7 +128,7 @@ describe('Creating a time unit', () => {
     cy.contains('Creating new time-unit')
     cy.get('[id=tu_display_name-textfield]').should('not.be.disabled')
     cy.get('[id=tu_display_name-textfield]').should('have.value', displayName)
-    cy.get('[id=sequence-tableselection]').should('have.value', 'ALMAAsianlandmammalage')
+    cy.get('[id=sequence-tableselection]').should('have.value', 'ALMA, Asian land mammal age')
     cy.contains('C2N-o')
     cy.contains('C2N-y')
 
@@ -166,7 +167,8 @@ describe('Creating a time unit', () => {
 })
 
 describe('Editing a time unit', () => {
-  beforeEach('Login as admin', () => {
+  beforeEach('Reset database and login as admin', () => {
+    cy.resetDatabase()
     cy.login('testSu')
   })
 
@@ -179,7 +181,7 @@ describe('Editing a time unit', () => {
     cy.get('[data-cy=add-button-ALMAAsianlandmammalage]').first().click()
 
     cy.addReferenceAndSave()
-    cy.contains('ALMAAsianlandmammalage')
+    cy.contains('ALMA, Asian land mammal age')
   })
 
   it('with incorrect, newly created bounds does not work', () => {

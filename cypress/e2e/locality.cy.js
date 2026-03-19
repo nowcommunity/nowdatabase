@@ -2,6 +2,8 @@ before('Reset database', () => {
   cy.resetDatabase()
 })
 
+const buildLocalityName = (base = 'Bugat') => `${base} ${Date.now()}-${Math.floor(Math.random() * 1e6)}`
+
 describe('Adding species in Locality -> Species tab for an existing locality', () => {
   beforeEach('Login as admin', () => {
     cy.login('testSu')
@@ -192,10 +194,12 @@ describe('Adding species in Locality -> Species tab for an existing locality', (
 
 describe('Creating a new locality', () => {
   beforeEach('Login as admin', () => {
+    cy.resetDatabase()
     cy.login('testSu')
   })
 
   it('with valid data works', () => {
+    const localityName = buildLocalityName()
     cy.visit('/locality/new/')
     cy.contains('Creating new locality')
     cy.get('[name=dating-method]').should('have.value', 'time_unit')
@@ -215,7 +219,7 @@ describe('Creating a new locality', () => {
     cy.get('[id=min_age-textfield]').type('10.23')
     cy.get('[id=max_age-textfield]').type('24.01')
     cy.get('[role=tablist]').contains('Locality').click()
-    cy.get('[id=loc_name-textfield]').type('Bugat')
+    cy.get('[id=loc_name-textfield]').type(localityName)
     cy.contains('Choose a country').parent().type('Mongo')
     cy.contains('Mongolia').click()
     cy.get('[id=dec_lat-textfield]').type('49.07')
@@ -225,10 +229,10 @@ describe('Creating a new locality', () => {
 
     cy.addReferenceAndSave()
     cy.contains('Edited item successfully.')
-    cy.contains('Bugat')
+    cy.contains(localityName)
     cy.get('[id=delete-button]').should('exist')
     cy.visit('/locality/')
-    cy.contains('Bugat')
+    cy.contains(localityName)
   })
 
   it("with missing country, min basis for age and longitude doesn't work", () => {
@@ -312,6 +316,7 @@ describe('Creating a new locality', () => {
   })
 
   it('composite dating method works', () => {
+    const localityName = buildLocalityName()
     cy.visit('/locality/new')
     cy.get('[name=dating-method][value=composite]').click()
     cy.get('[id=bfa_min-tableselection-helper-text]').contains(
@@ -331,7 +336,7 @@ describe('Creating a new locality', () => {
     cy.get('[id=min_age-textfield]').should('have.value', '8.676666666666668')
 
     cy.get('[role=tablist]').contains('Locality').click()
-    cy.get('[id=loc_name-textfield]').type('Bugat')
+    cy.get('[id=loc_name-textfield]').type(localityName)
     cy.contains('Choose a country').parent().type('Mongo')
     cy.contains('Mongolia').click()
     cy.get('[id=dec_lat-textfield]').type('49.07')
@@ -340,11 +345,11 @@ describe('Creating a new locality', () => {
 
     cy.addReferenceAndSave()
     cy.contains('Edited item successfully.')
-    cy.contains('Bugat')
+    cy.contains(localityName)
     cy.contains('8.676')
     cy.get('[id=delete-button]').should('exist')
     cy.visit('/locality/')
-    cy.contains('Bugat')
+    cy.contains(localityName)
   })
 
   it('selecting fractions and basis for age updates the age correctly', () => {
@@ -606,6 +611,7 @@ describe('Linking projects to an existing locality', () => {
     cy.get('[id=edit-button]').click()
     cy.contains('button', 'Select Project').click()
     cy.get(`[data-cy=add-button-${newProjectId}]`).click()
+    cy.contains(newProjectCode).should('be.visible')
     cy.contains('button', 'Close').click()
     cy.contains('td', newProjectCode).should('exist')
 

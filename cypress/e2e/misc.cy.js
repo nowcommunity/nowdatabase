@@ -8,9 +8,11 @@ const visitEntry = viewUrl => {
   cy.visit(normalizedUrl)
 }
 
-const hasStagingMode = viewUrl => {
+const hasStagingMode = (viewUrl, makeDirty) => {
   visitEntry(viewUrl)
   cy.contains('Edit', { timeout: 20000 }).should('be.visible').click()
+  makeDirty()
+  cy.get('#write-button').should('not.be.disabled')
   cy.contains('Finalize entry', { timeout: 15000 }).should('be.visible').click()
   cy.contains('Complete and save', { timeout: 15000 }).should('be.visible')
   cy.contains('Reference for the new data', { timeout: 15000 }).should('be.visible')
@@ -54,23 +56,29 @@ describe('Test individual features across the app', () => {
     })
 
     it('Staging mode works on locality', () => {
-      cy.login('testSu')
-      hasStagingMode('locality/24750')
+      hasStagingMode('locality/24750', () => {
+        cy.get('[role=tablist]').contains('Locality').click()
+        cy.get('[id=loc_name-textfield]').type(' staging')
+      })
     })
 
     it('Staging mode works on species', () => {
-      cy.login('testSu')
-      hasStagingMode('species/21052')
+      hasStagingMode('species/21052', () => {
+        cy.get('[id=subfamily_name-textfield]').type(' staging')
+      })
     })
 
     it('Staging mode works on time unit', () => {
-      cy.login('testSu')
-      hasStagingMode('time-unit/bahean')
+      hasStagingMode('time-unit/bahean', () => {
+        cy.get('[id=sequence-tableselection]').first().click()
+        cy.get('[data-cy=add-button-ALMAAsianlandmammalage]').first().click()
+      })
     })
 
     it('Staging mode works on time bound', () => {
-      cy.login('testSu')
-      hasStagingMode('time-bound/11')
+      hasStagingMode('time-bound/11', () => {
+        cy.get('[id=age-textfield]').first().clear().type('1.5')
+      })
     })
   })
 

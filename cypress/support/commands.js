@@ -77,7 +77,6 @@ Cypress.Commands.add('clearNewSpeciesForm', () => {
   cy.get('[name=suborder_or_superfamily_name]').clear()
   cy.get('[name=subfamily_name]').clear()
   cy.get('[name=unique_identifier]').clear()
-  cy.get('[name=taxonomic_status]').clear()
   cy.get('[name=sp_comment]').clear()
   cy.get('[name=sp_author]').clear()
 })

@@ -1,11 +1,8 @@
 /// <reference types="cypress" />
 
 describe('Sequence edit behavior', () => {
-  before('Wait for database and reset state', () => {
+  beforeEach('Reset database and login as admin', () => {
     cy.resetDatabase()
-  })
-
-  beforeEach('Login as admin', () => {
     cy.login('testSu')
   })
 
