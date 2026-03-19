@@ -27,10 +27,16 @@ const buildGeonamesResponse = (names: string[]): GeonamesJSON => ({
   })),
 })
 
+const getRequestUrl = (input: string | URL | Request) => {
+  if (typeof input === 'string') return input
+  if (input instanceof URL) return input.toString()
+  return input.url
+}
+
 describe('Getting data from Geonames-API', () => {
   beforeEach(() => {
-    jest.spyOn(global, 'fetch').mockImplementation(input => {
-      const url = typeof input === 'string' ? input : input.url
+    jest.spyOn(global, 'fetch').mockImplementation((input: string | URL | Request) => {
+      const url = getRequestUrl(input)
 
       if (url.includes('Kumpula')) {
         return Promise.resolve({
