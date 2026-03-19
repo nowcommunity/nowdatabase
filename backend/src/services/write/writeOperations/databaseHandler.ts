@@ -59,11 +59,27 @@ export class DatabaseHandler {
   async insert<T>(table: AllowedTables, items: DbWriteItem[], returnColumns?: string[]) {
     const returnString = returnColumns ? `RETURNING ${returnColumns.join(', ')}` : ''
     const { columns, values } = this.getValuesAndColumns(items)
-    const returnValue = await this.executeQuery<T>(
+    const returnValue = await this.executeQuery<T | Array<T> | { insertId?: number }>(
       `INSERT INTO ${this.dbName}.${table} (${columns.map(column => this.checkColumn(column)).join(', ')}) VALUES (${values.map(() => '?').join(', ')}) ${returnString}`,
       values
     )
-    return (returnValue as T[])[0]
+
+    if (Array.isArray(returnValue)) {
+      return returnValue[0]
+    }
+
+    if (
+      returnColumns &&
+      returnColumns.length === 1 &&
+      typeof returnValue === 'object' &&
+      returnValue !== null &&
+      'insertId' in returnValue &&
+      typeof returnValue.insertId === 'number'
+    ) {
+      return { [returnColumns[0]]: returnValue.insertId } as T
+    }
+
+    return returnValue as T
   }
 
   async update(table: AllowedTables, items: DbWriteItem[], ids: DbWriteItem[]) {
