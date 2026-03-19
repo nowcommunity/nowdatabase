@@ -42,13 +42,14 @@ export class DatabaseHandler {
 
   async end() {
     if (!this.connection) throw new Error('DB connection not initialized')
-    await this.connection.end()
+    const connection = this.connection
+    this.connection = undefined
+    await connection.end()
   }
 
   async commit() {
     if (!this.connection) throw new Error('DB connection not initialized')
     await this.connection.commit()
-    await this.end()
   }
 
   getValuesAndColumns(items: DbWriteItem[]) {
