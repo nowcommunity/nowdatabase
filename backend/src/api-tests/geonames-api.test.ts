@@ -29,25 +29,25 @@ const buildGeonamesResponse = (names: string[]): GeonamesJSON => ({
 
 describe('Getting data from Geonames-API', () => {
   beforeEach(() => {
-    jest.spyOn(global, 'fetch').mockImplementation(async input => {
-      const url = typeof input === 'string' ? input : input.toString()
+    jest.spyOn(global, 'fetch').mockImplementation(input => {
+      const url = typeof input === 'string' ? input : input.url
 
       if (url.includes('Kumpula')) {
-        return {
-          json: async () =>
+        return Promise.resolve({
+          json: () =>
             buildGeonamesResponse(['Kumpula', 'Kumpulantie', 'Kumpulanlaakso', 'Kumpulanmaki', 'Kumpula park']),
-        } as Response
+        } as Response)
       }
 
       if (url.includes('Tursola')) {
-        return {
-          json: async () => buildGeonamesResponse(['Tursola', 'Tursola village']),
-        } as Response
+        return Promise.resolve({
+          json: () => buildGeonamesResponse(['Tursola', 'Tursola village']),
+        } as Response)
       }
 
-      return {
-        json: async () => buildGeonamesResponse([]),
-      } as Response
+      return Promise.resolve({
+        json: () => buildGeonamesResponse([]),
+      } as Response)
     })
   })
 
