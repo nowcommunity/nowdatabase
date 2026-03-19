@@ -62,6 +62,8 @@ export class DatabaseHandler {
     }
 
     const result: Record<string, DbValue> = {}
+    const normalizedInsertId =
+      typeof insertId === 'bigint' ? Number(insertId) : typeof insertId === 'number' ? insertId : undefined
 
     for (const column of returnColumns) {
       const existingItem = items.find(item => item.column === column && item.value !== undefined)
@@ -70,8 +72,8 @@ export class DatabaseHandler {
         continue
       }
 
-      if (typeof insertId === 'number') {
-        result[column] = insertId
+      if (normalizedInsertId !== undefined) {
+        result[column] = normalizedInsertId
       }
     }
 
