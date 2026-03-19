@@ -7,9 +7,17 @@ import { editedLocality, newLocalityBasis } from './data'
 const TEST_PROJECT_ID = 35
 const localityId = 21050
 
-const buildLocalityPayload = (projectIds: number[]) => {
+const buildLocalityPayload = (projectIds: number[], options?: { includeSpeciesChanges?: boolean }) => {
   const payload = { ...newLocalityBasis, ...editedLocality, lid: localityId } as EditDataType<LocalityDetailsType> & {
     now_plr?: Array<{ lid: number; pid: number; rowState: 'new' }>
+  }
+
+  if (options?.includeSpeciesChanges === false) {
+    payload.now_ls = []
+    payload.now_mus = []
+    payload.now_ss = []
+    payload.now_coll_meth = []
+    payload.now_syn_loc = []
   }
 
   payload.now_plr = projectIds.map(pid => ({
@@ -59,7 +67,7 @@ describe('Locality project links', () => {
     const firstResult = await send<{ id: number }>('locality', 'PUT', { locality: duplicatePayload })
     expect(firstResult.status).toEqual(200)
 
-    const duplicateAttempt = buildLocalityPayload([TEST_PROJECT_ID])
+    const duplicateAttempt = buildLocalityPayload([TEST_PROJECT_ID], { includeSpeciesChanges: false })
     const secondResult = await send<{ id: number }>('locality', 'PUT', { locality: duplicateAttempt })
     expect(secondResult.status).toEqual(200)
 

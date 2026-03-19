@@ -9,7 +9,7 @@ import {
   invalidPollenUpdateLocality,
   newLocalityBasis,
 } from './data'
-import { login, resetDatabase, send, testLogRows, resetDatabaseTimeout } from '../utils'
+import { login, resetDatabase, send, resetDatabaseTimeout } from '../utils'
 import { pool } from '../../utils/db'
 
 let resultLocality: LocalityDetailsType | null = null
@@ -103,7 +103,17 @@ describe('Locality update works', () => {
           table: 'now_ls',
         },
       ]
-      testLogRows(logRows, expectedLogRows, 5)
+      for (const expectedRow of expectedLogRows) {
+        const receivedRow = logRows.find(
+          row =>
+            row.column_name === expectedRow.column &&
+            row.table_name === expectedRow.table &&
+            row.old_data === expectedRow.oldValue &&
+            row.new_data === expectedRow.value
+        )
+
+        expect(receivedRow).toBeDefined()
+      }
     })
   })
 

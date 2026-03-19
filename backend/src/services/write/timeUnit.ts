@@ -152,14 +152,22 @@ export const writeTimeUnit = async (
   references: Reference[] | undefined,
   authorizer: string
 ) => {
-  const normalizedTimeUnit = { ...timeUnit, rank: normalizeRank(timeUnit.rank) } as EditDataType<TimeUnitDetailsType> & {
+  const normalizedTimeUnit = {
+    ...timeUnit,
+    rank: normalizeRank(timeUnit.rank),
+  } as EditDataType<TimeUnitDetailsType> & {
     up_bound?: unknown
     low_bound?: unknown
     references?: unknown
     comment?: unknown
   }
-  const { up_bound: _upBound, low_bound: _lowBound, references: _references, comment: _comment, ...persistableTimeUnit } =
-    normalizedTimeUnit
+  const {
+    up_bound: _upBound,
+    low_bound: _lowBound,
+    references: _references,
+    comment: _comment,
+    ...persistableTimeUnit
+  } = normalizedTimeUnit
 
   const writeHandler = getTimeUnitWriteHandler(persistableTimeUnit.tu_name ? 'update' : 'add')
   const createdId = persistableTimeUnit.tu_name ?? createTimeUnitId(persistableTimeUnit.tu_display_name!)
