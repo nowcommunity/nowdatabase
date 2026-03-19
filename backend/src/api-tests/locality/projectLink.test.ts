@@ -8,7 +8,11 @@ const TEST_PROJECT_ID = 35
 const localityId = 21050
 
 const buildLocalityPayload = (projectIds: number[], options?: { includeSpeciesChanges?: boolean }) => {
-  const payload = { ...newLocalityBasis, ...editedLocality, lid: localityId } as EditDataType<LocalityDetailsType> & {
+  const payload = {
+    ...newLocalityBasis,
+    ...editedLocality,
+    lid: localityId,
+  } as unknown as EditDataType<LocalityDetailsType> & {
     now_plr?: Array<{ lid: number; pid: number; rowState: 'new' }>
   }
 
