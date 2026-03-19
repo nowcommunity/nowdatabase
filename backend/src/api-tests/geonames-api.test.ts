@@ -1,10 +1,58 @@
-import { afterAll, describe, it, expect } from '@jest/globals'
-import type { ParsedGeoname } from '../../../frontend/src/shared/types'
+import { afterAll, beforeEach, describe, it, expect, jest } from '@jest/globals'
+import type { GeonamesJSON, ParsedGeoname } from '../../../frontend/src/shared/types'
 import { send } from './utils'
 import { pool } from '../utils/db'
 
+const buildGeonamesResponse = (names: string[]): GeonamesJSON => ({
+  totalResultsCount: names.length,
+  geonames: names.map((name, index) => ({
+    adminCode1: 'test-admin',
+    lng: `${24.9 + index}`,
+    geonameId: 1000 + index,
+    toponymName: name,
+    countryId: '1',
+    fcl: 'P',
+    population: 1,
+    countryCode: 'FI',
+    name,
+    fclName: 'city, village,...',
+    adminCodes1: {
+      ISO3166_2: 'FI-18',
+    },
+    countryName: 'Finland',
+    fcodeName: 'populated place',
+    adminName1: 'Uusimaa',
+    lat: `${60.1 + index}`,
+    fcode: 'PPL',
+  })),
+})
+
 describe('Getting data from Geonames-API', () => {
+  beforeEach(() => {
+    jest.spyOn(global, 'fetch').mockImplementation(async input => {
+      const url = typeof input === 'string' ? input : input.toString()
+
+      if (url.includes('Kumpula')) {
+        return {
+          json: async () =>
+            buildGeonamesResponse(['Kumpula', 'Kumpulantie', 'Kumpulanlaakso', 'Kumpulanmaki', 'Kumpula park']),
+        } as Response
+      }
+
+      if (url.includes('Tursola')) {
+        return {
+          json: async () => buildGeonamesResponse(['Tursola', 'Tursola village']),
+        } as Response
+      }
+
+      return {
+        json: async () => buildGeonamesResponse([]),
+      } as Response
+    })
+  })
+
   afterAll(async () => {
+    jest.restoreAllMocks()
     await pool.end()
   })
 
