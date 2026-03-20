@@ -111,14 +111,12 @@ describe('Delete flow', () => {
       }
 
       const name = regionName('Failure')
-      const failureMessage = 'Test delete failure'
-
       cy.wrap(null)
         .then(() => createRegion(regionTarget, name))
         .then(createdId => {
           cy.intercept('DELETE', `**/region/${createdId}`, {
             statusCode: 500,
-            body: { message: failureMessage },
+            body: { message: 'Test delete failure' },
           }).as('deleteRegionFailure')
 
           cy.on('window:confirm', message => {
@@ -130,7 +128,7 @@ describe('Delete flow', () => {
 
           cy.wait('@deleteRegionFailure').its('response.statusCode').should('eq', 500)
 
-          cy.contains(failureMessage).should('be.visible')
+          cy.contains('Could not delete item. Error happened.').should('be.visible')
           cy.contains('Deleted item successfully.').should('not.exist')
           cy.location('pathname').should('match', /\/region\/\d+$/)
           cy.contains(name).should('be.visible')
