@@ -72,6 +72,20 @@ When changing backend code or backend API tests, Codex must proactively apply th
 - Be careful with generated ids in MariaDB-backed tests. Prefer deterministic id handling that works with the actual driver behavior instead of assuming `RETURNING` semantics.
 - When debugging backend test failures, capture the real exception if possible before applying another speculative fix.
 
+## Cypress / E2E Test Policy
+
+When changing Cypress support code or E2E specs, Codex must proactively apply these rules:
+
+- Prefer fixing the shared Cypress harness first when multiple specs fail in similar ways. Check `cypress/support/commands.js`, `cypress.config.js`, shared fixtures, and common login/reset helpers before patching many individual specs.
+- Use deterministic database setup. Prefer a single shared `cy.resetDatabase()` helper over raw reset requests scattered through specs, and use `beforeEach` isolation when tests mutate shared seeded state.
+- Treat Cypress support files as strict code too: custom commands, TS declaration files, fixtures used as typed metadata, and support helpers must satisfy ESLint, Prettier, and TypeScript rules.
+- Be careful with Material UI wrappers and hidden inputs. Target the actual interactive element (for example the nested `input` inside a `TextField` wrapper) rather than wrapper divs or hidden native select inputs.
+- Do not rely on live external services in E2E tests. Stub third-party requests such as Geonames lookups with `cy.intercept(...)` when the behavior under test is not the external service itself.
+- Prefer stable post-action assertions over brittle transient UI text. If a save/create flow is asynchronous, verify the actual network response or returned id/slug and then navigate/assert from the durable saved state instead of depending only on an immediate toast or header text.
+- Avoid over-asserting read-mode text for fields whose display formatting can legitimately differ from edit-mode values. For selectors such as time-unit sequences, assert against the stable UI state that the current component actually exposes.
+- When a Cypress failure shows an application-side unhandled rejection, check whether the real fix belongs in production code, especially around RTK Query `unwrap()` calls, delete flows, or mutation side effects leaking rejected promises.
+- Keep hard-coded seeded ids in E2E specs aligned with the current checked-in seed data. If API and E2E tests both exercise the same entity, prefer the same known-good ids.
+
 ## Validation Expectations
 
 Before finishing, Codex should run the narrowest useful checks for the task, and run broader checks when the scope justifies it.
@@ -83,6 +97,7 @@ Typical commands from the repository root:
 - `npm run test`
 - `npm run lint:frontend`
 - `npm run tsc:frontend`
+- `npm run lint:cypress`
 
 Backend-focused checks are also expected when relevant:
 

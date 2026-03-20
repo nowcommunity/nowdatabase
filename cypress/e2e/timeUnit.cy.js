@@ -136,7 +136,8 @@ describe('Creating a time unit', () => {
     cy.wait('@saveTimeUnit').then(({ response }) => {
       expect(response?.statusCode).to.eq(200)
       const createdSlug = response?.body?.tu_name
-      expect(createdSlug, 'created time unit slug').to.be.a('string').and.not.be.empty
+      expect(createdSlug, 'created time unit slug').to.be.a('string')
+      expect(createdSlug, 'created time unit slug').to.not.equal('')
       cy.visit(`/time-unit/${createdSlug}`)
     })
     cy.contains('C2N-o')
