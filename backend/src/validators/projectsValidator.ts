@@ -18,12 +18,18 @@ export class NotFoundError extends Error {
   }
 }
 
-export const ensureNonEmptyString = (value: unknown, fieldName: string) => {
+export const ensureNonEmptyString = (value: unknown, fieldName: string, maxLength?: number) => {
   if (typeof value !== 'string' || value.trim() === '') {
     throw new ValidationError(`${fieldName} is required`)
   }
 
-  return value.trim()
+  const trimmedValue = value.trim()
+
+  if (maxLength !== undefined && trimmedValue.length > maxLength) {
+    throw new ValidationError(`${fieldName} must be at most ${maxLength} characters`)
+  }
+
+  return trimmedValue
 }
 
 export const ensureValidUserId = (value: unknown, fieldName: string) => {

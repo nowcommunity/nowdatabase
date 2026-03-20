@@ -6,6 +6,8 @@ import { newTimeUnitBasis } from './data'
 import { pool } from '../../utils/db'
 
 let createdTimeUnit: TimeUnitDetailsType | null = null
+const successTimeUnitBasis = { ...newTimeUnitBasis, tu_display_name: 'Bahean Test Success' }
+const duplicateTimeUnitBasis = { ...newTimeUnitBasis, tu_display_name: 'Bahean Test Duplicate' }
 
 const hasStructuredErrorPayload = (resultBody: unknown) => {
   if (Array.isArray(resultBody)) {
@@ -32,15 +34,17 @@ describe('Creating new time unit', () => {
     await resetDatabase()
   }, resetDatabaseTimeout)
   beforeEach(async () => {
+    await resetDatabase()
     await login()
+    createdTimeUnit = null
   })
   afterAll(async () => {
     await pool.end()
   })
 
   describe('Creating is successful with a correct time unit', () => {
-    it('Request succeeds and returns valid number id', async () => {
-      const okTimeUnit = { ...newTimeUnitBasis, up_bnd: 20214, low_bnd: 20213 }
+    beforeEach(async () => {
+      const okTimeUnit = { ...successTimeUnitBasis, up_bnd: 20214, low_bnd: 20213 }
       const { body: resultBody, status: getReqStatus } = await send<{ tu_name: string }>('time-unit', 'PUT', {
         timeUnit: okTimeUnit,
       })
@@ -54,11 +58,15 @@ describe('Creating new time unit', () => {
       createdTimeUnit = body
     })
 
+    it('Request succeeds and returns valid number id', () => {
+      expect(typeof createdTimeUnit?.tu_name).toEqual('string')
+    })
+
     it('Contains correct data', () => {
       const { tu_name, tu_display_name, tu_comment } = createdTimeUnit!
-      expect(tu_name).toEqual(newTimeUnitBasis.tu_display_name?.toLowerCase().replace(/[\s_-]+/g, '')) //'Name is different than expected'
-      expect(tu_display_name).toEqual(newTimeUnitBasis.tu_display_name) // 'Display name differs'
-      expect(tu_comment).toEqual(newTimeUnitBasis.tu_comment) // 'Comment differs'
+      expect(tu_name).toEqual(successTimeUnitBasis.tu_display_name.toLowerCase().replace(/[\s_-]+/g, '')) //'Name is different than expected'
+      expect(tu_display_name).toEqual(successTimeUnitBasis.tu_display_name) // 'Display name differs'
+      expect(tu_comment).toEqual(successTimeUnitBasis.tu_comment) // 'Comment differs'
     })
 
     it('Update logs are correct', () => {
@@ -70,7 +78,7 @@ describe('Creating new time unit', () => {
           table: 'now_time_unit',
           column: 'tu_display_name',
           oldValue: null,
-          value: newTimeUnitBasis.tu_display_name!,
+          value: successTimeUnitBasis.tu_display_name,
           type: 'add',
         },
       ]
@@ -79,8 +87,13 @@ describe('Creating new time unit', () => {
   })
 
   it('Creation fails with duplicate display name and returns structured error', async () => {
+    const setupResult = await send<{ tu_name: string }>('time-unit', 'PUT', {
+      timeUnit: { ...duplicateTimeUnitBasis },
+    })
+    expect(setupResult.status).toEqual(200)
+
     const duplicateResult = await send('time-unit', 'PUT', {
-      timeUnit: { ...newTimeUnitBasis },
+      timeUnit: { ...duplicateTimeUnitBasis },
     })
 
     expect(duplicateResult.status).toEqual(409)
@@ -91,8 +104,13 @@ describe('Creating new time unit', () => {
   })
 
   it('Creation fails when normalized name collides despite punctuation changes', async () => {
+    const setupResult = await send<{ tu_name: string }>('time-unit', 'PUT', {
+      timeUnit: { ...duplicateTimeUnitBasis },
+    })
+    expect(setupResult.status).toEqual(200)
+
     const duplicateResult = await send('time-unit', 'PUT', {
-      timeUnit: { ...newTimeUnitBasis, tu_display_name: 'Bahean-Test' },
+      timeUnit: { ...duplicateTimeUnitBasis, tu_display_name: 'Bahean-Test-Duplicate' },
     })
 
     expect(duplicateResult.status).toEqual(409)

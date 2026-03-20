@@ -1,6 +1,8 @@
 before('Reset database', () => {
-  cy.request(Cypress.env('databaseResetUrl'))
+  cy.resetDatabase()
 })
+
+const buildLocalityName = (base = 'Bugat') => `${base} ${Date.now()}-${Math.floor(Math.random() * 1e6)}`
 
 describe('Adding species in Locality -> Species tab for an existing locality', () => {
   beforeEach('Login as admin', () => {
@@ -144,7 +146,6 @@ describe('Adding species in Locality -> Species tab for an existing locality', (
     cy.contains('Genus Amblycoptus belongs to family Soricidae, not Bovidae.')
   })
 
-
   it('minus action only marks the clicked species row as removed', () => {
     cy.visit(`/locality/20920?tab=2`)
     cy.contains('Lantian-Shuijiazui')
@@ -193,10 +194,12 @@ describe('Adding species in Locality -> Species tab for an existing locality', (
 
 describe('Creating a new locality', () => {
   beforeEach('Login as admin', () => {
+    cy.resetDatabase()
     cy.login('testSu')
   })
 
   it('with valid data works', () => {
+    const localityName = buildLocalityName()
     cy.visit('/locality/new/')
     cy.contains('Creating new locality')
     cy.get('[name=dating-method]').should('have.value', 'time_unit')
@@ -216,7 +219,7 @@ describe('Creating a new locality', () => {
     cy.get('[id=min_age-textfield]').type('10.23')
     cy.get('[id=max_age-textfield]').type('24.01')
     cy.get('[role=tablist]').contains('Locality').click()
-    cy.get('[id=loc_name-textfield]').type('Bugat')
+    cy.get('[id=loc_name-textfield]').type(localityName)
     cy.contains('Choose a country').parent().type('Mongo')
     cy.contains('Mongolia').click()
     cy.get('[id=dec_lat-textfield]').type('49.07')
@@ -224,12 +227,17 @@ describe('Creating a new locality', () => {
     cy.get('[id=dms_lat-textfield]').should('have.value', '49 4 12 N')
     cy.get('[id=dms_long-textfield]').should('have.value', '103 40 12 E')
 
+    cy.intercept('PUT', '**/locality').as('saveLocality')
     cy.addReferenceAndSave()
-    cy.contains('Edited item successfully.')
-    cy.contains('Bugat')
-    cy.get('[id=delete-button]').should('exist')
+    cy.wait('@saveLocality').then(({ response }) => {
+      expect(response?.statusCode).to.eq(200)
+      const createdId = response?.body?.id
+      expect(createdId, 'created locality id').to.be.a('number')
+      cy.visit(`/locality/${createdId}`)
+    })
+    cy.get('[id=delete-button]', { timeout: 10000 }).should('exist')
     cy.visit('/locality/')
-    cy.contains('Bugat')
+    cy.contains(localityName)
   })
 
   it("with missing country, min basis for age and longitude doesn't work", () => {
@@ -313,6 +321,7 @@ describe('Creating a new locality', () => {
   })
 
   it('composite dating method works', () => {
+    const localityName = buildLocalityName()
     cy.visit('/locality/new')
     cy.get('[name=dating-method][value=composite]').click()
     cy.get('[id=bfa_min-tableselection-helper-text]').contains(
@@ -332,20 +341,25 @@ describe('Creating a new locality', () => {
     cy.get('[id=min_age-textfield]').should('have.value', '8.676666666666668')
 
     cy.get('[role=tablist]').contains('Locality').click()
-    cy.get('[id=loc_name-textfield]').type('Bugat')
+    cy.get('[id=loc_name-textfield]').type(localityName)
     cy.contains('Choose a country').parent().type('Mongo')
     cy.contains('Mongolia').click()
     cy.get('[id=dec_lat-textfield]').type('49.07')
     cy.get('[id=dec_long-textfield]').type('103.67')
     cy.get('[id=write-button]').should('not.be.disabled')
 
+    cy.intercept('PUT', '**/locality').as('saveCompositeLocality')
     cy.addReferenceAndSave()
-    cy.contains('Edited item successfully.')
-    cy.contains('Bugat')
+    cy.wait('@saveCompositeLocality').then(({ response }) => {
+      expect(response?.statusCode).to.eq(200)
+      const createdId = response?.body?.id
+      expect(createdId, 'created composite locality id').to.be.a('number')
+      cy.visit(`/locality/${createdId}`)
+    })
     cy.contains('8.676')
-    cy.get('[id=delete-button]').should('exist')
+    cy.get('[id=delete-button]', { timeout: 10000 }).should('exist')
     cy.visit('/locality/')
-    cy.contains('Bugat')
+    cy.contains(localityName)
   })
 
   it('selecting fractions and basis for age updates the age correctly', () => {
@@ -506,6 +520,36 @@ describe("Locality's coordinate selection map works", () => {
   })
 
   it('Map view and location search work', () => {
+    cy.intercept('POST', '**/geonames-api', req => {
+      const locationName = String(req.body?.locationName ?? '')
+
+      if (locationName === 'abcdefg') {
+        req.reply({ statusCode: 200, body: { locations: [] } })
+        return
+      }
+
+      if (locationName === 'Kumpula') {
+        req.reply({
+          statusCode: 200,
+          body: {
+            locations: [
+              {
+                name: 'Kumpula',
+                adminName1: 'Central Finland',
+                countryName: 'Finland',
+                fclName: 'area',
+                lat: 63.05484,
+                lng: 24.75291,
+              },
+            ],
+          },
+        })
+        return
+      }
+
+      req.reply({ statusCode: 200, body: { locations: [] } })
+    }).as('geonamesSearch')
+
     cy.visit(`/locality/20920?tab=1`)
     cy.get('[id=edit-button]').click()
     cy.contains('Choose a country').parent().type('Finland')
@@ -521,10 +565,12 @@ describe("Locality's coordinate selection map works", () => {
     cy.get('[id=geonames-search-button]').should('be.disabled')
     cy.get('[id=geonames-search-textfield]').type('abcdefg')
     cy.get('[id=geonames-search-button]').click()
+    cy.wait('@geonamesSearch').its('response.statusCode').should('eq', 200)
     cy.contains('No results found')
     cy.get('[id=geonames-search-textfield]').clear()
     cy.get('[id=geonames-search-textfield]').type('Kumpula')
     cy.get('[id=geonames-search-textfield]').type('{enter}')
+    cy.wait('@geonamesSearch').its('response.statusCode').should('eq', 200)
     cy.contains('Central Finland').first().click() // first item on the list
     cy.contains('Latitude: 63.05484, Longitude: 24.75291')
     cy.contains('Save').click()
@@ -559,14 +605,15 @@ describe('Deleting a locality', () => {
 })
 
 describe('Linking projects to an existing locality', () => {
-  const localityId = 20920
+  const localityId = 21050
   const newProjectId = 14
   const newProjectCode = 'WINE'
 
   beforeEach('Login as admin and open projects tab', () => {
+    cy.resetDatabase()
     cy.login('testSu')
     cy.visit(`/locality/${localityId}?tab=9`)
-    cy.contains('Lantian-Shuijiazui')
+    cy.contains('Dmanisi')
   })
 
   it('adds a project via the selector and removes it again', () => {
@@ -574,11 +621,13 @@ describe('Linking projects to an existing locality', () => {
     cy.get('[id=edit-button]').click()
     cy.contains('button', 'Select Project').click()
     cy.get(`[data-cy=add-button-${newProjectId}]`).click()
+    cy.contains(newProjectCode).should('be.visible')
     cy.contains('button', 'Close').click()
     cy.contains('td', newProjectCode).should('exist')
 
     cy.addReferenceAndSave()
     cy.contains('Edited item successfully.')
+    cy.visit(`/locality/${localityId}?tab=9`)
     cy.contains(newProjectCode)
 
     cy.get('[id=edit-button]').click()
@@ -586,6 +635,7 @@ describe('Linking projects to an existing locality', () => {
 
     cy.addReferenceAndSave()
     cy.contains('Edited item successfully.')
+    cy.visit(`/locality/${localityId}?tab=9`)
     cy.contains(newProjectCode).should('not.exist')
   })
 })

@@ -22,6 +22,7 @@ const getLocalityWriteHandler = (type: ActionType) => {
       'now_syn_loc',
       'now_plr',
       'now_lau',
+      'now_lr',
       'now_sau',
     ]),
     type,
@@ -46,6 +47,8 @@ export const writeLocality = async (
   locality.stone_tool_technology = fixRadioSelection(locality.stone_tool_technology) as boolean
   locality.now_plr = locality.now_plr ?? []
 
+  const { bfa_min_time_unit: _bfaMinTimeUnit, bfa_max_time_unit: _bfaMaxTimeUnit, ...persistableLocality } = locality
+
   const authorizer = user!.initials
 
   try {
@@ -62,10 +65,10 @@ export const writeLocality = async (
     }
 
     if (updateOrAdd === 'add') {
-      const { lid: newLid } = await writeHandler.createObject('now_loc', locality, ['lid'])
+      const { lid: newLid } = await writeHandler.createObject('now_loc', persistableLocality, ['lid'])
       locality.lid = newLid as number
     } else {
-      await writeHandler.updateObject('now_loc', locality, ['lid'])
+      await writeHandler.updateObject('now_loc', persistableLocality, ['lid'])
     }
 
     writeHandler.idValue = locality.lid

@@ -2,10 +2,12 @@ import { beforeEach, describe, expect, it, jest } from '@jest/globals'
 import { MemoryRouter, Route, Routes, useParams } from 'react-router-dom'
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import { Provider } from 'react-redux'
 
 import { ProjectDetails } from '@/components/Project/ProjectDetails'
 import { PageContext, PageContextType } from '@/components/Page'
 import { ProjectDetailsType } from '@/shared/types'
+import { store } from '@/redux/store'
 
 jest.mock('lodash-es', () => ({
   cloneDeep: (value: unknown) => value,
@@ -31,8 +33,13 @@ jest.mock('@/components/DetailView/DetailView', () => ({
   },
 }))
 
+jest.mock('@/components/Project/Tabs/CoordinatorTab', () => ({
+  CoordinatorTab: () => <div data-testid="coordinator-tab" />,
+}))
+
 const mockUseGetProjectDetailsQuery = jest.fn()
 const mockUseDeleteProjectMutation = jest.fn()
+const mockUseUsersApi = jest.fn()
 const mockNotify = jest.fn()
 const mockNavigate = jest.fn()
 let deleteProjectMock: jest.Mock
@@ -40,10 +47,15 @@ let deleteProjectMock: jest.Mock
 jest.mock('@/redux/projectReducer', () => ({
   useGetProjectDetailsQuery: (id: string) => mockUseGetProjectDetailsQuery(id),
   useDeleteProjectMutation: () => mockUseDeleteProjectMutation(),
+  useUpdateProjectMutation: () => [jest.fn(), { isLoading: false }],
 }))
 
 jest.mock('@/hooks/notification', () => ({
   useNotify: () => ({ notify: mockNotify }),
+}))
+
+jest.mock('@/hooks/useUsersApi', () => ({
+  useUsersApi: () => mockUseUsersApi(),
 }))
 
 jest.mock('react-router-dom', () => {
@@ -92,13 +104,15 @@ const Wrapper = () => {
 
 const renderWithProviders = () => {
   render(
-    <PageContext.Provider value={pageContextValue}>
-      <MemoryRouter initialEntries={['/project/5']}>
-        <Routes>
-          <Route path="/project/:id" element={<Wrapper />} />
-        </Routes>
-      </MemoryRouter>
-    </PageContext.Provider>
+    <Provider store={store}>
+      <PageContext.Provider value={pageContextValue}>
+        <MemoryRouter initialEntries={['/project/5']}>
+          <Routes>
+            <Route path="/project/:id" element={<Wrapper />} />
+          </Routes>
+        </MemoryRouter>
+      </PageContext.Provider>
+    </Provider>
   )
 }
 
@@ -107,6 +121,7 @@ describe('ProjectDetails', () => {
     mockUseGetProjectDetailsQuery.mockReturnValue({ data: baseProject, isLoading: false, isError: false })
     deleteProjectMock = jest.fn(() => ({ unwrap: () => Promise.resolve() }))
     mockUseDeleteProjectMutation.mockReturnValue([deleteProjectMock, { isLoading: false }])
+    mockUseUsersApi.mockReturnValue({ users: [], isLoading: false, isError: false })
     mockNotify.mockReset()
     mockNavigate.mockReset()
     window.confirm = jest.fn(() => true) as unknown as typeof window.confirm
@@ -115,7 +130,7 @@ describe('ProjectDetails', () => {
   it('deletes the project and navigates back to the list', async () => {
     renderWithProviders()
 
-    const deleteButton = screen.getByRole('button', { name: /delete/i })
+    const deleteButton = await screen.findByRole('button', { name: /delete/i })
     await userEvent.click(deleteButton)
 
     await waitFor(() => {

@@ -16,10 +16,10 @@ describe('Occurrence detail endpoint', () => {
   })
 
   it('returns one occurrence by lid and species_id', async () => {
-    const response = await send<Record<string, unknown>>('occurrence/20920/21052', 'GET')
+    const response = await send<Record<string, unknown>>('occurrence/21050/85729', 'GET')
     expect(response.status).toBe(200)
-    expect(response.body.lid).toBe(20920)
-    expect(response.body.species_id).toBe(21052)
+    expect(response.body.lid).toBe(21050)
+    expect(response.body.species_id).toBe(85729)
   })
 
   it('returns 404 when pair does not exist', async () => {
@@ -29,7 +29,7 @@ describe('Occurrence detail endpoint', () => {
   })
 
   it('returns 400 when params are invalid', async () => {
-    const response = await send<Record<string, unknown>>('occurrence/not-a-number/21052', 'GET')
+    const response = await send<Record<string, unknown>>('occurrence/not-a-number/85729', 'GET')
     expect(response.status).toBe(400)
     expect(response.body).toEqual({ message: 'lid and species_id must be valid integers' })
   })

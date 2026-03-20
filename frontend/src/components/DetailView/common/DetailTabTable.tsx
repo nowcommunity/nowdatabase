@@ -196,7 +196,6 @@ const DetailTabEditableTable = <T extends MRT_RowData>({
   tableName = 'table',
 }: DetailTabTableEditProps<T>) => {
   const [pagination, setPagination] = useState<MRT_PaginationState>(paginationState ?? defaultEditPagination)
-  const user = useUser()
 
   const resolvedPagination = paginationState ?? pagination
   const handlePaginationChange: MRT_TableOptions<T>['onPaginationChange'] = onPaginationChange ?? setPagination
@@ -219,16 +218,30 @@ const DetailTabEditableTable = <T extends MRT_RowData>({
 
   return (
     <Box>
-      {enableTopToolbar && user && (
-        <div className="table-top-row">
-          <Box display="flex" alignItems="center" gap={1}>
-            <TableHelp showFiltering showSorting showMultiSorting showColumnVisibility showExport />
-            <TableToolBar<T> table={table} tableName={tableName} hideLeftButtons={true} />
-          </Box>
-        </div>
-      )}
+      {enableTopToolbar && <DetailTabEditableToolbar table={table} tableName={tableName} />}
       <MaterialReactTable table={table} />
     </Box>
+  )
+}
+
+const DetailTabEditableToolbar = <T extends MRT_RowData>({
+  table,
+  tableName,
+}: {
+  table: ReturnType<typeof useMaterialReactTable<T>>
+  tableName: string
+}) => {
+  const user = useUser()
+
+  if (!user) return null
+
+  return (
+    <div className="table-top-row">
+      <Box display="flex" alignItems="center" gap={1}>
+        <TableHelp showFiltering showSorting showMultiSorting showColumnVisibility showExport />
+        <TableToolBar<T> table={table} tableName={tableName} hideLeftButtons={true} />
+      </Box>
+    </div>
   )
 }
 

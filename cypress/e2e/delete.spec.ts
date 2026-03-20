@@ -13,7 +13,7 @@ const createRegion = (regionTarget: DeleteTarget, name: string) => {
   cy.get(regionTarget.deleteButton).should('exist')
 
   return cy.url().then(url => {
-    const createdId = url.split('/').pop()
+    const createdId = new URL(url).pathname.split('/').pop()
     expect(createdId, 'created region id').to.match(/\d+/)
     return createdId!
   })
@@ -21,8 +21,7 @@ const createRegion = (regionTarget: DeleteTarget, name: string) => {
 
 describe('Delete flow', () => {
   before('Wait for database and reset', () => {
-    cy.task('waitForDbHealthy')
-    cy.request(Cypress.env('databaseResetUrl'))
+    cy.resetDatabase()
   })
 
   beforeEach('Login as delete-capable coordinator', () => {
@@ -38,26 +37,28 @@ describe('Delete flow', () => {
 
       const name = regionName('Success')
 
-      cy.wrap(null).then(() => createRegion(regionTarget, name)).then(createdId => {
-        cy.intercept('DELETE', `**/region/${createdId}`).as('deleteRegion')
+      cy.wrap(null)
+        .then(() => createRegion(regionTarget, name))
+        .then(createdId => {
+          cy.intercept('DELETE', `**/region/${createdId}`).as('deleteRegion')
 
-        cy.on('window:confirm', message => {
-          expect(message).to.eq(regionTarget.confirmText)
-          return true
+          cy.on('window:confirm', message => {
+            expect(message).to.eq(regionTarget.confirmText)
+            return true
+          })
+
+          cy.get(regionTarget.deleteButton).click()
+
+          cy.wait('@deleteRegion').its('response.statusCode').should('be.oneOf', [200])
+
+          cy.contains('Deleted item successfully.').should('be.visible')
+
+          cy.url().should('include', '/region')
+          cy.contains(name).should('not.exist')
+
+          cy.visit(`/region/${createdId}`)
+          cy.contains('Error loading data')
         })
-
-        cy.get(regionTarget.deleteButton).click()
-
-        cy.wait('@deleteRegion').its('response.statusCode').should('be.oneOf', [200])
-
-        cy.contains('Deleted item successfully.').should('be.visible')
-
-        cy.url().should('include', '/region')
-        cy.contains(name).should('not.exist')
-
-        cy.visit(`/region/${createdId}`)
-        cy.contains('Error loading data')
-      })
     })
   })
 
@@ -70,33 +71,35 @@ describe('Delete flow', () => {
 
       const name = regionName('Cancel')
 
-      cy.wrap(null).then(() => createRegion(regionTarget, name)).then(createdId => {
-        let deleteCallCount = 0
-        cy.intercept('DELETE', `**/region/${createdId}`, req => {
-          deleteCallCount += 1
-          req.reply({ statusCode: 500 })
-        }).as('deleteRegionCancel')
+      cy.wrap(null)
+        .then(() => createRegion(regionTarget, name))
+        .then(createdId => {
+          let deleteCallCount = 0
+          cy.intercept('DELETE', `**/region/${createdId}`, req => {
+            deleteCallCount += 1
+            req.reply({ statusCode: 500 })
+          }).as('deleteRegionCancel')
 
-        cy.on('window:confirm', message => {
-          expect(message).to.eq(regionTarget.confirmText)
-          return false
+          cy.on('window:confirm', message => {
+            expect(message).to.eq(regionTarget.confirmText)
+            return false
+          })
+
+          cy.get(regionTarget.deleteButton).click()
+
+          cy.then(() => {
+            expect(deleteCallCount).to.eq(0)
+          })
+
+          cy.contains('Deleted item successfully.').should('not.exist')
+          cy.location('pathname').should('match', /\/region\/\d+$/)
+          cy.contains(name).should('be.visible')
+
+          cy.visit('/region')
+          cy.contains(name).should('be.visible')
+          cy.visit(`/region/${createdId}`)
+          cy.contains(name).should('be.visible')
         })
-
-        cy.get(regionTarget.deleteButton).click()
-
-        cy.then(() => {
-          expect(deleteCallCount).to.eq(0)
-        })
-
-        cy.contains('Deleted item successfully.').should('not.exist')
-        cy.url().should('match', /\/region\/\d+$/)
-        cy.contains(name).should('be.visible')
-
-        cy.visit('/region')
-        cy.contains(name).should('be.visible')
-        cy.visit(`/region/${createdId}`)
-        cy.contains(name).should('be.visible')
-      })
     })
   })
 
@@ -108,31 +111,31 @@ describe('Delete flow', () => {
       }
 
       const name = regionName('Failure')
-      const failureMessage = 'Test delete failure'
+      cy.wrap(null)
+        .then(() => createRegion(regionTarget, name))
+        .then(createdId => {
+          cy.intercept('DELETE', `**/region/${createdId}`, {
+            statusCode: 500,
+            body: { message: 'Test delete failure' },
+          }).as('deleteRegionFailure')
 
-      cy.wrap(null).then(() => createRegion(regionTarget, name)).then(createdId => {
-        cy.intercept('DELETE', `**/region/${createdId}`, {
-          statusCode: 500,
-          body: { message: failureMessage },
-        }).as('deleteRegionFailure')
+          cy.on('window:confirm', message => {
+            expect(message).to.eq(regionTarget.confirmText)
+            return true
+          })
 
-        cy.on('window:confirm', message => {
-          expect(message).to.eq(regionTarget.confirmText)
-          return true
+          cy.get(regionTarget.deleteButton).click()
+
+          cy.wait('@deleteRegionFailure').its('response.statusCode').should('eq', 500)
+
+          cy.contains('Could not delete item. Error happened.').should('be.visible')
+          cy.contains('Deleted item successfully.').should('not.exist')
+          cy.location('pathname').should('match', /\/region\/\d+$/)
+          cy.contains(name).should('be.visible')
+
+          cy.visit('/region')
+          cy.contains(name).should('be.visible')
         })
-
-        cy.get(regionTarget.deleteButton).click()
-
-        cy.wait('@deleteRegionFailure').its('response.statusCode').should('eq', 500)
-
-        cy.contains(failureMessage).should('be.visible')
-        cy.contains('Deleted item successfully.').should('not.exist')
-        cy.url().should('match', /\/region\/\d+$/)
-        cy.contains(name).should('be.visible')
-
-        cy.visit('/region')
-        cy.contains(name).should('be.visible')
-      })
     })
   })
 })

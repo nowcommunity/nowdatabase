@@ -42,27 +42,64 @@ export class DatabaseHandler {
 
   async end() {
     if (!this.connection) throw new Error('DB connection not initialized')
-    await this.connection.end()
+    const connection = this.connection
+    this.connection = undefined
+    await connection.end()
   }
 
   async commit() {
     if (!this.connection) throw new Error('DB connection not initialized')
     await this.connection.commit()
-    await this.end()
   }
 
   getValuesAndColumns(items: DbWriteItem[]) {
     return { values: items.map(item => item.value), columns: items.map(item => item.column) }
   }
 
+  buildIdResult<T>(items: DbWriteItem[], returnColumns?: string[], insertId?: unknown) {
+    if (!returnColumns || returnColumns.length === 0) {
+      return {} as T
+    }
+
+    const result: Record<string, DbValue> = {}
+    const normalizedInsertId =
+      typeof insertId === 'bigint' ? Number(insertId) : typeof insertId === 'number' ? insertId : undefined
+
+    for (const column of returnColumns) {
+      const existingItem = items.find(item => item.column === column && item.value !== undefined)
+      if (existingItem) {
+        result[column] = existingItem.value
+        continue
+      }
+
+      if (normalizedInsertId !== undefined) {
+        result[column] = normalizedInsertId
+      }
+    }
+
+    return result as T
+  }
+
   async insert<T>(table: AllowedTables, items: DbWriteItem[], returnColumns?: string[]) {
-    const returnString = returnColumns ? `RETURNING ${returnColumns.join(', ')}` : ''
     const { columns, values } = this.getValuesAndColumns(items)
-    const returnValue = await this.executeQuery<T>(
-      `INSERT INTO ${this.dbName}.${table} (${columns.map(column => this.checkColumn(column)).join(', ')}) VALUES (${values.map(() => '?').join(', ')}) ${returnString}`,
+    await this.executeQuery(
+      `INSERT INTO ${this.dbName}.${table} (${columns.map(column => this.checkColumn(column)).join(', ')}) VALUES (${values.map(() => '?').join(', ')})`,
       values
     )
-    return (returnValue as T[])[0]
+
+    const allReturnColumnsProvided =
+      returnColumns?.every(column => items.some(item => item.column === column && item.value !== undefined)) ?? false
+
+    if (allReturnColumnsProvided) {
+      return this.buildIdResult<T>(items, returnColumns)
+    }
+
+    const lastInsertIdResult = await this.executeQuery<Array<{ insertId?: number; 'LAST_INSERT_ID()'?: number }>>(
+      'SELECT LAST_INSERT_ID() AS insertId'
+    )
+    const insertId = lastInsertIdResult[0]?.insertId ?? lastInsertIdResult[0]?.['LAST_INSERT_ID()']
+
+    return this.buildIdResult<T>(items, returnColumns, insertId)
   }
 
   async update(table: AllowedTables, items: DbWriteItem[], ids: DbWriteItem[]) {
@@ -82,11 +119,8 @@ export class DatabaseHandler {
   async delete(table: AllowedTables, ids: DbWriteItem[], returnColumns?: string[]) {
     const { columns: idColumns, values: idValues } = this.getValuesAndColumns(ids)
     const whereClause = this.createWhereClause(idColumns)
-    const returningClause = returnColumns?.join(' ,') ?? `${idColumns.join(', ')}`
-    return await this.executeQuery(
-      `DELETE FROM ${this.dbName}.${table} WHERE ${whereClause} RETURNING ${returningClause}`,
-      idValues
-    )
+    await this.executeQuery(`DELETE FROM ${this.dbName}.${table} WHERE ${whereClause}`, idValues)
+    return this.buildIdResult(ids, returnColumns ?? idColumns)
   }
 
   async select<T>(table: AllowedTables, columns: string[], ids: DbWriteItem[]) {

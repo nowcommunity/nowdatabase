@@ -12,61 +12,69 @@ describe('Updating species works', () => {
     await resetDatabase()
   }, resetDatabaseTimeout)
   beforeEach(async () => {
+    await resetDatabase()
     await login()
+    editedSpeciesResult = null
   })
   afterAll(async () => {
     await pool.end()
   })
 
-  it('Edits name, comment and locality-species correctly', async () => {
-    const writeResult = await send<{ species_id: number }>('species', 'PUT', { species: editedSpecies })
-    expect(writeResult.status).toEqual(200) // 'Response status was OK'
-    expect(writeResult.body.species_id).toEqual(editedSpecies.species_id) // `Invalid result returned on write: ${writeResult.body.id}`
+  describe('after updating species successfully', () => {
+    beforeEach(async () => {
+      const writeResult = await send<{ species_id: number }>('species', 'PUT', { species: editedSpecies })
+      expect(writeResult.status).toEqual(200)
+      expect(writeResult.body.species_id).toEqual(editedSpecies.species_id)
 
-    const { body, status } = await send<SpeciesDetailsType>(`species/${writeResult.body.species_id}`, 'GET')
-    expect(status).toEqual(200) // 'Status on response to GET added species request was OK'
-    editedSpeciesResult = body
-  })
+      const { body, status } = await send<SpeciesDetailsType>(`species/${writeResult.body.species_id}`, 'GET')
+      expect(status).toEqual(200)
+      editedSpeciesResult = body
+    })
 
-  it('Name changed correctly', () => {
-    expect(editedSpeciesResult!.species_name).toEqual(editedSpecies.species_name) // 'Name was not changed correctly'
-  })
+    it('Edits name, comment and locality-species correctly', () => {
+      expect(editedSpeciesResult?.species_id).toEqual(editedSpecies.species_id)
+    })
 
-  it('Added locality species is found', () => {
-    editedSpeciesResult!.now_ls.find(ls => ls.species_id === editedSpecies.species_id && ls.lid === 20920) //'Added locality species not found'
-    expect(!!editedSpeciesResult).toEqual(true)
-  })
+    it('Name changed correctly', () => {
+      expect(editedSpeciesResult!.species_name).toEqual(editedSpecies.species_name)
+    })
 
-  it('Locality species include correct amount of entries', () => {
-    expect(editedSpeciesResult!.now_ls.length).toEqual(5) // `Unexpected now_ls length: ${editedSpeciesResult!.now_ls.length}`)
-  })
+    it('Added locality species is found', () => {
+      editedSpeciesResult!.now_ls.find(ls => ls.species_id === editedSpecies.species_id && ls.lid === 20920)
+      expect(!!editedSpeciesResult).toEqual(true)
+    })
 
-  it('Changes were logged correctly', () => {
-    const update = editedSpeciesResult!.now_sau
-    const lastUpdate = update[update.length - 1]
+    it('Locality species include correct amount of entries', () => {
+      expect(editedSpeciesResult!.now_ls.length).toEqual(5)
+    })
 
-    expect(lastUpdate.sau_comment).toEqual(editedSpecies.comment) // 'Comment wrong'
-    expect(lastUpdate.now_sr[lastUpdate.now_sr.length - 1].rid).toEqual(editedSpecies.references![0].rid)
+    it('Changes were logged correctly', () => {
+      const update = editedSpeciesResult!.now_sau
+      const lastUpdate = update[update.length - 1]
 
-    const logRows = lastUpdate.updates
+      expect(lastUpdate.sau_comment).toEqual(editedSpecies.comment)
+      expect(lastUpdate.now_sr[lastUpdate.now_sr.length - 1].rid).toEqual(editedSpecies.references![0].rid)
 
-    const expectedLogRows: Partial<LogRow>[] = [
-      {
-        table: 'com_species',
-        column: 'sp_comment',
-        value: editedSpecies.sp_comment,
-        oldValue: null,
-        type: 'update',
-      },
-      {
-        table: 'now_ls',
-        column: 'species_id',
-        value: editedSpecies.species_id!.toString(),
-        oldValue: null,
-        type: 'add',
-      },
-    ]
-    testLogRows(logRows, expectedLogRows, 4)
+      const logRows = lastUpdate.updates
+
+      const expectedLogRows: Partial<LogRow>[] = [
+        {
+          table: 'com_species',
+          column: 'sp_comment',
+          value: editedSpecies.sp_comment,
+          oldValue: null,
+          type: 'update',
+        },
+        {
+          table: 'now_ls',
+          column: 'species_id',
+          value: editedSpecies.species_id!.toString(),
+          oldValue: null,
+          type: 'add',
+        },
+      ]
+      testLogRows(logRows, expectedLogRows, 4)
+    })
   })
 
   it('Updates only comment without triggering duplicate taxon error', async () => {
@@ -91,30 +99,39 @@ describe('Updating species works', () => {
   })
 
   it('Returns duplicate error when taxonomy is changed to existing taxon', async () => {
-    await send<{ species_id: number }>('species', 'PUT', {
+    const duplicateTarget = await send<{ species_id: number }>('species', 'PUT', {
       species: {
         ...cloneSpeciesData(),
-        species_name: 'duplicate target',
+        genus_name: 'DuplicateTestGenus',
+        species_name: 'duplicatetarget',
         unique_identifier: 'dup-id',
+        now_ls: [],
         comment: 'target',
       },
     })
+    expect(duplicateTarget.status).toEqual(200)
 
     const sourceSpecies = await send<{ species_id: number }>('species', 'PUT', {
       species: {
         ...cloneSpeciesData(),
-        species_name: 'source species',
+        genus_name: 'DuplicateTestGenus',
+        species_name: 'sourcespecies',
         unique_identifier: 'source-id',
+        now_ls: [],
         comment: 'source',
       },
     })
+    expect(sourceSpecies.status).toEqual(200)
 
     const duplicateUpdate = await send<{ name: string; error: string }[]>('species', 'PUT', {
       species: {
         species_id: sourceSpecies.body.species_id,
-        genus_name: 'Petenyia',
-        species_name: 'duplicate target',
+        order_name: 'Eulipotyphla',
+        family_name: 'Soricidae',
+        genus_name: 'DuplicateTestGenus',
+        species_name: 'duplicatetarget',
         unique_identifier: 'dup-id',
+        taxonomic_status: '',
         now_ls: [],
         com_taxa_synonym: [],
         now_sau: [],

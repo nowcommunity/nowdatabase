@@ -44,16 +44,25 @@ export const EditingForm = <T extends object, ParentType extends object>({
   replacedValues?: T | undefined
   copyTaxonomyButton?: JSX.Element | undefined
 }) => {
-  const getDefaultValues: () => { [x: string]: unknown } = () => {
-    if (!existingObject) return {}
-    return existingObject
+  const buildDefaultValues = (values?: T) => {
+    const defaults = (values ? { ...values } : {}) as Record<string, unknown>
+
+    for (const field of formFields) {
+      if (field.selectOptions && defaults[field.name] === undefined) {
+        defaults[field.name] = ''
+      }
+    }
+
+    return defaults
   }
-  const { register, trigger, formState, getValues, reset } = useForm({ defaultValues: getDefaultValues() })
+
+  const defaultValues = buildDefaultValues(existingObject)
+  const { register, trigger, formState, getValues, reset } = useForm({ defaultValues })
   const { errors } = formState
   const { editData, setEditData } = useDetailContext<ParentType>()
 
   useEffect(() => {
-    if (replacedValues) reset(replacedValues)
+    if (replacedValues) reset(buildDefaultValues(replacedValues))
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [replacedValues])
 
@@ -80,6 +89,7 @@ export const EditingForm = <T extends object, ParentType extends object>({
             key={field.name}
             slotProps={{ inputLabel: { shrink: true } }}
             select={!!field.selectOptions}
+            defaultValue={defaultValues[field.name] ?? (field.selectOptions ? '' : undefined)}
             {...register(field.name, {
               required: field.required ? 'This field is required' : false,
               ...(field.type === 'number' &&

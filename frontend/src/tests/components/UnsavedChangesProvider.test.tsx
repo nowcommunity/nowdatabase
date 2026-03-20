@@ -3,6 +3,7 @@ import { describe, expect, it, beforeEach, jest } from '@jest/globals'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { useContext, useEffect } from 'react'
+import { RouterProvider, createMemoryRouter } from 'react-router-dom'
 
 import { UnsavedChangesProvider } from '@/components/UnsavedChangesProvider'
 import { UnsavedChangesContext } from '@/components/unsavedChangesContext'
@@ -24,6 +25,12 @@ type MockedBlocker = {
 }
 
 const mockUseBlocker = useBlocker as jest.MockedFunction<typeof useBlocker>
+const unblockedBlocker = {
+  state: 'unblocked',
+  proceed: undefined,
+  reset: undefined,
+  location: undefined,
+} as unknown as ReturnType<typeof useBlocker>
 
 const TestConsumer = ({ setDirtyOnMount = true }: { setDirtyOnMount?: boolean }) => {
   const context = useContext(UnsavedChangesContext)
@@ -40,20 +47,25 @@ const TestConsumer = ({ setDirtyOnMount = true }: { setDirtyOnMount?: boolean })
 const renderWithProvider = (blocker: MockedBlocker, setDirtyOnMount = true) => {
   mockUseBlocker.mockImplementation((shouldBlock: boolean | BlockerFunction) => {
     if (!shouldBlock || (typeof shouldBlock === 'boolean' && !shouldBlock)) {
-      return {
-        state: 'unblocked',
-        proceed: undefined,
-        reset: undefined,
-        location: undefined,
-      } as unknown as ReturnType<typeof useBlocker>
+      return unblockedBlocker
     }
     return blocker as unknown as ReturnType<typeof useBlocker>
   })
-  return render(
-    <UnsavedChangesProvider>
-      <TestConsumer setDirtyOnMount={setDirtyOnMount} />
-    </UnsavedChangesProvider>
+  const router = createMemoryRouter(
+    [
+      {
+        path: '/',
+        element: (
+          <UnsavedChangesProvider>
+            <TestConsumer setDirtyOnMount={setDirtyOnMount} />
+          </UnsavedChangesProvider>
+        ),
+      },
+    ],
+    { initialEntries: ['/'] }
   )
+
+  return render(<RouterProvider router={router} />)
 }
 
 describe('UnsavedChangesProvider', () => {
@@ -75,6 +87,8 @@ describe('UnsavedChangesProvider', () => {
   })
 
   it('shows a dialog when blocked navigation happens to a different path and calls proceed on confirm', async () => {
+    const user = userEvent.setup()
+
     renderWithProvider(
       {
         state: 'blocked',
@@ -89,7 +103,7 @@ describe('UnsavedChangesProvider', () => {
     expect(screen.getByText('You have unsaved changes. Do you want to leave this page without saving?')).toBeTruthy()
     expect(screen.getByTestId('dirty-state').textContent).toBe('dirty')
 
-    await userEvent.click(screen.getByRole('button', { name: /leave page/i }))
+    await user.click(screen.getByRole('button', { name: /leave page/i }))
 
     expect(proceed).toHaveBeenCalledTimes(1)
   })

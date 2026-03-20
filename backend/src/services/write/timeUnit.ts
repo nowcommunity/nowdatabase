@@ -134,7 +134,7 @@ const getTimeUnitWriteHandler = (type: ActionType) => {
     dbName: NOW_DB_NAME,
     table: 'now_time_unit',
     idColumn: 'tu_name',
-    allowedColumns: getFieldsOfTables(['now_time_unit', 'now_tu_sequence', 'now_tau']),
+    allowedColumns: getFieldsOfTables(['now_time_unit', 'now_tu_sequence', 'now_tau', 'now_tr']),
     type,
   })
 }
@@ -152,17 +152,32 @@ export const writeTimeUnit = async (
   references: Reference[] | undefined,
   authorizer: string
 ) => {
-  const normalizedTimeUnit = { ...timeUnit, rank: normalizeRank(timeUnit.rank) }
+  const normalizedTimeUnit = {
+    ...timeUnit,
+    rank: normalizeRank(timeUnit.rank),
+  } as EditDataType<TimeUnitDetailsType> & {
+    up_bound?: unknown
+    low_bound?: unknown
+    references?: unknown
+    comment?: unknown
+  }
+  const {
+    up_bound: _upBound,
+    low_bound: _lowBound,
+    references: _references,
+    comment: _comment,
+    ...persistableTimeUnit
+  } = normalizedTimeUnit
 
-  const writeHandler = getTimeUnitWriteHandler(normalizedTimeUnit.tu_name ? 'update' : 'add')
-  const createdId = normalizedTimeUnit.tu_name ?? createTimeUnitId(normalizedTimeUnit.tu_display_name!)
+  const writeHandler = getTimeUnitWriteHandler(persistableTimeUnit.tu_name ? 'update' : 'add')
+  const createdId = persistableTimeUnit.tu_name ?? createTimeUnitId(persistableTimeUnit.tu_display_name!)
 
-  await assertTimeUnitNameIsUnique(normalizedTimeUnit.tu_display_name!, normalizedTimeUnit.tu_name)
+  await assertTimeUnitNameIsUnique(persistableTimeUnit.tu_display_name!, persistableTimeUnit.tu_name)
 
   try {
     await writeHandler.start()
 
-    const timeUnitToPersist: EditDataType<TimeUnitDetailsType> = { ...normalizedTimeUnit }
+    const timeUnitToPersist: EditDataType<TimeUnitDetailsType> = { ...persistableTimeUnit }
 
     if (timeUnitToPersist.tu_name) {
       await writeHandler.updateObject('now_time_unit', timeUnitToPersist, ['tu_name'])

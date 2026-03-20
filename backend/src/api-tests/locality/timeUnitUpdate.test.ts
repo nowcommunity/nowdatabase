@@ -10,6 +10,7 @@ describe('Updating locality time unit keeps provided ages', () => {
   }, resetDatabaseTimeout)
 
   beforeEach(async () => {
+    await resetDatabase()
     await login()
   })
 
@@ -26,8 +27,8 @@ describe('Updating locality time unit keeps provided ages', () => {
       ...newLocalityBasis,
       ...updatedAges,
       lid,
-      bfa_min: 'abdounian',
-      bfa_max: 'abdounian',
+      bfa_min: 'langhian',
+      bfa_max: 'langhian',
       now_ls: [],
       now_mus: [],
       now_ss: [],
@@ -44,7 +45,7 @@ describe('Updating locality time unit keeps provided ages', () => {
     const { body: updatedLocality } = await send<LocalityDetailsType>(`locality/${lid}`, 'GET')
     expect(updatedLocality.min_age).toEqual(parseFloat(updatedAges.min_age))
     expect(updatedLocality.max_age).toEqual(parseFloat(updatedAges.max_age))
-    expect(updatedLocality.bfa_min).toEqual('abdounian')
-    expect(updatedLocality.bfa_max).toEqual('abdounian')
+    expect(updatedLocality.bfa_min).toEqual('langhian')
+    expect(updatedLocality.bfa_max).toEqual('langhian')
   })
 })

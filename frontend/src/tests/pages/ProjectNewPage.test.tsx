@@ -4,9 +4,11 @@ import '@testing-library/jest-dom'
 import { Link, MemoryRouter, Route, RouterProvider, Routes, createMemoryRouter, useLocation } from 'react-router-dom'
 import { act, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import { Provider } from 'react-redux'
 import { Role } from '@/shared/types'
 import { ProjectNewPage } from '@/pages/ProjectNewPage'
 import type { ProjectFormValues } from '@/components/Project/ProjectForm'
+import { store } from '@/redux/store'
 
 const mockUseUser = jest.fn()
 const mockUseUsersApi = jest.fn()
@@ -59,11 +61,13 @@ const renderWithRouter = () => {
   }
 
   render(
-    <MemoryRouter initialEntries={[{ pathname: '/project/new' }]}>
-      <Routes>
-        <Route path="/project/new" element={<Wrapper />} />
-      </Routes>
-    </MemoryRouter>
+    <Provider store={store}>
+      <MemoryRouter initialEntries={[{ pathname: '/project/new' }]}>
+        <Routes>
+          <Route path="/project/new" element={<Wrapper />} />
+        </Routes>
+      </MemoryRouter>
+    </Provider>
   )
 }
 
@@ -84,7 +88,11 @@ const renderWithDataRouter = () => {
     { initialEntries: ['/project/new'] }
   )
 
-  render(<RouterProvider router={router} />)
+  render(
+    <Provider store={store}>
+      <RouterProvider router={router} />
+    </Provider>
+  )
   return router
 }
 
