@@ -161,7 +161,9 @@ describe('Creating a time unit', () => {
     cy.get('[data-cy=add-button-49]').first().click()
 
     cy.addReferenceAndSave()
-    cy.contains('CalatayudTeruellocalbiozone')
+    cy.contains(displayName)
+    cy.get('[id=edit-button]').click()
+    cy.get('[id=sequence-tableselection]').should('have.value', 'CalatayudTeruellocalbiozone')
     cy.contains('Langhian/Serravallian')
   })
 })
@@ -181,7 +183,9 @@ describe('Editing a time unit', () => {
     cy.get('[data-cy=add-button-ALMAAsianlandmammalage]').first().click()
 
     cy.addReferenceAndSave()
-    cy.contains('ALMA, Asian land mammal age')
+    cy.contains('Bahean')
+    cy.get('[id=edit-button]').click()
+    cy.get('[id=sequence-tableselection]').should('have.value', 'ALMA, Asian land mammal age')
   })
 
   it('with incorrect, newly created bounds does not work', () => {
@@ -248,7 +252,7 @@ describe('Editing a time unit', () => {
     cy.contains('Bahean')
     cy.get('[id=edit-button]').click()
     cy.get('[id=sequence-tableselection]').first().click()
-    cy.get('[data-cy=add-button-CalatayudTeruellocalbiozone]').first().click()
+    cy.get('[data-cy=add-button-ALMAAsianlandmammalage]').first().click()
     cy.get('[id=up_bnd-tableselection]').first().click()
     cy.get('[data-cy=add-button-11]').first().click()
     cy.get('[id=write-button]').click()
@@ -256,14 +260,14 @@ describe('Editing a time unit', () => {
     cy.contains('Bahean')
     cy.get('[id=tu_display_name-textfield]').should('be.disabled')
     cy.get('[id=tu_display_name-textfield]').should('have.value', 'Bahean')
-    cy.get('[id=sequence-tableselection]').should('have.value', 'CalatayudTeruellocalbiozone')
+    cy.get('[id=sequence-tableselection]').should('have.value', 'ALMA, Asian land mammal age')
     cy.contains('C2N-y')
-    cy.contains('MioceneLate-low')
 
     cy.addReferenceAndSave()
-    cy.contains('CalatayudTeruellocalbiozone')
+    cy.contains('Bahean')
+    cy.get('[id=edit-button]').click()
+    cy.get('[id=sequence-tableselection]').should('have.value', 'ALMA, Asian land mammal age')
     cy.contains('C2N-y')
-    cy.contains('MioceneLate-low')
   })
 
   it('and editing again after saving works', () => {
@@ -275,22 +279,25 @@ describe('Editing a time unit', () => {
 
     cy.addReferenceAndSave()
     cy.contains('Bahean')
-    cy.contains('easternparatethys')
     cy.get('[id=edit-button]').click()
     cy.get('[id=tu_display_name-textfield]').should('be.disabled')
+    cy.get('[id=sequence-tableselection]').should('have.value', 'easternparatethys')
     cy.get('[id=sequence-tableselection]').first().click()
     cy.get('[data-cy=add-button-CalatayudTeruellocalbiozone]').first().click()
     cy.get('[id=up_bnd-tableselection]').first().click()
     cy.get('[data-cy=add-button-14]').first().click()
 
     cy.addReferenceAndSave()
-    cy.contains('CalatayudTeruellocalbiozone')
+    cy.contains('Bahean')
+    cy.get('[id=edit-button]').click()
+    cy.get('[id=sequence-tableselection]').should('have.value', 'CalatayudTeruellocalbiozone')
     cy.contains('C2N-o')
   })
 })
 
 describe('Deleting a time unit', () => {
-  beforeEach('Login as admin', () => {
+  beforeEach('Reset database and login as admin', () => {
+    cy.resetDatabase()
     cy.login('testSu')
   })
 

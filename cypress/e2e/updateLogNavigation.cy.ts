@@ -17,7 +17,7 @@ describe('Update log navigation', () => {
     cy.contains('Update log')
     cy.contains('References')
 
-    cy.contains('View').first().click()
+    cy.get('a[href^="/reference/"]').first().click()
 
     cy.url().should('include', '/reference/')
     cy.contains('button', 'Return to table').should('be.visible').click()

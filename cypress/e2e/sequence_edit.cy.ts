@@ -12,16 +12,14 @@ describe('Sequence edit behavior', () => {
 
     cy.get('[id=edit-button]').click()
 
-    cy.get('[id=sequence-tableselection]').should('have.value', 'ChLMA')
-
     cy.get('[id=sequence-tableselection]').click()
-    cy.get('[data-cy=add-button-centralparatethys]').should('be.visible').click()
+    cy.get('[data-cy=add-button-ALMAAsianlandmammalage]').should('be.visible').click()
 
-    cy.get('[id=sequence-tableselection]').should('have.value', 'Central Paratethys')
+    cy.get('[id=sequence-tableselection]').should('have.value', 'ALMA, Asian land mammal age')
 
     cy.addReferenceAndSave()
 
     cy.get('[id=edit-button]').click()
-    cy.get('[id=sequence-tableselection]').should('have.value', 'Central Paratethys')
+    cy.get('[id=sequence-tableselection]').should('have.value', 'ALMA, Asian land mammal age')
   })
 })

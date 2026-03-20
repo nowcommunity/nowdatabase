@@ -32,7 +32,12 @@ const localitiesApi = api.injectEndpoints({
         result ? [{ type: 'locality', id: lid }, 'localities', 'specieslist'] : [],
       async onQueryStarted(locality, { dispatch, queryFulfilled }) {
         if (!locality.lid) {
-          await queryFulfilled
+          try {
+            await queryFulfilled
+          } catch {
+            // The component handles create errors; avoid leaking RTK Query rejections
+            // as unhandled promise rejections during locality creation flows.
+          }
           return
         }
         const patchResult = dispatch(

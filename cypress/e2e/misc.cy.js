@@ -64,7 +64,7 @@ describe('Test individual features across the app', () => {
 
     it('Staging mode works on species', () => {
       hasStagingMode('species/21052', () => {
-        cy.get('[id=subfamily_name-textfield]').type(' staging')
+        cy.get('[id=sp_comment-textfield]').type('staging comment')
       })
     })
 
@@ -77,7 +77,8 @@ describe('Test individual features across the app', () => {
 
     it('Staging mode works on time bound', () => {
       hasStagingMode('time-bound/11', () => {
-        cy.get('[id=age-textfield]').first().clear().type('1.5')
+        cy.get('[id=age-textfield]').first().clear()
+        cy.get('[id=age-textfield]').first().type('1.5')
       })
     })
   })

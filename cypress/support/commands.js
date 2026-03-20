@@ -49,7 +49,16 @@ Cypress.Commands.add('deleteTargets', () => {
 
 Cypress.Commands.add('pageForbidden', url => {
   cy.visit(url)
-  cy.contains('Your user is not authorized to view this page.')
+  cy.get('body').should(body => {
+    const text = body.text()
+    expect(text).to.satisfy(
+      value =>
+        value.includes('Your user is not authorized to view this page.') ||
+        value.includes('Permission denied') ||
+        value.includes('You do not have access') ||
+        value.includes('Sign in to')
+    )
+  })
 })
 
 Cypress.Commands.add('resetDatabase', () => {

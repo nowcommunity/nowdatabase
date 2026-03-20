@@ -617,6 +617,7 @@ describe('Linking projects to an existing locality', () => {
 
     cy.addReferenceAndSave()
     cy.contains('Edited item successfully.')
+    cy.visit(`/locality/${localityId}?tab=9`)
     cy.contains(newProjectCode)
 
     cy.get('[id=edit-button]').click()
@@ -624,6 +625,7 @@ describe('Linking projects to an existing locality', () => {
 
     cy.addReferenceAndSave()
     cy.contains('Edited item successfully.')
+    cy.visit(`/locality/${localityId}?tab=9`)
     cy.contains(newProjectCode).should('not.exist')
   })
 })

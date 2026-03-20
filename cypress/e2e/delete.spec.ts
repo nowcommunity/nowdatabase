@@ -13,7 +13,7 @@ const createRegion = (regionTarget: DeleteTarget, name: string) => {
   cy.get(regionTarget.deleteButton).should('exist')
 
   return cy.url().then(url => {
-    const createdId = url.split('/').pop()
+    const createdId = new URL(url).pathname.split('/').pop()
     expect(createdId, 'created region id').to.match(/\d+/)
     return createdId!
   })
@@ -92,7 +92,7 @@ describe('Delete flow', () => {
           })
 
           cy.contains('Deleted item successfully.').should('not.exist')
-          cy.url().should('match', /\/region\/\d+$/)
+          cy.location('pathname').should('match', /\/region\/\d+$/)
           cy.contains(name).should('be.visible')
 
           cy.visit('/region')
@@ -132,7 +132,7 @@ describe('Delete flow', () => {
 
           cy.contains(failureMessage).should('be.visible')
           cy.contains('Deleted item successfully.').should('not.exist')
-          cy.url().should('match', /\/region\/\d+$/)
+          cy.location('pathname').should('match', /\/region\/\d+$/)
           cy.contains(name).should('be.visible')
 
           cy.visit('/region')
