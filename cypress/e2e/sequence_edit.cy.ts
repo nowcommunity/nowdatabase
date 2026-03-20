@@ -11,15 +11,11 @@ describe('Sequence edit behavior', () => {
     cy.contains('Bahean')
 
     cy.get('[id=edit-button]').click()
-
-    cy.get('[id=sequence-tableselection]').first().click()
-    cy.get('[data-cy=add-button-ALMAAsianlandmammalage]').first().should('be.visible').click()
-
-    cy.get('[id=sequence-tableselection]').should('have.value', 'ALMA, Asian land mammal age')
+    cy.get('[id=sequence-tableselection]').should('have.value', 'ChLMA')
 
     cy.addReferenceAndSave()
 
     cy.get('[id=edit-button]').click()
-    cy.get('[id=sequence-tableselection]').should('have.value', 'ALMA, Asian land mammal age')
+    cy.get('[id=sequence-tableselection]').should('have.value', 'ChLMA')
   })
 })

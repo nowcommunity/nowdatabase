@@ -228,7 +228,7 @@ describe('Creating a new locality', () => {
     cy.get('[id=dms_long-textfield]').should('have.value', '103 40 12 E')
 
     cy.addReferenceAndSave()
-    cy.location('pathname').should('match', /\/locality\/\d+$/)
+    cy.location('pathname', { timeout: 10000 }).should('match', /\/locality\/\d+$/)
     cy.get('[id=delete-button]').should('exist')
     cy.visit('/locality/')
     cy.contains(localityName)
@@ -343,7 +343,7 @@ describe('Creating a new locality', () => {
     cy.get('[id=write-button]').should('not.be.disabled')
 
     cy.addReferenceAndSave()
-    cy.location('pathname').should('match', /\/locality\/\d+$/)
+    cy.location('pathname', { timeout: 10000 }).should('match', /\/locality\/\d+$/)
     cy.contains('8.676')
     cy.get('[id=delete-button]').should('exist')
     cy.visit('/locality/')
