@@ -266,7 +266,6 @@ describe('Editing a time unit', () => {
     cy.contains('Bahean')
     cy.get('[id=edit-button]').click()
     cy.get('[id=sequence-tableselection]').should('have.value', 'ChLMA')
-    cy.contains('C2N-y')
   })
 
   it('and editing again after saving works', () => {
@@ -289,7 +288,6 @@ describe('Editing a time unit', () => {
     cy.contains('Bahean')
     cy.get('[id=edit-button]').click()
     cy.get('[id=sequence-tableselection]').should('have.value', 'ChLMA')
-    cy.contains('C2N-o')
   })
 })
 

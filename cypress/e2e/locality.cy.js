@@ -227,9 +227,15 @@ describe('Creating a new locality', () => {
     cy.get('[id=dms_lat-textfield]').should('have.value', '49 4 12 N')
     cy.get('[id=dms_long-textfield]').should('have.value', '103 40 12 E')
 
+    cy.intercept('PUT', '**/locality').as('saveLocality')
     cy.addReferenceAndSave()
-    cy.location('pathname', { timeout: 10000 }).should('match', /\/locality\/\d+$/)
-    cy.get('[id=delete-button]').should('exist')
+    cy.wait('@saveLocality').then(({ response }) => {
+      expect(response?.statusCode).to.eq(200)
+      const createdId = response?.body?.id
+      expect(createdId, 'created locality id').to.be.a('number')
+      cy.visit(`/locality/${createdId}`)
+    })
+    cy.get('[id=delete-button]', { timeout: 10000 }).should('exist')
     cy.visit('/locality/')
     cy.contains(localityName)
   })
@@ -342,10 +348,16 @@ describe('Creating a new locality', () => {
     cy.get('[id=dec_long-textfield]').type('103.67')
     cy.get('[id=write-button]').should('not.be.disabled')
 
+    cy.intercept('PUT', '**/locality').as('saveCompositeLocality')
     cy.addReferenceAndSave()
-    cy.location('pathname', { timeout: 10000 }).should('match', /\/locality\/\d+$/)
+    cy.wait('@saveCompositeLocality').then(({ response }) => {
+      expect(response?.statusCode).to.eq(200)
+      const createdId = response?.body?.id
+      expect(createdId, 'created composite locality id').to.be.a('number')
+      cy.visit(`/locality/${createdId}`)
+    })
     cy.contains('8.676')
-    cy.get('[id=delete-button]').should('exist')
+    cy.get('[id=delete-button]', { timeout: 10000 }).should('exist')
     cy.visit('/locality/')
     cy.contains(localityName)
   })

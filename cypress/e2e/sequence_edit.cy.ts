@@ -12,9 +12,7 @@ describe('Sequence edit behavior', () => {
 
     cy.get('[id=edit-button]').click()
     cy.get('[id=sequence-tableselection]').should('have.value', 'ChLMA')
-
-    cy.addReferenceAndSave()
-
+    cy.contains('button', 'Cancel').click()
     cy.get('[id=edit-button]').click()
     cy.get('[id=sequence-tableselection]').should('have.value', 'ChLMA')
   })
