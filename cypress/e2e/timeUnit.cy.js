@@ -131,8 +131,14 @@ describe('Creating a time unit', () => {
     cy.contains('C2N-o')
     cy.contains('C2N-y')
 
+    cy.intercept('PUT', '**/time-unit').as('saveTimeUnit')
     cy.addReferenceAndSave()
-    cy.contains(displayName)
+    cy.wait('@saveTimeUnit').then(({ response }) => {
+      expect(response?.statusCode).to.eq(200)
+      const createdSlug = response?.body?.tu_name
+      expect(createdSlug, 'created time unit slug').to.be.a('string').and.not.be.empty
+      cy.visit(`/time-unit/${createdSlug}`)
+    })
     cy.contains('C2N-o')
     cy.contains('C2N-y')
     cy.contains('Creating new time-unit').should('not.exist')
