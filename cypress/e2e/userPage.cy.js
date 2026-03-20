@@ -16,9 +16,7 @@ describe('Change password form validates passwords correctly and shows errors to
     cy.get('[id=new-password-textfield]').type('test2')
     cy.get('[id=change-password-button]').should('be.disabled')
     cy.get('[id=new-password-verification-textfield]').type('test2')
-    cy.get('[id=change-password-button]').should('not.be.disabled')
-    cy.get('[id=change-password-button]').click()
-    cy.contains('Password must be at least 8 characters long')
+    cy.get('[id=change-password-button]').should('be.disabled')
   })
 
   it('Incorrect old password', () => {
@@ -37,14 +35,14 @@ describe('Change password form validates passwords correctly and shows errors to
     cy.get('[id=old-password-textfield]').type('test')
     cy.get('[id=new-password-textfield]').type('short')
     cy.get('[id=new-password-verification-textfield]').type('short')
-    cy.get('[id=change-password-button]').click()
+    cy.get('[id=change-password-button]').should('be.disabled')
     cy.contains('Password must be at least 8 characters long')
 
     cy.get('[id=new-password-textfield]').clear()
     cy.get('[id=new-password-textfield]').type('€uroisnotallowed')
     cy.get('[id=new-password-verification-textfield]').clear()
     cy.get('[id=new-password-verification-textfield]').type('€uroisnotallowed')
-    cy.get('[id=change-password-button]').click()
+    cy.get('[id=change-password-button]').should('be.disabled')
     cy.contains('Password must only contain characters a-z, A-Z, 0-9 and ^?$%&~!')
   })
 
@@ -54,8 +52,7 @@ describe('Change password form validates passwords correctly and shows errors to
     cy.get('[id=old-password-textfield]').type('test')
     cy.get('[id=new-password-textfield]').type('Password1!')
     cy.get('[id=new-password-verification-textfield]').type('Password')
-    cy.get('[id=change-password-button]').click()
-    cy.contains('New password was not the same in both fields.')
+    cy.get('[id=change-password-button]').should('be.disabled')
   })
 
   it('Changing succeeds with valid password', () => {

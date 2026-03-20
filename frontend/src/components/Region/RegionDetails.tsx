@@ -45,7 +45,11 @@ export const RegionDetails = () => {
   }
 
   const deleteFunction = async () => {
-    await deleteMutation(parseInt(id!)).unwrap()
+    try {
+      await deleteMutation(parseInt(id!)).unwrap()
+    } catch {
+      // Let deleteError drive the user-facing notification without leaking an uncaught rejection.
+    }
   }
 
   const tabs: TabType[] = [

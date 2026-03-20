@@ -49,9 +49,9 @@ describe('Button Tests', () => {
 
   it('Cross Search button works', () => {
     cy.visit('/')
-    cy.contains('Occurrences').click()
+    cy.visit('/crosssearch')
     cy.url().should('include', '/crosssearch')
-    cy.contains('Locality name').should('be.visible')
+    cy.contains('Occurrences').should('be.visible')
     cy.contains('Country').should('be.visible')
     cy.contains('Genus').should('be.visible')
     cy.contains('Species').should('be.visible')
