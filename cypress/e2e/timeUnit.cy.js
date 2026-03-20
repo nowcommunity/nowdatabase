@@ -22,8 +22,15 @@ describe('Creating a time unit', () => {
     cy.get('[id=low_bnd-tableselection]').first().click() // Select Lower Bound Button
     cy.get('[data-cy=add-button-14]').first().click()
 
+    cy.intercept('PUT', '**/time-unit').as('saveTimeUnitInitial')
     cy.addReferenceAndSave()
-    cy.contains(displayName)
+    cy.wait('@saveTimeUnitInitial').then(({ response }) => {
+      expect(response?.statusCode).to.eq(200)
+      const createdSlug = response?.body?.tu_name
+      expect(createdSlug, 'created time unit slug').to.be.a('string')
+      expect(createdSlug, 'created time unit slug').to.not.equal('')
+      cy.visit(`/time-unit/${createdSlug}`)
+    })
     cy.contains('ALMA, Asian land mammal age')
     cy.contains('C2N-o')
     cy.contains('C2N-y')
