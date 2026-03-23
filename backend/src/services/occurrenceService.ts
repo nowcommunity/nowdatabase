@@ -61,9 +61,11 @@ export const validateOccurrencePayload = (payload: EditableOccurrenceData) => {
 
 type RawOccurrenceLogRow = Awaited<ReturnType<typeof logDb.log.findMany>>[number]
 
-type OccurrenceLogCandidate = RawOccurrenceLogRow & {
+type OccurrenceLogCandidate = Omit<RawOccurrenceLogRow, 'luid' | 'suid'> & {
   pk_data: string
   table_name: 'now_ls'
+  luid: number | null
+  suid: number | null
 }
 
 type OccurrenceLogRow = Omit<OccurrenceLogCandidate, 'luid' | 'suid'> & {
@@ -88,14 +90,32 @@ const collectUniqueIds = (rows: OccurrenceLogRow[], fieldName: 'luid' | 'suid') 
   return Array.from(ids)
 }
 
-const isOccurrenceLogCandidate = (row: RawOccurrenceLogRow): row is OccurrenceLogCandidate =>
-  row.table_name === 'now_ls' && typeof row.pk_data === 'string'
-
 const normalizeOccurrenceLogRow = (row: OccurrenceLogCandidate): OccurrenceLogRow => ({
   ...row,
   luid: readNumericField(row, 'luid'),
   suid: readNumericField(row, 'suid'),
 })
+
+const getOccurrenceLogRows = (rows: RawOccurrenceLogRow[], speciesPk: string): OccurrenceLogRow[] => {
+  const occurrenceRows: OccurrenceLogRow[] = []
+
+  for (const row of rows) {
+    if (row.table_name !== 'now_ls' || typeof row.pk_data !== 'string') continue
+    if (!row.pk_data.includes(speciesPk)) continue
+
+    const occurrenceLogCandidate: OccurrenceLogCandidate = {
+      ...row,
+      table_name: 'now_ls',
+      pk_data: row.pk_data,
+      luid: readNumericField(row, 'luid'),
+      suid: readNumericField(row, 'suid'),
+    }
+
+    occurrenceRows.push(normalizeOccurrenceLogRow(occurrenceLogCandidate))
+  }
+
+  return occurrenceRows
+}
 
 type OccurrenceUpdate = {
   occ_date: Date | null
@@ -167,10 +187,7 @@ const getOccurrenceUpdates = async (lid: number, speciesId: number) => {
     },
   })
 
-  const nowLsLogs = candidateLogsRaw
-    .filter(isOccurrenceLogCandidate)
-    .filter(logRow => logRow.pk_data.includes(speciesPk))
-    .map(normalizeOccurrenceLogRow)
+  const nowLsLogs = getOccurrenceLogRows(candidateLogsRaw, speciesPk)
 
   const luids = collectUniqueIds(nowLsLogs, 'luid')
   const suids = collectUniqueIds(nowLsLogs, 'suid')
