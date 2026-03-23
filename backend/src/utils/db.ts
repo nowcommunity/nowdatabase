@@ -9,10 +9,10 @@ import { readFile } from 'fs/promises'
 import { PathLike } from 'fs'
 
 type LogRecord = Record<string, unknown> & {
-  luid?: number
-  suid?: number
-  buid?: number
-  tuid?: number
+  luid?: number | null
+  suid?: number | null
+  buid?: number | null
+  tuid?: number | null
 }
 
 type LogModel = {
