@@ -59,11 +59,13 @@ export const validateOccurrencePayload = (payload: EditableOccurrenceData) => {
   }
 }
 
-type OccurrenceLogRow = Record<string, unknown> & {
+type RawOccurrenceLogRow = Awaited<ReturnType<typeof logDb.log.findMany>>[number]
+
+type OccurrenceLogRow = RawOccurrenceLogRow & {
   pk_data: string
   table_name: string
-  luid?: number
-  suid?: number
+  luid?: number | null
+  suid?: number | null
 }
 
 const readNumericField = (row: unknown, fieldName: 'luid' | 'suid'): number | null => {
@@ -83,16 +85,12 @@ const collectUniqueIds = (rows: OccurrenceLogRow[], fieldName: 'luid' | 'suid') 
   return Array.from(ids)
 }
 
-const isOccurrenceLogRow = (value: unknown): value is OccurrenceLogRow => {
-  if (typeof value !== 'object' || value === null) return false
-
-  const row = value as Record<string, unknown>
-
+const isOccurrenceLogRow = (row: RawOccurrenceLogRow): row is OccurrenceLogRow => {
   return (
     row.table_name === 'now_ls' &&
     typeof row.pk_data === 'string' &&
-    (typeof row.luid === 'number' || row.luid === undefined) &&
-    (typeof row.suid === 'number' || row.suid === undefined)
+    (typeof row.luid === 'number' || row.luid === null || row.luid === undefined) &&
+    (typeof row.suid === 'number' || row.suid === null || row.suid === undefined)
   )
 }
 
