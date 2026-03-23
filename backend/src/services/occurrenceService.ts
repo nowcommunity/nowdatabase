@@ -61,11 +61,14 @@ export const validateOccurrencePayload = (payload: EditableOccurrenceData) => {
 
 type RawOccurrenceLogRow = Awaited<ReturnType<typeof logDb.log.findMany>>[number]
 
-type OccurrenceLogRow = RawOccurrenceLogRow & {
+type OccurrenceLogCandidate = RawOccurrenceLogRow & {
   pk_data: string
-  table_name: string
-  luid?: number | null
-  suid?: number | null
+  table_name: 'now_ls'
+}
+
+type OccurrenceLogRow = Omit<OccurrenceLogCandidate, 'luid' | 'suid'> & {
+  luid: number | null
+  suid: number | null
 }
 
 const readNumericField = (row: unknown, fieldName: 'luid' | 'suid'): number | null => {
@@ -85,14 +88,14 @@ const collectUniqueIds = (rows: OccurrenceLogRow[], fieldName: 'luid' | 'suid') 
   return Array.from(ids)
 }
 
-const isOccurrenceLogRow = (row: RawOccurrenceLogRow): row is OccurrenceLogRow => {
-  return (
-    row.table_name === 'now_ls' &&
-    typeof row.pk_data === 'string' &&
-    (typeof row.luid === 'number' || row.luid === null || row.luid === undefined) &&
-    (typeof row.suid === 'number' || row.suid === null || row.suid === undefined)
-  )
-}
+const isOccurrenceLogCandidate = (row: RawOccurrenceLogRow): row is OccurrenceLogCandidate =>
+  row.table_name === 'now_ls' && typeof row.pk_data === 'string'
+
+const normalizeOccurrenceLogRow = (row: OccurrenceLogCandidate): OccurrenceLogRow => ({
+  ...row,
+  luid: readNumericField(row, 'luid'),
+  suid: readNumericField(row, 'suid'),
+})
 
 type OccurrenceUpdate = {
   occ_date: Date | null
@@ -103,11 +106,18 @@ type OccurrenceUpdate = {
   updates: OccurrenceLogRow[]
 }
 
+const stringifyLogValue = (value: unknown) => {
+  if (value === null || value === undefined) return ''
+  if (typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean') return String(value)
+  if (value instanceof Date) return value.toISOString()
+  return JSON.stringify(value)
+}
+
 const buildUpdateSignature = (update: OccurrenceUpdate) => {
   const updateRows = update.updates
     .map(
       row =>
-        `${row.table_name}|${row.pk_data}|${String(row['column_name'])}|${String(row['new_data'])}|${String(row['old_data'])}|${String(row['log_action'])}`
+        `${stringifyLogValue(row.table_name)}|${stringifyLogValue(row.pk_data)}|${stringifyLogValue(row['column_name'])}|${stringifyLogValue(row['new_data'])}|${stringifyLogValue(row['old_data'])}|${stringifyLogValue(row['log_action'])}`
     )
     .sort()
     .join('||')
@@ -157,9 +167,10 @@ const getOccurrenceUpdates = async (lid: number, speciesId: number) => {
     },
   })
 
-  const nowLsLogs: OccurrenceLogRow[] = candidateLogsRaw.filter(
-    (logRow): logRow is OccurrenceLogRow => isOccurrenceLogRow(logRow) && logRow.pk_data.includes(speciesPk)
-  )
+  const nowLsLogs = candidateLogsRaw
+    .filter(isOccurrenceLogCandidate)
+    .filter(logRow => logRow.pk_data.includes(speciesPk))
+    .map(normalizeOccurrenceLogRow)
 
   const luids = collectUniqueIds(nowLsLogs, 'luid')
   const suids = collectUniqueIds(nowLsLogs, 'suid')
