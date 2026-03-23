@@ -163,21 +163,34 @@ describe('Creating a time unit', () => {
     cy.get('[id=low_bnd-tableselection]').first().click()
     cy.get('[data-cy=add-button-14]').first().click()
 
+    cy.intercept('PUT', '**/time-unit').as('createTimeUnit')
     cy.addReferenceAndSave()
-    cy.contains(displayName)
-    cy.contains('C2N-o')
-    cy.contains('C2N-y')
-    cy.get('[id=edit-button]').click()
-    cy.get('[id=sequence-tableselection]').first().click()
-    cy.get('[data-cy=add-button-CalatayudTeruellocalbiozone]').first().click()
-    cy.get('[id=low_bnd-tableselection]').first().click()
-    cy.get('[data-cy=add-button-49]').first().click()
+    cy.wait('@createTimeUnit').then(({ response }) => {
+      expect(response?.statusCode).to.eq(200)
+      const createdSlug = response?.body?.tu_name
+      expect(createdSlug, 'created time unit slug').to.be.a('string')
+      expect(createdSlug, 'created time unit slug').to.not.equal('')
 
-    cy.addReferenceAndSave()
-    cy.contains(displayName)
-    cy.get('[id=edit-button]').click()
-    cy.get('[id=sequence-tableselection]').should('have.value', 'Calatayud-Teruel local biozone')
-    cy.contains('Langhian/Serravallian')
+      cy.visit(`/time-unit/${createdSlug}`)
+      cy.contains(displayName)
+      cy.contains('C2N-o')
+      cy.contains('C2N-y')
+      cy.get('[id=edit-button]').click()
+      cy.get('[id=sequence-tableselection]').first().click()
+      cy.get('[data-cy=add-button-CalatayudTeruellocalbiozone]').first().click()
+      cy.get('[id=low_bnd-tableselection]').first().click()
+      cy.get('[data-cy=add-button-49]').first().click()
+
+      cy.intercept('PUT', '**/time-unit').as('updateTimeUnit')
+      cy.addReferenceAndSave()
+      cy.wait('@updateTimeUnit').its('response.statusCode').should('eq', 200)
+
+      cy.visit(`/time-unit/${createdSlug}`)
+      cy.contains(displayName)
+      cy.get('[id=edit-button]').click()
+      cy.get('[id=sequence-tableselection]').should('have.value', 'Calatayud-Teruel local biozone')
+      cy.contains('Langhian/Serravallian')
+    })
   })
 })
 
@@ -323,15 +336,16 @@ describe('Deleting a time unit', () => {
     cy.get('[id=low_bnd-tableselection]').first().click()
     cy.get('[data-cy=add-button-14]').first().click()
 
+    cy.intercept('PUT', '**/time-unit').as('saveTimeUnitForDelete')
     cy.addReferenceAndSave()
-
-    cy.location('pathname').should('match', /\/time-unit\/[^/]+$/)
-    cy.contains('Creating new time-unit').should('not.exist')
-    cy.get('[id=delete-button]', { timeout: 10000 }).should('be.visible')
-
-    cy.url().then(url => {
-      const slug = new URL(url).pathname.split('/').pop()
+    cy.wait('@saveTimeUnitForDelete').then(({ response }) => {
+      expect(response?.statusCode).to.eq(200)
+      const slug = response?.body?.tu_name
       expect(slug, 'time unit slug').to.be.a('string').and.to.have.length.greaterThan(0)
+
+      cy.visit(`/time-unit/${slug}`)
+      cy.contains('Creating new time-unit').should('not.exist')
+      cy.get('[id=delete-button]', { timeout: 10000 }).should('be.visible')
 
       const deletePath = `**/time-unit/${slug}`
       cy.intercept('DELETE', deletePath).as('deleteTimeUnit')
