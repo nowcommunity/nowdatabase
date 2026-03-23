@@ -106,11 +106,18 @@ type OccurrenceUpdate = {
   updates: OccurrenceLogRow[]
 }
 
+const stringifyLogValue = (value: unknown) => {
+  if (value === null || value === undefined) return ''
+  if (typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean') return String(value)
+  if (value instanceof Date) return value.toISOString()
+  return JSON.stringify(value)
+}
+
 const buildUpdateSignature = (update: OccurrenceUpdate) => {
   const updateRows = update.updates
     .map(
       row =>
-        `${row.table_name}|${row.pk_data}|${String(row['column_name'])}|${String(row['new_data'])}|${String(row['old_data'])}|${String(row['log_action'])}`
+        `${row.table_name}|${row.pk_data}|${stringifyLogValue(row['column_name'])}|${stringifyLogValue(row['new_data'])}|${stringifyLogValue(row['old_data'])}|${stringifyLogValue(row['log_action'])}`
     )
     .sort()
     .join('||')
