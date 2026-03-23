@@ -117,7 +117,7 @@ const buildUpdateSignature = (update: OccurrenceUpdate) => {
   const updateRows = update.updates
     .map(
       row =>
-        `${row.table_name}|${row.pk_data}|${stringifyLogValue(row['column_name'])}|${stringifyLogValue(row['new_data'])}|${stringifyLogValue(row['old_data'])}|${stringifyLogValue(row['log_action'])}`
+        `${stringifyLogValue(row.table_name)}|${stringifyLogValue(row.pk_data)}|${stringifyLogValue(row['column_name'])}|${stringifyLogValue(row['new_data'])}|${stringifyLogValue(row['old_data'])}|${stringifyLogValue(row['log_action'])}`
     )
     .sort()
     .join('||')
