@@ -1,6 +1,9 @@
 import { describe, expect, it, jest, beforeEach } from '@jest/globals'
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import { MemoryRouter } from 'react-router-dom'
+import { Provider } from 'react-redux'
+import { useRef, useState, type ReactNode } from 'react'
 import { SpeciesTab } from '@/components/Locality/Tabs/SpeciesTab'
 import {
   useDetailContext,
@@ -11,6 +14,8 @@ import type { EditDataType, LocalityDetailsType } from '@/shared/types'
 import { useGetAllSpeciesQuery } from '@/redux/speciesReducer'
 import { useNotify } from '@/hooks/notification'
 import { taxonStatusSelectLabels } from '@/constants/taxonStatusOptions'
+import { PageContext, type PageContextType } from '@/components/Page'
+import { store } from '@/redux/store'
 
 jest.mock('@/components/DetailView/Context/DetailContext', () => ({
   useDetailContext: jest.fn(),
@@ -31,6 +36,126 @@ jest.mock('@/hooks/notification', () => ({
   useNotify: jest.fn(),
 }))
 
+jest.mock('@/components/DetailView/common/EditingForm', () => ({
+  EditingForm: ({
+    buttonText,
+    editAction,
+  }: {
+    buttonText: string
+    editAction?: (value: Record<string, unknown>) => void
+  }) => {
+    const [open, setOpen] = useState(false)
+    const formRef = useRef<HTMLDivElement>(null)
+
+    return (
+      <div>
+        <button type="button" onClick={() => setOpen(true)}>
+          {buttonText}
+        </button>
+        {open ? (
+          <div ref={formRef}>
+            <label>
+              Order
+              <input name="order_name" defaultValue="" />
+            </label>
+            <label>
+              Family
+              <input name="family_name" defaultValue="" />
+            </label>
+            <label>
+              Genus
+              <input name="genus_name" defaultValue="" />
+            </label>
+            <label>
+              Species
+              <input name="species_name" defaultValue="" />
+            </label>
+            <label>
+              Taxon status
+              <select name="taxonomic_status" defaultValue="">
+                {taxonStatusSelectLabels.map(label => (
+                  <option key={label} value={label === 'No value' ? '' : label}>
+                    {label}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <button
+              type="button"
+              onClick={() => {
+                const fields = formRef.current?.querySelectorAll('input, select') ?? []
+                const values = Array.from(fields).reduce<Record<string, unknown>>(
+                  (acc, field) => {
+                    acc[field.getAttribute('name') ?? ''] = (field as HTMLInputElement | HTMLSelectElement).value
+                    return acc
+                  },
+                  { unique_identifier: '-', taxonomic_status: '' }
+                )
+
+                editAction?.(values)
+                setOpen(false)
+              }}
+            >
+              Save
+            </button>
+          </div>
+        ) : null}
+      </div>
+    )
+  },
+}))
+
+jest.mock('@/components/DetailView/common/EditingModal', () => ({
+  EditingModal: ({
+    buttonText,
+    children,
+    onSave,
+  }: {
+    buttonText: string
+    children: ReactNode
+    onSave?: () => Promise<boolean>
+  }) => {
+    const [open, setOpen] = useState(false)
+
+    return (
+      <div>
+        <button type="button" onClick={() => setOpen(true)}>
+          {buttonText}
+        </button>
+        {open ? (
+          <div>
+            {children}
+            {onSave ? (
+              <button
+                type="button"
+                onClick={() => {
+                  void onSave().then(shouldClose => {
+                    if (shouldClose) setOpen(false)
+                  })
+                }}
+              >
+                Save
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+      </div>
+    )
+  },
+}))
+
+jest.mock('@/components/DetailView/common/EditableTable', () => ({
+  EditableTable: () => <div data-testid="editable-table" />,
+}))
+
+jest.mock('@/components/DetailView/common/SelectingTable', () => ({
+  SelectingTable: ({ buttonText }: { buttonText: string }) => <button type="button">{buttonText}</button>,
+}))
+
+jest.mock('@/components/Species/SynonymsModal', () => ({
+  SynonymsModal: () => null,
+}))
+
 jest.mock('@/util/taxonomyUtilities', () => ({
   checkSpeciesTaxonomy: jest.fn(() => new Set()),
   convertSpeciesTaxonomyFields: jest.fn((fields: Record<string, unknown>) => {
@@ -49,6 +174,26 @@ const mockUseGetAllSpeciesQuery = useGetAllSpeciesQuery as jest.MockedFunction<t
 const mockUseNotify = useNotify as jest.MockedFunction<typeof useNotify>
 
 const setEditData = jest.fn()
+
+const pageContextValue: PageContextType<unknown> = {
+  idList: [],
+  setIdList: jest.fn(),
+  idFieldName: 'lid',
+  viewName: 'locality',
+  previousTableUrls: [],
+  setPreviousTableUrls: jest.fn(),
+  createTitle: () => '',
+  createSubtitle: () => '',
+  editRights: { edit: true, delete: true },
+  sqlLimit: 20,
+  sqlOffset: 0,
+  sqlColumnFilters: [],
+  sqlOrderBy: [],
+  setSqlLimit: jest.fn(),
+  setSqlOffset: jest.fn(),
+  setSqlColumnFilters: jest.fn(),
+  setSqlOrderBy: jest.fn(),
+}
 
 const createContextValue = (): DetailContextType<LocalityDetailsType> => ({
   data: { lid: 1, now_ls: [] } as unknown as LocalityDetailsType,
@@ -80,7 +225,15 @@ describe('SpeciesTab taxon status dropdown', () => {
   it('renders taxon status as a dropdown and submits the selected value', async () => {
     const user = userEvent.setup()
 
-    render(<SpeciesTab />)
+    render(
+      <Provider store={store}>
+        <MemoryRouter>
+          <PageContext.Provider value={pageContextValue}>
+            <SpeciesTab />
+          </PageContext.Provider>
+        </MemoryRouter>
+      </Provider>
+    )
 
     await user.click(screen.getByRole('button', { name: /add new species/i }))
 
@@ -97,7 +250,7 @@ describe('SpeciesTab taxon status dropdown', () => {
 
     expect(noValueOption).toBeDefined()
     expect(nowSynonymOption).toBeDefined()
-    await user.click(nowSynonymOption!)
+    await user.selectOptions(taxonStatusField, 'NOW synonym')
 
     await user.type(screen.getByLabelText(/^order$/i), 'Carnivora')
     await user.type(screen.getByLabelText(/^family$/i), 'Felidae')

@@ -1,5 +1,5 @@
 before('Reset database', () => {
-  cy.request(Cypress.env('databaseResetUrl'))
+  cy.resetDatabase()
 })
 
 describe('Creating a species', () => {
@@ -100,7 +100,7 @@ describe('Editing a species', () => {
 
 describe('Taxonomy checks work', () => {
   before('Reset database', () => {
-    cy.request(Cypress.env('databaseResetUrl'))
+    cy.resetDatabase()
   })
 
   beforeEach('Login as admin', () => {

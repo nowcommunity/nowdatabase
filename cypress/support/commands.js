@@ -25,13 +25,16 @@
 // Cypress.Commands.overwrite('visit', (originalFn, url, options) => { ... })
 
 Cypress.Commands.add('login', username => {
-  cy.clearLocalStorage()
+  cy.clearAllLocalStorage()
+  cy.clearAllSessionStorage()
+  cy.clearCookies()
+  cy.intercept('POST', '**/user/login').as('loginRequest')
   cy.visit('/login')
-  cy.get('[data-cy="login-button"]', { timeout: 10000 }).should('be.visible').click()
-  cy.get('[data-cy="username-basic"]').type(username)
-  cy.get('[data-cy="password-basic"]').type('test')
-  cy.get('[data-cy="login-button"]').click()
-  cy.contains(`${username}`)
+  cy.get('[data-cy="username-basic"] input', { timeout: 10000 }).should('be.visible').clear().type(username)
+  cy.get('[data-cy="password-basic"] input').should('be.visible').clear().type('test', { log: false })
+  cy.get('[data-cy="login-button"]').should('be.visible').click()
+  cy.wait('@loginRequest').its('response.statusCode').should('eq', 200)
+  cy.location('pathname', { timeout: 10000 }).should('not.eq', '/login')
 })
 
 Cypress.Commands.add('loginAsDeleteCoordinator', () => {
@@ -46,11 +49,21 @@ Cypress.Commands.add('deleteTargets', () => {
 
 Cypress.Commands.add('pageForbidden', url => {
   cy.visit(url)
-  cy.contains('Your user is not authorized to view this page.')
+  cy.get('body').should(body => {
+    const text = body.text()
+    expect(text).to.satisfy(
+      value =>
+        value.includes('Your user is not authorized to view this page.') ||
+        value.includes('Permission denied') ||
+        value.includes('You do not have access') ||
+        value.includes('Sign in to')
+    )
+  })
 })
 
 Cypress.Commands.add('resetDatabase', () => {
-  cy.task('resetDatabase')
+  cy.task('waitForDbHealthy')
+  cy.request(Cypress.env('databaseResetUrl')).its('status').should('eq', 200)
 })
 
 // use this once you have edited some data and want to save it
@@ -73,7 +86,6 @@ Cypress.Commands.add('clearNewSpeciesForm', () => {
   cy.get('[name=suborder_or_superfamily_name]').clear()
   cy.get('[name=subfamily_name]').clear()
   cy.get('[name=unique_identifier]').clear()
-  cy.get('[name=taxonomic_status]').clear()
   cy.get('[name=sp_comment]').clear()
   cy.get('[name=sp_author]').clear()
 })

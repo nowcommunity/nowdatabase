@@ -4,7 +4,7 @@ import {
   buildReferenceDisplayLabelMap,
   validateEntireReference,
   type ReferenceTypeWithFieldNames,
-} from '../../services/reference'
+} from '../../services/referenceValidation'
 import { EditDataType, ReferenceDetailsType } from '../../../../frontend/src/shared/types'
 
 const electronicCitationReferenceType: ReferenceTypeWithFieldNames = {

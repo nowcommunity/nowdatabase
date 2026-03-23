@@ -1,12 +1,16 @@
-import { afterAll, beforeAll, describe, expect, it } from '@jest/globals'
+import { afterAll, beforeAll, beforeEach, describe, expect, it } from '@jest/globals'
 import { pool } from '../../utils/db'
 import { login, resetDatabase, resetDatabaseTimeout, send } from '../utils'
 
 describe('Tab list query validation and pagination', () => {
   beforeAll(async () => {
     await resetDatabase()
-    await login()
   }, resetDatabaseTimeout)
+
+  beforeEach(async () => {
+    await resetDatabase()
+    await login()
+  })
 
   afterAll(async () => {
     await pool.end()
@@ -49,7 +53,7 @@ describe('Tab list query validation and pagination', () => {
 
   it('applies pagination to museum localities without changing authorization behavior', async () => {
     const { body, status } = await send<{ localities: Record<string, unknown>[] }>(
-      'museum/APM?limit=1&offset=0&sorting=%5B%7B%22id%22%3A%22loc_name%22%2C%22desc%22%3Afalse%7D%5D',
+      'museum/RGM?sorting=%5B%7B%22id%22%3A%22loc_name%22%2C%22desc%22%3Afalse%7D%5D&pagination=%7B%22pageIndex%22%3A0%2C%22pageSize%22%3A1%7D',
       'GET'
     )
 

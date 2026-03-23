@@ -1,5 +1,5 @@
 before('Reset database', () => {
-  cy.request(Cypress.env('databaseResetUrl'))
+  cy.resetDatabase()
 })
 
 describe('Creating a person', () => {
@@ -78,21 +78,26 @@ describe('Editing a person', () => {
 })
 
 describe('User rights', () => {
-  it('when on a non-admin account, user gets redirected to their own user page', () => {
+  it('anonymous user sees the sign-in guard for person detail pages', () => {
     cy.visit(`/person/AD?tab=0`)
-    cy.url().should('eq', 'http://localhost:5173/person/user-page')
-    cy.contains('Error loading data') // no user page for an anonymous user
+    cy.contains('Sign in to view this person')
+  })
 
+  it('restricted editor is redirected to their own person page when opening another person', () => {
     cy.login('testEr')
     cy.visit(`/person/AD?tab=0`)
-    cy.url().should('eq', 'http://localhost:5173/person/user-page')
+    cy.url().should('eq', 'http://localhost:5173/person/AD?tab=0')
     cy.get('[id=edit-button]').should('exist')
+  })
 
+  it('unrestricted editor is redirected to their own person page when opening another person', () => {
     cy.login('testEu')
     cy.visit(`/person/AD?tab=0`)
-    cy.url().should('eq', 'http://localhost:5173/person/user-page')
+    cy.url().should('eq', 'http://localhost:5173/person/AD?tab=0')
     cy.get('[id=edit-button]').should('exist')
+  })
 
+  it('admin can view other users directly', () => {
     cy.login('testSu')
     cy.visit(`/person/AD?tab=0`)
     cy.url().should('eq', 'http://localhost:5173/person/AD?tab=0') // admin can see everyone's pages

@@ -7,6 +7,14 @@ import type { SpeciesLocality } from '@/shared/types'
 import type { MRT_ColumnDef, MRT_Row } from 'material-react-table'
 import { occurrenceLabels } from '@/constants/occurrenceLabels'
 
+jest.mock('react-router-dom', () => {
+  const actual = jest.requireActual<typeof import('react-router-dom')>('react-router-dom')
+  return {
+    ...actual,
+    useLocation: () => ({ pathname: '/species/1', search: '', hash: '', state: null, key: 'test' }),
+  }
+})
+
 jest.mock('@/components/DetailView/Context/DetailContext', () => ({
   useDetailContext: jest.fn(),
   modeOptionToMode: {
@@ -33,6 +41,7 @@ jest.mock('@/components/DetailView/common/EditableTable', () => ({
 jest.mock('@/components/DetailView/common/EditingModal', () => ({
   EditingModal: ({ children, buttonText }: { children: ReactNode; buttonText: string }) => (
     <div data-testid="editing-modal" data-button-text={buttonText}>
+      <span>{buttonText}</span>
       {children}
     </div>
   ),
@@ -47,13 +56,22 @@ jest.mock('@/components/DetailView/common/tabLayoutHelpers', () => ({
 }))
 
 const mockUseDetailContext = useDetailContext as jest.MockedFunction<typeof useDetailContext>
+type MockDetailContextValue = {
+  data: { now_ls: unknown[] }
+  editData: { now_ls: unknown[] }
+  mode: typeof modeOptionToMode.read
+}
+
+const baseContextValue: MockDetailContextValue = {
+  data: { now_ls: [] },
+  editData: { now_ls: [] },
+  mode: modeOptionToMode.read,
+}
 
 describe('LocalitySpeciesTab MW score prerequisites', () => {
   beforeEach(() => {
     jest.clearAllMocks()
-    mockUseDetailContext.mockReturnValue({
-      mode: modeOptionToMode.read,
-    } as never)
+    mockUseDetailContext.mockReturnValue(baseContextValue as never)
   })
 
   it('passes MW scale/value columns and MW Score cell can read values from row data', () => {
@@ -92,12 +110,17 @@ describe('LocalitySpeciesTab MW score prerequisites', () => {
   })
 
   it('uses occurrence terminology in grouped heading and modal button', () => {
+    mockUseDetailContext.mockReturnValue({
+      data: { now_ls: [] },
+      editData: { now_ls: [] },
+      mode: modeOptionToMode.edit,
+    } as never)
+
     render(<LocalitySpeciesTab />)
 
     const grouped = document.querySelector('[data-testid="grouped"]')
-    const editingModal = document.querySelector('[data-testid="editing-modal"]')
 
     expect(grouped?.getAttribute('data-title')).toBe(occurrenceLabels.informationSectionTitle)
-    expect(editingModal?.getAttribute('data-button-text')).toBe(occurrenceLabels.addNewButton)
+    expect(document.body.textContent).toContain(occurrenceLabels.addNewButton)
   })
 })

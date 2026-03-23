@@ -1,13 +1,20 @@
 import { describe, expect, it, jest } from '@jest/globals'
 import '@testing-library/jest-dom'
 import { RouterProvider, createMemoryRouter } from 'react-router-dom'
-import { render, screen, waitFor } from '@testing-library/react'
+import { act, render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import { Provider } from 'react-redux'
 
 import { DetailView, type TabType } from '@/components/DetailView/DetailView'
 import { PageContext, type PageContextType } from '@/components/Page'
+import { NotificationContextProvider } from '@/components/Notification'
 import { useDetailContext } from '@/components/DetailView/Context/DetailContext'
 import type { TimeUnitDetailsType } from '@/shared/types'
+import { store } from '@/redux/store'
+
+jest.mock('@/components/DetailView/common/ContactForm', () => ({
+  ContactForm: () => <div data-testid="contact-form" />,
+}))
 
 const timeUnitData = {
   tu_name: 'old_tu',
@@ -80,14 +87,16 @@ const renderWithRouter = () => {
       {
         path: '/time-unit/:id',
         element: (
-          <PageContext.Provider value={pageContextValue}>
-            <DetailView<TimeUnitDetailsType>
-              tabs={tabs}
-              data={timeUnitData}
-              validator={() => ({ name: 'noop', error: null })}
-              onWrite={onWrite}
-            />
-          </PageContext.Provider>
+          <NotificationContextProvider>
+            <PageContext.Provider value={pageContextValue}>
+              <DetailView<TimeUnitDetailsType>
+                tabs={tabs}
+                data={timeUnitData}
+                validator={() => ({ name: 'noop', error: null })}
+                onWrite={onWrite}
+              />
+            </PageContext.Provider>
+          </NotificationContextProvider>
         ),
       },
       { path: '/time-unit', element: <div>Table view</div> },
@@ -95,7 +104,11 @@ const renderWithRouter = () => {
     { initialEntries: ['/time-unit/old_tu'] }
   )
 
-  render(<RouterProvider router={router} />)
+  render(
+    <Provider store={store}>
+      <RouterProvider router={router} />
+    </Provider>
+  )
   return router
 }
 
@@ -106,14 +119,18 @@ describe('DetailView unsaved changes prompt', () => {
 
     await user.click(screen.getByRole('button', { name: /edit/i }))
     await user.click(screen.getByRole('button', { name: /change upper age/i }))
-    await user.click(screen.getByRole('button', { name: /return to table/i }))
+    await act(async () => {
+      await router.navigate('/time-unit')
+    })
 
     await screen.findByRole('dialog')
     await user.click(screen.getByRole('button', { name: /stay on page/i }))
 
     expect(router.state.location.pathname).toBe('/time-unit/old_tu')
 
-    await user.click(screen.getByRole('button', { name: /return to table/i }))
+    await act(async () => {
+      await router.navigate('/time-unit')
+    })
     await user.click(await screen.findByRole('button', { name: /leave page/i }))
 
     await waitFor(() => {

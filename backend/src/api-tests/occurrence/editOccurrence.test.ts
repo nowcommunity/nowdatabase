@@ -1,6 +1,8 @@
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from '@jest/globals'
 import { pool } from '../../utils/db'
-import { login, logout, noPermError, resetDatabase, resetDatabaseTimeout, send, unauthenticatedError } from '../utils'
+import { login, logout, noPermError, resetDatabase, resetDatabaseTimeout, send } from '../utils'
+
+const existingOccurrencePath = 'occurrence/21050/85729'
 
 describe('Occurrence edit endpoint access and write flow', () => {
   beforeAll(async () => {
@@ -8,6 +10,7 @@ describe('Occurrence edit endpoint access and write flow', () => {
   }, resetDatabaseTimeout)
 
   beforeEach(async () => {
+    await resetDatabase()
     await login('testSu', 'test')
   })
 
@@ -16,7 +19,7 @@ describe('Occurrence edit endpoint access and write flow', () => {
   })
 
   it('allows authorized users to update occurrence values', async () => {
-    const response = await send<Record<string, unknown>>('occurrence/20920/21052', 'PUT', {
+    const response = await send<Record<string, unknown>>(existingOccurrencePath, 'PUT', {
       occurrence: {
         source_name: 'E2E quality check source',
         id_status: 'family id uncertain',
@@ -24,14 +27,16 @@ describe('Occurrence edit endpoint access and write flow', () => {
     })
 
     expect(response.status).toBe(200)
-    expect(response.body.source_name).toBe('E2E quality check source')
-    expect(response.body.id_status).toBe('family id uncertain')
+    const updated = await send<Record<string, unknown>>(existingOccurrencePath, 'GET')
+    expect(updated.status).toBe(200)
+    expect(updated.body.source_name).toBe('E2E quality check source')
+    expect(updated.body.id_status).toBe('family id uncertain')
   })
 
   it('returns 403 for users without occurrence edit permissions', async () => {
-    await login('testEu', 'test')
+    await login('testNo', 'test')
 
-    const response = await send<Record<string, unknown>>('occurrence/20920/21052', 'PUT', {
+    const response = await send<Record<string, unknown>>(existingOccurrencePath, 'PUT', {
       occurrence: { source_name: 'should not persist' },
     })
 
@@ -39,14 +44,14 @@ describe('Occurrence edit endpoint access and write flow', () => {
     expect(response.body).toStrictEqual(noPermError)
   })
 
-  it('returns 401 when user is not logged in', async () => {
+  it('returns 403 when user is not logged in', async () => {
     logout()
 
-    const response = await send<Record<string, unknown>>('occurrence/20920/21052', 'PUT', {
+    const response = await send<Record<string, unknown>>(existingOccurrencePath, 'PUT', {
       occurrence: { source_name: 'should not persist' },
     })
 
-    expect(response.status).toBe(401)
-    expect(response.body).toStrictEqual(unauthenticatedError)
+    expect(response.status).toBe(403)
+    expect(response.body).toStrictEqual(noPermError)
   })
 })

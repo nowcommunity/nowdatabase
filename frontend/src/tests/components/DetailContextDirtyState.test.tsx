@@ -11,7 +11,11 @@ import type { EditDataType } from '@/shared/types'
 
 jest.mock('lodash-es', () => ({
   cloneDeep: <T,>(value: T) => structuredClone(value),
-  isEqual: (a: unknown, b: unknown) => JSON.stringify(a) === JSON.stringify(b),
+  isEqualWith: (a: unknown, b: unknown, customizer?: (left: unknown, right: unknown) => boolean | undefined) => {
+    const customizedResult = customizer?.(a, b)
+    if (customizedResult !== undefined) return customizedResult
+    return JSON.stringify(a) === JSON.stringify(b)
+  },
 }))
 
 type TestData = { name: string; count: number }

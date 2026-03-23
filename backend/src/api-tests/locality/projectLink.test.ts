@@ -1,22 +1,31 @@
 import { afterAll, beforeEach, describe, expect, it } from '@jest/globals'
 import { EditDataType, LocalityDetailsType } from '../../../../frontend/src/shared/types'
-import { editedLocality } from './data'
 import { login, resetDatabase, resetDatabaseTimeout, send, noPermError } from '../utils'
 import { pool } from '../../utils/db'
+import { editedLocality, newLocalityBasis } from './data'
 
 const TEST_PROJECT_ID = 35
-const localityId = editedLocality.lid
+const localityId = 21050
 
-const cloneEditedLocality = () => structuredClone(editedLocality)
-
-const buildLocalityPayload = (projectIds: number[]) => {
-  const payload = cloneEditedLocality() as unknown as EditDataType<LocalityDetailsType> & {
+const buildLocalityPayload = (projectIds: number[], options?: { includeSpeciesChanges?: boolean }) => {
+  const payload = {
+    ...newLocalityBasis,
+    ...editedLocality,
+    lid: localityId,
+  } as unknown as EditDataType<LocalityDetailsType> & {
     now_plr?: Array<{ lid: number; pid: number; rowState: 'new' }>
   }
-  const lid = payload.lid ?? localityId
+
+  if (options?.includeSpeciesChanges === false) {
+    payload.now_ls = []
+    payload.now_mus = []
+    payload.now_ss = []
+    payload.now_coll_meth = []
+    payload.now_syn_loc = []
+  }
 
   payload.now_plr = projectIds.map(pid => ({
-    lid,
+    lid: localityId,
     pid,
     rowState: 'new' as const,
   }))
@@ -62,7 +71,7 @@ describe('Locality project links', () => {
     const firstResult = await send<{ id: number }>('locality', 'PUT', { locality: duplicatePayload })
     expect(firstResult.status).toEqual(200)
 
-    const duplicateAttempt = buildLocalityPayload([TEST_PROJECT_ID])
+    const duplicateAttempt = buildLocalityPayload([TEST_PROJECT_ID], { includeSpeciesChanges: false })
     const secondResult = await send<{ id: number }>('locality', 'PUT', { locality: duplicateAttempt })
     expect(secondResult.status).toEqual(200)
 
