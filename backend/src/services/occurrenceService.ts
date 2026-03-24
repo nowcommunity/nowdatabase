@@ -91,6 +91,11 @@ const collectUniqueIds = (rows: OccurrenceLogRow[], fieldName: 'luid' | 'suid') 
 const isOccurrenceLogCandidate = (row: RawOccurrenceLogRow): row is OccurrenceLogCandidate =>
   row.table_name === 'now_ls' && typeof row.pk_data === 'string'
 
+const matchesOccurrenceSpeciesPk =
+  (speciesPk: string) =>
+  (row: OccurrenceLogCandidate): boolean =>
+    row.pk_data.includes(speciesPk)
+
 const normalizeOccurrenceLogRow = (row: OccurrenceLogCandidate): OccurrenceLogRow => ({
   ...row,
   luid: readNumericField(row, 'luid'),
@@ -169,7 +174,7 @@ const getOccurrenceUpdates = async (lid: number, speciesId: number) => {
 
   const nowLsLogs = candidateLogsRaw
     .filter(isOccurrenceLogCandidate)
-    .filter(logRow => logRow.pk_data.includes(speciesPk))
+    .filter(matchesOccurrenceSpeciesPk(speciesPk))
     .map(normalizeOccurrenceLogRow)
 
   const luids = collectUniqueIds(nowLsLogs, 'luid')
