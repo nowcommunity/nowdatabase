@@ -7,6 +7,7 @@ on:
     branches:
       - main
 env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: 'true'
   BACKEND_IMAGE_NAME: ${{ github.event_name == 'release' && 'nowdb-backend' || 'nowdb-backend-staging' }}
   FRONTEND_IMAGE_NAME: ${{ github.event_name == 'release' && 'nowdb-frontend' || 'nowdb-frontend-staging' }}
   BACKEND_URL: ${{ github.event_name == 'release' && secrets.BACKEND_URL_PROD || secrets.BACKEND_URL_STAGING }}
@@ -22,7 +23,7 @@ jobs:
       packages: write
       contents: read
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Build image
         run: docker build . --file backend/Dockerfile --tag $BACKEND_IMAGE_NAME --label "runnumber=${GITHUB_RUN_ID}" --target node-run
@@ -55,7 +56,7 @@ jobs:
       packages: write
       contents: read
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Build image
         run: docker build frontend --tag $FRONTEND_IMAGE_NAME --label "runnumber=${GITHUB_RUN_ID}" --build-arg BACKEND_URL=${BACKEND_URL} --build-arg RUNNING_ENV=${RUNNING_ENV} --build-arg ENABLE_WRITE=${ENABLE_WRITE} --build-arg GEONAMES_USERNAME=${{ secrets.GEONAMES_USERNAME }} --target serve
