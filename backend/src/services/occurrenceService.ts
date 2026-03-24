@@ -91,16 +91,24 @@ const collectUniqueIds = (rows: OccurrenceLogRow[], fieldName: 'luid' | 'suid') 
 const isOccurrenceLogCandidate = (row: RawOccurrenceLogRow): row is OccurrenceLogCandidate =>
   row.table_name === 'now_ls' && typeof row.pk_data === 'string'
 
-const matchesOccurrenceSpeciesPk =
-  (speciesPk: string) =>
-  (row: OccurrenceLogCandidate): boolean =>
-    row.pk_data.includes(speciesPk)
-
 const normalizeOccurrenceLogRow = (row: OccurrenceLogCandidate): OccurrenceLogRow => ({
   ...row,
   luid: readNumericField(row, 'luid'),
   suid: readNumericField(row, 'suid'),
 })
+
+const getOccurrenceLogRows = (rows: RawOccurrenceLogRow[], speciesPk: string): OccurrenceLogRow[] => {
+  const occurrenceRows: OccurrenceLogRow[] = []
+
+  for (const row of rows) {
+    if (!isOccurrenceLogCandidate(row)) continue
+    if (!row.pk_data.includes(speciesPk)) continue
+
+    occurrenceRows.push(normalizeOccurrenceLogRow(row))
+  }
+
+  return occurrenceRows
+}
 
 type OccurrenceUpdate = {
   occ_date: Date | null
@@ -172,10 +180,7 @@ const getOccurrenceUpdates = async (lid: number, speciesId: number) => {
     },
   })
 
-  const nowLsLogs = candidateLogsRaw
-    .filter(isOccurrenceLogCandidate)
-    .filter(matchesOccurrenceSpeciesPk(speciesPk))
-    .map(normalizeOccurrenceLogRow)
+  const nowLsLogs = getOccurrenceLogRows(candidateLogsRaw, speciesPk)
 
   const luids = collectUniqueIds(nowLsLogs, 'luid')
   const suids = collectUniqueIds(nowLsLogs, 'suid')
