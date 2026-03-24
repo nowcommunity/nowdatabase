@@ -7,7 +7,6 @@ on:
     branches:
       - main
 env:
-  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: 'true'
   BACKEND_IMAGE_NAME: ${{ github.event_name == 'release' && 'nowdb-backend' || 'nowdb-backend-staging' }}
   FRONTEND_IMAGE_NAME: ${{ github.event_name == 'release' && 'nowdb-frontend' || 'nowdb-frontend-staging' }}
   BACKEND_URL: ${{ github.event_name == 'release' && secrets.BACKEND_URL_PROD || secrets.BACKEND_URL_STAGING }}
@@ -97,16 +96,153 @@ jobs:
   delete_old_staging:
     runs-on: ubuntu-latest
     if: ${{ github.event_name == 'push' }}
-    env:
-      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: 'true'
+    permissions:
+      packages: write
+      contents: read
     steps:
-      - uses: actions/delete-package-versions@v5
+      - uses: actions/github-script@v8
+        env:
+          PACKAGE_NAME: nowdb-frontend-staging
+          MIN_VERSIONS_TO_KEEP: '3'
         with:
-          package-name: 'nowdb-frontend-staging'
-          min-versions-to-keep: 3
-          package-type: 'container'
-      - uses: actions/delete-package-versions@v5
+          script: |
+            const packageName = process.env.PACKAGE_NAME;
+            const minVersionsToKeep = Number(process.env.MIN_VERSIONS_TO_KEEP ?? '0');
+            const owner = context.repo.owner;
+
+            const listVersions = async () => {
+              try {
+                return await github.paginate(
+                  github.rest.packages.getAllPackageVersionsForPackageOwnedByOrg,
+                  {
+                    package_type: 'container',
+                    package_name: packageName,
+                    org: owner,
+                    per_page: 100,
+                  },
+                );
+              } catch (error) {
+                if (error.status !== 404) {
+                  throw error;
+                }
+
+                return github.paginate(
+                  github.rest.packages.getAllPackageVersionsForPackageOwnedByUser,
+                  {
+                    package_type: 'container',
+                    package_name: packageName,
+                    username: owner,
+                    per_page: 100,
+                  },
+                );
+              }
+            };
+
+            const deleteVersion = async (packageVersionId) => {
+              try {
+                await github.rest.packages.deletePackageVersionForOrg({
+                  package_type: 'container',
+                  package_name: packageName,
+                  org: owner,
+                  package_version_id: packageVersionId,
+                });
+              } catch (error) {
+                if (error.status !== 404) {
+                  throw error;
+                }
+
+                await github.rest.packages.deletePackageVersionForUser({
+                  package_type: 'container',
+                  package_name: packageName,
+                  username: owner,
+                  package_version_id: packageVersionId,
+                });
+              }
+            };
+
+            const versions = await listVersions();
+
+            const versionsToDelete = versions
+              .slice()
+              .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+              .slice(minVersionsToKeep);
+
+            core.info(`Found ${versions.length} versions for ${packageName}. Deleting ${versionsToDelete.length}.`);
+
+            for (const version of versionsToDelete) {
+              await deleteVersion(version.id);
+              core.info(`Deleted ${packageName} version ${version.id}.`);
+            }
+      - uses: actions/github-script@v8
+        env:
+          PACKAGE_NAME: nowdb-backend-staging
+          MIN_VERSIONS_TO_KEEP: '3'
         with:
-          package-name: 'nowdb-backend-staging'
-          min-versions-to-keep: 3
-          package-type: 'container'
+          script: |
+            const packageName = process.env.PACKAGE_NAME;
+            const minVersionsToKeep = Number(process.env.MIN_VERSIONS_TO_KEEP ?? '0');
+            const owner = context.repo.owner;
+
+            const listVersions = async () => {
+              try {
+                return await github.paginate(
+                  github.rest.packages.getAllPackageVersionsForPackageOwnedByOrg,
+                  {
+                    package_type: 'container',
+                    package_name: packageName,
+                    org: owner,
+                    per_page: 100,
+                  },
+                );
+              } catch (error) {
+                if (error.status !== 404) {
+                  throw error;
+                }
+
+                return github.paginate(
+                  github.rest.packages.getAllPackageVersionsForPackageOwnedByUser,
+                  {
+                    package_type: 'container',
+                    package_name: packageName,
+                    username: owner,
+                    per_page: 100,
+                  },
+                );
+              }
+            };
+
+            const deleteVersion = async (packageVersionId) => {
+              try {
+                await github.rest.packages.deletePackageVersionForOrg({
+                  package_type: 'container',
+                  package_name: packageName,
+                  org: owner,
+                  package_version_id: packageVersionId,
+                });
+              } catch (error) {
+                if (error.status !== 404) {
+                  throw error;
+                }
+
+                await github.rest.packages.deletePackageVersionForUser({
+                  package_type: 'container',
+                  package_name: packageName,
+                  username: owner,
+                  package_version_id: packageVersionId,
+                });
+              }
+            };
+
+            const versions = await listVersions();
+
+            const versionsToDelete = versions
+              .slice()
+              .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+              .slice(minVersionsToKeep);
+
+            core.info(`Found ${versions.length} versions for ${packageName}. Deleting ${versionsToDelete.length}.`);
+
+            for (const version of versionsToDelete) {
+              await deleteVersion(version.id);
+              core.info(`Deleted ${packageName} version ${version.id}.`);
+            }
