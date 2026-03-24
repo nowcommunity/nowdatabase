@@ -1,46 +1,79 @@
 import { Navigate, createBrowserRouter } from 'react-router-dom'
 import App from '../App'
-import { Login } from '../components/Login'
-import { EmailPage } from '../components/EmailPage'
-import {
-  crossSearchPage,
-  frontPage,
-  localityPage,
-  museumPage,
-  personPage,
-  projectPage,
-  referencePage,
-  regionPage,
-  speciesPage,
-  timeBoundPage,
-  timeUnitPage,
-} from '../components/pages'
-import { ProjectNewPage } from '../pages/ProjectNewPage'
-import { ProjectEditPage } from '../pages/projects/ProjectEditPage'
+
+const loadPagesElement = async (
+  key:
+    | 'crossSearchPage'
+    | 'localityPage'
+    | 'museumPage'
+    | 'personPage'
+    | 'projectPage'
+    | 'referencePage'
+    | 'regionPage'
+    | 'speciesPage'
+    | 'timeBoundPage'
+    | 'timeUnitPage'
+) => {
+  const pagesModule = await import('../components/pages')
+
+  return {
+    Component: () => pagesModule[key],
+  }
+}
 
 const router = createBrowserRouter([
   {
     path: '/',
     element: <App />,
     children: [
-      { index: true, element: frontPage },
-      { path: 'occurrence/:lid/:speciesId', element: crossSearchPage },
+      {
+        index: true,
+        lazy: async () => {
+          const { FrontPage } = await import('../components/FrontPage')
+          return { Component: FrontPage }
+        },
+      },
+      { path: 'occurrence/:lid/:speciesId', lazy: () => loadPagesElement('crossSearchPage') },
       { path: 'occurrence/:id', element: <Navigate to="/occurrence" replace /> },
-      { path: 'occurrence', element: crossSearchPage },
-      { path: 'crosssearch/:id?', element: crossSearchPage },
-      { path: 'locality/:id?', element: localityPage },
-      { path: 'species/:id?', element: speciesPage },
-      { path: 'museum/:id?', element: museumPage },
-      { path: 'reference/:id?', element: referencePage },
-      { path: 'time-unit/:id?', element: timeUnitPage },
-      { path: 'time-bound/:id?', element: timeBoundPage },
-      { path: 'region/:id?', element: regionPage },
-      { path: 'person/:id?', element: personPage },
-      { path: 'project/new', element: <ProjectNewPage /> },
-      { path: 'project/:id/edit', element: <ProjectEditPage /> },
-      { path: 'project/:id?', element: projectPage },
-      { path: 'email', element: <EmailPage /> },
-      { path: 'login', element: <Login /> },
+      { path: 'occurrence', lazy: () => loadPagesElement('crossSearchPage') },
+      { path: 'crosssearch/:id?', lazy: () => loadPagesElement('crossSearchPage') },
+      { path: 'locality/:id?', lazy: () => loadPagesElement('localityPage') },
+      { path: 'species/:id?', lazy: () => loadPagesElement('speciesPage') },
+      { path: 'museum/:id?', lazy: () => loadPagesElement('museumPage') },
+      { path: 'reference/:id?', lazy: () => loadPagesElement('referencePage') },
+      { path: 'time-unit/:id?', lazy: () => loadPagesElement('timeUnitPage') },
+      { path: 'time-bound/:id?', lazy: () => loadPagesElement('timeBoundPage') },
+      { path: 'region/:id?', lazy: () => loadPagesElement('regionPage') },
+      { path: 'person/:id?', lazy: () => loadPagesElement('personPage') },
+      {
+        path: 'project/new',
+        lazy: async () => {
+          const { ProjectNewPage } = await import('../pages/ProjectNewPage')
+          return { Component: ProjectNewPage }
+        },
+      },
+      {
+        path: 'project/:id/edit',
+        lazy: async () => {
+          const { ProjectEditPage } = await import('../pages/projects/ProjectEditPage')
+          return { Component: ProjectEditPage }
+        },
+      },
+      { path: 'project/:id?', lazy: () => loadPagesElement('projectPage') },
+      {
+        path: 'email',
+        lazy: async () => {
+          const { EmailPage } = await import('../components/EmailPage')
+          return { Component: EmailPage }
+        },
+      },
+      {
+        path: 'login',
+        lazy: async () => {
+          const { Login } = await import('../components/Login')
+          return { Component: Login }
+        },
+      },
       { path: '*', element: <div>Page not found.</div> },
     ],
   },
