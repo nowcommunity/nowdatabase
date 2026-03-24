@@ -407,16 +407,18 @@ export const LocalityTable = ({ selectorFn }: { selectorFn?: (newObject: Localit
     a.click()
   }
 
-  const svgExport = async <T extends MRT_RowData>(table: MRT_TableInstance<T>) => {
-    const rowData: Locality[] = table.getPrePaginationRowModel().rows.map(row => row.original as unknown as Locality)
-    const { generateSvg } = await import('../Map/generateSvg')
-    const dataString = generateSvg(rowData)
-    const blob = new Blob([dataString], { type: 'image/svg+xml' })
-    const url = URL.createObjectURL(blob)
-    const a = document.createElement('a')
-    a.href = url
-    a.download = `localities-map-${currentDateAsString()}.svg`
-    a.click()
+  const svgExport = <T extends MRT_RowData>(table: MRT_TableInstance<T>) => {
+    void (async () => {
+      const rowData: Locality[] = table.getPrePaginationRowModel().rows.map(row => row.original as unknown as Locality)
+      const { generateSvg } = await import('../Map/generateSvg')
+      const dataString = generateSvg(rowData)
+      const blob = new Blob([dataString], { type: 'image/svg+xml' })
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = `localities-map-${currentDateAsString()}.svg`
+      a.click()
+    })()
   }
 
   const checkRowRestriction = (row: Locality) => {
