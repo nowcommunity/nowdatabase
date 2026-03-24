@@ -323,9 +323,17 @@ describe('Deleting a time unit', () => {
     cy.get('[id=low_bnd-tableselection]').first().click()
     cy.get('[data-cy=add-button-14]').first().click()
 
+    cy.intercept('PUT', '**/time-unit').as('saveTimeUnitForDelete')
     cy.addReferenceAndSave()
+    cy.wait('@saveTimeUnitForDelete').then(({ response }) => {
+      expect(response?.statusCode).to.eq(200)
+      const createdSlug = response?.body?.tu_name
+      expect(createdSlug, 'created time unit slug').to.be.a('string')
+      expect(createdSlug, 'created time unit slug').to.not.equal('')
+      cy.visit(`/time-unit/${createdSlug}`)
+    })
 
-    cy.location('pathname').should('match', /\/time-unit\/[^/]+$/)
+    cy.contains(displayName)
     cy.contains('Creating new time-unit').should('not.exist')
     cy.get('[id=delete-button]', { timeout: 10000 }).should('be.visible')
 
