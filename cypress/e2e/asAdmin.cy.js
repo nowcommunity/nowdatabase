@@ -12,11 +12,9 @@ describe('Open each page, table view and detail view, and check at least some co
   it('Locality works', () => {
     cy.visit('/locality')
     cy.location('pathname', { timeout: pageLoadTimeout }).should('eq', '/locality')
-    cy.visit('/locality/21050')
-    cy.contains('Dmanisi', { timeout: pageLoadTimeout }).should('be.visible')
-    cy.contains('Dating method', { timeout: pageLoadTimeout }).should('be.visible')
-    cy.contains('Lithology', { timeout: pageLoadTimeout }).should('be.visible')
-    cy.contains('olduvai', { timeout: pageLoadTimeout }).should('be.visible')
+    cy.visit('/locality/20920?tab=2')
+    cy.contains('Lantian-Shuijiazui', { timeout: pageLoadTimeout }).should('be.visible')
+    cy.contains('Species', { timeout: pageLoadTimeout }).should('be.visible')
   })
 
   it('Species works', () => {
