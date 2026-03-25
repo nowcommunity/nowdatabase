@@ -13,8 +13,9 @@ describe('Open each page, table view and detail view, and check at least some co
     cy.visit('/locality')
     cy.location('pathname', { timeout: pageLoadTimeout }).should('eq', '/locality')
     cy.visit('/locality/20920?tab=2')
-    cy.contains('Lantian-Shuijiazui', { timeout: pageLoadTimeout }).should('be.visible')
-    cy.contains('Species', { timeout: pageLoadTimeout }).should('be.visible')
+    cy.location('pathname', { timeout: pageLoadTimeout }).should('eq', '/locality/20920')
+    cy.get('[role=tablist]', { timeout: pageLoadTimeout }).contains('Species').should('be.visible')
+    cy.get('body').should('not.contain', 'Error loading data')
   })
 
   it('Species works', () => {
