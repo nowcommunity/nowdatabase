@@ -1,3 +1,4 @@
+import { lazy, Suspense, useState } from 'react'
 import { Editable, LocalityDetailsType, LocalitySynonym } from '@/shared/types'
 import { useDetailContext } from '@/components/DetailView/Context/DetailContext'
 import { Grouped, ArrayFrame, HalfFrames } from '@/components/DetailView/common/tabLayoutHelpers'
@@ -7,12 +8,19 @@ import { useForm } from 'react-hook-form'
 import { EditableTable } from '@/components/DetailView/common/EditableTable'
 import { EditingModal } from '@/components/DetailView/common/EditingModal'
 import { emptyOption } from '@/components/DetailView/common/misc'
-import { CoordinateSelectionMap } from '@/components/Map/CoordinateSelectionMap'
-import { useState } from 'react'
 import { convertDmsToDec, convertDecToDms } from '@/util/coordinateConversion'
 import { validCountries } from '@/shared/validators/countryList'
-import { SingleLocalityMap } from '@/components/Map/SingleLocalityMap'
 import { useNotify } from '@/hooks/notification'
+
+const CoordinateSelectionMap = lazy(async () => {
+  const module = await import('@/components/Map/CoordinateSelectionMap')
+  return { default: module.CoordinateSelectionMap }
+})
+
+const SingleLocalityMap = lazy(async () => {
+  const module = await import('@/components/Map/SingleLocalityMap')
+  return { default: module.SingleLocalityMap }
+})
 
 type SynonymFormValues = {
   synonym: string
@@ -228,7 +236,9 @@ export const LocalityTab = () => {
   const coordinateButton = (
     <EditingModal buttonText="Get Coordinates" onSave={onCoordinateSelectorSave}>
       <Box sx={{ display: 'flex', flexDirection: 'column', gap: '1em' }}>
-        <CoordinateSelectionMap markerCoordinates={markerCoordinates} setMarkerCoordinates={setMarkerCoordinates} />
+        <Suspense fallback={<div>Loading map...</div>}>
+          <CoordinateSelectionMap markerCoordinates={markerCoordinates} setMarkerCoordinates={setMarkerCoordinates} />
+        </Suspense>
       </Box>
     </EditingModal>
   )
@@ -250,7 +260,11 @@ export const LocalityTab = () => {
         >
           <ArrayFrame array={latlong} title="Latitude & Longitude" />
           <Box sx={{ width: '50%' }}>
-            {hasCoordinates && <SingleLocalityMap decLat={editData.dec_lat} decLong={editData.dec_long} />}
+            {hasCoordinates && (
+              <Suspense fallback={<div>Loading map...</div>}>
+                <SingleLocalityMap decLat={editData.dec_lat} decLong={editData.dec_long} />
+              </Suspense>
+            )}
           </Box>
         </Box>
         {!mode.read && coordinateButton}

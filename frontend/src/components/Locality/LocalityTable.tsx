@@ -1,16 +1,19 @@
-import { useEffect, useMemo, useState } from 'react'
+import { lazy, Suspense, useEffect, useMemo, useState } from 'react'
 import { MRT_TableInstance, type MRT_ColumnDef, MRT_RowData } from 'material-react-table'
 import { useGetAllLocalitiesQuery } from '../../redux/localityReducer'
 import { Locality, SimplifiedLocality } from '@/shared/types'
 import { TableView } from '../TableView/TableView'
-import { LocalitiesMap } from '../Map/LocalitiesMap'
 import { generateKml } from '@/util/kml'
-import { generateSvg } from '../Map/generateSvg'
 import { formatWithMaxThreeDecimals } from '@/util/numberFormatting'
 import { usePageContext } from '../Page'
 import { LocalitySynonymsModal } from './LocalitySynonymsModal'
 import { currentDateAsString } from '@/shared/currentDateAsString'
 import { matchesCountryOrContinent } from '@/shared/validators/countryContinents'
+
+const LocalitiesMap = lazy(async () => {
+  const module = await import('../Map/LocalitiesMap')
+  return { default: module.LocalitiesMap }
+})
 
 export const LocalityTable = ({ selectorFn }: { selectorFn?: (newObject: Locality) => void }) => {
   const [selectedLocality, setSelectedLocality] = useState<string | undefined>()
@@ -405,14 +408,17 @@ export const LocalityTable = ({ selectorFn }: { selectorFn?: (newObject: Localit
   }
 
   const svgExport = <T extends MRT_RowData>(table: MRT_TableInstance<T>) => {
-    const rowData: Locality[] = table.getPrePaginationRowModel().rows.map(row => row.original as unknown as Locality)
-    const dataString = generateSvg(rowData)
-    const blob = new Blob([dataString], { type: 'image/svg+xml' })
-    const url = URL.createObjectURL(blob)
-    const a = document.createElement('a')
-    a.href = url
-    a.download = `localities-map-${currentDateAsString()}.svg`
-    a.click()
+    void (async () => {
+      const rowData: Locality[] = table.getPrePaginationRowModel().rows.map(row => row.original as unknown as Locality)
+      const { generateSvg } = await import('../Map/generateSvg')
+      const dataString = generateSvg(rowData)
+      const blob = new Blob([dataString], { type: 'image/svg+xml' })
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = `localities-map-${currentDateAsString()}.svg`
+      a.click()
+    })()
   }
 
   const checkRowRestriction = (row: Locality) => {
@@ -421,7 +427,9 @@ export const LocalityTable = ({ selectorFn }: { selectorFn?: (newObject: Localit
 
   return (
     <>
-      <LocalitiesMap localities={filteredLocalities} isFetching={localitiesQueryIsFetching} />
+      <Suspense fallback={<div />}>
+        <LocalitiesMap localities={filteredLocalities} isFetching={localitiesQueryIsFetching} />
+      </Suspense>
       <TableView<Locality>
         title="Localities"
         selectorFn={selectorFn}
