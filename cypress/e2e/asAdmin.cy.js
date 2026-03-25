@@ -9,9 +9,12 @@ describe('Open each page, table view and detail view, and check at least some co
 
   it('Locality works', () => {
     cy.visit('/locality')
-    cy.location('pathname').should('eq', '/locality')
-    cy.visit('/locality/21050?tab=0')
+    cy.contains('Name').should('be.visible')
+    cy.contains('Country').should('be.visible')
+    cy.visit('/locality/21050')
+    cy.contains('Dmanisi')
     cy.contains('Dating method')
+    cy.contains('Lithology')
     cy.contains('olduvai')
   })
 
