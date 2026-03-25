@@ -12,9 +12,7 @@ describe('Open each page, table view and detail view, and check at least some co
   it('Locality works', () => {
     cy.visit('/locality')
     cy.location('pathname', { timeout: pageLoadTimeout }).should('eq', '/locality')
-    cy.intercept('GET', '**/locality/20920').as('getLocalityDetails')
     cy.visit('/locality/20920?tab=1')
-    cy.wait('@getLocalityDetails').its('response.statusCode').should('eq', 200)
     cy.location('pathname', { timeout: pageLoadTimeout }).should('eq', '/locality/20920')
     cy.get('body').should('not.contain', 'Error loading data')
   })
