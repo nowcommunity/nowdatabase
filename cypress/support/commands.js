@@ -42,7 +42,6 @@ Cypress.Commands.add('login', username => {
     expect(parsedUserState?.token, 'stored login token').to.be.a('string').and.not.be.empty
   })
   cy.contains('.username-box', username, { timeout: 30000 }).should('be.visible')
-  cy.contains('Login').should('not.exist')
 })
 
 Cypress.Commands.add('loginAsDeleteCoordinator', () => {

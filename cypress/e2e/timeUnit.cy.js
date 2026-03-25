@@ -163,7 +163,15 @@ describe('Creating a time unit', () => {
     cy.get('[id=low_bnd-tableselection]').first().click()
     cy.get('[data-cy=add-button-14]').first().click()
 
+    cy.intercept('PUT', '**/time-unit').as('saveCreatedTimeUnit')
     cy.addReferenceAndSave()
+    cy.wait('@saveCreatedTimeUnit').then(({ response }) => {
+      expect(response?.statusCode).to.eq(200)
+      const createdSlug = response?.body?.tu_name
+      expect(createdSlug, 'created time unit slug').to.be.a('string')
+      expect(createdSlug, 'created time unit slug').to.not.equal('')
+      cy.visit(`/time-unit/${createdSlug}`)
+    })
     cy.contains(displayName)
     cy.contains('C2N-o')
     cy.contains('C2N-y')
@@ -173,7 +181,9 @@ describe('Creating a time unit', () => {
     cy.get('[id=low_bnd-tableselection]').first().click()
     cy.get('[data-cy=add-button-49]').first().click()
 
+    cy.intercept('PUT', '**/time-unit').as('saveEditedTimeUnit')
     cy.addReferenceAndSave()
+    cy.wait('@saveEditedTimeUnit').its('response.statusCode').should('eq', 200)
     cy.contains(displayName)
     cy.get('[id=edit-button]').click()
     cy.get('[id=sequence-tableselection]').should('have.value', 'Calatayud-Teruel local biozone')
