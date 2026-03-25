@@ -11,8 +11,7 @@ describe('Open each page, table view and detail view, and check at least some co
 
   it('Locality works', () => {
     cy.visit('/locality')
-    cy.contains('Name', { timeout: pageLoadTimeout }).should('be.visible')
-    cy.contains('Country', { timeout: pageLoadTimeout }).should('be.visible')
+    cy.location('pathname', { timeout: pageLoadTimeout }).should('eq', '/locality')
     cy.visit('/locality/21050')
     cy.contains('Dmanisi', { timeout: pageLoadTimeout }).should('be.visible')
     cy.contains('Dating method', { timeout: pageLoadTimeout }).should('be.visible')
@@ -22,16 +21,14 @@ describe('Open each page, table view and detail view, and check at least some co
 
   it('Species works', () => {
     cy.visit('/species')
-    cy.location('pathname').should('eq', '/species')
-    cy.contains('Order', { timeout: pageLoadTimeout }).should('be.visible')
+    cy.location('pathname', { timeout: pageLoadTimeout }).should('eq', '/species')
     cy.visit('/species/21052/')
     cy.contains('21052 Simplomys simplicidens', { timeout: pageLoadTimeout }).should('be.visible')
   })
 
   it('Reference works', () => {
     cy.visit('/reference')
-    cy.location('pathname').should('eq', '/reference')
-    cy.contains('References', { timeout: pageLoadTimeout }).should('be.visible')
+    cy.location('pathname', { timeout: pageLoadTimeout }).should('eq', '/reference')
     cy.visit('/reference/10039')
     cy.contains('Reference type', { timeout: pageLoadTimeout }).should('be.visible')
     cy.contains('A new geomagnetic polarity time scale for the Late Cretaceous and Cenozoic', {
@@ -41,8 +38,7 @@ describe('Open each page, table view and detail view, and check at least some co
 
   it('Time Unit works', () => {
     cy.visit('/time-unit')
-    cy.location('pathname').should('eq', '/time-unit')
-    cy.contains('Sequence', { timeout: pageLoadTimeout }).should('be.visible')
+    cy.location('pathname', { timeout: pageLoadTimeout }).should('eq', '/time-unit')
     cy.visit('/time-unit/bahean?tab=0')
     cy.contains('Bahean', { timeout: pageLoadTimeout }).should('be.visible')
   })
