@@ -9,7 +9,7 @@ describe('Open each page, table view and detail view, and check at least some co
 
   it('Locality works', () => {
     cy.visit('/locality')
-    cy.visit('/locality/21050')
+    cy.visit('/locality/21050?tab=0')
     cy.contains('Dating method')
     cy.contains('olduvai')
   })
