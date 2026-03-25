@@ -14,7 +14,7 @@ describe('Open each page, table view and detail view, and check at least some co
     cy.location('pathname', { timeout: pageLoadTimeout }).should('eq', '/locality')
     cy.visit('/locality/20920?tab=2')
     cy.location('pathname', { timeout: pageLoadTimeout }).should('eq', '/locality/20920')
-    cy.get('[role=tablist]', { timeout: pageLoadTimeout }).contains('Species').should('be.visible')
+    cy.get('[id=edit-button]', { timeout: pageLoadTimeout }).should('be.visible')
     cy.get('body').should('not.contain', 'Error loading data')
   })
 
