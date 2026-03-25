@@ -12,9 +12,9 @@ describe('Open each page, table view and detail view, and check at least some co
   it('Locality works', () => {
     cy.visit('/locality')
     cy.location('pathname', { timeout: pageLoadTimeout }).should('eq', '/locality')
-    cy.visit('/locality/20920?tab=2')
+    cy.visit('/locality/20920?tab=1')
     cy.location('pathname', { timeout: pageLoadTimeout }).should('eq', '/locality/20920')
-    cy.get('[id=edit-button]', { timeout: pageLoadTimeout }).should('be.visible')
+    cy.contains('Name', { timeout: pageLoadTimeout }).should('be.visible')
     cy.get('body').should('not.contain', 'Error loading data')
   })
 
