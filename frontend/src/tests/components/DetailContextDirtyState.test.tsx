@@ -57,6 +57,15 @@ const NestedTestConsumer = () => {
       >
         Remove species
       </button>
+      <button
+        onClick={() => {
+          const items = [...editData.now_ls]
+          items[0].rowState = 'clean'
+          setEditData({ ...editData, now_ls: items })
+        }}
+      >
+        Restore species
+      </button>
     </div>
   )
 }
@@ -163,5 +172,22 @@ describe('DetailContext dirty state tracking', () => {
     await user.click(screen.getByRole('button', { name: /remove species/i }))
 
     expect(screen.getByTestId('dirty-state').textContent).toBe('dirty')
+  })
+
+  it('clears dirty state when a removed row is restored to clean', async () => {
+    const user = userEvent.setup()
+    const initialData: NestedTestData = {
+      now_ls: [{ species_id: 1 }],
+    }
+
+    render(createNestedProvider(initialData))
+
+    expect(screen.getByTestId('dirty-state').textContent).toBe('clean')
+
+    await user.click(screen.getByRole('button', { name: /remove species/i }))
+    expect(screen.getByTestId('dirty-state').textContent).toBe('dirty')
+
+    await user.click(screen.getByRole('button', { name: /restore species/i }))
+    expect(screen.getByTestId('dirty-state').textContent).toBe('clean')
   })
 })
