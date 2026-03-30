@@ -10,4 +10,5 @@ command -v npm >/dev/null 2>&1 || {
   exit 1
 }
 
-npm run lint && npm run tsc
+# Use lint-staged for faster pre-commit checks (only on changed files)
+npm run lint:staged
