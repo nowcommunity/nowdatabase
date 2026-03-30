@@ -10,3 +10,4 @@ cypress/screenshots
 cypress/downloads
 coverage
 .nyc_output
+.eslintcache
