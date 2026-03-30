@@ -176,15 +176,15 @@ export const DetailContextProvider = <T extends object>({
   }, [contextState.data])
 
   useEffect(() => {
-    setIsDirty(
-      !isEqualWith(normalizeForDirtyCheck(editData), normalizeForDirtyCheck(initialEditData), compareValues)
-    )
+    setIsDirty(!isEqualWith(normalizeForDirtyCheck(editData), normalizeForDirtyCheck(initialEditData), compareValues))
   }, [editData, initialEditData])
 
   const handleSetEditData = (data: unknown) => {
     const newEditData = data as EditDataType<T>
     setEditData(newEditData)
-    setIsDirty(!isEqualWith(normalizeForDirtyCheck(newEditData), normalizeForDirtyCheck(initialEditData), compareValues))
+    setIsDirty(
+      !isEqualWith(normalizeForDirtyCheck(newEditData), normalizeForDirtyCheck(initialEditData), compareValues)
+    )
   }
 
   const resetEditData = () => {
