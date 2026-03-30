@@ -25,7 +25,7 @@ export default defineConfig({
       { find: '@', replacement: path.resolve(__dirname, './src/') },
       { find: '@components', replacement: path.resolve(__dirname, './src/components') },
       { find: '@util', replacement: path.resolve(__dirname, './src/util') },
-      { find: '@backend', replacement: path.resolve(__dirname, '.,/src/') },
+      { find: '@backend', replacement: path.resolve(__dirname, '../src/') },
     ],
   },
   build: {
