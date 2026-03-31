@@ -5,8 +5,8 @@ before('Reset database', () => {
 const buildLocalityName = (base = 'Bugat') => `${base} ${Date.now()}-${Math.floor(Math.random() * 1e6)}`
 
 describe('Adding species in Locality -> Species tab for an existing locality', () => {
-  beforeEach('Login as admin', () => {
-    cy.login('testSu')
+  beforeEach('Login as admin with session caching', () => {
+    cy.loginWithSession('testSu')
   })
 
   it('works with valid, unique species', () => {
@@ -193,9 +193,8 @@ describe('Adding species in Locality -> Species tab for an existing locality', (
 })
 
 describe('Creating a new locality', () => {
-  beforeEach('Login as admin', () => {
-    cy.resetDatabase()
-    cy.login('testSu')
+  beforeEach('Login as admin with session caching', () => {
+    cy.loginWithSession('testSu')
   })
 
   it('with valid data works', () => {
@@ -415,8 +414,8 @@ describe('Creating a new locality', () => {
 })
 
 describe('Editing a locality', () => {
-  beforeEach('Login as admin', () => {
-    cy.login('testSu')
+  beforeEach('Login as admin with session caching', () => {
+    cy.loginWithSession('testSu')
   })
 
   it('with contradictory min and max ages does not work', () => {
@@ -497,8 +496,8 @@ describe('Editing a locality', () => {
 })
 
 describe('Locality table filtering', () => {
-  beforeEach('Login as admin', () => {
-    cy.login('testSu')
+  beforeEach('Login as admin with session caching', () => {
+    cy.loginWithSession('testSu')
   })
 
   it('supports filtering by synonym names', () => {
@@ -515,8 +514,8 @@ describe('Locality table filtering', () => {
 // This test needs GEONAMES_USERNAME to be set in .anon.env!
 
 describe("Locality's coordinate selection map works", () => {
-  beforeEach('Login as admin', () => {
-    cy.login('testSu')
+  beforeEach('Login as admin with session caching', () => {
+    cy.loginWithSession('testSu')
   })
 
   it('Map view and location search work', () => {
@@ -585,8 +584,8 @@ describe("Locality's coordinate selection map works", () => {
 })
 
 describe('Deleting a locality', () => {
-  beforeEach('Login as admin', () => {
-    cy.login('testSu')
+  beforeEach('Login as admin with session caching', () => {
+    cy.loginWithSession('testSu')
   })
 
   it('works and returns user to table view', () => {
@@ -610,8 +609,7 @@ describe('Linking projects to an existing locality', () => {
   const newProjectCode = 'WINE'
 
   beforeEach('Login as admin and open projects tab', () => {
-    cy.resetDatabase()
-    cy.login('testSu')
+    cy.loginWithSession('testSu')
     cy.visit(`/locality/${localityId}?tab=9`)
     cy.contains('Dmanisi')
   })

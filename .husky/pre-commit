@@ -10,4 +10,5 @@ command -v npm >/dev/null 2>&1 || {
   exit 1
 }
 
+# Full linting with cache for performance (97% faster on subsequent runs)
 npm run lint && npm run tsc

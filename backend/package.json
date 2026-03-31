@@ -10,7 +10,7 @@
     "test:unit": "jest src/unit-tests --coverage --config jest-config.js --detectOpenHandles --forceExit --silent",
     "test:api:local": "DOTENV_CONFIG_PATH=../.test.env npm run test:api -- --setupFiles dotenv/config",
     "start": "node build/index.js",
-    "lint": "eslint --report-unused-disable-directives --max-warnings 0",
+    "lint": "eslint --cache --report-unused-disable-directives --max-warnings 0",
     "prisma": "prisma generate --schema prisma/schema.prisma && prisma generate --schema prisma/schema_log.prisma",
     "clean": "rm -rf node_modules && rm -rf prisma/generated && rm -rf build && rm -rf coverage"
   },

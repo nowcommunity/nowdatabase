@@ -3,7 +3,7 @@
 describe('Sequence edit behavior', () => {
   beforeEach('Reset database and login as admin', () => {
     cy.resetDatabase()
-    cy.login('testSu')
+    cy.loginWithSession('testSu')
   })
 
   it('shows display labels in edit mode and keeps them after saving', () => {

@@ -19,7 +19,8 @@
     "lint": "npm run lint:backend && npm run lint:frontend && npm run lint:cypress",
     "lint:backend": "cd backend && npm run lint",
     "lint:frontend": "cd frontend && npm run lint",
-    "lint:cypress": "eslint --report-unused-disable-directives --max-warnings 0 \"cypress/e2e/**/*.{cy,spec}.{js,ts,tsx}\"",
+    "lint:cypress": "eslint --cache --report-unused-disable-directives --max-warnings 0 \"cypress/e2e/**/*.{cy,spec}.{js,ts,tsx}\"",
+    "lint:staged": "npx lint-staged",
     "tsc": "npm run tsc:backend && npm run tsc:frontend",
     "tsc:backend": "cd backend && npx tsc --noEmit",
     "tsc:frontend": "cd frontend && npx tsc --noEmit",
@@ -62,6 +63,19 @@
     "config:dev": "cp -n .template.env .dev.env && npm run config:geonames -- .dev.env",
     "config:geonames": "sed -i -e \"s|GEONAMES_USERNAME: \\\"\\\"|GEONAMES_USERNAME: $GEONAMES_USERNAME|g\"",
     "prepare": "husky"
+  },
+  "lint-staged": {
+    "frontend/**/*.{ts,tsx}": [
+      "cd frontend && npx eslint --cache --fix",
+      "cd frontend && npx tsc --noEmit"
+    ],
+    "backend/**/*.{ts,js}": [
+      "cd backend && npx eslint --cache --fix",
+      "cd backend && npx tsc --noEmit"
+    ],
+    "cypress/**/*.{ts,js,tsx}": [
+      "npx eslint --cache --fix"
+    ]
   },
   "author": "",
   "devDependencies": {

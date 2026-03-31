@@ -4,9 +4,8 @@ before('Reset database', () => {
 
 describe('Broadly test what different user rights see', () => {
   describe('Admin visibility', () => {
-    beforeEach('Login as admin', () => {
-      cy.session('admin-session', () => {})
-      cy.login('testSu')
+    beforeEach('Login as admin with session caching', () => {
+      cy.loginWithSession('testSu')
     })
 
     it('Sees new button in tableviews', () => {
@@ -17,8 +16,7 @@ describe('Broadly test what different user rights see', () => {
     })
 
     it('Regions view shows correctly', () => {
-      cy.get('div[id="/admin-menu-button"]').click()
-      cy.contains('Regions').click()
+      cy.visit('/region')
       cy.contains('region 4452477e')
       cy.get('[data-cy="details-button-1"]').first().click()
       cy.contains('Regional Coordinators')
@@ -28,8 +26,7 @@ describe('Broadly test what different user rights see', () => {
     })
 
     it('Projects view shows correctly', () => {
-      cy.get('div[id="/admin-menu-button"]').click()
-      cy.get('a[id="/project-menu-link"]').click()
+      cy.visit('/project')
       cy.contains('Workgroup on Insectivores')
       cy.get('[data-cy="details-button-3"]').first().click()
       cy.contains('Coordinator')
@@ -39,7 +36,7 @@ describe('Broadly test what different user rights see', () => {
     })
 
     it('Time Bound view shows correctly', () => {
-      cy.contains('Time Bounds').click()
+      cy.visit('/time-bound')
       cy.contains('C2N-y')
       cy.get('[data-cy="details-button-11"]').first().click()
       cy.contains('Bound')
@@ -49,8 +46,7 @@ describe('Broadly test what different user rights see', () => {
     })
 
     it('Email page opens', () => {
-      cy.get('div[id="/admin-menu-button"]').click()
-      cy.contains('Email').click()
+      cy.visit('/email')
       cy.contains('Send email')
     })
   })

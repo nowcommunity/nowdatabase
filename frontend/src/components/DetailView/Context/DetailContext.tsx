@@ -21,6 +21,23 @@ const cloneDeep = <T,>(value: T): T => {
 const isPlainObject = (value: unknown): value is Record<string, unknown> =>
   typeof value === 'object' && value !== null && !Array.isArray(value)
 
+const normalizeForDirtyCheck = (value: unknown): unknown => {
+  if (Array.isArray(value)) {
+    return value.map(item => normalizeForDirtyCheck(item))
+  }
+
+  if (isPlainObject(value)) {
+    const normalizedEntries = Object.entries(value).flatMap(([key, nestedValue]) => {
+      if (key === 'rowState' && nestedValue === 'clean') return []
+      return [[key, normalizeForDirtyCheck(nestedValue)]]
+    })
+
+    return Object.fromEntries(normalizedEntries)
+  }
+
+  return value
+}
+
 const isEqualWith = (
   value: unknown,
   other: unknown,
@@ -159,13 +176,15 @@ export const DetailContextProvider = <T extends object>({
   }, [contextState.data])
 
   useEffect(() => {
-    setIsDirty(!isEqualWith(editData, initialEditData, compareValues))
+    setIsDirty(!isEqualWith(normalizeForDirtyCheck(editData), normalizeForDirtyCheck(initialEditData), compareValues))
   }, [editData, initialEditData])
 
   const handleSetEditData = (data: unknown) => {
     const newEditData = data as EditDataType<T>
     setEditData(newEditData)
-    setIsDirty(!isEqualWith(newEditData, initialEditData, compareValues))
+    setIsDirty(
+      !isEqualWith(normalizeForDirtyCheck(newEditData), normalizeForDirtyCheck(initialEditData), compareValues)
+    )
   }
 
   const resetEditData = () => {

@@ -4,7 +4,7 @@ before('Reset database', () => {
 
 describe('Change password form validates passwords correctly and shows errors to the user', () => {
   beforeEach('Login as admin', () => {
-    cy.login('testSu')
+    cy.loginWithSession('testSu')
   })
 
   it('Missing fields are not allowed', () => {
