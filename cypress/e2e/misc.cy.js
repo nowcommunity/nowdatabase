@@ -51,8 +51,8 @@ describe('Test individual features across the app', () => {
   })
 
   describe('Staging mode works for the data types that require it', () => {
-    beforeEach('Login as admin', () => {
-      cy.login('testSu')
+    beforeEach('Login as admin with session caching', () => {
+      cy.loginWithSession('testSu')
     })
 
     it('Staging mode works on locality', () => {
@@ -85,27 +85,27 @@ describe('Test individual features across the app', () => {
 
   // TODO remove the skips once onWrite's has been added to all
   describe('Staging mode does not appear for the data types that dont require it', () => {
-    beforeEach('Login as admin', () => {
-      cy.login('testSu')
+    beforeEach('Login as admin with session caching', () => {
+      cy.loginWithSession('testSu')
     })
 
     it('Staging mode does not appear on reference', () => {
-      cy.login('testSu')
+      cy.loginWithSession('testSu')
       doesNotHaveStagingMode('reference/10039')
     })
 
     it.skip('Staging mode does not appear on regions', () => {
-      cy.login('testSu')
+      cy.loginWithSession('testSu')
       doesNotHaveStagingMode('region/1')
     })
 
     it.skip('Staging mode does not appear on projects', () => {
-      cy.login('testSu')
+      cy.loginWithSession('testSu')
       doesNotHaveStagingMode('project/3')
     })
 
     it.skip('Staging mode does not appear on person page', () => {
-      cy.login('testSu')
+      cy.loginWithSession('testSu')
       doesNotHaveStagingMode('person/AD')
     })
   })

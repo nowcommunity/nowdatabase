@@ -6,7 +6,7 @@ const pageLoadTimeout = 30000
 
 describe('Open each page, table view and detail view, and check at least some correct text appears', () => {
   beforeEach('Login as admin', () => {
-    cy.login('testSu')
+    cy.loginWithSession('testSu')
   })
 
   it('Locality works', () => {

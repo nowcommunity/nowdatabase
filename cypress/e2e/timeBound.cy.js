@@ -3,8 +3,8 @@ before('Reset database', () => {
 })
 
 describe('Creating time bound', () => {
-  beforeEach('Login as admin', () => {
-    cy.login('testSu')
+  beforeEach('Login as admin with session caching', () => {
+    cy.loginWithSession('testSu')
   })
 
   it('with correct values works', () => {
@@ -24,8 +24,8 @@ describe('Creating time bound', () => {
 })
 
 describe('Editing time bound', () => {
-  beforeEach('Login as admin', () => {
-    cy.login('testSu')
+  beforeEach('Login as admin with session caching', () => {
+    cy.loginWithSession('testSu')
   })
 
   it('with correct values works', () => {
@@ -52,8 +52,8 @@ describe('Editing time bound', () => {
 })
 
 describe('Deleting a time bound', () => {
-  beforeEach('Login as admin', () => {
-    cy.login('testSu')
+  beforeEach('Login as admin with session caching', () => {
+    cy.loginWithSession('testSu')
   })
 
   // TODO: Add test for deleting a time bound (this can be copy pasted from other e2e test files with minimal changes)

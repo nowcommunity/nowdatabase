@@ -3,8 +3,8 @@ before('Reset database', () => {
 })
 
 describe('Creating a region', () => {
-  beforeEach('Login as admin', () => {
-    cy.login('testSu')
+  beforeEach('Login as admin with session caching', () => {
+    cy.loginWithSession('testSu')
   })
 
   it('with valid data works', () => {
@@ -24,8 +24,8 @@ describe('Creating a region', () => {
 })
 
 describe('Editing a region', () => {
-  beforeEach('Login as admin', () => {
-    cy.login('testSu')
+  beforeEach('Login as admin with session caching', () => {
+    cy.loginWithSession('testSu')
   })
 
   it('with valid data works', () => {
@@ -112,8 +112,8 @@ describe('Editing a region', () => {
 })
 
 describe('Deleting a region', () => {
-  beforeEach('Login as admin', () => {
-    cy.login('testSu')
+  beforeEach('Login as admin with session caching', () => {
+    cy.loginWithSession('testSu')
   })
 
   it('works and returns user to table view', () => {

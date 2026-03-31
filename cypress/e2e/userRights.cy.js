@@ -6,7 +6,7 @@ describe('Broadly test what different user rights see', () => {
   describe('Admin visibility', () => {
     beforeEach('Login as admin', () => {
       cy.session('admin-session', () => {})
-      cy.login('testSu')
+      cy.loginWithSession('testSu')
     })
 
     it('Sees new button in tableviews', () => {

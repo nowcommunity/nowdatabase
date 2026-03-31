@@ -3,8 +3,8 @@ before('Reset database', () => {
 })
 
 describe('Creating a journal', () => {
-  beforeEach('Login as admin', () => {
-    cy.login('testSu')
+  beforeEach('Login as admin with session caching', () => {
+    cy.loginWithSession('testSu')
   })
 
   it('with valid data works', () => {
@@ -95,8 +95,8 @@ describe('Creating a journal', () => {
 // TODO: add more tests for different types of references
 
 describe('Editing a journal', () => {
-  beforeEach('Login as admin', () => {
-    cy.login('testSu')
+  beforeEach('Login as admin with session caching', () => {
+    cy.loginWithSession('testSu')
   })
 
   it('with valid data works', () => {
@@ -140,8 +140,8 @@ describe('Editing a journal', () => {
 // TODO: add more tests for different types of references
 
 describe('Deleting a reference', () => {
-  beforeEach('Login as admin', () => {
-    cy.login('testSu')
+  beforeEach('Login as admin with session caching', () => {
+    cy.loginWithSession('testSu')
   })
 
   it('that is not linked to anything works and returns user to table view', () => {

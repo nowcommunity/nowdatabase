@@ -6,7 +6,7 @@ describe('Update log navigation', () => {
   })
 
   beforeEach('Login as admin', () => {
-    cy.login('testSu')
+    cy.loginWithSession('testSu')
   })
 
   const openFirstUpdateWithReference = (index = 0) => {

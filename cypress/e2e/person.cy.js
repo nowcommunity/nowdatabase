@@ -3,16 +3,16 @@ before('Reset database', () => {
 })
 
 describe('Creating a person', () => {
-  beforeEach('Login as admin', () => {
-    cy.login('testSu')
+  beforeEach('Login as admin with session caching', () => {
+    cy.loginWithSession('testSu')
   })
 
   it.skip('with valid data works', () => {})
 })
 
 describe('Editing a person', () => {
-  beforeEach('Login as admin', () => {
-    cy.login('testSu')
+  beforeEach('Login as admin with session caching', () => {
+    cy.loginWithSession('testSu')
   })
 
   it('with valid data works', () => {
@@ -84,21 +84,21 @@ describe('User rights', () => {
   })
 
   it('restricted editor is redirected to their own person page when opening another person', () => {
-    cy.login('testEr')
+    cy.loginWithSession('testEr')
     cy.visit(`/person/AD?tab=0`)
     cy.url().should('eq', 'http://localhost:5173/person/AD?tab=0')
     cy.get('[id=edit-button]').should('exist')
   })
 
   it('unrestricted editor is redirected to their own person page when opening another person', () => {
-    cy.login('testEu')
+    cy.loginWithSession('testEu')
     cy.visit(`/person/AD?tab=0`)
     cy.url().should('eq', 'http://localhost:5173/person/AD?tab=0')
     cy.get('[id=edit-button]').should('exist')
   })
 
   it('admin can view other users directly', () => {
-    cy.login('testSu')
+    cy.loginWithSession('testSu')
     cy.visit(`/person/AD?tab=0`)
     cy.url().should('eq', 'http://localhost:5173/person/AD?tab=0') // admin can see everyone's pages
     cy.get('[id=edit-button]').should('exist')

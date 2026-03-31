@@ -6,9 +6,8 @@ before('Reset database', () => {
 })
 
 describe('Creating a time unit', () => {
-  beforeEach('Reset database and login as admin', () => {
-    cy.resetDatabase()
-    cy.login('testSu')
+  beforeEach('Login as admin with session caching', () => {
+    cy.loginWithSession('testSu')
   })
 
   it('with correct values works', () => {
@@ -192,9 +191,8 @@ describe('Creating a time unit', () => {
 })
 
 describe('Editing a time unit', () => {
-  beforeEach('Reset database and login as admin', () => {
-    cy.resetDatabase()
-    cy.login('testSu')
+  beforeEach('Login as admin with session caching', () => {
+    cy.loginWithSession('testSu')
   })
 
   it('with correct values works', () => {
@@ -316,9 +314,8 @@ describe('Editing a time unit', () => {
 })
 
 describe('Deleting a time unit', () => {
-  beforeEach('Reset database and login as admin', () => {
-    cy.resetDatabase()
-    cy.login('testSu')
+  beforeEach('Login as admin with session caching', () => {
+    cy.loginWithSession('testSu')
   })
 
   it('deletes a time unit that is not linked to any locality', () => {

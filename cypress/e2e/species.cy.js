@@ -1,10 +1,10 @@
-before('Reset database', () => {
+before('Reset database once for all tests', () => {
   cy.resetDatabase()
 })
 
 describe('Creating a species', () => {
-  beforeEach('Login as admin', () => {
-    cy.login('testSu')
+  beforeEach('Login as admin with session caching', () => {
+    cy.loginWithSession('testSu')
   })
 
   it('with valid data works and is formatted properly', () => {
@@ -44,8 +44,8 @@ describe('Creating a species', () => {
 })
 
 describe('Editing a species', () => {
-  beforeEach('Login as admin', () => {
-    cy.login('testSu')
+  beforeEach('Login as admin with session caching', () => {
+    cy.loginWithSession('testSu')
   })
 
   it('with valid data works', () => {
@@ -103,8 +103,8 @@ describe('Taxonomy checks work', () => {
     cy.resetDatabase()
   })
 
-  beforeEach('Login as admin', () => {
-    cy.login('testSu')
+  beforeEach('Login as admin with session caching', () => {
+    cy.loginWithSession('testSu')
   })
 
   it('Creating a species that already exists in database does not work', () => {
@@ -258,8 +258,8 @@ describe('Taxonomy checks work', () => {
 })
 
 describe('Deleting a species', () => {
-  beforeEach('Login as admin', () => {
-    cy.login('testSu')
+  beforeEach('Login as admin with session caching', () => {
+    cy.loginWithSession('testSu')
   })
   // TODO: Add test for deleting a species (this can be copy pasted from other e2e test files with minimal changes)
   // Not done because species that have synonyms cannot be deleted currently.

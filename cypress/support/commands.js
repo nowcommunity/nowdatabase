@@ -73,6 +73,45 @@ Cypress.Commands.add('resetDatabase', () => {
   cy.request(Cypress.env('databaseResetUrl')).its('status').should('eq', 200)
 })
 
+// Optimized database reset that only resets once per test file
+Cypress.Commands.add('resetDatabaseOnce', () => {
+  const currentSpec = Cypress.spec.name
+  const resetKey = `dbReset_${currentSpec}`
+  
+  if (!window[resetKey]) {
+    cy.resetDatabase()
+    window[resetKey] = true
+  }
+})
+
+// Login command with session caching for better performance
+Cypress.Commands.add('loginWithSession', (username) => {
+  cy.session(username, () => {
+    cy.clearAllLocalStorage()
+    cy.clearAllSessionStorage()
+    cy.clearCookies()
+    cy.intercept('POST', '**/user/login').as('loginRequest')
+    cy.visit('/login')
+    cy.get('[data-cy="username-basic"] input', { timeout: 10000 }).should('be.visible').clear().type(username)
+    cy.get('[data-cy="password-basic"] input').should('be.visible').clear().type('test', { log: false })
+    cy.get('[data-cy="login-button"]').should('be.visible').click()
+    cy.wait('@loginRequest').its('response.statusCode').should('eq', 200)
+    cy.window().should(window => {
+      const storedUserState = window.localStorage.getItem('userState')
+      expect(storedUserState, 'stored user state').to.not.be.null
+
+      const parsedUserState = JSON.parse(storedUserState)
+      expect(parsedUserState?.token, 'stored login token').to.be.a('string').and.not.be.empty
+    })
+  }, {
+    validate: () => {
+      // Validate the session is still valid by checking for the username box
+      cy.visit('/')
+      cy.contains('.username-box', username, { timeout: 10000 }).should('be.visible')
+    }
+  })
+})
+
 // use this once you have edited some data and want to save it
 Cypress.Commands.add('addReferenceAndSave', () => {
   cy.get('[id=write-button]').click()
