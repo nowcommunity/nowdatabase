@@ -12,6 +12,7 @@ export type LoginResponse = {
 }
 
 type LoginData = { username: string; password: string }
+type ChangePasswordRequest = { newPassword: string; oldPassword?: string; targetUserId?: number }
 
 const userApi = api.injectEndpoints({
   endpoints: builder => ({
@@ -25,12 +26,13 @@ const userApi = api.injectEndpoints({
         method: 'POST',
       }),
     }),
-    changePassword: builder.mutation<void, { newPassword: string; oldPassword: string }>({
-      query: ({ newPassword, oldPassword }: { newPassword: string; oldPassword: string }) => ({
+    changePassword: builder.mutation<void, ChangePasswordRequest>({
+      query: ({ newPassword, oldPassword, targetUserId }: ChangePasswordRequest) => ({
         url: 'user/password',
         body: {
           newPassword,
           oldPassword,
+          targetUserId,
         },
         method: 'PUT',
       }),
@@ -41,6 +43,7 @@ const userApi = api.injectEndpoints({
         body: user,
         method: 'POST',
       }),
+      invalidatesTags: (_result, _error, { initials }) => [{ type: 'person', id: initials }, 'persons'],
     }),
   }),
 })

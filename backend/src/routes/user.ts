@@ -106,33 +106,50 @@ router.post('/create', async (req, res) => {
 
 router.put('/password', async (req, res) => {
   if (!req.user) throw new AccessError()
-  const { userId } = req.user
-  const { newPassword, oldPassword } = req.body as { newPassword: string; oldPassword: string }
+  const { userId, role } = req.user
+  const { newPassword, oldPassword, targetUserId } = req.body as {
+    newPassword: string
+    oldPassword?: string
+    targetUserId?: number
+  }
+
+  const isAdminChangingAnotherUser = role === Role.Admin && typeof targetUserId === 'number' && targetUserId !== userId
+  const userIdToUpdate = isAdminChangingAnotherUser ? targetUserId : userId
 
   const foundUser = await nowDb.com_users.findFirst({
     where: {
-      user_id: userId,
+      user_id: userIdToUpdate,
     },
     select: { password: true, newpassword: true },
   })
 
-  let passwordMatches: boolean
-  if (foundUser?.newpassword === null) {
-    // Compare old password
-    const hash = md5(oldPassword)
-    passwordMatches = hash === foundUser.password
-  } else {
-    passwordMatches = !!foundUser && !!(await bcrypt.compare(oldPassword, foundUser.newpassword))
-  }
+  if (!foundUser) return res.status(404).send({ error: 'User not found.' })
 
-  if (!passwordMatches) return res.status(403).send({ error: 'Old password does not match your current password.' })
+  if (!isAdminChangingAnotherUser) {
+    let passwordMatches: boolean
+    if (typeof oldPassword !== 'string' || oldPassword.length === 0) {
+      return res.status(400).send({ error: 'Old password is required.' })
+    }
+    if (newPassword === oldPassword) {
+      return res.status(400).send({ error: 'New password must be different from your current password.' })
+    }
+    if (foundUser.newpassword === null) {
+      // Compare old password
+      const hash = md5(oldPassword)
+      passwordMatches = hash === foundUser.password
+    } else {
+      passwordMatches = !!(await bcrypt.compare(oldPassword, foundUser.newpassword))
+    }
+
+    if (!passwordMatches) return res.status(403).send({ error: 'Old password does not match your current password.' })
+  }
 
   const validationResult = validatePassword(newPassword)
   if (!validationResult.isValid) return res.status(400).send({ error: validationResult.error })
 
   const passwordHash = await createPasswordHash(newPassword)
 
-  await nowDb.com_users.update({ where: { user_id: userId }, data: { newpassword: passwordHash } })
+  await nowDb.com_users.update({ where: { user_id: userIdToUpdate }, data: { newpassword: passwordHash } })
   return res.status(200).send()
 })
 

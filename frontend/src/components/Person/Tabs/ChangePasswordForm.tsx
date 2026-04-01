@@ -7,7 +7,11 @@ import { usePasswordValidation } from '@/hooks/usePasswordValidation'
 
 type ChangePasswordError = { status: number; data: { error: string } }
 
-export const ChangePasswordForm = () => {
+type ChangePasswordFormProps = {
+  targetUserId?: number
+}
+
+export const ChangePasswordForm = ({ targetUserId }: ChangePasswordFormProps) => {
   const [oldPassword, setOldPassword] = useState('')
   const [newPassword, setNewPassword] = useState('')
   const [verifyPassword, setVerifyPassword] = useState('')
@@ -15,14 +19,15 @@ export const ChangePasswordForm = () => {
   const { notify } = useNotify()
   const sx = { display: 'flex', alignItems: 'center', width: '10em', fontWeight: 'bold' }
   const dispatch = useDispatch()
+  const isAdminOverride = typeof targetUserId === 'number'
 
   const { passwordRequirements, validatePassword } = usePasswordValidation()
   const isPasswordValid = useMemo(() => validatePassword(newPassword).isValid, [newPassword, validatePassword])
   const isFormValid =
-    oldPassword.length > 0 &&
     newPassword.length > 0 &&
     verifyPassword.length > 0 &&
     isPasswordValid &&
+    (isAdminOverride || oldPassword.length > 0) &&
     newPassword === verifyPassword
 
   const changePassword = async () => {
@@ -30,19 +35,25 @@ export const ChangePasswordForm = () => {
       notify('New password was not the same in both fields.', 'error')
       return
     }
+    if (!isAdminOverride && newPassword === oldPassword) {
+      notify('New password must be different from your current password.', 'error')
+      return
+    }
     const passwordValidationResult = validatePassword(newPassword)
     if (!passwordValidationResult.isValid) {
       notify(passwordValidationResult.error ?? 'Password does not meet requirements', 'error')
       return
     }
-    if (newPassword.length === 0 || oldPassword.length === 0) {
+    if (newPassword.length === 0 || (!isAdminOverride && oldPassword.length === 0)) {
       notify('Please fill all fields.', 'error')
       return
     }
     try {
-      await changePasswordMutation({ newPassword, oldPassword }).unwrap()
-      notify('Password changed successfully.')
-      dispatch(removeFirstLogin())
+      await changePasswordMutation({ newPassword, oldPassword, targetUserId }).unwrap()
+      notify(isAdminOverride ? 'Password changed successfully for user.' : 'Password changed successfully.')
+      if (!isAdminOverride) {
+        dispatch(removeFirstLogin())
+      }
       setOldPassword('')
       setNewPassword('')
       setVerifyPassword('')
@@ -54,18 +65,20 @@ export const ChangePasswordForm = () => {
 
   return (
     <Grid container direction="column" sx={{ rowGap: '1em' }}>
-      <Grid container direction="row">
-        <Grid item sx={sx}>
-          Old password:
+      {!isAdminOverride && (
+        <Grid container direction="row">
+          <Grid item sx={sx}>
+            Old password:
+          </Grid>
+          <TextField
+            id="old-password-textfield"
+            type="password"
+            value={oldPassword}
+            onChange={event => setOldPassword(event.target.value)}
+            inputProps={{ 'data-testid': 'old-password-input' }}
+          />
         </Grid>
-        <TextField
-          id="old-password-textfield"
-          type="password"
-          value={oldPassword}
-          onChange={event => setOldPassword(event.target.value)}
-          inputProps={{ 'data-testid': 'old-password-input' }}
-        />
-      </Grid>
+      )}
       <Grid container direction="row">
         <Grid item sx={sx}>
           New password:
@@ -110,7 +123,7 @@ export const ChangePasswordForm = () => {
             onClick={() => void changePassword()}
             disabled={!isFormValid}
           >
-            Change password
+            {isAdminOverride ? 'Set password' : 'Change password'}
           </Button>
         </Grid>
       </Grid>

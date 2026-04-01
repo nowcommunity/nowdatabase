@@ -108,11 +108,10 @@ interface UserFieldValues {
 interface Props {
   isOpen: boolean
   onClose: () => void
-  onSave: () => void
   personInitials: string
 }
 
-export const AddUserModal = ({ isOpen, onClose, onSave, personInitials }: Props) => {
+export const AddUserModal = ({ isOpen, onClose, personInitials }: Props) => {
   const [fieldValues, setFieldValues] = useState<UserFieldValues>({
     username: '',
     password: '',
@@ -134,7 +133,6 @@ export const AddUserModal = ({ isOpen, onClose, onSave, personInitials }: Props)
       .then(() => {
         notify('User saved successfully.')
         onClose()
-        onSave()
       })
       .catch(e => {
         notify((e as { data: { message: string } }).data.message, 'error')
