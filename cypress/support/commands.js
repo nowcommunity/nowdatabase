@@ -24,6 +24,16 @@
 // -- This will overwrite an existing command --
 // Cypress.Commands.overwrite('visit', (originalFn, url, options) => { ... })
 
+Cypress.Commands.overwrite('visit', (originalFn, url, options) => {
+  const targetUrl = typeof url === 'string' ? url : url?.url
+  const resolvedUrl = targetUrl ? new URL(targetUrl, Cypress.config('baseUrl')).toString() : Cypress.config('baseUrl')
+  const appWaitTimeoutMs = Number(Cypress.env('appWaitTimeoutMs') ?? 60000)
+
+  return cy
+    .task('waitForAppHealthy', { url: resolvedUrl }, { timeout: appWaitTimeoutMs })
+    .then(() => originalFn(url, options))
+})
+
 Cypress.Commands.add('login', username => {
   cy.clearAllLocalStorage()
   cy.clearAllSessionStorage()
@@ -77,7 +87,7 @@ Cypress.Commands.add('resetDatabase', () => {
 Cypress.Commands.add('resetDatabaseOnce', () => {
   const currentSpec = Cypress.spec.name
   const resetKey = `dbReset_${currentSpec}`
-  
+
   if (!window[resetKey]) {
     cy.resetDatabase()
     window[resetKey] = true
@@ -108,7 +118,7 @@ Cypress.Commands.add('loginWithSession', (username) => {
       // Validate the session is still valid by checking for the username box
       cy.visit('/')
       cy.contains('.username-box', username, { timeout: 10000 }).should('be.visible')
-    }
+    },
   })
 })
 

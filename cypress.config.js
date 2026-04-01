@@ -1,9 +1,13 @@
 const { defineConfig } = require('cypress')
 const net = require('net')
+const http = require('http')
+const https = require('https')
 
 const DEFAULT_DB_HOST = process.env.CYPRESS_DB_HOST ?? process.env.MARIADB_HOST ?? '127.0.0.1'
 const DEFAULT_DB_PORT = Number(process.env.CYPRESS_DB_PORT ?? process.env.MARIADB_PORT ?? 3306)
 const DEFAULT_DB_WAIT_TIMEOUT_MS = Number(process.env.CYPRESS_DB_WAIT_TIMEOUT ?? 30_000)
+const DEFAULT_APP_BASE_URL = process.env.CYPRESS_baseUrl ?? 'http://localhost:5173/'
+const DEFAULT_APP_WAIT_TIMEOUT_MS = Number(process.env.CYPRESS_APP_WAIT_TIMEOUT ?? 60_000)
 
 const RETRY_DELAY_MS = 1_000
 const SOCKET_TIMEOUT_MS = 2_000
@@ -59,6 +63,61 @@ async function waitForDatabase(options = {}, env = {}) {
   })
 }
 
+/**
+ * @param {{ url?: string; timeoutMs?: number }} [options]
+ * @param {{ appBaseUrl?: string; appWaitTimeoutMs?: number }} [env]
+ */
+async function waitForHttpUrl(options = {}, env = {}) {
+  const url = options.url ?? env.appBaseUrl ?? DEFAULT_APP_BASE_URL
+  const timeoutMs = Number(options.timeoutMs ?? env.appWaitTimeoutMs ?? DEFAULT_APP_WAIT_TIMEOUT_MS)
+  const parsedUrl = new URL(url)
+  const client = parsedUrl.protocol === 'https:' ? https : http
+  const deadline = Date.now() + timeoutMs
+
+  return new Promise((resolve, reject) => {
+    const attemptRequest = () => {
+      const request = client.request(
+        parsedUrl,
+        { method: 'GET', timeout: SOCKET_TIMEOUT_MS },
+        response => {
+          response.resume()
+
+          if (response.statusCode && response.statusCode < 500) {
+            resolve(null)
+            return
+          }
+
+          if (Date.now() >= deadline) {
+            reject(new Error(`Timed out waiting for app at ${url} (status ${response.statusCode ?? 'unknown'})`))
+            return
+          }
+
+          setTimeout(attemptRequest, RETRY_DELAY_MS)
+        }
+      )
+
+      const retry = error => {
+        request.destroy()
+
+        if (Date.now() >= deadline) {
+          reject(new Error(`Timed out waiting for app at ${url} (${error.message})`))
+          return
+        }
+
+        setTimeout(attemptRequest, RETRY_DELAY_MS)
+      }
+
+      request.on('error', retry)
+      request.on('timeout', () => {
+        retry(new Error('Connection attempt timed out'))
+      })
+      request.end()
+    }
+
+    attemptRequest()
+  })
+}
+
 module.exports = defineConfig({
   e2e: {
     setupNodeEvents(on, config) {
@@ -67,6 +126,12 @@ module.exports = defineConfig({
       on('task', {
         waitForDbHealthy(options) {
           return waitForDatabase(options, config.env)
+        },
+        waitForAppHealthy(options) {
+          return waitForHttpUrl(options, {
+            ...config.env,
+            appBaseUrl: config.baseUrl,
+          })
         },
       })
 
@@ -88,6 +153,8 @@ module.exports = defineConfig({
     dbHost: DEFAULT_DB_HOST,
     dbPort: DEFAULT_DB_PORT,
     dbWaitTimeoutMs: DEFAULT_DB_WAIT_TIMEOUT_MS,
+    appBaseUrl: DEFAULT_APP_BASE_URL,
+    appWaitTimeoutMs: DEFAULT_APP_WAIT_TIMEOUT_MS,
   },
   viewportHeight: 900,
   viewportWidth: 1200,

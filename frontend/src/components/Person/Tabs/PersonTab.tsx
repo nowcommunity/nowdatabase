@@ -18,9 +18,9 @@ export const PersonTab = () => {
   const { notify } = useNotify()
   const { id: idFromUrl } = useParams()
   const isNew = idFromUrl === 'new'
+  const isUserPage = idFromUrl === 'user-page'
   const isAdmin = currentUser.role == Role.Admin
   const [isAddUserModalOpen, setIsAddUserModalOpen] = useState(false)
-  const [disableAddUserButton, setDisableAddUserButton] = useState(false)
 
   useEffect(() => {
     if (!currentUser?.isFirstLogin) return
@@ -54,13 +54,12 @@ export const PersonTab = () => {
         onClose={() => {
           setIsAddUserModalOpen(false)
         }}
-        onSave={() => setDisableAddUserButton(true)}
         personInitials={data.initials}
       />
       <ArrayFrame array={person} title="Person" />
       {data.user && <ArrayFrame array={user} title="User" />}
 
-      {isAdmin && !data.user && !disableAddUserButton && mode.option === 'read' && (
+      {isAdmin && !data.user && mode.option === 'read' && (
         <Button
           variant="contained"
           startIcon={<PersonAddIcon />}
@@ -82,6 +81,12 @@ export const PersonTab = () => {
             </Box>
           )}
           <ChangePasswordForm />
+        </Grouped>
+      )}
+
+      {isAdmin && !isUserPage && currentUser.initials !== data.initials && data.user?.user_id && (
+        <Grouped title="Change password" style={{ padding: '1em' }}>
+          <ChangePasswordForm targetUserId={data.user.user_id} />
         </Grouped>
       )}
     </>

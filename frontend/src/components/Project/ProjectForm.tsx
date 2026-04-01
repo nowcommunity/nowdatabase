@@ -9,7 +9,6 @@ import {
   Divider,
   FormControl,
   FormHelperText,
-  Grid,
   InputLabel,
   MenuItem,
   Select,
@@ -17,6 +16,7 @@ import {
   TextField,
   Typography,
 } from '@mui/material'
+import Grid from '@mui/material/Grid2'
 import { Controller, useForm } from 'react-hook-form'
 import { recordStatusOptions, projectStatusOptions } from '@/constants/projectStatus'
 import type { RecordStatusValue } from '@/constants/projectStatus'
@@ -121,7 +121,7 @@ export const ProjectForm = ({
           </Stack>
 
           <Grid container spacing={3}>
-            <Grid item xs={12} md={6}>
+            <Grid size={{ xs: 12, md: 6 }}>
               <TextField
                 label="Project Code"
                 fullWidth
@@ -131,7 +131,7 @@ export const ProjectForm = ({
                 disabled={isSubmitting}
               />
             </Grid>
-            <Grid item xs={12} md={6}>
+            <Grid size={{ xs: 12, md: 6 }}>
               <TextField
                 label="Project Name"
                 fullWidth
@@ -141,7 +141,7 @@ export const ProjectForm = ({
                 disabled={isSubmitting}
               />
             </Grid>
-            <Grid item xs={12} md={6}>
+            <Grid size={{ xs: 12, md: 6 }}>
               <Controller
                 control={control}
                 name="coordinatorUserId"
@@ -162,7 +162,7 @@ export const ProjectForm = ({
                 )}
               />
             </Grid>
-            <Grid item xs={12} md={3}>
+            <Grid size={{ xs: 12, md: 3 }}>
               <FormControl fullWidth error={Boolean(errors.projectStatus)} disabled={isSubmitting}>
                 <InputLabel id="project-status-label">Project Status</InputLabel>
                 <Controller
@@ -182,7 +182,7 @@ export const ProjectForm = ({
                 <FormHelperText>{errors.projectStatus?.message}</FormHelperText>
               </FormControl>
             </Grid>
-            <Grid item xs={12} md={3}>
+            <Grid size={{ xs: 12, md: 3 }}>
               <FormControl fullWidth error={Boolean(errors.recordStatus)} disabled={isSubmitting}>
                 <InputLabel id="record-status-label">Record Status</InputLabel>
                 <Controller
