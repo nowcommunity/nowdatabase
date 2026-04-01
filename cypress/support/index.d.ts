@@ -13,12 +13,18 @@ declare namespace Cypress {
 
   interface Tasks {
     waitForDbHealthy(options?: WaitForDbHealthyOptions): null
+    waitForAppHealthy(options?: WaitForAppHealthyOptions): null
   }
 }
 
 interface WaitForDbHealthyOptions {
   host?: string
   port?: number
+  timeoutMs?: number
+}
+
+interface WaitForAppHealthyOptions {
+  url?: string
   timeoutMs?: number
 }
 
