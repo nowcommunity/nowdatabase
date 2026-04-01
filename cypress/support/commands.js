@@ -28,9 +28,7 @@ Cypress.Commands.overwrite('visit', (originalFn, url, options) => {
   const targetUrl = typeof url === 'string' ? url : url?.url
   const resolvedUrl = targetUrl ? new URL(targetUrl, Cypress.config('baseUrl')).toString() : Cypress.config('baseUrl')
 
-  cy.task('waitForAppHealthy', { url: resolvedUrl })
-
-  return originalFn(url, options)
+  return cy.task('waitForAppHealthy', { url: resolvedUrl }).then(() => originalFn(url, options))
 })
 
 Cypress.Commands.add('login', username => {
