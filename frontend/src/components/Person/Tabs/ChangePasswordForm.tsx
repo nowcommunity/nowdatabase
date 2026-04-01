@@ -1,6 +1,7 @@
 import { useNotify } from '@/hooks/notification'
 import { removeFirstLogin, useChangePasswordMutation } from '@/redux/userReducer'
-import { Button, Grid, List, ListItem, ListItemText, TextField, Typography } from '@mui/material'
+import { Button, List, ListItem, ListItemText, TextField, Typography } from '@mui/material'
+import Grid from '@mui/material/Grid2'
 import { useMemo, useState } from 'react'
 import { useDispatch } from 'react-redux'
 import { usePasswordValidation } from '@/hooks/usePasswordValidation'
@@ -66,10 +67,8 @@ export const ChangePasswordForm = ({ targetUserId }: ChangePasswordFormProps) =>
   return (
     <Grid container direction="column" sx={{ rowGap: '1em' }}>
       {!isAdminOverride && (
-        <Grid container direction="row">
-          <Grid item sx={sx}>
-            Old password:
-          </Grid>
+        <Grid container direction="row" size={12}>
+          <Grid sx={sx}>Old password:</Grid>
           <TextField
             id="old-password-textfield"
             type="password"
@@ -79,10 +78,8 @@ export const ChangePasswordForm = ({ targetUserId }: ChangePasswordFormProps) =>
           />
         </Grid>
       )}
-      <Grid container direction="row">
-        <Grid item sx={sx}>
-          New password:
-        </Grid>
+      <Grid container direction="row" size={12}>
+        <Grid sx={sx}>New password:</Grid>
         <TextField
           id="new-password-textfield"
           type="password"
@@ -91,10 +88,8 @@ export const ChangePasswordForm = ({ targetUserId }: ChangePasswordFormProps) =>
           inputProps={{ 'data-testid': 'new-password-input' }}
         />
       </Grid>
-      <Grid container direction="row">
-        <Grid item sx={sx}>
-          New password again:
-        </Grid>
+      <Grid container direction="row" size={12}>
+        <Grid sx={sx}>New password again:</Grid>
         <TextField
           id="new-password-verification-textfield"
           type="password"
@@ -103,7 +98,7 @@ export const ChangePasswordForm = ({ targetUserId }: ChangePasswordFormProps) =>
           inputProps={{ 'data-testid': 'verify-password-input' }}
         />
       </Grid>
-      <Grid container direction="column" sx={{ rowGap: '0.5em' }}>
+      <Grid container direction="column" size={12} sx={{ rowGap: '0.5em' }}>
         <Typography variant="subtitle1">Password requirements</Typography>
         <List dense sx={{ listStyleType: 'disc', pl: 4 }}>
           {passwordRequirements.map(requirement => (
@@ -113,8 +108,8 @@ export const ChangePasswordForm = ({ targetUserId }: ChangePasswordFormProps) =>
           ))}
         </List>
       </Grid>
-      <Grid container direction="row">
-        <Grid item width="27em">
+      <Grid container direction="row" size={12}>
+        <Grid width="27em">
           <Button
             id="change-password-button"
             fullWidth

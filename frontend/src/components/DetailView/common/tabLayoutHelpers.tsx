@@ -1,4 +1,5 @@
-import { Card, Typography, Box, Grid, Divider } from '@mui/material'
+import { Card, Typography, Box, Divider } from '@mui/material'
+import Grid from '@mui/material/Grid2'
 import { ReactNode } from 'react'
 import { useDetailContext } from '../Context/DetailContext'
 import { EditDataType } from '@/shared/types'
@@ -11,14 +12,13 @@ export const ArrayToTable = ({ array, half }: { array: Array<Array<ReactNode>>; 
     return width
   }
   return (
-    <Grid container direction="row">
+    <Grid container direction="column">
       {array.map((row, rowIndex) => (
-        <Grid key={rowIndex} container direction="row" minHeight="2.5em">
+        <Grid key={rowIndex} container direction="row" size={12} minHeight="2.5em">
           {row.map((item, index) => (
             <Grid
               key={index}
-              item
-              xs={getCellWidth(rowIndex, index)}
+              size={getCellWidth(rowIndex, index)}
               sx={{
                 display: 'flex',
                 alignItems: 'center',
