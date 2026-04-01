@@ -19,7 +19,7 @@ This section summarizes the overall architecture, structure, and technologies of
 - Backend: **Node.js** with **Express.js** (REST API)
 - ORM / database layer via **Prisma**, targeting **MySQL / MariaDB**
 - Frontend: **React** (via **Vite**)
-- UI library: **Material-UI (MUI)**
+- UI library: **Material-UI (MUI v6)**
 - State management: **Redux Toolkit** (or React context for simpler cases)
 - Routing: **React Router**
 - Build tooling: Vite, TypeScript, ESLint, Prettier
@@ -92,6 +92,7 @@ This section summarizes the overall architecture, structure, and technologies of
 - Database migrations managed with Prisma
 - CI/CD pipelines ensure linting, testing, and build integrity
 - All new features require code review, test coverage, and documentation updates
+- GitHub repository access may be configured via the repository's existing remote (for example SSH); do not assume HTTPS credentials or the GitHub CLI are available in every environment.
 
 ### Linting and Type-Checking Expectations
 

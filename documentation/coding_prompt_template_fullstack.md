@@ -10,7 +10,7 @@ Implement **exactly one task** from an approved feature plan.
 - **Language:** TypeScript (strict mode)
 - **Backend:** Node.js 18 + Express.js (REST API)
 - **ORM / DB:** Prisma • MySQL / MariaDB
-- **Frontend:** React + Vite + Material UI (MUI v5)
+- **Frontend:** React + Vite + Material UI (MUI v6)
 - **State management:** Redux Toolkit (or React Context when simpler)
 - **Routing:** React Router v6
 - **Auth:** JWT-based / role-based middleware on backend + protected routes on frontend
@@ -22,6 +22,7 @@ Implement **exactly one task** from an approved feature plan.
 - **Config:** `.env` (12-factor); `.env.template` lists defaults
 - **CI/CD:** GitHub Actions (lint → type-check → test → build → deploy)
 - **Code style:** ESLint + Prettier enforced in CI
+- **GitHub access:** Use the repository's configured remote/auth setup when syncing changes or opening PRs; do not assume HTTPS credentials or `gh` are available.
 
 ---
 
@@ -299,4 +300,4 @@ JWT_SECRET="replace_me"
 - Prisma migrations exist if `migrations:true`.
 - Role-based permissions verified.
 - Docs and `.env.template` updated if required.
-- CI pipeline green after push.
+- CI pipeline green after push or PR update.
