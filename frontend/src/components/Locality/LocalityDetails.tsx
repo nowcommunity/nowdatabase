@@ -13,6 +13,7 @@ import { EcometricsTab } from './Tabs/EcometricsTab'
 import { LithologyTab } from './Tabs/LithologyTab'
 import { LocalityTab } from './Tabs/LocalityTab'
 import { MuseumTab } from './Tabs/MuseumTab'
+import { OccurrencesTab } from './Tabs/OccurrencesTab'
 import { ProjectTab } from './Tabs/ProjectTab'
 import { SpeciesTab } from './Tabs/SpeciesTab'
 import { TaphonomyTab } from './Tabs/TaphonomyTab'
@@ -24,6 +25,7 @@ import { useNotify } from '@/hooks/notification'
 import { useEffect } from 'react'
 import { FetchBaseQueryError } from '@reduxjs/toolkit/query'
 import { makeEditData } from '../DetailView/Context/DetailContext'
+import { occurrenceLabels } from '@/constants/occurrenceLabels'
 
 export const LocalityDetails = ({
   wrapWithUnsavedChangesProvider = true,
@@ -116,6 +118,10 @@ export const LocalityDetails = ({
     {
       title: 'Species',
       content: <SpeciesTab />,
+    },
+    {
+      title: occurrenceLabels.plural,
+      content: <OccurrencesTab />,
     },
     {
       title: 'Lithology',
