@@ -11,3 +11,4 @@ cypress/downloads
 coverage
 .nyc_output
 .eslintcache
+.codex
