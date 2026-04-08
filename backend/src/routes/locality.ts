@@ -1,13 +1,14 @@
 import { Request, Router } from 'express'
 import {
   getAllLocalities,
+  canEditRestrictedWriteLocality,
   getLocalityDetails,
   normalizeLocalityAges,
   validateEntireLocality,
 } from '../services/locality'
 import { fixBigInt } from '../utils/common'
 import { EditDataType, EditMetaData, LocalityDetailsType, Role } from '../../../frontend/src/shared/types'
-import { requireOneOf } from '../middlewares/authorizer'
+import { AccessError, requireOneOf } from '../middlewares/authorizer'
 import { deleteLocality, writeLocality } from '../services/write/locality'
 
 const router = Router()
@@ -26,9 +27,13 @@ router.get('/:id', async (req, res) => {
 
 router.put(
   '/',
-  requireOneOf([Role.Admin, Role.EditUnrestricted]),
+  requireOneOf([Role.Admin, Role.EditUnrestricted, Role.EditRestricted]),
   async (req: Request<object, object, { locality: EditDataType<LocalityDetailsType> & EditMetaData }>, res) => {
     const { comment, references, ...editedLocality } = req.body.locality
+    if (req.user?.role === Role.EditRestricted) {
+      const hasAccess = await canEditRestrictedWriteLocality(editedLocality, req.user)
+      if (!hasAccess) throw new AccessError()
+    }
     const normalizedLocality = normalizeLocalityAges(editedLocality)
     const validationErrors = await validateEntireLocality({ ...normalizedLocality, references: references })
     if (validationErrors.length > 0) {

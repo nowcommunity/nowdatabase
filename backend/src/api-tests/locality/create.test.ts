@@ -65,18 +65,32 @@ describe('Creating new locality works', () => {
     expect(created!.synonyms).toEqual(expect.arrayContaining(['Shuijiazui', 'Bahe']))
   })
 
-  it('Creation fails without permissions', async () => {
+  it('Creation fails without permissions for unauthenticated users', async () => {
     logout()
     const resultNoPerm = await send('locality', 'PUT', {
       locality: { ...newLocalityBasis },
     })
     expect(resultNoPerm.body).toEqual(noPermError)
     expect(resultNoPerm.status).toEqual(403)
+  })
 
+  it('Creation succeeds for EditRestricted users within their projects', async () => {
     logout()
     await login('testEr', 'test')
     const resultEr = await send('locality', 'PUT', {
       locality: { ...newLocalityBasis },
+    })
+    expect(resultEr.status).toEqual(200)
+  })
+
+  it('Creation fails for EditRestricted users outside their projects', async () => {
+    logout()
+    await login('testEr', 'test')
+    const resultEr = await send('locality', 'PUT', {
+      locality: {
+        ...newLocalityBasis,
+        now_plr: [{ pid: 35, rowState: 'new' }],
+      },
     })
     expect(resultEr.body).toEqual(noPermError)
     expect(resultEr.status).toEqual(403)

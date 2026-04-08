@@ -47,13 +47,43 @@ export const normalizeLocalityAges = (locality: EditDataType<LocalityDetailsType
   frac_min: normalizeFraction(locality.frac_min) as EditDataType<LocalityDetailsType>['frac_min'],
 })
 
-const getIdsOfUsersProjects = async (user: User) => {
+export const getIdsOfUsersProjects = async (user: User) => {
   const usersProjects = await nowDb.now_proj_people.findMany({
     where: { initials: user.initials },
     select: { pid: true },
   })
 
   return new Set(usersProjects.map(({ pid }) => pid))
+}
+
+const getActiveProjectIds = (locality: EditDataType<LocalityDetailsType>) => {
+  if (!locality.now_plr) return [] as number[]
+  return locality.now_plr
+    .filter(link => link.rowState !== 'removed')
+    .map(link => link.pid ?? link.now_proj?.pid)
+    .flatMap(pid => {
+      if (typeof pid === 'string') {
+        const parsed = parseInt(pid, 10)
+        return Number.isFinite(parsed) ? [parsed] : []
+      }
+      if (typeof pid === 'number' && Number.isFinite(pid)) return [pid]
+      return []
+    })
+}
+
+export const canEditRestrictedWriteLocality = async (locality: EditDataType<LocalityDetailsType>, user: User) => {
+  const userProjectIds = await getIdsOfUsersProjects(user)
+  let activeProjectIds = getActiveProjectIds(locality)
+
+  if (activeProjectIds.length === 0 && locality.lid) {
+    const existingLocality = await getLocalityDetails(locality.lid, user)
+    if (existingLocality) {
+      activeProjectIds = existingLocality.now_plr.map(link => link.pid)
+    }
+  }
+
+  if (activeProjectIds.length === 0) return false
+  return activeProjectIds.every(pid => userProjectIds.has(pid))
 }
 
 type LocalityPreFilter = {

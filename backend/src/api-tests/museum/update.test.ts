@@ -56,17 +56,17 @@ describe('Updating museum works', () => {
     expect(resultStatusNoPerm).toEqual(403)
 
     await login('testEr')
-    const { body: resultBodyEr, status: resultStatusEr } = await send('museum/', 'PUT', {
+    const { body: resultBodyEr, status: resultStatusEr } = await send<{ museum: string }>('museum/', 'PUT', {
       museum: { ...editedMuseum, institution: 'New Museum 2' },
     })
-    expect(resultBodyEr).toEqual(noPermError)
-    expect(resultStatusEr).toEqual(403)
+    expect(resultStatusEr).toEqual(200)
+    expect(typeof resultBodyEr.museum).toEqual('string')
 
     await login('testEu')
-    const { body: resultBodyEu, status: resultStatusEu } = await send('museum/', 'PUT', {
+    const { body: resultBodyEu, status: resultStatusEu } = await send<{ museum: string }>('museum/', 'PUT', {
       museum: { ...editedMuseum, institution: 'New Museum 2' },
     })
-    expect(resultBodyEu).toEqual(noPermError)
-    expect(resultStatusEu).toEqual(403)
+    expect(resultStatusEu).toEqual(200)
+    expect(typeof resultBodyEu.museum).toEqual('string')
   })
 })

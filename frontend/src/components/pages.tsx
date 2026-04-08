@@ -124,9 +124,9 @@ export const museumPage = (
       idFieldName="museum"
       createTitle={(museum: Museum) => `${museum.institution}`}
       createSubtitle={(museum: Museum) => `${museum.city ? `${museum.city}, ` : ''}${museum.country}`}
-      getEditRights={(user: UserState, id: string | number) => {
+      getEditRights={(user: UserState) => {
         if ([Role.Admin, Role.EditUnrestricted].includes(user.role)) return fullRights
-        if (user.role === Role.EditRestricted && user.localities.includes(id as number)) return limitedRights
+        if (user.role === Role.EditRestricted) return limitedRights
         return noRights
       }}
     />
@@ -144,7 +144,7 @@ export const referencePage = (
       createSubtitle={createReferenceSubtitle}
       getEditRights={(user: UserState) => {
         if ([Role.Admin, Role.EditUnrestricted].includes(user.role)) return fullRights
-        if (user.role === Role.EditRestricted) return { new: true }
+        if (user.role === Role.EditRestricted) return limitedRights
         return noRights
       }}
     />
