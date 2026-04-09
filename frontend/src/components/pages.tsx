@@ -53,7 +53,10 @@ export const localityPage = (
       }
       getEditRights={(user: UserState, id: string | number) => {
         if ([Role.Admin, Role.EditUnrestricted].includes(user.role)) return fullRights
-        if (user.role === Role.EditRestricted && user.localities.includes(id as number)) return limitedRights
+        if (user.role === Role.EditRestricted) {
+          if (id === '' || id === 'new') return { new: true }
+          if (user.localities.includes(id as number)) return limitedRights
+        }
         return noRights
       }}
     />
