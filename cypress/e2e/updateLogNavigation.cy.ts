@@ -38,7 +38,7 @@ describe('Update log navigation', () => {
     cy.contains('button', 'Return to table').should('be.visible').click()
 
     cy.url().should('include', '/locality/21050')
-    cy.url().should('include', 'tab=10')
+    cy.url().should('include', 'tab=11')
     cy.contains('Updates')
   })
 })
