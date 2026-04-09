@@ -217,11 +217,7 @@ export const WriteButton = <T,>({
 
   return (
     <>
-      {shouldHideWriteButton ? (
-        <Typography color="text.secondary" variant="body2">
-          Select at least one project in the Projects tab to finalize this locality.
-        </Typography>
-      ) : (
+      {shouldHideWriteButton ? null : (
         <>
           <OutOfBoundsWarningModal
             isOpen={warningModalOpen}
@@ -294,10 +290,34 @@ export const WriteButton = <T,>({
 }
 
 export const ErrorBox = <T,>() => {
-  const { fieldsWithErrors } = useDetailContext<T>()
+  const { fieldsWithErrors, editData, mode } = useDetailContext<T>()
+  const user = useUser()
   const fields = Object.keys(fieldsWithErrors)
+  const hasMissingProject =
+    mode.new &&
+    user.role === Role.EditRestricted &&
+    typeof editData === 'object' &&
+    editData !== null &&
+    'now_plr' in editData &&
+    !(
+      (
+        editData as {
+          now_plr?: Array<{
+            pid?: number | null
+            now_proj?: { pid?: number | null } | null
+            rowState?: string | null
+          }>
+        }
+      ).now_plr ?? []
+    ).some(link => {
+      if (link.rowState === 'removed') return false
+      if (typeof link.pid === 'number' && Number.isFinite(link.pid)) return true
+      const nestedPid = link.now_proj?.pid
+      return typeof nestedPid === 'number' && Number.isFinite(nestedPid)
+    })
 
-  const title = fields.length > 1 ? `${fields.length} invalid fields` : '1 invalid field'
+  const totalFields = fields.length + (hasMissingProject ? 1 : 0)
+  const title = totalFields > 1 ? `${totalFields} invalid fields` : '1 invalid field'
 
   return (
     <Box
@@ -315,6 +335,12 @@ export const ErrorBox = <T,>() => {
         {title}
       </Typography>
       <List sx={{ maxHeight: '5em', maxWidth: '30em', padding: '0em 0.8em 0em 0.8em', overflow: 'auto' }}>
+        {hasMissingProject && (
+          <>
+            <Divider component="li" />
+            <ListItemText sx={{ color: 'text.secondary' }} primary="Project: This field is required" />
+          </>
+        )}
         {fields.map(field => (
           <Fragment key={field}>
             <Divider component="li" />
