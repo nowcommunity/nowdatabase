@@ -31,6 +31,7 @@ The **EditRestricted** role is enforced in the backend for specific write operat
 
 NOTE: Users with the **EditRestricted** role can only create or update localities that belong to the same project as the user. Otherwise, they have reading rights only.
 When creating a new locality, EditRestricted users can only select projects where they are a member.
+Users with the **EditUnrestricted** role are not limited by project membership when creating or updating localities.
 
 ## Species
 
@@ -101,7 +102,7 @@ When creating a new locality, EditRestricted users can only select projects wher
 | User group       | Locality | Species | References | Time Units | Time Bounds | Regions | Persons | Projects | Museums | Sedimentary Structures | Sending Email |
 | ---------------- | -------- | ------- | ---------- | ---------- | ----------- | ------- | ------- | -------- | ------- | ---------------------- | ------------- |
 | Admin            | ALL      | ALL     | ALL        | ALL        | ALL         | ALL     | ALL     | ALL      | ALL     | ALL                    | C             |
-| EditUnRestricted | ALL      | ALL     | ALL        | ALL        | ALL         | X       | X\*\*\* | R\*\*    | ALL     | ALL                    | C             |
+| EditUnrestricted | ALL      | ALL     | ALL        | ALL        | ALL         | X       | X\*\*\* | R\*\*    | ALL     | ALL                    | C             |
 | EditRestricted   | CRU      | CRU     | CRU        | R          | R           | X       | X\*\*\* | R\*\*    | CRU     | R                      | C             |
 | ReadOnly         | R        | R       | R          | R          | R           | X       | X\*\*\* | R\*\*    | R       | R                      | C             |
 
