@@ -479,7 +479,7 @@ describe('Editing a locality', () => {
   })
 
   it('adds collecting methods from the selector and persists them', () => {
-    cy.visit(`/locality/20920?tab=4`)
+    cy.visit(`/locality/20920?tab=5`)
     cy.contains('Lantian-Shuijiazui')
     cy.get('[id=edit-button]').click()
 
@@ -490,7 +490,7 @@ describe('Editing a locality', () => {
     cy.addReferenceAndSave()
     cy.contains('Edited item successfully.')
 
-    cy.visit(`/locality/20920?tab=4`)
+    cy.visit(`/locality/20920?tab=5`)
     cy.contains('wet_screen')
   })
 })
@@ -610,7 +610,7 @@ describe('Linking projects to an existing locality', () => {
 
   beforeEach('Login as admin and open projects tab', () => {
     cy.loginWithSession('testSu')
-    cy.visit(`/locality/${localityId}?tab=9`)
+    cy.visit(`/locality/${localityId}?tab=10`)
     cy.contains('Dmanisi')
   })
 
@@ -625,7 +625,7 @@ describe('Linking projects to an existing locality', () => {
 
     cy.addReferenceAndSave()
     cy.contains('Edited item successfully.')
-    cy.visit(`/locality/${localityId}?tab=9`)
+    cy.visit(`/locality/${localityId}?tab=10`)
     cy.contains(newProjectCode)
 
     cy.get('[id=edit-button]').click()
@@ -633,7 +633,7 @@ describe('Linking projects to an existing locality', () => {
 
     cy.addReferenceAndSave()
     cy.contains('Edited item successfully.')
-    cy.visit(`/locality/${localityId}?tab=9`)
+    cy.visit(`/locality/${localityId}?tab=10`)
     cy.contains(newProjectCode).should('not.exist')
   })
 })
