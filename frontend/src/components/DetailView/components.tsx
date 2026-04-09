@@ -217,7 +217,11 @@ export const WriteButton = <T,>({
 
   return (
     <>
-      {shouldHideWriteButton ? null : (
+      {shouldHideWriteButton ? (
+        <Typography color="text.secondary" variant="body2">
+          Select at least one project in the Projects tab to finalize this locality.
+        </Typography>
+      ) : (
         <>
           <OutOfBoundsWarningModal
             isOpen={warningModalOpen}

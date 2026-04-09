@@ -5,8 +5,8 @@ import { Role } from '../../../frontend/src/shared/types'
 
 const router = Router()
 
-router.get('/all', async (_req, res) => {
-  const projects = await getAllProjects()
+router.get('/all', async (req, res) => {
+  const projects = await getAllProjects(req.user)
   return res.status(200).send(projects)
 })
 
