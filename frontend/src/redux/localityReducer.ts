@@ -1,4 +1,5 @@
 import { api } from './api'
+import { addLocality } from '@/redux/userReducer'
 import { EditDataType, Locality, LocalityDetailsType } from '@/shared/types'
 
 const sanitizeLocalityProjects = (locality?: EditDataType<LocalityDetailsType>) => {
@@ -33,7 +34,8 @@ const localitiesApi = api.injectEndpoints({
       async onQueryStarted(locality, { dispatch, queryFulfilled }) {
         if (!locality.lid) {
           try {
-            await queryFulfilled
+            const { data } = await queryFulfilled
+            dispatch(addLocality(data.id))
           } catch {
             // The component handles create errors; avoid leaking RTK Query rejections
             // as unhandled promise rejections during locality creation flows.
