@@ -58,13 +58,26 @@ router.post('/login', async (req, res) => {
     where: { user_id: foundUser.user_id },
     select: {
       initials: true,
-      now_proj: { select: { now_plr: { select: { now_loc: { select: { lid: true } } } } } },
     },
   })
 
   if (!personResult) throw new Error('User found but not person; this should not happen.')
 
-  const associatedLocalityIds = personResult.now_proj.flatMap(proj => proj.now_plr.map(plr => plr.now_loc.lid))
+  const projectLinks = await nowDb.now_proj_people.findMany({
+    where: { initials: personResult.initials },
+    select: { pid: true },
+  })
+
+  const projectIds = Array.from(new Set(projectLinks.map(link => link.pid)))
+
+  const localityLinks = projectIds.length
+    ? await nowDb.now_plr.findMany({
+        where: { pid: { in: projectIds } },
+        select: { lid: true },
+      })
+    : []
+
+  const associatedLocalityIds = Array.from(new Set(localityLinks.map(link => link.lid)))
 
   await nowDb.com_users.update({ where: { user_id: foundUser.user_id }, data: { last_login: new Date() } })
 

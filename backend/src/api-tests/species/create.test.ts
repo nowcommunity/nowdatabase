@@ -15,7 +15,7 @@ describe('Creating new species works', () => {
     await resetDatabase()
     await login()
     createdSpecies = null
-  })
+  }, resetDatabaseTimeout)
   afterAll(async () => {
     await pool.end()
   })
@@ -83,20 +83,21 @@ describe('Creating new species works', () => {
     expect(resultWithRef.status).toEqual(200)
   })
 
-  it('Creation fails without permissions for non-authenticated and non-privileged users', async () => {
+  it('Creation fails without permissions for non-authenticated users', async () => {
     logout()
     const result1 = await send('species', 'PUT', {
       species: { ...newSpeciesBasis, comment: 'species test' },
     })
     expect(result1.body).toEqual(noPermError)
     expect(result1.status).toEqual(403)
+  })
 
+  it('Creation succeeds for EditRestricted users', async () => {
     logout()
     await login('testEr', 'test')
     const result2 = await send('species', 'PUT', {
       species: { ...newSpeciesBasis, comment: 'species test' },
     })
-    expect(result2.body).toEqual(noPermError)
-    expect(result2.status).toEqual(403)
+    expect(result2.status).toEqual(200)
   })
 })

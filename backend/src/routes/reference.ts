@@ -100,7 +100,7 @@ router.get('/species/:id', async (req, res) => {
 
 router.put(
   '/',
-  requireOneOf([Role.Admin, Role.EditUnrestricted]),
+  requireOneOf([Role.Admin, Role.EditUnrestricted, Role.EditRestricted]),
   async (req: Request<object, object, { reference: EditDataType<ReferenceDetailsType> & EditMetaData }>, res) => {
     const { ...editedReference } = req.body.reference
     const referenceTypes = await getReferenceTypes()

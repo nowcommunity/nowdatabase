@@ -20,7 +20,7 @@ In the new UI platform, there are 4 user roles:
 Users who have not logged in have the **ReadOnly** role.
 
 The Project, ProjectPrivate, and NowOffice roles exist in the old code but are currently not used. They don't exist at all in the frontend, and in the backend they are only used when assigning roles to test users.
-The **EditRestricted** role is also only used in the frontend to show/hide editing buttons, the backend does not use the role in any way.
+The **EditRestricted** role is enforced in the backend for specific write operations (for example, locality writes are limited to the user's projects).
 
 ## Locality
 
@@ -29,10 +29,9 @@ The **EditRestricted** role is also only used in the frontend to show/hide editi
 - Creating or updating a locality requires the **Admin**, **EditUnrestricted**, or **EditRestricted** roles.
 - Deleting a locality requires the **Admin** or **EditUnrestricted** roles.
 
-NOTE: Users with the **EditRestricted** role should only be able to create or update localities which are in the same project as the user. Otherwise, they have reading rights only.
-
-Current behaviour:
-- Users with the **EditRestricted** role can access the edit view in **their own** localities, but sending the PUT request to the backend fails because the role doesn't have permissions.
+NOTE: Users with the **EditRestricted** role can only create or update localities that belong to the same project as the user. Otherwise, they have reading rights only.
+When creating a new locality, EditRestricted users can only select projects where they are a member.
+Users with the **EditUnrestricted** role are not limited by project membership when creating or updating localities.
 
 ## Species
 
@@ -41,10 +40,6 @@ Current behaviour:
 - Creating or updating a species (and synonyms) requires the **Admin**, **EditUnrestricted**, or **EditRestricted** roles.
 - Deleting a species requires the **Admin** or **EditUnrestricted** roles.
 - Deleting a species synonym requires the **Admin**, **EditUnrestricted**, or **EditRestricted** roles.
-
-Current behaviour:
-
-- Users with the **EditRestricted** role can access the editing/creating new species view from the frontend, but sending the PUT request to the backend fails because the role doesn't have permissions.
 
 ## References
 
@@ -107,8 +102,8 @@ Current behaviour:
 | User group       | Locality | Species | References | Time Units | Time Bounds | Regions | Persons | Projects | Museums | Sedimentary Structures | Sending Email |
 | ---------------- | -------- | ------- | ---------- | ---------- | ----------- | ------- | ------- | -------- | ------- | ---------------------- | ------------- |
 | Admin            | ALL      | ALL     | ALL        | ALL        | ALL         | ALL     | ALL     | ALL      | ALL     | ALL                    | C             |
-| EditUnRestricted | ALL      | ALL     | ALL        | ALL        | ALL         | X       | X\*\*\* | R\*\*    | ALL     | ALL                    | C             |
-| EditRestricted   | CRU      | CRU     | CRU        | R          | R           | X       | X\*\*\* | R\*\*    | R       | R                      | C             |
+| EditUnrestricted | ALL      | ALL     | ALL        | ALL        | ALL         | X       | X\*\*\* | R\*\*    | ALL     | ALL                    | C             |
+| EditRestricted   | CRU      | CRU     | CRU        | R          | R           | X       | X\*\*\* | R\*\*    | CRU     | R                      | C             |
 | ReadOnly         | R        | R       | R          | R          | R           | X       | X\*\*\* | R\*\*    | R       | R                      | C             |
 
 C = Create

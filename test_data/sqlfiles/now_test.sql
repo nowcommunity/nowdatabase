@@ -946,6 +946,7 @@ LOCK TABLES `now_proj_people` WRITE;
 /*!40000 ALTER TABLE `now_proj_people` DISABLE KEYS */;
 INSERT INTO `now_proj_people` VALUES
 (3,'ER'),
+(3,'TEST-ER'),
 (14,'ER'),
 (35,'TEST-PL'),
 (36,'TEST-PL');
@@ -2241,4 +2242,3 @@ INSERT INTO `ref_ref_type` VALUES
 (14,'Undefined');
 /*!40000 ALTER TABLE `ref_ref_type` ENABLE KEYS */;
 UNLOCK TABLES;
-

@@ -32,7 +32,7 @@ router.get('/:id', async (req, res) => {
 
 router.put(
   '/',
-  requireOneOf([Role.Admin]),
+  requireOneOf([Role.Admin, Role.EditUnrestricted, Role.EditRestricted]),
   async (req: Request<object, object, { museum: EditDataType<Museum> & EditMetaData }>, res) => {
     try {
       const { ...editedMuseum } = req.body.museum

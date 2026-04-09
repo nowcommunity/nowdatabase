@@ -2,10 +2,12 @@ import { describe, expect, it, jest, beforeEach } from '@jest/globals'
 import { render, screen, waitFor, fireEvent } from '@testing-library/react'
 import '@testing-library/jest-dom'
 import { WriteButton } from '@/components/DetailView/components'
-import { EditDataType, Species } from '@/shared/types'
+import { EditDataType, Role, Species } from '@/shared/types'
 import { useDetailContext, type DetailContextType } from '@/components/DetailView/Context/DetailContext'
 import { useGetAllSpeciesQuery, useGetAllSynonymsQuery } from '@/redux/speciesReducer'
 import { checkSpeciesTaxonomy } from '@/util/taxonomyUtilities'
+import { useUser } from '@/hooks/user'
+import { UserState } from '@/redux/userReducer'
 
 const mockNotify = jest.fn()
 
@@ -15,6 +17,10 @@ jest.mock('@/components/DetailView/Context/DetailContext', () => ({
 
 jest.mock('@/hooks/notification', () => ({
   useNotify: () => ({ notify: mockNotify }),
+}))
+
+jest.mock('@/hooks/user', () => ({
+  useUser: jest.fn(),
 }))
 
 jest.mock('@/redux/speciesReducer', () => ({
@@ -35,6 +41,7 @@ const mockUseDetailContext = useDetailContext as jest.MockedFunction<() => Detai
 const mockUseGetAllSpeciesQuery = useGetAllSpeciesQuery as jest.MockedFunction<typeof useGetAllSpeciesQuery>
 const mockUseGetAllSynonymsQuery = useGetAllSynonymsQuery as jest.MockedFunction<typeof useGetAllSynonymsQuery>
 const mockCheckSpeciesTaxonomy = checkSpeciesTaxonomy as jest.MockedFunction<typeof checkSpeciesTaxonomy>
+const mockUseUser = useUser as jest.MockedFunction<typeof useUser>
 
 const modeEdit = { read: false, staging: false, new: false, option: 'edit' as const }
 const modeStagingEdit = { read: false, staging: true, new: false, option: 'staging-edit' as const }
@@ -125,6 +132,15 @@ const renderButton = (
 describe('WriteButton taxonomy handling', () => {
   beforeEach(() => {
     jest.clearAllMocks()
+    const mockUser: UserState = {
+      token: null,
+      username: 'tester',
+      role: Role.Admin,
+      initials: null,
+      localities: [],
+      isFirstLogin: undefined,
+    }
+    mockUseUser.mockReturnValue(mockUser)
   })
 
   it('skips duplicate taxonomy validation when taxonomy fields are unchanged', async () => {

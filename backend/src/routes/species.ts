@@ -26,7 +26,7 @@ router.get('/:id', async (req, res) => {
 
 router.put(
   '/',
-  requireOneOf([Role.Admin, Role.EditUnrestricted]),
+  requireOneOf([Role.Admin, Role.EditUnrestricted, Role.EditRestricted]),
   async (req: Request<object, object, { species: SpeciesDetailsType & EditMetaData }>, res) => {
     const { comment, references, ...editedSpecies } = req.body.species
     const validationErrors = await validateEntireSpecies({ ...editedSpecies, references })

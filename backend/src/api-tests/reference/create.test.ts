@@ -182,10 +182,10 @@ describe('Creating new reference works', () => {
     expect(resultStatusNoPerm).toEqual(403)
 
     await login('testEr')
-    const { body: resultBodyEr, status: resultStatusEr } = await send('reference/', 'PUT', {
+    const { body: resultBodyEr, status: resultStatusEr } = await send<{ rid: number }>('reference/', 'PUT', {
       reference: { ...newReferenceBasis },
     })
-    expect(resultBodyEr).toEqual(noPermError)
-    expect(resultStatusEr).toEqual(403)
+    expect(resultStatusEr).toEqual(200)
+    expect(typeof resultBodyEr.rid).toEqual('number')
   })
 })
