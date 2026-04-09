@@ -16,10 +16,15 @@ export const valueIsDifferent = (newValue: unknown, oldValue: unknown) => {
 }
 
 export const getItemList = (object: Record<string, unknown>, skipEmptyValues?: boolean) => {
+  const normalizeValue = (value: unknown) => {
+    if (skipEmptyValues && value === '') return null
+    return value as DbValue
+  }
+
   const list: DbWriteItem[] = Object.entries(object)
     .map(([field, value]) => ({
       column: field,
-      value: value as DbValue,
+      value: normalizeValue(value),
     }))
     .filter(
       item =>
