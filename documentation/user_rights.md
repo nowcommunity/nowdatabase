@@ -30,6 +30,7 @@ The **EditRestricted** role is enforced in the backend for specific write operat
 - Deleting a locality requires the **Admin** or **EditUnrestricted** roles.
 
 NOTE: Users with the **EditRestricted** role can only create or update localities that belong to the same project as the user. Otherwise, they have reading rights only.
+When creating a new locality, EditRestricted users can only select projects where they are a member.
 
 ## Species
 
