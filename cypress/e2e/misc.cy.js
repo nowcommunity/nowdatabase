@@ -33,7 +33,7 @@ before('Reset database', () => {
 
 describe('Test individual features across the app', () => {
   it('Locality update tab opens, detailed modal works, view-link works', () => {
-    cy.visit(`/locality/24750?tab=10`)
+    cy.visit(`/locality/24750?tab=11`)
     cy.contains('2006-10-16')
     cy.contains(
       'Cande (1992). A new geomagnetic polarity time scale for the Late Cretaceous and Cenozoic. Geology 97: 13917-13951.'
