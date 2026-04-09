@@ -317,6 +317,7 @@ export const ErrorBox = <T,>() => {
     })
 
   const totalFields = fields.length + (hasMissingProject ? 1 : 0)
+  if (totalFields === 0) return null
   const title = totalFields > 1 ? `${totalFields} invalid fields` : '1 invalid field'
 
   return (
