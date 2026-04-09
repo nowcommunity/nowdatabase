@@ -39,6 +39,11 @@ import { OccurrenceDetails } from './Occurrence/OccurrenceDetails'
 const noRights: EditRights = {}
 const fullRights: EditRights = { new: true, edit: true, delete: true }
 const limitedRights: EditRights = { new: true, edit: true }
+const userHasLocalityAccess = (user: UserState, id: string | number) => {
+  const parsedId = typeof id === 'number' ? id : parseInt(id, 10)
+  if (!Number.isFinite(parsedId)) return false
+  return user.localities.includes(parsedId)
+}
 
 export const localityPage = (
   <UnsavedChangesProvider>
@@ -55,7 +60,7 @@ export const localityPage = (
         if ([Role.Admin, Role.EditUnrestricted].includes(user.role)) return fullRights
         if (user.role === Role.EditRestricted) {
           if (id === '' || id === 'new') return { new: true }
-          if (user.localities.includes(id as number)) return limitedRights
+          if (userHasLocalityAccess(user, id)) return limitedRights
         }
         return noRights
       }}
@@ -88,7 +93,7 @@ ${occurrence.max_age ?? ''} Ma (${occurrence.bfa_max ?? ''}) – ${occurrence.mi
     }
     getEditRights={(user: UserState, id: string | number) => {
       if ([Role.Admin, Role.EditUnrestricted].includes(user.role)) return fullRights
-      if (user.role === Role.EditRestricted && user.localities.includes(id as number)) return limitedRights
+      if (user.role === Role.EditRestricted && userHasLocalityAccess(user, id)) return limitedRights
       return noRights
     }}
   />
