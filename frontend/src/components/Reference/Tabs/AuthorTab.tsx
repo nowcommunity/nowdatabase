@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useMemo } from 'react'
 import { ReferenceDetailsType, ReferenceAuthorType, RowState, EditDataType } from '@/shared/types'
 import { EditableTable } from '@/components/DetailView/common/EditableTable'
 import { EditingForm } from '@/components/DetailView/common/EditingForm'
@@ -14,6 +14,8 @@ interface AuthorTabProps {
   field_num_param: number
   tab_name?: string | null
 }
+
+type ReferenceAuthorSelectRow = ReferenceAuthorType & { authorKey: string }
 
 const tabNameToButtonText: { [tabName: string]: string } = {
   Authors: 'author',
@@ -35,6 +37,12 @@ function checkIndexes(editData: EditDataType<ReferenceDetailsType>): boolean {
     }
   }
   return needsUpdate
+}
+
+const buildAuthorKey = (author: Pick<ReferenceAuthorType, 'author_surname' | 'author_initials'>): string => {
+  const surname = author.author_surname?.trim().toLowerCase() ?? ''
+  const initials = author.author_initials?.trim().toLowerCase() ?? ''
+  return `${surname}|${initials}`
 }
 
 export const AuthorTab: React.FC<AuthorTabProps> = ({ field_num_param, tab_name = 'Authors' }) => {
@@ -59,7 +67,7 @@ export const AuthorTab: React.FC<AuthorTabProps> = ({ field_num_param, tab_name 
     return author.field_id?.toString() === field_num_param?.toString()
   })
 
-  const authorColumns: MRT_ColumnDef<ReferenceAuthorType>[] = [
+  const authorColumns: MRT_ColumnDef<ReferenceAuthorSelectRow>[] = [
     {
       accessorKey: 'author_initials',
       header: 'Author initials',
@@ -69,6 +77,18 @@ export const AuthorTab: React.FC<AuthorTabProps> = ({ field_num_param, tab_name 
       header: 'Surname',
     },
   ]
+
+  const selectedAuthorKeys = useMemo(() => {
+    return editData.ref_authors
+      .filter(author => author.field_id?.toString() === field_num_param?.toString())
+      .map(author => buildAuthorKey(author))
+  }, [editData.ref_authors, field_num_param])
+
+  const authorDataWithKey = useMemo<ReferenceAuthorSelectRow[]>(() => {
+    if (!authorData) return []
+    return authorData.map(author => ({ ...author, authorKey: buildAuthorKey(author) }))
+  }, [authorData])
+
   const formFields: { name: string; label: string; required?: boolean }[] = [
     { name: 'author_initials', label: 'Author initials', required: true },
     { name: 'author_surname', label: 'Surname', required: true },
@@ -121,19 +141,22 @@ export const AuthorTab: React.FC<AuthorTabProps> = ({ field_num_param, tab_name 
                 )
               }}
             />
-            <SelectingTable<ReferenceAuthorType, ReferenceDetailsType>
+            <SelectingTable<ReferenceAuthorSelectRow, ReferenceDetailsType>
               buttonText={`Select ${buttonText}`}
-              data={authorData}
+              data={authorDataWithKey}
               title="Authors"
               isError={isError}
               columns={authorColumns}
               fieldName="ref_authors"
-              idFieldName="data_id"
-              editingAction={(newAuthor: ReferenceAuthorType) => {
+              idFieldName="authorKey"
+              selectedValues={selectedAuthorKeys}
+              editingAction={(newAuthor: ReferenceAuthorSelectRow) => {
+                const { authorKey: _authorKey, ...author } = newAuthor
+                if (selectedAuthorKeys.includes(buildAuthorKey(author))) return
                 const updatedAuthors = [
                   ...editData.ref_authors,
                   {
-                    ...newAuthor,
+                    ...author,
                     rid: editData.rid,
                     au_num: editData.ref_authors.filter(author => author.field_id === field_num_param).length + 1,
                     field_id: field_num_param,
