@@ -58,7 +58,7 @@ let seedMuseum = { code: 'AM', institution: 'Australian Museum' }
 before(() => {
   cy.resetDatabase()
   cy.request('/museum/all').then(response => {
-    const museums = response.body ?? []
+    const museums = Array.isArray(response.body) ? response.body : response.body?.data ?? []
     const pick =
       museums.find(item => item?.institution && item.institution !== '[missing details]' && item?.museum) ??
       museums.find(item => item?.museum)
