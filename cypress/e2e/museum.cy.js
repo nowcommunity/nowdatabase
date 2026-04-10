@@ -15,7 +15,7 @@ const openMuseumFromList = (institution, code) => {
   cy.visit('/museum')
   cy.get('[aria-label="Filter by Institution"]', { timeout: 10000 }).clear()
   cy.get('[aria-label="Filter by Institution"]').type(institution)
-  cy.contains('td', institution, { timeout: 10000 })
+  cy.contains(institution, { timeout: 10000 })
     .should('be.visible')
     .closest('tr')
     .within(() => {
@@ -36,21 +36,36 @@ const fillMuseumForm = ({ code, institution, city, country, altName, state, stat
 }
 
 const fillCreateMuseumModal = ({ code, institution, city, country, altName, state, stateCode }) => {
-  typeIfNotEmpty('input[name="institution"]', institution)
-  typeIfNotEmpty('input[name="alt_int_name"]', altName)
-  typeIfNotEmpty('input[name="city"]', city)
+  cy.get('.modal-content').within(() => {
+    typeIfNotEmpty('input[name="institution"]', institution)
+    typeIfNotEmpty('input[name="alt_int_name"]', altName)
+    typeIfNotEmpty('input[name="city"]', city)
 
-  cy.get('input[name="country"]').parent().as('countryField')
-  cy.get('@countryField').find('[role="button"]').click()
+    cy.get('input[name="country"]').parents().find('[role="button"]').first().click()
+  })
+
   cy.contains('li', country).click()
 
-  typeIfNotEmpty('input[name="state"]', state)
-  typeIfNotEmpty('input[name="state_code"]', stateCode)
-  typeIfNotEmpty('input[name="museum"]', code)
+  cy.get('.modal-content').within(() => {
+    typeIfNotEmpty('input[name="state"]', state)
+    typeIfNotEmpty('input[name="state_code"]', stateCode)
+    typeIfNotEmpty('input[name="museum"]', code)
+  })
 }
+
+let seedMuseum = { code: 'AM', institution: 'Australian Museum' }
 
 before(() => {
   cy.resetDatabase()
+  cy.request('/museum/all').then(response => {
+    const museums = response.body ?? []
+    const pick =
+      museums.find(item => item?.institution && item.institution !== '[missing details]' && item?.museum) ??
+      museums.find(item => item?.museum)
+    if (pick) {
+      seedMuseum = { code: pick.museum, institution: pick.institution || pick.museum }
+    }
+  })
 })
 
 describe('Museum e2e flows', () => {
@@ -61,12 +76,12 @@ describe('Museum e2e flows', () => {
   it('shows museum list for authorized users', () => {
     cy.visit('/museum')
     cy.get('[aria-label="Filter by Institution"]', { timeout: 10000 }).clear()
-    cy.get('[aria-label="Filter by Institution"]').type('Australian Museum')
-    cy.contains('td', 'Australian Museum', { timeout: 10000 })
+    cy.get('[aria-label="Filter by Institution"]').type(seedMuseum.institution)
+    cy.contains(seedMuseum.institution, { timeout: 10000 })
       .should('be.visible')
       .closest('tr')
       .within(() => {
-        cy.get('[data-cy="details-button-AM"]').should('be.visible')
+        cy.get(`[data-cy="details-button-${seedMuseum.code}"]`).should('be.visible')
       })
   })
 
@@ -82,6 +97,7 @@ describe('Museum e2e flows', () => {
     cy.get('#institution-textfield', { timeout: 10000 }).should('be.visible')
     fillMuseumForm({ code, institution, city, country })
 
+    cy.get('[id=write-button]').should('not.be.disabled')
     cy.get('[id=write-button]').click()
     cy.wait('@saveMuseum').its('response.statusCode').should('eq', 200)
 
@@ -96,8 +112,8 @@ describe('Museum e2e flows', () => {
 
     cy.intercept('PUT', '**/museum').as('saveMuseum')
 
-    openMuseumFromList('Australian Museum', 'AM')
-    cy.contains('Australian Museum', { timeout: 10000 }).should('be.visible')
+    openMuseumFromList(seedMuseum.institution, seedMuseum.code)
+    cy.contains(seedMuseum.institution, { timeout: 10000 }).should('be.visible')
     cy.get('[id=edit-button]').should('be.visible').click()
     typeIfNotEmpty('#alt_int_name-textfield', altName)
 
@@ -115,8 +131,8 @@ describe('Museum e2e flows', () => {
 
     cy.contains('Select Museum').click()
     cy.get('[aria-label="Filter by Institution"]', { timeout: 10000 }).clear()
-    cy.get('[aria-label="Filter by Institution"]').type('Australian Museum')
-    cy.get('[data-cy="add-button-AM"]', { timeout: 10000 }).should('be.visible').click()
+    cy.get('[aria-label="Filter by Institution"]').type(seedMuseum.institution)
+    cy.get(`[data-cy="add-button-${seedMuseum.code}"]`, { timeout: 10000 }).should('be.visible').click()
     cy.contains('Australian Museum').should('be.visible')
     cy.contains('button', 'Close').click()
 
