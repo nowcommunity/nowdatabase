@@ -1,7 +1,8 @@
 import { nowDb } from '../utils/db'
-import * as bcrypt from 'bcrypt'
 import { logger } from '../utils/logger'
 import { sleep } from '../utils/common'
+
+const TEST_PASSWORD_HASH = '$2b$10$NJ4KwbedrlcHZwAc8MetxeDFnS/4uA76E0UvxeL5sS5K.IYYSwJaG'
 
 export const createDraftLocality = async () => {
   const draftLocality = await nowDb.now_loc.findUnique({ where: { lid: 49999 } })
@@ -56,7 +57,6 @@ export const createTestUsers = async () => {
   ]
   for (let i = 0; i < 10; i++) {
     try {
-      const passwordHash = await bcrypt.hash('test', 10)
       for (const testUser of testUsers) {
         const existingUser = await nowDb.com_users.findFirst({
           where: { ...testUser },
@@ -66,12 +66,16 @@ export const createTestUsers = async () => {
           const createdUser = await nowDb.com_users.create({
             data: {
               user_name: testUser.user_name,
-              newpassword: passwordHash,
+              newpassword: TEST_PASSWORD_HASH,
               now_user_group: testUser.now_user_group,
             },
           })
           userId = createdUser.user_id
         } else {
+          await nowDb.com_users.update({
+            where: { user_id: existingUser.user_id },
+            data: { newpassword: TEST_PASSWORD_HASH },
+          })
           userId = existingUser.user_id
         }
         const initials = `TEST-${testUser.now_user_group.toUpperCase()}`

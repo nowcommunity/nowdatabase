@@ -117,6 +117,18 @@ describe('Locality update works', () => {
     })
   })
 
+  it('Clearing an optional text field persists null', async () => {
+    const writeResult = await send<{ id: number }>('locality', 'PUT', {
+      locality: buildUpdatePayload({ rock_type: '' }),
+    })
+
+    expect(writeResult.status).toEqual(200)
+    expect(writeResult.body.id).toEqual(editedLocality.lid)
+
+    const { body } = await send<LocalityDetailsType>(`locality/${editedLocality.lid}`, 'GET')
+    expect(body.rock_type).toBeNull()
+  })
+
   it('Update fails when pollen values are out of range', async () => {
     const { body, status } = await send<ValidationObject[]>('locality', 'PUT', {
       locality: buildUpdatePayload(invalidPollenUpdateLocality),
