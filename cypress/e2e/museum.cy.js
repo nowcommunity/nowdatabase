@@ -3,51 +3,39 @@ const buildMuseumCode = prefix => {
   return `${prefix}${suffix}`.slice(0, 10)
 }
 
+const typeIfNotEmpty = (selector, value) => {
+  if (value === undefined || value === null || value === '') {
+    return
+  }
+  cy.get(selector).clear()
+  cy.get(selector).type(value)
+}
+
 const fillMuseumForm = ({ code, institution, city, country, altName, state, stateCode }) => {
-  cy.get('#institution-textfield').clear()
-  cy.get('#institution-textfield').type(institution)
-  cy.get('#city-textfield').clear()
-  cy.get('#city-textfield').type(city)
-  cy.get('#museum-textfield').clear()
-  cy.get('#museum-textfield').type(code)
+  typeIfNotEmpty('#institution-textfield', institution)
+  typeIfNotEmpty('#city-textfield', city)
+  typeIfNotEmpty('#museum-textfield', code)
 
-  cy.get('#Country-multiselect input').clear()
-  cy.get('#Country-multiselect input').type(`${country}{enter}`)
+  cy.get('#Country-multiselect').find('input').clear()
+  cy.get('#Country-multiselect').find('input').type(`${country}{enter}`)
 
-  if (altName !== undefined) {
-    cy.get('#alt_int_name-textfield').clear()
-    cy.get('#alt_int_name-textfield').type(altName)
-  }
-
-  if (state !== undefined) {
-    cy.get('#state-textfield').clear()
-    cy.get('#state-textfield').type(state)
-  }
-
-  if (stateCode !== undefined) {
-    cy.get('#state_code-textfield').clear()
-    cy.get('#state_code-textfield').type(stateCode)
-  }
+  typeIfNotEmpty('#alt_int_name-textfield', altName)
+  typeIfNotEmpty('#state-textfield', state)
+  typeIfNotEmpty('#state_code-textfield', stateCode)
 }
 
 const fillCreateMuseumModal = ({ code, institution, city, country, altName, state, stateCode }) => {
-  cy.get('input[name="institution"]').clear()
-  cy.get('input[name="institution"]').type(institution)
-  cy.get('input[name="alt_int_name"]').clear()
-  cy.get('input[name="alt_int_name"]').type(altName ?? '')
-  cy.get('input[name="city"]').clear()
-  cy.get('input[name="city"]').type(city)
+  typeIfNotEmpty('input[name="institution"]', institution)
+  typeIfNotEmpty('input[name="alt_int_name"]', altName)
+  typeIfNotEmpty('input[name="city"]', city)
 
   cy.contains('label', 'Country').parent().as('countryField')
   cy.get('@countryField').find('[role="button"]').click()
   cy.contains('li', country).click()
 
-  cy.get('input[name="state"]').clear()
-  cy.get('input[name="state"]').type(state ?? '')
-  cy.get('input[name="state_code"]').clear()
-  cy.get('input[name="state_code"]').type(stateCode ?? '')
-  cy.get('input[name="museum"]').clear()
-  cy.get('input[name="museum"]').type(code)
+  typeIfNotEmpty('input[name="state"]', state)
+  typeIfNotEmpty('input[name="state_code"]', stateCode)
+  typeIfNotEmpty('input[name="museum"]', code)
 }
 
 before(() => {
@@ -61,8 +49,12 @@ describe('Museum e2e flows', () => {
 
   it('shows museum list for authorized users', () => {
     cy.visit('/museum')
-    cy.get('[data-cy="details-button-AM"]').should('be.visible')
-    cy.contains('Australian Museum').should('be.visible')
+    cy.contains('td', 'Australian Museum', { timeout: 10000 })
+      .should('be.visible')
+      .closest('tr')
+      .within(() => {
+        cy.get('[data-cy="details-button-AM"]').should('be.visible')
+      })
   })
 
   it('creates a new museum and lands on its details view', () => {
@@ -74,6 +66,7 @@ describe('Museum e2e flows', () => {
     cy.intercept('PUT', '**/museum').as('saveMuseum')
 
     cy.visit('/museum/new')
+    cy.get('#institution-textfield', { timeout: 10000 }).should('be.visible')
     fillMuseumForm({ code, institution, city, country })
 
     cy.get('[id=write-button]').click()
@@ -91,9 +84,9 @@ describe('Museum e2e flows', () => {
     cy.intercept('PUT', '**/museum').as('saveMuseum')
 
     cy.visit('/museum/AM')
-    cy.get('[id=edit-button]').click()
-    cy.get('#alt_int_name-textfield').clear()
-    cy.get('#alt_int_name-textfield').type(altName)
+    cy.contains('Australian Museum', { timeout: 10000 }).should('be.visible')
+    cy.get('[id=edit-button]').should('be.visible').click()
+    typeIfNotEmpty('#alt_int_name-textfield', altName)
 
     cy.get('[id=write-button]').click()
     cy.wait('@saveMuseum').its('response.statusCode').should('eq', 200)
@@ -108,7 +101,7 @@ describe('Museum e2e flows', () => {
     cy.get('[id=edit-button]').click()
 
     cy.contains('Select Museum').click()
-    cy.get('[data-cy="add-button-AM"]').click()
+    cy.get('[data-cy="add-button-AM"]', { timeout: 10000 }).should('be.visible').click()
     cy.contains('Australian Museum').should('be.visible')
     cy.contains('button', 'Close').click()
 
