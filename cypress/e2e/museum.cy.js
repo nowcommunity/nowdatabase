@@ -41,7 +41,7 @@ const fillCreateMuseumModal = ({ code, institution, city, country, altName, stat
     typeIfNotEmpty('input[name="institution"]', institution)
     typeIfNotEmpty('input[name="alt_int_name"]', altName)
     typeIfNotEmpty('input[name="city"]', city)
-    cy.contains('Country').parent().type(country)
+    cy.get('#create-museum-country').click({ force: true })
   })
 
   cy.get('ul[role="listbox"]', { timeout: 10000 }).contains(country).click()

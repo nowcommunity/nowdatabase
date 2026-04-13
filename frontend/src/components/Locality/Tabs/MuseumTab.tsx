@@ -166,6 +166,7 @@ export const MuseumTab = () => {
         <TextField
           select
           label="Country"
+          id="create-museum-country"
           defaultValue=""
           {...register('country', { required: 'Country is required' })}
           error={Boolean(errors.country)}
