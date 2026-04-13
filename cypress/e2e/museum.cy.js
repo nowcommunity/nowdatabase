@@ -36,7 +36,7 @@ const fillMuseumForm = ({ code, institution, city, country, altName, state, stat
   typeIfNotEmpty('#state_code-textfield', stateCode)
 }
 
-const fillCreateMuseumModal = ({ code, institution, city, country, altName, state, stateCode }) => {
+  const fillCreateMuseumModal = ({ code, institution, city, country, altName, state, stateCode }) => {
   cy.get('.modal-content').within(() => {
     typeIfNotEmpty('input[name="institution"]', institution)
     typeIfNotEmpty('input[name="alt_int_name"]', altName)
@@ -180,7 +180,7 @@ describe('Museum e2e flows', () => {
     cy.get('[id=edit-button]').click()
 
     cy.contains('Create Museum').click()
-    fillCreateMuseumModal({ code, institution, city, country })
+    fillCreateMuseumModal({ code, institution, city, country, stateCode: '' })
     cy.contains('button', 'Save').click()
 
     cy.wait('@saveMuseum').then(({ response }) => {
