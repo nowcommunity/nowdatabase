@@ -41,10 +41,10 @@ const fillCreateMuseumModal = ({ code, institution, city, country, altName, stat
     typeIfNotEmpty('input[name="institution"]', institution)
     typeIfNotEmpty('input[name="alt_int_name"]', altName)
     typeIfNotEmpty('input[name="city"]', city)
-    cy.get('[name="country"]').parent().click({ force: true })
+    cy.contains('Country').parent().click({ force: true })
   })
 
-  cy.get('ul[role="listbox"]', { timeout: 10000 }).contains(country).click()
+  cy.contains('li', country, { timeout: 10000 }).click()
 
   cy.get('.modal-content').within(() => {
     typeIfNotEmpty('input[name="state"]', state)
@@ -151,14 +151,14 @@ describe('Museum e2e flows', () => {
     cy.get('[aria-label="Filter by Institution"]', { timeout: 10000 }).clear()
     cy.get('[aria-label="Filter by Institution"]').type(seedMuseum.institution)
     cy.get(`[data-cy="add-button-${seedMuseum.code}"]`, { timeout: 10000 }).should('be.visible').click()
-    cy.contains('Australian Museum').should('be.visible')
+    cy.contains(seedMuseum.institution).should('be.visible')
     cy.contains('button', 'Close').click()
 
     cy.addReferenceAndSave()
     cy.wait('@saveLocality').its('response.statusCode').should('eq', 200)
 
     cy.visit('/locality/20920?tab=9')
-    cy.contains('Australian Museum').should('be.visible')
+    cy.contains(seedMuseum.institution).should('be.visible')
   })
 
   it('creates a museum from the locality modal and links it', () => {
