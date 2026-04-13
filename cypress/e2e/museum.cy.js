@@ -53,6 +53,7 @@ const fillCreateMuseumModal = ({ code, institution, city, country, altName, stat
   })
 }
 
+const apiBaseUrl = Cypress.env('apiBaseUrl') ?? 'http://localhost:4000'
 let seedMuseum = { code: 'AM', institution: 'Australian Museum' }
 
 before(() => {
@@ -68,7 +69,7 @@ before(() => {
     }
     cy.request({
       method: 'PUT',
-      url: '/museum',
+      url: `${apiBaseUrl}/museum`,
       headers: { Authorization: `Bearer ${token}` },
       body: {
         museum: {
