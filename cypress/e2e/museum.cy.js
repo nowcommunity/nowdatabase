@@ -77,9 +77,9 @@ before(() => {
           institution: seedMuseum.institution,
           city: 'Helsinki',
           country: 'Finland',
-          alt_int_name: null,
-          state: null,
-          state_code: null,
+          alt_int_name: '',
+          state: '',
+          state_code: '',
         },
       },
     })
