@@ -41,10 +41,10 @@ const fillCreateMuseumModal = ({ code, institution, city, country, altName, stat
     typeIfNotEmpty('input[name="institution"]', institution)
     typeIfNotEmpty('input[name="alt_int_name"]', altName)
     typeIfNotEmpty('input[name="city"]', city)
-    cy.contains('Country').parent().click({ force: true })
+    cy.contains('Country').parent().type(country)
   })
 
-  cy.contains('li', country, { timeout: 10000 }).click()
+  cy.get('ul[role="listbox"]', { timeout: 10000 }).contains(country).click()
 
   cy.get('.modal-content').within(() => {
     typeIfNotEmpty('input[name="state"]', state)
