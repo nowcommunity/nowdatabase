@@ -180,7 +180,7 @@ describe('Museum e2e flows', () => {
     cy.get('[id=edit-button]').click()
 
     cy.contains('Create Museum').click()
-    fillCreateMuseumModal({ code, institution, city, country, stateCode: '' })
+    fillCreateMuseumModal({ code, institution, city, country, stateCode: 'NA' })
     cy.contains('button', 'Save').click()
 
     cy.wait('@saveMuseum').then(({ response }) => {
