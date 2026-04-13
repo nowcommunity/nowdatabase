@@ -178,7 +178,9 @@ describe('Museum e2e flows', () => {
     fillCreateMuseumModal({ code, institution, city, country })
     cy.contains('button', 'Save').click()
 
-    cy.wait('@saveMuseum').its('response.statusCode').should('eq', 200)
+    cy.wait('@saveMuseum').then(({ response }) => {
+      expect(response?.statusCode).to.eq(200, `Museum create failed: ${JSON.stringify(response?.body)}`)
+    })
     cy.contains(institution).should('be.visible')
 
     cy.addReferenceAndSave()
