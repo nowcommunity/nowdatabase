@@ -29,7 +29,7 @@ const fillMuseumForm = ({ code, institution, city, country, altName, state, stat
   typeIfNotEmpty('#museum-textfield', code)
 
   cy.contains('Choose a country', { timeout: 10000 }).parent().type(country)
-  cy.contains(country).click()
+  cy.get('ul[role="listbox"]', { timeout: 10000 }).contains(country).click()
 
   typeIfNotEmpty('#alt_int_name-textfield', altName)
   typeIfNotEmpty('#state-textfield', state)
@@ -44,7 +44,7 @@ const fillCreateMuseumModal = ({ code, institution, city, country, altName, stat
     cy.get('[name="country"]').parent().click({ force: true })
   })
 
-  cy.contains('li', country).click()
+  cy.get('ul[role="listbox"]', { timeout: 10000 }).contains(country).click()
 
   cy.get('.modal-content').within(() => {
     typeIfNotEmpty('input[name="state"]', state)
@@ -57,14 +57,31 @@ let seedMuseum = { code: 'AM', institution: 'Australian Museum' }
 
 before(() => {
   cy.resetDatabase()
-  cy.request('/museum/all').then(response => {
-    const museums = Array.isArray(response.body) ? response.body : response.body?.data ?? []
-    const pick =
-      museums.find(item => item?.institution && item.institution !== '[missing details]' && item?.museum) ??
-      museums.find(item => item?.museum)
-    if (pick) {
-      seedMuseum = { code: pick.museum, institution: pick.institution || pick.museum }
+  cy.loginWithSession('testSu')
+  const code = buildMuseumCode('CYM')
+  seedMuseum = { code, institution: `Cypress Museum ${code}` }
+  cy.window().then(win => {
+    const userState = win.localStorage.getItem('userState')
+    const token = userState ? JSON.parse(userState).token : null
+    if (!token) {
+      throw new Error('Missing auth token for museum setup')
     }
+    cy.request({
+      method: 'PUT',
+      url: '/museum',
+      headers: { Authorization: `Bearer ${token}` },
+      body: {
+        museum: {
+          museum: seedMuseum.code,
+          institution: seedMuseum.institution,
+          city: 'Helsinki',
+          country: 'Finland',
+          alt_int_name: null,
+          state: null,
+          state_code: null,
+        },
+      },
+    })
   })
 })
 
@@ -74,9 +91,7 @@ describe('Museum e2e flows', () => {
   })
 
   it('shows museum list for authorized users', () => {
-    cy.intercept('GET', '**/museum/all').as('getMuseums')
     cy.visit('/museum')
-    cy.wait('@getMuseums')
     cy.get('[aria-label="Filter by Institution"]', { timeout: 10000 }).clear()
     cy.get('[aria-label="Filter by Institution"]').type(seedMuseum.institution)
     cy.contains(seedMuseum.institution, { timeout: 10000 })
@@ -88,7 +103,6 @@ describe('Museum e2e flows', () => {
   })
 
   it('creates a new museum and lands on its details view', () => {
-    cy.intercept('GET', '**/museum/all').as('getMuseums')
     const code = buildMuseumCode('MT')
     const institution = `Museum Test ${code}`
     const city = 'Helsinki'
@@ -97,7 +111,6 @@ describe('Museum e2e flows', () => {
     cy.intercept('PUT', '**/museum').as('saveMuseum')
 
     cy.visit('/museum/new')
-    cy.wait('@getMuseums')
     cy.get('#institution-textfield', { timeout: 10000 }).should('be.visible')
     fillMuseumForm({ code, institution, city, country })
 
@@ -129,13 +142,11 @@ describe('Museum e2e flows', () => {
 
   it('links an existing museum to a locality and saves the locality', () => {
     cy.intercept('PUT', '**/locality').as('saveLocality')
-    cy.intercept('GET', '**/museum/all').as('getMuseums')
 
     cy.visit('/locality/20920?tab=9')
     cy.get('[id=edit-button]').click()
 
     cy.contains('Select Museum').click()
-    cy.wait('@getMuseums')
     cy.get('[aria-label="Filter by Institution"]', { timeout: 10000 }).clear()
     cy.get('[aria-label="Filter by Institution"]').type(seedMuseum.institution)
     cy.get(`[data-cy="add-button-${seedMuseum.code}"]`, { timeout: 10000 }).should('be.visible').click()
