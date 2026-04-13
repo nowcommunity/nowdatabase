@@ -49,7 +49,12 @@ const fillCreateMuseumModal = ({ code, institution, city, country, altName, stat
   cy.get('.modal-content').within(() => {
     cy.get('input[name="country"]').should('have.value', country)
     typeIfNotEmpty('input[name="state"]', state)
-    typeIfNotEmpty('input[name="state_code"]', stateCode)
+    if (stateCode !== undefined && stateCode !== null) {
+      typeIfNotEmpty('input[name="state_code"]', stateCode)
+    } else {
+      cy.get('input[name="state_code"]').clear()
+      cy.get('input[name="state_code"]').type(' {backspace}')
+    }
     typeIfNotEmpty('input[name="museum"]', code)
   })
 }
