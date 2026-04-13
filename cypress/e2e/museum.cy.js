@@ -28,7 +28,8 @@ const fillMuseumForm = ({ code, institution, city, country, altName, state, stat
   typeIfNotEmpty('#city-textfield', city)
   typeIfNotEmpty('#museum-textfield', code)
 
-  cy.contains('Choose a country', { timeout: 10000 }).parent().type(`${country}{enter}`)
+  cy.contains('Choose a country', { timeout: 10000 }).parent().type(country)
+  cy.contains(country).click()
 
   typeIfNotEmpty('#alt_int_name-textfield', altName)
   typeIfNotEmpty('#state-textfield', state)
@@ -40,8 +41,7 @@ const fillCreateMuseumModal = ({ code, institution, city, country, altName, stat
     typeIfNotEmpty('input[name="institution"]', institution)
     typeIfNotEmpty('input[name="alt_int_name"]', altName)
     typeIfNotEmpty('input[name="city"]', city)
-
-    cy.get('input[name="country"]').parents().find('[role="button"]').first().click()
+    cy.get('[name="country"]').parent().click({ force: true })
   })
 
   cy.contains('li', country).click()
@@ -74,7 +74,9 @@ describe('Museum e2e flows', () => {
   })
 
   it('shows museum list for authorized users', () => {
+    cy.intercept('GET', '**/museum/all').as('getMuseums')
     cy.visit('/museum')
+    cy.wait('@getMuseums')
     cy.get('[aria-label="Filter by Institution"]', { timeout: 10000 }).clear()
     cy.get('[aria-label="Filter by Institution"]').type(seedMuseum.institution)
     cy.contains(seedMuseum.institution, { timeout: 10000 })
@@ -86,6 +88,7 @@ describe('Museum e2e flows', () => {
   })
 
   it('creates a new museum and lands on its details view', () => {
+    cy.intercept('GET', '**/museum/all').as('getMuseums')
     const code = buildMuseumCode('MT')
     const institution = `Museum Test ${code}`
     const city = 'Helsinki'
@@ -94,6 +97,7 @@ describe('Museum e2e flows', () => {
     cy.intercept('PUT', '**/museum').as('saveMuseum')
 
     cy.visit('/museum/new')
+    cy.wait('@getMuseums')
     cy.get('#institution-textfield', { timeout: 10000 }).should('be.visible')
     fillMuseumForm({ code, institution, city, country })
 
@@ -125,11 +129,13 @@ describe('Museum e2e flows', () => {
 
   it('links an existing museum to a locality and saves the locality', () => {
     cy.intercept('PUT', '**/locality').as('saveLocality')
+    cy.intercept('GET', '**/museum/all').as('getMuseums')
 
     cy.visit('/locality/20920?tab=9')
     cy.get('[id=edit-button]').click()
 
     cy.contains('Select Museum').click()
+    cy.wait('@getMuseums')
     cy.get('[aria-label="Filter by Institution"]', { timeout: 10000 }).clear()
     cy.get('[aria-label="Filter by Institution"]').type(seedMuseum.institution)
     cy.get(`[data-cy="add-button-${seedMuseum.code}"]`, { timeout: 10000 }).should('be.visible').click()
