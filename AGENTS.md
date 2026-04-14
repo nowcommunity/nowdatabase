@@ -128,3 +128,10 @@ When tradeoffs appear, prefer:
 - Be concise and practical.
 - Mention files changed, validation performed, and any unresolved risk.
 - If a task was only partially verifiable locally, say so clearly.
+
+## Database Safety (Mandatory)
+
+- Never run database reset or restore commands against the **development** database unless the user explicitly asks for it.
+- Treat `/test/reset-test-database` and any SQL in `test_data/sqlfiles/` as **test-only** fixtures. Do not point dev services at those databases.
+- Before running any DB reset/restore, confirm which **DB host, port, and database names** the backend is using and whether they are isolated from dev data.
+- If test and dev share the same database container or port, stop and ask the user to separate them before proceeding.

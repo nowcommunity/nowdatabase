@@ -102,6 +102,13 @@ This section summarizes the overall architecture, structure, and technologies of
 - Typical CI failures to avoid: unchecked Prettier drift, unused imports/variables (especially in tests), missing async return types or implicit `any`, and stale `eslint-disable` directives.
 - Large fixtures or JSON assets (e.g., geodata) should remain excluded via `tsconfig.json`/`eslint.config.mjs` ignores; avoid importing them in type-checked code paths.
 
+### Database Safety Guardrails (Mandatory)
+
+- **Never** run test resets (`/test/reset-test-database`) against the development database.
+- Treat `test_data/sqlfiles/` as **test-only** fixtures. Development data should come from `data/sqlfiles/` or an explicitly provided dump.
+- If dev and test are on the same MariaDB container/port, **do not** proceed with resets. Plan a separation step (second container/port or distinct DB host) before running tests that reset data.
+- Before any DB reset/restore, confirm the **active backend env** and **DB connection target** (host, port, db names) to avoid unintended overwrites.
+
 ### Frontend Unit-Test Planning Guardrails
 
 - When a feature touches shared frontend infrastructure such as `DetailView`, `EditableTable`, `DetailTabTable`, `UnsavedChangesProvider`, Redux API slices, or route-aware components, include explicit test-harness tasks in the plan.

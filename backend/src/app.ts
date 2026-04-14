@@ -31,6 +31,7 @@ import { Role } from './../../frontend/src/shared/types'
 import { blockWriteRequests } from './middlewares/misc'
 import testRouter from './routes/test'
 import occurrenceRouter from './routes/occurrence'
+import speciesMergeRouter from './routes/speciesMerge'
 
 const app = express()
 
@@ -57,6 +58,7 @@ app.use('/occurrence', occurrenceRouter)
 app.use('/locality', localityRouter)
 app.use('/locality-species', localitySpeciesRouter)
 app.use('/species', speciesRouter)
+app.use('/admin/species-merge', requireOneOf([Role.Admin]), speciesMergeRouter)
 app.use('/statistics', statisticsRouter)
 app.use('/reference', referenceRouter)
 app.use('/time-unit', timeUnitRouter)

@@ -3,7 +3,15 @@ import { logger } from './logger'
 import { PrismaClient as NowClient } from '../../prisma/generated/now_test_client'
 import { PrismaClient as LogClient } from '../../prisma/generated/now_log_test_client/default'
 import mariadb from 'mariadb'
-import { MARIADB_HOST, MARIADB_PASSWORD, DB_CONNECTION_LIMIT, MARIADB_USER, RUNNING_ENV, LOG_DB_NAME } from './config'
+import {
+  MARIADB_HOST,
+  MARIADB_PASSWORD,
+  DB_CONNECTION_LIMIT,
+  MARIADB_USER,
+  RUNNING_ENV,
+  LOG_DB_NAME,
+  MARIADB_PORT,
+} from './config'
 
 import { readFile } from 'fs/promises'
 import { PathLike } from 'fs'
@@ -162,6 +170,7 @@ export const getFieldsOfTables = (tables: string[]) => {
 
 export const pool = mariadb.createPool({
   host: MARIADB_HOST,
+  port: MARIADB_PORT,
   password: MARIADB_PASSWORD,
   user: MARIADB_USER,
   connectionLimit: parseInt(DB_CONNECTION_LIMIT),
@@ -218,6 +227,7 @@ export const resetTestDb = async () => {
   const createTestConnection = (dbName: string) => {
     return mariadb.createConnection({
       host: MARIADB_HOST,
+      port: MARIADB_PORT,
       password: process.env.MARIADB_ROOT_PASSWORD,
       user: 'root',
       checkDuplicate: false,

@@ -20,10 +20,12 @@ export const WriteButton = <T,>({
   onWrite,
   taxonomy,
   hasStagingMode = false,
+  disabled = false,
 }: {
   onWrite: (editData: EditDataType<T>, setEditData: (editData: EditDataType<T>) => void) => Promise<void>
   taxonomy?: boolean
   hasStagingMode?: boolean
+  disabled?: boolean
 }) => {
   const { data, editData, setEditData, mode, setMode, validator, fieldsWithErrors, setFieldsWithErrors, isDirty } =
     useDetailContext<T>()
@@ -187,6 +189,7 @@ export const WriteButton = <T,>({
   }
 
   const handleWriteButtonClick = async () => {
+    if (disabled) return
     const finalize = async () => {
       if (taxonomy) {
         setLoading(true)
@@ -240,7 +243,7 @@ export const WriteButton = <T,>({
           >
             <span>
               <Button
-                disabled={Object.keys(fieldsWithErrors).length > 0 || !isDirty}
+                disabled={disabled || Object.keys(fieldsWithErrors).length > 0 || !isDirty}
                 id="write-button"
                 sx={{ width: '20em' }}
                 onClick={() => {

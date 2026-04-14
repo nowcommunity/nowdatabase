@@ -26,13 +26,14 @@
 
 Cypress.Commands.overwrite('visit', (originalFn, url, options) => {
   const targetUrl = typeof url === 'string' ? url : url?.url
-  const resolvedUrl = targetUrl ? new URL(targetUrl, Cypress.config('baseUrl')).toString() : Cypress.config('baseUrl')
+  const baseUrl = Cypress.config('baseUrl')
+  const resolvedUrl = targetUrl ? new URL(targetUrl, baseUrl).toString() : baseUrl
   const appWaitTimeoutMs = Number(Cypress.env('appWaitTimeoutMs') ?? 60000)
 
   return cy
-    .task('waitForAppHealthy', { url: resolvedUrl }, { timeout: appWaitTimeoutMs })
+    .task('waitForAppHealthy', { url: baseUrl }, { timeout: appWaitTimeoutMs })
     .then(() => {
-      originalFn(url, options)
+      return originalFn(url, options)
     })
 })
 

@@ -68,6 +68,13 @@ const router = createBrowserRouter([
         },
       },
       {
+        path: 'admin/merge-species',
+        lazy: async () => {
+          const { SpeciesMergePage } = await import('../pages/admin/SpeciesMergePage')
+          return { Component: SpeciesMergePage }
+        },
+      },
+      {
         path: 'login',
         lazy: async () => {
           const { Login } = await import('../components/Login')

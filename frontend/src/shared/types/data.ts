@@ -547,6 +547,157 @@ export type Reference = {
   title_secondary: string
 }
 
+export type OccurrenceMergeField =
+  | 'nis'
+  | 'pct'
+  | 'quad'
+  | 'mni'
+  | 'qua'
+  | 'id_status'
+  | 'orig_entry'
+  | 'source_name'
+  | 'body_mass'
+  | 'mesowear'
+  | 'mw_or_high'
+  | 'mw_or_low'
+  | 'mw_cs_sharp'
+  | 'mw_cs_round'
+  | 'mw_cs_blunt'
+  | 'mw_scale_min'
+  | 'mw_scale_max'
+  | 'mw_value'
+  | 'microwear'
+  | 'dc13_mean'
+  | 'dc13_n'
+  | 'dc13_max'
+  | 'dc13_min'
+  | 'dc13_stdev'
+  | 'do18_mean'
+  | 'do18_n'
+  | 'do18_max'
+  | 'do18_min'
+  | 'do18_stdev'
+
+export type SpeciesMergeSummaryField = {
+  species_id: number
+  class_name: string | null
+  order_name: string | null
+  family_name: string | null
+  genus_name: string | null
+  species_name: string | null
+  subclass_or_superorder_name: string | null
+  suborder_or_superfamily_name: string | null
+  subfamily_name: string | null
+  unique_identifier: string | null
+  taxonomic_status: string | null
+  common_name: string | null
+  sp_author: string | null
+  strain: string | null
+  gene: string | null
+  taxon_status: string | null
+  diet_description: string | null
+  rel_fib: string | null
+  selectivity: string | null
+  digestion: string | null
+  feedinghab1: string | null
+  feedinghab2: string | null
+  shelterhab1: string | null
+  shelterhab2: string | null
+  hunt_forage: string | null
+  brain_mass: number | null
+  activity: string | null
+  symph_mob: string | null
+  relative_blade_length: number | null
+  microwear: string | null
+  horizodonty: string | null
+  cusp_shape: string | null
+  cusp_count_buccal: string | null
+  cusp_count_lingual: string | null
+  loph_count_lon: string | null
+  loph_count_trs: string | null
+  fct_al: string | null
+  fct_ol: string | null
+  fct_sf: string | null
+  fct_ot: string | null
+  fct_cm: string | null
+  mesowear: string | null
+  mw_or_high: number | null
+  mw_or_low: number | null
+  mw_cs_sharp: number | null
+  mw_cs_round: number | null
+  mw_cs_blunt: number | null
+  mw_scale_min: number | null
+  mw_scale_max: number | null
+  mw_value: number | null
+  pop_struc: string | null
+  sp_status: boolean | null
+  used_morph: boolean | null
+  used_now: boolean | null
+  used_gene: boolean | null
+  sp_comment: string | null
+  localities: number
+  sv_length: string | null
+  body_mass: number | null
+  sd_size: string | null
+  sd_display: string | null
+  tshm: string | null
+  tht: string | null
+  crowntype: string | null
+  diet1: string | null
+  diet2: string | null
+  diet3: string | null
+  locomo1: string | null
+  locomo2: string | null
+  locomo3: string | null
+}
+
+export type SpeciesMergeFieldChoice = {
+  field: string
+  obsoleteValue: string | number | boolean | null
+  acceptedValue: string | number | boolean | null
+  defaultChoice: 'accepted' | 'obsolete'
+}
+
+export type SpeciesMergeConflict = {
+  lid: number
+  localityName: string | null
+  country: string | null
+  obsolete: Record<OccurrenceMergeField, string | number | null>
+  accepted: Record<OccurrenceMergeField, string | number | null>
+  defaultChoice: Record<OccurrenceMergeField, 'accepted' | 'obsolete'>
+}
+
+export type SpeciesMergeSummary = {
+  obsolete: SpeciesMergeSummaryField
+  accepted: SpeciesMergeSummaryField
+  speciesFieldChoices: SpeciesMergeFieldChoice[]
+  occurrenceConflicts: SpeciesMergeConflict[]
+}
+
+export type SpeciesMergeRequest = {
+  obsoleteSpeciesId: number
+  acceptedSpeciesId: number
+  selectedSpeciesFieldValues: Record<string, string | number | boolean | null>
+  occurrenceFieldChoices: Array<{
+    lid: number
+    fieldChoice: Record<OccurrenceMergeField, 'accepted' | 'obsolete'>
+  }>
+  addObsoleteAsSynonym: boolean
+  synonymComment?: string
+  addSourceNameToOccurrences: boolean
+  comment: string
+  references: Reference[]
+}
+
+export type SpeciesMergeResponse = {
+  message: string
+  suid: number
+  coordinator: string
+  editor: string
+  date: string
+  comment: string
+}
+
 export type ReferenceOfUpdate = Prisma.ref_ref & {
   ref_authors: Prisma.ref_authors[]
   ref_journal: Prisma.ref_journal

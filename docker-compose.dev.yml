@@ -35,6 +35,16 @@ services:
     ports:
       - 127.0.0.1:3306:3306
 
+  db-test:
+    container_name: nowdb-db-test
+    image: mariadb:11.4.3
+    env_file: .test.env
+    volumes:
+      - ./test_data/:/docker-entrypoint-initdb.d
+      - nowdb-db-test:/var/lib/mysql/data
+    ports:
+      - 127.0.0.1:3307:3306
+
   phpmyadmin:
     restart: always
     image: phpmyadmin:5.2.1
@@ -48,3 +58,4 @@ services:
 
 volumes:
   nowdb-db-dev:
+  nowdb-db-test:

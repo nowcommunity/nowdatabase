@@ -1,5 +1,13 @@
 import { api } from './api'
-import { EditDataType, Species, SpeciesDetailsType, SpeciesSynonym } from '@/shared/types'
+import {
+  EditDataType,
+  Species,
+  SpeciesDetailsType,
+  SpeciesMergeRequest,
+  SpeciesMergeResponse,
+  SpeciesMergeSummary,
+  SpeciesSynonym,
+} from '@/shared/types'
 
 const speciesApi = api.injectEndpoints({
   endpoints: builder => ({
@@ -39,6 +47,24 @@ const speciesApi = api.injectEndpoints({
       invalidatesTags: (result, _error, species_id) =>
         typeof result !== 'undefined' ? [{ type: 'species', id: species_id }, 'specieslist', 'speciessynonyms'] : [],
     }),
+    getSpeciesMergeSummary: builder.query<SpeciesMergeSummary, { obsoleteId: number; acceptedId: number }>({
+      query: ({ obsoleteId, acceptedId }) => ({
+        url: `/admin/species-merge/summary`,
+        params: { obsoleteId, acceptedId },
+      }),
+    }),
+    mergeSpecies: builder.mutation<SpeciesMergeResponse, SpeciesMergeRequest>({
+      query: payload => ({
+        url: `/admin/species-merge`,
+        method: 'POST',
+        body: payload,
+      }),
+      invalidatesTags: (_result, _error, { acceptedSpeciesId }) => [
+        { type: 'species', id: acceptedSpeciesId },
+        'specieslist',
+        'speciessynonyms',
+      ],
+    }),
   }),
 })
 
@@ -48,4 +74,6 @@ export const {
   useGetSpeciesDetailsQuery,
   useEditSpeciesMutation,
   useDeleteSpeciesMutation,
+  useGetSpeciesMergeSummaryQuery,
+  useMergeSpeciesMutation,
 } = speciesApi
