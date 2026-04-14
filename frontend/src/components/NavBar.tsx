@@ -35,6 +35,7 @@ export const NavBar = () => {
         { title: 'Projects', url: '/project' },
         { title: 'People', url: '/person' },
         { title: 'Email', url: '/email' },
+        { title: 'Merge Species', url: '/admin/merge-species' },
       ],
     },
   ]

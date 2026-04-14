@@ -14,7 +14,8 @@ Requirements: npm and some modern installation of Docker engine with Docker comp
 
 1. `npm run setup` in project root to install all node modules, generate prisma-client and create all required config files (doesn't overwrite previous ones!).
 2. If you wish to use the staging database, you need to copy the dump files into `data/sqlfiles/` directory. See example of how anonymized test data is in `test_data/sqlfiles/`
-3. `npm run dev` to run with the staging database or `npm run start:anon` to run with the anonymized small test-db included in the repository.
+3. `npm run dev` starts **both** the dev database (`nowdb-db-dev`) and the test database (`nowdb-db-test`) so API tests can reset safely without overwriting dev data.
+   - You can also start just the test database with `npm run dev:db-test` and stop it with `npm run dev:db-test:down`.
 4. Check if it worked: The docker logs should have a line saying database connection works. Open `localhost:5173` in browser to check if frontend works and shows data.
 
 **Errors while setting up**

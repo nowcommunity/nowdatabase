@@ -4,6 +4,14 @@
 
 The mariadb-container by default executes all .sql files it finds in the containers `/docker-entrypoint-initdb.d/` directory when the container is run the first time. The `data` directory is mounted there. It contains an initialization file (`restore_and_create.sql`) which will then restore the database from the sql-dumpfiles in `sqlfiles/`, and also create a user `'now_test'@'localhost'` with a password defined as MARIADB_PASSWORD in the .db.dev.env file for the database.
 
+**Dev vs Test database separation (important)**
+
+- Development data is restored from `data/sqlfiles/` and runs in the `nowdb-db-dev` container on port `3306`.
+- Test data is restored from `test_data/sqlfiles/` and runs in a separate `nowdb-db-test` container on port `3307`.
+- Never run `/test/reset-test-database` against the dev database. It must target the test container only.
+- Ensure `.test.env` points to port `3307` so API tests do not overwrite dev data.
+- `resetTestDb` now uses `MARIADB_PORT`, so keep `.test.env` aligned with the test DB port.
+
 **Accessing database inside docker**
 
 `docker exec -it nowdb-db mariadb -u now_test -p --database now_test`

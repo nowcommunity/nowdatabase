@@ -85,6 +85,9 @@ Implement **exactly one task** from an approved feature plan.
 ### Backend API-test checklist (mandatory when backend code or backend API tests change)
 
 - Prefer deterministic backend tests. Do not leave API tests dependent on live external services, network access, or unstable third-party result counts. Mock outbound integrations such as Geonames at the test boundary.
+- Never run `/test/reset-test-database` against the development database. Ensure test resets target an isolated test DB host/port.
+- Treat `test_data/sqlfiles/` as **test-only** fixtures. Development data must not be overwritten by test resets.
+- Before invoking any DB reset/restore command, verify the backend’s **active env** and **DB connection target** (host, port, db names).
 - Use seeded ids and fixture values that are actually present in the checked-in test SQL. If a test depends on seed data, verify those ids/rows before changing expectations.
 - When changing shared backend write helpers, assume the blast radius is large. Check how the change affects generated ids, update-log entry creation, reference join rows, and metadata stripping across locality/species/time-unit/time-bound flows.
 - Strip helper-only metadata before generic persistence utilities. Route/test payloads may include fields such as `comment`, `references`, `up_bound`, `low_bound`, or UI-only helper objects that must not be treated as DB columns.

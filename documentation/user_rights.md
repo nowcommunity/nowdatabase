@@ -40,6 +40,7 @@ Users with the **EditUnrestricted** role are not limited by project membership w
 - Creating or updating a species (and synonyms) requires the **Admin**, **EditUnrestricted**, or **EditRestricted** roles.
 - Deleting a species requires the **Admin** or **EditUnrestricted** roles.
 - Deleting a species synonym requires the **Admin**, **EditUnrestricted**, or **EditRestricted** roles.
+- Merging species requires the **Admin** role (via `/admin/species-merge`).
 
 ## References
 
