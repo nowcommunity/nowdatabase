@@ -19,7 +19,7 @@ router.get('/synonyms', async (_req, res) => {
 
 router.get('/:id', async (req, res) => {
   const id = parseInt(req.params.id)
-  const species = await getSpeciesDetails(id)
+  const species = await getSpeciesDetails(id, req.user)
   if (!species) return res.status(404).send()
   return res.status(200).send(species)
 })

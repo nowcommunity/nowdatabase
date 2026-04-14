@@ -85,6 +85,7 @@ export const LocalityTab = () => {
         enableAdvancedTableControls={true}
         idFieldName="lid"
         url="locality"
+        checkRowRestriction={row => Boolean((row as { now_loc?: { loc_status?: boolean | null } }).now_loc?.loc_status)}
       />
     </Grouped>
   )

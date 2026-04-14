@@ -1,4 +1,4 @@
-import { EditDataType, EditMetaData, SpeciesDetailsType } from '../../../frontend/src/shared/types'
+import { EditDataType, EditMetaData, Role, SpeciesDetailsType, User } from '../../../frontend/src/shared/types'
 import { validateSpecies } from '../../../frontend/src/shared/validators/species'
 import { ValidationObject, referenceValidator } from '../../../frontend/src/shared/validators/validator'
 import Prisma from '../../prisma/generated/now_test_client'
@@ -6,6 +6,7 @@ import { fixBigInt } from '../utils/common'
 import { logDb, nowDb } from '../utils/db'
 import { getReferenceDetails } from './reference'
 import { buildPersonLookupByInitials, getPersonDisplayName, getPersonFromLookup } from './utils/person'
+import { getIdsOfUsersProjects } from './locality'
 
 const TAXONOMIC_FIELDS: Array<keyof Prisma.com_species> = ['genus_name', 'species_name', 'unique_identifier']
 
@@ -111,13 +112,50 @@ export const getAllSpecies = async () => {
   return result
 }
 
-export const getSpeciesDetails = async (id: number) => {
+const filterSpeciesLocalitiesByUser = async (
+  localities: SpeciesDetailsType['now_ls'],
+  user?: User
+): Promise<SpeciesDetailsType['now_ls']> => {
+  if (user && [Role.Admin, Role.EditUnrestricted].includes(user.role)) {
+    return localities
+  }
+
+  if (!user) {
+    return localities.filter(locality => locality.now_loc?.loc_status === false)
+  }
+
+  const usersProjects = await getIdsOfUsersProjects(user)
+
+  return localities.filter(locality => {
+    const nowLoc = locality.now_loc as Prisma.now_loc & { now_plr?: Array<{ pid: number }> }
+    if (!nowLoc) return false
+    if (!nowLoc.loc_status) return true
+    return (nowLoc.now_plr ?? []).some(project => usersProjects.has(project.pid))
+  })
+}
+
+const stripLocalityProjectLinks = (localities: SpeciesDetailsType['now_ls']) =>
+  localities.map(locality => {
+    if (!locality.now_loc) return locality
+    const { now_plr, ...rest } = locality.now_loc as Prisma.now_loc & { now_plr?: Array<{ pid: number }> }
+    return { ...locality, now_loc: rest }
+  })
+
+export const getSpeciesDetails = async (id: number, user?: User) => {
   const result = await nowDb.com_species.findUnique({
     where: { species_id: id },
     include: {
       now_ls: {
         include: {
-          now_loc: true,
+          now_loc: {
+            include: {
+              now_plr: {
+                select: {
+                  pid: true,
+                },
+              },
+            },
+          },
         },
       },
       now_sau: {
@@ -163,7 +201,12 @@ export const getSpeciesDetails = async (id: number) => {
     }
   })
 
-  return JSON.parse(fixBigInt({ ...result, com_taxa_synonym: synonyms || [] })!) as SpeciesDetailsType
+  const filteredLocalities = await filterSpeciesLocalitiesByUser(result.now_ls as SpeciesDetailsType['now_ls'], user)
+  const sanitizedLocalities = stripLocalityProjectLinks(filteredLocalities)
+
+  return JSON.parse(
+    fixBigInt({ ...result, now_ls: sanitizedLocalities, com_taxa_synonym: synonyms || [] })!
+  ) as SpeciesDetailsType
 }
 
 export const getAllSynonyms = async () => {

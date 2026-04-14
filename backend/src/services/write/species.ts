@@ -47,7 +47,7 @@ export const writeSpecies = async (
 }
 
 export const deleteSpecies = async (species_id: number, user: User) => {
-  const species = (await getSpeciesDetails(species_id)) as EditDataType<FixBigInt<SpeciesDetailsType>>
+  const species = (await getSpeciesDetails(species_id, user)) as EditDataType<FixBigInt<SpeciesDetailsType>>
   if (!species) throw new Error('Species not found')
 
   const writeHandler = getSpeciesWriteHandler('delete')

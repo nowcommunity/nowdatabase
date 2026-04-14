@@ -33,6 +33,7 @@ export const EditableTable = <
   idFieldName,
   url,
   getDetailPath,
+  checkRowRestriction,
 }: {
   tableData?: Array<T> | null
   editTableData?: Array<EditDataType<T>> | null
@@ -45,6 +46,7 @@ export const EditableTable = <
   idFieldName?: keyof T
   url?: string
   getDetailPath?: (row: T) => string
+  checkRowRestriction?: (row: T) => boolean
 }) => {
   const { editData, setEditData, mode, data, validator, fieldsWithErrors, setFieldsWithErrors } =
     useDetailContext<ParentType>()
@@ -124,7 +126,8 @@ export const EditableTable = <
   }
 
   const linkToDetails = ({ row }: { row: MRT_Row<T> }) => {
-    if (idFieldName && url) return <ActionComponent {...{ row, idFieldName, url, getDetailPath }} />
+    if (idFieldName && url)
+      return <ActionComponent {...{ row, idFieldName, url, getDetailPath, checkRowRestriction }} />
     return null // code shouldn't get here!
   }
 

@@ -223,6 +223,7 @@ export const LocalitySpeciesTab = () => {
         idFieldName="lid"
         url="occurrence"
         getDetailPath={row => `/occurrence/${row.lid}/${row.species_id}`}
+        checkRowRestriction={row => Boolean(row.now_loc?.loc_status)}
       />
     </Grouped>
   )
