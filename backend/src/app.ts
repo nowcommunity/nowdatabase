@@ -21,6 +21,7 @@ import userRouter from './routes/user'
 import emailRouter, { emailLimiter } from './routes/email'
 import versionRouter from './routes/version'
 import geonamesRouter from './routes/geonames-api'
+import changelogRouter from './routes/changelog'
 import { responseLogger } from './middlewares/requestLogger'
 import compression from 'compression'
 import { ENABLE_WRITE, RUNNING_ENV } from './utils/config'
@@ -72,6 +73,7 @@ app.use('/sedimentary-structure', sedimentaryStructureRouter)
 app.use('/collecting-method-values', collectingMethodValuesRouter)
 app.use('/email', emailRouter)
 app.use('/version', versionRouter)
+app.use('/changelog', changelogRouter)
 app.use('/geonames-api', geonamesRouter)
 if (RUNNING_ENV === 'dev') app.use('/test', testRouter)
 
