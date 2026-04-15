@@ -1,8 +1,8 @@
-import { describe, expect, it } from '@jest/globals'
+import { describe, expect, it, jest } from '@jest/globals'
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { DetailContext, DetailContextType, modeOptionToMode } from '@/components/DetailView/Context/DetailContext'
-import { BasisForAgeSelection } from './editingComponents'
+import { BasisForAgeSelection, EditableTextField } from './editingComponents'
 import { EditDataType, LocalityDetailsType, TimeUnit } from '@/shared/types'
 import { ReactNode, useState } from 'react'
 import '@testing-library/jest-dom'
@@ -140,5 +140,74 @@ describe('BasisForAgeSelection', () => {
     await waitFor(() => {
       expect(screen.getByTestId('min-age').textContent).toContain('42.5')
     })
+  })
+})
+
+const NumberInputWrapper = ({ handleSetEditData }: { handleSetEditData?: (value: number | string) => void }) => {
+  const initialEditData = { min_age: '' } as unknown as EditDataType<LocalityDetailsType>
+  const [editData, setEditData] = useState<EditDataType<LocalityDetailsType>>(initialEditData)
+
+  const contextValue: DetailContextType<LocalityDetailsType> = {
+    data: initialEditData as unknown as LocalityDetailsType,
+    mode: modeOptionToMode.edit,
+    setMode: () => undefined,
+    editData,
+    setEditData,
+    isDirty: false,
+    resetEditData: () => setEditData(initialEditData),
+    textField: () => <></>,
+    bigTextField: () => <></>,
+    dropdown: () => <></>,
+    dropdownWithSearch: () => <></>,
+    radioSelection: () => <></>,
+    validator: () => ({ name: '', error: null }),
+    fieldsWithErrors: {},
+    setFieldsWithErrors: () => undefined,
+  }
+
+  return (
+    <DetailContext.Provider value={contextValue as DetailContextType<unknown>}>
+      <div data-testid="min-age">{String(editData.min_age ?? '')}</div>
+      <EditableTextField<LocalityDetailsType> field="min_age" type="number" handleSetEditData={handleSetEditData} />
+    </DetailContext.Provider>
+  )
+}
+
+describe('EditableTextField (number)', () => {
+  it('rejects non-numeric characters like e/E/+ while typing', async () => {
+    const user = userEvent.setup()
+    render(<NumberInputWrapper />)
+
+    const input = screen.getByRole<HTMLInputElement>('spinbutton')
+    await user.type(input, '12e3')
+
+    expect(input.value).toBe('123')
+    expect(screen.getByTestId('min-age').textContent).toBe('123')
+  })
+
+  it('allows negative numbers without setting NaN in editData', async () => {
+    const user = userEvent.setup()
+    render(<NumberInputWrapper />)
+
+    const input = screen.getByRole<HTMLInputElement>('spinbutton')
+    await user.type(input, '-1.5')
+
+    expect(input.value).toBe('-1.5')
+    expect(screen.getByTestId('min-age').textContent).toBe('-1.5')
+  })
+
+  it('calls handleSetEditData only with numbers or empty string', async () => {
+    const user = userEvent.setup()
+    const handleSetEditData = jest.fn()
+
+    render(<NumberInputWrapper handleSetEditData={handleSetEditData} />)
+
+    const input = screen.getByRole<HTMLInputElement>('spinbutton')
+    await user.type(input, '1e2')
+
+    for (const call of handleSetEditData.mock.calls) {
+      const arg = call[0]
+      expect(typeof arg === 'number' || arg === '').toBe(true)
+    }
   })
 })
