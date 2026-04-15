@@ -134,7 +134,7 @@ export class DatabaseHandler {
         idValues
       )
     )[0]
-    return JSON.parse(fixBigInt(returnValue as object)!) as T
+    return fixBigInt(returnValue) as T
   }
 
   async executeQuery<T>(query: string, values?: Array<DbValue>) {
