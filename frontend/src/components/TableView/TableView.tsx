@@ -220,6 +220,7 @@ export const TableView = <T extends MRT_RowData>({
   }
 
   const muiTableBodyRowProps = ({ row }: { row: MRT_Row<T> }) => ({
+    'data-cy': `table-row-${String(row.original[idFieldName])}`,
     onClick: () => {
       const sanitizedFilters = sanitizeColumnFilters(columnFilters)
       const columnFilterToUrl = `columnfilters=${JSON.stringify(sanitizedFilters)}`

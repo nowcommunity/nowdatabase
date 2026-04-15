@@ -173,6 +173,7 @@ export const EditableTable = <
       enableRowActions={!mode.read || Boolean(checkRowRestriction)}
       renderRowActions={resolveRenderRowActions()}
       muiTableBodyRowProps={({ row }: { row: MRT_Row<T> }) => ({
+        'data-cy': idFieldName ? `table-row-${String(row.original[idFieldName])}` : undefined,
         onClick: () => {
           if (mode.read && idFieldName && url) {
             setPreviousTableUrls([...previousTableUrls, `${location.pathname}?tab=${searchParams.get('tab')}`])
