@@ -34,24 +34,27 @@ export type TabType = {
   content: JSX.Element
 }
 
-export type TextFieldOptions = (
-  | {
-      type: 'text'
-      trim?: boolean
-    }
-  | {
-      type: 'number'
-      round?: number
-    }
-  | {
-      type: 'date'
-    }
-) & {
+type CommonTextFieldOptions = {
   disabled?: boolean
   big?: boolean
   readonly?: boolean
-  handleSetEditData?: (value: number | string | Date) => void
 }
+
+export type TextFieldOptions =
+  | ({
+      type?: 'text'
+      trim?: boolean
+      handleSetEditData?: (value: string) => void
+    } & CommonTextFieldOptions)
+  | ({
+      type: 'number'
+      round?: number
+      handleSetEditData?: (value: number | '') => void
+    } & CommonTextFieldOptions)
+  | ({
+      type: 'date'
+      handleSetEditData?: (value: string) => void
+    } & CommonTextFieldOptions)
 
 export type OptionalRadioSelectionProps = {
   defaultValue?: DropdownOptionValue

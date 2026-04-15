@@ -272,25 +272,11 @@ const MultiSelector = <T extends object>({
   return <DataValue<T> field={field} EditElement={editingComponent} displayValue={displayValue} />
 }
 
-export const EditableTextField = <T extends object>({
-  field,
-  type = 'text',
-  round,
-  trim = false,
-  big = false,
-  disabled = false,
-  readonly = false,
-  handleSetEditData,
-}: {
-  field: keyof EditDataType<T>
-  type?: React.HTMLInputTypeAttribute
-  round?: number
-  trim?: boolean
-  big?: boolean
-  disabled?: boolean
-  readonly?: boolean
-  handleSetEditData?: (value: number | string) => void
-}) => {
+export const EditableTextField = <T extends object>(props: EditableTextFieldProps<T>) => {
+  const { field, disabled = false, big = false, readonly = false, handleSetEditData } = props
+  const type = props.type ?? 'text'
+  const trim = type === 'text' ? (props as EditableTextFieldTextProps<T>).trim ?? false : false
+  const round = type === 'number' ? (props as EditableTextFieldNumberProps<T>).round : undefined
   const { setEditData, editData, validator, fieldsWithErrors, setFieldsWithErrors } = useDetailContext<T>()
   const errorObject = validator(editData, field)
   const { error } = errorObject
@@ -316,9 +302,10 @@ export const EditableTextField = <T extends object>({
   const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
     const value = event?.currentTarget?.value
     if (type === 'number') {
+      const setNumberValue = handleSetEditData as EditableTextFieldNumberProps<T>['handleSetEditData']
       if (value === '') {
         setNumberInputValue('')
-        if (handleSetEditData) handleSetEditData('')
+        if (setNumberValue) setNumberValue('')
         else setEditData({ ...editData, [field]: '' })
         return
       }
@@ -329,13 +316,13 @@ export const EditableTextField = <T extends object>({
       const asNumber = Number(value)
       if (isPartialNumberInputValue(value) || Number.isNaN(asNumber)) return
 
-      if (handleSetEditData) handleSetEditData(asNumber)
+      if (setNumberValue) setNumberValue(asNumber)
       else setEditData({ ...editData, [field]: asNumber })
       return
     }
 
     if (handleSetEditData) {
-      handleSetEditData(value)
+      ;(handleSetEditData as (value: string) => void)(value)
       return
     }
 
@@ -356,10 +343,11 @@ export const EditableTextField = <T extends object>({
 
   const handleNumberBlur = () => {
     const value = numberInputValue
+    const setNumberValue = handleSetEditData as EditableTextFieldNumberProps<T>['handleSetEditData']
     if (value === '') return
     if (isPartialNumberInputValue(value)) {
       setNumberInputValue('')
-      if (handleSetEditData) handleSetEditData('')
+      if (setNumberValue) setNumberValue('')
       else setEditData({ ...editData, [field]: '' })
       return
     }
@@ -399,6 +387,35 @@ export const EditableTextField = <T extends object>({
 const isAllowedNumberInputValue = (value: string) => /^-?\d*(\.\d*)?$/.test(value) || isPartialNumberInputValue(value)
 
 const isPartialNumberInputValue = (value: string) => value === '-' || value === '.' || value === '-.'
+
+type EditableTextFieldCommonProps<T extends object> = {
+  field: keyof EditDataType<T>
+  big?: boolean
+  disabled?: boolean
+  readonly?: boolean
+}
+
+type EditableTextFieldTextProps<T extends object> = EditableTextFieldCommonProps<T> & {
+  type?: 'text'
+  trim?: boolean
+  handleSetEditData?: (value: string) => void
+}
+
+type EditableTextFieldNumberProps<T extends object> = EditableTextFieldCommonProps<T> & {
+  type: 'number'
+  round?: number
+  handleSetEditData?: (value: number | '') => void
+}
+
+type EditableTextFieldDateProps<T extends object> = EditableTextFieldCommonProps<T> & {
+  type: 'date'
+  handleSetEditData?: (value: string) => void
+}
+
+export type EditableTextFieldProps<T extends object> =
+  | EditableTextFieldTextProps<T>
+  | EditableTextFieldNumberProps<T>
+  | EditableTextFieldDateProps<T>
 
 export const FieldWithTableSelection = <T extends object, ParentType extends object>({
   targetField,
