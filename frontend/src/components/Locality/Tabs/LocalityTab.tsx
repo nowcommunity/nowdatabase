@@ -71,7 +71,7 @@ export const LocalityTab = () => {
   ]
 
   const handleCoordinateChange = (
-    value: number | string | Date,
+    value: number | string,
     dmsOrDec: 'dms' | 'dec',
     latitudeOrLongitude: 'latitude' | 'longitude'
   ) => {
@@ -91,10 +91,10 @@ export const LocalityTab = () => {
         setEditData({ ...editData, [decField]: undefined, [dmsField]: undefined })
         return
       }
-      const valueAsNumber = Number(value)
+      const valueAsNumber = typeof value === 'number' ? value : Number(value)
       setEditData({
         ...editData,
-        [decField]: Number(value),
+        [decField]: valueAsNumber,
         [dmsField]: convertDecToDms(valueAsNumber, latitudeOrLongitude),
       })
     }
