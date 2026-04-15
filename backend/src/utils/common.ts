@@ -1,6 +1,10 @@
 export const sleep = async (ms: number) => new Promise(resolve => setTimeout(resolve, ms))
 
-// Note: using fixBigInt inside an object might crash the entire app for some reason
-export const fixBigInt = (obj: object | null) =>
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-  obj === null ? null : JSON.stringify(obj, (_key, value) => (typeof value === 'bigint' ? Number(value) : value))
+export const fixBigInt = (value: unknown) => {
+  if (value === null || value === undefined) return value
+  const parsed: unknown = JSON.parse(JSON.stringify(value, bigintToNumberReplacer))
+  return parsed
+}
+
+const bigintToNumberReplacer = (_key: string, innerValue: unknown): unknown =>
+  typeof innerValue === 'bigint' ? Number(innerValue) : innerValue

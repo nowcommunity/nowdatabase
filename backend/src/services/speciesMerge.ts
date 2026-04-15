@@ -397,7 +397,7 @@ export const getSpeciesMergeSummary = async (
     occurrenceConflicts,
   }
 
-  return JSON.parse(fixBigInt(result) ?? 'null') as SpeciesMergeSummaryResponse
+  return fixBigInt(result) as SpeciesMergeSummaryResponse
 }
 
 const validateReferences = async (references: Reference[]) => {

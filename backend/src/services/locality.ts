@@ -319,7 +319,7 @@ export const getLocalityDetails = async (id: number, user: User | undefined) => 
       : null,
   }
 
-  return JSON.parse(fixBigInt(localityWithTimeUnitDisplayValues)!) as LocalityDetailsType
+  return fixBigInt(localityWithTimeUnitDisplayValues) as LocalityDetailsType
 }
 
 // also validates possible new species that were added to this locality
