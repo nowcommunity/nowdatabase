@@ -17,10 +17,8 @@ const openMuseumFromList = (institution, code) => {
   cy.get('[aria-label="Filter by Institution"]').type(institution)
   cy.contains(institution, { timeout: 10000 })
     .should('be.visible')
-    .closest('tr')
-    .within(() => {
-      cy.get(`[data-cy="table-row-${code}"]`).click()
-    })
+    .closest(`[data-cy="table-row-${code}"]`)
+    .click()
 }
 
 const fillMuseumForm = ({ code, institution, city, country, altName, state, stateCode }) => {
