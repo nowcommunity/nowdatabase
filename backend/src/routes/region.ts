@@ -23,7 +23,7 @@ router.put(
   requireOneOf([Role.Admin]),
   async (req: Request<object, object, { region: EditDataType<RegionDetails> & EditMetaData }>, res) => {
     const { ...editedRegion } = req.body.region
-    const validationErrors = validateEntireRegion({ ...editedRegion })
+    const validationErrors = await validateEntireRegion({ ...editedRegion })
     if (validationErrors.length > 0) {
       return res.status(403).send(validationErrors)
     }

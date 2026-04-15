@@ -3,6 +3,8 @@ import { createContext, ReactNode, useContext, useState } from 'react'
 
 export type Severity = 'success' | 'info' | 'warning' | 'error'
 
+const MAX_NOTIFICATION_WIDTH_PX = 520
+
 export type NotificationContext = {
   notify: (msg: string, severity?: Severity, timeoutValue?: number | null) => void
   open: boolean
@@ -52,6 +54,8 @@ export const Notification = () => {
     setOpen(false)
   }
 
+  const maxWidth = `min(${MAX_NOTIFICATION_WIDTH_PX}px, calc(100vw - 32px))`
+
   return (
     <div>
       <Snackbar
@@ -59,12 +63,19 @@ export const Notification = () => {
         autoHideDuration={timeoutValue === undefined ? 6000 : timeoutValue}
         anchorOrigin={{ vertical: 'top', horizontal: 'left' }}
         onClose={handleClose}
+        sx={{ maxWidth }}
       >
         <Alert
           onClose={handleClose}
           severity={severity}
           variant="filled"
-          sx={{ width: '100%', fontSize: 16, whiteSpace: 'pre-line' }}
+          sx={{
+            width: '100%',
+            maxWidth,
+            fontSize: 16,
+            whiteSpace: 'pre-line',
+            overflowWrap: 'anywhere',
+          }}
         >
           {message}
         </Alert>
