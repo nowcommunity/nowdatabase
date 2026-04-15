@@ -1,14 +1,14 @@
 import { EditDataType, RowState } from '@/shared/types'
-import { CircularProgress, Box, Button } from '@mui/material'
+import { CircularProgress, Box, Button, Tooltip } from '@mui/material'
 import { type MRT_ColumnDef, type MRT_Row, type MRT_RowData } from 'material-react-table'
 import { useDetailContext } from '../Context/DetailContext'
 import RemoveCircleOutlineIcon from '@mui/icons-material/RemoveCircleOutline'
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline'
+import PolicyIcon from '@mui/icons-material/Policy'
 import { useEffect } from 'react'
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom'
 import { usePageContext } from '@/components/Page'
 import { checkFieldErrors } from './checkFieldErrors'
-import { ActionComponent } from '@/components/TableView/ActionComponent'
 import { DetailTabTable } from './DetailTabTable'
 
 const getNewState = (state: RowState): RowState => {
@@ -125,20 +125,18 @@ export const EditableTable = <
     return `/${url}/${String(row[idFieldName as keyof T] ?? '')}`
   }
 
-  const linkToDetails = ({ row }: { row: MRT_Row<T> }) => {
-    if (idFieldName && url)
-      return <ActionComponent {...{ row, idFieldName, url, getDetailPath, checkRowRestriction }} />
-    return null // code shouldn't get here!
+  const restrictionIndicator = ({ row }: { row: MRT_Row<T> }) => {
+    if (!checkRowRestriction || !checkRowRestriction(row.original)) return null
+
+    return (
+      <Tooltip placement="top" title="This item has restricted visibility">
+        <PolicyIcon aria-label="Restricted visibility indicator" color="primary" fontSize="medium" />
+      </Tooltip>
+    )
   }
 
   const resolveRenderRowActions = () => {
-    if (mode.read && (!idFieldName || !url)) {
-      return undefined
-    }
-
-    if (mode.read && idFieldName && url) {
-      return linkToDetails
-    }
+    if (mode.read) return checkRowRestriction ? restrictionIndicator : undefined
 
     return actionRow
   }
@@ -172,11 +170,12 @@ export const EditableTable = <
       enableTopToolbar={enableAdvancedTableControls}
       enableColumnActions={enableAdvancedTableControls}
       enableSorting={enableAdvancedTableControls}
-      enableRowActions={Boolean(resolveRenderRowActions())}
+      enableRowActions={!mode.read || Boolean(checkRowRestriction)}
       renderRowActions={resolveRenderRowActions()}
       muiTableBodyRowProps={({ row }: { row: MRT_Row<T> }) => ({
+        'data-cy': idFieldName ? `table-row-${String(row.original[idFieldName])}` : undefined,
         onClick: () => {
-          if (mode.read && idFieldName && url && getDetailPath) {
+          if (mode.read && idFieldName && url) {
             setPreviousTableUrls([...previousTableUrls, `${location.pathname}?tab=${searchParams.get('tab')}`])
             navigate(resolveDetailPath(row.original), {
               state: { returnTo: `${location.pathname}${location.search}` },
@@ -185,7 +184,7 @@ export const EditableTable = <
         },
         sx: {
           backgroundColor: rowStateToColor(row.original.rowState),
-          cursor: mode.read && idFieldName && url && getDetailPath ? 'pointer' : undefined,
+          cursor: mode.read && idFieldName && url ? 'pointer' : undefined,
         },
       })}
     />

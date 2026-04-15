@@ -18,7 +18,7 @@ describe('Broadly test what different user rights see', () => {
     it('Regions view shows correctly', () => {
       cy.visit('/region')
       cy.contains('region 4452477e')
-      cy.get('[data-cy="details-button-1"]').first().click()
+      cy.get('[data-cy="table-row-1"]', { timeout: 10000 }).first().click()
       cy.contains('Regional Coordinators')
       cy.contains('prs')
       cy.get('[id="edit-button"]').should('exist')
@@ -28,7 +28,7 @@ describe('Broadly test what different user rights see', () => {
     it('Projects view shows correctly', () => {
       cy.visit('/project')
       cy.contains('Workgroup on Insectivores')
-      cy.get('[data-cy="details-button-3"]').first().click()
+      cy.get('[data-cy="table-row-3"]', { timeout: 10000 }).first().click()
       cy.contains('Coordinator')
       cy.contains('NOW Database')
       cy.get('[id="edit-button"]').should('exist')
@@ -38,7 +38,7 @@ describe('Broadly test what different user rights see', () => {
     it('Time Bound view shows correctly', () => {
       cy.visit('/time-bound')
       cy.contains('C2N-y')
-      cy.get('[data-cy="details-button-11"]').first().click()
+      cy.get('[data-cy="table-row-11"]', { timeout: 10000 }).first().click()
       cy.contains('Bound')
       cy.contains('1.778')
       cy.get('[id="edit-button"]').should('exist')

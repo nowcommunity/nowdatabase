@@ -17,10 +17,8 @@ const openMuseumFromList = (institution, code) => {
   cy.get('[aria-label="Filter by Institution"]').type(institution)
   cy.contains(institution, { timeout: 10000 })
     .should('be.visible')
-    .closest('tr')
-    .within(() => {
-      cy.get(`[data-cy="details-button-${code}"]`).click()
-    })
+    .closest(`[data-cy="table-row-${code}"]`)
+    .click()
 }
 
 const fillMuseumForm = ({ code, institution, city, country, altName, state, stateCode }) => {
@@ -103,10 +101,6 @@ describe('Museum e2e flows', () => {
     cy.get('[aria-label="Filter by Institution"]').type(seedMuseum.institution)
     cy.contains(seedMuseum.institution, { timeout: 10000 })
       .should('be.visible')
-      .closest('tr')
-      .within(() => {
-        cy.get(`[data-cy="details-button-${seedMuseum.code}"]`).should('be.visible')
-      })
   })
 
   it('creates a new museum and lands on its details view', () => {

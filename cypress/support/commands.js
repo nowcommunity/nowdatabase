@@ -32,7 +32,7 @@ Cypress.Commands.overwrite('visit', (originalFn, url, options) => {
 
   return cy
     .task('waitForAppHealthy', { url: baseUrl }, { timeout: appWaitTimeoutMs })
-    .then(() => {
+    .then({ timeout: appWaitTimeoutMs }, () => {
       return originalFn(url, options)
     })
 })

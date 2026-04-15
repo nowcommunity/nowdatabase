@@ -59,8 +59,7 @@ describe('Button Tests', () => {
 
   it('Link to species details from species tab', () => {
     cy.visit('/species')
-    // Click the button with the SVG icon
-    cy.get('[data-testid="ManageSearchIcon"]').first().click()
+    cy.get('tbody tr', { timeout: 10000 }).first().click()
     cy.contains('Taxonomy').should('be.visible')
     cy.contains('Synonyms').should('be.visible')
     cy.contains('Diet').should('be.visible')
@@ -75,13 +74,13 @@ describe('Button Tests', () => {
   it('Links between localities and species work', () => {
     cy.visit('/locality/21050')
     cy.get('[role=tablist]').contains('Species').click()
-    cy.get('[data-cy="details-button-21426"]').click()
+    cy.get('[data-cy="table-row-21426"]', { timeout: 10000 }).click()
     cy.url().should('contain', '/species/21426')
     cy.contains('Amblycoptus indet.')
     cy.contains('Mammalia')
     cy.contains('Diet')
     cy.get('[role=tablist]').contains('Localities').click()
-    cy.get('[data-cy="details-button-21050"]').click()
+    cy.get('[data-cy="table-row-21050"]', { timeout: 10000 }).click()
     cy.url().should('contain', '/locality/21050')
     cy.contains('Dmanisi')
     cy.contains('Dating method')

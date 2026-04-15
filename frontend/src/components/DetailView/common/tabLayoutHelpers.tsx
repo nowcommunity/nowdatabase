@@ -14,7 +14,7 @@ export const ArrayToTable = ({ array, half }: { array: Array<Array<ReactNode>>; 
   return (
     <Grid container direction="column">
       {array.map((row, rowIndex) => (
-        <Grid key={rowIndex} container direction="row" size={12} minHeight="2.5em">
+        <Grid key={rowIndex} container direction="row" size={12} minHeight="2.5em" alignItems="stretch">
           {row.map((item, index) => (
             <Grid
               key={index}
@@ -23,7 +23,7 @@ export const ArrayToTable = ({ array, half }: { array: Array<Array<ReactNode>>; 
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'left',
-                height: '100%',
+                minHeight: '2.5em',
                 borderBottom: '1px solid rgba(224, 224, 224, 1)',
                 borderRight: '1px solid rgba(224, 224, 224, 1)',
               }}
