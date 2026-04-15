@@ -295,6 +295,19 @@ export const EditableTextField = <T extends object>({
   const errorObject = validator(editData, field)
   const { error } = errorObject
 
+  const [numberInputValue, setNumberInputValue] = useState('')
+
+  useEffect(() => {
+    if (type !== 'number') return
+    const raw = editData[field]
+    if (raw === null || raw === undefined || raw === '') {
+      setNumberInputValue('')
+      return
+    }
+    setNumberInputValue(String(raw))
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [editData[field], type])
+
   useEffect(() => {
     checkFieldErrors(String(field), errorObject, fieldsWithErrors, setFieldsWithErrors)
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -302,17 +315,37 @@ export const EditableTextField = <T extends object>({
 
   const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
     const value = event?.currentTarget?.value
+    if (type === 'number') {
+      if (value === '') {
+        setNumberInputValue('')
+        if (handleSetEditData) handleSetEditData('')
+        else setEditData({ ...editData, [field]: '' })
+        return
+      }
+
+      if (!isAllowedNumberInputValue(value)) return
+      setNumberInputValue(value)
+
+      const asNumber = Number(value)
+      if (isPartialNumberInputValue(value) || Number.isNaN(asNumber)) return
+
+      if (handleSetEditData) handleSetEditData(asNumber)
+      else setEditData({ ...editData, [field]: asNumber })
+      return
+    }
+
     if (handleSetEditData) {
       handleSetEditData(value)
+      return
+    }
+
+    if (type === 'date') {
+      // For date fields, ensure the value is stored as a string in the format 'YYYY-MM-DD'
+      setEditData({ ...editData, [field]: value })
+    } else if (type === 'text' || value === '') {
+      setEditData({ ...editData, [field]: value })
     } else {
-      if (type === 'date') {
-        // For date fields, ensure the value is stored as a string in the format 'YYYY-MM-DD'
-        setEditData({ ...editData, [field]: value })
-      } else if (type === 'text' || value === '') {
-        setEditData({ ...editData, [field]: value })
-      } else {
-        setEditData({ ...editData, [field]: parseFloat(value) })
-      }
+      setEditData({ ...editData, [field]: parseFloat(value) })
     }
   }
 
@@ -321,12 +354,30 @@ export const EditableTextField = <T extends object>({
     setEditData({ ...editData, [field]: (editData[field] as string).trim() })
   }
 
+  const handleNumberBlur = () => {
+    const value = numberInputValue
+    if (value === '') return
+    if (isPartialNumberInputValue(value)) {
+      setNumberInputValue('')
+      if (handleSetEditData) handleSetEditData('')
+      else setEditData({ ...editData, [field]: '' })
+      return
+    }
+    const asNumber = Number(value)
+    if (Number.isNaN(asNumber)) return
+    setNumberInputValue(String(asNumber))
+  }
+
   const editingComponent = (
     <TextField
       sx={{ width: fieldWidth, backgroundColor: disabled ? 'grey' : '' }}
       onChange={handleChange}
+      onKeyDown={event => {
+        if (type !== 'number') return
+        if (event.key === 'e' || event.key === 'E' || event.key === '+') event.preventDefault()
+      }}
       id={`${String(field)}-textfield`}
-      value={editData[field] ?? ''}
+      value={type === 'number' ? numberInputValue : editData[field] ?? ''}
       variant="outlined"
       size="small"
       error={!!error}
@@ -334,13 +385,20 @@ export const EditableTextField = <T extends object>({
       type={type}
       multiline={big}
       disabled={disabled}
-      onBlur={() => trim && trimValue()}
+      onBlur={() => {
+        if (type === 'number') handleNumberBlur()
+        if (trim) trimValue()
+      }}
       InputProps={readonly ? { readOnly: true } : { readOnly: false }}
     />
   )
 
   return <DataValue<T> field={field} EditElement={editingComponent} round={round} />
 }
+
+const isAllowedNumberInputValue = (value: string) => /^-?\d*(\.\d*)?$/.test(value) || isPartialNumberInputValue(value)
+
+const isPartialNumberInputValue = (value: string) => value === '-' || value === '.' || value === '-.'
 
 export const FieldWithTableSelection = <T extends object, ParentType extends object>({
   targetField,
