@@ -12,7 +12,7 @@ import {
   MRT_Row,
   type MRT_FilterFn,
 } from 'material-react-table'
-import { Alert, Box, CircularProgress, IconButton, Paper, Tooltip } from '@mui/material'
+import { Alert, Box, CircularProgress, Paper, Tooltip } from '@mui/material'
 import type { FetchBaseQueryError } from '@reduxjs/toolkit/query'
 import type { SerializedError } from '@reduxjs/toolkit'
 import type { FilterFn } from '@tanstack/table-core'
@@ -25,7 +25,6 @@ import { defaultPagination, defaultPaginationSmall } from '@/common'
 import '../../styles/TableView.css'
 import { TableToolBar } from './TableToolBar'
 import NotListedLocationIcon from '@mui/icons-material/NotListedLocation'
-import ManageSearchIcon from '@mui/icons-material/ManageSearch'
 import PolicyIcon from '@mui/icons-material/Policy'
 import '../../styles/tableview/TableView.css'
 import { resolveErrorMessage, resolveErrorStatus } from './errorUtils'
@@ -259,81 +258,54 @@ export const TableView = <T extends MRT_RowData>({
      * Row action audit (Task T1):
      *
      * • LocalityTable – supplies `selectorFn`, `checkRowRestriction`, and `tableRowAction`.
-     *   Shows the default ManageSearch navigation icon (or Add when `selectorFn` is used),
-     *   renders an "S" synonym action when `row.original.has_synonym` is true, and displays
-     *   the Policy restriction icon when `loc_status` flags a restricted locality.
-     * • SpeciesTable – provides `selectorFn` and `tableRowAction`. Uses the same default
-     *   ManageSearch/Add icon behaviour, an "S" synonym action for `has_synonym`, renders
-     *   optional extras via `renderRowActionExtras` (e.g. the species comment "C" button),
-     *   and the NotListedLocationIcon whenever `row.original.has_no_locality` is true.
+     *   Shows the Add icon when `selectorFn` is used, renders an "S" synonym action when
+     *   `row.original.has_synonym` is true, and displays the Policy restriction icon when
+     *   `loc_status` flags a restricted locality. The details icon is hidden when rows are
+     *   clickable (row click handles navigation).
+     * • SpeciesTable – provides `selectorFn` and `tableRowAction`. Uses the same Add icon
+     *   behaviour, an "S" synonym action for `has_synonym`, renders optional extras via
+     *   `renderRowActionExtras` (e.g. the species comment "C" button), and the
+     *   NotListedLocationIcon whenever `row.original.has_no_locality` is true.
      * • CrossSearchTable – passes `selectorFn` and `checkRowRestriction`, so rows use the
-     *   ManageSearch/Add icon and may show the Policy restriction indicator. No synonym
-     *   action is rendered because the dataset never sets `has_synonym`.
+     *   Add icon and may show the Policy restriction indicator. No synonym action is
+     *   rendered because the dataset never sets `has_synonym`.
      * • SelectingTable (used inside detail modals) – always passes `selectorFn` and may
      *   forward `tableRowAction` (e.g. locality/species synonym modals). This results in
      *   the Add icon for selection plus optional synonym "S" action.
      * • ReferenceTable, MuseumTable, PersonTable, RegionTable, TimeBoundTable,
-     *   TimeUnitTable, ProjectTable, and SequenceTable – rely on the default
-     *   ManageSearch navigation action (or Add when a consumer injects `selectorFn`).
+     *   TimeUnitTable, ProjectTable, and SequenceTable – show the details icon only when
+     *   rows are not clickable (for example, selector modals).
      *
      * Any future layout refactor must preserve these conditional branches because they
      * encode the full set of icons currently surfaced in production.
      */
     renderRowActions: ({ row }) => {
-      const showSynonymIndicator = Boolean(row.original.has_synonym)
+      const showSynonymAction = Boolean(tableRowAction && row.original.has_synonym)
       const showNoLocalityIndicator = Boolean(row.original.has_no_locality)
-
-      const hasCustomDetailPath = Boolean(getDetailPath && !selectorFn && !tableRowAction)
+      const showRestrictionIndicator = Boolean(checkRowRestriction && checkRowRestriction(row.original))
+      const showBaseAction = Boolean(selectorFn) || !clickableRows
 
       return (
         <Box className="row-actions-column">
-          {hasCustomDetailPath ? (
-            <Box display="flex" alignItems="center" gap={0.5}>
-              <Tooltip placement="top" title="View details">
-                <IconButton
-                  aria-label="View details"
-                  data-cy={`details-button-${String(row.original[idFieldName])}`}
-                  onClick={event => {
-                    event.stopPropagation()
-                    const sanitizedFilters = sanitizeColumnFilters(columnFilters)
-                    const columnFilterToUrl = `columnfilters=${JSON.stringify(sanitizedFilters)}`
-                    const sortingToUrl = `sorting=${JSON.stringify(sorting)}`
-                    const paginationToUrl = `pagination=${JSON.stringify(pagination)}`
-                    setPreviousTableUrls([
-                      ...previousTableUrls,
-                      `${location.pathname}?&${columnFilterToUrl}&${sortingToUrl}&${paginationToUrl}`,
-                    ])
-                    navigate(resolveDetailPath(row.original), {
-                      state: { returnTo: `${location.pathname}${location.search}` },
-                    })
-                  }}
-                  size="small"
-                  sx={{ p: 0.5 }}
-                >
-                  <ManageSearchIcon fontSize="small" />
-                </IconButton>
-              </Tooltip>
-              {checkRowRestriction && checkRowRestriction(row.original) && (
-                <Tooltip placement="top" title="This item has restricted visibility">
-                  <PolicyIcon aria-label="Restricted visibility indicator" color="primary" fontSize="medium" />
-                </Tooltip>
-              )}
-            </Box>
-          ) : (
-            <ActionComponent {...{ selectorFn, url, checkRowRestriction, row, idFieldName }} />
-          )}
-          {showSynonymIndicator && (
+          {showBaseAction ? (
             <ActionComponent
               {...{
                 selectorFn,
-                tableRowAction,
                 url,
                 checkRowRestriction,
                 row,
                 idFieldName,
+                getDetailPath,
               }}
             />
+          ) : (
+            showRestrictionIndicator && (
+              <Tooltip placement="top" title="This item has restricted visibility">
+                <PolicyIcon aria-label="Restricted visibility indicator" color="primary" fontSize="medium" />
+              </Tooltip>
+            )
           )}
+          {showSynonymAction && <ActionComponent {...{ tableRowAction, url, row, idFieldName }} />}
           {renderRowActionExtras && renderRowActionExtras({ row })}
           {showNoLocalityIndicator && (
             <Tooltip title="This species is not currently in any locality" placement="right-start">
