@@ -204,9 +204,7 @@ export const getSpeciesDetails = async (id: number, user?: User) => {
   const filteredLocalities = await filterSpeciesLocalitiesByUser(result.now_ls as SpeciesDetailsType['now_ls'], user)
   const sanitizedLocalities = stripLocalityProjectLinks(filteredLocalities)
 
-  return JSON.parse(
-    fixBigInt({ ...result, now_ls: sanitizedLocalities, com_taxa_synonym: synonyms || [] })!
-  ) as SpeciesDetailsType
+  return fixBigInt({ ...result, now_ls: sanitizedLocalities, com_taxa_synonym: synonyms || [] }) as SpeciesDetailsType
 }
 
 export const getAllSynonyms = async () => {
