@@ -104,6 +104,26 @@ describe('Updating region works', () => {
     expect(invalidCoordinatorResultBody.length).toEqual(1) //There should be 1 validation error
   })
 
+  it('Updating fails when coordinator initials do not exist', async () => {
+    const { body: resultBody, status } = await send('region/', 'PUT', {
+      region: {
+        reg_coord_id: 1,
+        region: 'Updated Region Missing Coordinator',
+        now_reg_coord_people: [{ initials: 'ZZ' }],
+      },
+    })
+
+    expect(status).toEqual(403)
+    expect(resultBody).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          name: 'Region Coordinators',
+          error: expect.stringContaining('ZZ'),
+        }),
+      ])
+    )
+  })
+
   it('Updating fails without permissions', async () => {
     logout()
     const { body: resultBodyNoPerm, status: resultStatusNoPerm } = await send('region/', 'PUT', {
