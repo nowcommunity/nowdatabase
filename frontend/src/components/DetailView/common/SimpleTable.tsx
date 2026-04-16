@@ -8,25 +8,29 @@ export const SimpleTable = <T extends MRT_RowData, ParentType extends MRT_RowDat
   columns,
   idFieldName,
   url,
+  isFetching,
 }: {
   data?: Array<T> | null
   columns: MRT_ColumnDef<T>[]
   idFieldName?: keyof T
   url?: string
+  isFetching?: boolean
 }) => {
   const { mode } = useDetailContext<ParentType>()
 
-  if (!data) return <CircularProgress />
+  if (isFetching) return <CircularProgress />
+
+  const safeData = data ?? []
 
   if (!idFieldName) {
-    return <DetailTabTable<T> mode="edit" data={data} columns={columns} enableRowActions={false} />
+    return <DetailTabTable<T> mode="edit" data={safeData} columns={columns} enableRowActions={false} />
   }
 
   return (
     <DetailTabTable<T>
       mode={mode.read ? 'read' : 'select'}
       title="Detail List"
-      data={data}
+      data={safeData}
       columns={columns}
       idFieldName={idFieldName}
       url={url}

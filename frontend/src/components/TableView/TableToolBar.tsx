@@ -62,7 +62,7 @@ export const TableToolBar = <T extends MRT_RowData>({
       )}
       <Box className="icon-buttons">
         <MRT_ShowHideColumnsButton table={table} />
-        <Tooltip title="Export">
+        <Tooltip title="Export table (hide columns to exclude them)">
           <IconButton
             id="export-button"
             aria-controls={open ? 'export-menu' : undefined}
