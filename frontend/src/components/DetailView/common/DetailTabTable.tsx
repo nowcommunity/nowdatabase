@@ -110,6 +110,7 @@ type DetailTabTableReadSelectProps<T extends MRT_RowData> = {
   clickableRows?: boolean
   enableColumnFilterModes?: boolean
   paginationPlacement?: 'top' | 'bottom' | 'both'
+  tableContainerMaxHeight?: string | number
 }
 
 type DetailTabTableEditProps<T extends MRT_RowData> = {
@@ -126,6 +127,7 @@ type DetailTabTableEditProps<T extends MRT_RowData> = {
   renderRowActions?: MRT_TableOptions<T>['renderRowActions']
   muiTableBodyRowProps?: MRT_TableOptions<T>['muiTableBodyRowProps']
   tableName?: string
+  tableContainerMaxHeight?: string | number
 }
 
 type DetailTabTableProps<T extends MRT_RowData> = DetailTabTableReadSelectProps<T> | DetailTabTableEditProps<T>
@@ -150,6 +152,7 @@ export const DetailTabTable = <T extends MRT_RowData>(props: DetailTabTableProps
     enableColumnFilterModes,
     paginationPlacement,
     isError,
+    tableContainerMaxHeight = '60vh',
   } = props
 
   const resolvedVisibleColumns: MRT_VisibilityState = visibleColumns
@@ -177,6 +180,7 @@ export const DetailTabTable = <T extends MRT_RowData>(props: DetailTabTableProps
       enableColumnFilterModes={enableColumnFilterModes}
       paginationPlacement={paginationPlacement}
       isError={isError}
+      tableContainerMaxHeight={tableContainerMaxHeight}
     />
   )
 }
@@ -194,6 +198,7 @@ const DetailTabEditableTable = <T extends MRT_RowData>({
   renderRowActions,
   muiTableBodyRowProps,
   tableName = 'table',
+  tableContainerMaxHeight = '60vh',
 }: DetailTabTableEditProps<T>) => {
   const [pagination, setPagination] = useState<MRT_PaginationState>(paginationState ?? defaultEditPagination)
 
@@ -214,6 +219,13 @@ const DetailTabEditableTable = <T extends MRT_RowData>({
     enableRowActions,
     renderRowActions,
     muiTableBodyRowProps,
+    muiTableContainerProps: {
+      sx: {
+        maxHeight: tableContainerMaxHeight,
+        overflowY: 'auto',
+      },
+    },
+    enableStickyHeader: true,
   })
 
   return (
