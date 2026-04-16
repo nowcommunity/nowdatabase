@@ -73,6 +73,7 @@ export const TableView = <T extends MRT_RowData>({
   isError,
   error,
   paginationPlacement,
+  tableContainerMaxHeight,
 }: {
   data: T[] | undefined
   columns: MRT_ColumnDef<T>[]
@@ -96,6 +97,7 @@ export const TableView = <T extends MRT_RowData>({
   filterFns?: Record<string, MRT_FilterFn<T>>
   renderRowActionExtras?: ({ row }: { row: MRT_Row<T> }) => ReactNode
   paginationPlacement?: 'top' | 'bottom' | 'both'
+  tableContainerMaxHeight?: string | number
 }) => {
   const location = useLocation()
   const {
@@ -243,6 +245,15 @@ export const TableView = <T extends MRT_RowData>({
     columns: columns,
     data: data || [],
     muiTableBodyRowProps: clickableRows ? muiTableBodyRowProps : undefined,
+    muiTableContainerProps: tableContainerMaxHeight
+      ? {
+          sx: {
+            maxHeight: tableContainerMaxHeight,
+            overflowY: 'auto',
+          },
+        }
+      : undefined,
+    enableStickyHeader: Boolean(tableContainerMaxHeight),
     state: {
       columnFilters,
       showColumnFilters: true,
