@@ -51,6 +51,99 @@ describe('Broadly test what different user rights see', () => {
     })
   })
 
+  describe('EditUnrestricted visibility', () => {
+    beforeEach('Login as EditUnrestricted with session caching', () => {
+      cy.loginWithSession('testEu')
+    })
+
+    it('Sees new button in tableviews', () => {
+      cy.visit('/locality')
+      cy.contains('New').click()
+      cy.contains('Time Unit')
+      cy.contains('Creating new locality')
+    })
+
+    it('Time Bound view shows correctly (has access)', () => {
+      cy.visit('/time-bound')
+      cy.contains('C2N-y')
+      cy.get('[data-cy="table-row-11"]', { timeout: 10000 }).first().click()
+      cy.contains('Bound')
+      cy.contains('1.778')
+      cy.get('[id="edit-button"]').should('exist')
+      cy.get('[id="delete-button"]').should('exist')
+    })
+
+    it('Direct routes to admin-only views do not work', () => {
+      cy.pageForbidden('/region')
+    })
+
+    it('Sees edit and delete buttons in locality detail view', () => {
+      cy.visit('locality/20920')
+      cy.contains('Lantian-Shuijiazui')
+      cy.get('[id="edit-button"]').should('exist')
+      cy.get('[id="delete-button"]').should('exist')
+    })
+
+    it('Sees edit button but not delete button in reference detail view', () => {
+      cy.visit('reference/10039')
+      cy.contains('A new geomagnetic polarity time scale')
+      cy.get('[id="edit-button"]').should('exist')
+      cy.get('[id="delete-button"]').should('not.exist')
+    })
+  })
+
+  describe('EditRestricted visibility', () => {
+    beforeEach('Login as EditRestricted with session caching', () => {
+      cy.loginWithSession('testEr')
+    })
+
+    it('Does not see time bounds in navbar and direct route does not work', () => {
+      cy.contains('Time Bound').should('not.exist')
+      cy.pageForbidden('/time-bound')
+    })
+
+    it('Sees new button for locality, species, and reference table views', () => {
+      cy.visit('/locality')
+      cy.contains('New').should('exist')
+      cy.visit('/species')
+      cy.contains('New').should('exist')
+      cy.visit('/reference')
+      cy.contains('New').should('exist')
+    })
+
+    it('Does not see the New button for time units', () => {
+      cy.visit('/time-unit')
+      cy.contains('New').should('not.exist')
+      cy.pageForbidden('/time-unit/new')
+    })
+
+    it('Sees edit button but not delete button in locality and species detail views', () => {
+      cy.visit('locality/20920')
+      cy.contains('Lantian-Shuijiazui')
+      cy.get('[id="edit-button"]').should('exist')
+      cy.get('[id="delete-button"]').should('not.exist')
+
+      cy.visit('species/21052')
+      cy.contains('Simplomys simplicidens')
+      cy.get('[id="edit-button"]').should('exist')
+      cy.get('[id="delete-button"]').should('not.exist')
+    })
+
+    it('Sees edit button but not delete button in reference detail view', () => {
+      cy.visit('reference/10039')
+      cy.contains('A new geomagnetic polarity time scale')
+      cy.get('[id="edit-button"]').should('exist')
+      cy.get('[id="delete-button"]').should('not.exist')
+    })
+
+    it('Does not see edit or delete buttons in time unit detail view', () => {
+      cy.visit('time-unit/bahean')
+      cy.contains('Bahean')
+      cy.get('[id="edit-button"]').should('not.exist')
+      cy.get('[id="delete-button"]').should('not.exist')
+    })
+  })
+
   describe('Test unlogged visibility', () => {
     beforeEach('Ensure logout', () => {
       cy.clearAllLocalStorage()
