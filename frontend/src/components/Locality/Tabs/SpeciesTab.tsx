@@ -1,8 +1,8 @@
 import {
-  Editable,
   EditDataType,
   LocalityDetailsType,
-  LocalitySpecies,
+  LocalitySpeciesDetailsType,
+  RowState,
   Species,
   SpeciesDetailsType,
 } from '@/shared/types'
@@ -44,11 +44,33 @@ export const SpeciesTab = () => {
     return applyDefaultSpeciesOrdering(speciesData, { skip: hasUrlSorting })
   }, [hasUrlSorting, speciesData])
 
-  const indexedLocalitySpeciesData = useMemo(() => {
-    return (editData.now_ls as unknown as LocalitySpecies[]).map((localitySpecies, index) => ({
-      ...localitySpecies,
-      index,
-    }))
+  const toSpeciesDetailsDraft = (
+    input: Partial<EditDataType<Species>> & { class_name?: string | null }
+  ): EditDataType<SpeciesDetailsType> => {
+    return {
+      now_ls: [],
+      com_taxa_synonym: [],
+      now_sau: [],
+      species_id: input.species_id,
+      class_name: input.class_name ?? undefined,
+      subclass_or_superorder_name: input.subclass_or_superorder_name ?? undefined,
+      order_name: input.order_name ?? undefined,
+      suborder_or_superfamily_name: input.suborder_or_superfamily_name ?? undefined,
+      family_name: input.family_name ?? undefined,
+      subfamily_name: input.subfamily_name ?? undefined,
+      genus_name: input.genus_name ?? undefined,
+      species_name: input.species_name ?? undefined,
+      unique_identifier: input.unique_identifier ?? undefined,
+      taxonomic_status: input.taxonomic_status ?? undefined,
+      sp_comment: input.sp_comment,
+      sp_author: input.sp_author,
+    }
+  }
+
+  type LocalitySpeciesRow = EditDataType<LocalitySpeciesDetailsType> & { rowState?: RowState; index: number }
+
+  const indexedLocalitySpeciesData = useMemo<LocalitySpeciesRow[]>(() => {
+    return editData.now_ls.map((localitySpecies, index) => ({ ...localitySpecies, index }))
   }, [editData.now_ls])
 
   const sortedLocalitySpeciesData = useMemo(() => {
@@ -98,25 +120,46 @@ export const SpeciesTab = () => {
   )
 
   const convertAndCheckNewSpeciesTaxonomy = (newSpecies: EditDataType<Species>) => {
-    const errors = []
-    for (const field in newSpecies) {
-      const errorObject = validateSpecies(
-        newSpecies as unknown as EditDataType<SpeciesDetailsType>,
-        field as unknown as keyof EditDataType<SpeciesDetailsType>
-      )
-      const { error } = errorObject
-      if (error) errors.push(errorObject)
-    }
+    const speciesForValidation = toSpeciesDetailsDraft(newSpecies)
+    const fieldsToValidate: Array<keyof EditDataType<SpeciesDetailsType>> = [
+      'subclass_or_superorder_name',
+      'order_name',
+      'suborder_or_superfamily_name',
+      'family_name',
+      'subfamily_name',
+      'genus_name',
+      'species_name',
+      'taxonomic_status',
+      'unique_identifier',
+    ]
+
+    const errors = fieldsToValidate
+      .map(fieldName => validateSpecies(speciesForValidation, fieldName))
+      .filter(({ error }) => Boolean(error))
+
     if (errors.length > 0) {
       notify('Following validators failed: \n' + errors.map(e => `${e.name}: ${e.error}`).join('\n'), 'error')
       return false
     }
 
     const convertedSpecies = convertSpeciesTaxonomyFields(newSpecies)
-    const everyLs = editData.now_ls.map(ls => ls.com_species) as unknown as Editable<Species>[]
-    const filteredLs = everyLs.filter(species => species.rowState === 'new')
+    const draftExistingTaxa = editData.now_ls
+      .filter(ls => ls.rowState === 'new')
+      .map(ls => ls.com_species)
+      .filter((species): species is EditDataType<SpeciesDetailsType> => Boolean(species))
+      .map(species => ({
+        species_id: species.species_id,
+        subclass_or_superorder_name: species.subclass_or_superorder_name,
+        order_name: species.order_name,
+        suborder_or_superfamily_name: species.suborder_or_superfamily_name,
+        family_name: species.family_name,
+        subfamily_name: species.subfamily_name,
+        genus_name: species.genus_name,
+        species_name: species.species_name,
+        unique_identifier: species.unique_identifier,
+      }))
 
-    const taxonomyErrors = checkSpeciesTaxonomy(convertedSpecies, speciesData!.concat(filteredLs), [])
+    const taxonomyErrors = checkSpeciesTaxonomy(convertedSpecies, [...(speciesData ?? []), ...draftExistingTaxa], [])
     if (taxonomyErrors.size > 0) {
       const errorMessage = [...taxonomyErrors].reduce((acc, currentError) => acc + `\n${currentError}`)
       notify(errorMessage, 'error', null)
@@ -159,7 +202,7 @@ export const SpeciesTab = () => {
       header: 'Taxon status',
     },
   ]
-  const localitySpeciesColumns: MRT_ColumnDef<LocalitySpecies>[] = [
+  const localitySpeciesColumns: MRT_ColumnDef<LocalitySpeciesRow>[] = [
     {
       accessorKey: 'com_species.order_name',
       header: 'Order',
@@ -237,7 +280,7 @@ export const SpeciesTab = () => {
                   {
                     lid: editData.lid,
                     species_id: undefined,
-                    com_species: { ...(convertedSpecies as unknown as SpeciesDetailsType), class_name: 'Mammalia' },
+                    com_species: toSpeciesDetailsDraft({ ...convertedSpecies, class_name: 'Mammalia' }),
                     rowState: 'new',
                   },
                 ],
@@ -260,9 +303,7 @@ export const SpeciesTab = () => {
                   {
                     lid: editData.lid,
                     species_id: newSpecies.species_id,
-                    com_species: {
-                      ...(fixNullValuesInTaxonomyFields(newSpecies) as SpeciesDetailsType),
-                    },
+                    com_species: toSpeciesDetailsDraft(fixNullValuesInTaxonomyFields(newSpecies)),
                     rowState: 'new',
                   },
                 ],
@@ -271,7 +312,7 @@ export const SpeciesTab = () => {
           />
         </Box>
       )}
-      <EditableTable<LocalitySpecies, LocalityDetailsType>
+      <EditableTable<LocalitySpeciesRow, LocalityDetailsType>
         columns={localitySpeciesColumns}
         field="now_ls"
         visible_data={sortedLocalitySpeciesData}
