@@ -56,7 +56,7 @@ router.get('/journal/:id', async (req, res) => {
 
 router.get('/:id', async (req, res) => {
   const id = parseInt(req.params.id)
-  const reference = await getReferenceDetails(id)
+  const reference = await getReferenceDetails(id, req.user)
   if (!reference) return res.status(404).send()
   return res.status(200).send(reference)
 })
@@ -73,7 +73,7 @@ router.get('/localities/:id', async (req, res) => {
     return res.status(400).send({ message: 'Invalid query parameters', errors: parsedQuery.errors })
   }
 
-  const localities = await getReferenceLocalities(id, parsedQuery.options)
+  const localities = await getReferenceLocalities(id, parsedQuery.options, req.user)
   return res.status(200).send(fixBigInt(localities))
 })
 
@@ -94,7 +94,7 @@ router.get('/species/:id', async (req, res) => {
     return res.status(400).send({ message: 'Invalid query parameters', errors: parsedQuery.errors })
   }
 
-  const species = await getReferenceSpecies(id, parsedQuery.options)
+  const species = await getReferenceSpecies(id, parsedQuery.options, req.user)
   return res.status(200).send(fixBigInt(species))
 })
 

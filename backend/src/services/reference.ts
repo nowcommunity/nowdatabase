@@ -5,6 +5,8 @@ import {
   type ReferenceTypeWithFieldNames,
   validateEntireReference,
 } from './referenceValidation'
+import { Role, User } from '../../../frontend/src/shared/types'
+import { getIdsOfUsersProjects } from './locality'
 
 export const getAllReferences = async () => {
   const result = await nowDb.ref_ref.findMany({
@@ -36,8 +38,7 @@ export const getAllReferences = async () => {
   return result
 }
 
-export const getReferenceDetails = async (id: number) => {
-  // TODO: Check if user has access
+export const getReferenceDetails = async (id: number, _user?: User) => {
   const result = await nowDb.ref_ref.findUnique({
     where: { rid: id },
     include: { ref_authors: true, ref_journal: true },
@@ -59,21 +60,36 @@ export const getReferenceDetails = async (id: number) => {
 }
 
 // Fetch localities that have been updated by the given reference id
-export const getReferenceLocalities = async (id: string, options?: TabListQueryOptions) => {
-  // TODO: Check if user has access
+export const getReferenceLocalities = async (id: string, options?: TabListQueryOptions, user?: User) => {
   const orderBy = options?.sorting.map(sort => ({
     [sort.id]: sort.desc ? 'desc' : 'asc',
   }))
 
+  const referenceId = parseInt(id, 10)
+
+  const visibilityWhere = await (async () => {
+    if (user && [Role.Admin, Role.EditUnrestricted].includes(user.role)) return null
+    if (!user) return { loc_status: false as const }
+    const usersProjects = await getIdsOfUsersProjects(user)
+    return {
+      OR: [{ loc_status: { not: true } }, { now_plr: { some: { pid: { in: Array.from(usersProjects) } } } }],
+    }
+  })()
+
   const result = await nowDb.now_loc.findMany({
     where: {
-      now_lau: {
-        some: {
-          now_lr: {
-            some: { rid: parseInt(id) },
+      AND: [
+        {
+          now_lau: {
+            some: {
+              now_lr: {
+                some: { rid: referenceId },
+              },
+            },
           },
         },
-      },
+        ...(visibilityWhere ? [visibilityWhere] : []),
+      ],
     },
     orderBy,
     skip: options?.skip,
@@ -83,8 +99,7 @@ export const getReferenceLocalities = async (id: string, options?: TabListQueryO
 }
 
 // Fetch species that have been updated by the given reference id
-export const getReferenceSpecies = async (id: string, options?: TabListQueryOptions) => {
-  // TODO: Check if user has access
+export const getReferenceSpecies = async (id: string, options?: TabListQueryOptions, _user?: User) => {
   const orderBy = options?.sorting.map(sort => ({
     [sort.id]: sort.desc ? 'desc' : 'asc',
   }))
