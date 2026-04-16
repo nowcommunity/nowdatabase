@@ -1,15 +1,27 @@
-import { EditDataType, Species, SpeciesDetailsType, SpeciesSynonym } from '@/shared/types'
+import { EditDataType, Species, SpeciesSynonym } from '@/shared/types'
+
+export type TaxonomySpecies = {
+  species_id: number | undefined
+  subclass_or_superorder_name: string | null | undefined
+  order_name: string | null | undefined
+  suborder_or_superfamily_name: string | null | undefined
+  family_name: string | null | undefined
+  subfamily_name: string | null | undefined
+  genus_name: string | null | undefined
+  species_name: string | null | undefined
+  unique_identifier: string | null | undefined
+}
 
 const generateMultipleParentsError = (
   invalidField: string,
-  invalidValue1: string | null,
-  invalidValue2: string | null
+  invalidValue1: string | null | undefined,
+  invalidValue2: string | null | undefined
 ) => {
   return `This taxon has several entries for ${invalidField}: ${invalidValue1}, ${invalidValue2}.
 Please contact the NOW administration to fix this taxonomy.`
 }
 
-const isDuplicateTaxon = (newSpecies: EditDataType<Species>, existingSpecies: Species) => {
+const isDuplicateTaxon = (newSpecies: EditDataType<Species>, existingSpecies: TaxonomySpecies) => {
   if (
     // the check for undefined species_id is here to make sure you cannot add two new,
     // identical species at the same time (e.g. in Locality -> Species -> Add new species)
@@ -33,14 +45,14 @@ const isDuplicateSynonym = (newSpecies: EditDataType<Species>, existingSynonyms:
   }
 }
 
-const speciesEqualsUniqueIdentifier = (newSpecies: EditDataType<Species>, existingSpecies: Species) => {
+const speciesEqualsUniqueIdentifier = (newSpecies: EditDataType<Species>, existingSpecies: TaxonomySpecies) => {
   return (
     newSpecies.genus_name === existingSpecies.genus_name &&
     newSpecies.species_name === existingSpecies.unique_identifier
   )
 }
 
-const checkOrderFamily = (newSpecies: EditDataType<Species>, existingSpecies: Species) => {
+const checkOrderFamily = (newSpecies: EditDataType<Species>, existingSpecies: TaxonomySpecies) => {
   return (
     newSpecies.subclass_or_superorder_name !== 'indet.' &&
     newSpecies.order_name !== 'indet.' &&
@@ -54,7 +66,7 @@ const checkOrderFamily = (newSpecies: EditDataType<Species>, existingSpecies: Sp
   )
 }
 
-const checkFamilyGenus = (newSpecies: EditDataType<Species>, existingSpecies: Species) => {
+const checkFamilyGenus = (newSpecies: EditDataType<Species>, existingSpecies: TaxonomySpecies) => {
   return (
     newSpecies.subclass_or_superorder_name !== 'indet.' &&
     newSpecies.order_name !== 'indet.' &&
@@ -70,7 +82,7 @@ const checkFamilyGenus = (newSpecies: EditDataType<Species>, existingSpecies: Sp
   )
 }
 
-const checkSubClassOrder = (newSpecies: EditDataType<Species>, existingSpecies: Species) => {
+const checkSubClassOrder = (newSpecies: EditDataType<Species>, existingSpecies: TaxonomySpecies) => {
   return (
     newSpecies.subclass_or_superorder_name &&
     newSpecies.subclass_or_superorder_name !== 'indet.' &&
@@ -80,7 +92,7 @@ const checkSubClassOrder = (newSpecies: EditDataType<Species>, existingSpecies: 
     newSpecies.order_name === existingSpecies.order_name
   )
 }
-const checkOrderSubOrder = (newSpecies: EditDataType<Species>, existingSpecies: Species) => {
+const checkOrderSubOrder = (newSpecies: EditDataType<Species>, existingSpecies: TaxonomySpecies) => {
   return (
     newSpecies.subclass_or_superorder_name !== 'indet.' &&
     newSpecies.order_name !== 'indet.' &&
@@ -91,7 +103,7 @@ const checkOrderSubOrder = (newSpecies: EditDataType<Species>, existingSpecies: 
   )
 }
 
-const checkSubOrderFamily = (newSpecies: EditDataType<Species>, existingSpecies: Species) => {
+const checkSubOrderFamily = (newSpecies: EditDataType<Species>, existingSpecies: TaxonomySpecies) => {
   return (
     newSpecies.subclass_or_superorder_name !== 'indet.' &&
     newSpecies.order_name !== 'indet.' &&
@@ -105,7 +117,7 @@ const checkSubOrderFamily = (newSpecies: EditDataType<Species>, existingSpecies:
   )
 }
 
-const checkFamilySubFamily = (newSpecies: EditDataType<Species>, existingSpecies: Species) => {
+const checkFamilySubFamily = (newSpecies: EditDataType<Species>, existingSpecies: TaxonomySpecies) => {
   return (
     newSpecies.subclass_or_superorder_name !== 'indet.' &&
     newSpecies.order_name !== 'indet.' &&
@@ -119,7 +131,7 @@ const checkFamilySubFamily = (newSpecies: EditDataType<Species>, existingSpecies
   )
 }
 
-const checkSubFamilyGenus = (newSpecies: EditDataType<Species>, existingSpecies: Species) => {
+const checkSubFamilyGenus = (newSpecies: EditDataType<Species>, existingSpecies: TaxonomySpecies) => {
   return (
     newSpecies.subclass_or_superorder_name !== 'indet.' &&
     newSpecies.order_name !== 'indet.' &&
@@ -138,7 +150,7 @@ const checkSubFamilyGenus = (newSpecies: EditDataType<Species>, existingSpecies:
 
 export const checkSpeciesTaxonomy = (
   newSpecies: EditDataType<Species>,
-  existingSpeciesArray: Species[],
+  existingSpeciesArray: TaxonomySpecies[],
   synonyms: SpeciesSynonym[]
 ) => {
   const {
@@ -164,7 +176,10 @@ export const checkSpeciesTaxonomy = (
       return errors
     }
 
-    const relatedSynonyms = synonyms.filter(syn => syn.species_id === existingSpecies.species_id)
+    const relatedSynonyms =
+      existingSpecies.species_id === undefined
+        ? []
+        : synonyms.filter(syn => syn.species_id === existingSpecies.species_id)
     if (isDuplicateSynonym(newSpecies, relatedSynonyms)) {
       errors.add(
         `${existingSpecies.genus_name} ${existingSpecies.species_name} already has ${genus} ${speciesName} as a synonym.`
@@ -356,7 +371,14 @@ export const hasTaxonomyChanges = (editedSpecies: EditDataType<Species>, origina
   return TAXONOMY_FIELDS.some(field => (editedSpecies[field] ?? '') !== (originalSpecies[field] ?? ''))
 }
 
-export const fixNullValuesInTaxonomyFields = (species: Species | SpeciesDetailsType) => {
+type TaxonomyNullFixable = {
+  subclass_or_superorder_name: string | null
+  suborder_or_superfamily_name: string | null
+  subfamily_name: string | null
+  taxonomic_status: string | null
+}
+
+export const fixNullValuesInTaxonomyFields = <T extends TaxonomyNullFixable>(species: T) => {
   return {
     ...species,
     subclass_or_superorder_name: species.subclass_or_superorder_name ?? '',
