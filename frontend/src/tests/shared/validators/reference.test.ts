@@ -1,4 +1,4 @@
-import { describe, expect, it } from '@jest/globals'
+import { describe, expect, it, jest } from '@jest/globals'
 
 import { createReferenceValidatorWithLabels } from '@/shared/validators/reference'
 import type { EditDataType, ReferenceDetailsType } from '@/shared/types'
@@ -83,5 +83,47 @@ describe('validateReference display labels', () => {
     const result = validator(createReferenceDetails({ ref_type_id: 4, title_primary: '', gen_notes: '' }), 'gen_notes')
 
     expect(result.error).toBe('At least one of the following fields is required: Subject, Notes')
+  })
+})
+
+describe('validateReference year fields', () => {
+  it('rejects a future primary year', () => {
+    jest.useFakeTimers().setSystemTime(new Date('2026-01-01T00:00:00.000Z'))
+
+    const validator = createReferenceValidatorWithLabels()
+    const result = validator(createReferenceDetails({ ref_type_id: 1, date_primary: 2027 }), 'date_primary')
+
+    expect(result.error).toContain('future')
+
+    jest.useRealTimers()
+  })
+
+  it('rejects non-positive primary years', () => {
+    const validator = createReferenceValidatorWithLabels()
+
+    expect(validator(createReferenceDetails({ ref_type_id: 1, date_primary: 0 }), 'date_primary').error).toContain(
+      'positive'
+    )
+    expect(validator(createReferenceDetails({ ref_type_id: 1, date_primary: -1 }), 'date_primary').error).toContain(
+      'positive'
+    )
+  })
+
+  it('rejects a future secondary year when provided', () => {
+    jest.useFakeTimers().setSystemTime(new Date('2026-01-01T00:00:00.000Z'))
+
+    const validator = createReferenceValidatorWithLabels()
+    const result = validator(createReferenceDetails({ date_secondary: 2027 }), 'date_secondary')
+
+    expect(result.error).toContain('future')
+
+    jest.useRealTimers()
+  })
+
+  it('allows an empty secondary year', () => {
+    const validator = createReferenceValidatorWithLabels()
+    const result = validator(createReferenceDetails({ date_secondary: null }), 'date_secondary')
+
+    expect(result.error).toBeNull()
   })
 })
