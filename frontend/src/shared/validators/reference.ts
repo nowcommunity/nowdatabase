@@ -88,6 +88,27 @@ const dateCheck: (dateString: string) => ValidationError = (dateString: string) 
   return null
 }
 
+const yearCheck: (year: number) => ValidationError = (year: number) => {
+  if (!Number.isFinite(year)) {
+    return 'Year must be a valid number'
+  }
+
+  if (!Number.isInteger(year)) {
+    return 'Year must be a whole number'
+  }
+
+  if (year <= 0) {
+    return 'Year must be a positive integer'
+  }
+
+  const currentYear = new Date().getFullYear()
+  if (year > currentYear) {
+    return `Year cannot be in the future (max ${currentYear})`
+  }
+
+  return null
+}
+
 export type ReferenceFieldDisplayNames = Partial<Record<keyof EditDataType<ReferenceDetailsType>, string>>
 
 export type ReferenceDisplayLabelMap = Partial<Record<number, ReferenceFieldDisplayNames>>
@@ -187,7 +208,7 @@ export const validateReference = (
     date_primary: {
       name: 'date_primary',
       required: true,
-      asNumber: true,
+      asNumber: yearCheck,
       condition: (data: Partial<EditDataType<ReferenceDetailsType>>) => {
         const ids: number[] = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14]
         return data.ref_type_id != null && ids.includes(data.ref_type_id)
@@ -206,7 +227,7 @@ export const validateReference = (
     date_secondary: {
       name: 'date_secondary',
       required: false,
-      asNumber: true,
+      asNumber: yearCheck,
     },
     ref_authors: {
       name: 'ref_authors',
