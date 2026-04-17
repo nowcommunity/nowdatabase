@@ -1,28 +1,29 @@
 import { ValidationObject } from '@/shared/validators/validator'
-import { FieldsWithErrorsType, SetFieldsWithErrorsType } from '../DetailView'
+import type { FieldsWithErrorsType, SetFieldsWithErrorsType } from '../DetailView'
 
 export const checkFieldErrors = (
   field: string,
   errorObject: ValidationObject,
-  fieldsWithErrors: FieldsWithErrorsType,
+  _fieldsWithErrors: FieldsWithErrorsType,
   setFieldsWithErrors: SetFieldsWithErrorsType
 ) => {
   const fieldAsString = String(field)
-  if (errorObject.error) {
-    if (
-      !(fieldAsString in fieldsWithErrors) ||
-      fieldsWithErrors[fieldAsString].name !== errorObject.name ||
-      fieldsWithErrors[fieldAsString].error !== errorObject.error
-    ) {
-      setFieldsWithErrors(prevFieldsWithErrors => {
+  setFieldsWithErrors(prevFieldsWithErrors => {
+    const previousError = prevFieldsWithErrors[fieldAsString]
+
+    if (errorObject.error) {
+      if (!previousError || previousError.name !== errorObject.name || previousError.error !== errorObject.error) {
         return { ...prevFieldsWithErrors, [fieldAsString]: errorObject }
-      })
+      }
+      return prevFieldsWithErrors
     }
-  } else if (!errorObject.error && fieldAsString in fieldsWithErrors) {
-    setFieldsWithErrors(prevFieldsWithErrors => {
+
+    if (previousError) {
       const newFieldsWithErrors = { ...prevFieldsWithErrors }
       delete newFieldsWithErrors[fieldAsString]
       return newFieldsWithErrors
-    })
-  }
+    }
+
+    return prevFieldsWithErrors
+  })
 }

@@ -283,6 +283,11 @@ export const EditableTextField = <T extends object>(props: EditableTextFieldProp
 
   const [numberInputValue, setNumberInputValue] = useState('')
 
+  const updateFieldErrors = (nextEditData: EditDataType<T>) => {
+    const nextErrorObject = validator(nextEditData, field)
+    checkFieldErrors(String(field), nextErrorObject, fieldsWithErrors, setFieldsWithErrors)
+  }
+
   useEffect(() => {
     if (type !== 'number') return
     const raw = editData[field]
@@ -297,7 +302,7 @@ export const EditableTextField = <T extends object>(props: EditableTextFieldProp
   useEffect(() => {
     checkFieldErrors(String(field), errorObject, fieldsWithErrors, setFieldsWithErrors)
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [errorObject])
+  }, [errorObject.error, errorObject.name])
 
   const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
     const value = event?.currentTarget?.value
@@ -305,8 +310,13 @@ export const EditableTextField = <T extends object>(props: EditableTextFieldProp
       const setNumberValue = handleSetEditData as EditableTextFieldNumberProps<T>['handleSetEditData']
       if (value === '') {
         setNumberInputValue('')
-        if (setNumberValue) setNumberValue('')
-        else setEditData({ ...editData, [field]: '' })
+        if (setNumberValue) {
+          setNumberValue('')
+        } else {
+          const nextEditData = { ...editData, [field]: '' }
+          setEditData(nextEditData)
+          updateFieldErrors(nextEditData)
+        }
         return
       }
 
@@ -316,8 +326,13 @@ export const EditableTextField = <T extends object>(props: EditableTextFieldProp
       const asNumber = Number(value)
       if (isPartialNumberInputValue(value) || Number.isNaN(asNumber)) return
 
-      if (setNumberValue) setNumberValue(asNumber)
-      else setEditData({ ...editData, [field]: asNumber })
+      if (setNumberValue) {
+        setNumberValue(asNumber)
+      } else {
+        const nextEditData = { ...editData, [field]: asNumber }
+        setEditData(nextEditData)
+        updateFieldErrors(nextEditData)
+      }
       return
     }
 
@@ -328,11 +343,17 @@ export const EditableTextField = <T extends object>(props: EditableTextFieldProp
 
     if (type === 'date') {
       // For date fields, ensure the value is stored as a string in the format 'YYYY-MM-DD'
-      setEditData({ ...editData, [field]: value })
+      const nextEditData = { ...editData, [field]: value }
+      setEditData(nextEditData)
+      updateFieldErrors(nextEditData)
     } else if (type === 'text' || value === '') {
-      setEditData({ ...editData, [field]: value })
+      const nextEditData = { ...editData, [field]: value }
+      setEditData(nextEditData)
+      updateFieldErrors(nextEditData)
     } else {
-      setEditData({ ...editData, [field]: parseFloat(value) })
+      const nextEditData = { ...editData, [field]: parseFloat(value) }
+      setEditData(nextEditData)
+      updateFieldErrors(nextEditData)
     }
   }
 

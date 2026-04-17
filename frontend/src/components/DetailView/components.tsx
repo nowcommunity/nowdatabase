@@ -14,6 +14,7 @@ import { boundingBoxSplit, isPointInBoxes } from '@/util/isPointInBox'
 import { OutOfBoundsWarningModal, OutOfBoundsWarningModalState } from './OutOfBoundsWarningModal'
 import { skipToken } from '@reduxjs/toolkit/query'
 import { finalizeEntry } from '@/services/entryApi'
+import { checkFieldErrors } from './common/checkFieldErrors'
 export { ReturnButton } from '@/components/common/ReturnButton'
 
 export const WriteButton = <T,>({
@@ -93,19 +94,7 @@ export const WriteButton = <T,>({
       for (const field in editData) {
         const fieldAsString = String(field)
         const errorObject = validator(editData, field)
-        if (errorObject.error) {
-          if (!(fieldAsString in fieldsWithErrors)) {
-            setFieldsWithErrors(prevFieldsWithErrors => {
-              return { ...prevFieldsWithErrors, [fieldAsString]: errorObject }
-            })
-          }
-        } else if (!errorObject.error && fieldAsString in fieldsWithErrors) {
-          setFieldsWithErrors(prevFieldsWithErrors => {
-            const newFieldsWithErrors = { ...prevFieldsWithErrors }
-            delete newFieldsWithErrors[fieldAsString]
-            return newFieldsWithErrors
-          })
-        }
+        checkFieldErrors(fieldAsString, errorObject, fieldsWithErrors, setFieldsWithErrors)
       }
     }
     if (mode.staging == true) {
