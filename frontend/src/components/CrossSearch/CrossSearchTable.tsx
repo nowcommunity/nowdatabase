@@ -7,6 +7,7 @@ import { usePageContext } from '../Page'
 import { LocalitiesMap } from '../Map/LocalitiesMap'
 import { formatWithMaxThreeDecimals } from '@/util/numberFormatting'
 import { occurrenceLabels } from '@/constants/occurrenceLabels'
+import { matchesCountryOrContinent } from '@/shared/validators/countryContinents'
 
 export const CrossSearchTable = ({ selectorFn }: { selectorFn?: (newObject: CrossSearch) => void }) => {
   const { sqlLimit, sqlOffset, sqlColumnFilters, sqlOrderBy } = usePageContext()
@@ -172,9 +173,15 @@ export const CrossSearchTable = ({ selectorFn }: { selectorFn?: (newObject: Cros
       {
         id: 'country',
         accessorFn: row => row.country || '',
-        header: 'Country',
+        header: 'Country or Continent',
         enableHiding: false,
-        filterFn: 'contains',
+        enableColumnFilterModes: false,
+        filterFn: (row, columnId, filterValue) => {
+          const search =
+            typeof filterValue === 'string' ? filterValue : Array.isArray(filterValue) ? filterValue.join(' ') : ''
+
+          return matchesCountryOrContinent(row.getValue<string>(columnId), search)
+        },
       },
       {
         id: 'state',
