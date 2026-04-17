@@ -151,7 +151,8 @@ export const referencePage = (
       createTitle={createReferenceTitle}
       createSubtitle={createReferenceSubtitle}
       getEditRights={(user: UserState) => {
-        if ([Role.Admin, Role.EditUnrestricted].includes(user.role)) return fullRights
+        if (user.role === Role.Admin) return fullRights
+        if (user.role === Role.EditUnrestricted) return limitedRights
         if (user.role === Role.EditRestricted) return limitedRights
         return noRights
       }}
