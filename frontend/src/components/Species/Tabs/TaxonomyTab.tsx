@@ -33,6 +33,7 @@ export const TaxonomyTab = () => {
         fieldName="order_name" // this doesn't do anything here but is required
         idFieldName="species_id"
         useObject={true}
+        closeOnSelect={true}
         tableRowAction={handleRowActionClick}
         editingAction={(selectedSpecies: Species) => {
           const fixedSpecies = fixNullValuesInTaxonomyFields(selectedSpecies)

@@ -3,6 +3,12 @@ import { ReactNode, useState } from 'react'
 import { modalStyle } from './misc'
 import '../../../styles/modal.css'
 
+type EditingModalRenderProps = {
+  close: () => void
+}
+
+type EditingModalChildren = ReactNode | ((props: EditingModalRenderProps) => ReactNode)
+
 /* 
   buttonText = Text for the button that opens modal
   children = Content of modal
@@ -17,17 +23,21 @@ export const EditingModal = ({
   dataCy,
 }: {
   buttonText: string
-  children: ReactNode | ReactNode[]
+  children: EditingModalChildren
   onSave?: () => Promise<boolean>
   dataCy?: string
 }) => {
   const [open, setOpen] = useState(false)
+  const close = () => setOpen(false)
+
   const closeWithSave = async () => {
     if (!onSave) return
     const close = await onSave()
     if (!close) return
     setOpen(false)
   }
+
+  const content = typeof children === 'function' ? children({ close }) : children
 
   return (
     <Box>
@@ -43,14 +53,14 @@ export const EditingModal = ({
         <Box sx={{ ...modalStyle }} className="modal-content">
           <Box marginBottom="2em" marginTop="1em">
             {' '}
-            {children}
+            {content}
           </Box>
           {onSave && (
             <Button sx={{ marginRight: '0.5em' }} variant="contained" onClick={() => void closeWithSave()}>
               Save
             </Button>
           )}
-          <Button variant="contained" onClick={() => setOpen(false)}>
+          <Button variant="contained" onClick={close}>
             {onSave ? 'Cancel' : 'Close'}
           </Button>
         </Box>

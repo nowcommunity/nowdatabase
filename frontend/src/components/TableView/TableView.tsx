@@ -221,30 +221,39 @@ export const TableView = <T extends MRT_RowData>({
     return `/${url}/${row[idFieldName] as string | number}`
   }
 
-  const muiTableBodyRowProps = ({ row }: { row: MRT_Row<T> }) => ({
-    'data-cy': `table-row-${String(row.original[idFieldName])}`,
-    onClick: () => {
-      const sanitizedFilters = sanitizeColumnFilters(columnFilters)
-      const columnFilterToUrl = `columnfilters=${JSON.stringify(sanitizedFilters)}`
-      const sortingToUrl = `sorting=${JSON.stringify(sorting)}`
-      const paginationToUrl = `pagination=${JSON.stringify(pagination)}`
-      setPreviousTableUrls([
-        ...previousTableUrls,
-        `${location.pathname}?&${columnFilterToUrl}&${sortingToUrl}&${paginationToUrl}`,
-      ])
-      navigate(resolveDetailPath(row.original), {
-        state: { returnTo: `${location.pathname}${location.search}` },
-      })
-    },
-    sx: {
-      cursor: 'pointer',
-    },
-  })
+  const muiTableBodyRowProps = ({ row }: { row: MRT_Row<T> }) => {
+    const clickSelectsRow = Boolean(selectorFn) && !clickableRows
+
+    return {
+      'data-cy': `table-row-${String(row.original[idFieldName])}`,
+      onClick: () => {
+        if (clickSelectsRow) {
+          selectorFn?.(row.original)
+          return
+        }
+
+        const sanitizedFilters = sanitizeColumnFilters(columnFilters)
+        const columnFilterToUrl = `columnfilters=${JSON.stringify(sanitizedFilters)}`
+        const sortingToUrl = `sorting=${JSON.stringify(sorting)}`
+        const paginationToUrl = `pagination=${JSON.stringify(pagination)}`
+        setPreviousTableUrls([
+          ...previousTableUrls,
+          `${location.pathname}?&${columnFilterToUrl}&${sortingToUrl}&${paginationToUrl}`,
+        ])
+        navigate(resolveDetailPath(row.original), {
+          state: { returnTo: `${location.pathname}${location.search}` },
+        })
+      },
+      sx: {
+        cursor: clickSelectsRow || clickableRows ? 'pointer' : undefined,
+      },
+    }
+  }
 
   const table = useMaterialReactTable({
     columns: columns,
     data: data || [],
-    muiTableBodyRowProps: clickableRows ? muiTableBodyRowProps : undefined,
+    muiTableBodyRowProps: clickableRows || selectorFn ? muiTableBodyRowProps : undefined,
     muiTableContainerProps: tableContainerMaxHeight
       ? {
           sx: {

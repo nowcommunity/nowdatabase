@@ -25,6 +25,7 @@ export const SelectingTable = <T extends MRT_RowData, ParentType extends object>
   isError,
   useObject,
   paginationPlacement,
+  closeOnSelect = false,
 }: {
   dataCy?: string
   buttonText: string
@@ -39,6 +40,7 @@ export const SelectingTable = <T extends MRT_RowData, ParentType extends object>
   isError: boolean
   useObject?: boolean
   paginationPlacement?: 'top' | 'bottom' | 'both'
+  closeOnSelect?: boolean
 }) => {
   const { editData, setEditData } = useDetailContext<ParentType>()
 
@@ -74,9 +76,10 @@ export const SelectingTable = <T extends MRT_RowData, ParentType extends object>
 
   if (isError) return <Box>Error fetching data for the selecting table.</Box>
   if (!data) return <CircularProgress />
+
   return (
     <EditingModal buttonText={buttonText} dataCy={dataCy}>
-      {data ? (
+      {({ close }) => (
         <DetailTabTable<T>
           mode="select"
           data={filteredData}
@@ -84,14 +87,15 @@ export const SelectingTable = <T extends MRT_RowData, ParentType extends object>
           title={title}
           isFetching={false}
           visibleColumns={visibleColumns}
-          selectorFn={editingAction ?? defaultEditingAction}
+          selectorFn={row => {
+            ;(editingAction ?? defaultEditingAction)(row)
+            if (closeOnSelect) close()
+          }}
           idFieldName={idFieldName}
           clickableRows={false}
           tableRowAction={tableRowAction}
           paginationPlacement={paginationPlacement}
         />
-      ) : (
-        <CircularProgress />
       )}
     </EditingModal>
   )
