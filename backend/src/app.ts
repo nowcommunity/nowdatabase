@@ -30,9 +30,11 @@ import { errorHandler } from './middlewares/errorHandler'
 import { requireOneOf } from './middlewares/authorizer'
 import { Role } from './../../frontend/src/shared/types'
 import { blockWriteRequests } from './middlewares/misc'
+import { maintenanceGate } from './middlewares/maintenanceGate'
 import testRouter from './routes/test'
 import occurrenceRouter from './routes/occurrence'
 import speciesMergeRouter from './routes/speciesMerge'
+import adminMaintenanceRouter from './routes/adminMaintenance'
 
 const app = express()
 
@@ -51,6 +53,8 @@ app.use(refreshTokenRouter)
 app.use(tokenExtractor)
 app.use(userExtractor)
 
+app.use(maintenanceGate)
+
 app.use('/email', emailLimiter)
 
 app.use('/user', userRouter)
@@ -60,6 +64,7 @@ app.use('/locality', localityRouter)
 app.use('/locality-species', localitySpeciesRouter)
 app.use('/species', speciesRouter)
 app.use('/admin/species-merge', requireOneOf([Role.Admin]), speciesMergeRouter)
+app.use('/admin/maintenance', requireOneOf([Role.Admin]), adminMaintenanceRouter)
 app.use('/statistics', statisticsRouter)
 app.use('/reference', referenceRouter)
 app.use('/time-unit', timeUnitRouter)

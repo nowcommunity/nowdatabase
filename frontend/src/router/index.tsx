@@ -75,10 +75,24 @@ const router = createBrowserRouter([
         },
       },
       {
+        path: 'admin/emergency-shutdown',
+        lazy: async () => {
+          const { EmergencyShutdownPage } = await import('../pages/admin/EmergencyShutdownPage')
+          return { Component: EmergencyShutdownPage }
+        },
+      },
+      {
         path: 'login',
         lazy: async () => {
           const { Login } = await import('../components/Login')
           return { Component: Login }
+        },
+      },
+      {
+        path: 'maintenance',
+        lazy: async () => {
+          const { MaintenancePage } = await import('../pages/MaintenancePage')
+          return { Component: MaintenancePage }
         },
       },
       { path: '*', element: <div>Page not found.</div> },
