@@ -284,9 +284,9 @@ const continentAliases: Record<Continent, string[]> = {
   Antarctica: ['antarctica'],
   Asia: ['asia'],
   Europe: ['europe'],
-  'North America': ['north america', 'northern america', 'central america', 'caribbean'],
+  'North America': ['north america', 'northern america', 'central america', 'caribbean', 'americas'],
   Oceania: ['oceania', 'australia', 'australasia', 'pacific'],
-  'South America': ['south america', 'southern america', 'latin america'],
+  'South America': ['south america', 'southern america', 'latin america', 'americas'],
 }
 
 const normalize = (value: string | null | undefined) => value?.trim().toLowerCase() ?? ''
@@ -324,4 +324,27 @@ export const matchesCountryOrContinent = (
   }
 
   return continentAliases[continent].some(alias => alias.includes(normalizedFilter))
+}
+
+export const getContinentsMatchingFilter = (filterValue: string | null | undefined): Continent[] => {
+  const normalizedFilter = normalize(filterValue)
+  if (!normalizedFilter) return []
+
+  const continents = Object.keys(continentAliases) as Continent[]
+  return continents.filter(continent => {
+    const normalizedContinent = continent.toLowerCase()
+    if (normalizedContinent.includes(normalizedFilter)) return true
+
+    return continentAliases[continent].some(alias => alias.includes(normalizedFilter))
+  })
+}
+
+export const getCountriesForContinentFilter = (filterValue: string | null | undefined): string[] => {
+  const matchingContinents = new Set(getContinentsMatchingFilter(filterValue))
+  if (matchingContinents.size === 0) return []
+
+  return Object.keys(countryToContinentMap).filter(country => {
+    const continent = countryToContinentMap[country as keyof typeof countryToContinentMap]
+    return matchingContinents.has(continent)
+  })
 }

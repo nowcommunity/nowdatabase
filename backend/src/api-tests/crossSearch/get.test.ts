@@ -1,4 +1,5 @@
 import type { CrossSearch } from '../../../../frontend/src/shared/types'
+import { matchesCountryOrContinent } from '../../../../frontend/src/shared/validators/countryContinents'
 import { beforeAll, afterAll, describe, it, expect } from '@jest/globals'
 import { resetDatabase, send, resetDatabaseTimeout, login, logout } from '../utils'
 import { pool } from '../../utils/db'
@@ -90,6 +91,14 @@ describe('Getting cross-search data', () => {
         'Spain',
         'Spain',
       ])
+
+      const { body: responseBodyEurope, status: responseStatusEurope } = await send<CrossSearch[]>(
+        `crosssearch/all/200/0/[{"id": "country", "value": "Europe"}]/[]`,
+        'GET'
+      )
+      expect(responseStatusEurope).toEqual(200)
+      expect(responseBodyEurope.length).toBeGreaterThan(0)
+      expect(responseBodyEurope.every(row => matchesCountryOrContinent(row.country, 'Europe'))).toBe(true)
 
       const { body: responseBody3, status: responseStatus3 } = await send<CrossSearch[]>(
         `crosssearch/all/20/0/[{"id": "lid_now_loc", "value": "invalid"}]/[]`,

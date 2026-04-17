@@ -1,5 +1,6 @@
 import { Prisma } from '../../../prisma/generated/now_test_client'
 import { ColumnFilter } from '../../../../frontend/src/shared/types'
+import { getCountriesForContinentFilter } from '../../../../frontend/src/shared/validators/countryContinents'
 
 const generateWhereClause = (showAll: boolean, allowedLocalities: Array<number>, columnFilters: ColumnFilter[]) => {
   let userCheck: Prisma.Sql
@@ -15,6 +16,17 @@ const generateWhereClause = (showAll: boolean, allowedLocalities: Array<number>,
   else {
     const conditions: Prisma.Sql[] = []
     for (const filter of columnFilters) {
+      if (filter.id === 'now_loc.country') {
+        const continentCountries = getCountriesForContinentFilter(filter.value)
+        if (continentCountries.length > 0) {
+          const newQuery = Prisma.sql`(${Prisma.raw(filter.id)} LIKE ${'%' + filter.value + '%'} OR ${Prisma.raw(
+            filter.id
+          )} IN (${Prisma.join(continentCountries)}))`
+          conditions.push(newQuery)
+          continue
+        }
+      }
+
       const newQuery = Prisma.sql`${Prisma.raw(filter.id)} LIKE ${'%' + filter.value + '%'}`
       conditions.push(newQuery)
     }
