@@ -98,9 +98,13 @@ export const ReferenceTab = () => {
         ? bigTextField(field.field_name! as keyof ReferenceDetailsType)
         : textField(field.field_name! as keyof ReferenceDetailsType)
       if (field.field_name && numberFields.includes(field.field_name)) {
+        const isPageField = field.field_name === 'start_page' || field.field_name === 'end_page'
         nonAuthorFieldsArray.push([
           field.ref_field_name,
-          textField(field.field_name as keyof ReferenceDetailsType, { type: 'number' }),
+          textField(field.field_name as keyof ReferenceDetailsType, {
+            type: 'number',
+            ...(isPageField ? { integerOnly: true, min: 1 } : {}),
+          }),
         ])
       } else if (field.field_name == 'exact_date') {
         nonAuthorFieldsArray.push([

@@ -33,11 +33,36 @@ export const OccurrenceWearTab = () => {
               'Mesowear',
               mode.read ? formatMesowear(sourceData.mesowear) : dropdown('mesowear', mesowearOptions, 'Mesowear'),
             ],
-            ['MW OR High', mode.read ? toText(sourceData.mw_or_high) : textField('mw_or_high', { type: 'number' })],
-            ['MW OR Low', mode.read ? toText(sourceData.mw_or_low) : textField('mw_or_low', { type: 'number' })],
-            ['MW CS Sharp', mode.read ? toText(sourceData.mw_cs_sharp) : textField('mw_cs_sharp', { type: 'number' })],
-            ['MW CS Round', mode.read ? toText(sourceData.mw_cs_round) : textField('mw_cs_round', { type: 'number' })],
-            ['MW CS Blunt', mode.read ? toText(sourceData.mw_cs_blunt) : textField('mw_cs_blunt', { type: 'number' })],
+            [
+              'MW OR High',
+              mode.read
+                ? toText(sourceData.mw_or_high)
+                : textField('mw_or_high', { type: 'number', integerOnly: true, min: 0, max: 100 }),
+            ],
+            [
+              'MW OR Low',
+              mode.read
+                ? toText(sourceData.mw_or_low)
+                : textField('mw_or_low', { type: 'number', integerOnly: true, min: 0, max: 100 }),
+            ],
+            [
+              'MW CS Sharp',
+              mode.read
+                ? toText(sourceData.mw_cs_sharp)
+                : textField('mw_cs_sharp', { type: 'number', integerOnly: true, min: 0, max: 100 }),
+            ],
+            [
+              'MW CS Round',
+              mode.read
+                ? toText(sourceData.mw_cs_round)
+                : textField('mw_cs_round', { type: 'number', integerOnly: true, min: 0, max: 100 }),
+            ],
+            [
+              'MW CS Blunt',
+              mode.read
+                ? toText(sourceData.mw_cs_blunt)
+                : textField('mw_cs_blunt', { type: 'number', integerOnly: true, min: 0, max: 100 }),
+            ],
           ]}
         />,
         <div key="wear-score-and-microwear">
@@ -47,11 +72,15 @@ export const OccurrenceWearTab = () => {
             array={[
               [
                 'MW scale min',
-                mode.read ? toText(sourceData.mw_scale_min) : textField('mw_scale_min', { type: 'number' }),
+                mode.read
+                  ? toText(sourceData.mw_scale_min)
+                  : textField('mw_scale_min', { type: 'number', integerOnly: true, min: 0 }),
               ],
               [
                 'MW scale max',
-                mode.read ? toText(sourceData.mw_scale_max) : textField('mw_scale_max', { type: 'number' }),
+                mode.read
+                  ? toText(sourceData.mw_scale_max)
+                  : textField('mw_scale_max', { type: 'number', integerOnly: true, min: 0 }),
               ],
               ['MW value', mode.read ? toText(sourceData.mw_value) : textField('mw_value', { type: 'number' })],
               ['Normalized Score', normalizedScoreText],

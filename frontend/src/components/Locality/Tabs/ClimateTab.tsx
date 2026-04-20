@@ -129,9 +129,12 @@ export const ClimateTab = () => {
   ]
 
   const pollenRecord = [
-    ['Arboreal pollen (AP%)', textField('pers_pollen_ap', { type: 'number' })],
-    ['Non-arboreal pollen (NAP%)', textField('pers_pollen_nap', { type: 'number' })],
-    ['Other pollen (OP%)', textField('pers_pollen_other', { type: 'number' })],
+    ['Arboreal pollen (AP%)', textField('pers_pollen_ap', { type: 'number', integerOnly: true, min: 0, max: 100 })],
+    [
+      'Non-arboreal pollen (NAP%)',
+      textField('pers_pollen_nap', { type: 'number', integerOnly: true, min: 0, max: 100 }),
+    ],
+    ['Other pollen (OP%)', textField('pers_pollen_other', { type: 'number', integerOnly: true, min: 0, max: 100 })],
   ]
 
   const pollenTotalError = ['pers_pollen_ap', 'pers_pollen_nap', 'pers_pollen_other']

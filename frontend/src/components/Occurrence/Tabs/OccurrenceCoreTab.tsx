@@ -43,10 +43,19 @@ export const OccurrenceCoreTab = () => {
             key="counts"
             title="Occurrence counts"
             array={[
-              ['NISP', mode.read ? toText(sourceData.nis) : textField('nis', { type: 'number' })],
+              [
+                'NISP',
+                mode.read ? toText(sourceData.nis) : textField('nis', { type: 'number', integerOnly: true, min: 1 }),
+              ],
               ['Percent', mode.read ? toText(sourceData.pct) : textField('pct', { type: 'number' })],
-              ['Quadrate', mode.read ? toText(sourceData.quad) : textField('quad', { type: 'number' })],
-              ['MNI', mode.read ? toText(sourceData.mni) : textField('mni', { type: 'number' })],
+              [
+                'Quadrate',
+                mode.read ? toText(sourceData.quad) : textField('quad', { type: 'number', integerOnly: true, min: 1 }),
+              ],
+              [
+                'MNI',
+                mode.read ? toText(sourceData.mni) : textField('mni', { type: 'number', integerOnly: true, min: 1 }),
+              ],
               ['Quantity', mode.read ? formatQuantity(sourceData.qua) : dropdown('qua', quantityOptions, 'Quantity')],
             ]}
           />,
@@ -54,7 +63,12 @@ export const OccurrenceCoreTab = () => {
       </HalfFrames>
       <ArrayFrame
         array={[
-          ['Body Mass (g)', mode.read ? toText(sourceData.body_mass) : textField('body_mass', { type: 'number' })],
+          [
+            'Body Mass (g)',
+            mode.read
+              ? toText(sourceData.body_mass)
+              : textField('body_mass', { type: 'number', integerOnly: true, min: 1 }),
+          ],
         ]}
         title="Size"
       />
