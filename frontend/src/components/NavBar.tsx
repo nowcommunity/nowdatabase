@@ -36,6 +36,7 @@ export const NavBar = () => {
         { title: 'People', url: '/person' },
         { title: 'Email', url: '/email' },
         { title: 'Merge Species', url: '/admin/merge-species' },
+        { title: 'Emergency shutdown', url: '/admin/emergency-shutdown' },
       ],
     },
   ]

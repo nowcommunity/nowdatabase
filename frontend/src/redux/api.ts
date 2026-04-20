@@ -33,6 +33,26 @@ const baseQueryWithReauth: BaseQueryFn<string | FetchArgs, unknown, FetchBaseQue
   extraOptions
 ) => {
   let result = await baseQuery(args, api, extraOptions)
+
+  if (result.error?.status === 503) {
+    let isMaintenance = false
+    const data = result.error.data
+    if (data && typeof data === 'object') {
+      const candidate = data as { maintenance?: unknown; enabledAt?: unknown; reason?: unknown }
+      if (candidate.maintenance === true) {
+        isMaintenance = true
+        const enabledAt = typeof candidate.enabledAt === 'string' ? candidate.enabledAt : null
+        const reason = typeof candidate.reason === 'string' ? candidate.reason : null
+        sessionStorage.setItem('nowdb_maintenance', JSON.stringify({ enabledAt, reason }))
+      }
+    }
+
+    if (isMaintenance && window.location.pathname !== '/maintenance') {
+      window.location.replace('/maintenance')
+    }
+    return result
+  }
+
   const token = (api.getState() as RootState).user.token
   if (token && result.error?.status === 401) {
     const refreshedToken = (await baseQuery(
