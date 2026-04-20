@@ -17,6 +17,10 @@ jest.mock('@/components/TimeUnit/TimeUnitTable', () => ({
   TimeUnitTable: () => <div>TimeUnitTable</div>,
 }))
 
+jest.mock('@/hooks/notification', () => ({
+  useNotify: () => ({ notify: jest.fn(), setMessage: jest.fn() }),
+}))
+
 const toDisplayValue = (option: DropdownOption | string): string => {
   if (typeof option === 'string') return option
   return option.display
@@ -50,9 +54,12 @@ const ContextWrapper = ({ children }: { children: ReactNode }) => {
   const [editData, setEditData] = useState<EditDataType<LocalityDetailsType>>(initialEditData)
 
   const setFieldValue = (field: keyof EditDataType<LocalityDetailsType>, value: string) => {
+    const trimmed = value.trim()
+    const parsedValue = trimmed === '' ? '' : /^-?\d+(\.\d+)?$/.test(trimmed) ? Number(trimmed) : (value as unknown)
+
     setEditData(prev => ({
       ...prev,
-      [field]: value === '' ? '' : Number.isNaN(Number(value)) ? value : Number(value),
+      [field]: parsedValue,
     }))
   }
 
@@ -153,8 +160,8 @@ describe('AgeTab', () => {
     expect(screen.getByLabelText<HTMLInputElement>('max_age').value).toBe('20')
     expect(screen.getByLabelText<HTMLInputElement>('bfa_min').value).toBe('tu-min-initial')
     expect(screen.getByLabelText<HTMLInputElement>('bfa_max').value).toBe('tu-max-initial')
-    expect(screen.getByLabelText<HTMLInputElement>('frac_min').value).toBe('1:2')
-    expect(screen.getByLabelText<HTMLInputElement>('frac_max').value).toBe('2:2')
+    expect(screen.getByLabelText('frac_min').textContent).toContain('Early half 1:2')
+    expect(screen.getByLabelText('frac_max').textContent).toContain('Late half 2:2')
 
     await user.click(screen.getByRole('button', { name: 'Composite' }))
 
