@@ -30,6 +30,22 @@ const validatePositiveInteger = (name: string, num: number) => {
   return
 }
 
+const validateFraction = (name: string, value: string) => {
+  const trimmed = value.trim()
+  if (trimmed === '') return
+  const match = /^(\d+):(\d+)$/.exec(trimmed)
+  if (!match) return `${name} must be in format integer:integer`
+
+  const numerator = Number(match[1])
+  const denominator = Number(match[2])
+
+  if (!Number.isInteger(numerator) || !Number.isInteger(denominator)) return `${name} must be in format integer:integer`
+  if (denominator < 1) return `${name} denominator must be >= 1`
+  if (numerator < 1) return `${name} numerator must be >= 1`
+  if (numerator > denominator) return `${name} numerator must be <= denominator`
+  return
+}
+
 const validatePollenRecordTotal = (editData: Partial<EditDataType<LocalityDetailsType>>) => {
   const values = pollenFields
     .map(fieldName => editData[fieldName])
@@ -236,6 +252,18 @@ export const validateLocality = (
     pers_woody_cover: {
       name: 'Woody cover percentage',
       asNumber: (num: number) => validateIntegerInRange('Woody cover percentage', num, 0, 100),
+    },
+    frac_min: {
+      name: 'Minimum fraction',
+      condition: (data: Partial<EditDataType<LocalityDetailsType>>) =>
+        data.frac_min !== null && data.frac_min !== undefined && data.frac_min !== '',
+      asString: (value: string) => validateFraction('Minimum fraction', value),
+    },
+    frac_max: {
+      name: 'Maximum fraction',
+      condition: (data: Partial<EditDataType<LocalityDetailsType>>) =>
+        data.frac_max !== null && data.frac_max !== undefined && data.frac_max !== '',
+      asString: (value: string) => validateFraction('Maximum fraction', value),
     },
   }
 
