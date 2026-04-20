@@ -17,7 +17,7 @@ const createSpeciesEditData = (
 describe('validateSpecies mesowear scale/value constraints', () => {
   it('rejects negative Scale Minimum', () => {
     const result = validateSpecies(createSpeciesEditData({ mw_scale_min: -1 }), 'mw_scale_min')
-    expect(result.error).toBe('Scale Minimum cannot be negative.')
+    expect(result.error).toBe('Scale Minimum must be a non-negative integer.')
   })
 
   it('rejects Scale Minimum greater than Scale Maximum', () => {
@@ -27,7 +27,7 @@ describe('validateSpecies mesowear scale/value constraints', () => {
 
   it('rejects negative Scale Maximum and values below Scale Minimum', () => {
     const negative = validateSpecies(createSpeciesEditData({ mw_scale_max: -1 }), 'mw_scale_max')
-    expect(negative.error).toBe('Scale Maximum cannot be negative.')
+    expect(negative.error).toBe('Scale Maximum must be a non-negative integer.')
 
     const lessThanMin = validateSpecies(createSpeciesEditData({ mw_scale_min: 4, mw_scale_max: 3 }), 'mw_scale_max')
     expect(lessThanMin.error).toBe('Scale Maximum cannot be less than Scale Minimum.')

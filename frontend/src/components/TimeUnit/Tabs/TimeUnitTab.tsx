@@ -4,6 +4,7 @@ import { TimeBoundSelection } from '@/components/DetailView/common/editingCompon
 import { emptyOption } from '@/components/DetailView/common/misc'
 import { ArrayFrame, Grouped } from '@/components/DetailView/common/tabLayoutHelpers'
 import { useDetailContext } from '@/components/DetailView/Context/DetailContext'
+import { checkFieldErrors } from '@/components/DetailView/common/checkFieldErrors'
 import { Alert, Box } from '@mui/material'
 import { EditingForm, EditingFormField } from '@/components/DetailView/common/EditingForm'
 import { SequenceSelect } from '@/components/Sequence/SequenceSelect'
@@ -15,13 +16,18 @@ const DUPLICATE_CHECK_PENDING_FIELD = 'duplicateTimeUnitNamePending'
 const DUPLICATE_CHECK_PENDING_MESSAGE = 'Checking time unit name availability...'
 
 export const TimeUnitTab = () => {
-  const { textField, dropdown, data, editData, setEditData, fieldsWithErrors, setFieldsWithErrors, mode } =
+  const { textField, dropdown, data, editData, setEditData, validator, fieldsWithErrors, setFieldsWithErrors, mode } =
     useDetailContext<TimeUnitDetailsType>()
 
   const { hasDuplicateName, isCheckingName, normalizedInputName } = useTimeUnitNameAvailability(
     editData.tu_display_name,
     data.tu_name
   )
+
+  const revalidateBounds = (nextEditData: typeof editData) => {
+    checkFieldErrors('up_bound', validator(nextEditData, 'up_bound'), fieldsWithErrors, setFieldsWithErrors)
+    checkFieldErrors('low_bound', validator(nextEditData, 'low_bound'), fieldsWithErrors, setFieldsWithErrors)
+  }
 
   useEffect(() => {
     setFieldsWithErrors(prevFieldsWithErrors => {
@@ -134,7 +140,7 @@ export const TimeUnitTab = () => {
                 buttonText="Add new time bound"
                 formFields={formFields}
                 editAction={(newUpTimeBound: TimeBound) => {
-                  setEditData({
+                  const nextEditData = {
                     ...editData,
                     up_bnd: undefined,
                     up_bound: {
@@ -142,7 +148,9 @@ export const TimeUnitTab = () => {
                       age: Number(newUpTimeBound.age),
                       b_comment: newUpTimeBound.b_comment,
                     },
-                  })
+                  }
+                  setEditData(nextEditData)
+                  revalidateBounds(nextEditData)
                 }}
               />
               <TimeBoundSelection key="up_bnd" targetField="up_bnd" />
@@ -158,7 +166,7 @@ export const TimeUnitTab = () => {
                 buttonText="Add new time bound"
                 formFields={formFields}
                 editAction={(newLowTimeBound: TimeBound) => {
-                  setEditData({
+                  const nextEditData = {
                     ...editData,
                     low_bnd: undefined,
                     low_bound: {
@@ -166,7 +174,9 @@ export const TimeUnitTab = () => {
                       age: Number(newLowTimeBound.age),
                       b_comment: newLowTimeBound.b_comment,
                     },
-                  })
+                  }
+                  setEditData(nextEditData)
+                  revalidateBounds(nextEditData)
                 }}
               />
               <TimeBoundSelection key="low_bnd" targetField="low_bnd" />
