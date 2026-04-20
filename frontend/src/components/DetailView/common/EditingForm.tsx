@@ -57,7 +57,7 @@ export const EditingForm = <T extends object, ParentType extends object>({
   }
 
   const defaultValues = buildDefaultValues(existingObject)
-  const { register, trigger, formState, getValues, reset } = useForm({ defaultValues })
+  const { register, trigger, formState, getValues, reset } = useForm({ defaultValues, shouldUnregister: true })
   const { errors } = formState
   const { editData, setEditData } = useDetailContext<ParentType>()
 
@@ -77,6 +77,7 @@ export const EditingForm = <T extends object, ParentType extends object>({
         [arrayFieldName]: [...(editData[arrayFieldName as keyof EditDataType<ParentType>] as Array<T>), newObject],
       })
     if (editAction) editAction(newObject)
+    reset(buildDefaultValues(existingObject))
     return true
   }
 
