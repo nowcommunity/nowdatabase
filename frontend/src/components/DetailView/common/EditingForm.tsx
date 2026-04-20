@@ -77,6 +77,7 @@ export const EditingForm = <T extends object, ParentType extends object>({
         [arrayFieldName]: [...(editData[arrayFieldName as keyof EditDataType<ParentType>] as Array<T>), newObject],
       })
     if (editAction) editAction(newObject)
+    reset(buildDefaultValues(existingObject))
     return true
   }
 
