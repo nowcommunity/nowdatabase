@@ -135,7 +135,7 @@ export const LocalityTab = () => {
         'Approximate Coordinates'
       ),
     ],
-    ['Altitude (m)', textField('altitude')],
+    ['Altitude (m)', textField('altitude', { type: 'number', integerOnly: true, min: -500, max: 9000 })],
   ]
 
   const { notify } = useNotify()

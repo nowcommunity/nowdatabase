@@ -23,6 +23,17 @@ const validatePositiveInteger = (name: string, value: number) => {
   return
 }
 
+const validateNonNegativeInteger = (name: string, value: number) => {
+  if (!Number.isInteger(value) || value < 0) return `${name} must be a non-negative integer.`
+  return
+}
+
+const validateIntegerInRange = (name: string, value: number, min: number, max: number) => {
+  if (!Number.isInteger(value)) return `${name} must be a whole number.`
+  if (value < min || value > max) return `${name} must be between ${min} and ${max}.`
+  return
+}
+
 const validatePositiveDecimal = (name: string, value: number) => {
   if (!Number.isFinite(value) || value <= 0) return `${name} must be a positive decimal number.`
   return
@@ -61,15 +72,15 @@ export const validateOccurrence = (editData: EditableOccurrenceData, fieldName: 
     body_mass: { name: 'Body mass', asNumber: value => validatePositiveInteger('Body mass', value) },
     dc13_n: { name: 'δ13C N', asNumber: value => validatePositiveInteger('δ13C N', value) },
     do18_n: { name: 'δ18O N', asNumber: value => validatePositiveInteger('δ18O N', value) },
-    mw_or_high: { name: 'MW OR High', asNumber: value => validatePositiveInteger('MW OR High', value) },
-    mw_or_low: { name: 'MW OR Low', asNumber: value => validatePositiveInteger('MW OR Low', value) },
-    mw_cs_sharp: { name: 'MW CS Sharp', asNumber: value => validatePositiveInteger('MW CS Sharp', value) },
-    mw_cs_round: { name: 'MW CS Round', asNumber: value => validatePositiveInteger('MW CS Round', value) },
-    mw_cs_blunt: { name: 'MW CS Blunt', asNumber: value => validatePositiveInteger('MW CS Blunt', value) },
+    mw_or_high: { name: 'MW OR High', asNumber: value => validateIntegerInRange('MW OR High', value, 0, 100) },
+    mw_or_low: { name: 'MW OR Low', asNumber: value => validateIntegerInRange('MW OR Low', value, 0, 100) },
+    mw_cs_sharp: { name: 'MW CS Sharp', asNumber: value => validateIntegerInRange('MW CS Sharp', value, 0, 100) },
+    mw_cs_round: { name: 'MW CS Round', asNumber: value => validateIntegerInRange('MW CS Round', value, 0, 100) },
+    mw_cs_blunt: { name: 'MW CS Blunt', asNumber: value => validateIntegerInRange('MW CS Blunt', value, 0, 100) },
     mw_scale_min: {
       name: 'Scale Minimum',
       asNumber: value => {
-        const positivityError = validatePositiveInteger('Scale Minimum', value)
+        const positivityError = validateNonNegativeInteger('Scale Minimum', value)
         if (positivityError) return positivityError
         if (hasNumericValue(editData.mw_scale_max) && value > editData.mw_scale_max)
           return 'Scale Minimum cannot be greater than Scale Maximum.'
@@ -79,7 +90,7 @@ export const validateOccurrence = (editData: EditableOccurrenceData, fieldName: 
     mw_scale_max: {
       name: 'Scale Maximum',
       asNumber: value => {
-        const positivityError = validatePositiveInteger('Scale Maximum', value)
+        const positivityError = validateNonNegativeInteger('Scale Maximum', value)
         if (positivityError) return positivityError
         if (hasNumericValue(editData.mw_scale_min) && value < editData.mw_scale_min)
           return 'Scale Maximum cannot be less than Scale Minimum.'
