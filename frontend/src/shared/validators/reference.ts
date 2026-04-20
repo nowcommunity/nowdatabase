@@ -109,6 +109,13 @@ const yearCheck: (year: number) => ValidationError = (year: number) => {
   return null
 }
 
+const positiveIntegerCheck: (name: string, num: number) => ValidationError = (name: string, num: number) => {
+  if (!Number.isFinite(num)) return `${name} must be a valid number`
+  if (!Number.isInteger(num)) return `${name} must be a whole number`
+  if (num < 1) return `${name} must be a positive integer`
+  return null
+}
+
 export type ReferenceFieldDisplayNames = Partial<Record<keyof EditDataType<ReferenceDetailsType>, string>>
 
 export type ReferenceDisplayLabelMap = Partial<Record<number, ReferenceFieldDisplayNames>>
@@ -217,12 +224,19 @@ export const validateReference = (
     start_page: {
       name: 'start_page',
       required: false,
-      asNumber: true,
+      asNumber: (num: number) => positiveIntegerCheck('start_page', num),
     },
     end_page: {
       name: 'end_page',
       required: false,
-      asNumber: true,
+      asNumber: (num: number) => {
+        const base = positiveIntegerCheck('end_page', num)
+        if (base) return base
+        if (typeof editData.start_page === 'number' && num < editData.start_page) {
+          return 'end_page must be greater than or equal to start_page'
+        }
+        return null
+      },
     },
     date_secondary: {
       name: 'date_secondary',

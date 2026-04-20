@@ -48,6 +48,9 @@ export type TextFieldOptions =
     } & CommonTextFieldOptions)
   | ({
       type: 'number'
+      integerOnly?: boolean
+      min?: number
+      max?: number
       round?: number
       handleSetEditData?: (value: number | '') => void
     } & CommonTextFieldOptions)

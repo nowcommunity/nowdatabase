@@ -11,6 +11,22 @@ export const validateSpecies = (
   editData: EditDataType<SpeciesDetailsType>,
   fieldName: keyof EditDataType<SpeciesDetailsType>
 ) => {
+  const validatePositiveInteger = (name: string, value: number) => {
+    if (!Number.isInteger(value) || value < 1) return `${name} must be a positive integer.`
+    return
+  }
+
+  const validateNonNegativeInteger = (name: string, value: number) => {
+    if (!Number.isInteger(value) || value < 0) return `${name} must be a non-negative integer.`
+    return
+  }
+
+  const validateIntegerInRange = (name: string, value: number, min: number, max: number) => {
+    if (!Number.isInteger(value)) return `${name} must be a whole number.`
+    if (value < min || value > max) return `${name} must be between ${min} and ${max}.`
+    return
+  }
+
   const validators: Validators<Partial<EditDataType<SpeciesDetailsType>>> = {
     subclass_or_superorder_name: {
       name: 'Subclass or Superorder',
@@ -103,11 +119,40 @@ export const validateSpecies = (
         return
       },
     },
+    body_mass: {
+      name: 'Body Mass (g)',
+      asNumber: (value: number) => validatePositiveInteger('Body Mass (g)', value),
+    },
+    brain_mass: {
+      name: 'Brain Mass (g)',
+      asNumber: (value: number) => validatePositiveInteger('Brain Mass (g)', value),
+    },
+    mw_or_low: {
+      name: 'Cusp Relief Low (OR%)',
+      asNumber: (value: number) => validateIntegerInRange('Cusp Relief Low (OR%)', value, 0, 100),
+    },
+    mw_or_high: {
+      name: 'Cusp Relief High (OR%)',
+      asNumber: (value: number) => validateIntegerInRange('Cusp Relief High (OR%)', value, 0, 100),
+    },
+    mw_cs_sharp: {
+      name: 'Cusp Shape Sharp (CS%)',
+      asNumber: (value: number) => validateIntegerInRange('Cusp Shape Sharp (CS%)', value, 0, 100),
+    },
+    mw_cs_round: {
+      name: 'Cusp Shape Rounded (CS%)',
+      asNumber: (value: number) => validateIntegerInRange('Cusp Shape Rounded (CS%)', value, 0, 100),
+    },
+    mw_cs_blunt: {
+      name: 'Cusp Shape Blunt (CS%)',
+      asNumber: (value: number) => validateIntegerInRange('Cusp Shape Blunt (CS%)', value, 0, 100),
+    },
 
     mw_scale_min: {
       name: 'Scale Minimum',
       asNumber: (value: number) => {
-        if (value < 0) return 'Scale Minimum cannot be negative.'
+        const nonNegativeError = validateNonNegativeInteger('Scale Minimum', value)
+        if (nonNegativeError) return nonNegativeError
         if (typeof editData.mw_scale_max === 'number' && value > editData.mw_scale_max)
           return 'Scale Minimum cannot be greater than Scale Maximum.'
         return
@@ -116,7 +161,8 @@ export const validateSpecies = (
     mw_scale_max: {
       name: 'Scale Maximum',
       asNumber: (value: number) => {
-        if (value < 0) return 'Scale Maximum cannot be negative.'
+        const nonNegativeError = validateNonNegativeInteger('Scale Maximum', value)
+        if (nonNegativeError) return nonNegativeError
         if (typeof editData.mw_scale_min === 'number' && value < editData.mw_scale_min)
           return 'Scale Maximum cannot be less than Scale Minimum.'
         return

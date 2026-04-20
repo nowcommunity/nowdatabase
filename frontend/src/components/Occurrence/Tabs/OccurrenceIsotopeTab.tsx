@@ -16,7 +16,12 @@ export const OccurrenceIsotopeTab = () => {
           title="δ13C"
           array={[
             ['Mean', mode.read ? toText(sourceData.dc13_mean) : textField('dc13_mean', { type: 'number' })],
-            ['N', mode.read ? toText(sourceData.dc13_n) : textField('dc13_n', { type: 'number' })],
+            [
+              'N',
+              mode.read
+                ? toText(sourceData.dc13_n)
+                : textField('dc13_n', { type: 'number', integerOnly: true, min: 1 }),
+            ],
             ['Max', mode.read ? toText(sourceData.dc13_max) : textField('dc13_max', { type: 'number' })],
             ['Min', mode.read ? toText(sourceData.dc13_min) : textField('dc13_min', { type: 'number' })],
             ['Stdev', mode.read ? toText(sourceData.dc13_stdev) : textField('dc13_stdev', { type: 'number' })],
@@ -27,7 +32,12 @@ export const OccurrenceIsotopeTab = () => {
           title="δ18O"
           array={[
             ['Mean', mode.read ? toText(sourceData.do18_mean) : textField('do18_mean', { type: 'number' })],
-            ['N', mode.read ? toText(sourceData.do18_n) : textField('do18_n', { type: 'number' })],
+            [
+              'N',
+              mode.read
+                ? toText(sourceData.do18_n)
+                : textField('do18_n', { type: 'number', integerOnly: true, min: 1 }),
+            ],
             ['Max', mode.read ? toText(sourceData.do18_max) : textField('do18_max', { type: 'number' })],
             ['Min', mode.read ? toText(sourceData.do18_min) : textField('do18_min', { type: 'number' })],
             ['Stdev', mode.read ? toText(sourceData.do18_stdev) : textField('do18_stdev', { type: 'number' })],

@@ -14,6 +14,22 @@ const validatePollenPercentage = (name: string, num: number) => {
   return
 }
 
+const validateNonNegativeInteger = (name: string, num: number) => {
+  if (!Number.isInteger(num) || num < 0) return `${name} must be a non-negative integer.`
+  return
+}
+
+const validateIntegerInRange = (name: string, num: number, min: number, max: number) => {
+  if (!Number.isInteger(num)) return `${name} must be an integer value`
+  if (num < min || num > max) return `${name} must be between ${min} and ${max}`
+  return
+}
+
+const validatePositiveInteger = (name: string, num: number) => {
+  if (!Number.isInteger(num) || num < 1) return `${name} must be a positive integer.`
+  return
+}
+
 const validatePollenRecordTotal = (editData: Partial<EditDataType<LocalityDetailsType>>) => {
   const values = pollenFields
     .map(fieldName => editData[fieldName])
@@ -192,6 +208,34 @@ export const validateLocality = (
         if (num <= -1000 || num >= 1000) return estimateTempRangeValidationError
         return
       },
+    },
+    estimate_precip: {
+      name: 'Estimate of annual precipitation (mm)',
+      asNumber: (num: number) => validateNonNegativeInteger('Estimate of annual precipitation (mm)', num),
+    },
+    altitude: {
+      name: 'Altitude (m)',
+      asNumber: (num: number) => validateIntegerInRange('Altitude (m)', num, -500, 9000),
+    },
+    appr_num_spm: {
+      name: 'Approx. Number of Specimens',
+      asNumber: (num: number) => validatePositiveInteger('Approx. Number of Specimens', num),
+    },
+    num_spm: {
+      name: 'Exact Number of Specimens',
+      asNumber: (num: number) => validatePositiveInteger('Exact Number of Specimens', num),
+    },
+    num_quad: {
+      name: 'Number of Quadrats',
+      asNumber: (num: number) => validatePositiveInteger('Number of Quadrats', num),
+    },
+    estimate_npp: {
+      name: 'Estimate of net primary productivity (g/m2/yr)',
+      asNumber: (num: number) => validateNonNegativeInteger('Estimate of net primary productivity (g/m2/yr)', num),
+    },
+    pers_woody_cover: {
+      name: 'Woody cover percentage',
+      asNumber: (num: number) => validateIntegerInRange('Woody cover percentage', num, 0, 100),
     },
   }
 
