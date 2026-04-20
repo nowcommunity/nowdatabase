@@ -1,13 +1,15 @@
 import { EditDataType, LocalityDetailsType } from '@/shared/types'
 import { BasisForAgeSelection } from '@/components/DetailView/common/editingComponents'
 import { emptyOption } from '@/components/DetailView/common/misc'
-import { ArrayFrame, HalfFrames } from '@/components/DetailView/common/tabLayoutHelpers'
+import { ArrayFrame, DataValue, HalfFrames } from '@/components/DetailView/common/tabLayoutHelpers'
 import { makeEditData, useDetailContext } from '@/components/DetailView/Context/DetailContext'
 import { TimeUnitTable } from '@/components/TimeUnit/TimeUnitTable'
 import { useGetTimeUnitDetailsQuery } from '@/redux/timeUnitReducer'
 import { skipToken } from '@reduxjs/toolkit/query'
-import { CircularProgress } from '@mui/material'
+import { CircularProgress, FormControl, FormHelperText, InputLabel, MenuItem, Select } from '@mui/material'
 import { useEffect, useState } from 'react'
+import { checkFieldErrors } from '@/components/DetailView/common/checkFieldErrors'
+import { useNotify } from '@/hooks/notification'
 
 type LocalityDatingMethod = 'time_unit' | 'absolute' | 'composite'
 
@@ -58,6 +60,111 @@ const initializeDrafts = (editData: EditDataType<LocalityDetailsType>): AgeDraft
   return { ...drafts, [dateMethod]: getAgeFields(editData) }
 }
 
+const otherFractionOptionValue = '__other__'
+
+const isPresetFraction = (value: string) => {
+  return value === '1:2' || value === '2:2' || value === '1:3' || value === '2:3' || value === '3:3'
+}
+
+const validateFractionInput = (value: string) => {
+  const trimmed = value.trim()
+  const match = /^(\d+):(\d+)$/.exec(trimmed)
+  if (!match) return null
+  const numerator = Number(match[1])
+  const denominator = Number(match[2])
+  if (!Number.isInteger(numerator) || !Number.isInteger(denominator)) return null
+  if (denominator < 1) return null
+  if (numerator < 1) return null
+  if (numerator > denominator) return null
+  return `${numerator}:${denominator}`
+}
+
+const FractionSelection = ({
+  field,
+  label,
+  disabled,
+}: {
+  field: 'frac_min' | 'frac_max'
+  label: string
+  disabled?: boolean
+}) => {
+  const { data, editData, setEditData, validator, fieldsWithErrors, setFieldsWithErrors, mode } =
+    useDetailContext<LocalityDetailsType>()
+  const { notify } = useNotify()
+
+  const errorObject = validator(editData, field)
+  const { error } = errorObject
+
+  useEffect(() => {
+    checkFieldErrors(field, errorObject, fieldsWithErrors, setFieldsWithErrors)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [errorObject.error, errorObject.name])
+
+  const currentValue = (mode.read ? data[field] : editData[field]) ?? ''
+
+  const options = [
+    emptyOption,
+    { display: 'Early half 1:2', value: '1:2' },
+    { display: 'Late half 2:2', value: '2:2' },
+    { display: 'Early third 1:3', value: '1:3' },
+    { display: 'Middle third 2:3', value: '2:3' },
+    { display: 'Late third 3:3', value: '3:3' },
+  ] as const
+
+  const customOptions =
+    typeof currentValue === 'string' && currentValue !== '' && !isPresetFraction(currentValue)
+      ? [{ display: `Other ${currentValue}`, value: currentValue }]
+      : []
+
+  const editingComponent = (
+    <FormControl size="small" error={!!error}>
+      <InputLabel id={`${field}-fraction-label`}>{label}</InputLabel>
+      <Select
+        labelId={`${field}-fraction-label`}
+        label={label}
+        id={`${field}-fraction`}
+        value={(editData[field] as string) || ''}
+        onChange={event => {
+          const nextValue = String(event.target.value)
+          if (nextValue === otherFractionOptionValue) {
+            const input = window.prompt('Enter fraction in format integer:integer (e.g. 1:2)')
+            if (input === null) return
+            const normalized = validateFractionInput(input)
+            if (!normalized) {
+              notify('Fraction must be in format integer:integer where 1 <= numerator <= denominator.', 'error')
+              return
+            }
+            setEditData({ ...editData, [field]: normalized })
+            return
+          }
+          setEditData({ ...editData, [field]: nextValue })
+        }}
+        sx={{ width: '14em', backgroundColor: disabled ? 'grey' : '' }}
+        disabled={disabled}
+      >
+        {options.map(item => (
+          <MenuItem key={item.value} value={item.value} style={{ height: '2em' }}>
+            {item.display}
+          </MenuItem>
+        ))}
+        {customOptions.map(item => (
+          <MenuItem key={item.value} value={item.value} style={{ height: '2em' }}>
+            {item.display}
+          </MenuItem>
+        ))}
+        <MenuItem key={otherFractionOptionValue} value={otherFractionOptionValue} style={{ height: '2em' }}>
+          Other…
+        </MenuItem>
+      </Select>
+      {error && <FormHelperText>{error}</FormHelperText>}
+    </FormControl>
+  )
+
+  const displayValue = typeof currentValue === 'string' && currentValue !== '' ? currentValue : '-'
+
+  return <DataValue<LocalityDetailsType> field={field} EditElement={editingComponent} displayValue={displayValue} />
+}
+
 export const AgeTab = () => {
   const { textField, radioSelection, dropdown, bigTextField, editData, setEditData, data } =
     useDetailContext<LocalityDetailsType>()
@@ -74,15 +181,6 @@ export const AgeTab = () => {
   const maxTimeUnitDisplay = data.bfa_max_time_unit?.tu_display_name
 
   if (bfaMinFetching || bfaMaxFetching) return <CircularProgress />
-
-  const fracOptions = [
-    emptyOption,
-    { display: 'Early half 1:2', value: '1:2' },
-    { display: 'Late half 2:2', value: '2:2' },
-    { display: 'Early third 1:3', value: '1:3' },
-    { display: 'Middle third 2:3', value: '2:3' },
-    { display: 'Late third 3:3', value: '3:3' },
-  ]
 
   const bfa_abs_options = [
     'AAR',
@@ -173,7 +271,7 @@ export const AgeTab = () => {
         disabled={minAgeTimeUnitDisabled}
         displayValue={minTimeUnitDisplay}
       />,
-      dropdown('frac_min', fracOptions, 'Minimum fraction', minAgeTimeUnitDisabled),
+      <FractionSelection key="frac_min" field="frac_min" label="Minimum fraction" disabled={minAgeTimeUnitDisabled} />,
     ],
     [
       'Maximum age',
@@ -188,7 +286,7 @@ export const AgeTab = () => {
         disabled={maxAgeTimeUnitDisabled}
         displayValue={maxTimeUnitDisplay}
       />,
-      dropdown('frac_max', fracOptions, 'Maximum fraction', maxAgeTimeUnitDisabled),
+      <FractionSelection key="frac_max" field="frac_max" label="Maximum fraction" disabled={maxAgeTimeUnitDisabled} />,
     ],
     [''],
     ['Chronostratigraphic Age', textField('chron')],
