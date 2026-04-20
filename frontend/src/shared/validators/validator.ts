@@ -26,8 +26,24 @@ const validate: (validator: Validator, value: unknown) => ValidationError = (val
     if (typeof required === 'function') return required()
   }
   if (asNumber) {
-    if (typeof value !== 'number' && value !== null) return 'Value must be a valid number' // If this happens, code is broken somewhere
-    if (typeof asNumber === 'function' && typeof value == 'number') return asNumber(value)
+    if (value === null || value === undefined || value === '') return null
+
+    if (typeof value === 'number') {
+      if (typeof asNumber === 'function') return asNumber(value)
+      return null
+    }
+
+    if (typeof value === 'string') {
+      const trimmed = value.trim()
+      if (trimmed === '') return null
+
+      const asCoercedNumber = Number(trimmed)
+      if (Number.isNaN(asCoercedNumber)) return `${validator.name} must be a valid number`
+      if (typeof asNumber === 'function') return asNumber(asCoercedNumber)
+      return null
+    }
+
+    return `${validator.name} must be a valid number`
   }
   if (asString) {
     if (typeof value !== 'string') return 'Value must be of type string'
