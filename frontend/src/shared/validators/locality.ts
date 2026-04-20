@@ -14,6 +14,11 @@ const validatePollenPercentage = (name: string, num: number) => {
   return
 }
 
+const validateNonNegativeInteger = (name: string, num: number) => {
+  if (!Number.isInteger(num) || num < 0) return `${name} must be a positive integer.`
+  return
+}
+
 const validatePollenRecordTotal = (editData: Partial<EditDataType<LocalityDetailsType>>) => {
   const values = pollenFields
     .map(fieldName => editData[fieldName])
@@ -192,6 +197,10 @@ export const validateLocality = (
         if (num <= -1000 || num >= 1000) return estimateTempRangeValidationError
         return
       },
+    },
+    estimate_precip: {
+      name: 'Estimate of annual precipitation (mm)',
+      asNumber: (num: number) => validateNonNegativeInteger('Estimate of annual precipitation (mm)', num),
     },
   }
 

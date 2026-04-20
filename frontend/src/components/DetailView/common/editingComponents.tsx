@@ -277,6 +277,8 @@ export const EditableTextField = <T extends object>(props: EditableTextFieldProp
   const type = props.type ?? 'text'
   const trim = type === 'text' ? (props as EditableTextFieldTextProps<T>).trim ?? false : false
   const round = type === 'number' ? (props as EditableTextFieldNumberProps<T>).round : undefined
+  const integerOnly = type === 'number' ? (props as EditableTextFieldNumberProps<T>).integerOnly ?? false : false
+  const min = type === 'number' ? (props as EditableTextFieldNumberProps<T>).min : undefined
   const { setEditData, editData, validator, fieldsWithErrors, setFieldsWithErrors } = useDetailContext<T>()
   const errorObject = validator(editData, field)
   const { error } = errorObject
@@ -308,6 +310,7 @@ export const EditableTextField = <T extends object>(props: EditableTextFieldProp
     const value = event?.currentTarget?.value
     if (type === 'number') {
       const setNumberValue = handleSetEditData as EditableTextFieldNumberProps<T>['handleSetEditData']
+      const allowNegative = min === undefined || min < 0
       if (value === '') {
         setNumberInputValue('')
         if (setNumberValue) {
@@ -320,11 +323,19 @@ export const EditableTextField = <T extends object>(props: EditableTextFieldProp
         return
       }
 
-      if (!isAllowedNumberInputValue(value)) return
+      if (integerOnly) {
+        if (!isAllowedIntegerInputValue(value, allowNegative)) return
+      } else {
+        if (!isAllowedNumberInputValue(value)) return
+      }
       setNumberInputValue(value)
 
       const asNumber = Number(value)
-      if (isPartialNumberInputValue(value) || Number.isNaN(asNumber)) return
+      if (
+        (integerOnly ? isPartialIntegerInputValue(value, allowNegative) : isPartialNumberInputValue(value)) ||
+        Number.isNaN(asNumber)
+      )
+        return
 
       if (setNumberValue) {
         setNumberValue(asNumber)
@@ -366,7 +377,8 @@ export const EditableTextField = <T extends object>(props: EditableTextFieldProp
     const value = numberInputValue
     const setNumberValue = handleSetEditData as EditableTextFieldNumberProps<T>['handleSetEditData']
     if (value === '') return
-    if (isPartialNumberInputValue(value)) {
+    const allowNegative = min === undefined || min < 0
+    if (integerOnly ? isPartialIntegerInputValue(value, allowNegative) : isPartialNumberInputValue(value)) {
       setNumberInputValue('')
       if (setNumberValue) setNumberValue('')
       else setEditData({ ...editData, [field]: '' })
@@ -384,6 +396,7 @@ export const EditableTextField = <T extends object>(props: EditableTextFieldProp
       onKeyDown={event => {
         if (type !== 'number') return
         if (event.key === 'e' || event.key === 'E' || event.key === '+') event.preventDefault()
+        if (integerOnly && event.key === '.') event.preventDefault()
       }}
       id={`${String(field)}-textfield`}
       value={type === 'number' ? numberInputValue : editData[field] ?? ''}
@@ -409,6 +422,11 @@ const isAllowedNumberInputValue = (value: string) => /^-?\d*(\.\d*)?$/.test(valu
 
 const isPartialNumberInputValue = (value: string) => value === '-' || value === '.' || value === '-.'
 
+const isAllowedIntegerInputValue = (value: string, allowNegative: boolean) =>
+  (allowNegative ? /^-?\d*$/.test(value) : /^\d*$/.test(value)) || isPartialIntegerInputValue(value, allowNegative)
+
+const isPartialIntegerInputValue = (value: string, allowNegative: boolean) => allowNegative && value === '-'
+
 type EditableTextFieldCommonProps<T extends object> = {
   field: keyof EditDataType<T>
   big?: boolean
@@ -424,6 +442,9 @@ type EditableTextFieldTextProps<T extends object> = EditableTextFieldCommonProps
 
 type EditableTextFieldNumberProps<T extends object> = EditableTextFieldCommonProps<T> & {
   type: 'number'
+  integerOnly?: boolean
+  min?: number
+  max?: number
   round?: number
   handleSetEditData?: (value: number | '') => void
 }
