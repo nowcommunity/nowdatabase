@@ -39,6 +39,20 @@ const isEmptyFilterValue = (value: unknown): boolean => {
   return value === '' || value === null || value === undefined
 }
 
+const toTableCellTitle = (value: unknown): string | undefined => {
+  if (typeof value === 'string') {
+    const normalized = value.replace(/[\r\n]+/g, ' ').trim()
+    if (!normalized) return
+    return normalized.length > 500 ? `${normalized.slice(0, 500)}…` : normalized
+  }
+
+  if (typeof value === 'number' || typeof value === 'boolean') {
+    return String(value)
+  }
+
+  return
+}
+
 const sanitizeColumnFilters = (filters: MRT_ColumnFiltersState): MRT_ColumnFiltersState => {
   return filters.filter(filter => !isEmptyFilterValue(filter.value))
 }
@@ -276,7 +290,8 @@ export const TableView = <T extends MRT_RowData>({
         },
       },
     },
-    muiTableBodyCellProps: {
+    muiTableBodyCellProps: ({ cell }) => ({
+      ...(cell.column.id === 'mrt-row-actions' ? {} : { title: toTableCellTitle(cell.getValue()) }),
       sx: {
         whiteSpace: 'nowrap',
         overflow: 'hidden',
@@ -286,7 +301,7 @@ export const TableView = <T extends MRT_RowData>({
           textOverflow: 'clip',
         },
       },
-    },
+    }),
     muiTableBodyRowProps: clickableRows || selectorFn ? muiTableBodyRowProps : undefined,
     muiTableContainerProps: tableContainerMaxHeight
       ? {

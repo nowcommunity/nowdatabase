@@ -23,13 +23,18 @@ export const ArrayToTable = ({ array, half }: { array: Array<Array<ReactNode>>; 
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'left',
+                minWidth: 0,
                 minHeight: '2.5em',
                 borderBottom: '1px solid rgba(224, 224, 224, 1)',
                 borderRight: '1px solid rgba(224, 224, 224, 1)',
               }}
               padding="5px"
             >
-              {typeof item === 'string' ? <b>{item}</b> : item}
+              {typeof item === 'string' ? (
+                <b style={{ overflowWrap: 'anywhere', whiteSpace: 'normal' }}>{item}</b>
+              ) : (
+                item
+              )}
             </Grid>
           ))}
         </Grid>
