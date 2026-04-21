@@ -5,6 +5,7 @@ import {
   SelectChangeEvent,
   MenuItem,
   TextField,
+  InputAdornment,
   RadioGroup,
   FormControlLabel,
   FormHelperText,
@@ -12,8 +13,10 @@ import {
   Box,
   Modal,
   Button,
+  IconButton,
   Autocomplete,
 } from '@mui/material'
+import CloseIcon from '@mui/icons-material/Close'
 import { cloneElement, ChangeEvent, ReactNode, useState, ReactElement, useEffect } from 'react'
 import { RegisterOptions, FieldValues, UseFormRegisterReturn, FieldErrors } from 'react-hook-form'
 import { useDetailContext } from '../Context/DetailContext'
@@ -668,6 +671,32 @@ export const BasisForAgeSelection = ({
     setOpen(false)
   }
 
+  const handleClear = () => {
+    setCurrentBasisForAge(undefined)
+
+    if (targetField === 'bfa_min') {
+      setEditData({
+        ...editData,
+        bfa_min: '',
+        min_age: undefined,
+        frac_min: '',
+      })
+      return
+    }
+
+    if (targetField === 'bfa_max') {
+      setEditData({
+        ...editData,
+        bfa_max: '',
+        max_age: undefined,
+        frac_max: '',
+      })
+      return
+    }
+
+    setEditData({ ...editData, [targetField]: '' })
+  }
+
   useEffect(() => {
     if (targetField === 'bfa_min' && currentBasisForAge) {
       setEditData({
@@ -721,7 +750,26 @@ export const BasisForAgeSelection = ({
       onClick={() => setOpen(true)}
       disabled={disabled}
       sx={{ backgroundColor: disabled ? 'grey' : '' }}
-      inputProps={{ readOnly: true }}
+      inputProps={{ 'aria-label': String(targetField) }}
+      InputProps={{
+        readOnly: true,
+        endAdornment:
+          !disabled && editData[targetField] ? (
+            <InputAdornment position="end">
+              <IconButton
+                aria-label={`Clear ${String(targetField)}`}
+                size="small"
+                onClick={event => {
+                  event.preventDefault()
+                  event.stopPropagation()
+                  handleClear()
+                }}
+              >
+                <CloseIcon fontSize="small" />
+              </IconButton>
+            </InputAdornment>
+          ) : undefined,
+      }}
     />
   )
   return (
