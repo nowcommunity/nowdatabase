@@ -253,6 +253,40 @@ export const TableView = <T extends MRT_RowData>({
   const table = useMaterialReactTable({
     columns: columns,
     data: data || [],
+    muiTableProps: {
+      sx: {
+        tableLayout: 'fixed',
+      },
+    },
+    muiTableHeadCellProps: {
+      sx: {
+        whiteSpace: 'nowrap',
+        overflow: 'hidden',
+        textOverflow: 'ellipsis',
+        '& .MuiTableSortLabel-root': {
+          // Reserve space for the sort icon so toggling sorting doesn't shift column widths.
+          position: 'relative',
+          paddingRight: '1.25em',
+        },
+        '& .MuiTableSortLabel-icon': {
+          // Keep the icon from affecting layout when it appears.
+          position: 'absolute',
+          right: 0,
+          margin: 0,
+        },
+      },
+    },
+    muiTableBodyCellProps: {
+      sx: {
+        whiteSpace: 'nowrap',
+        overflow: 'hidden',
+        textOverflow: 'ellipsis',
+        '&.row-actions-cell': {
+          overflow: 'visible',
+          textOverflow: 'clip',
+        },
+      },
+    },
     muiTableBodyRowProps: clickableRows || selectorFn ? muiTableBodyRowProps : undefined,
     muiTableContainerProps: tableContainerMaxHeight
       ? {
