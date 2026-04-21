@@ -124,6 +124,7 @@ const FractionSelection = ({
         label={label}
         id={`${field}-fraction`}
         value={(editData[field] as string) || ''}
+        inputProps={{ 'aria-label': field }}
         onChange={event => {
           const nextValue = String(event.target.value)
           if (nextValue === otherFractionOptionValue) {
@@ -183,6 +184,7 @@ export const AgeTab = () => {
   if (bfaMinFetching || bfaMaxFetching) return <CircularProgress />
 
   const bfa_abs_options = [
+    emptyOption,
     'AAR',
     'Ar/Ar',
     'C14',
