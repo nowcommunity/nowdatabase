@@ -13,3 +13,12 @@ A species has the following required fields in the database:
 - `unique_identifier`
 
 All of these are also required when editing or creating a new species (with the exception of `species_id`). The `class_name` is set to "Mammalia" by default and cannot be edited.
+
+## Synonyms
+
+Species synonyms are stored in `com_taxa_synonym` and are shown in some list views to help users find the accepted taxonomy using alternative names.
+
+The UI often needs only the “list synonym” display fields:
+
+- `syn_genus_name`
+- `syn_species_name`
