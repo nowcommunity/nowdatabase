@@ -216,7 +216,16 @@ export const TableView = <T extends MRT_RowData>({
       return normalizedFilters as unknown as TState
     }
     if (state === 'sorting') {
-      return (isSortingState(parsed) ? parsed : defaultState) as TState
+      if (!isSortingState(parsed)) {
+        return defaultState
+      }
+
+      const fallback = defaultState as unknown as MRT_SortingState
+      if (parsed.length === 0 && fallback.length > 0) {
+        return defaultState
+      }
+
+      return parsed as unknown as TState
     }
 
     if (state === 'pagination') {
