@@ -86,7 +86,7 @@ export const TableToolBar = <T extends MRT_RowData>({
   const resolvedGroups: ResolvedColumnVisibilityGroup[] = (() => {
     const groups = (columnVisibilityGroups ?? [])
       .filter(group => group.columnIds.length > 0)
-      .filter(group => !/(updates|lists)/i.test(group.label) && !/(updates|lists)/i.test(group.id))
+      .filter(group => !/^updates$/i.test(group.label) && !/^updates$/i.test(group.id))
 
     const resolved = groups
       .map(group => {
@@ -124,6 +124,36 @@ export const TableToolBar = <T extends MRT_RowData>({
 
     return resolved
   })()
+
+  const resolvedAllColumns =
+    table
+      .getAllLeafColumns?.()
+      ?.filter(isHideableColumn)
+      ?.map(column => ({
+        id: column.id,
+        header: (column.columnDef?.header ?? column.id) as ReactNode,
+        isVisible: column.getIsVisible?.() ?? true,
+        toggleVisibility: (value?: boolean) => column.toggleVisibility?.(value),
+      })) ?? []
+
+  const getAllVisibilityState = () => {
+    if (resolvedAllColumns.length === 0) {
+      return { checked: false, indeterminate: false }
+    }
+
+    const visibleCount = resolvedAllColumns.reduce((acc, column) => acc + (column.isVisible ? 1 : 0), 0)
+    return {
+      checked: visibleCount === resolvedAllColumns.length,
+      indeterminate: visibleCount > 0 && visibleCount < resolvedAllColumns.length,
+    }
+  }
+
+  const toggleAll = () => {
+    if (resolvedAllColumns.length === 0) return
+    const { checked } = getAllVisibilityState()
+    const nextVisible = !checked
+    resolvedAllColumns.forEach(column => column.toggleVisibility(nextVisible))
+  }
 
   const getGroupVisibilityState = (group: ResolvedColumnVisibilityGroup) => {
     if (group.columns.length === 0) {
@@ -193,6 +223,20 @@ export const TableToolBar = <T extends MRT_RowData>({
             'aria-labelledby': 'column-visibility-button',
           }}
         >
+          {resolvedAllColumns.length > 0 && (
+            <MenuItem
+              key="all-columns"
+              onClick={() => {
+                toggleAll()
+              }}
+            >
+              {(() => {
+                const { checked, indeterminate } = getAllVisibilityState()
+                return <Checkbox checked={checked} indeterminate={indeterminate} />
+              })()}
+              <ListItemText primary="All" />
+            </MenuItem>
+          )}
           {resolvedGroups.flatMap(group => {
             const { checked, indeterminate } = getGroupVisibilityState(group)
             return [

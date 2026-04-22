@@ -93,6 +93,7 @@ describe('TableToolBar', () => {
 
     fireEvent.click(screen.getByRole('button', { name: /show\/hide columns/i }))
 
+    expect(screen.getByRole('menuitem', { name: /^all$/i })).toBeTruthy()
     expect(screen.getByRole('menuitem', { name: /test tab/i })).toBeTruthy()
     expect(screen.getByRole('menuitem', { name: /column a/i })).toBeTruthy()
     expect(screen.getByRole('menuitem', { name: /column b/i })).toBeTruthy()
