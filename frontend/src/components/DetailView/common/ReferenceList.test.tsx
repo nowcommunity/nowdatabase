@@ -15,7 +15,7 @@ const references = [
         {
           author_surname: 'Smith',
           author_initials: 'J',
-          field_id: 1,
+          field_id: 2,
         },
       ],
       issue: null,
@@ -31,6 +31,48 @@ const references = [
       end_page: null,
       title_secondary: null,
       gen_notes: null,
+    },
+  },
+  {
+    rid: 124,
+    ref_ref: {
+      rid: 124,
+      ref_type_id: 4,
+      ref_authors: [
+        {
+          author_surname: 'Doe',
+          author_initials: 'J',
+          field_id: 2,
+        },
+      ],
+      title_primary: 'Thesis Title',
+      date_primary: 2001,
+      misc_1: 'PhD thesis',
+      publisher: 'University of Helsinki',
+      end_page: 200,
+      web_url: 'https://example.com/thesis',
+      ref_journal: null,
+    },
+  },
+  {
+    rid: 125,
+    ref_ref: {
+      rid: 125,
+      ref_type_id: 6,
+      ref_authors: [
+        {
+          author_surname: 'OrgAuthor',
+          author_initials: 'A',
+          field_id: 12,
+        },
+      ],
+      title_primary: 'Web Reference Title',
+      date_primary: 2020,
+      title_secondary: 'Some Organisation',
+      misc_1: '12 Mar',
+      web_url: 'https://example.com/page',
+      exact_date: '2026-04-21',
+      ref_journal: null,
     },
   },
 ] as unknown as AnyReference[]
@@ -54,6 +96,9 @@ describe('ReferenceList', () => {
     )
 
     expect(screen.getByText(/Smith \(1999\).*Primary Title/)).toBeTruthy()
+    expect(screen.getByText(/Doe \(2001\).*Thesis Title/)).toBeTruthy()
+    expect(screen.getByText(/Web Reference Title/)).toBeTruthy()
+    expect(screen.getByText(/Accessed 2026-04-21/)).toBeTruthy()
   })
 
   it('passes the current location as return state when navigating to reference details', async () => {
@@ -68,7 +113,8 @@ describe('ReferenceList', () => {
       </MemoryRouter>
     )
 
-    await user.click(screen.getByRole('link', { name: /view/i }))
+    const viewLinks = screen.getAllByRole('link', { name: /view/i })
+    await user.click(viewLinks[0])
 
     const path = await screen.findByTestId('reference-path')
     expect(path.textContent).toBe('/reference/123')
