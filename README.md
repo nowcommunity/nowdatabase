@@ -50,4 +50,4 @@ The new version is not deployed yet.
 
 ### Documentation index
 
-See `documentation/README.md` for the full documentation tree (includes reviewer notes, FAQ, and a complete list of docs).
+See [`documentation/README.md`](documentation/README.md) for the full documentation tree (includes reviewer notes, FAQ, and a complete list of docs).
