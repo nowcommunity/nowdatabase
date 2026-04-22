@@ -69,6 +69,7 @@ export const TableView = <T extends MRT_RowData>({
   columns,
   visibleColumns,
   idFieldName,
+  defaultSorting,
   checkRowRestriction,
   selectorFn,
   tableRowAction,
@@ -93,6 +94,7 @@ export const TableView = <T extends MRT_RowData>({
   columns: MRT_ColumnDef<T>[]
   visibleColumns: MRT_VisibilityState
   idFieldName: keyof T
+  defaultSorting?: MRT_SortingState
   checkRowRestriction?: (row: T) => boolean
   selectorFn?: (id: T) => void
   tableRowAction?: (row: T) => void
@@ -124,7 +126,7 @@ export const TableView = <T extends MRT_RowData>({
     setPreviousTableUrls,
   } = usePageContext()
   const [columnFilters, setColumnFilters] = useState<MRT_ColumnFiltersState>([])
-  const [sorting, setSorting] = useState<MRT_SortingState>([])
+  const [sorting, setSorting] = useState<MRT_SortingState>(defaultSorting ?? [])
   const navigate = useNavigate()
   const [pagination, setPagination] = useState<MRT_PaginationState>(
     selectorFn ? defaultPaginationSmall : defaultPagination
@@ -185,7 +187,10 @@ export const TableView = <T extends MRT_RowData>({
     return typeof candidate.pageIndex === 'number' && typeof candidate.pageSize === 'number'
   }
 
-  const loadStateFromUrl = (state: TableStateInUrl, defaultState: [] | MRT_PaginationState) => {
+  const loadStateFromUrl = <TState extends MRT_ColumnFiltersState | MRT_SortingState | MRT_PaginationState>(
+    state: TableStateInUrl,
+    defaultState: TState
+  ): TState => {
     const searchParams = new URLSearchParams(location.search)
     const stateFromUrl = searchParams.get(state)
     if (!stateFromUrl) return defaultState
@@ -208,14 +213,23 @@ export const TableView = <T extends MRT_RowData>({
         }
         return columnFilter
       })
-      return normalizedFilters
+      return normalizedFilters as unknown as TState
     }
     if (state === 'sorting') {
-      return isSortingState(parsed) ? parsed : defaultState
+      if (!isSortingState(parsed)) {
+        return defaultState
+      }
+
+      const fallback = defaultState as unknown as MRT_SortingState
+      if (parsed.length === 0 && fallback.length > 0) {
+        return defaultState
+      }
+
+      return parsed as unknown as TState
     }
 
     if (state === 'pagination') {
-      return isPaginationState(parsed) ? parsed : defaultState
+      return (isPaginationState(parsed) ? parsed : defaultState) as TState
     }
 
     return defaultState
@@ -440,9 +454,9 @@ export const TableView = <T extends MRT_RowData>({
   // Load state from url only on first render
   useEffect(() => {
     if (selectorFn) return
-    setColumnFilters(loadStateFromUrl('columnfilters', []) as MRT_ColumnFiltersState)
-    setSorting(loadStateFromUrl('sorting', []) as MRT_SortingState)
-    setPagination(loadStateFromUrl('pagination', defaultPagination) as MRT_PaginationState)
+    setColumnFilters(loadStateFromUrl('columnfilters', []))
+    setSorting(loadStateFromUrl('sorting', defaultSorting ?? []))
+    setPagination(loadStateFromUrl('pagination', defaultPagination))
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 

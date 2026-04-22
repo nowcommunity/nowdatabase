@@ -21,11 +21,11 @@ jest.mock('@/hooks/user', () => ({
   useUser: jest.fn(),
 }))
 
-const reactRouterDom = jest.requireActual<typeof import('react-router-dom')>('react-router-dom')
+let mockLocationSearch = ''
 
 jest.mock('react-router-dom', () => ({
-  ...reactRouterDom,
-  useLocation: () => ({ search: '', pathname: '/table' }),
+  ...jest.requireActual<typeof import('react-router-dom')>('react-router-dom'),
+  useLocation: () => ({ search: mockLocationSearch, pathname: '/table' }),
   useNavigate: () => jest.fn(),
 }))
 
@@ -44,6 +44,7 @@ const mockUseUser = useUser as jest.Mock
 
 describe('TableView table help integration', () => {
   beforeEach(() => {
+    mockLocationSearch = ''
     mockUsePageContext.mockReturnValue({
       editRights: {},
       idList: [],
@@ -72,6 +73,55 @@ describe('TableView table help integration', () => {
       localities: [],
       isFirstLogin: undefined,
     })
+  })
+
+  it('uses defaultSorting when URL sorting is explicitly empty', () => {
+    mockLocationSearch = '?&columnfilters=[]&sorting=[]&pagination={"pageIndex":0,"pageSize":25}'
+
+    const setSqlOrderBy = jest.fn()
+    mockUsePageContext.mockReturnValue({
+      editRights: {},
+      idList: [],
+      idFieldName: 'id',
+      viewName: 'test',
+      previousTableUrls: [],
+      createTitle: () => '',
+      createSubtitle: () => '',
+      sqlLimit: 25,
+      sqlOffset: 0,
+      sqlColumnFilters: [],
+      sqlOrderBy: [],
+      setIdList: jest.fn(),
+      setSqlLimit: jest.fn(),
+      setSqlOffset: jest.fn(),
+      setSqlColumnFilters: jest.fn(),
+      setSqlOrderBy,
+      setPreviousTableUrls: jest.fn(),
+    })
+
+    render(
+      <TableView<TestRow>
+        title="Test Table"
+        idFieldName="id"
+        columns={[
+          { header: 'Name', accessorKey: 'name' },
+          { header: 'Id', accessorKey: 'id' },
+        ]}
+        visibleColumns={{ name: true, id: true }}
+        data={[
+          {
+            id: '1',
+            name: 'Alpha',
+            full_count: 1,
+          },
+        ]}
+        url="test"
+        isFetching={false}
+        defaultSorting={[{ id: 'name', desc: false }]}
+      />
+    )
+
+    expect(setSqlOrderBy).toHaveBeenCalledWith([{ id: 'name', desc: false }])
   })
 
   it('shows help with multi-sort guidance for regular tables', () => {

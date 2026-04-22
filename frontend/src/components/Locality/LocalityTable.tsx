@@ -435,6 +435,7 @@ export const LocalityTable = ({ selectorFn }: { selectorFn?: (newObject: Localit
         selectorFn={selectorFn}
         checkRowRestriction={checkRowRestriction}
         idFieldName="lid"
+        defaultSorting={[{ id: 'loc_name', desc: false }]}
         columns={columns}
         isFetching={localitiesQueryIsFetching}
         isError={localitiesQueryIsError}
