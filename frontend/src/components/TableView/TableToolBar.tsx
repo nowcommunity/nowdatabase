@@ -1,11 +1,11 @@
 import { Box, Button, Checkbox, IconButton, ListItemText, Menu, MenuItem, Tooltip } from '@mui/material'
-import { MRT_RowData, MRT_ShowHideColumnsButton, MRT_TableInstance } from 'material-react-table'
+import { MRT_RowData, MRT_TableInstance } from 'material-react-table'
 import { exportRows } from './helpers'
 import { ContactForm } from '../DetailView/common/ContactForm'
 import FileDownloadIcon from '@mui/icons-material/FileDownload'
-import ViewWeekIcon from '@mui/icons-material/ViewWeek'
+import ViewColumnIcon from '@mui/icons-material/ViewColumn'
 import '../../styles/TableToolBar.css'
-import { useState } from 'react'
+import { useState, type ReactNode } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import AddCircleIcon from '@mui/icons-material/AddCircle'
 import { CrossSearchExportMenuItem } from '../CrossSearch/CrossSearchExportMenuItem'
@@ -15,6 +15,17 @@ export type ColumnVisibilityGroup = {
   id: string
   label: string
   columnIds: string[]
+}
+
+type ResolvedColumnVisibilityGroup = {
+  id: string
+  label: string
+  columns: Array<{
+    id: string
+    header: ReactNode
+    isVisible: boolean
+    toggleVisibility: (value?: boolean) => void
+  }>
 }
 
 export const TableToolBar = <T extends MRT_RowData>({
@@ -42,8 +53,8 @@ export const TableToolBar = <T extends MRT_RowData>({
   const location = useLocation()
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
   const open = Boolean(anchorEl)
-  const [groupAnchorEl, setGroupAnchorEl] = useState<null | HTMLElement>(null)
-  const groupMenuOpen = Boolean(groupAnchorEl)
+  const [columnAnchorEl, setColumnAnchorEl] = useState<null | HTMLElement>(null)
+  const columnMenuOpen = Boolean(columnAnchorEl)
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget)
   }
@@ -51,43 +62,93 @@ export const TableToolBar = <T extends MRT_RowData>({
     setAnchorEl(null)
   }
 
-  const handleGroupMenuOpen = (event: React.MouseEvent<HTMLButtonElement>) => {
-    setGroupAnchorEl(event.currentTarget)
+  const handleColumnMenuOpen = (event: React.MouseEvent<HTMLButtonElement>) => {
+    setColumnAnchorEl(event.currentTarget)
   }
 
-  const handleGroupMenuClose = () => {
-    setGroupAnchorEl(null)
+  const handleColumnMenuClose = () => {
+    setColumnAnchorEl(null)
   }
 
-  const resolvedGroups = columnVisibilityGroups?.filter(group => group.columnIds.length > 0) ?? []
+  const resolveColumn = (columnId: string) => {
+    const fromApi = table.getColumn?.(columnId)
+    if (fromApi) return fromApi
 
-  const resolveGroupColumns = (group: ColumnVisibilityGroup) => {
-    return group.columnIds
-      .map(columnId => table.getColumn?.(columnId))
-      .filter((column): column is NonNullable<typeof column> => Boolean(column))
-      .filter(column => (typeof column.getCanHide === 'function' ? column.getCanHide() : true))
+    const allLeafColumns = table.getAllLeafColumns?.()
+    return allLeafColumns?.find(column => column.id === columnId)
   }
 
-  const getGroupVisibilityState = (group: ColumnVisibilityGroup) => {
-    const columns = resolveGroupColumns(group)
-    if (columns.length === 0) {
+  const isHideableColumn = (column: unknown): boolean => {
+    const canHide = (column as { getCanHide?: () => boolean } | null | undefined)?.getCanHide
+    return typeof canHide === 'function' ? canHide() : true
+  }
+
+  const resolvedGroups: ResolvedColumnVisibilityGroup[] = (() => {
+    const groups = (columnVisibilityGroups ?? [])
+      .filter(group => group.columnIds.length > 0)
+      .filter(group => !/(updates|lists)/i.test(group.label) && !/(updates|lists)/i.test(group.id))
+
+    const resolved = groups
+      .map(group => {
+        const columns = group.columnIds
+          .map(columnId => resolveColumn(columnId))
+          .filter((column): column is NonNullable<typeof column> => Boolean(column))
+          .filter(isHideableColumn)
+          .map(column => ({
+            id: column.id,
+            header: (column.columnDef?.header ?? column.id) as ReactNode,
+            isVisible: column.getIsVisible?.() ?? true,
+            toggleVisibility: (value?: boolean) => column.toggleVisibility?.(value),
+          }))
+
+        return { id: group.id, label: group.label, columns }
+      })
+      .filter(group => group.columns.length > 0)
+
+    const groupedColumnIds = new Set(resolved.flatMap(group => group.columns.map(column => column.id)))
+    const otherColumns =
+      table
+        .getAllLeafColumns?.()
+        ?.filter(isHideableColumn)
+        ?.filter(column => !groupedColumnIds.has(column.id))
+        ?.map(column => ({
+          id: column.id,
+          header: (column.columnDef?.header ?? column.id) as ReactNode,
+          isVisible: column.getIsVisible?.() ?? true,
+          toggleVisibility: (value?: boolean) => column.toggleVisibility?.(value),
+        })) ?? []
+
+    if (otherColumns.length > 0) {
+      return [...resolved, { id: 'other', label: 'Other', columns: otherColumns }]
+    }
+
+    return resolved
+  })()
+
+  const getGroupVisibilityState = (group: ResolvedColumnVisibilityGroup) => {
+    if (group.columns.length === 0) {
       return { checked: false, indeterminate: false }
     }
 
-    const visibleCount = columns.reduce((acc, column) => acc + (column.getIsVisible?.() ? 1 : 0), 0)
+    const visibleCount = group.columns.reduce((acc, column) => acc + (column.isVisible ? 1 : 0), 0)
     return {
-      checked: visibleCount === columns.length,
-      indeterminate: visibleCount > 0 && visibleCount < columns.length,
+      checked: visibleCount === group.columns.length,
+      indeterminate: visibleCount > 0 && visibleCount < group.columns.length,
     }
   }
 
-  const toggleGroup = (group: ColumnVisibilityGroup) => {
-    const columns = resolveGroupColumns(group)
-    if (columns.length === 0) return
+  const toggleGroup = (group: ResolvedColumnVisibilityGroup) => {
+    if (group.columns.length === 0) return
 
     const { checked } = getGroupVisibilityState(group)
     const nextVisible = !checked
-    columns.forEach(column => column.toggleVisibility?.(nextVisible))
+    group.columns.forEach(column => column.toggleVisibility(nextVisible))
+  }
+
+  const toggleColumn = (columnId: string) => {
+    const column = resolveColumn(columnId)
+    if (!column || !isHideableColumn(column)) return
+    column.toggleVisibility?.(!column.getIsVisible?.())
   }
 
   return (
@@ -111,47 +172,54 @@ export const TableToolBar = <T extends MRT_RowData>({
         </Box>
       )}
       <Box className="icon-buttons">
-        <MRT_ShowHideColumnsButton table={table} />
-        {resolvedGroups.length > 0 && (
-          <>
-            <Tooltip title="Show/hide column groups">
-              <IconButton
-                id="column-groups-button"
-                aria-label="Show/hide column groups"
-                aria-controls={groupMenuOpen ? 'column-groups-menu' : undefined}
-                aria-haspopup="true"
-                aria-expanded={groupMenuOpen ? 'true' : undefined}
-                onClick={handleGroupMenuOpen}
+        <Tooltip title="Show/hide columns">
+          <IconButton
+            id="column-visibility-button"
+            aria-label="Show/hide columns"
+            aria-controls={columnMenuOpen ? 'column-visibility-menu' : undefined}
+            aria-haspopup="true"
+            aria-expanded={columnMenuOpen ? 'true' : undefined}
+            onClick={handleColumnMenuOpen}
+          >
+            <ViewColumnIcon />
+          </IconButton>
+        </Tooltip>
+        <Menu
+          id="column-visibility-menu"
+          anchorEl={columnAnchorEl}
+          open={columnMenuOpen}
+          onClose={handleColumnMenuClose}
+          MenuListProps={{
+            'aria-labelledby': 'column-visibility-button',
+          }}
+        >
+          {resolvedGroups.flatMap(group => {
+            const { checked, indeterminate } = getGroupVisibilityState(group)
+            return [
+              <MenuItem
+                key={`group:${group.id}`}
+                onClick={() => {
+                  toggleGroup(group)
+                }}
               >
-                <ViewWeekIcon />
-              </IconButton>
-            </Tooltip>
-            <Menu
-              id="column-groups-menu"
-              anchorEl={groupAnchorEl}
-              open={groupMenuOpen}
-              onClose={handleGroupMenuClose}
-              MenuListProps={{
-                'aria-labelledby': 'column-groups-button',
-              }}
-            >
-              {resolvedGroups.map(group => {
-                const { checked, indeterminate } = getGroupVisibilityState(group)
-                return (
-                  <MenuItem
-                    key={group.id}
-                    onClick={() => {
-                      toggleGroup(group)
-                    }}
-                  >
-                    <Checkbox checked={checked} indeterminate={indeterminate} />
-                    <ListItemText primary={group.label} />
-                  </MenuItem>
-                )
-              })}
-            </Menu>
-          </>
-        )}
+                <Checkbox checked={checked} indeterminate={indeterminate} />
+                <ListItemText primary={group.label} />
+              </MenuItem>,
+              ...group.columns.map(column => (
+                <MenuItem
+                  key={`column:${group.id}:${column.id}`}
+                  sx={{ pl: 4 }}
+                  onClick={() => {
+                    toggleColumn(column.id)
+                  }}
+                >
+                  <Checkbox checked={column.isVisible} />
+                  <ListItemText primary={column.header ?? column.id} />
+                </MenuItem>
+              )),
+            ]
+          })}
+        </Menu>
         <Tooltip title="Export table (hide columns to exclude them)">
           <IconButton
             id="export-button"
