@@ -2,6 +2,7 @@ import { useMemo } from 'react'
 import { type MRT_ColumnDef } from 'material-react-table'
 import { CrossSearch, formatDevelopmentalCrownType } from '@/shared/types'
 import { TableView } from '../TableView/TableView'
+import type { ColumnVisibilityGroup } from '../TableView/TableToolBar'
 import { useGetAllCrossSearchQuery, useGetAllCrossSearchLocalitiesQuery } from '@/redux/crossSearchReducer'
 import { usePageContext } from '../Page'
 import { LocalitiesMap } from '../Map/LocalitiesMap'
@@ -717,7 +718,7 @@ export const CrossSearchTable = ({ selectorFn }: { selectorFn?: (newObject: Cros
   )
 
   const visibleColumns = {
-    lid: false,
+    lid_now_loc: false,
     loc_name: true,
     dms_lat: false,
     dms_long: false,
@@ -765,8 +766,7 @@ export const CrossSearchTable = ({ selectorFn }: { selectorFn?: (newObject: Cros
     regional_culture_1: false,
     regional_culture_2: false,
     regional_culture_3: false,
-    com_species_id: false,
-    now_species_id: false,
+    species_id_com_species: false,
     subclass_or_superorder_name: false,
     order_name: false,
     suborder_or_superfamily_name: false,
@@ -817,6 +817,140 @@ export const CrossSearchTable = ({ selectorFn }: { selectorFn?: (newObject: Cros
     sp_comment: false,
   }
 
+  const columnVisibilityGroups = useMemo<ColumnVisibilityGroup[]>(
+    () => [
+      {
+        id: 'coordinates',
+        label: 'Coordinates',
+        columnIds: ['dms_lat', 'dms_long', 'dec_lat', 'dec_long', 'altitude'],
+      },
+      {
+        id: 'age',
+        label: 'Age',
+        columnIds: [
+          'max_age',
+          'min_age',
+          'bfa_max',
+          'bfa_min',
+          'bfa_max_abs',
+          'bfa_min_abs',
+          'frac_max',
+          'frac_min',
+          'chron',
+          'age_comm',
+        ],
+      },
+      { id: 'geology', label: 'Geology', columnIds: ['basin', 'subbasin', 'plate', 'formation', 'member', 'bed'] },
+      { id: 'admin', label: 'Admin', columnIds: ['country', 'state', 'county'] },
+      { id: 'site', label: 'Site', columnIds: ['lid_now_loc', 'loc_name', 'appr_num_spm', 'gen_loc'] },
+      {
+        id: 'climate',
+        label: 'Climate',
+        columnIds: [
+          'estimate_precip',
+          'estimate_temp',
+          'estimate_npp',
+          'pers_woody_cover',
+          'pers_pollen_ap',
+          'pers_pollen_nap',
+          'pers_pollen_other',
+        ],
+      },
+      {
+        id: 'hominin_tools',
+        label: 'Hominin/Tools',
+        columnIds: [
+          'hominin_skeletal_remains',
+          'bipedal_footprints',
+          'stone_tool_cut_marks_on_bones',
+          'stone_tool_technology',
+        ],
+      },
+      {
+        id: 'culture',
+        label: 'Culture',
+        columnIds: [
+          'technological_mode_1',
+          'technological_mode_2',
+          'technological_mode_3',
+          'cultural_stage_1',
+          'cultural_stage_2',
+          'cultural_stage_3',
+          'regional_culture_1',
+          'regional_culture_2',
+          'regional_culture_3',
+        ],
+      },
+      {
+        id: 'taxonomy',
+        label: 'Taxonomy',
+        columnIds: [
+          'species_id_com_species',
+          'subclass_or_superorder_name',
+          'order_name',
+          'suborder_or_superfamily_name',
+          'family_name',
+          'subfamily_name',
+          'unique_identifier',
+          'taxonomic_status',
+          'orig_entry',
+          'source_name',
+        ],
+      },
+      { id: 'size', label: 'Size', columnIds: ['sv_length', 'body_mass_com_species', 'sd_size', 'sd_display'] },
+      {
+        id: 'teeth',
+        label: 'Teeth',
+        columnIds: [
+          'tshm',
+          'tht',
+          'horizodonty',
+          'crowntype',
+          'cusp_shape',
+          'cusp_count_buccal',
+          'cusp_count_lingual',
+          'loph_count_lon',
+          'loph_count_trs',
+          'fct_al',
+          'fct_ol',
+          'fct_sf',
+          'fct_ot',
+          'fct_cm',
+        ],
+      },
+      {
+        id: 'wear_locality',
+        label: 'Wear (Locality)',
+        columnIds: [
+          'microwear_now_ls',
+          'mesowear_now_ls',
+          'mw_or_high_now_ls',
+          'mw_or_low_now_ls',
+          'mw_cs_sharp_now_ls',
+          'mw_cs_round_now_ls',
+          'mw_cs_blunt_now_ls',
+        ],
+      },
+      {
+        id: 'wear_species',
+        label: 'Wear (Species)',
+        columnIds: [
+          'microwear_com_species',
+          'mesowear_com_species',
+          'mw_or_high_com_species',
+          'mw_or_low_com_species',
+          'mw_cs_sharp_com_species',
+          'mw_cs_round_com_species',
+          'mw_cs_blunt_com_species',
+        ],
+      },
+      { id: 'diet', label: 'Diet', columnIds: ['diet1', 'diet2', 'diet3'] },
+      { id: 'locomotion', label: 'Locomotion', columnIds: ['locomo1', 'locomo2', 'locomo3'] },
+      { id: 'comment', label: 'Comment', columnIds: ['sp_comment'] },
+    ],
+    []
+  )
+
   const checkRowRestriction = (row: CrossSearch) => {
     return !!row.loc_status
   }
@@ -833,6 +967,7 @@ export const CrossSearchTable = ({ selectorFn }: { selectorFn?: (newObject: Cros
         columns={columns}
         isFetching={isFetching}
         visibleColumns={visibleColumns}
+        columnVisibilityGroups={columnVisibilityGroups}
         data={crossSearchQueryData}
         url="occurrence"
         enableColumnFilterModes={true}

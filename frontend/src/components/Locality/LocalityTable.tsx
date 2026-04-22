@@ -3,6 +3,7 @@ import { MRT_TableInstance, type MRT_ColumnDef, MRT_RowData } from 'material-rea
 import { useGetAllLocalitiesQuery } from '../../redux/localityReducer'
 import { Locality, SimplifiedLocality } from '@/shared/types'
 import { TableView } from '../TableView/TableView'
+import type { ColumnVisibilityGroup } from '../TableView/TableToolBar'
 import { generateKml } from '@/util/kml'
 import { formatWithMaxThreeDecimals } from '@/util/numberFormatting'
 import { usePageContext } from '../Page'
@@ -394,6 +395,74 @@ export const LocalityTable = ({ selectorFn }: { selectorFn?: (newObject: Localit
     regional_culture_3: false,
   }
 
+  const columnVisibilityGroups = useMemo<ColumnVisibilityGroup[]>(
+    () => [
+      {
+        id: 'coordinates',
+        label: 'Coordinates',
+        columnIds: ['dms_lat', 'dms_long', 'dec_lat', 'dec_long', 'altitude'],
+      },
+      {
+        id: 'age',
+        label: 'Age',
+        columnIds: [
+          'max_age',
+          'min_age',
+          'bfa_max',
+          'bfa_min',
+          'bfa_max_abs',
+          'bfa_min_abs',
+          'frac_max',
+          'frac_min',
+          'chron',
+          'age_comm',
+        ],
+      },
+      { id: 'geology', label: 'Geology', columnIds: ['basin', 'subbasin', 'plate', 'formation', 'member', 'bed'] },
+      { id: 'admin', label: 'Admin', columnIds: ['country', 'state', 'county'] },
+      { id: 'site', label: 'Site', columnIds: ['lid', 'loc_name', 'appr_num_spm', 'gen_loc', 'site_area'] },
+      {
+        id: 'climate',
+        label: 'Climate',
+        columnIds: [
+          'estimate_precip',
+          'estimate_temp',
+          'estimate_npp',
+          'pers_woody_cover',
+          'pers_pollen_ap',
+          'pers_pollen_nap',
+          'pers_pollen_other',
+        ],
+      },
+      {
+        id: 'hominin_tools',
+        label: 'Hominin/Tools',
+        columnIds: [
+          'hominin_skeletal_remains',
+          'bipedal_footprints',
+          'stone_tool_cut_marks_on_bones',
+          'stone_tool_technology',
+        ],
+      },
+      {
+        id: 'culture',
+        label: 'Culture',
+        columnIds: [
+          'technological_mode_1',
+          'technological_mode_2',
+          'technological_mode_3',
+          'cultural_stage_1',
+          'cultural_stage_2',
+          'cultural_stage_3',
+          'regional_culture_1',
+          'regional_culture_2',
+          'regional_culture_3',
+        ],
+      },
+    ],
+    []
+  )
+
   // Downloads a KML file of filtered localities.
   const kmlExport = <T extends MRT_RowData>(table: MRT_TableInstance<T>) => {
     const rowData: Locality[] = table.getPrePaginationRowModel().rows.map(row => row.original as unknown as Locality)
@@ -441,6 +510,7 @@ export const LocalityTable = ({ selectorFn }: { selectorFn?: (newObject: Localit
         isError={localitiesQueryIsError}
         error={localitiesQueryError}
         visibleColumns={visibleColumns}
+        columnVisibilityGroups={columnVisibilityGroups}
         data={localitiesQueryData}
         url="locality"
         kmlExport={kmlExport}

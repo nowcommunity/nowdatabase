@@ -57,6 +57,14 @@ describe('TableToolBar', () => {
     expect(screen.getByRole('button', { name: /show\/hide columns/i })).toBeTruthy()
   })
 
+  it('renders a column group visibility button when groups are provided', () => {
+    renderToolbar({
+      columnVisibilityGroups: [{ id: 'test-group', label: 'Test group', columnIds: ['column_a', 'column_b'] }],
+    })
+
+    expect(screen.getByRole('button', { name: /show\/hide column groups/i })).toBeTruthy()
+  })
+
   it('exports table rows from the export menu', () => {
     renderToolbar()
 

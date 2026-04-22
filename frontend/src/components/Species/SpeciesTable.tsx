@@ -3,6 +3,7 @@ import { type MRT_ColumnDef, type MRT_FilterFn, type MRT_Row } from 'material-re
 import { IconButton, Tooltip, Typography } from '@mui/material'
 import { Species, formatDevelopmentalCrownType, formatFunctionalCrownType } from '@/shared/types'
 import { TableView } from '../TableView/TableView'
+import type { ColumnVisibilityGroup } from '../TableView/TableToolBar'
 import { useGetAllSpeciesQuery } from '../../redux/speciesReducer'
 import { SynonymsModal } from './SynonymsModal'
 import { SpeciesCommentDialog } from './SpeciesCommentDialog'
@@ -488,6 +489,54 @@ export const SpeciesTable = ({ selectorFn }: { selectorFn?: (id: Species) => voi
     locomo3: false,
   }
 
+  const columnVisibilityGroups = useMemo<ColumnVisibilityGroup[]>(
+    () => [
+      {
+        id: 'taxonomy',
+        label: 'Taxonomy',
+        columnIds: [
+          'subclass_or_superorder_name',
+          'order_name',
+          'suborder_or_superfamily_name',
+          'family_name',
+          'subfamily_name',
+          'taxonomic_status',
+        ],
+      },
+      { id: 'identifiers', label: 'Identifiers', columnIds: ['unique_identifier'] },
+      { id: 'size', label: 'Size', columnIds: ['sv_length', 'body_mass', 'sd_size', 'sd_display'] },
+      {
+        id: 'teeth',
+        label: 'Teeth',
+        columnIds: [
+          'tshm',
+          'tht',
+          'horizodonty',
+          'developmental_crown_type',
+          'functional_crown_type',
+          'cusp_shape',
+          'cusp_count_buccal',
+          'cusp_count_lingual',
+          'loph_count_lon',
+          'loph_count_trs',
+          'fct_al',
+          'fct_ol',
+          'fct_sf',
+          'fct_ot',
+          'fct_cm',
+        ],
+      },
+      {
+        id: 'wear',
+        label: 'Wear',
+        columnIds: ['microwear', 'mesowear', 'mw_or_high', 'mw_or_low', 'mw_cs_sharp', 'mw_cs_round', 'mw_cs_blunt'],
+      },
+      { id: 'diet', label: 'Diet', columnIds: ['diet1', 'diet2', 'diet3'] },
+      { id: 'locomotion', label: 'Locomotion', columnIds: ['locomo1', 'locomo2', 'locomo3'] },
+    ],
+    []
+  )
+
   return (
     <>
       <TableView<Species>
@@ -499,6 +548,7 @@ export const SpeciesTable = ({ selectorFn }: { selectorFn?: (id: Species) => voi
         isError={isError}
         error={error}
         visibleColumns={visibleColumns}
+        columnVisibilityGroups={columnVisibilityGroups}
         data={speciesQueryData}
         url="species"
         enableColumnFilterModes={true}

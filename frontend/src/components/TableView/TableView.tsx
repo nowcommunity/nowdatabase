@@ -28,6 +28,7 @@ import NotListedLocationIcon from '@mui/icons-material/NotListedLocation'
 import PolicyIcon from '@mui/icons-material/Policy'
 import '../../styles/tableview/TableView.css'
 import { resolveErrorMessage, resolveErrorStatus } from './errorUtils'
+import type { ColumnVisibilityGroup } from './TableToolBar'
 
 type TableStateInUrl = 'sorting' | 'columnfilters' | 'pagination'
 
@@ -89,6 +90,7 @@ export const TableView = <T extends MRT_RowData>({
   error,
   paginationPlacement,
   tableContainerMaxHeight,
+  columnVisibilityGroups,
 }: {
   data: T[] | undefined
   columns: MRT_ColumnDef<T>[]
@@ -114,6 +116,7 @@ export const TableView = <T extends MRT_RowData>({
   renderRowActionExtras?: ({ row }: { row: MRT_Row<T> }) => ReactNode
   paginationPlacement?: 'top' | 'bottom' | 'both'
   tableContainerMaxHeight?: string | number
+  columnVisibilityGroups?: ColumnVisibilityGroup[]
 }) => {
   const location = useLocation()
   const {
@@ -528,6 +531,7 @@ export const TableView = <T extends MRT_RowData>({
               isCrossSearchTable={isCrossSearchTable}
               selectorFn={selectorFn}
               hideLeftButtons={false}
+              columnVisibilityGroups={columnVisibilityGroups}
             />
           </Box>
         </div>
