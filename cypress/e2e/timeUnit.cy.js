@@ -216,7 +216,7 @@ describe('Editing a time unit', () => {
     cy.contains('11.63') // existing lower bound age
 
     cy.get('[data-cy=add-new-up-bound-form]').click()
-    cy.get('[role=dialog]').within(() => {
+    cy.get('.modal-content:visible').within(() => {
       cy.get('[name=b_name]').type('new upper time bound name')
       cy.get('[name=b_comment]').type('test comment')
       cy.get('[name=age]').type('12')
@@ -227,7 +227,7 @@ describe('Editing a time unit', () => {
     cy.get('[id=write-button]').should('be.disabled')
 
     cy.get('[data-cy=add-new-up-bound-form]').click()
-    cy.get('[role=dialog]').within(() => {
+    cy.get('.modal-content:visible').within(() => {
       cy.get('[name=b_name]').type('new upper time bound name')
       cy.get('[name=age]').clear()
       cy.get('[name=age]').type('11.02')
@@ -236,7 +236,7 @@ describe('Editing a time unit', () => {
     cy.get('[id=write-button]').should('not.be.disabled')
 
     cy.get('[data-cy=add-new-low-bound-form]').click()
-    cy.get('[role=dialog]').within(() => {
+    cy.get('.modal-content:visible').within(() => {
       cy.get('[name=b_name]').type('new lower time bound name')
       cy.get('[name=b_comment]').type('test comment')
       cy.get('[name=age]').type('0.5')
@@ -248,7 +248,7 @@ describe('Editing a time unit', () => {
     cy.get('[id=write-button]').should('be.disabled')
 
     cy.get('[data-cy=add-new-low-bound-form]').click()
-    cy.get('[role=dialog]').within(() => {
+    cy.get('.modal-content:visible').within(() => {
       cy.get('[name=b_name]').type('new lower time bound name')
       cy.get('[name=age]').clear()
       cy.get('[name=age]').type('15.55')
