@@ -11,15 +11,18 @@ import logo from '../resource/nowlogo.jpg'
 import '../styles/FrontPage.css'
 import { occurrenceLabels } from '@/constants/occurrenceLabels'
 import { useGetChangelogQuery } from '@/redux/changelogReducer'
+import { useUser } from '@/hooks/user'
 
 export const FrontPage = () => {
   const mapContainerRef = useRef<HTMLDivElement | null>(null)
+  const user = useUser()
+  const isLoggedIn = Boolean(user.token)
   const { data: statisticsQueryData } = useGetStatisticsQuery()
   const { data: speciesStatisticsQueryData, isFetching: speciesStatisticsQueryIsFetching } =
     useGetSpeciesStatisticsQuery()
   const { data: localityStatisticsQueryData, isFetching: localityStatisticsQueryIsFetching } =
     useGetLocalityStatisticsQuery()
-  const { data: changelogData } = useGetChangelogQuery()
+  const { data: changelogData } = useGetChangelogQuery(undefined, { skip: !isLoggedIn })
 
   // Map hover effect
   useEffect(() => {
@@ -152,31 +155,35 @@ export const FrontPage = () => {
           <a href="http://doi.org/10.5281/zenodo.4268068">doi:10.5281/zenodo.4268068</a>.
         </div>
         <div>
-          <h2>Changelog</h2>
-          <div className="activity-stats">
-            <div className="stat-table" style={{ width: '100%' }}>
-              {!changelogData || changelogData.length === 0 ? (
-                <p>No recent releases.</p>
-              ) : (
-                changelogData.map(entry => (
-                  <div key={entry.tagName} style={{ marginBottom: '1.5em' }}>
-                    <h3 style={{ marginBottom: '0.25em' }}>
-                      <a href={entry.url} target="_blank" rel="noreferrer">
-                        {entry.name}
-                      </a>
-                    </h3>
-                    <div style={{ fontSize: 14, opacity: 0.75, marginBottom: '0.5em' }}>
-                      {new Date(entry.createdAt).toLocaleString('fi-FI')}
-                    </div>
-                    <div
-                      style={{ fontSize: 14, overflowWrap: 'anywhere' }}
-                      dangerouslySetInnerHTML={{ __html: entry.bodyHtml }}
-                    />
-                  </div>
-                ))
-              )}
-            </div>
-          </div>
+          {isLoggedIn && (
+            <>
+              <h2>Changelog</h2>
+              <div className="activity-stats">
+                <div className="stat-table" style={{ width: '100%' }}>
+                  {!changelogData || changelogData.length === 0 ? (
+                    <p>No recent releases.</p>
+                  ) : (
+                    changelogData.map(entry => (
+                      <div key={entry.tagName} style={{ marginBottom: '1.5em' }}>
+                        <h3 style={{ marginBottom: '0.25em' }}>
+                          <a href={entry.url} target="_blank" rel="noreferrer">
+                            {entry.name}
+                          </a>
+                        </h3>
+                        <div style={{ fontSize: 14, opacity: 0.75, marginBottom: '0.5em' }}>
+                          {new Date(entry.createdAt).toLocaleString('fi-FI')}
+                        </div>
+                        <div
+                          style={{ fontSize: 14, overflowWrap: 'anywhere' }}
+                          dangerouslySetInnerHTML={{ __html: entry.bodyHtml }}
+                        />
+                      </div>
+                    ))
+                  )}
+                </div>
+              </div>
+            </>
+          )}
         </div>
       </section>
     </main>
