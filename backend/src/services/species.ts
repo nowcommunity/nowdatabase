@@ -161,14 +161,8 @@ export const getSpeciesDetails = async (id: number, user?: User) => {
       now_sau: {
         include: {
           now_sr: {
-            include: {
-              ref_ref: {
-                include: {
-                  ref_authors: true,
-                  ref_journal: true,
-                },
-              },
-            },
+            // Load reference details separately so we can tolerate invalid `ref_ref.exact_date` values
+            // (e.g. MySQL dates with month/day set to zero) that Prisma cannot deserialize.
           },
         },
       },
@@ -176,6 +170,46 @@ export const getSpeciesDetails = async (id: number, user?: User) => {
   })
 
   if (!result) return null
+
+  const referenceIds = Array.from(
+    new Set(result.now_sau.flatMap(sau => sau.now_sr.map(sr => sr.rid)).filter((rid): rid is number => !!rid))
+  )
+
+  const safeReferences = referenceIds.length
+    ? await nowDb.ref_ref.findMany({
+        where: { rid: { in: referenceIds } },
+        select: {
+          rid: true,
+          ref_type_id: true,
+          date_primary: true,
+          date_secondary: true,
+          title_primary: true,
+          title_secondary: true,
+          title_series: true,
+          gen_notes: true,
+          misc_1: true,
+          publisher: true,
+          pub_place: true,
+          volume: true,
+          issue: true,
+          start_page: true,
+          end_page: true,
+          web_url: true,
+          ref_authors: true,
+          ref_journal: true,
+        },
+      })
+    : []
+
+  const safeReferenceById = new Map(safeReferences.map(ref => [ref.rid, { ...ref, exact_date: null }] as const))
+
+  result.now_sau = result.now_sau.map(sau => ({
+    ...sau,
+    now_sr: sau.now_sr.map(sr => ({
+      ...sr,
+      ref_ref: safeReferenceById.get(sr.rid) ?? { rid: sr.rid, exact_date: null, ref_authors: [], ref_journal: null },
+    })),
+  }))
 
   const synonyms = await nowDb.com_taxa_synonym.findMany({ where: { species_id: id } })
 
