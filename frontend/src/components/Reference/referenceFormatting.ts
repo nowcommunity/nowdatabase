@@ -1,4 +1,4 @@
-import type { ReferenceDetailsType } from '@/shared/types'
+import type { ReferenceDetailsType, ReferenceOfUpdate } from '@/shared/types'
 
 const makeNameList = (names: Array<string | null | undefined>) => {
   if (names.length === 3) {
@@ -11,7 +11,7 @@ const makeNameList = (names: Array<string | null | undefined>) => {
   return names[0] ?? ''
 }
 
-const getSurnamesByFieldId = (ref: ReferenceDetailsType, fieldId: number) =>
+const getSurnamesByFieldId = (ref: ReferenceDetailsType | ReferenceOfUpdate, fieldId: number) =>
   ref.ref_authors
     .filter(author => author.field_id === fieldId)
     .map(author => author.author_surname)
@@ -66,17 +66,70 @@ export const createReferenceTitle = (ref: ReferenceDetailsType): string => {
   return result.length > 0 ? result : `Reference ${ref.rid}`
 }
 
-export const createReferenceSubtitle = (ref: ReferenceDetailsType) => {
+const formatExactDate = (exactDate: unknown) => {
+  if (!exactDate) return null
+  const date = exactDate instanceof Date ? exactDate : new Date(String(exactDate))
+  if (Number.isNaN(date.getTime())) return null
+  return date.toISOString().split('T')[0]
+}
+
+const formatPages = (startPage?: number | null, endPage?: number | null) => {
+  if (!startPage && !endPage) return null
+  if (startPage && endPage && startPage !== endPage) return `${startPage}-${endPage}`
+  return `${startPage ?? endPage}`
+}
+
+const formatPublisherPlace = (publisher?: string | null, pubPlace?: string | null) => {
+  const parts = [publisher?.trim(), pubPlace?.trim()].filter(Boolean)
+  return parts.length > 0 ? parts.join(', ') : null
+}
+
+const ensurePeriod = (text: string) => (text.trim().endsWith('.') ? text.trim() : `${text.trim()}.`)
+
+const joinSegments = (segments: Array<string | null | undefined>) =>
+  segments
+    .filter((s): s is string => Boolean(s?.trim()))
+    .join(' ')
+    .replace(/\s+/g, ' ')
+    .trim()
+
+const makeHeading = (ref: ReferenceDetailsType | ReferenceOfUpdate) => {
   const authorsSurnames = getSurnamesByFieldId(ref, 2)
   const editorsSurnames = getSurnamesByFieldId(ref, 12)
-  const authorsPart = `${makeNameList(authorsSurnames)}`
-  const editorsPart = `${makeNameList(editorsSurnames)} ${editorsSurnames.length > 1 ? '(eds)' : '(ed)'}`
 
-  let title = `${authorsPart} (${ref.date_primary}).`
+  const hasAuthors = authorsSurnames.length > 0
+  const hasEditors = !hasAuthors && editorsSurnames.length > 0
+
+  const authorOrEditor = hasAuthors
+    ? makeNameList(authorsSurnames)
+    : hasEditors
+      ? makeNameList(editorsSurnames)
+      : undefined
+
+  const year = ref.date_primary != null ? `${ref.date_primary}` : undefined
+
+  if (authorOrEditor && year) return `${authorOrEditor} (${year}).`
+  if (authorOrEditor) return `${authorOrEditor}.`
+  if (year) return `${year}.`
+  return undefined
+}
+
+export const createReferenceSubtitle = (ref: ReferenceDetailsType | ReferenceOfUpdate) => {
+  const heading = makeHeading(ref)
+  const exactDate = formatExactDate(ref.exact_date)
+  const pages = formatPages(ref.start_page, ref.end_page)
+  const publisherPlace = formatPublisherPlace(ref.publisher, ref.pub_place)
+
+  const authorsSurnames = getSurnamesByFieldId(ref, 2)
+  const editorsSurnames = getSurnamesByFieldId(ref, 12)
+  const editorsPart = editorsSurnames.length > 0 ? makeNameList(editorsSurnames) : undefined
+  const editorsLabel = editorsSurnames.length > 1 ? '(eds)' : '(ed)'
 
   switch (ref.ref_type_id) {
     case 1: {
-      title += ` ${ref.title_primary}. ${ref.ref_journal.journal_title}`
+      const journalTitle = ref.ref_journal?.journal_title ?? ''
+      let title = joinSegments([heading, ref.title_primary ? ensurePeriod(ref.title_primary) : null])
+      title = joinSegments([title, journalTitle ? journalTitle : null])
       if (ref.volume) {
         title += ` ${ref.volume}`
       }
@@ -95,76 +148,196 @@ export const createReferenceSubtitle = (ref: ReferenceDetailsType) => {
       if (ref.volume || ref.issue || ref.start_page || ref.end_page) {
         title += `.`
       }
-      return title
+      if (publisherPlace) title = joinSegments([title, ensurePeriod(publisherPlace)])
+      return title || `Reference ${ref.rid}`
     }
     case 2: {
-      title += ` ${ref.title_primary}.`
-      if (ref.publisher || ref.pub_place) {
-        title += ` `
-      }
-      if (ref.publisher) {
-        title += `${ref.publisher}`
-      }
-      if (ref.publisher && ref.pub_place) {
-        title += `, `
-      }
-      if (ref.pub_place) {
-        title += `${ref.pub_place}`
-      }
-      if (ref.publisher || ref.pub_place) {
-        title += `.`
-      }
-      return title
+      const pagesCount = ref.end_page ? `${ref.end_page} pp.` : null
+      return (
+        joinSegments([
+          heading,
+          ref.title_primary ? ensurePeriod(ref.title_primary) : null,
+          ref.volume ? ensurePeriod(`Ed. ${ref.volume}`) : null,
+          ref.issue ? ensurePeriod(`Vol. ${ref.issue}`) : null,
+          pagesCount ? ensurePeriod(pagesCount) : null,
+          publisherPlace ? ensurePeriod(publisherPlace) : null,
+        ]) || `Reference ${ref.rid}`
+      )
     }
     case 3: {
-      title += ` ${ref.title_primary}. IN: ${editorsPart} ${ref.title_secondary}.`
-
-      if (ref.start_page || ref.end_page) {
-        title += ` pp.`
-      }
-      if (ref.start_page) {
-        title += `${ref.start_page}`
-      }
-      if (ref.start_page && ref.end_page) {
-        title += `-`
-      }
-      if (ref.end_page) {
-        title += `${ref.end_page}`
-      }
-      if (ref.start_page || ref.end_page) {
-        title += `.`
-      }
-      if (ref.publisher || ref.pub_place) {
-        title += ` `
-      }
-      if (ref.publisher) {
-        title += `${ref.publisher}`
-      }
-      if (ref.publisher && ref.pub_place) {
-        title += `, `
-      }
-      if (ref.pub_place) {
-        title += `${ref.pub_place}`
-      }
-      if (ref.publisher || ref.pub_place) {
-        title += `.`
-      }
-      return title
+      const inSegment = joinSegments([
+        'IN:',
+        editorsPart ? `${editorsPart} ${editorsLabel}` : null,
+        ref.title_secondary ? ensurePeriod(ref.title_secondary) : null,
+      ])
+      const pagesSegment = pages ? ensurePeriod(`pp. ${pages}`) : null
+      return (
+        joinSegments([
+          heading,
+          ref.title_primary ? ensurePeriod(ref.title_primary) : null,
+          inSegment ? ensurePeriod(inSegment.replace(/\.\s*$/, '')) : null,
+          pagesSegment,
+          publisherPlace ? ensurePeriod(publisherPlace) : null,
+        ]) || `Reference ${ref.rid}`
+      )
+    }
+    case 4: {
+      // Thesis/Dissertation
+      const pagesCount = ref.end_page ? `${ref.end_page} pp.` : null
+      return (
+        joinSegments([
+          heading,
+          ref.title_primary ? ensurePeriod(ref.title_primary) : null,
+          ref.misc_1 ? ensurePeriod(ref.misc_1) : null,
+          ref.publisher ? ensurePeriod(ref.publisher) : null,
+          pagesCount ? ensurePeriod(pagesCount) : null,
+          ref.web_url ? ensurePeriod(ref.web_url) : null,
+          exactDate ? ensurePeriod(`Date: ${exactDate}`) : null,
+        ]) || `Reference ${ref.rid}`
+      )
+    }
+    case 5: {
+      // Conference Proceeding
+      const journalTitle = ref.ref_journal?.journal_title ?? ''
+      const conference = joinSegments([
+        ref.title_secondary ? `"${ref.title_secondary}"` : null,
+        ref.date_secondary != null ? `(${ref.date_secondary})` : null,
+      ])
+      const journalBits = joinSegments([
+        journalTitle || null,
+        ref.volume || null,
+        ref.issue ? `(${ref.issue})` : null,
+      ])
+      const pagesBits = pages ? `: ${pages}` : null
+      return (
+        joinSegments([
+          heading,
+          ref.title_primary ? ensurePeriod(ref.title_primary) : null,
+          conference ? ensurePeriod(`Conference: ${conference}`) : null,
+          journalBits ? ensurePeriod(joinSegments([journalBits, pagesBits])) : null,
+          publisherPlace ? ensurePeriod(publisherPlace) : null,
+        ]) || `Reference ${ref.rid}`
+      )
+    }
+    case 6: {
+      // Electronic Citation
+      return (
+        joinSegments([
+          heading,
+          ref.title_primary ? ensurePeriod(ref.title_primary) : null,
+          ref.title_secondary ? ensurePeriod(`Organisation: ${ref.title_secondary}`) : null,
+          ref.misc_1 ? ensurePeriod(`Updated ${ref.misc_1}`) : null,
+          ref.web_url ? ensurePeriod(ref.web_url) : null,
+          exactDate ? ensurePeriod(`Accessed ${exactDate}`) : null,
+        ]) || `Reference ${ref.rid}`
+      )
+    }
+    case 7: {
+      // Internet Communication
+      const toSegment = editorsPart ? ensurePeriod(`To: ${editorsPart}`) : null
+      const emails = joinSegments([
+        ref.misc_1 ? `From email: ${ref.misc_1}` : null,
+        ref.misc_2 ? `To email: ${ref.misc_2}` : null,
+      ])
+      return (
+        joinSegments([
+          heading,
+          ref.title_primary ? ensurePeriod(`Subject: ${ref.title_primary}`) : null,
+          toSegment,
+          emails ? ensurePeriod(emails) : null,
+          exactDate ? ensurePeriod(`Date: ${exactDate}`) : null,
+          ref.gen_notes ? ensurePeriod(ref.gen_notes) : null,
+        ]) || `Reference ${ref.rid}`
+      )
+    }
+    case 8: {
+      // Report
+      const reportNo = ref.volume ? ensurePeriod(`Report No. ${ref.volume}`) : null
+      const pagesSegment = pages ? ensurePeriod(`pp. ${pages}`) : null
+      return (
+        joinSegments([
+          heading,
+          ref.title_primary ? ensurePeriod(ref.title_primary) : null,
+          ref.title_secondary ? ensurePeriod(ref.title_secondary) : null,
+          reportNo,
+          pagesSegment,
+          publisherPlace ? ensurePeriod(publisherPlace) : null,
+        ]) || `Reference ${ref.rid}`
+      )
+    }
+    case 9: {
+      // Unpublished Work
+      return (
+        joinSegments([
+          heading,
+          ref.title_primary ? ensurePeriod(ref.title_primary) : null,
+          ref.title_secondary ? ensurePeriod(`Organisation: ${ref.title_secondary}`) : null,
+          ref.title_series ? ensurePeriod(ref.title_series) : null,
+          ref.gen_notes ? ensurePeriod(ref.gen_notes) : null,
+        ]) || `Reference ${ref.rid}`
+      )
+    }
+    case 10: {
+      // Personal Communication
+      const recipients = editorsPart ? ensurePeriod(`Recipients: ${editorsPart}`) : null
+      return (
+        joinSegments([
+          heading,
+          ref.misc_1 ? ensurePeriod(`Type: ${ref.misc_1}`) : null,
+          recipients,
+          exactDate ? ensurePeriod(`Date: ${exactDate}`) : null,
+          ref.gen_notes ? ensurePeriod(ref.gen_notes) : null,
+        ]) || `Reference ${ref.rid}`
+      )
+    }
+    case 11: {
+      // Manuscript
+      return (
+        joinSegments([
+          heading,
+          ref.title_primary ? ensurePeriod(ref.title_primary) : null,
+          ref.title_secondary ? ensurePeriod(`Organisation: ${ref.title_secondary}`) : null,
+          exactDate ? ensurePeriod(`Date: ${exactDate}`) : null,
+          ref.gen_notes ? ensurePeriod(ref.gen_notes) : null,
+        ]) || `Reference ${ref.rid}`
+      )
+    }
+    case 12: {
+      // Notes
+      return (
+        joinSegments([
+          heading,
+          ref.title_primary ? ensurePeriod(`Subject: ${ref.title_primary}`) : null,
+          exactDate ? ensurePeriod(`Date: ${exactDate}`) : null,
+          ref.gen_notes ? ensurePeriod(ref.gen_notes) : null,
+        ]) || `Reference ${ref.rid}`
+      )
+    }
+    case 13: {
+      // Editing
+      return (
+        joinSegments([
+          heading,
+          ref.title_primary ? ensurePeriod(ref.title_primary) : null,
+          exactDate ? ensurePeriod(`Date: ${exactDate}`) : null,
+          ref.gen_notes ? ensurePeriod(ref.gen_notes) : null,
+        ]) || `Reference ${ref.rid}`
+      )
     }
     default: {
-      if (ref.title_primary) {
-        title += ` ${ref.title_primary}.`
-      }
-      if (ref.title_secondary) {
-        title += ` ${ref.title_secondary}.`
-      }
-      if (ref.title_series) {
-        title += ` ${ref.title_series}.`
-      }
-      if (ref.gen_notes) {
-        title += ` ${ref.gen_notes}.`
-      }
-      return title
+      const fallbackAuthors = authorsSurnames.length > 0 ? makeNameList(authorsSurnames) : undefined
+      const year = ref.date_primary != null ? `${ref.date_primary}` : undefined
+      const fallbackHeading =
+        fallbackAuthors && year ? `${fallbackAuthors} (${year}).` : fallbackAuthors ? `${fallbackAuthors}.` : year ? `${year}.` : undefined
+      return (
+        joinSegments([
+          fallbackHeading,
+          ref.title_primary ? ensurePeriod(ref.title_primary) : null,
+          ref.title_secondary ? ensurePeriod(ref.title_secondary) : null,
+          ref.title_series ? ensurePeriod(ref.title_series) : null,
+          ref.gen_notes ? ensurePeriod(ref.gen_notes) : null,
+        ]) || `Reference ${ref.rid}`
+      )
     }
   }
 }
