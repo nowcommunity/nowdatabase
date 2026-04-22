@@ -216,34 +216,44 @@ describe('Editing a time unit', () => {
     cy.contains('11.63') // existing lower bound age
 
     cy.get('[data-cy=add-new-up-bound-form]').click()
-    cy.get('[name=b_name]').type('new upper time bound name')
-    cy.get('[name=b_comment]').type('test comment')
-    cy.get('[name=age]').type('12')
-    cy.contains('Save').click()
+    cy.get('.modal-content:visible').within(() => {
+      cy.get('[name=b_name]').type('new upper time bound name')
+      cy.get('[name=b_comment]').type('test comment')
+      cy.get('[name=age]').type('12')
+      cy.contains('button', 'Save').click()
+    })
     cy.contains('Upper Bound: Upper bound age has to be lower than lower bound age')
     cy.contains('Lower Bound: Lower bound age has to be higher than upper bound age')
     cy.get('[id=write-button]').should('be.disabled')
 
     cy.get('[data-cy=add-new-up-bound-form]').click()
-    cy.get('[name=age]').clear()
-    cy.get('[name=age]').type('11.02')
-    cy.contains('Save').click()
+    cy.get('.modal-content:visible').within(() => {
+      cy.get('[name=b_name]').type('new upper time bound name')
+      cy.get('[name=age]').clear()
+      cy.get('[name=age]').type('11.02')
+      cy.contains('button', 'Save').click()
+    })
     cy.get('[id=write-button]').should('not.be.disabled')
 
     cy.get('[data-cy=add-new-low-bound-form]').click()
-    cy.get('[name=b_name]').type('new lower time bound name')
-    cy.get('[name=b_comment]').type('test comment')
-    cy.get('[name=age]').type('0.5')
-    cy.contains('Save').click()
+    cy.get('.modal-content:visible').within(() => {
+      cy.get('[name=b_name]').type('new lower time bound name')
+      cy.get('[name=b_comment]').type('test comment')
+      cy.get('[name=age]').type('0.5')
+      cy.contains('button', 'Save').click()
+    })
 
     cy.contains('Upper Bound: Upper bound age has to be lower than lower bound age')
     cy.contains('Lower Bound: Lower bound age has to be higher than upper bound age')
     cy.get('[id=write-button]').should('be.disabled')
 
     cy.get('[data-cy=add-new-low-bound-form]').click()
-    cy.get('[name=age]').clear()
-    cy.get('[name=age]').type('15.55')
-    cy.contains('Save').click()
+    cy.get('.modal-content:visible').within(() => {
+      cy.get('[name=b_name]').type('new lower time bound name')
+      cy.get('[name=age]').clear()
+      cy.get('[name=age]').type('15.55')
+      cy.contains('button', 'Save').click()
+    })
     cy.get('[id=write-button]').should('not.be.disabled')
   })
 
