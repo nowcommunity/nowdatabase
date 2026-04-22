@@ -68,7 +68,16 @@ export const createReferenceTitle = (ref: ReferenceDetailsType): string => {
 
 const formatExactDate = (exactDate: unknown) => {
   if (!exactDate) return null
-  const date = exactDate instanceof Date ? exactDate : new Date(String(exactDate))
+  if (exactDate instanceof Date) {
+    if (Number.isNaN(exactDate.getTime())) return null
+    return exactDate.toISOString().split('T')[0]
+  }
+
+  if (typeof exactDate !== 'string' && typeof exactDate !== 'number') {
+    return null
+  }
+
+  const date = new Date(exactDate)
   if (Number.isNaN(date.getTime())) return null
   return date.toISOString().split('T')[0]
 }
@@ -203,11 +212,7 @@ export const createReferenceSubtitle = (ref: ReferenceDetailsType | ReferenceOfU
         ref.title_secondary ? `"${ref.title_secondary}"` : null,
         ref.date_secondary != null ? `(${ref.date_secondary})` : null,
       ])
-      const journalBits = joinSegments([
-        journalTitle || null,
-        ref.volume || null,
-        ref.issue ? `(${ref.issue})` : null,
-      ])
+      const journalBits = joinSegments([journalTitle || null, ref.volume || null, ref.issue ? `(${ref.issue})` : null])
       const pagesBits = pages ? `: ${pages}` : null
       return (
         joinSegments([
@@ -328,7 +333,13 @@ export const createReferenceSubtitle = (ref: ReferenceDetailsType | ReferenceOfU
       const fallbackAuthors = authorsSurnames.length > 0 ? makeNameList(authorsSurnames) : undefined
       const year = ref.date_primary != null ? `${ref.date_primary}` : undefined
       const fallbackHeading =
-        fallbackAuthors && year ? `${fallbackAuthors} (${year}).` : fallbackAuthors ? `${fallbackAuthors}.` : year ? `${year}.` : undefined
+        fallbackAuthors && year
+          ? `${fallbackAuthors} (${year}).`
+          : fallbackAuthors
+            ? `${fallbackAuthors}.`
+            : year
+              ? `${year}.`
+              : undefined
       return (
         joinSegments([
           fallbackHeading,

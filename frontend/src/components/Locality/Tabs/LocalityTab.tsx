@@ -254,12 +254,14 @@ export const LocalityTab = () => {
         <Box
           sx={{
             display: 'flex',
-            flexDirection: 'row',
+            flexDirection: { xs: 'column', md: 'row' },
             gap: 2,
           }}
         >
-          <ArrayFrame array={latlong} title="Latitude & Longitude" />
-          <Box sx={{ width: '50%' }}>
+          <Box sx={{ flex: { xs: '1 1 auto', md: '1 1 50%' }, minWidth: 0 }}>
+            <ArrayFrame array={latlong} title="Latitude & Longitude" />
+          </Box>
+          <Box sx={{ flex: { xs: '1 1 auto', md: '1 1 50%' }, minWidth: 0 }}>
             {hasCoordinates && (
               <Suspense fallback={<div>Loading map...</div>}>
                 <SingleLocalityMap decLat={editData.dec_lat} decLong={editData.dec_long} />
