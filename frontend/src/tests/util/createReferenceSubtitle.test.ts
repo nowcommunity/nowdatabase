@@ -1,5 +1,6 @@
 import { describe, expect, it } from '@jest/globals'
 import { createReferenceSubtitle } from '../../components/Reference/referenceFormatting'
+import type { ReferenceDetailsType } from '@/shared/types'
 
 describe('createReferenceSubtitle', () => {
   it('formats journal references (type 1)', () => {
@@ -14,7 +15,7 @@ describe('createReferenceSubtitle', () => {
       end_page: 20,
       ref_authors: [{ author_surname: 'Smith', field_id: 2 }],
       ref_journal: { journal_title: 'Journal Title' },
-    } as any
+    } as unknown as ReferenceDetailsType
 
     const text = createReferenceSubtitle(ref)
     expect(text).toContain('Smith (1999)')
@@ -37,7 +38,7 @@ describe('createReferenceSubtitle', () => {
       web_url: 'https://example.com/thesis',
       ref_authors: [{ author_surname: 'Doe', field_id: 2 }],
       ref_journal: null,
-    } as any
+    } as unknown as ReferenceDetailsType
 
     const text = createReferenceSubtitle(ref)
     expect(text).toContain('Doe (2001)')
@@ -60,7 +61,7 @@ describe('createReferenceSubtitle', () => {
       exact_date: '2026-04-21',
       ref_authors: [{ author_surname: 'OrgAuthor', field_id: 12 }],
       ref_journal: null,
-    } as any
+    } as unknown as ReferenceDetailsType
 
     const text = createReferenceSubtitle(ref)
     expect(text).toContain('(2020)')
@@ -78,9 +79,12 @@ describe('createReferenceSubtitle', () => {
       date_primary: 2023,
       title_primary: 'Re: Fossils',
       exact_date: '2026-04-21',
-      ref_authors: [{ author_surname: 'Sender', field_id: 2 }, { author_surname: 'Recipient', field_id: 12 }],
+      ref_authors: [
+        { author_surname: 'Sender', field_id: 2 },
+        { author_surname: 'Recipient', field_id: 12 },
+      ],
       ref_journal: null,
-    } as any
+    } as unknown as ReferenceDetailsType
 
     const text = createReferenceSubtitle(ref)
     expect(text).toContain('Sender (2023)')
@@ -89,4 +93,3 @@ describe('createReferenceSubtitle', () => {
     expect(text).toContain('Date: 2026-04-21')
   })
 })
-
