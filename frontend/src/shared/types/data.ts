@@ -297,16 +297,16 @@ export type CrossSearch = {
   // mw_scale_max_now_ls: number | null;
   // mw_value_now_ls: number | null;
   microwear_now_ls: string | null
-  // dc13_mean: number | null;
-  // dc13_n: number | null;
-  // dc13_max: number | null;
-  // dc13_min: number | null;
-  // dc13_stdev: number | null;
-  // do18_mean: number | null;
-  // do18_n: number | null;
-  // do18_max: number | null;
-  // do18_min: number | null;
-  // do18_stdev: number | null;
+  dc13_mean: number | null
+  dc13_n: number | null
+  dc13_max: number | null
+  dc13_min: number | null
+  dc13_stdev: number | null
+  do18_mean: number | null
+  do18_n: number | null
+  do18_max: number | null
+  do18_min: number | null
+  do18_stdev: number | null
 
   // now_loc fields
   lid_now_loc: number

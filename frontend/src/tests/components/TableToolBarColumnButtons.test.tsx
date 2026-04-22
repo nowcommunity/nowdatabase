@@ -31,6 +31,32 @@ jest.mock('../../components/TableView/helpers', () => ({
   exportRows: (...args: unknown[]) => exportRows(...args),
 }))
 
+const createTableMock = (initialVisibility: Record<string, boolean>) => {
+  const visibility = { ...initialVisibility }
+
+  const createColumn = (id: string, header: string) => ({
+    id,
+    columnDef: { header },
+    getCanHide: () => true,
+    getIsVisible: () => visibility[id] ?? true,
+    toggleVisibility: jest.fn((value?: boolean) => {
+      visibility[id] = value ?? !visibility[id]
+    }),
+  })
+
+  const columns = {
+    column_a: createColumn('column_a', 'Column A'),
+    column_b: createColumn('column_b', 'Column B'),
+  }
+
+  const table = {
+    getColumn: (id: string) => (columns as Record<string, unknown>)[id],
+    getAllLeafColumns: () => Object.values(columns),
+  }
+
+  return { table, columns }
+}
+
 const renderToolbar = (props?: Partial<React.ComponentProps<typeof TableToolBar>>) => {
   const table = {} as never
   const tableName = 'Test table'
@@ -55,6 +81,27 @@ describe('TableToolBar', () => {
     renderToolbar()
 
     expect(screen.getByRole('button', { name: /show\/hide columns/i })).toBeTruthy()
+  })
+
+  it('renders a grouped column visibility menu and toggles a group', () => {
+    const { table, columns } = createTableMock({ column_a: false, column_b: false })
+
+    renderToolbar({
+      table: table as never,
+      columnVisibilityGroups: [{ id: 'test-group', label: 'Test tab', columnIds: ['column_a', 'column_b'] }],
+    })
+
+    fireEvent.click(screen.getByRole('button', { name: /show\/hide columns/i }))
+
+    expect(screen.getByRole('menuitem', { name: /^all$/i })).toBeTruthy()
+    expect(screen.getByRole('menuitem', { name: /test tab/i })).toBeTruthy()
+    expect(screen.getByRole('menuitem', { name: /column a/i })).toBeTruthy()
+    expect(screen.getByRole('menuitem', { name: /column b/i })).toBeTruthy()
+
+    fireEvent.click(screen.getByRole('menuitem', { name: /test tab/i }))
+
+    expect(columns.column_a.toggleVisibility).toHaveBeenCalledWith(true)
+    expect(columns.column_b.toggleVisibility).toHaveBeenCalledWith(true)
   })
 
   it('exports table rows from the export menu', () => {
