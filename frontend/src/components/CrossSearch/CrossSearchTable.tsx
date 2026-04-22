@@ -438,6 +438,13 @@ export const CrossSearchTable = ({ selectorFn }: { selectorFn?: (newObject: Cros
         filterFn: 'contains',
       },
       {
+        id: 'id_status',
+        accessorFn: row => row.id_status || '',
+        header: 'ID status',
+        size: 20,
+        filterFn: 'contains',
+      },
+      {
         id: 'microwear_now_ls',
         accessorFn: row => row.microwear_now_ls || '',
         header: 'LS Microwear',
@@ -776,6 +783,7 @@ export const CrossSearchTable = ({ selectorFn }: { selectorFn?: (newObject: Cros
     taxonomic_status: false,
     orig_entry: false,
     source_name: false,
+    id_status: false,
     microwear_now_ls: false,
     mesowear_now_ls: false,
     mw_or_high_now_ls: false,
@@ -877,12 +885,6 @@ export const CrossSearchTable = ({ selectorFn }: { selectorFn?: (newObject: Cros
           'bipedal_footprints',
           'stone_tool_cut_marks_on_bones',
           'stone_tool_technology',
-        ],
-      },
-      {
-        id: 'culture',
-        label: 'Culture',
-        columnIds: [
           'technological_mode_1',
           'technological_mode_2',
           'technological_mode_3',
@@ -911,7 +913,7 @@ export const CrossSearchTable = ({ selectorFn }: { selectorFn?: (newObject: Cros
           'sp_comment',
         ],
       },
-      { id: 'occurrence', label: 'Occurrence', columnIds: ['orig_entry', 'source_name'] },
+      { id: 'occurrence', label: 'Occurrence', columnIds: ['orig_entry', 'source_name', 'id_status'] },
       { id: 'diet', label: 'Diet', columnIds: ['diet1', 'diet2', 'diet3'] },
       { id: 'locomotion', label: 'Locomotion', columnIds: ['locomo1', 'locomo2', 'locomo3'] },
       { id: 'size', label: 'Size', columnIds: ['sv_length', 'body_mass_com_species', 'sd_size', 'sd_display'] },
