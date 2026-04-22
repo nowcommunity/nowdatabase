@@ -187,9 +187,7 @@ export const TableView = <T extends MRT_RowData>({
     return typeof candidate.pageIndex === 'number' && typeof candidate.pageSize === 'number'
   }
 
-  const loadStateFromUrl = <
-    TState extends MRT_ColumnFiltersState | MRT_SortingState | MRT_PaginationState,
-  >(
+  const loadStateFromUrl = <TState extends MRT_ColumnFiltersState | MRT_SortingState | MRT_PaginationState>(
     state: TableStateInUrl,
     defaultState: TState
   ): TState => {
@@ -447,9 +445,9 @@ export const TableView = <T extends MRT_RowData>({
   // Load state from url only on first render
   useEffect(() => {
     if (selectorFn) return
-    setColumnFilters(loadStateFromUrl('columnfilters', []) as MRT_ColumnFiltersState)
-    setSorting(loadStateFromUrl('sorting', defaultSorting ?? []) as MRT_SortingState)
-    setPagination(loadStateFromUrl('pagination', defaultPagination) as MRT_PaginationState)
+    setColumnFilters(loadStateFromUrl('columnfilters', []))
+    setSorting(loadStateFromUrl('sorting', defaultSorting ?? []))
+    setPagination(loadStateFromUrl('pagination', defaultPagination))
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
