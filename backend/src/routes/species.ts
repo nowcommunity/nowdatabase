@@ -4,6 +4,8 @@ import { fixBigInt } from '../utils/common'
 import { EditMetaData, SpeciesDetailsType, Role } from '../../../frontend/src/shared/types'
 import { deleteSpecies, writeSpecies } from '../services/write/species'
 import { requireOneOf } from '../middlewares/authorizer'
+import { buildDwcArchiveZipBuffer } from '../services/dwcArchiveExport'
+import { currentDateAsString } from '../../../frontend/src/shared/currentDateAsString'
 
 const router = Router()
 
@@ -15,6 +17,13 @@ router.get('/all', async (_req, res) => {
 router.get('/synonyms', async (_req, res) => {
   const synonyms = await getAllSynonyms()
   return res.status(200).send(fixBigInt(synonyms))
+})
+
+router.get('/export/dwc-archive', requireOneOf([Role.Admin]), async (_req, res) => {
+  const zipBuffer = await buildDwcArchiveZipBuffer()
+  res.setHeader('Content-Type', 'application/zip')
+  res.setHeader('Content-Disposition', `attachment; filename="now_dwc_test_export_${currentDateAsString()}.zip"`)
+  return res.status(200).send(zipBuffer)
 })
 
 router.get('/:id', async (req, res) => {

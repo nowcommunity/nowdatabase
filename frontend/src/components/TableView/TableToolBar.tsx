@@ -38,6 +38,7 @@ export const TableToolBar = <T extends MRT_RowData>({
   showNewButton,
   hideLeftButtons,
   columnVisibilityGroups,
+  renderExtraExportMenuItems,
 }: {
   table: MRT_TableInstance<T>
   tableName: string
@@ -48,6 +49,7 @@ export const TableToolBar = <T extends MRT_RowData>({
   showNewButton?: boolean
   hideLeftButtons?: boolean
   columnVisibilityGroups?: ColumnVisibilityGroup[]
+  renderExtraExportMenuItems?: (handleClose: () => void) => ReactNode
 }) => {
   const { previousTableUrls, setPreviousTableUrls } = usePageContext<T>()
   const location = useLocation()
@@ -296,6 +298,8 @@ export const TableToolBar = <T extends MRT_RowData>({
               Export table
             </MenuItem>
           )}
+
+          {renderExtraExportMenuItems ? renderExtraExportMenuItems(handleClose) : null}
 
           {kmlExport && (
             <MenuItem
