@@ -145,6 +145,7 @@ export const MEASUREMENT_HEADERS = [
   'taxonID',
   'measurementID',
   'measurementType',
+  'verbatimMeasurementType',
   'measurementValue',
   'measurementUnit',
   'measurementMethod',
@@ -177,21 +178,106 @@ const MEASUREMENT_FIELD_MAPPINGS: Array<{
   field: keyof SpeciesForMeasurementExport
   measurementType: string
   measurementUnit: string
+  measurementMethod: string
 }> = [
-  { field: 'body_mass', measurementType: 'body mass', measurementUnit: 'g' },
-  { field: 'brain_mass', measurementType: 'brain mass', measurementUnit: 'g' },
-  { field: 'diet1', measurementType: 'diet category 1', measurementUnit: '' },
-  { field: 'diet2', measurementType: 'diet category 2', measurementUnit: '' },
-  { field: 'diet3', measurementType: 'diet category 3', measurementUnit: '' },
-  { field: 'diet_description', measurementType: 'diet description', measurementUnit: '' },
-  { field: 'locomo1', measurementType: 'locomotion 1', measurementUnit: '' },
-  { field: 'locomo2', measurementType: 'locomotion 2', measurementUnit: '' },
-  { field: 'locomo3', measurementType: 'locomotion 3', measurementUnit: '' },
-  { field: 'activity', measurementType: 'activity', measurementUnit: '' },
-  { field: 'crowntype', measurementType: 'crown type', measurementUnit: '' },
-  { field: 'microwear', measurementType: 'microwear', measurementUnit: '' },
-  { field: 'mesowear', measurementType: 'mesowear', measurementUnit: '' },
-  { field: 'mw_value', measurementType: 'mesowear value', measurementUnit: '' },
+  {
+    field: 'body_mass',
+    measurementType: 'body mass',
+    measurementUnit: 'g',
+    measurementMethod:
+      'The average adult body mass estimated for the species, in grams. Where there is sexual dimorphism in size, put the mean of the two sexes here and record the masses per sex, if known, in the Comment field. Confidence intervals, if known, can also be put there.',
+  },
+  {
+    field: 'brain_mass',
+    measurementType: 'brain mass',
+    measurementUnit: 'g',
+    measurementMethod:
+      'The average adult brain mass estimated for the species, in grams. Where there is sexual dimorphism in size, put the mean of the two sexes here and record the masses per sex, if known, in the Comment field. Confidence intervals, if known, can also be put there.',
+  },
+  {
+    field: 'diet1',
+    measurementType: 'diet category 1',
+    measurementUnit: '',
+    measurementMethod:
+      'The predominant food type in the diet of the species, at the coarsest level of resolution: Animal, Plant, Omnivore. See also Diet 3, Diet 2, Relative Fiber Content, Selectivity, Food Processing Mode, Digestion.',
+  },
+  {
+    field: 'diet2',
+    measurementType: 'diet category 2',
+    measurementUnit: '',
+    measurementMethod:
+      'The predominant food type in the diet of the species, at an intermediate level of resolution. See also Diet 1, Diet 3, Relative Fiber Content, Selectivity, Food Processing Mode, Digestion.',
+  },
+  {
+    field: 'diet3',
+    measurementType: 'diet category 3',
+    measurementUnit: '',
+    measurementMethod:
+      'The predominant, or most important or most characteristic, food type in the diet of the species, at a detailed level of resolution. At this scale, the diets of many species will not be clearly distinguishable from one another using only a single term for the most common dietary component. Nevertheless, highly variable food-type categories often delineate distinct ecological/adaptive/functional types (as in the case of mixed browsing/grazing ungulates). That is, calling something a "frugivore" may not explicitly describe other components of its diet, some of which may be of adaptive importance to the species; it does not allow one to distinguish among species within the frugivore category, either. But it does allow one to place the species between omnivores or insectivores, on the one hand, and browsers, on the other.',
+  },
+  {
+    field: 'diet_description',
+    measurementType: 'diet description',
+    measurementUnit: '',
+    // TODO(#1150): No matching field description found on pantherion.com/dbmanual97/VSP.html.
+    measurementMethod: '',
+  },
+  {
+    field: 'locomo1',
+    measurementType: 'locomotion 1',
+    measurementUnit: '',
+    measurementMethod:
+      'The general substrate upon which locomotion characteristically takes place. These categories are the same as those in Feeding Habitat 1 and Shelter Habitat 1.',
+  },
+  {
+    field: 'locomo2',
+    measurementType: 'locomotion 2',
+    measurementUnit: '',
+    measurementMethod:
+      'For non-aquatic, non-aerial species the terrestrial substrate upon which locomotion characteristically takes place. "Arboreal" describes species that almost never come to the ground, or, if they do, it is almost always for the purpose of dispersing to another tree or trees. "Scansorial" is a broad category including those species that habitually use both trees and the ground in their movements. At the non-arboreal extreme, it includes species that rarely in practice use the trees, but are not morphologically prevented from doing so. [This category may eventually have to be split to distinguish species that exhibit some arboreal adaptations (e.g., squirrels), from those that could climb in a limited way if they had to (e.g., lions).] "Surficial" refers to those creatures who use only the ground surface in locomotion (e.g., sauropods, wildebeeste).',
+  },
+  {
+    field: 'locomo3',
+    measurementType: 'locomotion 3',
+    measurementUnit: '',
+    measurementMethod:
+      'The predominant mode of locomotor activity. [These categories are not necessarily complete at this time.] The categorization of flight locomotion in Locomotion 2 and Locomotion 3 is based on Norberg (1985).',
+  },
+  {
+    field: 'activity',
+    measurementType: 'activity',
+    measurementUnit: '',
+    measurementMethod:
+      'The primary time of day during which the species was active. Choices are Diurnal, Crepuscular, or Nocturnal.',
+  },
+  {
+    field: 'crowntype',
+    measurementType: 'crown type',
+    measurementUnit: '',
+    measurementMethod:
+      'This field describes the morphology of mammalian molar crowns, and is complimentary to the Tooth Shape - Multicuspid field. The latter presents a traditional classification of molar crown types (and other multicusped teeth) for vertebrates. Molar Crown Type, in contrast, uses a more recently developed classification scheme that is currently restricted to mammals. The scheme is phylogenetically neutral and descriptive, allowing functional interpretations and interpretations of underlying developmental mechanisms (see Jernvall, 1995). Currently, the values for the field consist of five-letter alphanumeric codes, described in Jernvall, et al. (1996), and the reader is referred to that paper for further explanation.',
+  },
+  {
+    field: 'microwear',
+    measurementType: 'microwear',
+    measurementUnit: '',
+    measurementMethod:
+      "This field describes the kind of microwear (in terms of striations or pits) revealed by microscopic examination of the wear facets of the tooth crowns of the species. A considerable literature exists concerning the ways to infer aspects of a species' diet from patterns of microwear.",
+  },
+  {
+    field: 'mesowear',
+    measurementType: 'mesowear',
+    measurementUnit: '',
+    // TODO(#1150): No matching field description found on pantherion.com/dbmanual97/VSP.html.
+    measurementMethod: '',
+  },
+  {
+    field: 'mw_value',
+    measurementType: 'mesowear value',
+    measurementUnit: '',
+    // TODO(#1150): No matching field description found on pantherion.com/dbmanual97/VSP.html.
+    measurementMethod: '',
+  },
 ]
 
 export const mapSpeciesToMeasurementRows = (species: SpeciesForMeasurementExport): MeasurementCsvRow[] => {
@@ -212,9 +298,10 @@ export const mapSpeciesToMeasurementRows = (species: SpeciesForMeasurementExport
         taxonID,
         measurementID: `NOW:${taxonID}:${mapping.field.toString()}`,
         measurementType: mapping.measurementType,
+        verbatimMeasurementType: mapping.field.toString(),
         measurementValue,
         measurementUnit: mapping.measurementUnit,
-        measurementMethod: '',
+        measurementMethod: mapping.measurementMethod,
         measurementRemarks: '',
       },
     ]
@@ -245,6 +332,7 @@ const DWC_TERMS = {
     taxonID: 'http://rs.tdwg.org/dwc/terms/taxonID',
     measurementID: 'http://rs.tdwg.org/dwc/terms/measurementID',
     measurementType: 'http://rs.tdwg.org/dwc/terms/measurementType',
+    verbatimMeasurementType: 'http://rs.tdwg.org/dwc/terms/verbatimMeasurementType',
     measurementValue: 'http://rs.tdwg.org/dwc/terms/measurementValue',
     measurementUnit: 'http://rs.tdwg.org/dwc/terms/measurementUnit',
     measurementMethod: 'http://rs.tdwg.org/dwc/terms/measurementMethod',

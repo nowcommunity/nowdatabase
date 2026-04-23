@@ -55,7 +55,8 @@ Columns:
 - `taxonID` = `species_id`
 - `measurementID` = `NOW:<species_id>:<field_name>`
 - `measurementType` / `measurementUnit` / `measurementValue` per field mapping
-- `measurementMethod` = empty
+- `verbatimMeasurementType` = original DB field name (e.g. `diet1`, `body_mass`)
+- `measurementMethod` = Pantheria VSP field description where available (`https://www.pantherion.com/dbmanual97/VSP.html`)
 - `measurementRemarks` = empty
 
 v1 includes only these `com_species` fields (rows emitted only when source value is non-null and non-empty; `-` is treated as empty):
@@ -80,4 +81,3 @@ v1 includes only these `com_species` fields (rows emitted only when source value
 - Add synonym export from `com_taxa_synonym` (either separate Taxon rows or a dedicated extension).
 - Add additional traits/measurements from `com_species`.
 - Replace the placeholder `eml.xml` generator with a real dataset-level EML implementation.
-
