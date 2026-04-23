@@ -80,7 +80,6 @@ export const TAXON_HEADERS = [
   'infraspecificEpithet',
   'higherClassification',
   'taxonRemarks',
-  'taxonConceptID',
 ] as const
 
 export type TaxonCsvHeader = (typeof TAXON_HEADERS)[number]
@@ -109,6 +108,14 @@ const endsWithSuffix = (value: string | null, suffix: string): boolean => {
   return value.trim().toLowerCase().endsWith(suffix.toLowerCase())
 }
 
+const isMeaningfulTaxonName = (value: string | null): boolean => {
+  if (!isMeaningfulString(value)) return false
+  const trimmed = value.trim()
+  if (trimmed.includes(' ')) return false
+  if (trimmed.includes('.')) return false
+  return true
+}
+
 const containsDot = (value: string): boolean => value.includes('.')
 const containsSpaceOrDot = (value: string): boolean => value.includes(' ') || value.includes('.')
 
@@ -123,17 +130,37 @@ const resolveTaxonRank = ({
   genus,
   specificEpithet,
   uniqueIdentifier,
+  superfamily,
+  subfamily,
+  tribe,
+  subtribe,
 }: {
   family: string
   genus: string
   specificEpithet: string
   uniqueIdentifier: string | null
+  superfamily: string
+  subfamily: string
+  tribe: string
+  subtribe: string
 }): string => {
   if (family && containsDot(family)) return 'order'
   if (genus && containsDot(genus)) return 'family'
   if (specificEpithet && containsSpaceOrDot(specificEpithet)) return 'genus'
   if (isSingleLowercaseWord(uniqueIdentifier)) return 'subspecies'
   if (uniqueIdentifier === '-') return 'species'
+
+  // If lower taxa are not meaningful (e.g. contain '.'), but a higher rank is known,
+  // pick the most specific available rank.
+  const hasLowerTaxa =
+    isMeaningfulTaxonName(genus) || isMeaningfulTaxonName(specificEpithet) || isSingleLowercaseWord(uniqueIdentifier)
+  if (!hasLowerTaxa) {
+    if (subtribe) return 'subtribe'
+    if (tribe) return 'tribe'
+    if (subfamily) return 'subfamily'
+    if (superfamily) return 'superfamily'
+  }
+
   return 'species'
 }
 
@@ -141,9 +168,6 @@ export const mapSpeciesToTaxonRow = (species: SpeciesForTaxonExport): TaxonCsvRo
   const genusName = isMeaningfulString(species.genus_name) ? species.genus_name.trim() : ''
   const speciesName = isMeaningfulString(species.species_name) ? species.species_name.trim() : ''
   const authorship = isMeaningfulString(species.sp_author) ? species.sp_author.trim() : ''
-
-  const baseScientificName = [genusName, speciesName].filter(Boolean).join(' ').trim()
-  const scientificName = [baseScientificName, authorship].filter(Boolean).join(' ').trim()
 
   const higherClassification = [
     species.class_name,
@@ -170,14 +194,49 @@ export const mapSpeciesToTaxonRow = (species: SpeciesForTaxonExport): TaxonCsvRo
   const tribe = subfamilyRaw && subfamilyRaw.toLowerCase().endsWith('ini') ? subfamilyRaw : ''
   const subtribe = subfamilyRaw && subfamilyRaw.toLowerCase().endsWith('ina') ? subfamilyRaw : ''
 
-  const genericName = speciesName && !containsSpaceOrDot(speciesName) ? genusName : ''
+  const genericName = isMeaningfulTaxonName(speciesName) ? genusName : ''
 
   const taxonRank = resolveTaxonRank({
     family: isMeaningfulString(species.family_name) ? species.family_name.trim() : '',
     genus: genusName,
     specificEpithet: speciesName,
     uniqueIdentifier: isMeaningfulString(species.unique_identifier) ? species.unique_identifier.trim() : null,
+    superfamily,
+    subfamily,
+    tribe,
+    subtribe,
   })
+
+  const scientificName = (() => {
+    const familyName = isMeaningfulString(species.family_name) ? species.family_name.trim() : ''
+    const orderName = isMeaningfulString(species.order_name) ? species.order_name.trim() : ''
+    const className = isMeaningfulString(species.class_name) ? species.class_name.trim() : ''
+
+    switch (taxonRank) {
+      case 'subspecies':
+        return [genusName, speciesName, infraspecificEpithet, authorship].filter(Boolean).join(' ').trim()
+      case 'species':
+        return [genusName, speciesName, authorship].filter(Boolean).join(' ').trim()
+      case 'genus':
+        return [genusName, authorship].filter(Boolean).join(' ').trim()
+      case 'family':
+        return familyName
+      case 'superfamily':
+        return superfamily
+      case 'subfamily':
+        return subfamily
+      case 'tribe':
+        return tribe
+      case 'subtribe':
+        return subtribe
+      case 'order':
+        return orderName
+      case 'class':
+        return className
+      default:
+        return [genusName, speciesName, authorship].filter(Boolean).join(' ').trim()
+    }
+  })()
 
   return {
     taxonID: species.species_id.toString(),
@@ -202,8 +261,6 @@ export const mapSpeciesToTaxonRow = (species: SpeciesForTaxonExport): TaxonCsvRo
     infraspecificEpithet,
     higherClassification,
     taxonRemarks: isMeaningfulString(species.sp_comment) ? species.sp_comment.trim() : '',
-    // TODO(#1150): Decide if any existing field should populate this.
-    taxonConceptID: '',
   }
 }
 
@@ -701,7 +758,6 @@ const DWC_TERMS = {
     infraspecificEpithet: 'http://rs.tdwg.org/dwc/terms/infraspecificEpithet',
     higherClassification: 'http://rs.tdwg.org/dwc/terms/higherClassification',
     taxonRemarks: 'http://rs.tdwg.org/dwc/terms/taxonRemarks',
-    taxonConceptID: 'http://rs.tdwg.org/dwc/terms/taxonConceptID',
   },
   measurement: {
     rowType: 'http://rs.tdwg.org/dwc/terms/MeasurementOrFact',

@@ -53,7 +53,6 @@ Columns:
 - `infraspecificEpithet` = `unique_identifier` (only when meaningful and not `-`)
 - `higherClassification` = `class_name|subclass_or_superorder_name|order_name|suborder_or_superfamily_name|family_name|subfamily_name` (skip empty / `-`)
 - `taxonRemarks` = `sp_comment`
-- `taxonConceptID` = empty (TODO)
 
 Note:
 
