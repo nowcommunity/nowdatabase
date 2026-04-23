@@ -1,11 +1,19 @@
 import { Container } from '@mui/material'
 import Grid from '@mui/material/Grid2'
-import { Outlet } from 'react-router-dom'
+import { Outlet, useLocation } from 'react-router-dom'
 import { NavBar } from './components/NavBar'
 import { Notification, NotificationContextProvider } from './components/Notification'
 import { Footer } from './Footer'
+import { useEffect } from 'react'
+import { trackPageView } from './util/analytics'
 
 const App = () => {
+  const location = useLocation()
+
+  useEffect(() => {
+    trackPageView(`${location.pathname}${location.search}`)
+  }, [location.pathname, location.search])
+
   return (
     <NotificationContextProvider>
       <Notification />

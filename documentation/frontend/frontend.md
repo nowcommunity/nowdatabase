@@ -67,6 +67,13 @@ Some DB fields use MariaDB `DECIMAL` and are represented as `Decimal` in Prisma-
 - Prefer explicit parsing/conversion at usage points if numeric operations are required.
 - `estimate_temp` additionally has validator bounds to avoid DB errors from out-of-range values (`-999.9` to `999.9`).
 
+**Analytics (optional)**
+
+The frontend can optionally send GA4 page-view events if configured.
+
+- Set `VITE_GA4_MEASUREMENT_ID` to your GA4 measurement id (for example `G-XXXXXXXXXX`).
+- Tracking is disabled by default and never runs when `VITE_RUNNING_ENV` is `dev`.
+
 **Detailed documentation for editingComponents**
 
 - [RadioSelector](./components/editingComponents/RadioSelector.md)
