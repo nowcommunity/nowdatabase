@@ -7,11 +7,26 @@ import { getSpeciesDetails } from '../species'
 import { makeListRemoved } from './writeOperations/utils'
 
 const getSpeciesWriteHandler = (type: ActionType) => {
+  const baseAllowedColumns = getFieldsOfTables([
+    'com_species',
+    'now_ls',
+    'now_sau',
+    'now_sr',
+    'now_lau',
+    'com_taxa_synonym',
+  ])
+
+  // Defensive: `com_taxa_synonym.synonym_id` is required for delete/update operations when a species has synonyms.
+  // We've observed runtime failures complaining it is "Non-allowed", so ensure it is always present.
+  const allowedColumns = Array.from(
+    new Set([...baseAllowedColumns, 'synonym_id', 'species_id', 'syn_genus_name', 'syn_species_name', 'syn_comment'])
+  )
+
   return new WriteHandler({
     dbName: NOW_DB_NAME,
     table: 'com_species',
     idColumn: 'species_id',
-    allowedColumns: getFieldsOfTables(['com_species', 'now_ls', 'now_sau', 'now_sr', 'now_lau', 'com_taxa_synonym']),
+    allowedColumns,
     type,
   })
 }

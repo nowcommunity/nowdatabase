@@ -142,7 +142,7 @@ export const newSpeciesBasis: EditDataType<SpeciesDetailsType & EditMetaData> = 
   references: references,
 }
 
-export const cloneSpeciesData = () => {
+export const cloneSpeciesData = (): EditDataType<SpeciesDetailsType & EditMetaData> => {
   const cloneReferences = newSpeciesBasis.references?.map(reference => ({
     ...reference,
     ref_journal: reference.ref_journal ? { ...reference.ref_journal } : undefined,
