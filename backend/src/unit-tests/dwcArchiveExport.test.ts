@@ -2,6 +2,7 @@ import { describe, expect, it } from '@jest/globals'
 import JSZip from 'jszip'
 import {
   buildDwcArchiveZipBufferFromSpecies,
+  buildMetaXml,
   mapSpeciesToMeasurementRows,
   mapSpeciesToTaxonRow,
 } from '../services/dwcArchiveExport'
@@ -114,5 +115,11 @@ describe('DwC-A export mapping', () => {
     expect(zip.file('measurementorfact.csv')).toBeTruthy()
     expect(zip.file('meta.xml')).toBeTruthy()
     expect(zip.file('eml.xml')).toBeTruthy()
+  })
+
+  it('generates valid meta.xml attributes for enclosed fields', () => {
+    const metaXml = buildMetaXml()
+    expect(metaXml).toContain('fieldsEnclosedBy="&quot;"')
+    expect(metaXml).not.toContain('fieldsEnclosedBy="\\""')
   })
 })

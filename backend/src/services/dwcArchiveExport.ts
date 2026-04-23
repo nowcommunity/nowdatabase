@@ -427,14 +427,14 @@ export const buildMetaXml = (): string => {
 
   return `<?xml version="1.0" encoding="UTF-8"?>
 <archive xmlns="http://rs.tdwg.org/dwc/text/" metadata="eml.xml">
-  <core encoding="UTF-8" linesTerminatedBy="\\n" fieldsTerminatedBy="," fieldsEnclosedBy="\\"" ignoreHeaderLines="1" rowType="${DWC_TERMS.taxon.rowType}">
+  <core encoding="UTF-8" linesTerminatedBy="\\n" fieldsTerminatedBy="," fieldsEnclosedBy="&quot;" ignoreHeaderLines="1" rowType="${DWC_TERMS.taxon.rowType}">
     <files>
       <location>taxon.csv</location>
     </files>
     <id index="0" />
 ${taxonFields}
   </core>
-  <extension encoding="UTF-8" linesTerminatedBy="\\n" fieldsTerminatedBy="," fieldsEnclosedBy="\\"" ignoreHeaderLines="1" rowType="${DWC_TERMS.measurement.rowType}">
+  <extension encoding="UTF-8" linesTerminatedBy="\\n" fieldsTerminatedBy="," fieldsEnclosedBy="&quot;" ignoreHeaderLines="1" rowType="${DWC_TERMS.measurement.rowType}">
     <files>
       <location>measurementorfact.csv</location>
     </files>
