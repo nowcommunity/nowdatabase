@@ -70,24 +70,61 @@ Columns:
 - `measurementType` / `measurementUnit` / `measurementValue` per field mapping
 - `verbatimMeasurementType` = original DB field name (e.g. `diet1`, `body_mass`)
 - `measurementMethod` = Pantheria VSP field description where available (`https://www.pantherion.com/dbmanual97/VSP.html`)
-- `measurementRemarks` = empty
 
-v1 includes only these `com_species` fields (rows emitted only when source value is non-null and non-empty; `-` is treated as empty):
+v1 includes these `com_species` fields (rows emitted only when source value is non-null and non-empty; `-` is treated as empty):
 
+- `strain`
+- `gene`
+- `taxon_status`
 - `body_mass` → type: `body mass`, unit: `g`
 - `brain_mass` → type: `brain mass`, unit: `g`
+- `sv_length`
+- `sd_size`
+- `sd_display`
+- `tshm`
+- `symph_mob`
+- `relative_blade_length`
+- `tht`
 - `diet1` → type: `diet category 1`
 - `diet2` → type: `diet category 2`
 - `diet3` → type: `diet category 3`
 - `diet_description` → type: `diet description`
+- `rel_fib`
+- `selectivity`
+- `digestion`
+- `feedinghab1`
+- `feedinghab2`
+- `shelterhab1`
+- `shelterhab2`
 - `locomo1` → type: `locomotion 1`
 - `locomo2` → type: `locomotion 2`
 - `locomo3` → type: `locomotion 3`
+- `hunt_forage`
 - `activity` → type: `activity`
 - `crowntype` → type: `crown type`
 - `microwear` → type: `microwear`
 - `mesowear` → type: `mesowear`
+- `horizodonty`
+- `cusp_shape`
+- `cusp_count_buccal`
+- `cusp_count_lingual`
+- `loph_count_lon`
+- `loph_count_trs`
+- `fct_al`
+- `fct_ol`
+- `fct_sf`
+- `fct_ot`
+- `fct_cm`
+- `mw_or_high`
+- `mw_or_low`
+- `mw_cs_sharp`
+- `mw_cs_round`
+- `mw_cs_blunt`
+- `mw_scale_min`
+- `mw_scale_max`
 - `mw_value` → type: `mesowear value`
+- `pop_struc`
+- `sp_status`
 
 ## Extension points (TODOs)
 

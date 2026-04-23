@@ -58,6 +58,7 @@ describe('DwC-A species export (admin-only)', () => {
     const measurementCsv = await zip.file('measurementorfact.csv')!.async('string')
     expect(measurementCsv).toContain('"measurementID"')
     expect(measurementCsv).toContain('"verbatimMeasurementType"')
+    expect(measurementCsv).not.toContain('"measurementRemarks"')
 
     const metaXml = await zip.file('meta.xml')!.async('string')
     expect(metaXml).toContain('<core')
