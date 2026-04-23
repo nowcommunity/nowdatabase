@@ -14,8 +14,14 @@ type MockTable = {
   getColumn: (id: string) => { columnDef: { header: string } }
 }
 
+let lastMaterialReactTableOptions: unknown = null
+
+export const getLastMaterialReactTableOptions = <T,>(): T | null => {
+  return (lastMaterialReactTableOptions as T | null) ?? null
+}
+
 export const useMaterialReactTable = <T extends object>(options: T): T & MockTable => ({
-  ...options,
+  ...(lastMaterialReactTableOptions = options),
   getPrePaginationRowModel: () => ({ rows: [] }),
   getColumn: (id: string) => ({ columnDef: { header: id } }),
 })
