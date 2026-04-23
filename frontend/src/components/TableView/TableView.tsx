@@ -32,6 +32,9 @@ import type { ColumnVisibilityGroup } from './TableToolBar'
 
 type TableStateInUrl = 'sorting' | 'columnfilters' | 'pagination'
 
+const TEXT_FILTER_MODE_OPTIONS = ['equals', 'contains', 'startsWith'] as const
+type TextFilterModeOption = (typeof TEXT_FILTER_MODE_OPTIONS)[number]
+
 const isEmptyFilterValue = (value: unknown): boolean => {
   if (Array.isArray(value)) {
     return value.every(item => item === '' || item === null || item === undefined)
@@ -56,6 +59,91 @@ const toTableCellTitle = (value: unknown): string | undefined => {
 
 const sanitizeColumnFilters = (filters: MRT_ColumnFiltersState): MRT_ColumnFiltersState => {
   return filters.filter(filter => !isEmptyFilterValue(filter.value))
+}
+
+const getColumnId = <T extends MRT_RowData>(column: MRT_ColumnDef<T>) => {
+  if (column.id) return String(column.id)
+  if (typeof column.accessorKey === 'string') return column.accessorKey
+  if (column.accessorKey !== undefined) return String(column.accessorKey)
+  return undefined
+}
+
+const isIdLikeColumnId = (columnId: string) => {
+  const lastSegment = columnId.split('.').pop() ?? columnId
+  return lastSegment === 'id' || lastSegment === 'rid' || lastSegment === 'lid' || lastSegment.endsWith('_id')
+}
+
+const isRangeLikeFilterVariant = (variant: MRT_ColumnDef<MRT_RowData>['filterVariant']) => {
+  return (
+    variant === 'range' ||
+    variant === 'range-slider' ||
+    variant === 'date-range' ||
+    variant === 'datetime-range' ||
+    variant === 'time-range'
+  )
+}
+
+const applyColumnFilterModeDefaults = <T extends MRT_RowData>(
+  columns: MRT_ColumnDef<T>[],
+  idFieldName: keyof T
+): {
+  columns: MRT_ColumnDef<T>[]
+  columnFilterFns: Record<string, TextFilterModeOption>
+} => {
+  const columnFilterFns: Record<string, TextFilterModeOption> = {}
+
+  const mapColumn = (column: MRT_ColumnDef<T>): MRT_ColumnDef<T> => {
+    if (column.columns) {
+      return {
+        ...column,
+        columns: column.columns.map(mapColumn),
+      }
+    }
+
+    const columnId = getColumnId(column)
+    if (!columnId) return column
+
+    const idFieldId = String(idFieldName)
+    const hasCustomFilterFn = typeof column.filterFn === 'function'
+    const isRangeFilter = isRangeLikeFilterVariant(column.filterVariant)
+
+    if (columnId === idFieldId) {
+      columnFilterFns[columnId] = 'equals'
+      return {
+        ...column,
+        filterFn: typeof column.filterFn === 'function' ? column.filterFn : column.filterFn ?? 'equals',
+        enableColumnFilterModes: false,
+        columnFilterModeOptions: ['equals'],
+      }
+    }
+
+    if (isIdLikeColumnId(columnId)) {
+      columnFilterFns[columnId] = 'equals'
+      return {
+        ...column,
+        filterFn: typeof column.filterFn === 'function' ? column.filterFn : column.filterFn ?? 'equals',
+        enableColumnFilterModes: false,
+        columnFilterModeOptions: ['equals'],
+      }
+    }
+
+    if (hasCustomFilterFn || isRangeFilter) {
+      return {
+        ...column,
+        enableColumnFilterModes: false,
+        columnFilterModeOptions: null,
+      }
+    }
+
+    columnFilterFns[columnId] = 'equals'
+    return {
+      ...column,
+      enableColumnFilterModes: true,
+      columnFilterModeOptions: [...TEXT_FILTER_MODE_OPTIONS],
+    }
+  }
+
+  return { columns: columns.map(mapColumn), columnFilterFns }
 }
 
 /*
@@ -136,6 +224,13 @@ export const TableView = <T extends MRT_RowData>({
   )
   const user = useUser()
   const { setIdList } = usePageContext<T>()
+
+  const { columns: preparedColumns, columnFilterFns: initialColumnFilterFns } = useMemo(
+    () => applyColumnFilterModeDefaults(columns, idFieldName),
+    [columns, idFieldName]
+  )
+
+  const allowColumnFilterModes = (enableColumnFilterModes ?? true) && !serverSidePagination
 
   useEffect(() => {
     setSqlLimit(pagination.pageSize)
@@ -282,7 +377,7 @@ export const TableView = <T extends MRT_RowData>({
   }
 
   const table = useMaterialReactTable({
-    columns: columns,
+    columns: preparedColumns,
     data: data || [],
     muiTableProps: {
       sx: {
@@ -339,6 +434,7 @@ export const TableView = <T extends MRT_RowData>({
     },
     initialState: {
       columnVisibility: visibleColumns,
+      columnFilterFns: initialColumnFilterFns,
     },
     onColumnFiltersChange: setColumnFilters,
     /**
@@ -440,8 +536,8 @@ export const TableView = <T extends MRT_RowData>({
     },
     enableDensityToggle: false,
     enableGlobalFilter: false,
-    enableColumnFilterModes: enableColumnFilterModes && !serverSidePagination,
-    columnFilterModeOptions: ['fuzzy', 'contains', 'startsWith', 'endsWith', 'equals'],
+    enableColumnFilterModes: allowColumnFilterModes,
+    columnFilterModeOptions: [...TEXT_FILTER_MODE_OPTIONS],
     enableColumnActions: false,
     enableHiding: true,
     enableTopToolbar: false,
