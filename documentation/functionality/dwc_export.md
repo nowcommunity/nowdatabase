@@ -27,14 +27,27 @@ One row per `com_species` record.
 Columns:
 
 - `taxonID` = `com_species.species_id`
+- `nomenclaturalCode` = `ICZN`
 - `scientificName` = `${genus_name} ${species_name} ${sp_author}` (trimmed; authorship appended when present)
+- `genericName` = `genus_name` (only when `species_name` is a simple epithet; no spaces or dots)
 - `scientificNameAuthorship` = `sp_author`
 - `vernacularName` = `common_name`
-- `taxonRank` = `species` (TODO: validate for `indet.` / `gen.` / `sp.` cases)
+- `taxonRank`:
+  - `order` if `family_name` contains `.`
+  - `family` if `genus_name` contains `.`
+  - `genus` if `species_name` contains a space or `.`
+  - `species` if `unique_identifier` is `-`
+  - `subspecies` if `unique_identifier` is a single lowercase word
 - `taxonomicStatus` = `taxonomic_status` (fallback: `accepted`)
+- `kingdom` = `Animalia`
+- `phylum` = `Chordata`
 - `class` = `class_name`
 - `order` = `order_name`
+- `superfamily` = `subclass_or_superorder_name` (only when it ends with `-oidea`)
 - `family` = `family_name`
+- `subfamily` = `subfamily_name` (only when it ends with `-inae`)
+- `tribe` = `subfamily_name` (only when it ends with `-ini`)
+- `subtribe` = `subfamily_name` (only when it ends with `-ina`)
 - `genus` = `genus_name`
 - `specificEpithet` = `species_name`
 - `infraspecificEpithet` = `unique_identifier` (only when meaningful and not `-`)

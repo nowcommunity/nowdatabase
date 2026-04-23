@@ -52,6 +52,8 @@ describe('DwC-A species export (admin-only)', () => {
 
     const taxonCsv = await zip.file('taxon.csv')!.async('string')
     expect(taxonCsv).toContain('"taxonID"')
+    expect(taxonCsv).toContain('"nomenclaturalCode"')
+    expect(taxonCsv).toContain('"genericName"')
 
     const measurementCsv = await zip.file('measurementorfact.csv')!.async('string')
     expect(measurementCsv).toContain('"measurementID"')

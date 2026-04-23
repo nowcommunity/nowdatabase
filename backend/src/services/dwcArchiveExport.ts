@@ -59,14 +59,22 @@ const writeCsvString = async (headers: string[], rows: Array<Record<string, unkn
 
 export const TAXON_HEADERS = [
   'taxonID',
+  'nomenclaturalCode',
   'scientificName',
+  'genericName',
   'scientificNameAuthorship',
   'vernacularName',
   'taxonRank',
   'taxonomicStatus',
+  'kingdom',
+  'phylum',
   'class',
   'order',
+  'superfamily',
   'family',
+  'subfamily',
+  'tribe',
+  'subtribe',
   'genus',
   'specificEpithet',
   'infraspecificEpithet',
@@ -96,6 +104,39 @@ type SpeciesForTaxonExport = Pick<
   | 'sp_comment'
 >
 
+const endsWithSuffix = (value: string | null, suffix: string): boolean => {
+  if (!isMeaningfulString(value)) return false
+  return value.trim().toLowerCase().endsWith(suffix.toLowerCase())
+}
+
+const containsDot = (value: string): boolean => value.includes('.')
+const containsSpaceOrDot = (value: string): boolean => value.includes(' ') || value.includes('.')
+
+const isSingleLowercaseWord = (value: string | null): boolean => {
+  if (!isMeaningfulString(value)) return false
+  const trimmed = value.trim()
+  return /^[a-z]+$/.test(trimmed)
+}
+
+const resolveTaxonRank = ({
+  family,
+  genus,
+  specificEpithet,
+  uniqueIdentifier,
+}: {
+  family: string
+  genus: string
+  specificEpithet: string
+  uniqueIdentifier: string | null
+}): string => {
+  if (family && containsDot(family)) return 'order'
+  if (genus && containsDot(genus)) return 'family'
+  if (specificEpithet && containsSpaceOrDot(specificEpithet)) return 'genus'
+  if (isSingleLowercaseWord(uniqueIdentifier)) return 'subspecies'
+  if (uniqueIdentifier === '-') return 'species'
+  return 'species'
+}
+
 export const mapSpeciesToTaxonRow = (species: SpeciesForTaxonExport): TaxonCsvRow => {
   const genusName = isMeaningfulString(species.genus_name) ? species.genus_name.trim() : ''
   const speciesName = isMeaningfulString(species.species_name) ? species.species_name.trim() : ''
@@ -120,17 +161,42 @@ export const mapSpeciesToTaxonRow = (species: SpeciesForTaxonExport): TaxonCsvRo
 
   const taxonomicStatus = isMeaningfulString(species.taxonomic_status) ? species.taxonomic_status.trim() : 'accepted'
 
+  const superfamily = endsWithSuffix(species.subclass_or_superorder_name, 'oidea')
+    ? species.subclass_or_superorder_name!.trim()
+    : ''
+
+  const subfamilyRaw = isMeaningfulString(species.subfamily_name) ? species.subfamily_name.trim() : ''
+  const subfamily = subfamilyRaw && subfamilyRaw.toLowerCase().endsWith('inae') ? subfamilyRaw : ''
+  const tribe = subfamilyRaw && subfamilyRaw.toLowerCase().endsWith('ini') ? subfamilyRaw : ''
+  const subtribe = subfamilyRaw && subfamilyRaw.toLowerCase().endsWith('ina') ? subfamilyRaw : ''
+
+  const genericName = speciesName && !containsSpaceOrDot(speciesName) ? genusName : ''
+
+  const taxonRank = resolveTaxonRank({
+    family: isMeaningfulString(species.family_name) ? species.family_name.trim() : '',
+    genus: genusName,
+    specificEpithet: speciesName,
+    uniqueIdentifier: isMeaningfulString(species.unique_identifier) ? species.unique_identifier.trim() : null,
+  })
+
   return {
     taxonID: species.species_id.toString(),
+    nomenclaturalCode: 'ICZN',
     scientificName,
+    genericName,
     scientificNameAuthorship: authorship,
     vernacularName: isMeaningfulString(species.common_name) ? species.common_name.trim() : '',
-    // TODO(#1150): Validate rank from taxonomic fields (indet./gen./sp. cases).
-    taxonRank: 'species',
+    taxonRank,
     taxonomicStatus,
+    kingdom: 'Animalia',
+    phylum: 'Chordata',
     class: isMeaningfulString(species.class_name) ? species.class_name.trim() : '',
     order: isMeaningfulString(species.order_name) ? species.order_name.trim() : '',
+    superfamily,
     family: isMeaningfulString(species.family_name) ? species.family_name.trim() : '',
+    subfamily,
+    tribe,
+    subtribe,
     genus: genusName,
     specificEpithet: speciesName,
     infraspecificEpithet,
@@ -312,14 +378,22 @@ const DWC_TERMS = {
   taxon: {
     rowType: 'http://rs.tdwg.org/dwc/terms/Taxon',
     taxonID: 'http://rs.tdwg.org/dwc/terms/taxonID',
+    nomenclaturalCode: 'http://rs.tdwg.org/dwc/terms/nomenclaturalCode',
     scientificName: 'http://rs.tdwg.org/dwc/terms/scientificName',
+    genericName: 'http://rs.tdwg.org/dwc/terms/genericName',
     scientificNameAuthorship: 'http://rs.tdwg.org/dwc/terms/scientificNameAuthorship',
     vernacularName: 'http://rs.tdwg.org/dwc/terms/vernacularName',
     taxonRank: 'http://rs.tdwg.org/dwc/terms/taxonRank',
     taxonomicStatus: 'http://rs.tdwg.org/dwc/terms/taxonomicStatus',
+    kingdom: 'http://rs.tdwg.org/dwc/terms/kingdom',
+    phylum: 'http://rs.tdwg.org/dwc/terms/phylum',
     class: 'http://rs.tdwg.org/dwc/terms/class',
     order: 'http://rs.tdwg.org/dwc/terms/order',
+    superfamily: 'http://rs.tdwg.org/dwc/terms/superfamily',
     family: 'http://rs.tdwg.org/dwc/terms/family',
+    subfamily: 'http://rs.tdwg.org/dwc/terms/subfamily',
+    tribe: 'http://rs.tdwg.org/dwc/terms/tribe',
+    subtribe: 'http://rs.tdwg.org/dwc/terms/subtribe',
     genus: 'http://rs.tdwg.org/dwc/terms/genus',
     specificEpithet: 'http://rs.tdwg.org/dwc/terms/specificEpithet',
     infraspecificEpithet: 'http://rs.tdwg.org/dwc/terms/infraspecificEpithet',
