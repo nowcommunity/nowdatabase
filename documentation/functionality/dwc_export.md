@@ -27,6 +27,7 @@ One row per `com_species` record.
 Columns:
 
 - `taxonID` = `com_species.species_id`
+- `taxonID` = `NOW:<species_id>`
 - `nomenclaturalCode` = `ICZN`
 - `scientificName` = `${genus_name} ${species_name} ${sp_author}` (trimmed; authorship appended when present)
 - `genericName` = `genus_name` (only when `species_name` is a simple epithet; no spaces or dots)
@@ -65,6 +66,7 @@ Long-format measurements linked by `taxonID`.
 Columns:
 
 - `taxonID` = `species_id`
+- `taxonID` = `NOW:<species_id>`
 - `measurementID` = `NOW:<species_id>:<field_name>`
 - `measurementType` / `measurementUnit` / `measurementValue` per field mapping
 - `verbatimMeasurementType` = original DB field name (e.g. `diet1`, `body_mass`)

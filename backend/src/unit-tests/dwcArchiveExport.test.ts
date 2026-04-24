@@ -26,7 +26,7 @@ describe('DwC-A export mapping', () => {
       sp_comment: 'Test comment',
     })
 
-    expect(row.taxonID).toEqual('123')
+    expect(row.taxonID).toEqual('NOW:123')
     expect(row.nomenclaturalCode).toEqual('ICZN')
     expect(row.scientificName).toEqual('Felis catus Linnaeus, 1758')
     expect(row.genericName).toEqual('Felis')
@@ -100,6 +100,8 @@ describe('DwC-A export mapping', () => {
       pop_struc: null,
       sp_status: null,
     })
+
+    expect(rows.some(row => row.taxonID === 'NOW:123')).toEqual(true)
 
     const ids = rows.map(row => row.measurementID)
     expect(ids).toContain('NOW:123:body_mass')

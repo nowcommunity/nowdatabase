@@ -116,21 +116,22 @@ const isMeaningfulTaxonName = (value: string | null): boolean => {
   return true
 }
 
-const containsDot = (value: string): boolean => value.includes('.')
-const containsSpaceOrDot = (value: string): boolean => value.includes(' ') || value.includes('.')
-
 const isSingleLowercaseWord = (value: string | null): boolean => {
   if (!isMeaningfulString(value)) return false
   const trimmed = value.trim()
   return /^[a-z]+$/.test(trimmed)
 }
 
+const isSpeciesSp = (value: string): boolean => /^sp\.?$/i.test(value.trim())
+
+const includesIndet = (value: string): boolean => value.toLowerCase().includes('indet.')
+
 const resolveTaxonRank = ({
   family,
   genus,
   specificEpithet,
   uniqueIdentifier,
-  superfamily,
+  subclassOrSuperorderName,
   subfamily,
   tribe,
   subtribe,
@@ -139,26 +140,32 @@ const resolveTaxonRank = ({
   genus: string
   specificEpithet: string
   uniqueIdentifier: string | null
-  superfamily: string
+  subclassOrSuperorderName: string | null
   subfamily: string
   tribe: string
   subtribe: string
 }): string => {
-  if (family && containsDot(family)) return 'order'
-  if (genus && containsDot(genus)) return 'family'
-  if (specificEpithet && containsSpaceOrDot(specificEpithet)) return 'genus'
-  if (isSingleLowercaseWord(uniqueIdentifier)) return 'subspecies'
-  if (uniqueIdentifier === '-') return 'species'
+  // Start from the lowest rank to the highest, but respect the indet.* rules which
+  // indicate that lower taxa are unknown and we should not emit species/subspecies ranks.
+  const genusIndet = includesIndet(genus)
+  const epithetIndet = includesIndet(specificEpithet)
 
-  // If lower taxa are not meaningful (e.g. contain '.'), but a higher rank is known,
-  // pick the most specific available rank.
-  const hasLowerTaxa =
-    isMeaningfulTaxonName(genus) || isMeaningfulTaxonName(specificEpithet) || isSingleLowercaseWord(uniqueIdentifier)
-  if (!hasLowerTaxa) {
+  if (!genusIndet && !epithetIndet) {
+    const speciesSp = isSpeciesSp(specificEpithet)
+    if (!speciesSp && isSingleLowercaseWord(uniqueIdentifier)) return 'subspecies'
+    if (uniqueIdentifier === '-') return 'species'
+    if (speciesSp) return 'species'
+  }
+
+  if (!genusIndet && epithetIndet) return 'genus'
+
+  if (genusIndet) {
     if (subtribe) return 'subtribe'
     if (tribe) return 'tribe'
     if (subfamily) return 'subfamily'
-    if (superfamily) return 'superfamily'
+    if (!isMeaningfulString(subclassOrSuperorderName)) return 'family'
+    if (includesIndet(family)) return 'order'
+    return 'family'
   }
 
   return 'species'
@@ -201,10 +208,10 @@ export const mapSpeciesToTaxonRow = (species: SpeciesForTaxonExport): TaxonCsvRo
     genus: genusName,
     specificEpithet: speciesName,
     uniqueIdentifier: isMeaningfulString(species.unique_identifier) ? species.unique_identifier.trim() : null,
-    superfamily,
     subfamily,
     tribe,
     subtribe,
+    subclassOrSuperorderName: species.subclass_or_superorder_name,
   })
 
   const scientificName = (() => {
@@ -239,7 +246,7 @@ export const mapSpeciesToTaxonRow = (species: SpeciesForTaxonExport): TaxonCsvRo
   })()
 
   return {
-    taxonID: species.species_id.toString(),
+    taxonID: `NOW:${species.species_id}`,
     nomenclaturalCode: 'ICZN',
     scientificName,
     genericName,
@@ -707,7 +714,7 @@ const MEASUREMENT_FIELD_MAPPINGS: Array<{
 ]
 
 export const mapSpeciesToMeasurementRows = (species: SpeciesForMeasurementExport): MeasurementCsvRow[] => {
-  const taxonID = species.species_id.toString()
+  const taxonID = `NOW:${species.species_id}`
 
   return MEASUREMENT_FIELD_MAPPINGS.flatMap(mapping => {
     if (mapping.field === 'species_id') return []
@@ -722,7 +729,7 @@ export const mapSpeciesToMeasurementRows = (species: SpeciesForMeasurementExport
     return [
       {
         taxonID,
-        measurementID: `NOW:${taxonID}:${mapping.field.toString()}`,
+        measurementID: `NOW:${species.species_id}:${mapping.field.toString()}`,
         measurementType: mapping.measurementType,
         verbatimMeasurementType: mapping.field.toString(),
         measurementValue,
