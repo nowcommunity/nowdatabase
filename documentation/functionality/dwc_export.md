@@ -65,12 +65,17 @@ Long-format measurements linked by `taxonID`.
 
 Columns:
 
-- `taxonID` = `species_id`
 - `taxonID` = `NOW:<species_id>`
 - `measurementID` = `NOW:<species_id>:<field_name>`
+- `parentMeasurementID` = empty by default; for crown-type segments points to the calculated parent row
 - `measurementType` / `measurementUnit` / `measurementValue` per field mapping
 - `verbatimMeasurementType` = original DB field name (e.g. `diet1`, `body_mass`)
 - `measurementMethod` = Pantheria VSP field description where available (`https://www.pantherion.com/dbmanual97/VSP.html`)
+
+Calculated tooth rows (emitted only when at least one segment field is present):
+
+- `NOW:<species_id>:developmental_crown_type` (value is a 5-char concatenation of `cusp_shape`, `cusp_count_buccal`, `cusp_count_lingual`, `loph_count_lon`, `loph_count_trs`, using `-` for missing)
+- `NOW:<species_id>:functional_crown_type` (value is a 5-char concatenation of `fct_al`, `fct_ol`, `fct_sf`, `fct_ot`, `fct_cm`, using `-` for missing)
 
 v1 includes these `com_species` fields (rows emitted only when source value is non-null and non-empty; `-` is treated as empty):
 

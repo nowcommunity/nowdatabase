@@ -274,6 +274,7 @@ export const mapSpeciesToTaxonRow = (species: SpeciesForTaxonExport): TaxonCsvRo
 export const MEASUREMENT_HEADERS = [
   'taxonID',
   'measurementID',
+  'parentMeasurementID',
   'measurementType',
   'verbatimMeasurementType',
   'measurementValue',
@@ -341,11 +342,49 @@ type SpeciesForMeasurementExport = Pick<
   | 'sp_status'
 >
 
+const isMeaningfulMeasurementValue = (value: unknown): boolean => {
+  if (value === null || value === undefined) return false
+  if (typeof value === 'string') {
+    return isMeaningfulString(value)
+  }
+  return true
+}
+
+const buildCrownTypeMeasurementId = (speciesId: number, kind: 'developmental_crown_type' | 'functional_crown_type') =>
+  `NOW:${speciesId}:${kind}`
+
+type CrownSegment = string | number | null | undefined
+
+const mapCrownSegment = (segment: CrownSegment): string => {
+  if (segment === null || segment === undefined || segment === '') {
+    return '-'
+  }
+
+  return String(segment)
+}
+
+const formatDevelopmentalCrownType = (source: SpeciesForMeasurementExport): string => {
+  return [
+    source.cusp_shape,
+    source.cusp_count_buccal,
+    source.cusp_count_lingual,
+    source.loph_count_lon,
+    source.loph_count_trs,
+  ]
+    .map(mapCrownSegment)
+    .join('')
+}
+
+const formatFunctionalCrownType = (source: SpeciesForMeasurementExport): string => {
+  return [source.fct_al, source.fct_ol, source.fct_sf, source.fct_ot, source.fct_cm].map(mapCrownSegment).join('')
+}
+
 const MEASUREMENT_FIELD_MAPPINGS: Array<{
   field: keyof SpeciesForMeasurementExport
   measurementType: string
   measurementUnit: string
   measurementMethod: string
+  parentKind?: 'developmental_crown_type' | 'functional_crown_type'
 }> = [
   // NOTE: In v1, measurementMethod is populated from the Pantheria VSP manual where available:
   // https://www.pantherion.com/dbmanual97/VSP.html
@@ -570,6 +609,7 @@ const MEASUREMENT_FIELD_MAPPINGS: Array<{
     measurementUnit: '',
     // TODO(#1150): No matching field description found on pantherion.com/dbmanual97/VSP.html.
     measurementMethod: '',
+    parentKind: 'developmental_crown_type',
   },
   {
     field: 'cusp_count_buccal',
@@ -577,6 +617,7 @@ const MEASUREMENT_FIELD_MAPPINGS: Array<{
     measurementUnit: '',
     // TODO(#1150): No matching field description found on pantherion.com/dbmanual97/VSP.html.
     measurementMethod: '',
+    parentKind: 'developmental_crown_type',
   },
   {
     field: 'cusp_count_lingual',
@@ -584,6 +625,7 @@ const MEASUREMENT_FIELD_MAPPINGS: Array<{
     measurementUnit: '',
     // TODO(#1150): No matching field description found on pantherion.com/dbmanual97/VSP.html.
     measurementMethod: '',
+    parentKind: 'developmental_crown_type',
   },
   {
     field: 'loph_count_lon',
@@ -591,6 +633,7 @@ const MEASUREMENT_FIELD_MAPPINGS: Array<{
     measurementUnit: '',
     // TODO(#1150): No matching field description found on pantherion.com/dbmanual97/VSP.html.
     measurementMethod: '',
+    parentKind: 'developmental_crown_type',
   },
   {
     field: 'loph_count_trs',
@@ -598,6 +641,7 @@ const MEASUREMENT_FIELD_MAPPINGS: Array<{
     measurementUnit: '',
     // TODO(#1150): No matching field description found on pantherion.com/dbmanual97/VSP.html.
     measurementMethod: '',
+    parentKind: 'developmental_crown_type',
   },
   {
     field: 'fct_al',
@@ -605,6 +649,7 @@ const MEASUREMENT_FIELD_MAPPINGS: Array<{
     measurementUnit: '',
     // TODO(#1150): No matching field description found on pantherion.com/dbmanual97/VSP.html.
     measurementMethod: '',
+    parentKind: 'functional_crown_type',
   },
   {
     field: 'fct_ol',
@@ -612,6 +657,7 @@ const MEASUREMENT_FIELD_MAPPINGS: Array<{
     measurementUnit: '',
     // TODO(#1150): No matching field description found on pantherion.com/dbmanual97/VSP.html.
     measurementMethod: '',
+    parentKind: 'functional_crown_type',
   },
   {
     field: 'fct_sf',
@@ -619,6 +665,7 @@ const MEASUREMENT_FIELD_MAPPINGS: Array<{
     measurementUnit: '',
     // TODO(#1150): No matching field description found on pantherion.com/dbmanual97/VSP.html.
     measurementMethod: '',
+    parentKind: 'functional_crown_type',
   },
   {
     field: 'fct_ot',
@@ -626,6 +673,7 @@ const MEASUREMENT_FIELD_MAPPINGS: Array<{
     measurementUnit: '',
     // TODO(#1150): No matching field description found on pantherion.com/dbmanual97/VSP.html.
     measurementMethod: '',
+    parentKind: 'functional_crown_type',
   },
   {
     field: 'fct_cm',
@@ -633,6 +681,7 @@ const MEASUREMENT_FIELD_MAPPINGS: Array<{
     measurementUnit: '',
     // TODO(#1150): No matching field description found on pantherion.com/dbmanual97/VSP.html.
     measurementMethod: '',
+    parentKind: 'functional_crown_type',
   },
   {
     field: 'mesowear',
@@ -715,8 +764,60 @@ const MEASUREMENT_FIELD_MAPPINGS: Array<{
 
 export const mapSpeciesToMeasurementRows = (species: SpeciesForMeasurementExport): MeasurementCsvRow[] => {
   const taxonID = `NOW:${species.species_id}`
+  const speciesId = species.species_id
 
-  return MEASUREMENT_FIELD_MAPPINGS.flatMap(mapping => {
+  const developmentalSegments = [
+    species.cusp_shape,
+    species.cusp_count_buccal,
+    species.cusp_count_lingual,
+    species.loph_count_lon,
+    species.loph_count_trs,
+  ]
+  const functionalSegments = [species.fct_al, species.fct_ol, species.fct_sf, species.fct_ot, species.fct_cm]
+
+  const hasDevelopmentalCrownType = developmentalSegments.some(isMeaningfulMeasurementValue)
+  const hasFunctionalCrownType = functionalSegments.some(isMeaningfulMeasurementValue)
+
+  const parentIds = {
+    developmental_crown_type: hasDevelopmentalCrownType
+      ? buildCrownTypeMeasurementId(speciesId, 'developmental_crown_type')
+      : '',
+    functional_crown_type: hasFunctionalCrownType
+      ? buildCrownTypeMeasurementId(speciesId, 'functional_crown_type')
+      : '',
+  } as const
+
+  const calculatedRows: MeasurementCsvRow[] = []
+
+  if (hasDevelopmentalCrownType) {
+    calculatedRows.push({
+      taxonID,
+      measurementID: parentIds.developmental_crown_type,
+      parentMeasurementID: '',
+      measurementType: 'developmental crown type',
+      verbatimMeasurementType: 'developmental_crown_type',
+      measurementValue: formatDevelopmentalCrownType(species),
+      measurementUnit: '',
+      // TODO(#1150): Add field description / controlled vocabulary.
+      measurementMethod: '',
+    })
+  }
+
+  if (hasFunctionalCrownType) {
+    calculatedRows.push({
+      taxonID,
+      measurementID: parentIds.functional_crown_type,
+      parentMeasurementID: '',
+      measurementType: 'functional crown type',
+      verbatimMeasurementType: 'functional_crown_type',
+      measurementValue: formatFunctionalCrownType(species),
+      measurementUnit: '',
+      // TODO(#1150): Add field description / controlled vocabulary.
+      measurementMethod: '',
+    })
+  }
+
+  const fieldRows = MEASUREMENT_FIELD_MAPPINGS.flatMap(mapping => {
     if (mapping.field === 'species_id') return []
     const rawValue = species[mapping.field]
     if (rawValue === null || rawValue === undefined) return []
@@ -730,6 +831,7 @@ export const mapSpeciesToMeasurementRows = (species: SpeciesForMeasurementExport
       {
         taxonID,
         measurementID: `NOW:${species.species_id}:${mapping.field.toString()}`,
+        parentMeasurementID: mapping.parentKind ? parentIds[mapping.parentKind] : '',
         measurementType: mapping.measurementType,
         verbatimMeasurementType: mapping.field.toString(),
         measurementValue,
@@ -738,6 +840,8 @@ export const mapSpeciesToMeasurementRows = (species: SpeciesForMeasurementExport
       },
     ]
   })
+
+  return [...calculatedRows, ...fieldRows]
 }
 
 const DWC_TERMS = {
@@ -770,6 +874,7 @@ const DWC_TERMS = {
     rowType: 'http://rs.tdwg.org/dwc/terms/MeasurementOrFact',
     taxonID: 'http://rs.tdwg.org/dwc/terms/taxonID',
     measurementID: 'http://rs.tdwg.org/dwc/terms/measurementID',
+    parentMeasurementID: 'http://rs.tdwg.org/dwc/terms/parentMeasurementID',
     measurementType: 'http://rs.tdwg.org/dwc/terms/measurementType',
     verbatimMeasurementType: 'http://rs.tdwg.org/dwc/terms/verbatimMeasurementType',
     measurementValue: 'http://rs.tdwg.org/dwc/terms/measurementValue',
@@ -791,14 +896,14 @@ export const buildMetaXml = (): string => {
 
   return `<?xml version="1.0" encoding="UTF-8"?>
 <archive xmlns="http://rs.tdwg.org/dwc/text/" metadata="eml.xml">
-  <core encoding="UTF-8" linesTerminatedBy="\\n" fieldsTerminatedBy="," fieldsEnclosedBy="&quot;" ignoreHeaderLines="1" rowType="${DWC_TERMS.taxon.rowType}">
+  <core encoding="UTF-8" linesTerminatedBy="\\n" fieldsTerminatedBy="," fieldsEnclosedBy='"' ignoreHeaderLines="1" rowType="${DWC_TERMS.taxon.rowType}">
     <files>
       <location>taxon.csv</location>
     </files>
     <id index="0" />
 ${taxonFields}
   </core>
-  <extension encoding="UTF-8" linesTerminatedBy="\\n" fieldsTerminatedBy="," fieldsEnclosedBy="&quot;" ignoreHeaderLines="1" rowType="${DWC_TERMS.measurement.rowType}">
+  <extension encoding="UTF-8" linesTerminatedBy="\\n" fieldsTerminatedBy="," fieldsEnclosedBy='"' ignoreHeaderLines="1" rowType="${DWC_TERMS.measurement.rowType}">
     <files>
       <location>measurementorfact.csv</location>
     </files>

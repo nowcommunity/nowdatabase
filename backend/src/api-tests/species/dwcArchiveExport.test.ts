@@ -57,6 +57,7 @@ describe('DwC-A species export (admin-only)', () => {
 
     const measurementCsv = await zip.file('measurementorfact.csv')!.async('string')
     expect(measurementCsv).toContain('"measurementID"')
+    expect(measurementCsv).toContain('"parentMeasurementID"')
     expect(measurementCsv).toContain('"verbatimMeasurementType"')
     expect(measurementCsv).not.toContain('"measurementRemarks"')
 

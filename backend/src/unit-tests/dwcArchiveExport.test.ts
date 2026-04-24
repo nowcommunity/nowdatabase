@@ -197,7 +197,8 @@ describe('DwC-A export mapping', () => {
 
   it('generates valid meta.xml attributes for enclosed fields', () => {
     const metaXml = buildMetaXml()
-    expect(metaXml).toContain('fieldsEnclosedBy="&quot;"')
+    expect(metaXml).toContain("fieldsEnclosedBy='\"'")
+    expect(metaXml).not.toContain('fieldsEnclosedBy="&quot;"')
     expect(metaXml).not.toContain('fieldsEnclosedBy="\\""')
   })
 })
