@@ -47,11 +47,16 @@ v1 columns:
 
 Extension rowType: `http://rs.tdwg.org/dwc/terms/MeasurementOrFact`
 
-v1 emits a small set of locality/time-related measurements. Each row has:
+`measurementorfact.csv` uses the same column headings as the taxa export (for consistency), but the `taxonID` column contains the locality `locationID` value (`NOW:LOC:<lid>`).
 
-- `locationID` = `NOW:LOC:<lid>` (core id)
-- `measurementID` = `NOW:LOC:<lid>:<field_name>`
-- `verbatimMeasurementType` = original DB field name
+Each emitted row has:
+
+- `taxonID` = `NOW:LOC:<lid>` (core id for Location)
+- `measurementID` = `NOW:LOC:<lid>:<field_name>` (or calculated group id)
+- `parentMeasurementID` is used for the age hierarchy:
+  - `NOW:LOC:<lid>:age` (parent) → `max_age` / `min_age`
+  - `bfa_*`, `*_abs`, `frac_*` link to the relevant `max_age` / `min_age`
+- `verbatimMeasurementType` = original DB field name (or `|`-joined source field list for concatenated group rows)
 
 ## Admin-only
 

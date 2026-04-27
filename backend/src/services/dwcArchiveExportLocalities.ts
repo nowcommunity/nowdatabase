@@ -97,14 +97,14 @@ export type GeologicalContextCsvHeader = (typeof GEOLOGICAL_CONTEXT_HEADERS)[num
 export type GeologicalContextCsvRow = Record<GeologicalContextCsvHeader, string>
 
 export const LOCALITY_MEASUREMENT_HEADERS = [
-  'locationID',
+  'taxonID',
   'measurementID',
+  'parentMeasurementID',
   'measurementType',
   'verbatimMeasurementType',
   'measurementValue',
   'measurementUnit',
   'measurementMethod',
-  'measurementRemarks',
 ] as const
 
 export type LocalityMeasurementCsvHeader = (typeof LOCALITY_MEASUREMENT_HEADERS)[number]
@@ -134,13 +134,48 @@ type LocalityForExport = Pick<
   | 'bed'
   | 'bfa_max'
   | 'bfa_min'
+  | 'bfa_max_abs'
+  | 'bfa_min_abs'
+  | 'frac_max'
+  | 'frac_min'
   | 'max_age'
   | 'min_age'
   | 'date_meth'
   | 'age_comm'
+  | 'site_area'
+  | 'appr_num_spm'
+  | 'num_spm'
+  | 'true_quant'
+  | 'complete'
+  | 'num_quad'
+  | 'rock_type'
+  | 'rt_adj'
+  | 'lith_comm'
+  | 'depo_context1'
+  | 'depo_context2'
+  | 'depo_context3'
+  | 'depo_context4'
+  | 'depo_comm'
+  | 'sed_env_1'
+  | 'sed_env_2'
+  | 'event_circum'
+  | 'se_comm'
+  | 'assem_fm'
+  | 'transport'
+  | 'trans_mod'
+  | 'weath_trmp'
+  | 'pt_conc'
+  | 'size_type'
+  | 'vert_pres'
+  | 'plant_pres'
+  | 'invert_pres'
+  | 'time_rep'
+  | 'taph_comm'
 > & {
   now_time_unit_now_loc_bfa_maxTonow_time_unit: TimeUnitForLocalityExport | null
   now_time_unit_now_loc_bfa_minTonow_time_unit: TimeUnitForLocalityExport | null
+  now_syn_loc: ReadonlyArray<{ synonym: string | null }>
+  now_ss: ReadonlyArray<{ sed_struct: string }>
 }
 
 const locationIdForLocality = (lid: number): string => `NOW:LOC:${lid}`
@@ -235,6 +270,22 @@ const isMeaningfulMeasurementValue = (value: unknown): boolean => {
   return true
 }
 
+const concatMeaningful = (values: Array<string | null | undefined>): string => {
+  const parts = values.map(toMaybeMeaningful).filter(Boolean)
+  return parts.join('|')
+}
+
+const buildLocalityMeasurementId = (lid: number, kind: string): string => `NOW:LOC:${lid}:${kind}`
+
+const formatAgeRange = (locality: LocalityForExport): string => {
+  const minAge = toMaybeMeaningfulNumber(locality.min_age)
+  const maxAge = toMaybeMeaningfulNumber(locality.max_age)
+  if (minAge && maxAge) return `${minAge}-${maxAge}`
+  if (minAge) return minAge
+  if (maxAge) return maxAge
+  return ''
+}
+
 const LOCALITY_MEASUREMENT_MAPPINGS: Array<{
   field: keyof LocalityForExport
   measurementType: string
@@ -242,17 +293,87 @@ const LOCALITY_MEASUREMENT_MAPPINGS: Array<{
   measurementMethod: string
 }> = [
   {
-    field: 'max_age',
-    measurementType: 'maximum age',
-    measurementUnit: 'Ma',
-    // TODO(#1150): Add authoritative definition for NOW locality max_age/min_age semantics.
+    field: 'bfa_max',
+    measurementType: 'Basis for age (Time Unit)',
+    measurementUnit: '',
+    // TODO(#1150): Add authoritative definition for NOW locality basis-for-age fields.
     measurementMethod: '',
   },
   {
-    field: 'min_age',
-    measurementType: 'minimum age',
-    measurementUnit: 'Ma',
-    // TODO(#1150): Add authoritative definition for NOW locality max_age/min_age semantics.
+    field: 'bfa_min',
+    measurementType: 'Basis for age (Time Unit)',
+    measurementUnit: '',
+    // TODO(#1150): Add authoritative definition for NOW locality basis-for-age fields.
+    measurementMethod: '',
+  },
+  {
+    field: 'bfa_max_abs',
+    measurementType: 'Basis for age (Absolute)',
+    measurementUnit: '',
+    // TODO(#1150): Add authoritative definition for NOW locality basis-for-age fields.
+    measurementMethod: '',
+  },
+  {
+    field: 'bfa_min_abs',
+    measurementType: 'Basis for age (Absolute)',
+    measurementUnit: '',
+    // TODO(#1150): Add authoritative definition for NOW locality basis-for-age fields.
+    measurementMethod: '',
+  },
+  {
+    field: 'frac_max',
+    measurementType: 'Basis for age (Fraction)',
+    measurementUnit: '',
+    // TODO(#1150): Add authoritative definition for NOW locality basis-for-age fields.
+    measurementMethod: '',
+  },
+  {
+    field: 'frac_min',
+    measurementType: 'Basis for age (Fraction)',
+    measurementUnit: '',
+    // TODO(#1150): Add authoritative definition for NOW locality basis-for-age fields.
+    measurementMethod: '',
+  },
+  {
+    field: 'site_area',
+    measurementType: 'site area',
+    measurementUnit: '',
+    // TODO(#1150): Add unit and definition for NOW locality site_area.
+    measurementMethod: '',
+  },
+  {
+    field: 'appr_num_spm',
+    measurementType: 'approximate number of specimens',
+    measurementUnit: '',
+    // TODO(#1150): Confirm whether this is a sample-unit or locality-level count.
+    measurementMethod: '',
+  },
+  {
+    field: 'num_spm',
+    measurementType: 'number of specimens',
+    measurementUnit: '',
+    // TODO(#1150): Confirm whether this is a sample-unit or locality-level count.
+    measurementMethod: '',
+  },
+  {
+    field: 'true_quant',
+    measurementType: 'true quantification',
+    measurementUnit: '',
+    // TODO(#1150): Add controlled vocabulary for NOW locality true_quant.
+    measurementMethod: '',
+  },
+  {
+    field: 'complete',
+    measurementType: 'complete sampling',
+    measurementUnit: '',
+    // TODO(#1150): Add controlled vocabulary for NOW locality complete.
+    measurementMethod: '',
+  },
+  {
+    field: 'num_quad',
+    measurementType: 'number of quadrats',
+    measurementUnit: '',
+    // TODO(#1150): Add definition for NOW locality num_quad.
     measurementMethod: '',
   },
   {
@@ -269,46 +390,228 @@ const LOCALITY_MEASUREMENT_MAPPINGS: Array<{
     // TODO(#1150): Add field description.
     measurementMethod: '',
   },
-  {
-    field: 'bfa_max',
-    measurementType: 'BFA max',
-    measurementUnit: '',
-    // TODO(#1150): Add field description.
-    measurementMethod: '',
-  },
-  {
-    field: 'bfa_min',
-    measurementType: 'BFA min',
-    measurementUnit: '',
-    // TODO(#1150): Add field description.
-    measurementMethod: '',
-  },
 ]
 
 export const mapLocalityToMeasurementRows = (locality: LocalityForExport): LocalityMeasurementCsvRow[] => {
-  const locationID = locationIdForLocality(locality.lid)
+  const taxonID = locationIdForLocality(locality.lid)
+  const lid = locality.lid
 
-  return LOCALITY_MEASUREMENT_MAPPINGS.flatMap(mapping => {
+  const ageParentId = buildLocalityMeasurementId(lid, 'age')
+  const maxAgeId = buildLocalityMeasurementId(lid, 'max_age')
+  const minAgeId = buildLocalityMeasurementId(lid, 'min_age')
+
+  const hasMaxAgeGroup =
+    isMeaningfulMeasurementValue(locality.max_age) ||
+    isMeaningfulMeasurementValue(locality.bfa_max) ||
+    isMeaningfulMeasurementValue(locality.bfa_max_abs) ||
+    isMeaningfulMeasurementValue(locality.frac_max)
+
+  const hasMinAgeGroup =
+    isMeaningfulMeasurementValue(locality.min_age) ||
+    isMeaningfulMeasurementValue(locality.bfa_min) ||
+    isMeaningfulMeasurementValue(locality.bfa_min_abs) ||
+    isMeaningfulMeasurementValue(locality.frac_min)
+
+  const hasAnyAgeBasis = hasMaxAgeGroup || hasMinAgeGroup
+
+  const rows: LocalityMeasurementCsvRow[] = []
+
+  if (hasAnyAgeBasis) {
+    rows.push({
+      taxonID,
+      measurementID: ageParentId,
+      parentMeasurementID: '',
+      measurementType: 'age range',
+      verbatimMeasurementType: 'age_range',
+      measurementValue: formatAgeRange(locality),
+      measurementUnit: 'Ma',
+      // TODO(#1150): Add authoritative definition for NOW locality age range semantics.
+      measurementMethod: '',
+    })
+  }
+
+  if (hasMaxAgeGroup) {
+    rows.push({
+      taxonID,
+      measurementID: maxAgeId,
+      parentMeasurementID: hasAnyAgeBasis ? ageParentId : '',
+      measurementType: 'maximum age',
+      verbatimMeasurementType: 'max_age',
+      measurementValue: toMaybeMeaningfulNumber(locality.max_age),
+      measurementUnit: 'Ma',
+      // TODO(#1150): Add authoritative definition for NOW locality max_age semantics.
+      measurementMethod: '',
+    })
+  }
+
+  if (hasMinAgeGroup) {
+    rows.push({
+      taxonID,
+      measurementID: minAgeId,
+      parentMeasurementID: hasAnyAgeBasis ? ageParentId : '',
+      measurementType: 'minimum age',
+      verbatimMeasurementType: 'min_age',
+      measurementValue: toMaybeMeaningfulNumber(locality.min_age),
+      measurementUnit: 'Ma',
+      // TODO(#1150): Add authoritative definition for NOW locality min_age semantics.
+      measurementMethod: '',
+    })
+  }
+
+  const coreRows = LOCALITY_MEASUREMENT_MAPPINGS.flatMap(mapping => {
     const rawValue = locality[mapping.field]
     if (!isMeaningfulMeasurementValue(rawValue)) return []
 
     const measurementValue = toDwcString(rawValue).trim()
     if (!measurementValue) return []
 
+    const verbatimMeasurementType = mapping.field.toString()
+
+    const parentMeasurementID = (() => {
+      if (verbatimMeasurementType === 'bfa_max') return hasMaxAgeGroup ? maxAgeId : ''
+      if (verbatimMeasurementType === 'bfa_max_abs') return hasMaxAgeGroup ? maxAgeId : ''
+      if (verbatimMeasurementType === 'frac_max') return hasMaxAgeGroup ? maxAgeId : ''
+
+      if (verbatimMeasurementType === 'bfa_min') return hasMinAgeGroup ? minAgeId : ''
+      if (verbatimMeasurementType === 'bfa_min_abs') return hasMinAgeGroup ? minAgeId : ''
+      if (verbatimMeasurementType === 'frac_min') return hasMinAgeGroup ? minAgeId : ''
+
+      return ''
+    })()
+
+    const measurementID = buildLocalityMeasurementId(lid, verbatimMeasurementType)
+
     return [
       {
-        locationID,
-        measurementID: `NOW:LOC:${locality.lid}:${mapping.field.toString()}`,
+        taxonID,
+        measurementID,
+        parentMeasurementID,
         measurementType: mapping.measurementType,
-        verbatimMeasurementType: mapping.field.toString(),
+        verbatimMeasurementType,
         measurementValue,
         measurementUnit: mapping.measurementUnit,
         measurementMethod: mapping.measurementMethod,
-        // TODO(#1150): Decide whether any locality measurementRemarks should be emitted and from which columns.
-        measurementRemarks: '',
       },
     ]
   })
+
+  rows.push(...coreRows)
+
+  const localitySynonyms = locality.now_syn_loc
+    .map(row => row.synonym)
+    .filter((syn): syn is string => isMeaningfulString(syn))
+    .map(syn => syn.trim())
+
+  if (localitySynonyms.length) {
+    rows.push({
+      taxonID,
+      measurementID: buildLocalityMeasurementId(lid, 'synonyms'),
+      parentMeasurementID: '',
+      measurementType: 'synonyms',
+      verbatimMeasurementType: 'synonym',
+      measurementValue: localitySynonyms.join('|'),
+      measurementUnit: '',
+      // TODO(#1150): Add field description.
+      measurementMethod: '',
+    })
+  }
+
+  const lithologyValue = concatMeaningful([locality.rock_type, locality.rt_adj, locality.lith_comm])
+  if (lithologyValue) {
+    rows.push({
+      taxonID,
+      measurementID: buildLocalityMeasurementId(lid, 'lithology'),
+      parentMeasurementID: '',
+      measurementType: 'lithology',
+      verbatimMeasurementType: 'rock_type|rt_adj|lith_comm',
+      measurementValue: lithologyValue,
+      measurementUnit: '',
+      // TODO(#1150): Add field description.
+      measurementMethod: '',
+    })
+  }
+
+  const depositionalContextValue = concatMeaningful([
+    locality.depo_context1,
+    locality.depo_context2,
+    locality.depo_context3,
+    locality.depo_context4,
+    locality.depo_comm,
+  ])
+  if (depositionalContextValue) {
+    rows.push({
+      taxonID,
+      measurementID: buildLocalityMeasurementId(lid, 'depositional_context'),
+      parentMeasurementID: '',
+      measurementType: 'depositional context',
+      verbatimMeasurementType: 'depo_context1|depo_context2|depo_context3|depo_context4|depo_comm',
+      measurementValue: depositionalContextValue,
+      measurementUnit: '',
+      // TODO(#1150): Add field description.
+      measurementMethod: '',
+    })
+  }
+
+  const sedimentaryEnvironmentValue = concatMeaningful([
+    locality.sed_env_1,
+    locality.sed_env_2,
+    locality.event_circum,
+    locality.se_comm,
+  ])
+  if (sedimentaryEnvironmentValue) {
+    rows.push({
+      taxonID,
+      measurementID: buildLocalityMeasurementId(lid, 'sedimentary_environment'),
+      parentMeasurementID: '',
+      measurementType: 'sedimentary environment',
+      verbatimMeasurementType: 'sed_env_1|sed_env_2|event_circum|se_comm',
+      measurementValue: sedimentaryEnvironmentValue,
+      measurementUnit: '',
+      // TODO(#1150): Add field description.
+      measurementMethod: '',
+    })
+  }
+
+  const sedimentaryStructures = locality.now_ss
+    .map(row => row.sed_struct)
+    .filter(value => isMeaningfulString(value))
+    .map(value => value.trim())
+
+  const taphonomicDetailValue = concatMeaningful([
+    locality.assem_fm,
+    locality.transport,
+    locality.trans_mod,
+    locality.weath_trmp,
+    locality.pt_conc,
+    locality.size_type,
+    locality.vert_pres,
+    locality.plant_pres,
+    locality.invert_pres,
+    locality.time_rep,
+    locality.taph_comm,
+  ])
+
+  const sedimentaryStructureAndTaphonomicDetailValue = [
+    ...sedimentaryStructures,
+    ...(taphonomicDetailValue ? [taphonomicDetailValue] : []),
+  ].join('|')
+
+  if (sedimentaryStructureAndTaphonomicDetailValue) {
+    rows.push({
+      taxonID,
+      measurementID: buildLocalityMeasurementId(lid, 'sedimentary_structure_taphonomic_detail'),
+      parentMeasurementID: '',
+      measurementType: 'sedimentary structure & taphonomic detail',
+      verbatimMeasurementType:
+        'now_ss.sed_struct|assem_fm|transport|trans_mod|weath_trmp|pt_conc|size_type|vert_pres|plant_pres|invert_pres|time_rep|taph_comm',
+      measurementValue: sedimentaryStructureAndTaphonomicDetailValue,
+      measurementUnit: '',
+      // TODO(#1150): Add field description.
+      measurementMethod: '',
+    })
+  }
+
+  return rows
 }
 
 const DWC_TERMS = {
@@ -342,14 +645,14 @@ const DWC_TERMS = {
   },
   measurement: {
     rowType: 'http://rs.tdwg.org/dwc/terms/MeasurementOrFact',
-    locationID: 'http://rs.tdwg.org/dwc/terms/locationID',
+    taxonID: 'http://rs.tdwg.org/dwc/terms/locationID',
     measurementID: 'http://rs.tdwg.org/dwc/terms/measurementID',
+    parentMeasurementID: 'http://rs.tdwg.org/dwc/terms/parentMeasurementID',
     measurementType: 'http://rs.tdwg.org/dwc/terms/measurementType',
     verbatimMeasurementType: 'http://rs.tdwg.org/dwc/terms/verbatimMeasurementType',
     measurementValue: 'http://rs.tdwg.org/dwc/terms/measurementValue',
     measurementUnit: 'http://rs.tdwg.org/dwc/terms/measurementUnit',
     measurementMethod: 'http://rs.tdwg.org/dwc/terms/measurementMethod',
-    measurementRemarks: 'http://rs.tdwg.org/dwc/terms/measurementRemarks',
   },
 } as const
 
@@ -479,15 +782,54 @@ export const buildDwcLocalityArchiveZipBuffer = async (): Promise<Buffer> => {
       bed: true,
       bfa_max: true,
       bfa_min: true,
+      bfa_max_abs: true,
+      bfa_min_abs: true,
+      frac_max: true,
+      frac_min: true,
       max_age: true,
       min_age: true,
       date_meth: true,
       age_comm: true,
+      site_area: true,
+      appr_num_spm: true,
+      num_spm: true,
+      true_quant: true,
+      complete: true,
+      num_quad: true,
+      rock_type: true,
+      rt_adj: true,
+      lith_comm: true,
+      depo_context1: true,
+      depo_context2: true,
+      depo_context3: true,
+      depo_context4: true,
+      depo_comm: true,
+      sed_env_1: true,
+      sed_env_2: true,
+      event_circum: true,
+      se_comm: true,
+      assem_fm: true,
+      transport: true,
+      trans_mod: true,
+      weath_trmp: true,
+      pt_conc: true,
+      size_type: true,
+      vert_pres: true,
+      plant_pres: true,
+      invert_pres: true,
+      time_rep: true,
+      taph_comm: true,
       now_time_unit_now_loc_bfa_maxTonow_time_unit: {
         select: { tu_name: true, tu_display_name: true, rank: true, sequence: true },
       },
       now_time_unit_now_loc_bfa_minTonow_time_unit: {
         select: { tu_name: true, tu_display_name: true, rank: true, sequence: true },
+      },
+      now_syn_loc: {
+        select: { synonym: true },
+      },
+      now_ss: {
+        select: { sed_struct: true },
       },
     },
   })
