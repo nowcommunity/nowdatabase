@@ -122,6 +122,12 @@ const isSingleLowercaseWord = (value: string | null): boolean => {
   return /^[a-z]+$/.test(trimmed)
 }
 
+const isSinglePropercaseWord = (value: string | null): boolean => {
+  if (!isMeaningfulString(value)) return false
+  const trimmed = value.trim()
+  return /^[A-Z][a-z]+$/.test(trimmed)
+}
+
 const isSpeciesSp = (value: string): boolean => /^sp\.?$/i.test(value.trim())
 
 const includesIndet = (value: string): boolean => value.toLowerCase().includes('indet.')
@@ -145,28 +151,35 @@ const resolveTaxonRank = ({
   tribe: string
   subtribe: string
 }): string => {
-  // Start from the lowest rank to the highest, but respect the indet.* rules which
-  // indicate that lower taxa are unknown and we should not emit species/subspecies ranks.
-  const genusIndet = includesIndet(genus)
-  const epithetIndet = includesIndet(specificEpithet)
+  const genusIsPropercaseWord = isSinglePropercaseWord(genus)
+  const specificEpithetIsLowercaseWord = isSingleLowercaseWord(specificEpithet)
+  const uniqueIdentifierIsSingleLowercaseWord = isSingleLowercaseWord(uniqueIdentifier)
 
-  if (!genusIndet && !epithetIndet) {
-    const speciesSp = isSpeciesSp(specificEpithet)
-    if (!speciesSp && isSingleLowercaseWord(uniqueIdentifier)) return 'subspecies'
-    if (uniqueIdentifier === '-') return 'species'
-    if (speciesSp) return 'species'
+  // IMPORTANT: Rule order matters; implement in the exact execution order requested.
+  if (uniqueIdentifierIsSingleLowercaseWord && specificEpithetIsLowercaseWord && genusIsPropercaseWord) {
+    return 'subspecies'
   }
 
-  if (!genusIndet && epithetIndet) return 'genus'
+  if (isSpeciesSp(specificEpithet) && genusIsPropercaseWord) return 'species'
 
-  if (genusIndet) {
+  if (uniqueIdentifier === '-' && specificEpithetIsLowercaseWord && genusIsPropercaseWord) return 'species'
+
+  if (uniqueIdentifier !== null && specificEpithetIsLowercaseWord && genusIsPropercaseWord) return 'species'
+
+  if (includesIndet(specificEpithet) && genusIsPropercaseWord) return 'genus'
+
+  if (includesIndet(genus)) {
     if (subtribe) return 'subtribe'
     if (tribe) return 'tribe'
     if (subfamily) return 'subfamily'
-    if (!isMeaningfulString(subclassOrSuperorderName)) return 'family'
-    if (includesIndet(family)) return 'order'
-    return 'family'
+
+    const familyTrimmed = family.trim()
+    const isIncertaeSedis = familyTrimmed.toLowerCase() === 'incertae sedis'
+    const endsWithIdae = endsWithSuffix(familyTrimmed, 'idae')
+    if (!isMeaningfulString(subclassOrSuperorderName) && (endsWithIdae || isIncertaeSedis)) return 'family'
   }
+
+  if (includesIndet(family)) return 'order'
 
   return 'species'
 }
