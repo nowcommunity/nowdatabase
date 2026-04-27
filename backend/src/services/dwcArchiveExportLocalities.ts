@@ -1,4 +1,4 @@
-import Prisma from '../../prisma/generated/now_test_client'
+import type { now_loc, now_time_unit } from '../../prisma/generated/now_test_client'
 import { format } from 'fast-csv'
 import { Writable } from 'stream'
 import JSZip from 'jszip'
@@ -106,10 +106,10 @@ export const LOCALITY_MEASUREMENT_HEADERS = [
 export type LocalityMeasurementCsvHeader = (typeof LOCALITY_MEASUREMENT_HEADERS)[number]
 export type LocalityMeasurementCsvRow = Record<LocalityMeasurementCsvHeader, string>
 
-type TimeUnitForLocalityExport = Pick<Prisma.now_time_unit, 'tu_name' | 'tu_display_name' | 'rank' | 'sequence'>
+type TimeUnitForLocalityExport = Pick<now_time_unit, 'tu_name' | 'tu_display_name' | 'rank' | 'sequence'>
 
 type LocalityForExport = Pick<
-  Prisma.now_loc,
+  now_loc,
   | 'lid'
   | 'loc_name'
   | 'country'
@@ -431,42 +431,38 @@ export const buildDwcLocalityArchiveZipBufferFromLocalities = async (
 }
 
 export const buildDwcLocalityArchiveZipBuffer = async (): Promise<Buffer> => {
-  const prisma = new Prisma.PrismaClient()
-  try {
-    const localities = await prisma.now_loc.findMany({
-      select: {
-        lid: true,
-        loc_name: true,
-        country: true,
-        state: true,
-        county: true,
-        dec_lat: true,
-        dec_long: true,
-        dms_lat: true,
-        dms_long: true,
-        loc_detail: true,
-        chron: true,
-        lgroup: true,
-        formation: true,
-        member: true,
-        bed: true,
-        bfa_max: true,
-        bfa_min: true,
-        max_age: true,
-        min_age: true,
-        date_meth: true,
-        age_comm: true,
-        now_time_unit_now_loc_bfa_maxTonow_time_unit: {
-          select: { tu_name: true, tu_display_name: true, rank: true, sequence: true },
-        },
-        now_time_unit_now_loc_bfa_minTonow_time_unit: {
-          select: { tu_name: true, tu_display_name: true, rank: true, sequence: true },
-        },
+  const { nowDb } = await import('../utils/db')
+  const localities = await nowDb.now_loc.findMany({
+    select: {
+      lid: true,
+      loc_name: true,
+      country: true,
+      state: true,
+      county: true,
+      dec_lat: true,
+      dec_long: true,
+      dms_lat: true,
+      dms_long: true,
+      loc_detail: true,
+      chron: true,
+      lgroup: true,
+      formation: true,
+      member: true,
+      bed: true,
+      bfa_max: true,
+      bfa_min: true,
+      max_age: true,
+      min_age: true,
+      date_meth: true,
+      age_comm: true,
+      now_time_unit_now_loc_bfa_maxTonow_time_unit: {
+        select: { tu_name: true, tu_display_name: true, rank: true, sequence: true },
       },
-    })
+      now_time_unit_now_loc_bfa_minTonow_time_unit: {
+        select: { tu_name: true, tu_display_name: true, rank: true, sequence: true },
+      },
+    },
+  })
 
-    return await buildDwcLocalityArchiveZipBufferFromLocalities(localities as unknown as LocalityForExport[])
-  } finally {
-    await prisma.$disconnect()
-  }
+  return await buildDwcLocalityArchiveZipBufferFromLocalities(localities as unknown as LocalityForExport[])
 }
