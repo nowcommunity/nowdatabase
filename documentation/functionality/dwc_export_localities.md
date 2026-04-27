@@ -20,11 +20,14 @@ v1 columns:
 
 - `locationID` = `NOW:LOC:<lid>`
 - `locality` = `loc_name`
+- `continent` = derived from `country` (via shared country→continent map)
 - `country` = `country`
 - `stateProvince` = `state`
 - `county` = `county`
+- `higherGeography` = `continent|country|state|county|basin|subbasin` (skip empty)
 - `decimalLatitude` / `decimalLongitude` = `dec_lat` / `dec_long` (0 treated as empty for v1)
 - `verbatimLatitude` / `verbatimLongitude` = `dms_lat` / `dms_long`
+- `verbatimElevation` = `altitude`
 - `locationRemarks` = `loc_detail` and `age_comm` (joined with ` | `)
 
 ## Extension: `geologicalcontext.csv`
@@ -53,4 +56,3 @@ v1 emits a small set of locality/time-related measurements. Each row has:
 ## Admin-only
 
 The backend route is restricted to `Role.Admin`.
-

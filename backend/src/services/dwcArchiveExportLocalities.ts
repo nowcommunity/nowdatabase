@@ -2,6 +2,7 @@ import type { now_loc, now_time_unit } from '../../prisma/generated/now_test_cli
 import { format } from 'fast-csv'
 import { Writable } from 'stream'
 import JSZip from 'jszip'
+import { getContinentByCountry } from '../../../frontend/src/shared/validators/countryContinents'
 
 const isMeaningfulString = (value: unknown): value is string => {
   if (typeof value !== 'string') return false
@@ -64,13 +65,16 @@ const writeCsvString = async (headers: string[], rows: Array<Record<string, unkn
 export const LOCATION_HEADERS = [
   'locationID',
   'locality',
+  'continent',
   'country',
   'stateProvince',
   'county',
+  'higherGeography',
   'decimalLatitude',
   'decimalLongitude',
   'verbatimLatitude',
   'verbatimLongitude',
+  'verbatimElevation',
   'locationRemarks',
 ] as const
 
@@ -112,6 +116,8 @@ type LocalityForExport = Pick<
   now_loc,
   | 'lid'
   | 'loc_name'
+  | 'basin'
+  | 'subbasin'
   | 'country'
   | 'state'
   | 'county'
@@ -119,6 +125,7 @@ type LocalityForExport = Pick<
   | 'dec_long'
   | 'dms_lat'
   | 'dms_long'
+  | 'altitude'
   | 'loc_detail'
   | 'chron'
   | 'lgroup'
@@ -150,17 +157,32 @@ const toMaybeMeaningfulNumber = (value: number | null | undefined): string => {
 
 export const mapLocalityToLocationRow = (locality: LocalityForExport): LocationCsvRow => {
   const locationID = locationIdForLocality(locality.lid)
+  const continent = getContinentByCountry(locality.country) ?? ''
+
+  const higherGeography = [
+    continent,
+    toMaybeMeaningful(locality.country),
+    toMaybeMeaningful(locality.state),
+    toMaybeMeaningful(locality.county),
+    toMaybeMeaningful(locality.basin),
+    toMaybeMeaningful(locality.subbasin),
+  ]
+    .filter(Boolean)
+    .join('|')
 
   return {
     locationID,
     locality: toMaybeMeaningful(locality.loc_name),
+    continent,
     country: toMaybeMeaningful(locality.country),
     stateProvince: toMaybeMeaningful(locality.state),
     county: toMaybeMeaningful(locality.county),
+    higherGeography,
     decimalLatitude: toMaybeMeaningfulNumber(locality.dec_lat),
     decimalLongitude: toMaybeMeaningfulNumber(locality.dec_long),
     verbatimLatitude: toMaybeMeaningful(locality.dms_lat),
     verbatimLongitude: toMaybeMeaningful(locality.dms_long),
+    verbatimElevation: locality.altitude === null || locality.altitude === undefined ? '' : String(locality.altitude),
     locationRemarks: [toMaybeMeaningful(locality.loc_detail), toMaybeMeaningful(locality.age_comm)]
       .filter(Boolean)
       .join(' | '),
@@ -294,13 +316,16 @@ const DWC_TERMS = {
     rowType: 'http://rs.tdwg.org/dwc/terms/Location',
     locationID: 'http://rs.tdwg.org/dwc/terms/locationID',
     locality: 'http://rs.tdwg.org/dwc/terms/locality',
+    continent: 'http://rs.tdwg.org/dwc/terms/continent',
     country: 'http://rs.tdwg.org/dwc/terms/country',
     stateProvince: 'http://rs.tdwg.org/dwc/terms/stateProvince',
     county: 'http://rs.tdwg.org/dwc/terms/county',
+    higherGeography: 'http://rs.tdwg.org/dwc/terms/higherGeography',
     decimalLatitude: 'http://rs.tdwg.org/dwc/terms/decimalLatitude',
     decimalLongitude: 'http://rs.tdwg.org/dwc/terms/decimalLongitude',
     verbatimLatitude: 'http://rs.tdwg.org/dwc/terms/verbatimLatitude',
     verbatimLongitude: 'http://rs.tdwg.org/dwc/terms/verbatimLongitude',
+    verbatimElevation: 'http://rs.tdwg.org/dwc/terms/verbatimElevation',
     locationRemarks: 'http://rs.tdwg.org/dwc/terms/locationRemarks',
   },
   geologicalContext: {
@@ -436,6 +461,8 @@ export const buildDwcLocalityArchiveZipBuffer = async (): Promise<Buffer> => {
     select: {
       lid: true,
       loc_name: true,
+      basin: true,
+      subbasin: true,
       country: true,
       state: true,
       county: true,
@@ -443,6 +470,7 @@ export const buildDwcLocalityArchiveZipBuffer = async (): Promise<Buffer> => {
       dec_long: true,
       dms_lat: true,
       dms_long: true,
+      altitude: true,
       loc_detail: true,
       chron: true,
       lgroup: true,

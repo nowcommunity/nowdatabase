@@ -12,6 +12,8 @@ describe('DwC-A locality export mapping', () => {
   const baseLocality = {
     lid: 42,
     loc_name: 'Test locality',
+    basin: 'Test basin',
+    subbasin: 'Test subbasin',
     country: 'Finland',
     state: 'Uusimaa',
     county: 'Helsinki',
@@ -19,6 +21,7 @@ describe('DwC-A locality export mapping', () => {
     dec_long: 24.9384,
     dms_lat: null,
     dms_long: null,
+    altitude: 123,
     loc_detail: 'Some notes',
     chron: 'Test chron',
     lgroup: 'Test group',
@@ -39,11 +42,14 @@ describe('DwC-A locality export mapping', () => {
     const row = mapLocalityToLocationRow(baseLocality)
     expect(row.locationID).toEqual('NOW:LOC:42')
     expect(row.locality).toEqual('Test locality')
+    expect(row.continent).toEqual('Europe')
     expect(row.country).toEqual('Finland')
     expect(row.stateProvince).toEqual('Uusimaa')
     expect(row.county).toEqual('Helsinki')
+    expect(row.higherGeography).toEqual('Europe|Finland|Uusimaa|Helsinki|Test basin|Test subbasin')
     expect(row.decimalLatitude).toEqual('60.1699')
     expect(row.decimalLongitude).toEqual('24.9384')
+    expect(row.verbatimElevation).toEqual('123')
     expect(row.locationRemarks).toContain('Some notes')
   })
 
