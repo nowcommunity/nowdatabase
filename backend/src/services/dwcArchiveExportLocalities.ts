@@ -384,6 +384,90 @@ const LOCALITY_MEASUREMENT_MAPPINGS: Array<{
     measurementMethod: '',
   },
   {
+    field: 'rock_type',
+    measurementType: 'rock type',
+    measurementUnit: '',
+    // TODO(#1150): Add field description / controlled vocabulary.
+    measurementMethod: '',
+  },
+  {
+    field: 'rt_adj',
+    measurementType: 'rock type adjective',
+    measurementUnit: '',
+    // TODO(#1150): Add field description / controlled vocabulary.
+    measurementMethod: '',
+  },
+  {
+    field: 'lith_comm',
+    measurementType: 'lithology comment',
+    measurementUnit: '',
+    // TODO(#1150): Add field description / controlled vocabulary.
+    measurementMethod: '',
+  },
+  {
+    field: 'sed_env_1',
+    measurementType: 'sedimentary environment 1',
+    measurementUnit: '',
+    // TODO(#1150): Add field description / controlled vocabulary.
+    measurementMethod: '',
+  },
+  {
+    field: 'sed_env_2',
+    measurementType: 'sedimentary environment 2',
+    measurementUnit: '',
+    // TODO(#1150): Add field description / controlled vocabulary.
+    measurementMethod: '',
+  },
+  {
+    field: 'event_circum',
+    measurementType: 'event circumstances',
+    measurementUnit: '',
+    // TODO(#1150): Add field description / controlled vocabulary.
+    measurementMethod: '',
+  },
+  {
+    field: 'se_comm',
+    measurementType: 'sedimentary environment comment',
+    measurementUnit: '',
+    // TODO(#1150): Add field description / controlled vocabulary.
+    measurementMethod: '',
+  },
+  {
+    field: 'depo_context1',
+    measurementType: 'depositional context 1',
+    measurementUnit: '',
+    // TODO(#1150): Add field description / controlled vocabulary.
+    measurementMethod: '',
+  },
+  {
+    field: 'depo_context2',
+    measurementType: 'depositional context 2',
+    measurementUnit: '',
+    // TODO(#1150): Add field description / controlled vocabulary.
+    measurementMethod: '',
+  },
+  {
+    field: 'depo_context3',
+    measurementType: 'depositional context 3',
+    measurementUnit: '',
+    // TODO(#1150): Add field description / controlled vocabulary.
+    measurementMethod: '',
+  },
+  {
+    field: 'depo_context4',
+    measurementType: 'depositional context 4',
+    measurementUnit: '',
+    // TODO(#1150): Add field description / controlled vocabulary.
+    measurementMethod: '',
+  },
+  {
+    field: 'depo_comm',
+    measurementType: 'depositional context comment',
+    measurementUnit: '',
+    // TODO(#1150): Add field description / controlled vocabulary.
+    measurementMethod: '',
+  },
+  {
     field: 'chron',
     measurementType: 'chron',
     measurementUnit: '',
@@ -510,62 +594,6 @@ export const mapLocalityToMeasurementRows = (locality: LocalityForExport): Local
       measurementType: 'synonyms',
       verbatimMeasurementType: 'synonym',
       measurementValue: localitySynonyms.join('|'),
-      measurementUnit: '',
-      // TODO(#1150): Add field description.
-      measurementMethod: '',
-    })
-  }
-
-  const lithologyValue = concatMeaningful([locality.rock_type, locality.rt_adj, locality.lith_comm])
-  if (lithologyValue) {
-    rows.push({
-      taxonID,
-      measurementID: buildLocalityMeasurementId(lid, 'lithology'),
-      parentMeasurementID: '',
-      measurementType: 'lithology',
-      verbatimMeasurementType: 'rock_type|rt_adj|lith_comm',
-      measurementValue: lithologyValue,
-      measurementUnit: '',
-      // TODO(#1150): Add field description.
-      measurementMethod: '',
-    })
-  }
-
-  const depositionalContextValue = concatMeaningful([
-    locality.depo_context1,
-    locality.depo_context2,
-    locality.depo_context3,
-    locality.depo_context4,
-    locality.depo_comm,
-  ])
-  if (depositionalContextValue) {
-    rows.push({
-      taxonID,
-      measurementID: buildLocalityMeasurementId(lid, 'depositional_context'),
-      parentMeasurementID: '',
-      measurementType: 'depositional context',
-      verbatimMeasurementType: 'depo_context1|depo_context2|depo_context3|depo_context4|depo_comm',
-      measurementValue: depositionalContextValue,
-      measurementUnit: '',
-      // TODO(#1150): Add field description.
-      measurementMethod: '',
-    })
-  }
-
-  const sedimentaryEnvironmentValue = concatMeaningful([
-    locality.sed_env_1,
-    locality.sed_env_2,
-    locality.event_circum,
-    locality.se_comm,
-  ])
-  if (sedimentaryEnvironmentValue) {
-    rows.push({
-      taxonID,
-      measurementID: buildLocalityMeasurementId(lid, 'sedimentary_environment'),
-      parentMeasurementID: '',
-      measurementType: 'sedimentary environment',
-      verbatimMeasurementType: 'sed_env_1|sed_env_2|event_circum|se_comm',
-      measurementValue: sedimentaryEnvironmentValue,
       measurementUnit: '',
       // TODO(#1150): Add field description.
       measurementMethod: '',

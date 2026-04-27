@@ -56,7 +56,12 @@ Each emitted row has:
 - `parentMeasurementID` is used for the age hierarchy:
   - `NOW:LOC:<lid>:age` (parent) → `max_age` / `min_age`
   - `bfa_*`, `*_abs`, `frac_*` link to the relevant `max_age` / `min_age`
-- `verbatimMeasurementType` = original DB field name (or `|`-joined source field list for concatenated group rows)
+- `verbatimMeasurementType` = original DB field name
+
+Concatenation rules (v1):
+
+- Locality synonyms are concatenated with `|` into a single `synonyms` measurement row.
+- Sedimentary Structure & Taphonomic Detail values are concatenated with `|` into a single measurement row.
 
 ## Admin-only
 
