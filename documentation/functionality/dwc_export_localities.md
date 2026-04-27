@@ -61,7 +61,12 @@ Each emitted row has:
 Concatenation rules (v1):
 
 - Locality synonyms are concatenated with `|` into a single `synonyms` measurement row.
-- Sedimentary Structure & Taphonomic Detail values are concatenated with `|` into a single measurement row.
+- Collecting methods (`now_coll_meth`) are concatenated with `|` into a single measurement row.
+- Sedimentary structures (`now_ss`) are concatenated with `|` into a single measurement row.
+
+Field coverage (v1):
+
+- Fossil Assemblage, Taphonomy, Climate, Ecometrics, and Archaeology tab fields are exported as `MeasurementOrFact` rows when populated (plus selected calculated values such as mean hypsodonty).
 
 ## Admin-only
 

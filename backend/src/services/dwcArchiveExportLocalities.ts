@@ -19,6 +19,11 @@ const toDwcString = (value: unknown): string => {
   if (typeof value === 'boolean') return value ? 'true' : 'false'
   if (typeof value === 'string') return value
   if (typeof value === 'object') {
+    if (value instanceof Date) return value.toISOString()
+    if (typeof (value as { toString?: unknown }).toString === 'function') {
+      const asString = (value as { toString: () => string }).toString()
+      if (asString && asString !== '[object Object]') return asString
+    }
     try {
       return JSON.stringify(value) ?? ''
     } catch {
@@ -171,11 +176,51 @@ type LocalityForExport = Pick<
   | 'invert_pres'
   | 'time_rep'
   | 'taph_comm'
+  | 'climate_type'
+  | 'biome'
+  | 'v_ht'
+  | 'v_struct'
+  | 'v_envi_det'
+  | 'disturb'
+  | 'nutrients'
+  | 'water'
+  | 'seasonality'
+  | 'seas_intens'
+  | 'pri_prod'
+  | 'moisture'
+  | 'temperature'
+  | 'estimate_precip'
+  | 'estimate_temp'
+  | 'estimate_npp'
+  | 'pers_woody_cover'
+  | 'pers_pollen_ap'
+  | 'pers_pollen_nap'
+  | 'pers_pollen_other'
+  | 'stone_tool_cut_marks_on_bones'
+  | 'bipedal_footprints'
+  | 'stone_tool_technology'
+  | 'technological_mode_1'
+  | 'technological_mode_2'
+  | 'technological_mode_3'
+  | 'cultural_stage_1'
+  | 'cultural_stage_2'
+  | 'cultural_stage_3'
+  | 'regional_culture_1'
+  | 'regional_culture_2'
+  | 'regional_culture_3'
 > & {
   now_time_unit_now_loc_bfa_maxTonow_time_unit: TimeUnitForLocalityExport | null
   now_time_unit_now_loc_bfa_minTonow_time_unit: TimeUnitForLocalityExport | null
   now_syn_loc: ReadonlyArray<{ synonym: string | null }>
   now_ss: ReadonlyArray<{ sed_struct: string }>
+  now_coll_meth: ReadonlyArray<{ coll_meth: string }>
+  now_ls: ReadonlyArray<{
+    com_species: {
+      order_name: string
+      tht: string | null
+      genus_name: string | null
+    }
+  }>
 }
 
 const locationIdForLocality = (lid: number): string => `NOW:LOC:${lid}`
@@ -267,12 +312,8 @@ const isMeaningfulMeasurementValue = (value: unknown): boolean => {
   if (value === null || value === undefined) return false
   if (typeof value === 'string') return isMeaningfulString(value)
   if (typeof value === 'number') return Number.isFinite(value) && value !== 0
+  if (typeof value === 'boolean') return value
   return true
-}
-
-const concatMeaningful = (values: Array<string | null | undefined>): string => {
-  const parts = values.map(toMaybeMeaningful).filter(Boolean)
-  return parts.join('|')
 }
 
 const buildLocalityMeasurementId = (lid: number, kind: string): string => `NOW:LOC:${lid}:${kind}`
@@ -286,11 +327,80 @@ const formatAgeRange = (locality: LocalityForExport): string => {
   return ''
 }
 
+const calculateMeanHypsodontyForExport = (locality: Pick<LocalityForExport, 'now_ls'>): number => {
+  const relevantOrderNames = [
+    'Perissodactyla',
+    'Artiodactyla',
+    'Primates',
+    'Proboscidea',
+    'Hyracoidea',
+    'Dinocerata',
+    'Embrithopoda',
+    'Notoungulata',
+    'Astrapotheria',
+    'Pyrotheria',
+    'Litopterna',
+    'Condylarthra',
+    'Pantodonta',
+  ]
+
+  const thtToValue = {
+    bra: 1.0,
+    mes: 2.0,
+    hyp: 3.0,
+    hys: 3.0,
+    none: 0.0,
+  } as Record<string, number>
+
+  const values = locality.now_ls
+    .map(row => row.com_species)
+    .filter(species => relevantOrderNames.includes(species.order_name))
+    .map(species => thtToValue[species.tht ?? 'none'])
+
+  const sum = values.reduce((acc, cur) => acc + cur, 0.0)
+  const mean = values.length > 0 ? sum / values.length : 0.0
+  return parseFloat((Math.floor(mean * 100) / 100).toFixed(2))
+}
+
+const hasHomininSkeletalRemainsForExport = (locality: Pick<LocalityForExport, 'now_ls'>): boolean => {
+  const hominins = [
+    'sahelanthropus',
+    'orrorin',
+    'ardipithecus',
+    'kenyanthropus',
+    'australopithecus',
+    'paranthropus',
+    'homo',
+  ]
+
+  return locality.now_ls.some(({ com_species }) => {
+    const genusName = com_species.genus_name
+    if (!genusName) return false
+    return hominins.includes(genusName.toLowerCase())
+  })
+}
+
+const isNumberMeaningful = (value: number | null | undefined, { allowZero }: { allowZero: boolean }): boolean => {
+  if (value === null || value === undefined) return false
+  if (!Number.isFinite(value)) return false
+  if (!allowZero && value === 0) return false
+  return true
+}
+
+const toMaybeMeaningfulNumberWithZeroOption = (
+  value: number | null | undefined,
+  { allowZero }: { allowZero: boolean }
+): string => {
+  if (!isNumberMeaningful(value, { allowZero })) return ''
+  return value!.toString()
+}
+
 const LOCALITY_MEASUREMENT_MAPPINGS: Array<{
   field: keyof LocalityForExport
   measurementType: string
   measurementUnit: string
   measurementMethod: string
+  allowZero?: boolean
 }> = [
   {
     field: 'bfa_max',
@@ -474,6 +584,287 @@ const LOCALITY_MEASUREMENT_MAPPINGS: Array<{
     // TODO(#1150): Add field description.
     measurementMethod: '',
   },
+  {
+    field: 'assem_fm',
+    measurementType: 'Assemblage Formation',
+    measurementUnit: '',
+    // TODO(#1150): Add field description / controlled vocabulary.
+    measurementMethod: '',
+  },
+  {
+    field: 'transport',
+    measurementType: 'Transport',
+    measurementUnit: '',
+    // TODO(#1150): Add field description / controlled vocabulary.
+    measurementMethod: '',
+  },
+  {
+    field: 'trans_mod',
+    measurementType: 'Abrasion',
+    measurementUnit: '',
+    // TODO(#1150): Add field description / controlled vocabulary.
+    measurementMethod: '',
+  },
+  {
+    field: 'weath_trmp',
+    measurementType: 'Weathering / Trampling',
+    measurementUnit: '',
+    // TODO(#1150): Add field description / controlled vocabulary.
+    measurementMethod: '',
+  },
+  {
+    field: 'pt_conc',
+    measurementType: 'Part Concentration',
+    measurementUnit: '',
+    // TODO(#1150): Add field description / controlled vocabulary.
+    measurementMethod: '',
+  },
+  {
+    field: 'size_type',
+    measurementType: 'Assemblage Component Size',
+    measurementUnit: '',
+    // TODO(#1150): Add field description / controlled vocabulary.
+    measurementMethod: '',
+  },
+  {
+    field: 'time_rep',
+    measurementType: 'Time Represented (years)',
+    measurementUnit: '',
+    // TODO(#1150): Add unit and definition (years bins).
+    measurementMethod: '',
+  },
+  {
+    field: 'vert_pres',
+    measurementType: 'Vertebrate Preservation',
+    measurementUnit: '',
+    // TODO(#1150): Add controlled vocabulary.
+    measurementMethod: '',
+  },
+  {
+    field: 'taph_comm',
+    measurementType: 'Taphonomy comment',
+    measurementUnit: '',
+    // TODO(#1150): Add field description.
+    measurementMethod: '',
+  },
+  {
+    field: 'climate_type',
+    measurementType: 'Climate Type',
+    measurementUnit: '',
+    // TODO(#1150): Add field description / controlled vocabulary.
+    measurementMethod: '',
+  },
+  {
+    field: 'temperature',
+    measurementType: 'Temperature',
+    measurementUnit: '',
+    // TODO(#1150): Add field description / controlled vocabulary.
+    measurementMethod: '',
+  },
+  {
+    field: 'moisture',
+    measurementType: 'Moisture',
+    measurementUnit: '',
+    // TODO(#1150): Add field description / controlled vocabulary.
+    measurementMethod: '',
+  },
+  {
+    field: 'disturb',
+    measurementType: 'Agent(s) of Disturbance',
+    measurementUnit: '',
+    // TODO(#1150): Add field description / controlled vocabulary.
+    measurementMethod: '',
+  },
+  {
+    field: 'v_envi_det',
+    measurementType: 'Environment & Vegetation Detail',
+    measurementUnit: '',
+    // TODO(#1150): Add field description.
+    measurementMethod: '',
+  },
+  {
+    field: 'seasonality',
+    measurementType: 'Seasonality',
+    measurementUnit: '',
+    // TODO(#1150): Add field description / controlled vocabulary.
+    measurementMethod: '',
+  },
+  {
+    field: 'seas_intens',
+    measurementType: 'Seasonality Intensity',
+    measurementUnit: '',
+    // TODO(#1150): Add unit and definition.
+    measurementMethod: '',
+  },
+  {
+    field: 'biome',
+    measurementType: 'Biome',
+    measurementUnit: '',
+    // TODO(#1150): Add field description / controlled vocabulary.
+    measurementMethod: '',
+  },
+  {
+    field: 'v_ht',
+    measurementType: 'Vegetation Height',
+    measurementUnit: '',
+    // TODO(#1150): Add field description / controlled vocabulary.
+    measurementMethod: '',
+  },
+  {
+    field: 'v_struct',
+    measurementType: 'Vegetation Structure',
+    measurementUnit: '',
+    // TODO(#1150): Add field description / controlled vocabulary.
+    measurementMethod: '',
+  },
+  {
+    field: 'pri_prod',
+    measurementType: 'Primary Productivity Level',
+    measurementUnit: '',
+    // TODO(#1150): Add field description / controlled vocabulary.
+    measurementMethod: '',
+  },
+  {
+    field: 'nutrients',
+    measurementType: 'Nutrient Availability',
+    measurementUnit: '',
+    // TODO(#1150): Add field description / controlled vocabulary.
+    measurementMethod: '',
+  },
+  {
+    field: 'water',
+    measurementType: 'Water Availability',
+    measurementUnit: '',
+    // TODO(#1150): Add field description / controlled vocabulary.
+    measurementMethod: '',
+  },
+  {
+    field: 'pers_pollen_ap',
+    measurementType: 'Arboreal pollen (AP%)',
+    measurementUnit: '%',
+    measurementMethod: '',
+    allowZero: true,
+  },
+  {
+    field: 'pers_pollen_nap',
+    measurementType: 'Non-arboreal pollen (NAP%)',
+    measurementUnit: '%',
+    measurementMethod: '',
+    allowZero: true,
+  },
+  {
+    field: 'pers_pollen_other',
+    measurementType: 'Other pollen (OP%)',
+    measurementUnit: '%',
+    measurementMethod: '',
+    allowZero: true,
+  },
+  {
+    field: 'estimate_precip',
+    measurementType: 'Estimate of annual precipitation (mm)',
+    measurementUnit: 'mm',
+    measurementMethod: '',
+    allowZero: true,
+  },
+  {
+    field: 'estimate_temp',
+    measurementType: 'Estimate of mean annual temperature (°C)',
+    measurementUnit: '°C',
+    measurementMethod: '',
+    allowZero: true,
+  },
+  {
+    field: 'estimate_npp',
+    measurementType: 'Estimate of net primary productivity (g/m2/yr)',
+    measurementUnit: 'g/m2/yr',
+    measurementMethod: '',
+    allowZero: true,
+  },
+  {
+    field: 'pers_woody_cover',
+    measurementType: 'Woody cover percentage',
+    measurementUnit: '%',
+    measurementMethod: '',
+    allowZero: true,
+  },
+  {
+    field: 'stone_tool_cut_marks_on_bones',
+    measurementType: 'Stone tool cut marks on bones',
+    measurementUnit: '',
+    // TODO(#1150): Add field description.
+    measurementMethod: '',
+  },
+  {
+    field: 'bipedal_footprints',
+    measurementType: 'Bipedal footprints',
+    measurementUnit: '',
+    // TODO(#1150): Add field description.
+    measurementMethod: '',
+  },
+  {
+    field: 'stone_tool_technology',
+    measurementType: 'Stone tool technology',
+    measurementUnit: '',
+    // TODO(#1150): Add field description.
+    measurementMethod: '',
+  },
+  {
+    field: 'technological_mode_1',
+    measurementType: 'Technological mode 1',
+    measurementUnit: '',
+    measurementMethod: '',
+    allowZero: true,
+  },
+  {
+    field: 'technological_mode_2',
+    measurementType: 'Technological mode 2',
+    measurementUnit: '',
+    measurementMethod: '',
+    allowZero: true,
+  },
+  {
+    field: 'technological_mode_3',
+    measurementType: 'Technological mode 3',
+    measurementUnit: '',
+    measurementMethod: '',
+    allowZero: true,
+  },
+  {
+    field: 'cultural_stage_1',
+    measurementType: 'Cultural stage 1',
+    measurementUnit: '',
+    measurementMethod: '',
+  },
+  {
+    field: 'cultural_stage_2',
+    measurementType: 'Cultural stage 2',
+    measurementUnit: '',
+    measurementMethod: '',
+  },
+  {
+    field: 'cultural_stage_3',
+    measurementType: 'Cultural stage 3',
+    measurementUnit: '',
+    measurementMethod: '',
+  },
+  {
+    field: 'regional_culture_1',
+    measurementType: 'Regional culture 1',
+    measurementUnit: '',
+    measurementMethod: '',
+  },
+  {
+    field: 'regional_culture_2',
+    measurementType: 'Regional culture 2',
+    measurementUnit: '',
+    measurementMethod: '',
+  },
+  {
+    field: 'regional_culture_3',
+    measurementType: 'Regional culture 3',
+    measurementUnit: '',
+    measurementMethod: '',
+  },
 ]
 
 export const mapLocalityToMeasurementRows = (locality: LocalityForExport): LocalityMeasurementCsvRow[] => {
@@ -544,9 +935,15 @@ export const mapLocalityToMeasurementRows = (locality: LocalityForExport): Local
 
   const coreRows = LOCALITY_MEASUREMENT_MAPPINGS.flatMap(mapping => {
     const rawValue = locality[mapping.field]
-    if (!isMeaningfulMeasurementValue(rawValue)) return []
 
-    const measurementValue = toDwcString(rawValue).trim()
+    const measurementValue = (() => {
+      if (typeof rawValue === 'number') {
+        return toMaybeMeaningfulNumberWithZeroOption(rawValue, { allowZero: mapping.allowZero ?? false })
+      }
+      if (!isMeaningfulMeasurementValue(rawValue)) return ''
+      return toDwcString(rawValue).trim()
+    })()
+
     if (!measurementValue) return []
 
     const verbatimMeasurementType = mapping.field.toString()
@@ -581,6 +978,55 @@ export const mapLocalityToMeasurementRows = (locality: LocalityForExport): Local
 
   rows.push(...coreRows)
 
+  const collectingMethods = locality.now_coll_meth
+    .map(method => method.coll_meth)
+    .filter(value => isMeaningfulString(value))
+    .map(value => value.trim())
+
+  if (collectingMethods.length) {
+    rows.push({
+      taxonID,
+      measurementID: buildLocalityMeasurementId(lid, 'collecting_methods'),
+      parentMeasurementID: '',
+      measurementType: 'Collecting Methods',
+      verbatimMeasurementType: 'now_coll_meth.coll_meth',
+      measurementValue: collectingMethods.join('|'),
+      measurementUnit: '',
+      // TODO(#1150): Add field description.
+      measurementMethod: '',
+    })
+  }
+
+  const meanHypsodonty = calculateMeanHypsodontyForExport(locality)
+  if (isNumberMeaningful(meanHypsodonty, { allowZero: true })) {
+    rows.push({
+      taxonID,
+      measurementID: buildLocalityMeasurementId(lid, 'mean_hypsodonty'),
+      parentMeasurementID: '',
+      measurementType: 'Mean hypsodonty',
+      verbatimMeasurementType: 'calculated_mean_hypsodonty',
+      measurementValue: meanHypsodonty.toString(),
+      measurementUnit: '',
+      // TODO(#1150): Document calculation provenance (see frontend shared calculations).
+      measurementMethod: '',
+    })
+  }
+
+  const homininSkeletalRemains = hasHomininSkeletalRemainsForExport(locality)
+  if (homininSkeletalRemains) {
+    rows.push({
+      taxonID,
+      measurementID: buildLocalityMeasurementId(lid, 'hominin_skeletal_remains'),
+      parentMeasurementID: '',
+      measurementType: 'Hominin skeletal remains',
+      verbatimMeasurementType: 'calculated_hominin_skeletal_remains',
+      measurementValue: 'true',
+      measurementUnit: '',
+      // TODO(#1150): Document calculation provenance (see frontend shared calculations).
+      measurementMethod: '',
+    })
+  }
+
   const localitySynonyms = locality.now_syn_loc
     .map(row => row.synonym)
     .filter((syn): syn is string => isMeaningfulString(syn))
@@ -605,36 +1051,16 @@ export const mapLocalityToMeasurementRows = (locality: LocalityForExport): Local
     .filter(value => isMeaningfulString(value))
     .map(value => value.trim())
 
-  const taphonomicDetailValue = concatMeaningful([
-    locality.assem_fm,
-    locality.transport,
-    locality.trans_mod,
-    locality.weath_trmp,
-    locality.pt_conc,
-    locality.size_type,
-    locality.vert_pres,
-    locality.plant_pres,
-    locality.invert_pres,
-    locality.time_rep,
-    locality.taph_comm,
-  ])
-
-  const sedimentaryStructureAndTaphonomicDetailValue = [
-    ...sedimentaryStructures,
-    ...(taphonomicDetailValue ? [taphonomicDetailValue] : []),
-  ].join('|')
-
-  if (sedimentaryStructureAndTaphonomicDetailValue) {
+  if (sedimentaryStructures.length) {
     rows.push({
       taxonID,
-      measurementID: buildLocalityMeasurementId(lid, 'sedimentary_structure_taphonomic_detail'),
+      measurementID: buildLocalityMeasurementId(lid, 'sedimentary_structures'),
       parentMeasurementID: '',
-      measurementType: 'sedimentary structure & taphonomic detail',
-      verbatimMeasurementType:
-        'now_ss.sed_struct|assem_fm|transport|trans_mod|weath_trmp|pt_conc|size_type|vert_pres|plant_pres|invert_pres|time_rep|taph_comm',
-      measurementValue: sedimentaryStructureAndTaphonomicDetailValue,
+      measurementType: 'Sedimentary structures',
+      verbatimMeasurementType: 'now_ss.sed_struct',
+      measurementValue: sedimentaryStructures.join('|'),
       measurementUnit: '',
-      // TODO(#1150): Add field description.
+      // TODO(#1150): Add field description / controlled vocabulary.
       measurementMethod: '',
     })
   }
@@ -847,6 +1273,38 @@ export const buildDwcLocalityArchiveZipBuffer = async (): Promise<Buffer> => {
       invert_pres: true,
       time_rep: true,
       taph_comm: true,
+      climate_type: true,
+      biome: true,
+      v_ht: true,
+      v_struct: true,
+      v_envi_det: true,
+      disturb: true,
+      nutrients: true,
+      water: true,
+      seasonality: true,
+      seas_intens: true,
+      pri_prod: true,
+      moisture: true,
+      temperature: true,
+      estimate_precip: true,
+      estimate_temp: true,
+      estimate_npp: true,
+      pers_woody_cover: true,
+      pers_pollen_ap: true,
+      pers_pollen_nap: true,
+      pers_pollen_other: true,
+      stone_tool_cut_marks_on_bones: true,
+      bipedal_footprints: true,
+      stone_tool_technology: true,
+      technological_mode_1: true,
+      technological_mode_2: true,
+      technological_mode_3: true,
+      cultural_stage_1: true,
+      cultural_stage_2: true,
+      cultural_stage_3: true,
+      regional_culture_1: true,
+      regional_culture_2: true,
+      regional_culture_3: true,
       now_time_unit_now_loc_bfa_maxTonow_time_unit: {
         select: { tu_name: true, tu_display_name: true, rank: true, sequence: true },
       },
@@ -858,6 +1316,16 @@ export const buildDwcLocalityArchiveZipBuffer = async (): Promise<Buffer> => {
       },
       now_ss: {
         select: { sed_struct: true },
+      },
+      now_coll_meth: {
+        select: { coll_meth: true },
+      },
+      now_ls: {
+        select: {
+          com_species: {
+            select: { order_name: true, tht: true, genus_name: true },
+          },
+        },
       },
     },
   })

@@ -67,8 +67,42 @@ describe('DwC-A locality export mapping', () => {
     invert_pres: null,
     time_rep: null,
     taph_comm: null,
+    climate_type: null,
+    biome: null,
+    v_ht: null,
+    v_struct: null,
+    v_envi_det: null,
+    disturb: null,
+    nutrients: null,
+    water: null,
+    seasonality: null,
+    seas_intens: null,
+    pri_prod: null,
+    moisture: null,
+    temperature: null,
+    estimate_precip: null,
+    estimate_temp: null,
+    estimate_npp: null,
+    pers_woody_cover: null,
+    pers_pollen_ap: null,
+    pers_pollen_nap: null,
+    pers_pollen_other: null,
+    stone_tool_cut_marks_on_bones: false,
+    bipedal_footprints: false,
+    stone_tool_technology: false,
+    technological_mode_1: null,
+    technological_mode_2: null,
+    technological_mode_3: null,
+    cultural_stage_1: null,
+    cultural_stage_2: null,
+    cultural_stage_3: null,
+    regional_culture_1: null,
+    regional_culture_2: null,
+    regional_culture_3: null,
     now_syn_loc: [],
     now_ss: [],
+    now_coll_meth: [],
+    now_ls: [],
     now_time_unit_now_loc_bfa_maxTonow_time_unit: null,
     now_time_unit_now_loc_bfa_minTonow_time_unit: null,
   } as const
@@ -110,6 +144,15 @@ describe('DwC-A locality export mapping', () => {
     expect(rows.some(r => r.verbatimMeasurementType === 'min_age')).toEqual(true)
     expect(rows.some(r => r.verbatimMeasurementType === 'chron')).toEqual(false)
     expect(rows.some(r => r.verbatimMeasurementType === 'bfa_min')).toEqual(false)
+  })
+
+  it('concatenates collecting methods with |', () => {
+    const rows = mapLocalityToMeasurementRows({
+      ...baseLocality,
+      now_coll_meth: [{ coll_meth: 'screenwash' }, { coll_meth: 'quarry' }],
+    })
+    const collectingMethodsRow = rows.find(r => r.verbatimMeasurementType === 'now_coll_meth.coll_meth')
+    expect(collectingMethodsRow?.measurementValue).toEqual('screenwash|quarry')
   })
 
   it('generates a ZIP archive with expected files', async () => {
