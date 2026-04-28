@@ -1,5 +1,10 @@
 import Prisma from '../../prisma/generated/now_test_client'
 import { format } from 'fast-csv'
+import { createReadStream, createWriteStream } from 'fs'
+import { mkdtemp, rm } from 'fs/promises'
+import { tmpdir } from 'os'
+import path from 'path'
+import { once } from 'events'
 import { Writable } from 'stream'
 import JSZip from 'jszip'
 import {
@@ -123,8 +128,16 @@ type OccurrenceForExport = Pick<
   | 'do18_min'
   | 'do18_stdev'
 > & {
-  now_loc: LocalityForOccurrenceExport
   com_species: SpeciesForOccurrenceExport
+}
+
+type OccurrenceWithLocalityForExport = OccurrenceForExport & {
+  now_loc: LocalityForOccurrenceExport
+}
+
+type DwcOccurrenceArchiveStream = {
+  stream: NodeJS.ReadableStream
+  cleanup: () => Promise<void>
 }
 
 const scientificNameForOccurrence = (species: SpeciesForOccurrenceExport): string => {
@@ -322,6 +335,154 @@ const uniqueBy = <T>(rows: T[], keyFn: (row: T) => string): T[] => {
   return [...byKey.values()]
 }
 
+const OCCURRENCE_EXPORT_PAGE_SIZE = 1000
+const LOOKUP_EXPORT_CHUNK_SIZE = 1000
+
+const occurrenceSelect = {
+  lid: true,
+  species_id: true,
+  nis: true,
+  pct: true,
+  quad: true,
+  mni: true,
+  qua: true,
+  id_status: true,
+  orig_entry: true,
+  source_name: true,
+  body_mass: true,
+  mesowear: true,
+  mw_or_high: true,
+  mw_or_low: true,
+  mw_cs_sharp: true,
+  mw_cs_round: true,
+  mw_cs_blunt: true,
+  mw_scale_min: true,
+  mw_scale_max: true,
+  mw_value: true,
+  microwear: true,
+  dc13_mean: true,
+  dc13_n: true,
+  dc13_max: true,
+  dc13_min: true,
+  dc13_stdev: true,
+  do18_mean: true,
+  do18_n: true,
+  do18_max: true,
+  do18_min: true,
+  do18_stdev: true,
+  com_species: {
+    select: {
+      species_id: true,
+      class_name: true,
+      subclass_or_superorder_name: true,
+      order_name: true,
+      suborder_or_superfamily_name: true,
+      family_name: true,
+      subfamily_name: true,
+      genus_name: true,
+      species_name: true,
+      unique_identifier: true,
+      taxonomic_status: true,
+      common_name: true,
+      sp_author: true,
+      sp_comment: true,
+    },
+  },
+} as const
+
+const localityLookupSelect = {
+  lid: true,
+  loc_name: true,
+  basin: true,
+  subbasin: true,
+  country: true,
+  state: true,
+  county: true,
+  dec_lat: true,
+  dec_long: true,
+  dms_lat: true,
+  dms_long: true,
+  altitude: true,
+  loc_detail: true,
+  age_comm: true,
+  tax_comm: true,
+  chron: true,
+  lgroup: true,
+  formation: true,
+  member: true,
+  bed: true,
+  bfa_max: true,
+  bfa_min: true,
+  now_time_unit_now_loc_bfa_maxTonow_time_unit: {
+    select: { tu_name: true, tu_display_name: true, rank: true, sequence: true },
+  },
+  now_time_unit_now_loc_bfa_minTonow_time_unit: {
+    select: { tu_name: true, tu_display_name: true, rank: true, sequence: true },
+  },
+} as const
+
+const speciesLookupSelect = occurrenceSelect.com_species.select
+
+const csvCell = (value: unknown): string => `"${toDwcString(value).replace(/"/g, '""')}"`
+
+const csvLine = (headers: readonly string[], row: Record<string, unknown>): string =>
+  `${headers.map(header => csvCell(row[header])).join(',')}\n`
+
+const createCsvFileWriter = async (filePath: string, headers: readonly string[]) => {
+  const stream = createWriteStream(filePath, { encoding: 'utf8' })
+  await new Promise<void>((resolve, reject) => {
+    stream.once('open', () => resolve())
+    stream.once('error', reject)
+  })
+
+  const write = async (line: string): Promise<void> => {
+    if (!stream.write(line)) await once(stream, 'drain')
+  }
+
+  await write(`${headers.map(csvCell).join(',')}\n`)
+
+  return {
+    writeRow: async (row: Record<string, unknown>): Promise<void> => {
+      await write(csvLine(headers, row))
+    },
+    close: async (): Promise<void> => {
+      stream.end()
+      await once(stream, 'finish')
+    },
+  }
+}
+
+async function* iterateOccurrenceRows(): AsyncGenerator<OccurrenceForExport> {
+  const { nowDb } = await import('../utils/db')
+  let cursor: { lid: number; species_id: number } | undefined
+
+  while (true) {
+    const page = await nowDb.now_ls.findMany({
+      take: OCCURRENCE_EXPORT_PAGE_SIZE,
+      ...(cursor ? { cursor: { lid_species_id: cursor }, skip: 1 } : {}),
+      orderBy: [{ lid: 'asc' }, { species_id: 'asc' }],
+      select: occurrenceSelect,
+    })
+
+    if (page.length === 0) return
+
+    for (const occurrence of page) {
+      yield occurrence as unknown as OccurrenceForExport
+    }
+
+    const last = page[page.length - 1]
+    cursor = { lid: last.lid, species_id: last.species_id }
+  }
+}
+
+const chunk = <T>(values: T[], size: number): T[][] => {
+  const chunks: T[][] = []
+  for (let index = 0; index < values.length; index += size) {
+    chunks.push(values.slice(index, index + size))
+  }
+  return chunks
+}
+
 const DWC_TERMS = {
   occurrence: {
     rowType: 'http://rs.tdwg.org/dwc/terms/Occurrence',
@@ -414,7 +575,7 @@ export const buildOccurrenceEmlXml = (publicationDateIso: string): string => {
 }
 
 export const buildDwcOccurrenceArchiveZipBufferFromOccurrences = async (
-  occurrences: OccurrenceForExport[]
+  occurrences: OccurrenceWithLocalityForExport[]
 ): Promise<Buffer> => {
   const localities = uniqueBy(
     occurrences.map(occurrence => occurrence.now_loc),
@@ -451,185 +612,138 @@ export const buildDwcOccurrenceArchiveZipBufferFromOccurrences = async (
   return await zip.generateAsync({ type: 'nodebuffer', compression: 'DEFLATE', compressionOptions: { level: 6 } })
 }
 
-export const buildDwcOccurrenceArchiveZipBuffer = async (): Promise<Buffer> => {
-  const { nowDb } = await import('../utils/db')
-  const occurrences = await nowDb.now_ls.findMany({
-    select: {
-      lid: true,
-      species_id: true,
-      nis: true,
-      pct: true,
-      quad: true,
-      mni: true,
-      qua: true,
-      id_status: true,
-      orig_entry: true,
-      source_name: true,
-      body_mass: true,
-      mesowear: true,
-      mw_or_high: true,
-      mw_or_low: true,
-      mw_cs_sharp: true,
-      mw_cs_round: true,
-      mw_cs_blunt: true,
-      mw_scale_min: true,
-      mw_scale_max: true,
-      mw_value: true,
-      microwear: true,
-      dc13_mean: true,
-      dc13_n: true,
-      dc13_max: true,
-      dc13_min: true,
-      dc13_stdev: true,
-      do18_mean: true,
-      do18_n: true,
-      do18_max: true,
-      do18_min: true,
-      do18_stdev: true,
-      now_loc: {
-        select: {
-          lid: true,
-          loc_name: true,
-          basin: true,
-          subbasin: true,
-          country: true,
-          state: true,
-          county: true,
-          dec_lat: true,
-          dec_long: true,
-          dms_lat: true,
-          dms_long: true,
-          approx_coord: true,
-          altitude: true,
-          loc_detail: true,
-          chron: true,
-          lgroup: true,
-          formation: true,
-          member: true,
-          bed: true,
-          bfa_max: true,
-          bfa_min: true,
-          bfa_max_abs: true,
-          bfa_min_abs: true,
-          frac_max: true,
-          frac_min: true,
-          max_age: true,
-          min_age: true,
-          date_meth: true,
-          age_comm: true,
-          site_area: true,
-          gen_loc: true,
-          plate: true,
-          appr_num_spm: true,
-          num_spm: true,
-          true_quant: true,
-          complete: true,
-          num_quad: true,
-          rock_type: true,
-          rt_adj: true,
-          lith_comm: true,
-          depo_context1: true,
-          depo_context2: true,
-          depo_context3: true,
-          depo_context4: true,
-          depo_comm: true,
-          sed_env_1: true,
-          sed_env_2: true,
-          event_circum: true,
-          se_comm: true,
-          assem_fm: true,
-          transport: true,
-          trans_mod: true,
-          weath_trmp: true,
-          pt_conc: true,
-          size_type: true,
-          vert_pres: true,
-          plant_pres: true,
-          invert_pres: true,
-          time_rep: true,
-          taph_comm: true,
-          tax_comm: true,
-          datum_plane: true,
-          tos: true,
-          bos: true,
-          loc_status: true,
-          hominin_skeletal_remains: true,
-          climate_type: true,
-          biome: true,
-          v_ht: true,
-          v_struct: true,
-          v_envi_det: true,
-          disturb: true,
-          nutrients: true,
-          water: true,
-          seasonality: true,
-          seas_intens: true,
-          pri_prod: true,
-          moisture: true,
-          temperature: true,
-          estimate_precip: true,
-          estimate_temp: true,
-          estimate_npp: true,
-          pers_woody_cover: true,
-          pers_pollen_ap: true,
-          pers_pollen_nap: true,
-          pers_pollen_other: true,
-          stone_tool_cut_marks_on_bones: true,
-          bipedal_footprints: true,
-          stone_tool_technology: true,
-          technological_mode_1: true,
-          technological_mode_2: true,
-          technological_mode_3: true,
-          cultural_stage_1: true,
-          cultural_stage_2: true,
-          cultural_stage_3: true,
-          regional_culture_1: true,
-          regional_culture_2: true,
-          regional_culture_3: true,
-          now_time_unit_now_loc_bfa_maxTonow_time_unit: {
-            select: { tu_name: true, tu_display_name: true, rank: true, sequence: true },
-          },
-          now_time_unit_now_loc_bfa_minTonow_time_unit: {
-            select: { tu_name: true, tu_display_name: true, rank: true, sequence: true },
-          },
-          now_syn_loc: { select: { synonym: true } },
-          now_ss: { select: { sed_struct: true } },
-          now_coll_meth: { select: { coll_meth: true } },
-          now_mus: {
-            select: {
-              museum: true,
-              com_mlist: { select: { institution: true, alt_int_name: true, city: true, state: true, country: true } },
-            },
-          },
-          now_ls: {
-            select: {
-              com_species: {
-                select: { order_name: true, tht: true, genus_name: true },
-              },
-            },
-          },
-        },
-      },
-      com_species: {
-        select: {
-          species_id: true,
-          class_name: true,
-          subclass_or_superorder_name: true,
-          order_name: true,
-          suborder_or_superfamily_name: true,
-          family_name: true,
-          subfamily_name: true,
-          genus_name: true,
-          species_name: true,
-          unique_identifier: true,
-          taxonomic_status: true,
-          common_name: true,
-          sp_author: true,
-          sp_comment: true,
-        },
-      },
-    },
-  })
+const writeOccurrenceAndMeasurementFiles = async ({
+  occurrenceFilePath,
+  measurementFilePath,
+}: {
+  occurrenceFilePath: string
+  measurementFilePath: string
+}): Promise<{ localityIds: number[]; speciesIds: number[] }> => {
+  const occurrenceWriter = await createCsvFileWriter(occurrenceFilePath, OCCURRENCE_HEADERS)
+  const measurementWriter = await createCsvFileWriter(measurementFilePath, MEASUREMENT_HEADERS)
+  const localityIds = new Set<number>()
+  const speciesIds = new Set<number>()
 
-  return await buildDwcOccurrenceArchiveZipBufferFromOccurrences(occurrences as unknown as OccurrenceForExport[])
+  try {
+    for await (const occurrence of iterateOccurrenceRows()) {
+      localityIds.add(occurrence.lid)
+      speciesIds.add(occurrence.species_id)
+      await occurrenceWriter.writeRow(mapOccurrenceToOccurrenceRow(occurrence))
+
+      for (const measurementRow of mapOccurrenceToMeasurementRows(occurrence)) {
+        await measurementWriter.writeRow(measurementRow)
+      }
+    }
+  } finally {
+    await occurrenceWriter.close()
+    await measurementWriter.close()
+  }
+
+  return {
+    localityIds: [...localityIds].sort((a, b) => a - b),
+    speciesIds: [...speciesIds].sort((a, b) => a - b),
+  }
+}
+
+const writeLocalityLookupFiles = async ({
+  localityIds,
+  locationFilePath,
+  geologicalContextFilePath,
+}: {
+  localityIds: number[]
+  locationFilePath: string
+  geologicalContextFilePath: string
+}): Promise<void> => {
+  const { nowDb } = await import('../utils/db')
+  const locationWriter = await createCsvFileWriter(locationFilePath, LOCATION_HEADERS)
+  const geologicalContextWriter = await createCsvFileWriter(geologicalContextFilePath, GEOLOGICAL_CONTEXT_HEADERS)
+
+  try {
+    for (const ids of chunk(localityIds, LOOKUP_EXPORT_CHUNK_SIZE)) {
+      const localities = await nowDb.now_loc.findMany({
+        where: { lid: { in: ids } },
+        orderBy: { lid: 'asc' },
+        select: localityLookupSelect,
+      })
+
+      for (const locality of localities) {
+        const localityForExport = locality as unknown as LocalityForOccurrenceExport
+        await locationWriter.writeRow(mapLocalityToLocationRow(localityForExport))
+        await geologicalContextWriter.writeRow(mapLocalityToGeologicalContextRow(localityForExport))
+      }
+    }
+  } finally {
+    await locationWriter.close()
+    await geologicalContextWriter.close()
+  }
+}
+
+const writeTaxonLookupFile = async ({
+  speciesIds,
+  taxonFilePath,
+}: {
+  speciesIds: number[]
+  taxonFilePath: string
+}): Promise<void> => {
+  const { nowDb } = await import('../utils/db')
+  const taxonWriter = await createCsvFileWriter(taxonFilePath, TAXON_HEADERS)
+
+  try {
+    for (const ids of chunk(speciesIds, LOOKUP_EXPORT_CHUNK_SIZE)) {
+      const speciesRows = await nowDb.com_species.findMany({
+        where: { species_id: { in: ids } },
+        orderBy: { species_id: 'asc' },
+        select: speciesLookupSelect,
+      })
+
+      for (const species of speciesRows) {
+        await taxonWriter.writeRow(mapSpeciesToTaxonRow(species))
+      }
+    }
+  } finally {
+    await taxonWriter.close()
+  }
+}
+
+export const buildDwcOccurrenceArchiveZipStream = async (): Promise<DwcOccurrenceArchiveStream> => {
+  const tempDirectory = await mkdtemp(path.join(tmpdir(), 'now-dwc-occurrences-'))
+  const files = {
+    location: path.join(tempDirectory, 'location.csv'),
+    geologicalContext: path.join(tempDirectory, 'geologicalcontext.csv'),
+    taxon: path.join(tempDirectory, 'taxon.csv'),
+    occurrence: path.join(tempDirectory, 'occurrence.csv'),
+    measurement: path.join(tempDirectory, 'measurementorfact.csv'),
+  }
+
+  try {
+    const { localityIds, speciesIds } = await writeOccurrenceAndMeasurementFiles({
+      occurrenceFilePath: files.occurrence,
+      measurementFilePath: files.measurement,
+    })
+    await writeLocalityLookupFiles({
+      localityIds,
+      locationFilePath: files.location,
+      geologicalContextFilePath: files.geologicalContext,
+    })
+    await writeTaxonLookupFile({ speciesIds, taxonFilePath: files.taxon })
+
+    const zip = new JSZip()
+    zip.file('location.csv', createReadStream(files.location))
+    zip.file('geologicalcontext.csv', createReadStream(files.geologicalContext))
+    zip.file('taxon.csv', createReadStream(files.taxon))
+    zip.file('occurrence.csv', createReadStream(files.occurrence))
+    zip.file('measurementorfact.csv', createReadStream(files.measurement))
+    zip.file('meta.xml', buildOccurrenceMetaXml())
+    zip.file('eml.xml', buildOccurrenceEmlXml(new Date().toISOString().slice(0, 10)))
+
+    return {
+      stream: zip.generateNodeStream({ type: 'nodebuffer', streamFiles: true, compression: 'DEFLATE' }),
+      cleanup: async () => {
+        await rm(tempDirectory, { recursive: true, force: true })
+      },
+    }
+  } catch (error) {
+    await rm(tempDirectory, { recursive: true, force: true })
+    throw error
+  }
 }
