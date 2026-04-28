@@ -10,6 +10,7 @@ import { usePageContext } from '../Page'
 import { LocalitySynonymsModal } from './LocalitySynonymsModal'
 import { currentDateAsString } from '@/shared/currentDateAsString'
 import { matchesCountryOrContinent } from '@/shared/validators/countryContinents'
+import { LocalityDwcExportMenuItem } from './LocalityDwcExportMenuItem'
 
 const LocalitiesMap = lazy(async () => {
   const module = await import('../Map/LocalitiesMap')
@@ -523,6 +524,7 @@ export const LocalityTable = ({ selectorFn }: { selectorFn?: (newObject: Localit
         url="locality"
         kmlExport={kmlExport}
         svgExport={svgExport}
+        renderExtraExportMenuItems={handleClose => <LocalityDwcExportMenuItem handleClose={handleClose} />}
         enableColumnFilterModes={true}
         tableRowAction={handleLocalityRowActionClick}
       />
