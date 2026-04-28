@@ -21,6 +21,7 @@ describe('DwC-A locality export mapping', () => {
     dec_long: 24.9384,
     dms_lat: null,
     dms_long: null,
+    approx_coord: null,
     altitude: 123,
     loc_detail: 'Some notes',
     chron: 'Test chron',
@@ -39,6 +40,8 @@ describe('DwC-A locality export mapping', () => {
     date_meth: 'radioisotope',
     age_comm: 'Age comment',
     site_area: null,
+    gen_loc: null,
+    plate: null,
     appr_num_spm: null,
     num_spm: null,
     true_quant: null,
@@ -67,6 +70,12 @@ describe('DwC-A locality export mapping', () => {
     invert_pres: null,
     time_rep: null,
     taph_comm: null,
+    tax_comm: null,
+    datum_plane: null,
+    tos: null,
+    bos: null,
+    loc_status: null,
+    hominin_skeletal_remains: false,
     climate_type: null,
     biome: null,
     v_ht: null,
@@ -102,6 +111,9 @@ describe('DwC-A locality export mapping', () => {
     now_syn_loc: [],
     now_ss: [],
     now_coll_meth: [],
+    now_mus: [],
+    now_plr: [],
+    now_lau: [],
     now_ls: [],
     now_time_unit_now_loc_bfa_maxTonow_time_unit: null,
     now_time_unit_now_loc_bfa_minTonow_time_unit: null,
@@ -153,6 +165,21 @@ describe('DwC-A locality export mapping', () => {
     })
     const collectingMethodsRow = rows.find(r => r.verbatimMeasurementType === 'now_coll_meth.coll_meth')
     expect(collectingMethodsRow?.measurementValue).toEqual('screenwash|quarry')
+  })
+
+  it('uses parentMeasurementID for stratigraphy fields', () => {
+    const rows = mapLocalityToMeasurementRows({
+      ...baseLocality,
+      datum_plane: 'Datum',
+      tos: 0,
+      bos: 12.5,
+    })
+    const parent = rows.find(r => r.verbatimMeasurementType === 'stratigraphy')
+    expect(parent).toBeTruthy()
+    const tosRow = rows.find(r => r.verbatimMeasurementType === 'tos')
+    const bosRow = rows.find(r => r.verbatimMeasurementType === 'bos')
+    expect(tosRow?.parentMeasurementID).toEqual(parent?.measurementID)
+    expect(bosRow?.parentMeasurementID).toEqual(parent?.measurementID)
   })
 
   it('generates a ZIP archive with expected files', async () => {

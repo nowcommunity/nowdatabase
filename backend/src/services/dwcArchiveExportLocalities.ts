@@ -130,6 +130,7 @@ type LocalityForExport = Pick<
   | 'dec_long'
   | 'dms_lat'
   | 'dms_long'
+  | 'approx_coord'
   | 'altitude'
   | 'loc_detail'
   | 'chron'
@@ -148,6 +149,8 @@ type LocalityForExport = Pick<
   | 'date_meth'
   | 'age_comm'
   | 'site_area'
+  | 'gen_loc'
+  | 'plate'
   | 'appr_num_spm'
   | 'num_spm'
   | 'true_quant'
@@ -176,6 +179,12 @@ type LocalityForExport = Pick<
   | 'invert_pres'
   | 'time_rep'
   | 'taph_comm'
+  | 'tax_comm'
+  | 'datum_plane'
+  | 'tos'
+  | 'bos'
+  | 'loc_status'
+  | 'hominin_skeletal_remains'
   | 'climate_type'
   | 'biome'
   | 'v_ht'
@@ -214,6 +223,29 @@ type LocalityForExport = Pick<
   now_syn_loc: ReadonlyArray<{ synonym: string | null }>
   now_ss: ReadonlyArray<{ sed_struct: string }>
   now_coll_meth: ReadonlyArray<{ coll_meth: string }>
+  now_mus: ReadonlyArray<{
+    museum: string
+    com_mlist: {
+      institution: string
+      alt_int_name: string | null
+      city: string | null
+      state: string | null
+      country: string | null
+    }
+  }>
+  now_plr: ReadonlyArray<{
+    now_proj: {
+      proj_code: string | null
+      proj_name: string | null
+      proj_status: string | null
+    }
+  }>
+  now_lau: ReadonlyArray<{
+    lau_date: Date | null
+    lau_comment: string | null
+    com_people_now_lau_lau_coordinatorTocom_people: { full_name: string }
+    com_people_now_lau_lau_authorizerTocom_people: { full_name: string }
+  }>
   now_ls: ReadonlyArray<{
     com_species: {
       order_name: string
@@ -263,7 +295,11 @@ export const mapLocalityToLocationRow = (locality: LocalityForExport): LocationC
     verbatimLatitude: toMaybeMeaningful(locality.dms_lat),
     verbatimLongitude: toMaybeMeaningful(locality.dms_long),
     verbatimElevation: locality.altitude === null || locality.altitude === undefined ? '' : String(locality.altitude),
-    locationRemarks: [toMaybeMeaningful(locality.loc_detail), toMaybeMeaningful(locality.age_comm)]
+    locationRemarks: [
+      toMaybeMeaningful(locality.loc_detail),
+      toMaybeMeaningful(locality.age_comm),
+      toMaybeMeaningful(locality.tax_comm),
+    ]
       .filter(Boolean)
       .join(' | '),
   }
@@ -452,6 +488,27 @@ const LOCALITY_MEASUREMENT_MAPPINGS: Array<{
     measurementMethod: '',
   },
   {
+    field: 'approx_coord',
+    measurementType: 'approximate coordinates',
+    measurementUnit: '',
+    // TODO(#1150): Add definition (what qualifies as approximate).
+    measurementMethod: '',
+  },
+  {
+    field: 'gen_loc',
+    measurementType: 'general locality',
+    measurementUnit: '',
+    // TODO(#1150): Add controlled vocabulary / definition.
+    measurementMethod: '',
+  },
+  {
+    field: 'plate',
+    measurementType: 'tectonic plate',
+    measurementUnit: '',
+    // TODO(#1150): Add controlled vocabulary / definition.
+    measurementMethod: '',
+  },
+  {
     field: 'appr_num_spm',
     measurementType: 'approximate number of specimens',
     measurementUnit: '',
@@ -580,6 +637,20 @@ const LOCALITY_MEASUREMENT_MAPPINGS: Array<{
   {
     field: 'chron',
     measurementType: 'chron',
+    measurementUnit: '',
+    // TODO(#1150): Add field description.
+    measurementMethod: '',
+  },
+  {
+    field: 'loc_status',
+    measurementType: 'locality status',
+    measurementUnit: '',
+    // TODO(#1150): Add definition.
+    measurementMethod: '',
+  },
+  {
+    field: 'hominin_skeletal_remains',
+    measurementType: 'Hominin skeletal remains (field)',
     measurementUnit: '',
     // TODO(#1150): Add field description.
     measurementMethod: '',
@@ -875,6 +946,13 @@ export const mapLocalityToMeasurementRows = (locality: LocalityForExport): Local
   const maxAgeId = buildLocalityMeasurementId(lid, 'max_age')
   const minAgeId = buildLocalityMeasurementId(lid, 'min_age')
 
+  const stratigraphyParentId = buildLocalityMeasurementId(lid, 'stratigraphy')
+  const tosId = buildLocalityMeasurementId(lid, 'tos')
+  const bosId = buildLocalityMeasurementId(lid, 'bos')
+  const datumPlaneId = buildLocalityMeasurementId(lid, 'datum_plane')
+
+  const lastUpdateParentId = buildLocalityMeasurementId(lid, 'last_update')
+
   const hasMaxAgeGroup =
     isMeaningfulMeasurementValue(locality.max_age) ||
     isMeaningfulMeasurementValue(locality.bfa_max) ||
@@ -890,6 +968,135 @@ export const mapLocalityToMeasurementRows = (locality: LocalityForExport): Local
   const hasAnyAgeBasis = hasMaxAgeGroup || hasMinAgeGroup
 
   const rows: LocalityMeasurementCsvRow[] = []
+
+  const hasAnyStratigraphy =
+    isMeaningfulMeasurementValue(locality.datum_plane) ||
+    isMeaningfulMeasurementValue(locality.tos) ||
+    isMeaningfulMeasurementValue(locality.bos)
+
+  if (hasAnyStratigraphy) {
+    rows.push({
+      taxonID,
+      measurementID: stratigraphyParentId,
+      parentMeasurementID: '',
+      measurementType: 'stratigraphic section',
+      verbatimMeasurementType: 'stratigraphy',
+      measurementValue: '',
+      measurementUnit: '',
+      // TODO(#1150): Add field description.
+      measurementMethod: '',
+    })
+  }
+
+  if (isMeaningfulMeasurementValue(locality.datum_plane)) {
+    rows.push({
+      taxonID,
+      measurementID: datumPlaneId,
+      parentMeasurementID: hasAnyStratigraphy ? stratigraphyParentId : '',
+      measurementType: 'datum plane',
+      verbatimMeasurementType: 'datum_plane',
+      measurementValue: toMaybeMeaningful(locality.datum_plane),
+      measurementUnit: '',
+      // TODO(#1150): Add field description.
+      measurementMethod: '',
+    })
+  }
+
+  if (typeof locality.tos === 'number') {
+    const value = toMaybeMeaningfulNumberWithZeroOption(locality.tos, { allowZero: true })
+    if (value) {
+      rows.push({
+        taxonID,
+        measurementID: tosId,
+        parentMeasurementID: hasAnyStratigraphy ? stratigraphyParentId : '',
+        measurementType: 'top of section',
+        verbatimMeasurementType: 'tos',
+        measurementValue: value,
+        measurementUnit: '',
+        // TODO(#1150): Add unit and definition.
+        measurementMethod: '',
+      })
+    }
+  }
+
+  if (typeof locality.bos === 'number') {
+    const value = toMaybeMeaningfulNumberWithZeroOption(locality.bos, { allowZero: true })
+    if (value) {
+      rows.push({
+        taxonID,
+        measurementID: bosId,
+        parentMeasurementID: hasAnyStratigraphy ? stratigraphyParentId : '',
+        measurementType: 'bottom of section',
+        verbatimMeasurementType: 'bos',
+        measurementValue: value,
+        measurementUnit: '',
+        // TODO(#1150): Add unit and definition.
+        measurementMethod: '',
+      })
+    }
+  }
+
+  const lastUpdate = locality.now_lau[0]
+  if (lastUpdate) {
+    rows.push({
+      taxonID,
+      measurementID: lastUpdateParentId,
+      parentMeasurementID: '',
+      measurementType: 'last update',
+      verbatimMeasurementType: 'now_lau',
+      measurementValue: '',
+      measurementUnit: '',
+      measurementMethod: '',
+    })
+
+    if (lastUpdate.lau_date) {
+      rows.push({
+        taxonID,
+        measurementID: buildLocalityMeasurementId(lid, 'last_update_date'),
+        parentMeasurementID: lastUpdateParentId,
+        measurementType: 'last update date',
+        verbatimMeasurementType: 'now_lau.lau_date',
+        measurementValue: lastUpdate.lau_date.toISOString().slice(0, 10),
+        measurementUnit: '',
+        measurementMethod: '',
+      })
+    }
+
+    rows.push({
+      taxonID,
+      measurementID: buildLocalityMeasurementId(lid, 'last_update_coordinator'),
+      parentMeasurementID: lastUpdateParentId,
+      measurementType: 'last update coordinator',
+      verbatimMeasurementType: 'now_lau.lau_coordinator',
+      measurementValue: toMaybeMeaningful(lastUpdate.com_people_now_lau_lau_coordinatorTocom_people.full_name),
+      measurementUnit: '',
+      measurementMethod: '',
+    })
+
+    rows.push({
+      taxonID,
+      measurementID: buildLocalityMeasurementId(lid, 'last_update_authorizer'),
+      parentMeasurementID: lastUpdateParentId,
+      measurementType: 'last update authorizer',
+      verbatimMeasurementType: 'now_lau.lau_authorizer',
+      measurementValue: toMaybeMeaningful(lastUpdate.com_people_now_lau_lau_authorizerTocom_people.full_name),
+      measurementUnit: '',
+      measurementMethod: '',
+    })
+
+    if (isMeaningfulString(lastUpdate.lau_comment)) {
+      rows.push({
+        taxonID,
+        measurementID: buildLocalityMeasurementId(lid, 'last_update_comment'),
+        parentMeasurementID: lastUpdateParentId,
+        measurementType: 'last update comment',
+        verbatimMeasurementType: 'now_lau.lau_comment',
+        measurementValue: lastUpdate.lau_comment.trim(),
+        measurementUnit: '',
+        measurementMethod: '',
+      })
+    }
+  }
 
   if (hasAnyAgeBasis) {
     rows.push({
@@ -977,6 +1184,63 @@ export const mapLocalityToMeasurementRows = (locality: LocalityForExport): Local
   })
 
   rows.push(...coreRows)
+
+  const museums = locality.now_mus
+    .map(row => {
+      const institution = row.com_mlist.alt_int_name ?? row.com_mlist.institution
+      const locationBits = [
+        toMaybeMeaningful(row.com_mlist.city),
+        toMaybeMeaningful(row.com_mlist.state),
+        toMaybeMeaningful(row.com_mlist.country),
+      ]
+        .filter(Boolean)
+        .join(', ')
+      return [row.museum, institution, locationBits ? `(${locationBits})` : ''].filter(Boolean).join(' ')
+    })
+    .filter(isMeaningfulString)
+    .map(value => value.trim())
+
+  if (museums.length) {
+    rows.push({
+      taxonID,
+      measurementID: buildLocalityMeasurementId(lid, 'museums'),
+      parentMeasurementID: '',
+      measurementType: 'Museums',
+      verbatimMeasurementType: 'now_mus.museum',
+      measurementValue: museums.join('|'),
+      measurementUnit: '',
+      // TODO(#1150): Add field description.
+      measurementMethod: '',
+    })
+  }
+
+  const projects = locality.now_plr
+    .map(row => row.now_proj)
+    .map(project =>
+      [
+        toMaybeMeaningful(project.proj_code),
+        toMaybeMeaningful(project.proj_name),
+        toMaybeMeaningful(project.proj_status),
+      ]
+        .filter(Boolean)
+        .join(' - ')
+    )
+    .filter(isMeaningfulString)
+    .map(value => value.trim())
+
+  if (projects.length) {
+    rows.push({
+      taxonID,
+      measurementID: buildLocalityMeasurementId(lid, 'projects'),
+      parentMeasurementID: '',
+      measurementType: 'Projects',
+      verbatimMeasurementType: 'now_plr.pid',
+      measurementValue: projects.join('|'),
+      measurementUnit: '',
+      // TODO(#1150): Add field description.
+      measurementMethod: '',
+    })
+  }
 
   const collectingMethods = locality.now_coll_meth
     .map(method => method.coll_meth)
@@ -1227,6 +1491,7 @@ export const buildDwcLocalityArchiveZipBuffer = async (): Promise<Buffer> => {
       dec_long: true,
       dms_lat: true,
       dms_long: true,
+      approx_coord: true,
       altitude: true,
       loc_detail: true,
       chron: true,
@@ -1245,6 +1510,8 @@ export const buildDwcLocalityArchiveZipBuffer = async (): Promise<Buffer> => {
       date_meth: true,
       age_comm: true,
       site_area: true,
+      gen_loc: true,
+      plate: true,
       appr_num_spm: true,
       num_spm: true,
       true_quant: true,
@@ -1273,6 +1540,12 @@ export const buildDwcLocalityArchiveZipBuffer = async (): Promise<Buffer> => {
       invert_pres: true,
       time_rep: true,
       taph_comm: true,
+      tax_comm: true,
+      datum_plane: true,
+      tos: true,
+      bos: true,
+      loc_status: true,
+      hominin_skeletal_remains: true,
       climate_type: true,
       biome: true,
       v_ht: true,
@@ -1319,6 +1592,27 @@ export const buildDwcLocalityArchiveZipBuffer = async (): Promise<Buffer> => {
       },
       now_coll_meth: {
         select: { coll_meth: true },
+      },
+      now_mus: {
+        select: {
+          museum: true,
+          com_mlist: { select: { institution: true, alt_int_name: true, city: true, state: true, country: true } },
+        },
+      },
+      now_plr: {
+        select: {
+          now_proj: { select: { proj_code: true, proj_name: true, proj_status: true } },
+        },
+      },
+      now_lau: {
+        take: 1,
+        orderBy: { lau_date: 'desc' },
+        select: {
+          lau_date: true,
+          lau_comment: true,
+          com_people_now_lau_lau_coordinatorTocom_people: { select: { full_name: true } },
+          com_people_now_lau_lau_authorizerTocom_people: { select: { full_name: true } },
+        },
       },
       now_ls: {
         select: {
