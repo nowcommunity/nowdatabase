@@ -67,6 +67,8 @@ Concatenation rules (v1):
 Field coverage (v1):
 
 - Fossil Assemblage, Taphonomy, Climate, Ecometrics, and Archaeology tab fields are exported as `MeasurementOrFact` rows when populated (plus selected calculated values such as mean hypsodonty).
+- `basin` and `subbasin` are exported both as part of `higherGeography` and as explicit `MeasurementOrFact` rows.
+- `now_plr` project links and `now_lau` last-update rows are intentionally excluded.
 
 ## Admin-only
 

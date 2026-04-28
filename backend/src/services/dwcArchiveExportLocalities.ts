@@ -233,19 +233,6 @@ type LocalityForExport = Pick<
       country: string | null
     }
   }>
-  now_plr: ReadonlyArray<{
-    now_proj: {
-      proj_code: string | null
-      proj_name: string | null
-      proj_status: string | null
-    }
-  }>
-  now_lau: ReadonlyArray<{
-    lau_date: Date | null
-    lau_comment: string | null
-    com_people_now_lau_lau_coordinatorTocom_people: { full_name: string }
-    com_people_now_lau_lau_authorizerTocom_people: { full_name: string }
-  }>
   now_ls: ReadonlyArray<{
     com_species: {
       order_name: string
@@ -551,6 +538,20 @@ const LOCALITY_MEASUREMENT_MAPPINGS: Array<{
     measurementMethod: '',
   },
   {
+    field: 'basin',
+    measurementType: 'basin',
+    measurementUnit: '',
+    // TODO(#1150): Add field description / controlled vocabulary.
+    measurementMethod: '',
+  },
+  {
+    field: 'subbasin',
+    measurementType: 'subbasin',
+    measurementUnit: '',
+    // TODO(#1150): Add field description / controlled vocabulary.
+    measurementMethod: '',
+  },
+  {
     field: 'rock_type',
     measurementType: 'rock type',
     measurementUnit: '',
@@ -707,6 +708,20 @@ const LOCALITY_MEASUREMENT_MAPPINGS: Array<{
   {
     field: 'vert_pres',
     measurementType: 'Vertebrate Preservation',
+    measurementUnit: '',
+    // TODO(#1150): Add controlled vocabulary.
+    measurementMethod: '',
+  },
+  {
+    field: 'plant_pres',
+    measurementType: 'Plant Preservation',
+    measurementUnit: '',
+    // TODO(#1150): Add controlled vocabulary.
+    measurementMethod: '',
+  },
+  {
+    field: 'invert_pres',
+    measurementType: 'Invertebrate Preservation',
     measurementUnit: '',
     // TODO(#1150): Add controlled vocabulary.
     measurementMethod: '',
@@ -951,8 +966,6 @@ export const mapLocalityToMeasurementRows = (locality: LocalityForExport): Local
   const bosId = buildLocalityMeasurementId(lid, 'bos')
   const datumPlaneId = buildLocalityMeasurementId(lid, 'datum_plane')
 
-  const lastUpdateParentId = buildLocalityMeasurementId(lid, 'last_update')
-
   const hasMaxAgeGroup =
     isMeaningfulMeasurementValue(locality.max_age) ||
     isMeaningfulMeasurementValue(locality.bfa_max) ||
@@ -1031,68 +1044,6 @@ export const mapLocalityToMeasurementRows = (locality: LocalityForExport): Local
         measurementValue: value,
         measurementUnit: '',
         // TODO(#1150): Add unit and definition.
-        measurementMethod: '',
-      })
-    }
-  }
-
-  const lastUpdate = locality.now_lau[0]
-  if (lastUpdate) {
-    rows.push({
-      taxonID,
-      measurementID: lastUpdateParentId,
-      parentMeasurementID: '',
-      measurementType: 'last update',
-      verbatimMeasurementType: 'now_lau',
-      measurementValue: '',
-      measurementUnit: '',
-      measurementMethod: '',
-    })
-
-    if (lastUpdate.lau_date) {
-      rows.push({
-        taxonID,
-        measurementID: buildLocalityMeasurementId(lid, 'last_update_date'),
-        parentMeasurementID: lastUpdateParentId,
-        measurementType: 'last update date',
-        verbatimMeasurementType: 'now_lau.lau_date',
-        measurementValue: lastUpdate.lau_date.toISOString().slice(0, 10),
-        measurementUnit: '',
-        measurementMethod: '',
-      })
-    }
-
-    rows.push({
-      taxonID,
-      measurementID: buildLocalityMeasurementId(lid, 'last_update_coordinator'),
-      parentMeasurementID: lastUpdateParentId,
-      measurementType: 'last update coordinator',
-      verbatimMeasurementType: 'now_lau.lau_coordinator',
-      measurementValue: toMaybeMeaningful(lastUpdate.com_people_now_lau_lau_coordinatorTocom_people.full_name),
-      measurementUnit: '',
-      measurementMethod: '',
-    })
-
-    rows.push({
-      taxonID,
-      measurementID: buildLocalityMeasurementId(lid, 'last_update_authorizer'),
-      parentMeasurementID: lastUpdateParentId,
-      measurementType: 'last update authorizer',
-      verbatimMeasurementType: 'now_lau.lau_authorizer',
-      measurementValue: toMaybeMeaningful(lastUpdate.com_people_now_lau_lau_authorizerTocom_people.full_name),
-      measurementUnit: '',
-      measurementMethod: '',
-    })
-
-    if (isMeaningfulString(lastUpdate.lau_comment)) {
-      rows.push({
-        taxonID,
-        measurementID: buildLocalityMeasurementId(lid, 'last_update_comment'),
-        parentMeasurementID: lastUpdateParentId,
-        measurementType: 'last update comment',
-        verbatimMeasurementType: 'now_lau.lau_comment',
-        measurementValue: lastUpdate.lau_comment.trim(),
-        measurementUnit: '',
         measurementMethod: '',
       })
     }
@@ -1208,34 +1159,6 @@ export const mapLocalityToMeasurementRows = (locality: LocalityForExport): Local
       measurementType: 'Museums',
       verbatimMeasurementType: 'now_mus.museum',
       measurementValue: museums.join('|'),
-      measurementUnit: '',
-      // TODO(#1150): Add field description.
-      measurementMethod: '',
-    })
-  }
-
-  const projects = locality.now_plr
-    .map(row => row.now_proj)
-    .map(project =>
-      [
-        toMaybeMeaningful(project.proj_code),
-        toMaybeMeaningful(project.proj_name),
-        toMaybeMeaningful(project.proj_status),
-      ]
-        .filter(Boolean)
-        .join(' - ')
-    )
-    .filter(isMeaningfulString)
-    .map(value => value.trim())
-
-  if (projects.length) {
-    rows.push({
-      taxonID,
-      measurementID: buildLocalityMeasurementId(lid, 'projects'),
-      parentMeasurementID: '',
-      measurementType: 'Projects',
-      verbatimMeasurementType: 'now_plr.pid',
-      measurementValue: projects.join('|'),
       measurementUnit: '',
       // TODO(#1150): Add field description.
       measurementMethod: '',
@@ -1597,21 +1520,6 @@ export const buildDwcLocalityArchiveZipBuffer = async (): Promise<Buffer> => {
         select: {
           museum: true,
           com_mlist: { select: { institution: true, alt_int_name: true, city: true, state: true, country: true } },
-        },
-      },
-      now_plr: {
-        select: {
-          now_proj: { select: { proj_code: true, proj_name: true, proj_status: true } },
-        },
-      },
-      now_lau: {
-        take: 1,
-        orderBy: { lau_date: 'desc' },
-        select: {
-          lau_date: true,
-          lau_comment: true,
-          com_people_now_lau_lau_coordinatorTocom_people: { select: { full_name: true } },
-          com_people_now_lau_lau_authorizerTocom_people: { select: { full_name: true } },
         },
       },
       now_ls: {

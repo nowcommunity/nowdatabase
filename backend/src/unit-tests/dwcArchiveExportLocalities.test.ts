@@ -112,8 +112,6 @@ describe('DwC-A locality export mapping', () => {
     now_ss: [],
     now_coll_meth: [],
     now_mus: [],
-    now_plr: [],
-    now_lau: [],
     now_ls: [],
     now_time_unit_now_loc_bfa_maxTonow_time_unit: null,
     now_time_unit_now_loc_bfa_minTonow_time_unit: null,
@@ -156,6 +154,37 @@ describe('DwC-A locality export mapping', () => {
     expect(rows.some(r => r.verbatimMeasurementType === 'min_age')).toEqual(true)
     expect(rows.some(r => r.verbatimMeasurementType === 'chron')).toEqual(false)
     expect(rows.some(r => r.verbatimMeasurementType === 'bfa_min')).toEqual(false)
+  })
+
+  it('exports requested locality fields and omits project and last-update rows', () => {
+    const rows = mapLocalityToMeasurementRows({
+      ...baseLocality,
+      basin: 'Basin value',
+      subbasin: 'Subbasin value',
+      bipedal_footprints: true,
+      invert_pres: 'Invert preservation',
+      nutrients: 'High',
+      pers_pollen_ap: 10,
+      pers_pollen_nap: 20,
+      pers_pollen_other: 0,
+      plant_pres: 'Plant preservation',
+    })
+
+    expect(rows).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ verbatimMeasurementType: 'basin', measurementValue: 'Basin value' }),
+        expect.objectContaining({ verbatimMeasurementType: 'subbasin', measurementValue: 'Subbasin value' }),
+        expect.objectContaining({ verbatimMeasurementType: 'bipedal_footprints', measurementValue: 'true' }),
+        expect.objectContaining({ verbatimMeasurementType: 'invert_pres', measurementValue: 'Invert preservation' }),
+        expect.objectContaining({ verbatimMeasurementType: 'nutrients', measurementValue: 'High' }),
+        expect.objectContaining({ verbatimMeasurementType: 'pers_pollen_ap', measurementValue: '10' }),
+        expect.objectContaining({ verbatimMeasurementType: 'pers_pollen_nap', measurementValue: '20' }),
+        expect.objectContaining({ verbatimMeasurementType: 'pers_pollen_other', measurementValue: '0' }),
+        expect.objectContaining({ verbatimMeasurementType: 'plant_pres', measurementValue: 'Plant preservation' }),
+      ])
+    )
+    expect(rows.some(r => r.verbatimMeasurementType.startsWith('now_plr'))).toEqual(false)
+    expect(rows.some(r => r.verbatimMeasurementType.startsWith('now_lau'))).toEqual(false)
   })
 
   it('concatenates collecting methods with |', () => {
