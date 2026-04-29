@@ -140,6 +140,15 @@ type DwcOccurrenceArchiveStream = {
   cleanup: () => Promise<void>
 }
 
+export type DwcOccurrenceExportProgress = {
+  stage: 'occurrences' | 'localities' | 'taxa' | 'zipping' | 'complete'
+  generated: number
+  total: number | null
+  message: string
+}
+
+type DwcOccurrenceExportProgressReporter = (progress: DwcOccurrenceExportProgress) => void
+
 const scientificNameForOccurrence = (species: SpeciesForOccurrenceExport): string => {
   const nameParts = [
     toMaybeMeaningful(species.genus_name),
@@ -475,6 +484,11 @@ async function* iterateOccurrenceRows(): AsyncGenerator<OccurrenceForExport> {
   }
 }
 
+const countOccurrenceRows = async (): Promise<number> => {
+  const { nowDb } = await import('../utils/db')
+  return await nowDb.now_ls.count()
+}
+
 const chunk = <T>(values: T[], size: number): T[][] => {
   const chunks: T[][] = []
   for (let index = 0; index < values.length; index += size) {
@@ -615,14 +629,25 @@ export const buildDwcOccurrenceArchiveZipBufferFromOccurrences = async (
 const writeOccurrenceAndMeasurementFiles = async ({
   occurrenceFilePath,
   measurementFilePath,
+  reportProgress,
 }: {
   occurrenceFilePath: string
   measurementFilePath: string
+  reportProgress?: DwcOccurrenceExportProgressReporter
 }): Promise<{ localityIds: number[]; speciesIds: number[] }> => {
   const occurrenceWriter = await createCsvFileWriter(occurrenceFilePath, OCCURRENCE_HEADERS)
   const measurementWriter = await createCsvFileWriter(measurementFilePath, MEASUREMENT_HEADERS)
   const localityIds = new Set<number>()
   const speciesIds = new Set<number>()
+  const totalOccurrences = await countOccurrenceRows()
+  let generatedOccurrences = 0
+
+  reportProgress?.({
+    stage: 'occurrences',
+    generated: generatedOccurrences,
+    total: totalOccurrences,
+    message: `Generating occurrence rows: ${generatedOccurrences}/${totalOccurrences} generated`,
+  })
 
   try {
     for await (const occurrence of iterateOccurrenceRows()) {
@@ -632,6 +657,16 @@ const writeOccurrenceAndMeasurementFiles = async ({
 
       for (const measurementRow of mapOccurrenceToMeasurementRows(occurrence)) {
         await measurementWriter.writeRow(measurementRow)
+      }
+
+      generatedOccurrences += 1
+      if (generatedOccurrences === totalOccurrences || generatedOccurrences % OCCURRENCE_EXPORT_PAGE_SIZE === 0) {
+        reportProgress?.({
+          stage: 'occurrences',
+          generated: generatedOccurrences,
+          total: totalOccurrences,
+          message: `Generating occurrence rows: ${generatedOccurrences}/${totalOccurrences} generated`,
+        })
       }
     }
   } finally {
@@ -649,14 +684,24 @@ const writeLocalityLookupFiles = async ({
   localityIds,
   locationFilePath,
   geologicalContextFilePath,
+  reportProgress,
 }: {
   localityIds: number[]
   locationFilePath: string
   geologicalContextFilePath: string
+  reportProgress?: DwcOccurrenceExportProgressReporter
 }): Promise<void> => {
   const { nowDb } = await import('../utils/db')
   const locationWriter = await createCsvFileWriter(locationFilePath, LOCATION_HEADERS)
   const geologicalContextWriter = await createCsvFileWriter(geologicalContextFilePath, GEOLOGICAL_CONTEXT_HEADERS)
+  let generatedLocalities = 0
+
+  reportProgress?.({
+    stage: 'localities',
+    generated: generatedLocalities,
+    total: localityIds.length,
+    message: `Generating location lookup rows: ${generatedLocalities}/${localityIds.length} generated`,
+  })
 
   try {
     for (const ids of chunk(localityIds, LOOKUP_EXPORT_CHUNK_SIZE)) {
@@ -670,7 +715,15 @@ const writeLocalityLookupFiles = async ({
         const localityForExport = locality as unknown as LocalityForOccurrenceExport
         await locationWriter.writeRow(mapLocalityToLocationRow(localityForExport))
         await geologicalContextWriter.writeRow(mapLocalityToGeologicalContextRow(localityForExport))
+        generatedLocalities += 1
       }
+
+      reportProgress?.({
+        stage: 'localities',
+        generated: generatedLocalities,
+        total: localityIds.length,
+        message: `Generating location lookup rows: ${generatedLocalities}/${localityIds.length} generated`,
+      })
     }
   } finally {
     await locationWriter.close()
@@ -681,12 +734,22 @@ const writeLocalityLookupFiles = async ({
 const writeTaxonLookupFile = async ({
   speciesIds,
   taxonFilePath,
+  reportProgress,
 }: {
   speciesIds: number[]
   taxonFilePath: string
+  reportProgress?: DwcOccurrenceExportProgressReporter
 }): Promise<void> => {
   const { nowDb } = await import('../utils/db')
   const taxonWriter = await createCsvFileWriter(taxonFilePath, TAXON_HEADERS)
+  let generatedTaxa = 0
+
+  reportProgress?.({
+    stage: 'taxa',
+    generated: generatedTaxa,
+    total: speciesIds.length,
+    message: `Generating taxon lookup rows: ${generatedTaxa}/${speciesIds.length} generated`,
+  })
 
   try {
     for (const ids of chunk(speciesIds, LOOKUP_EXPORT_CHUNK_SIZE)) {
@@ -698,14 +761,26 @@ const writeTaxonLookupFile = async ({
 
       for (const species of speciesRows) {
         await taxonWriter.writeRow(mapSpeciesToTaxonRow(species))
+        generatedTaxa += 1
       }
+
+      reportProgress?.({
+        stage: 'taxa',
+        generated: generatedTaxa,
+        total: speciesIds.length,
+        message: `Generating taxon lookup rows: ${generatedTaxa}/${speciesIds.length} generated`,
+      })
     }
   } finally {
     await taxonWriter.close()
   }
 }
 
-export const buildDwcOccurrenceArchiveZipStream = async (): Promise<DwcOccurrenceArchiveStream> => {
+export const buildDwcOccurrenceArchiveZipStream = async ({
+  reportProgress,
+}: {
+  reportProgress?: DwcOccurrenceExportProgressReporter
+} = {}): Promise<DwcOccurrenceArchiveStream> => {
   const tempDirectory = await mkdtemp(path.join(tmpdir(), 'now-dwc-occurrences-'))
   const files = {
     location: path.join(tempDirectory, 'location.csv'),
@@ -719,13 +794,22 @@ export const buildDwcOccurrenceArchiveZipStream = async (): Promise<DwcOccurrenc
     const { localityIds, speciesIds } = await writeOccurrenceAndMeasurementFiles({
       occurrenceFilePath: files.occurrence,
       measurementFilePath: files.measurement,
+      reportProgress,
     })
     await writeLocalityLookupFiles({
       localityIds,
       locationFilePath: files.location,
       geologicalContextFilePath: files.geologicalContext,
+      reportProgress,
     })
-    await writeTaxonLookupFile({ speciesIds, taxonFilePath: files.taxon })
+    await writeTaxonLookupFile({ speciesIds, taxonFilePath: files.taxon, reportProgress })
+
+    reportProgress?.({
+      stage: 'zipping',
+      generated: 0,
+      total: null,
+      message: 'Compressing DwC-A ZIP...',
+    })
 
     const zip = new JSZip()
     zip.file('location.csv', createReadStream(files.location))

@@ -6,6 +6,15 @@ import { useUser } from '@/hooks/user'
 import { Role } from '@/shared/types'
 import { currentDateAsString } from '@/shared/currentDateAsString'
 
+type OccurrenceExportProgress = {
+  message: string
+}
+
+const createExportId = () => {
+  if (window.crypto?.randomUUID) return window.crypto.randomUUID()
+  return `${Date.now()}-${Math.random().toString(36).slice(2)}`
+}
+
 export const OccurrenceDwcExportMenuItem = ({ handleClose }: { handleClose: () => void }) => {
   const [loading, setLoading] = useState(false)
   const { notify, setMessage: setNotificationMessage } = useNotify()
@@ -20,10 +29,40 @@ export const OccurrenceDwcExportMenuItem = ({ handleClose }: { handleClose: () =
 
   const fetchZipFile = async () => {
     setLoading(true)
-    notify('Generating DwC-A ZIP export, please wait...', 'info', null)
+    const exportId = createExportId()
+    let generationProgressTimer: number | undefined
+    notify('Generating DwC-A ZIP export...', 'info', null)
+
+    const updateGenerationProgress = async () => {
+      try {
+        const response = await fetch(`${BACKEND_URL}/occurrence/export/dwc-archive/progress/${exportId}`, fetchOptions)
+        if (!response.ok) return
+
+        const progress = (await response.json()) as OccurrenceExportProgress
+        setNotificationMessage(progress.message)
+      } catch {
+        // The download request owns the final success/failure notification.
+      }
+    }
+
+    const stopGenerationProgress = () => {
+      if (generationProgressTimer !== undefined) {
+        window.clearInterval(generationProgressTimer)
+        generationProgressTimer = undefined
+      }
+    }
 
     try {
-      const response = await fetch(`${BACKEND_URL}/occurrence/export/dwc-archive`, fetchOptions)
+      generationProgressTimer = window.setInterval(() => {
+        void updateGenerationProgress()
+      }, 1000)
+
+      const response = await fetch(
+        `${BACKEND_URL}/occurrence/export/dwc-archive?${new URLSearchParams({ exportId })}`,
+        fetchOptions
+      )
+      stopGenerationProgress()
+
       if (!response.ok) {
         throw new Error('Server response was not OK.')
       }
@@ -68,6 +107,7 @@ export const OccurrenceDwcExportMenuItem = ({ handleClose }: { handleClose: () =
 
       notify('Download finished.')
     } catch {
+      stopGenerationProgress()
       notify('Downloading DwC-A export failed.', 'error')
     } finally {
       setLoading(false)
