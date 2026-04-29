@@ -20,6 +20,7 @@ import { logDb, nowDb } from '../utils/db'
 import { validateCollectingMethodValues } from '../utils/validation/collectingMethodValues'
 import { buildPersonLookupByInitials, getPersonDisplayName, getPersonFromLookup } from './utils/person'
 import { getReferenceDetails } from './reference'
+import { addNullExactDateToReferenceJoins, referenceWithoutExactDateSelect } from './utils/referenceDate'
 
 const normalizeNumberField = (value: unknown) => {
   if (typeof value === 'string') {
@@ -259,34 +260,7 @@ export const getLocalityDetails = async (id: number, user: User | undefined) => 
           now_lr: {
             include: {
               ref_ref: {
-                select: {
-                  rid: true,
-                  ref_type_id: true,
-                  journal_id: true,
-                  title_primary: true,
-                  date_primary: true,
-                  volume: true,
-                  issue: true,
-                  start_page: true,
-                  end_page: true,
-                  publisher: true,
-                  pub_place: true,
-                  title_secondary: true,
-                  date_secondary: true,
-                  title_series: true,
-                  issn_isbn: true,
-                  ref_abstract: true,
-                  web_url: true,
-                  misc_1: true,
-                  misc_2: true,
-                  gen_notes: true,
-                  printed_language: true,
-                  used_morph: true,
-                  used_now: true,
-                  used_gene: true,
-                  ref_authors: true,
-                  ref_journal: true,
-                },
+                select: referenceWithoutExactDateSelect,
               },
             },
           },
@@ -315,13 +289,7 @@ export const getLocalityDetails = async (id: number, user: User | undefined) => 
       ...lau,
       lau_coordinator: getPersonDisplayName(coordinatorPerson, lau.lau_coordinator),
       lau_authorizer: getPersonDisplayName(authorizerPerson, lau.lau_authorizer),
-      now_lr: lau.now_lr.map(lr => ({
-        ...lr,
-        ref_ref: {
-          ...lr.ref_ref,
-          exact_date: null,
-        },
-      })),
+      now_lr: addNullExactDateToReferenceJoins(lau.now_lr),
       updates,
     }
   })

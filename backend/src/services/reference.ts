@@ -7,6 +7,20 @@ import {
 } from './referenceValidation'
 import { Role, User } from '../../../frontend/src/shared/types'
 import { getIdsOfUsersProjects } from './locality'
+import { referenceWithoutExactDateSelect } from './utils/referenceDate'
+
+type RawReferenceExactDate = {
+  exact_date: string | null
+}
+
+const normalizeRawExactDate = (value: string | null | undefined): string | null => {
+  if (!value) return null
+  const date = value.slice(0, 10)
+  const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(date)
+  if (!match) return null
+  if (match[2] === '00' || match[3] === '00') return null
+  return date
+}
 
 export const getAllReferences = async () => {
   const result = await nowDb.ref_ref.findMany({
@@ -41,22 +55,20 @@ export const getAllReferences = async () => {
 export const getReferenceDetails = async (id: number, _user?: User) => {
   const result = await nowDb.ref_ref.findUnique({
     where: { rid: id },
-    include: { ref_authors: true, ref_journal: true },
+    select: referenceWithoutExactDateSelect,
   })
 
   if (!result) {
     return null
   }
 
-  //changing exact_date to yyyy-mm-dd string since frontend uses that + we don't want to display ISO string in frontend
-  if (result && result.exact_date) {
-    const date = new Date(result.exact_date)
-    const formattedDate = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`
+  const exactDateRows = await nowDb.$queryRaw<RawReferenceExactDate[]>`
+    SELECT CAST(exact_date AS CHAR) AS exact_date
+    FROM ref_ref
+    WHERE rid = ${id}
+  `
 
-    return { ...result, exact_date: formattedDate }
-  }
-
-  return result
+  return { ...result, exact_date: normalizeRawExactDate(exactDateRows[0]?.exact_date) }
 }
 
 // Fetch localities that have been updated by the given reference id

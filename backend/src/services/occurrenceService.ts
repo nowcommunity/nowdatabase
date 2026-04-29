@@ -4,6 +4,7 @@ import { AccessError } from '../middlewares/authorizer'
 import { logDb, nowDb } from '../utils/db'
 import { buildPersonLookupByInitials, getPersonDisplayName, getPersonFromLookup } from './utils/person'
 import { generateOccurrenceDetailSql } from './queries/crossSearchQuery'
+import { addNullExactDateToReferenceJoins, referenceWithoutExactDateSelect } from './utils/referenceDate'
 
 const getAllowedLocalities = async (user: User) => {
   const usersProjects = await nowDb.now_proj_people.findMany({
@@ -119,44 +120,6 @@ type OccurrenceUpdate = {
   updates: OccurrenceLogRow[]
 }
 
-const referenceWithoutExactDateSelect = {
-  rid: true,
-  ref_type_id: true,
-  journal_id: true,
-  title_primary: true,
-  date_primary: true,
-  volume: true,
-  issue: true,
-  start_page: true,
-  end_page: true,
-  publisher: true,
-  pub_place: true,
-  title_secondary: true,
-  date_secondary: true,
-  title_series: true,
-  issn_isbn: true,
-  ref_abstract: true,
-  web_url: true,
-  misc_1: true,
-  misc_2: true,
-  gen_notes: true,
-  printed_language: true,
-  used_morph: true,
-  used_now: true,
-  used_gene: true,
-  ref_authors: true,
-  ref_journal: true,
-} as const
-
-const addNullExactDateToReferences = <T extends { ref_ref: object }>(references: T[]) =>
-  references.map(reference => ({
-    ...reference,
-    ref_ref: {
-      ...reference.ref_ref,
-      exact_date: null,
-    },
-  }))
-
 const stringifyLogValue = (value: unknown) => {
   if (value === null || value === undefined) return ''
   if (typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean') return String(value)
@@ -271,7 +234,7 @@ const getOccurrenceUpdates = async (lid: number, speciesId: number) => {
         update.lau_coordinator
       ),
       occ_comment: update.lau_comment ?? '',
-      references: addNullExactDateToReferences(update.now_lr) as unknown as AnyReference[],
+      references: addNullExactDateToReferenceJoins(update.now_lr) as unknown as AnyReference[],
       updates: nowLsLogs.filter(logRow => logRow.luid === update.luid),
     })),
     ...speciesUpdates.map(update => ({
@@ -285,7 +248,7 @@ const getOccurrenceUpdates = async (lid: number, speciesId: number) => {
         update.sau_coordinator
       ),
       occ_comment: update.sau_comment ?? '',
-      references: addNullExactDateToReferences(update.now_sr) as unknown as AnyReference[],
+      references: addNullExactDateToReferenceJoins(update.now_sr) as unknown as AnyReference[],
       updates: nowLsLogs.filter(logRow => logRow.suid === update.suid),
     })),
   ])
