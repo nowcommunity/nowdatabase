@@ -7,6 +7,7 @@ import {
   buildDwcOccurrenceArchiveZipStream,
   type DwcOccurrenceExportProgress,
 } from '../services/dwcArchiveExportOccurrences'
+import { buildDwcDataPackageZipBuffer } from '../services/dwcDataPackageExport'
 import { currentDateAsString } from '../../../frontend/src/shared/currentDateAsString'
 import { logger } from '../utils/logger'
 
@@ -61,6 +62,13 @@ router.get('/export/dwc-archive', requireOneOf([Role.Admin]), async (req, res, n
     }
     if (error) next(error)
   })
+})
+
+router.get('/export/dwc-data-package', requireOneOf([Role.Admin]), async (_req, res) => {
+  const zipBuffer = await buildDwcDataPackageZipBuffer()
+  res.setHeader('Content-Type', 'application/zip')
+  res.setHeader('Content-Disposition', `attachment; filename="now_dwc_dp_test_export_${currentDateAsString()}.zip"`)
+  return res.status(200).send(zipBuffer)
 })
 
 router.get('/:lid/:speciesId', getOccurrenceDetail)

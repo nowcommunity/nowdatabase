@@ -67,4 +67,34 @@ describe('DwC-A occurrence export (admin-only)', () => {
     expect(result.status).toEqual(403)
     expect(result.body).toEqual(noPermError)
   })
+
+  it('returns a DwC-DP ZIP archive for admins', async () => {
+    const loginResult = await send<{ token: string }>('user/login', 'POST', { username: 'testSu', password: 'test' })
+    expect(loginResult.status).toEqual(200)
+
+    const result = await request(app)
+      .get('/occurrence/export/dwc-data-package')
+      .set('authorization', `bearer ${loginResult.body.token}`)
+      .buffer(true)
+      .parse(parseBinary)
+
+    expect(result.status).toEqual(200)
+    expect(result.headers['content-type']).toMatch(/application\/zip/i)
+    expect(result.headers['content-disposition']).toMatch(/attachment;\s*filename="now_dwc_dp_test_export_/i)
+
+    const zip = await JSZip.loadAsync(result.body as unknown as Buffer)
+    expect(zip.file('datapackage.json')).toBeTruthy()
+    expect(zip.file('event.csv')).toBeTruthy()
+    expect(zip.file('geological-context.csv')).toBeTruthy()
+    expect(zip.file('occurrence.csv')).toBeTruthy()
+    expect(zip.file('event-assertion.csv')).toBeTruthy()
+    expect(zip.file('occurrence-assertion.csv')).toBeTruthy()
+    expect(zip.file('eml.xml')).toBeTruthy()
+  })
+
+  it('rejects non-admin DwC-DP requests', async () => {
+    const result = await request(app).get('/occurrence/export/dwc-data-package')
+    expect(result.status).toEqual(403)
+    expect(result.body).toEqual(noPermError)
+  })
 })
