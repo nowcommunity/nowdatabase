@@ -1,5 +1,3 @@
-import { format } from 'fast-csv'
-import { Writable } from 'stream'
 import JSZip from 'jszip'
 import { getContinentByCountry } from '../../../frontend/src/shared/validators/countryContinents'
 import {
@@ -12,37 +10,8 @@ import {
   mapOccurrenceToOccurrenceRow,
   type OccurrenceCsvRow,
 } from './dwcArchiveExportOccurrences'
-import type { MeasurementCsvRow } from './dwcArchiveExport'
-
-const writeCsvString = async (headers: string[], rows: Array<Record<string, unknown>>): Promise<string> => {
-  return await new Promise((resolve, reject) => {
-    let output = ''
-    const csvStream = format({
-      delimiter: ',',
-      headers,
-      quoteColumns: true,
-      quoteHeaders: true,
-      includeEndRowDelimiter: true,
-    })
-
-    const sink = new Writable({
-      write(chunk: Buffer | string, _encoding: BufferEncoding, callback: (error?: Error | null) => void) {
-        output += typeof chunk === 'string' ? chunk : chunk.toString('utf8')
-        callback()
-      },
-    })
-
-    sink.on('finish', () => resolve(output))
-    sink.on('error', reject)
-    csvStream.on('error', reject)
-
-    csvStream.pipe(sink)
-    for (const row of rows) {
-      csvStream.write(row)
-    }
-    csvStream.end()
-  })
-}
+import { buildDwcArchiveZipBuffer, type MeasurementCsvRow } from './dwcArchiveExport'
+import { writeDwcCsvString } from './utils/dwcCsv'
 
 const isMeaningfulString = (value: unknown): value is string => {
   if (typeof value !== 'string') return false
@@ -642,16 +611,13 @@ export const buildDwcDataPackageZipBufferFromRows = async ({
   const occurrenceAssertionRows = occurrences.flatMap(mapOccurrenceToDwcDpOccurrenceAssertionRows)
 
   const zip = new JSZip()
-  zip.file(DWC_DP_TABLES.event, await writeCsvString([...DWC_DP_EVENT_HEADERS], eventRows))
-  zip.file(
-    DWC_DP_TABLES.geologicalContext,
-    await writeCsvString([...DWC_DP_GEOLOGICAL_CONTEXT_HEADERS], geologicalContextRows)
-  )
-  zip.file(DWC_DP_TABLES.occurrence, await writeCsvString([...DWC_DP_OCCURRENCE_HEADERS], occurrenceRows))
-  zip.file(DWC_DP_TABLES.eventAssertion, await writeCsvString([...DWC_DP_EVENT_ASSERTION_HEADERS], eventAssertionRows))
+  zip.file(DWC_DP_TABLES.event, writeDwcCsvString(DWC_DP_EVENT_HEADERS, eventRows))
+  zip.file(DWC_DP_TABLES.geologicalContext, writeDwcCsvString(DWC_DP_GEOLOGICAL_CONTEXT_HEADERS, geologicalContextRows))
+  zip.file(DWC_DP_TABLES.occurrence, writeDwcCsvString(DWC_DP_OCCURRENCE_HEADERS, occurrenceRows))
+  zip.file(DWC_DP_TABLES.eventAssertion, writeDwcCsvString(DWC_DP_EVENT_ASSERTION_HEADERS, eventAssertionRows))
   zip.file(
     DWC_DP_TABLES.occurrenceAssertion,
-    await writeCsvString([...DWC_DP_OCCURRENCE_ASSERTION_HEADERS], occurrenceAssertionRows)
+    writeDwcCsvString(DWC_DP_OCCURRENCE_ASSERTION_HEADERS, occurrenceAssertionRows)
   )
   zip.file(DWC_DP_TABLES.dataPackage, buildDwcDataPackageJson(publicationDateIso))
   zip.file(DWC_DP_TABLES.eml, buildDwcDataPackageEmlXml(publicationDateIso))
@@ -674,6 +640,84 @@ export const buildDwcDataPackageZipBuffer = async (): Promise<Buffer> => {
   return await buildDwcDataPackageZipBufferFromRows({
     localities,
     occurrences,
+  })
+}
+
+const addZipEntriesUnderPrefix = async ({
+  sourceZipBuffer,
+  targetZip,
+  prefix,
+}: {
+  sourceZipBuffer: Buffer
+  targetZip: JSZip
+  prefix: string
+}): Promise<void> => {
+  const sourceZip = await JSZip.loadAsync(sourceZipBuffer)
+  const files = Object.values(sourceZip.files).filter(file => !file.dir)
+
+  await Promise.all(
+    files.map(async file => {
+      targetZip.file(`${prefix}/${file.name}`, await file.async('nodebuffer'))
+    })
+  )
+}
+
+const buildFullDarwinCoreReadme = (): string => `NOW database Darwin Core full test export
+
+This ZIP is a convenience bundle. It contains two separate standards-based export
+artifacts in their own folders:
+
+- dwc-dp/
+  Darwin Core Data Package test export for relational event, geological context,
+  occurrence, event assertion, and occurrence assertion data.
+
+- dwc-a-taxa/
+  Darwin Core Archive test export for taxon records and synthesized taxon-level
+  traits. The traits remain in DwC-A Taxon + MeasurementOrFact form because they
+  are not currently linked to source specimen/material records.
+
+Join key:
+
+- dwc-dp/occurrence.csv taxonID uses NOW:<species_id>
+- dwc-a-taxa/taxon.csv taxonID uses the same NOW:<species_id>
+- dwc-a-taxa/measurementorfact.csv links taxon traits by that same taxonID
+
+The outer ZIP is not itself a single DwC-DP or DwC-A artifact. Each subfolder is
+intended to remain internally understandable as its own export format.
+`
+
+export const buildFullDarwinCoreExportZipBufferFromArchives = async ({
+  dwcDataPackageZipBuffer,
+  dwcTaxonArchiveZipBuffer,
+}: {
+  dwcDataPackageZipBuffer: Buffer
+  dwcTaxonArchiveZipBuffer: Buffer
+}): Promise<Buffer> => {
+  const zip = new JSZip()
+  zip.file('README.txt', buildFullDarwinCoreReadme())
+  await addZipEntriesUnderPrefix({
+    sourceZipBuffer: dwcDataPackageZipBuffer,
+    targetZip: zip,
+    prefix: 'dwc-dp',
+  })
+  await addZipEntriesUnderPrefix({
+    sourceZipBuffer: dwcTaxonArchiveZipBuffer,
+    targetZip: zip,
+    prefix: 'dwc-a-taxa',
+  })
+
+  return await zip.generateAsync({ type: 'nodebuffer', compression: 'DEFLATE', compressionOptions: { level: 6 } })
+}
+
+export const buildFullDarwinCoreExportZipBuffer = async (): Promise<Buffer> => {
+  const [dwcDataPackageZipBuffer, dwcTaxonArchiveZipBuffer] = await Promise.all([
+    buildDwcDataPackageZipBuffer(),
+    buildDwcArchiveZipBuffer(),
+  ])
+
+  return await buildFullDarwinCoreExportZipBufferFromArchives({
+    dwcDataPackageZipBuffer,
+    dwcTaxonArchiveZipBuffer,
   })
 }
 

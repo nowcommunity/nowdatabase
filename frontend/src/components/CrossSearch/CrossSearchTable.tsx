@@ -10,6 +10,7 @@ import { formatWithMaxThreeDecimals } from '@/util/numberFormatting'
 import { occurrenceLabels } from '@/constants/occurrenceLabels'
 import { OccurrenceDwcExportMenuItem } from '@/components/Occurrence/OccurrenceDwcExportMenuItem'
 import { OccurrenceDwcDpExportMenuItem } from '@/components/Occurrence/OccurrenceDwcDpExportMenuItem'
+import { OccurrenceFullDarwinCoreExportMenuItem } from '@/components/Occurrence/OccurrenceFullDarwinCoreExportMenuItem'
 import { matchesCountryOrContinent } from '@/shared/validators/countryContinents'
 
 export const CrossSearchTable = ({ selectorFn }: { selectorFn?: (newObject: CrossSearch) => void }) => {
@@ -1095,6 +1096,7 @@ export const CrossSearchTable = ({ selectorFn }: { selectorFn?: (newObject: Cros
           <>
             <OccurrenceDwcExportMenuItem handleClose={handleClose} />
             <OccurrenceDwcDpExportMenuItem handleClose={handleClose} />
+            <OccurrenceFullDarwinCoreExportMenuItem handleClose={handleClose} />
           </>
         )}
       />

@@ -1,8 +1,7 @@
 import type { now_loc, now_time_unit } from '../../prisma/generated/now_test_client'
-import { format } from 'fast-csv'
-import { Writable } from 'stream'
 import JSZip from 'jszip'
 import { getContinentByCountry } from '../../../frontend/src/shared/validators/countryContinents'
+import { toDwcCsvString, writeDwcCsvString } from './utils/dwcCsv'
 
 const isMeaningfulString = (value: unknown): value is string => {
   if (typeof value !== 'string') return false
@@ -12,60 +11,7 @@ const isMeaningfulString = (value: unknown): value is string => {
   return true
 }
 
-const toDwcString = (value: unknown): string => {
-  if (value === null || value === undefined) return ''
-  if (typeof value === 'bigint') return value.toString()
-  if (typeof value === 'number') return Number.isFinite(value) ? value.toString() : ''
-  if (typeof value === 'boolean') return value ? 'true' : 'false'
-  if (typeof value === 'string') return value
-  if (typeof value === 'object') {
-    if (value instanceof Date) return value.toISOString()
-    if (typeof (value as { toString?: unknown }).toString === 'function') {
-      const asString = (value as { toString: () => string }).toString()
-      if (asString && asString !== '[object Object]') return asString
-    }
-    try {
-      return JSON.stringify(value) ?? ''
-    } catch {
-      return ''
-    }
-  }
-  return ''
-}
-
-const writeCsvString = async (headers: string[], rows: Array<Record<string, unknown>>): Promise<string> => {
-  return await new Promise((resolve, reject) => {
-    let output = ''
-    const csvStream = format({
-      delimiter: ',',
-      headers,
-      quoteColumns: true,
-      quoteHeaders: true,
-      includeEndRowDelimiter: true,
-    })
-
-    const sink = new Writable({
-      write(chunk: Buffer | string, _encoding: BufferEncoding, callback: (error?: Error | null) => void) {
-        if (typeof chunk === 'string') {
-          output += chunk
-        } else {
-          output += chunk.toString('utf8')
-        }
-        callback()
-      },
-    })
-
-    sink.on('finish', () => resolve(output))
-    sink.on('error', reject)
-    csvStream.on('error', reject)
-
-    csvStream.pipe(sink)
-    for (const row of rows) {
-      csvStream.write(row)
-    }
-    csvStream.end()
-  })
-}
+const toDwcString = toDwcCsvString
 
 export const LOCATION_HEADERS = [
   'locationID',
@@ -1381,9 +1327,9 @@ export const buildDwcLocalityArchiveZipBufferFromLocalities = async (
   const geologicalContextRows = localities.map(mapLocalityToGeologicalContextRow)
   const measurementRows = localities.flatMap(mapLocalityToMeasurementRows)
 
-  const locationCsv = await writeCsvString([...LOCATION_HEADERS], locationRows)
-  const geologyCsv = await writeCsvString([...GEOLOGICAL_CONTEXT_HEADERS], geologicalContextRows)
-  const measurementCsv = await writeCsvString([...LOCALITY_MEASUREMENT_HEADERS], measurementRows)
+  const locationCsv = writeDwcCsvString(LOCATION_HEADERS, locationRows)
+  const geologyCsv = writeDwcCsvString(GEOLOGICAL_CONTEXT_HEADERS, geologicalContextRows)
+  const measurementCsv = writeDwcCsvString(LOCALITY_MEASUREMENT_HEADERS, measurementRows)
   const metaXml = buildLocalityMetaXml()
 
   const publicationDateIso = new Date().toISOString().slice(0, 10)

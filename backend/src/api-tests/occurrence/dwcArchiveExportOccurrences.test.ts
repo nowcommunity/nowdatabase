@@ -97,4 +97,33 @@ describe('DwC-A occurrence export (admin-only)', () => {
     expect(result.status).toEqual(403)
     expect(result.body).toEqual(noPermError)
   })
+
+  it('returns a full Darwin Core ZIP archive for admins', async () => {
+    const loginResult = await send<{ token: string }>('user/login', 'POST', { username: 'testSu', password: 'test' })
+    expect(loginResult.status).toEqual(200)
+
+    const result = await request(app)
+      .get('/occurrence/export/dwc-full-package')
+      .set('authorization', `bearer ${loginResult.body.token}`)
+      .buffer(true)
+      .parse(parseBinary)
+
+    expect(result.status).toEqual(200)
+    expect(result.headers['content-type']).toMatch(/application\/zip/i)
+    expect(result.headers['content-disposition']).toMatch(/attachment;\s*filename="now_dwc_full_test_export_/i)
+
+    const zip = await JSZip.loadAsync(result.body as unknown as Buffer)
+    expect(zip.file('README.txt')).toBeTruthy()
+    expect(zip.file('dwc-dp/datapackage.json')).toBeTruthy()
+    expect(zip.file('dwc-dp/occurrence.csv')).toBeTruthy()
+    expect(zip.file('dwc-a-taxa/taxon.csv')).toBeTruthy()
+    expect(zip.file('dwc-a-taxa/measurementorfact.csv')).toBeTruthy()
+    expect(zip.file('dwc-a-taxa/meta.xml')).toBeTruthy()
+  })
+
+  it('rejects non-admin full Darwin Core requests', async () => {
+    const result = await request(app).get('/occurrence/export/dwc-full-package')
+    expect(result.status).toEqual(403)
+    expect(result.body).toEqual(noPermError)
+  })
 })

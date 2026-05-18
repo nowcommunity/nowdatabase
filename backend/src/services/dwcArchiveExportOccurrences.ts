@@ -1,11 +1,8 @@
 import Prisma from '../../prisma/generated/now_test_client'
-import { format } from 'fast-csv'
-import { createReadStream, createWriteStream } from 'fs'
+import { createReadStream } from 'fs'
 import { mkdtemp, rm } from 'fs/promises'
 import { tmpdir } from 'os'
 import path from 'path'
-import { once } from 'events'
-import { Writable } from 'stream'
 import JSZip from 'jszip'
 import {
   GEOLOGICAL_CONTEXT_HEADERS,
@@ -14,40 +11,7 @@ import {
   mapLocalityToLocationRow,
 } from './dwcArchiveExportLocalities'
 import { MEASUREMENT_HEADERS, TAXON_HEADERS, mapSpeciesToTaxonRow, type MeasurementCsvRow } from './dwcArchiveExport'
-
-const writeCsvString = async (headers: string[], rows: Array<Record<string, unknown>>): Promise<string> => {
-  if (rows.length === 0) {
-    return `${headers.map(header => `"${header.replace(/"/g, '""')}"`).join(',')}\n`
-  }
-
-  return await new Promise((resolve, reject) => {
-    let output = ''
-    const csvStream = format({
-      delimiter: ',',
-      headers,
-      quoteColumns: true,
-      quoteHeaders: true,
-      includeEndRowDelimiter: true,
-    })
-
-    const sink = new Writable({
-      write(chunk: Buffer | string, _encoding: BufferEncoding, callback: (error?: Error | null) => void) {
-        output += typeof chunk === 'string' ? chunk : chunk.toString('utf8')
-        callback()
-      },
-    })
-
-    sink.on('finish', () => resolve(output))
-    sink.on('error', reject)
-    csvStream.on('error', reject)
-
-    csvStream.pipe(sink)
-    for (const row of rows) {
-      csvStream.write(row)
-    }
-    csvStream.end()
-  })
-}
+import { createDwcCsvFileWriter, toDwcCsvString, writeDwcCsvString } from './utils/dwcCsv'
 
 const isMeaningfulString = (value: unknown): value is string => {
   if (typeof value !== 'string') return false
@@ -57,18 +21,7 @@ const isMeaningfulString = (value: unknown): value is string => {
   return true
 }
 
-const toDwcString = (value: unknown): string => {
-  if (value === null || value === undefined) return ''
-  if (typeof value === 'bigint') return value.toString()
-  if (typeof value === 'number') return Number.isFinite(value) ? value.toString() : ''
-  if (typeof value === 'boolean') return value ? 'true' : 'false'
-  if (typeof value === 'string') return value
-  if (typeof value === 'object' && typeof (value as { toString?: unknown }).toString === 'function') {
-    const asString = (value as { toString: () => string }).toString()
-    return asString === '[object Object]' ? '' : asString
-  }
-  return ''
-}
+const toDwcString = toDwcCsvString
 
 const toMaybeMeaningful = (value: string | null | undefined): string => (isMeaningfulString(value) ? value.trim() : '')
 
@@ -432,35 +385,6 @@ const localityLookupSelect = {
 
 const speciesLookupSelect = occurrenceSelect.com_species.select
 
-const csvCell = (value: unknown): string => `"${toDwcString(value).replace(/"/g, '""')}"`
-
-const csvLine = (headers: readonly string[], row: Record<string, unknown>): string =>
-  `${headers.map(header => csvCell(row[header])).join(',')}\n`
-
-const createCsvFileWriter = async (filePath: string, headers: readonly string[]) => {
-  const stream = createWriteStream(filePath, { encoding: 'utf8' })
-  await new Promise<void>((resolve, reject) => {
-    stream.once('open', () => resolve())
-    stream.once('error', reject)
-  })
-
-  const write = async (line: string): Promise<void> => {
-    if (!stream.write(line)) await once(stream, 'drain')
-  }
-
-  await write(`${headers.map(csvCell).join(',')}\n`)
-
-  return {
-    writeRow: async (row: Record<string, unknown>): Promise<void> => {
-      await write(csvLine(headers, row))
-    },
-    close: async (): Promise<void> => {
-      stream.end()
-      await once(stream, 'finish')
-    },
-  }
-}
-
 async function* iterateOccurrenceRows(): AsyncGenerator<OccurrenceForExport> {
   const { nowDb } = await import('../utils/db')
   let cursor: { lid: number; species_id: number } | undefined
@@ -600,17 +524,14 @@ export const buildDwcOccurrenceArchiveZipBufferFromOccurrences = async (
     species => species.species_id.toString()
   )
 
-  const locationCsv = await writeCsvString([...LOCATION_HEADERS], localities.map(mapLocalityToLocationRow))
-  const geologicalContextCsv = await writeCsvString(
-    [...GEOLOGICAL_CONTEXT_HEADERS],
+  const locationCsv = writeDwcCsvString(LOCATION_HEADERS, localities.map(mapLocalityToLocationRow))
+  const geologicalContextCsv = writeDwcCsvString(
+    GEOLOGICAL_CONTEXT_HEADERS,
     localities.map(mapLocalityToGeologicalContextRow)
   )
-  const taxonCsv = await writeCsvString([...TAXON_HEADERS], speciesRows.map(mapSpeciesToTaxonRow))
-  const occurrenceCsv = await writeCsvString([...OCCURRENCE_HEADERS], occurrences.map(mapOccurrenceToOccurrenceRow))
-  const measurementCsv = await writeCsvString(
-    [...MEASUREMENT_HEADERS],
-    occurrences.flatMap(mapOccurrenceToMeasurementRows)
-  )
+  const taxonCsv = writeDwcCsvString(TAXON_HEADERS, speciesRows.map(mapSpeciesToTaxonRow))
+  const occurrenceCsv = writeDwcCsvString(OCCURRENCE_HEADERS, occurrences.map(mapOccurrenceToOccurrenceRow))
+  const measurementCsv = writeDwcCsvString(MEASUREMENT_HEADERS, occurrences.flatMap(mapOccurrenceToMeasurementRows))
   const metaXml = buildOccurrenceMetaXml()
   const emlXml = buildOccurrenceEmlXml(new Date().toISOString().slice(0, 10))
 
@@ -635,8 +556,8 @@ const writeOccurrenceAndMeasurementFiles = async ({
   measurementFilePath: string
   reportProgress?: DwcOccurrenceExportProgressReporter
 }): Promise<{ localityIds: number[]; speciesIds: number[] }> => {
-  const occurrenceWriter = await createCsvFileWriter(occurrenceFilePath, OCCURRENCE_HEADERS)
-  const measurementWriter = await createCsvFileWriter(measurementFilePath, MEASUREMENT_HEADERS)
+  const occurrenceWriter = await createDwcCsvFileWriter(occurrenceFilePath, OCCURRENCE_HEADERS)
+  const measurementWriter = await createDwcCsvFileWriter(measurementFilePath, MEASUREMENT_HEADERS)
   const localityIds = new Set<number>()
   const speciesIds = new Set<number>()
   const totalOccurrences = await countOccurrenceRows()
@@ -692,8 +613,8 @@ const writeLocalityLookupFiles = async ({
   reportProgress?: DwcOccurrenceExportProgressReporter
 }): Promise<void> => {
   const { nowDb } = await import('../utils/db')
-  const locationWriter = await createCsvFileWriter(locationFilePath, LOCATION_HEADERS)
-  const geologicalContextWriter = await createCsvFileWriter(geologicalContextFilePath, GEOLOGICAL_CONTEXT_HEADERS)
+  const locationWriter = await createDwcCsvFileWriter(locationFilePath, LOCATION_HEADERS)
+  const geologicalContextWriter = await createDwcCsvFileWriter(geologicalContextFilePath, GEOLOGICAL_CONTEXT_HEADERS)
   let generatedLocalities = 0
 
   reportProgress?.({
@@ -741,7 +662,7 @@ const writeTaxonLookupFile = async ({
   reportProgress?: DwcOccurrenceExportProgressReporter
 }): Promise<void> => {
   const { nowDb } = await import('../utils/db')
-  const taxonWriter = await createCsvFileWriter(taxonFilePath, TAXON_HEADERS)
+  const taxonWriter = await createDwcCsvFileWriter(taxonFilePath, TAXON_HEADERS)
   let generatedTaxa = 0
 
   reportProgress?.({

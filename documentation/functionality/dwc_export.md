@@ -4,6 +4,8 @@ Issue: `nowcommunity/nowdatabase#1150`
 
 This repository includes an **admin-only** Darwin Core Archive (DwC-A) export intended for initial testing.
 
+For spreadsheet compatibility, embedded line breaks in exported CSV cell values are normalized to spaces. This keeps each exported record on one physical CSV line.
+
 ## Access
 
 - Backend route: `GET /species/export/dwc-archive` (**Role.Admin only**)

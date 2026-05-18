@@ -104,8 +104,8 @@ export const TableView = <T extends MRT_RowData>({
   getDetailPath?: (row: T) => string
   url?: string
   title: string
-  kmlExport?: (table: MRT_TableInstance<T>) => void
-  svgExport?: (table: MRT_TableInstance<T>) => void
+  kmlExport?: (table: MRT_TableInstance<T>) => void | Promise<void>
+  svgExport?: (table: MRT_TableInstance<T>) => void | Promise<void>
   isCrossSearchTable?: boolean
   clickableRows?: boolean
   enableColumnFilterModes?: boolean

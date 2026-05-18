@@ -5,6 +5,7 @@ import { BACKEND_URL } from '@/util/config'
 import { useUser } from '@/hooks/user'
 import { Role } from '@/shared/types'
 import { currentDateAsString } from '@/shared/currentDateAsString'
+import { downloadExportFileWithProgress } from '@/util/exportProgress'
 
 export const SpeciesDwcExportMenuItem = ({ handleClose }: { handleClose: () => void }) => {
   const [loading, setLoading] = useState(false)
@@ -20,55 +21,22 @@ export const SpeciesDwcExportMenuItem = ({ handleClose }: { handleClose: () => v
 
   const fetchZipFile = async () => {
     setLoading(true)
-    notify('Generating DwC-A ZIP export, please wait...', 'info', null)
 
     try {
-      const response = await fetch(`${BACKEND_URL}/species/export/dwc-archive`, fetchOptions)
-      if (!response.ok) {
-        throw new Error('Server response was not OK.')
-      }
-
-      const reader = response.body?.getReader()
-      if (!reader) {
-        throw new Error('Missing response stream.')
-      }
-
-      const file: Uint8Array[] = []
-      let bytes = 0
-      let closed = false
-
-      const showDownloadProgress = () => {
-        if (!closed) {
-          setTimeout(() => {
-            setNotificationMessage(`Downloading DwC-A ZIP, ${Math.round((bytes / 1000000) * 10) / 10} MB`)
-            showDownloadProgress()
-          }, 500)
-        }
-      }
-
-      notify('Downloading DwC-A ZIP...', 'info', null)
-      showDownloadProgress()
-
-      while (true) {
-        const { done, value } = await reader.read()
-        if (done) break
-        bytes = bytes + value.length
-        file.push(value)
-      }
-      closed = true
-
-      const blobUrl = window.URL.createObjectURL(new Blob(file, { type: 'application/zip' }))
-      const downloadLink = document.createElement('a')
-      downloadLink.href = blobUrl
-      downloadLink.download = filename
-      document.body.appendChild(downloadLink)
-      downloadLink.click()
-      downloadLink.remove()
-      window.URL.revokeObjectURL(blobUrl)
-
-      notify('Download finished.')
+      await downloadExportFileWithProgress({
+        url: `${BACKEND_URL}/species/export/dwc-archive`,
+        filename,
+        fetchOptions,
+        notify,
+        setNotificationMessage,
+        startMessage: 'Generating DwC-A taxon ZIP export...',
+        waitingMessage: 'Waiting for taxon export rows',
+        downloadMessage: 'Downloading DwC-A taxon ZIP',
+        failureMessage: 'Downloading DwC-A export failed.',
+        contentType: 'application/zip',
+      })
     } catch {
-      notify('Downloading DwC-A export failed.', 'error')
+      // downloadExportFileWithProgress owns the failure notification.
     } finally {
       setLoading(false)
     }

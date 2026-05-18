@@ -9,7 +9,8 @@ DwC-DP is intentionally published as a separate format from the existing DwC-A e
 ## Access
 
 - Backend route: `GET /occurrence/export/dwc-data-package` (**Role.Admin only**)
-- The frontend exposes this as an export option on the cross-search occurrence table for administrators.
+- Backend route: `GET /occurrence/export/dwc-full-package` (**Role.Admin only**)
+- The frontend exposes both as export options on the cross-search occurrence table for administrators.
 
 ## Output
 
@@ -22,6 +23,30 @@ The downloaded ZIP contains:
 - `event-assertion.csv` (locality-level facts formerly expressed as locality `MeasurementOrFact`)
 - `occurrence-assertion.csv` (occurrence-level facts formerly expressed as occurrence `MeasurementOrFact`)
 - `eml.xml` (minimal placeholder EML metadata)
+
+## Full Darwin Core Convenience Bundle
+
+The full export route downloads one outer ZIP for users who need both occurrence/event data and taxon traits.
+
+The outer ZIP contains:
+
+- `README.txt`
+- `dwc-dp/` with the DwC-DP event + occurrence package described above
+- `dwc-a-taxa/` with the existing DwC-A taxon trait archive:
+  - `taxon.csv`
+  - `measurementorfact.csv`
+  - `meta.xml`
+  - `eml.xml`
+
+The outer ZIP is a NOW convenience bundle, not a single hybrid standard artifact. Each subfolder remains its own internally described export format.
+
+For spreadsheet compatibility, embedded line breaks in exported CSV cell values are normalized to spaces. This keeps each exported record on one physical CSV line.
+
+Join key:
+
+- `dwc-dp/occurrence.csv` uses `taxonID = NOW:<species_id>`
+- `dwc-a-taxa/taxon.csv` uses the same `taxonID`
+- `dwc-a-taxa/measurementorfact.csv` links synthesized taxon traits by the same `taxonID`
 
 ## Model
 

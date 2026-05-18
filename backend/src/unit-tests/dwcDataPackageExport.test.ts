@@ -2,6 +2,7 @@ import { describe, expect, it } from '@jest/globals'
 import JSZip from 'jszip'
 import {
   DWC_DP_TABLES,
+  buildFullDarwinCoreExportZipBufferFromArchives,
   buildDwcDataPackageZipBufferFromRows,
   mapLocalityToDwcDpEventAssertionRows,
   mapLocalityToDwcDpEventRow,
@@ -161,8 +162,12 @@ describe('DwC-DP export mapping', () => {
   })
 
   it('generates a ZIP archive with DwC-DP files and relational metadata', async () => {
+    const multilineLocality = {
+      ...locality,
+      loc_detail: 'Some notes\nwith a line feed',
+    } as DwcDpLocalityFixture
     const zipBuffer = await buildDwcDataPackageZipBufferFromRows({
-      localities: [locality],
+      localities: [multilineLocality],
       occurrences: [occurrence],
       publicationDateIso: '2026-05-13',
     })
@@ -175,6 +180,10 @@ describe('DwC-DP export mapping', () => {
     expect(zip.file(DWC_DP_TABLES.occurrenceAssertion)).toBeTruthy()
     expect(zip.file(DWC_DP_TABLES.dataPackage)).toBeTruthy()
     expect(zip.file(DWC_DP_TABLES.eml)).toBeTruthy()
+
+    const eventCsv = await zip.file(DWC_DP_TABLES.event)!.async('string')
+    expect(eventCsv).toContain('Some notes with a line feed')
+    expect(eventCsv.trimEnd().split('\n')).toHaveLength(2)
 
     const dataPackageJson = JSON.parse(await zip.file(DWC_DP_TABLES.dataPackage)!.async('string')) as {
       resources: Array<{ name: string; schema: { foreignKeys?: unknown[] } }>
@@ -192,5 +201,35 @@ describe('DwC-DP export mapping', () => {
         reference: { resource: 'event', fields: 'eventID' },
       },
     ])
+  })
+
+  it('combines DwC-DP and DwC-A taxon archives into a namespaced convenience bundle', async () => {
+    const dwcDataPackageZip = new JSZip()
+    dwcDataPackageZip.file('datapackage.json', '{}\n')
+    dwcDataPackageZip.file('event.csv', '"eventID"\n')
+    dwcDataPackageZip.file('occurrence.csv', '"occurrenceID","taxonID"\n')
+
+    const dwcTaxonArchiveZip = new JSZip()
+    dwcTaxonArchiveZip.file('taxon.csv', '"taxonID"\n')
+    dwcTaxonArchiveZip.file('measurementorfact.csv', '"taxonID","measurementID"\n')
+    dwcTaxonArchiveZip.file('meta.xml', '<archive />\n')
+
+    const fullZipBuffer = await buildFullDarwinCoreExportZipBufferFromArchives({
+      dwcDataPackageZipBuffer: await dwcDataPackageZip.generateAsync({ type: 'nodebuffer' }),
+      dwcTaxonArchiveZipBuffer: await dwcTaxonArchiveZip.generateAsync({ type: 'nodebuffer' }),
+    })
+
+    const fullZip = await JSZip.loadAsync(fullZipBuffer)
+    expect(fullZip.file('README.txt')).toBeTruthy()
+    expect(fullZip.file('dwc-dp/datapackage.json')).toBeTruthy()
+    expect(fullZip.file('dwc-dp/event.csv')).toBeTruthy()
+    expect(fullZip.file('dwc-dp/occurrence.csv')).toBeTruthy()
+    expect(fullZip.file('dwc-a-taxa/taxon.csv')).toBeTruthy()
+    expect(fullZip.file('dwc-a-taxa/measurementorfact.csv')).toBeTruthy()
+    expect(fullZip.file('dwc-a-taxa/meta.xml')).toBeTruthy()
+
+    const readme = await fullZip.file('README.txt')!.async('string')
+    expect(readme).toContain('dwc-dp/occurrence.csv taxonID')
+    expect(readme).toContain('dwc-a-taxa/taxon.csv taxonID')
   })
 })

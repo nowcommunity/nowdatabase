@@ -2,6 +2,8 @@
 
 This document describes the admin-only Darwin Core Archive (DwC-A) test export for localities.
 
+For spreadsheet compatibility, embedded line breaks in exported CSV cell values are normalized to spaces. This keeps each exported record on one physical CSV line.
+
 ## Files
 
 The export ZIP contains:

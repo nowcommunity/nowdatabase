@@ -10,6 +10,7 @@ import { Link, useLocation } from 'react-router-dom'
 import AddCircleIcon from '@mui/icons-material/AddCircle'
 import { CrossSearchExportMenuItem } from '../CrossSearch/CrossSearchExportMenuItem'
 import { usePageContext } from '../Page'
+import { useNotify } from '@/hooks/notification'
 
 export type ColumnVisibilityGroup = {
   id: string
@@ -42,8 +43,8 @@ export const TableToolBar = <T extends MRT_RowData>({
 }: {
   table: MRT_TableInstance<T>
   tableName: string
-  kmlExport?: (table: MRT_TableInstance<T>) => void
-  svgExport?: (table: MRT_TableInstance<T>) => void
+  kmlExport?: (table: MRT_TableInstance<T>) => void | Promise<void>
+  svgExport?: (table: MRT_TableInstance<T>) => void | Promise<void>
   isCrossSearchTable?: boolean
   selectorFn?: (id: T) => void
   showNewButton?: boolean
@@ -52,6 +53,7 @@ export const TableToolBar = <T extends MRT_RowData>({
   renderExtraExportMenuItems?: (handleClose: () => void) => ReactNode
 }) => {
   const { previousTableUrls, setPreviousTableUrls } = usePageContext<T>()
+  const { notify, setMessage: setNotificationMessage } = useNotify()
   const location = useLocation()
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
   const open = Boolean(anchorEl)
@@ -183,6 +185,22 @@ export const TableToolBar = <T extends MRT_RowData>({
     column.toggleVisibility?.(!column.getIsVisible?.())
   }
 
+  const exportVisibleTableRows = () => {
+    notify(`Preparing ${tableName} table CSV export...`, 'info', null)
+    const rowCount = exportRows(table, tableName)
+    setNotificationMessage(`Generated ${tableName} table CSV with ${rowCount} rows. Saving file...`)
+    notify('Download finished.')
+  }
+
+  const runMapExport = async (label: string, exportFn: (table: MRT_TableInstance<T>) => void | Promise<void>) => {
+    notify(`Preparing ${label} export...`, 'info', null)
+    const rowCount = table.getPrePaginationRowModel().rows.length
+    setNotificationMessage(`Generating ${label} export from ${rowCount} rows...`)
+    await exportFn(table)
+    setNotificationMessage(`Saving ${label} export...`)
+    notify('Download finished.')
+  }
+
   return (
     <div className="table-tool-bar">
       {!selectorFn && !hideLeftButtons && (
@@ -291,7 +309,7 @@ export const TableToolBar = <T extends MRT_RowData>({
           ) : (
             <MenuItem
               onClick={() => {
-                exportRows(table, tableName)
+                exportVisibleTableRows()
                 handleClose()
               }}
             >
@@ -304,7 +322,7 @@ export const TableToolBar = <T extends MRT_RowData>({
           {kmlExport && (
             <MenuItem
               onClick={() => {
-                kmlExport(table)
+                void runMapExport('KML', kmlExport)
                 handleClose()
               }}
             >
@@ -315,7 +333,7 @@ export const TableToolBar = <T extends MRT_RowData>({
           {svgExport && (
             <MenuItem
               onClick={() => {
-                svgExport(table)
+                void runMapExport('SVG map', svgExport)
                 handleClose()
               }}
             >

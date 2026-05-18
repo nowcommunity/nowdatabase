@@ -1,7 +1,6 @@
 import Prisma from '../../prisma/generated/now_test_client'
-import { format } from 'fast-csv'
-import { Writable } from 'stream'
 import JSZip from 'jszip'
+import { toDwcCsvString, writeDwcCsvString } from './utils/dwcCsv'
 
 const isMeaningfulString = (value: unknown): value is string => {
   if (typeof value !== 'string') return false
@@ -11,51 +10,7 @@ const isMeaningfulString = (value: unknown): value is string => {
   return true
 }
 
-const toDwcString = (value: unknown): string => {
-  if (value === null || value === undefined) return ''
-  if (typeof value === 'bigint') return value.toString()
-  if (typeof value === 'number') return Number.isFinite(value) ? value.toString() : ''
-  if (typeof value === 'boolean') return value ? 'true' : 'false'
-  if (typeof value === 'string') return value
-  if (typeof value === 'object') {
-    try {
-      return JSON.stringify(value) ?? ''
-    } catch {
-      return ''
-    }
-  }
-  return ''
-}
-
-const writeCsvString = async (headers: string[], rows: Array<Record<string, unknown>>): Promise<string> => {
-  return await new Promise((resolve, reject) => {
-    let output = ''
-    const csvStream = format({
-      delimiter: ',',
-      headers,
-      quoteColumns: true,
-      quoteHeaders: true,
-      includeEndRowDelimiter: true,
-    })
-
-    const sink = new Writable({
-      write(chunk: Buffer, _encoding, callback) {
-        output += chunk.toString('utf8')
-        callback()
-      },
-    })
-
-    sink.on('finish', () => resolve(output))
-    sink.on('error', reject)
-    csvStream.on('error', reject)
-
-    csvStream.pipe(sink)
-    for (const row of rows) {
-      csvStream.write(row)
-    }
-    csvStream.end()
-  })
-}
+const toDwcString = toDwcCsvString
 
 export const TAXON_HEADERS = [
   'taxonID',
@@ -967,8 +922,8 @@ export const buildDwcArchiveZipBufferFromSpecies = async (
   const taxonRows = speciesRows.map(mapSpeciesToTaxonRow)
   const measurementRows = speciesRows.flatMap(mapSpeciesToMeasurementRows)
 
-  const taxonCsv = await writeCsvString([...TAXON_HEADERS], taxonRows)
-  const measurementCsv = await writeCsvString([...MEASUREMENT_HEADERS], measurementRows)
+  const taxonCsv = writeDwcCsvString(TAXON_HEADERS, taxonRows)
+  const measurementCsv = writeDwcCsvString(MEASUREMENT_HEADERS, measurementRows)
   const metaXml = buildMetaXml()
   const publicationDateIso = new Date().toISOString().slice(0, 10)
   const emlXml = buildEmlXml(publicationDateIso)
