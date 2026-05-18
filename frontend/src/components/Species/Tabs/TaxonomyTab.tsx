@@ -7,14 +7,35 @@ import { SelectingTable } from '@/components/DetailView/common/SelectingTable'
 import { useGetAllSpeciesQuery } from '@/redux/speciesReducer'
 import { smallSpeciesTableColumns } from '@/common'
 import { SynonymsModal } from '../SynonymsModal'
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { taxonStatusOptions } from '@/shared/taxonStatusOptions'
+import { TaxonomySuggestionField } from '../TaxonomySuggestionField'
+import {
+  buildTaxonomySuggestionOptions,
+  TaxonomySuggestionField as TaxonomySuggestionFieldName,
+} from '../taxonomySuggestions'
 
 export const TaxonomyTab = () => {
   const { textField, dropdown, bigTextField, editData, setEditData, mode } = useDetailContext<SpeciesDetailsType>()
   const { data: speciesQueryData, isError } = useGetAllSpeciesQuery()
   const [selectedSpecies, setSelectedSpecies] = useState<string | undefined>()
   const [modalOpen, setModalOpen] = useState<boolean>(false)
+  const taxonomySuggestionOptions = useMemo(
+    () => ({
+      subclass_or_superorder_name: buildTaxonomySuggestionOptions(speciesQueryData, 'subclass_or_superorder_name'),
+      order_name: buildTaxonomySuggestionOptions(speciesQueryData, 'order_name'),
+      suborder_or_superfamily_name: buildTaxonomySuggestionOptions(speciesQueryData, 'suborder_or_superfamily_name'),
+      family_name: buildTaxonomySuggestionOptions(speciesQueryData, 'family_name'),
+      subfamily_name: buildTaxonomySuggestionOptions(speciesQueryData, 'subfamily_name'),
+      genus_name: buildTaxonomySuggestionOptions(speciesQueryData, 'genus_name'),
+      species_name: buildTaxonomySuggestionOptions(speciesQueryData, 'species_name'),
+    }),
+    [speciesQueryData]
+  )
+
+  const taxonomySuggestionField = (field: TaxonomySuggestionFieldName) => (
+    <TaxonomySuggestionField field={field} options={taxonomySuggestionOptions[field]} />
+  )
 
   const handleRowActionClick = (row: Species) => {
     setSelectedSpecies(row.species_id.toString())
@@ -55,28 +76,18 @@ export const TaxonomyTab = () => {
   )
 
   const classification = [
-    [
-      'Class',
-      'Mammalia',
-      'Subclass or Superorder',
-      textField('subclass_or_superorder_name', { type: 'text', trim: true }),
-    ],
+    ['Class', 'Mammalia', 'Subclass or Superorder', taxonomySuggestionField('subclass_or_superorder_name')],
     [
       'Order',
-      textField('order_name', { type: 'text', trim: true }),
+      taxonomySuggestionField('order_name'),
       'Suborder or Superfamily',
-      textField('suborder_or_superfamily_name', { type: 'text', trim: true }),
+      taxonomySuggestionField('suborder_or_superfamily_name'),
     ],
-    [
-      'Family',
-      textField('family_name', { type: 'text', trim: true }),
-      'Subfamily or Tribe',
-      textField('subfamily_name', { type: 'text', trim: true }),
-    ],
-    ['Genus', textField('genus_name', { type: 'text', trim: true })],
+    ['Family', taxonomySuggestionField('family_name'), 'Subfamily or Tribe', taxonomySuggestionField('subfamily_name')],
+    ['Genus', taxonomySuggestionField('genus_name')],
     [
       'Species',
-      textField('species_name', { type: 'text', trim: true }),
+      taxonomySuggestionField('species_name'),
       'Unique Identifier',
       textField('unique_identifier', { type: 'text', trim: true }),
     ],
