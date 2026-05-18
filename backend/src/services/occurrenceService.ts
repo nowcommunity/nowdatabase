@@ -4,6 +4,7 @@ import { AccessError } from '../middlewares/authorizer'
 import { logDb, nowDb } from '../utils/db'
 import { buildPersonLookupByInitials, getPersonDisplayName, getPersonFromLookup } from './utils/person'
 import { generateOccurrenceDetailSql } from './queries/crossSearchQuery'
+import { addNullExactDateToReferenceJoins, referenceWithoutExactDateSelect } from './utils/referenceDate'
 
 const getAllowedLocalities = async (user: User) => {
   const usersProjects = await nowDb.now_proj_people.findMany({
@@ -193,7 +194,7 @@ const getOccurrenceUpdates = async (lid: number, speciesId: number) => {
             now_lr: {
               include: {
                 ref_ref: {
-                  include: { ref_authors: true, ref_journal: true },
+                  select: referenceWithoutExactDateSelect,
                 },
               },
             },
@@ -207,7 +208,7 @@ const getOccurrenceUpdates = async (lid: number, speciesId: number) => {
             now_sr: {
               include: {
                 ref_ref: {
-                  include: { ref_authors: true, ref_journal: true },
+                  select: referenceWithoutExactDateSelect,
                 },
               },
             },
@@ -233,7 +234,7 @@ const getOccurrenceUpdates = async (lid: number, speciesId: number) => {
         update.lau_coordinator
       ),
       occ_comment: update.lau_comment ?? '',
-      references: update.now_lr as unknown as AnyReference[],
+      references: addNullExactDateToReferenceJoins(update.now_lr) as unknown as AnyReference[],
       updates: nowLsLogs.filter(logRow => logRow.luid === update.luid),
     })),
     ...speciesUpdates.map(update => ({
@@ -247,7 +248,7 @@ const getOccurrenceUpdates = async (lid: number, speciesId: number) => {
         update.sau_coordinator
       ),
       occ_comment: update.sau_comment ?? '',
-      references: update.now_sr as unknown as AnyReference[],
+      references: addNullExactDateToReferenceJoins(update.now_sr) as unknown as AnyReference[],
       updates: nowLsLogs.filter(logRow => logRow.suid === update.suid),
     })),
   ])

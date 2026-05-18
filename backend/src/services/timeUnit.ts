@@ -5,6 +5,7 @@ import { validateTimeUnit } from '../../../frontend/src/shared/validators/timeUn
 import { getReferenceDetails } from './reference'
 import { buildPersonLookupByInitials, getPersonDisplayName, getPersonFromLookup } from './utils/person'
 import { TabListQueryOptions } from './tabularQuery'
+import { addNullExactDateToReferenceJoins, referenceWithoutExactDateSelect } from './utils/referenceDate'
 
 export const getAllTimeUnits = async () => {
   const result = await nowDb.now_time_unit.findMany({
@@ -53,10 +54,7 @@ export const getTimeUnitDetails = async (id: string) => {
           now_tr: {
             include: {
               ref_ref: {
-                include: {
-                  ref_authors: true,
-                  ref_journal: true,
-                },
+                select: referenceWithoutExactDateSelect,
               },
             },
           },
@@ -85,6 +83,7 @@ export const getTimeUnitDetails = async (id: string) => {
       ...tau,
       tau_coordinator: getPersonDisplayName(coordinatorPerson, tau.tau_coordinator),
       tau_authorizer: getPersonDisplayName(authorizerPerson, tau.tau_authorizer),
+      now_tr: addNullExactDateToReferenceJoins(tau.now_tr),
       updates,
     }
   })

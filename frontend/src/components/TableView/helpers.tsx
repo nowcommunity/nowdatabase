@@ -29,4 +29,5 @@ export const exportRows = <T extends MRT_RowData>(table: MRT_TableInstance<T>, t
   })
   const csv = generateCsv(csvConfig)(rowData)
   download(csvConfig)(csv)
+  return rowData.length
 }

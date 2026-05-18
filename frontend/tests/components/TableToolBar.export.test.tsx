@@ -23,19 +23,29 @@ jest.mock('../../src/components/Page', () => ({
   }),
 }))
 
+jest.mock('../../src/hooks/notification', () => ({
+  useNotify: () => ({
+    notify: jest.fn(),
+    setMessage: jest.fn(),
+  }),
+}))
+
 jest.mock('material-react-table', () => ({
   MRT_ShowHideColumnsButton: () => <button type="button">Show/Hide</button>,
 }))
 
 describe('TableToolBar export menu', () => {
   it('omits the species export option while keeping other exports available', async () => {
+    const kmlExport: (table: MRT_TableInstance<MRT_RowData>) => void = jest.fn(() => undefined)
+    const svgExport: (table: MRT_TableInstance<MRT_RowData>) => void = jest.fn(() => undefined)
+
     const { container } = render(
       <MemoryRouter>
         <TableToolBar
           table={{} as MRT_TableInstance<MRT_RowData>}
           tableName="Localities"
-          kmlExport={jest.fn()}
-          svgExport={jest.fn()}
+          kmlExport={kmlExport}
+          svgExport={svgExport}
         />
       </MemoryRouter>
     )

@@ -179,6 +179,7 @@ export const TableView = <T extends MRT_RowData>({
   paginationPlacement,
   tableContainerMaxHeight,
   columnVisibilityGroups,
+  renderExtraExportMenuItems,
 }: {
   data: T[] | undefined
   columns: MRT_ColumnDef<T>[]
@@ -191,8 +192,8 @@ export const TableView = <T extends MRT_RowData>({
   getDetailPath?: (row: T) => string
   url?: string
   title: string
-  kmlExport?: (table: MRT_TableInstance<T>) => void
-  svgExport?: (table: MRT_TableInstance<T>) => void
+  kmlExport?: (table: MRT_TableInstance<T>) => void | Promise<void>
+  svgExport?: (table: MRT_TableInstance<T>) => void | Promise<void>
   isCrossSearchTable?: boolean
   clickableRows?: boolean
   enableColumnFilterModes?: boolean
@@ -202,6 +203,7 @@ export const TableView = <T extends MRT_RowData>({
   error?: FetchBaseQueryError | SerializedError
   filterFns?: Record<string, MRT_FilterFn<T>>
   renderRowActionExtras?: ({ row }: { row: MRT_Row<T> }) => ReactNode
+  renderExtraExportMenuItems?: (handleClose: () => void) => ReactNode
   paginationPlacement?: 'top' | 'bottom' | 'both'
   tableContainerMaxHeight?: string | number
   columnVisibilityGroups?: ColumnVisibilityGroup[]
@@ -628,6 +630,7 @@ export const TableView = <T extends MRT_RowData>({
               selectorFn={selectorFn}
               hideLeftButtons={false}
               columnVisibilityGroups={columnVisibilityGroups}
+              renderExtraExportMenuItems={renderExtraExportMenuItems}
             />
           </Box>
         </div>

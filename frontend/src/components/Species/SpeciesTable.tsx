@@ -7,6 +7,7 @@ import type { ColumnVisibilityGroup } from '../TableView/TableToolBar'
 import { useGetAllSpeciesQuery } from '../../redux/speciesReducer'
 import { SynonymsModal } from './SynonymsModal'
 import { SpeciesCommentDialog } from './SpeciesCommentDialog'
+import { SpeciesDwcExportMenuItem } from './SpeciesDwcExportMenuItem'
 
 const normalizeFilterValue = (value: unknown): string => {
   if (typeof value === 'string') {
@@ -566,6 +567,7 @@ export const SpeciesTable = ({ selectorFn }: { selectorFn?: (id: Species) => voi
         tableRowAction={handleSpeciesRowActionClick}
         filterFns={synonymFilterFns}
         renderRowActionExtras={renderCommentAction}
+        renderExtraExportMenuItems={handleClose => <SpeciesDwcExportMenuItem handleClose={handleClose} />}
       />
       <SpeciesCommentDialog
         open={commentModalOpen}

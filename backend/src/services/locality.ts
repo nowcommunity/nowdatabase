@@ -20,6 +20,7 @@ import { logDb, nowDb } from '../utils/db'
 import { validateCollectingMethodValues } from '../utils/validation/collectingMethodValues'
 import { buildPersonLookupByInitials, getPersonDisplayName, getPersonFromLookup } from './utils/person'
 import { getReferenceDetails } from './reference'
+import { addNullExactDateToReferenceJoins, referenceWithoutExactDateSelect } from './utils/referenceDate'
 
 const normalizeNumberField = (value: unknown) => {
   if (typeof value === 'string') {
@@ -259,10 +260,7 @@ export const getLocalityDetails = async (id: number, user: User | undefined) => 
           now_lr: {
             include: {
               ref_ref: {
-                include: {
-                  ref_authors: true,
-                  ref_journal: true,
-                },
+                select: referenceWithoutExactDateSelect,
               },
             },
           },
@@ -291,6 +289,7 @@ export const getLocalityDetails = async (id: number, user: User | undefined) => 
       ...lau,
       lau_coordinator: getPersonDisplayName(coordinatorPerson, lau.lau_coordinator),
       lau_authorizer: getPersonDisplayName(authorizerPerson, lau.lau_authorizer),
+      now_lr: addNullExactDateToReferenceJoins(lau.now_lr),
       updates,
     }
   })

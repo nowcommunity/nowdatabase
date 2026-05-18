@@ -6,6 +6,7 @@ import { ValidationObject, referenceValidator } from '../../../frontend/src/shar
 import { getReferenceDetails } from './reference'
 import { buildPersonLookupByInitials, getPersonDisplayName, getPersonFromLookup } from './utils/person'
 import { TabListQueryOptions } from './tabularQuery'
+import { addNullExactDateToReferenceJoins, referenceWithoutExactDateSelect } from './utils/referenceDate'
 
 export const getAllTimeBounds = async () => {
   const result = await nowDb.now_tu_bound.findMany({
@@ -30,10 +31,7 @@ export const getTimeBoundDetails = async (id: number) => {
           now_br: {
             include: {
               ref_ref: {
-                include: {
-                  ref_authors: true,
-                  ref_journal: true,
-                },
+                select: referenceWithoutExactDateSelect,
               },
             },
           },
@@ -61,6 +59,7 @@ export const getTimeBoundDetails = async (id: number) => {
       ...bau,
       bau_coordinator: getPersonDisplayName(coordinatorPerson, bau.bau_coordinator),
       bau_authorizer: getPersonDisplayName(authorizerPerson, bau.bau_authorizer),
+      now_br: addNullExactDateToReferenceJoins(bau.now_br),
       updates,
     }
   })

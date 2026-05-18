@@ -10,12 +10,24 @@ import { fixBigInt } from '../utils/common'
 import { EditDataType, EditMetaData, LocalityDetailsType, Role } from '../../../frontend/src/shared/types'
 import { AccessError, requireOneOf } from '../middlewares/authorizer'
 import { deleteLocality, writeLocality } from '../services/write/locality'
+import { buildDwcLocalityArchiveZipBuffer } from '../services/dwcArchiveExportLocalities'
+import { currentDateAsString } from '../../../frontend/src/shared/currentDateAsString'
 
 const router = Router()
 
 router.get('/all', async (req, res) => {
   const localities = await getAllLocalities(req.user)
   return res.status(200).send(fixBigInt(localities))
+})
+
+router.get('/export/dwc-archive', requireOneOf([Role.Admin]), async (_req, res) => {
+  const zipBuffer = await buildDwcLocalityArchiveZipBuffer()
+  res.setHeader('Content-Type', 'application/zip')
+  res.setHeader(
+    'Content-Disposition',
+    `attachment; filename="now_dwc_localities_test_export_${currentDateAsString()}.zip"`
+  )
+  return res.status(200).send(zipBuffer)
 })
 
 router.get('/:id', async (req, res) => {
