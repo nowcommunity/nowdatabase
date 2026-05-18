@@ -10,7 +10,7 @@ import {
   useDeleteReferenceMutation,
   useGetReferenceTypesQuery,
 } from '@/redux/referenceReducer'
-import { EditDataType, ReferenceDetailsType, ValidationErrors } from '@/shared/types'
+import { EditDataType, ReferenceDetailsType } from '@/shared/types'
 import { emptyReference } from '../DetailView/common/defaultValues'
 import {
   createReferenceValidatorWithLabels,
@@ -23,6 +23,7 @@ import { createReferenceTitle } from './referenceFormatting'
 import { useReturnNavigation } from '@/hooks/useReturnNavigation'
 import type { FetchBaseQueryError } from '@reduxjs/toolkit/query'
 import type { SerializedError } from '@reduxjs/toolkit'
+import { formatReferenceValidationErrorMessage } from './referenceValidationErrors'
 
 const REFERENCE_DELETE_CONFLICT_MESSAGE = 'The Reference with associated updates cannot be deleted.'
 const GENERIC_DELETE_MESSAGE = 'Could not delete item. Error happened.'
@@ -101,8 +102,8 @@ export const ReferenceDetails = ({
       notify('Saved reference successfully.')
       setTimeout(() => navigate(`/reference/${rid}`), 15)
     } catch (e) {
-      const error = e as ValidationErrors
-      notify('Following validators failed: ' + error.data.map(e => e.name).join(', '), 'error')
+      const message = formatReferenceValidationErrorMessage(e, editData.ref_type_id, referenceFieldDisplayLabelMap)
+      notify(message, 'error')
     }
   }
 
