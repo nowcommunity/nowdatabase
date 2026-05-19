@@ -1,9 +1,13 @@
 import { Locality } from '@/shared/types'
 
+type KmlLocality = Locality & {
+  species?: string[]
+}
+
 // Replaces special characters with html entities.
 const htmlEncode = (str: string) => {
   const el = document.createElement('div')
-  el.innerText = str
+  el.textContent = str
   return el.innerHTML
 }
 
@@ -26,8 +30,15 @@ const tableRow = (title: string, value: string, indentLevel: number) => {
   return tableRowString
 }
 
+const speciesTableRow = (species: string[], indentLevel: number) => {
+  if (species.length === 0) return ''
+
+  const speciesListItems = species.map(speciesName => `<li>${htmlEncode(speciesName)}</li>`).join('')
+  return tableRow('Species:', `<ul>${speciesListItems}</ul>`, indentLevel)
+}
+
 // Locality info table that shows up when clicking map marker in Google Earth for example.
-const localityInfoTable = (locality: Locality, indentLevel: number = 3) => {
+const localityInfoTable = (locality: KmlLocality, indentLevel: number = 3) => {
   const indent = '\t'.repeat(indentLevel)
 
   let tableString = `${indent}<![CDATA[\n`
@@ -41,6 +52,7 @@ const localityInfoTable = (locality: Locality, indentLevel: number = 3) => {
     `${locality.max_age} Ma (${locality.bfa_max}) - ${locality.min_age} Ma (${locality.bfa_min})`,
     indentLevel + 1
   )
+  tableString += speciesTableRow(locality.species ?? [], indentLevel + 1)
 
   tableString += `${indent}</table>\n`
   tableString += `${indent}]]>\n`
@@ -48,7 +60,7 @@ const localityInfoTable = (locality: Locality, indentLevel: number = 3) => {
   return tableString
 }
 
-const generatePlacemarkKml = (locality: Locality) => {
+const generatePlacemarkKml = (locality: KmlLocality) => {
   let kmlString = `\t<Placemark>\n`
   kmlString += `\t\t<name>${htmlEncode(locality.loc_name)}</name>\n`
 
@@ -66,7 +78,7 @@ const generatePlacemarkKml = (locality: Locality) => {
 }
 
 // Returns an XML / KML string containing locality information as map markers, openable in Google Earth for example.
-export const generateKml = (localities: Locality[]) => {
+export const generateKml = (localities: KmlLocality[]) => {
   let kmlString = `<?xml version="1.0" encoding="UTF-8"?>\n`
   kmlString +=
     `<kml xmlns="http://www.opengis.net/kml/2.2" xmlns:gx="http://www.google.com/kml/ext/2.2" ` +
