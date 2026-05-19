@@ -42,6 +42,11 @@ export const TaxonomySuggestionField = ({ field, options }: TaxonomySuggestionFi
       inputValue={editData[field] ?? ''}
       onInputChange={(_, value) => updateField(value)}
       onChange={(_, value) => updateField(value ?? '')}
+      slotProps={{
+        popper: {
+          placement: 'top-start',
+        },
+      }}
       sx={{ width: FIELD_WIDTH }}
       renderInput={params => (
         <TextField
