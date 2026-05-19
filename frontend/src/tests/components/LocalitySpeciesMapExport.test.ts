@@ -1,13 +1,15 @@
 import { describe, expect, it } from '@jest/globals'
 
 import {
+  getUniqueCrossSearchMapExportLocalities,
   getUniqueOccurrenceMapExportLocalities,
   getUniqueSpeciesLocalityMapExportLocalities,
   toMapExportLocality,
 } from '@/components/Species/localitySpeciesMapExport'
 import { generateKml } from '@/util/kml'
-import type { LocalityDetailsType, LocalitySpecies, SpeciesLocality } from '@/shared/types'
+import type { CrossSearch, LocalityDetailsType, LocalitySpecies, SpeciesLocality } from '@/shared/types'
 
+const crossSearch = (overrides: unknown): CrossSearch => overrides as CrossSearch
 const speciesLocality = (overrides: unknown): SpeciesLocality => overrides as SpeciesLocality
 const localitySpecies = (overrides: unknown): LocalitySpecies => overrides as LocalitySpecies
 const locality = (overrides: unknown): LocalityDetailsType => overrides as LocalityDetailsType
@@ -100,6 +102,47 @@ describe('locality species map export helpers', () => {
     )
 
     expect(result).toHaveLength(1)
+    expect(result[0]?.species).toEqual(['Ursus arctos', 'Vulpes vulpes'])
+  })
+
+  it('groups cross-search occurrence rows by locality with species names', () => {
+    const result = getUniqueCrossSearchMapExportLocalities([
+      crossSearch({
+        lid_now_loc: 1,
+        loc_name: 'A',
+        country: 'Finland',
+        dec_lat: 1,
+        dec_long: 2,
+        species_id_com_species: 100,
+        genus_name: 'Ursus',
+        species_name: 'arctos',
+        unique_identifier: '-',
+      }),
+      crossSearch({
+        lid_now_loc: 1,
+        loc_name: 'A',
+        country: 'Finland',
+        dec_lat: 1,
+        dec_long: 2,
+        species_id_com_species: 101,
+        genus_name: 'Vulpes',
+        species_name: 'vulpes',
+        unique_identifier: null,
+      }),
+      crossSearch({
+        lid_now_loc: 2,
+        loc_name: 'B',
+        country: 'Sweden',
+        dec_lat: null,
+        dec_long: 2,
+        species_id_com_species: 102,
+        genus_name: 'Alces',
+        species_name: 'alces',
+      }),
+    ])
+
+    expect(result).toHaveLength(1)
+    expect(result[0]).toMatchObject({ lid: 1, loc_name: 'A', country: 'Finland' })
     expect(result[0]?.species).toEqual(['Ursus arctos', 'Vulpes vulpes'])
   })
 

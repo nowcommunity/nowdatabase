@@ -1,4 +1,4 @@
-import type { Locality, LocalityDetailsType, LocalitySpecies, SpeciesLocality } from '@/shared/types'
+import type { CrossSearch, Locality, LocalityDetailsType, LocalitySpecies, SpeciesLocality } from '@/shared/types'
 
 type SpeciesSource = {
   species_id?: number | null
@@ -120,4 +120,39 @@ export const getUniqueOccurrenceMapExportLocalities = (
   })
 
   return [exportLocality]
+}
+
+export const getUniqueCrossSearchMapExportLocalities = (rows: CrossSearch[]): MapExportLocality[] => {
+  const localitiesById = new Map<number, MapExportLocality>()
+
+  rows.forEach(row => {
+    const locality = toMapExportLocality({
+      lid: row.lid_now_loc,
+      loc_name: row.loc_name,
+      country: row.country,
+      dms_lat: row.dms_lat,
+      dms_long: row.dms_long,
+      dec_lat: row.dec_lat,
+      dec_long: row.dec_long,
+      bfa_max: row.bfa_max,
+      bfa_min: row.bfa_min,
+      max_age: row.max_age,
+      min_age: row.min_age,
+      altitude: row.altitude,
+      appr_num_spm: row.appr_num_spm,
+    })
+
+    if (!locality) return
+
+    const exportLocality = localitiesById.get(locality.lid) ?? locality
+    addSpecies(exportLocality, {
+      species_id: row.species_id_com_species,
+      genus_name: row.genus_name,
+      species_name: row.species_name,
+      unique_identifier: row.unique_identifier,
+    })
+    localitiesById.set(locality.lid, exportLocality)
+  })
+
+  return [...localitiesById.values()]
 }
