@@ -4,13 +4,16 @@ import { EditingModal } from '@/components/DetailView/common/EditingModal'
 import { Grouped } from '@/components/DetailView/common/tabLayoutHelpers'
 import { useDetailContext } from '@/components/DetailView/Context/DetailContext'
 import { Box, TextField } from '@mui/material'
-import { MRT_ColumnDef, MRT_Row } from 'material-react-table'
+import { MRT_ColumnDef, MRT_Row, MRT_RowData, MRT_TableInstance } from 'material-react-table'
 import { useForm } from 'react-hook-form'
 import { calculateNormalizedMesowearScore } from '@/shared/utils/mesowear'
 import { applyDefaultSpeciesOrdering, hasActiveSortingInSearch } from '@/components/DetailView/common/DetailTabTable'
 import { useLocation } from 'react-router-dom'
 import { useMemo } from 'react'
 import { occurrenceLabels } from '@/constants/occurrenceLabels'
+import { generateKml } from '@/util/kml'
+import { currentDateAsString } from '@/shared/currentDateAsString'
+import { getUniqueOccurrenceMapExportLocalities } from '@/components/Species/localitySpeciesMapExport'
 
 const hasMesowearScoreInputs = (row: LocalitySpecies) => {
   return (
@@ -215,6 +218,32 @@ export const OccurrencesTab = () => {
     return Object.keys(errors).length === 0
   }
 
+  const getExportLocalities = <T extends MRT_RowData>(table: MRT_TableInstance<T>) => {
+    const rows = table.getPrePaginationRowModel().rows.map(row => row.original as unknown as LocalitySpecies)
+    return getUniqueOccurrenceMapExportLocalities(data, rows)
+  }
+
+  const kmlExport = <T extends MRT_RowData>(table: MRT_TableInstance<T>) => {
+    const dataString = generateKml(getExportLocalities(table))
+    const blob = new Blob([dataString], { type: 'text/kml' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `locality-occurrences-${currentDateAsString()}.kml`
+    a.click()
+  }
+
+  const svgExport = async <T extends MRT_RowData>(table: MRT_TableInstance<T>) => {
+    const { generateSvg } = await import('@/components/Map/generateSvg')
+    const dataString = generateSvg(getExportLocalities(table))
+    const blob = new Blob([dataString], { type: 'image/svg+xml' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `locality-occurrences-map-${currentDateAsString()}.svg`
+    a.click()
+  }
+
   const editingModal = (
     <EditingModal buttonText={occurrenceLabels.addNewButton} onSave={onSave}>
       <Box sx={{ display: 'flex', flexDirection: 'column', gap: '1em' }}>
@@ -238,6 +267,8 @@ export const OccurrencesTab = () => {
         idFieldName="species_id"
         url="occurrence"
         getDetailPath={row => `/occurrence/${row.lid}/${row.species_id}`}
+        kmlExport={kmlExport}
+        svgExport={svgExport}
       />
     </Grouped>
   )

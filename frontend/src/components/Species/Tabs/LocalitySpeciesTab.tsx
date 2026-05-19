@@ -14,7 +14,7 @@ import { useMemo } from 'react'
 import { occurrenceLabels } from '@/constants/occurrenceLabels'
 import { generateKml } from '@/util/kml'
 import { currentDateAsString } from '@/shared/currentDateAsString'
-import { getUniqueMapExportLocalities } from '../localitySpeciesMapExport'
+import { getUniqueSpeciesLocalityMapExportLocalities } from '../localitySpeciesMapExport'
 
 const hasMesowearScoreInputs = (row: SpeciesLocality) => {
   return (
@@ -202,7 +202,7 @@ export const LocalitySpeciesTab = () => {
 
   const getExportLocalities = <T extends MRT_RowData>(table: MRT_TableInstance<T>) => {
     const rows = table.getPrePaginationRowModel().rows.map(row => row.original as unknown as SpeciesLocality)
-    return getUniqueMapExportLocalities(rows)
+    return getUniqueSpeciesLocalityMapExportLocalities(rows)
   }
 
   const kmlExport = <T extends MRT_RowData>(table: MRT_TableInstance<T>) => {
