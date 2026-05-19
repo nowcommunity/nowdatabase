@@ -1,4 +1,4 @@
-import { Autocomplete, TextField } from '@mui/material'
+import { TextField } from '@mui/material'
 import { useEffect } from 'react'
 
 import { useDetailContext } from '@/components/DetailView/Context/DetailContext'
@@ -19,6 +19,7 @@ export const TaxonomySuggestionField = ({ field, options }: TaxonomySuggestionFi
     useDetailContext<SpeciesDetailsType>()
   const errorObject = validator(editData, field)
   const { error } = errorObject
+  const suggestionListId = `${field}-taxonomy-suggestions`
 
   const updateField = (value: string) => {
     const nextEditData: EditDataType<SpeciesDetailsType> = { ...editData, [field]: value }
@@ -33,37 +34,25 @@ export const TaxonomySuggestionField = ({ field, options }: TaxonomySuggestionFi
   }, [errorObject.error, errorObject.name])
 
   const editingComponent = (
-    <Autocomplete
-      freeSolo
-      autoHighlight
-      id={`${field}-taxonomy-suggestions`}
-      options={options}
-      value={editData[field] ?? ''}
-      inputValue={editData[field] ?? ''}
-      onInputChange={(_, value) => updateField(value)}
-      onChange={(_, value) => updateField(value ?? '')}
-      slotProps={{
-        popper: {
-          placement: 'top-start',
-        },
-      }}
-      sx={{ width: FIELD_WIDTH }}
-      renderInput={params => (
-        <TextField
-          {...params}
-          id={`${field}-textfield`}
-          inputProps={{
-            ...params.inputProps,
-            id: `${field}-textfield`,
-          }}
-          variant="outlined"
-          size="small"
-          error={!!error}
-          helperText={error ?? ''}
-          onBlur={event => updateField(event.currentTarget.value.trim())}
-        />
-      )}
-    />
+    <>
+      <TextField
+        id={`${field}-textfield`}
+        inputProps={{ list: suggestionListId }}
+        value={editData[field] ?? ''}
+        onChange={event => updateField(event.currentTarget.value)}
+        variant="outlined"
+        size="small"
+        error={!!error}
+        helperText={error ?? ''}
+        onBlur={event => updateField(event.currentTarget.value.trim())}
+        sx={{ width: FIELD_WIDTH }}
+      />
+      <datalist id={suggestionListId}>
+        {options.map(option => (
+          <option key={option} value={option} />
+        ))}
+      </datalist>
+    </>
   )
 
   return <DataValue<SpeciesDetailsType> field={field} EditElement={editingComponent} />
