@@ -47,6 +47,10 @@ export const TaxonomySuggestionField = ({ field, options }: TaxonomySuggestionFi
         <TextField
           {...params}
           id={`${field}-textfield`}
+          inputProps={{
+            ...params.inputProps,
+            id: `${field}-textfield`,
+          }}
           variant="outlined"
           size="small"
           error={!!error}
