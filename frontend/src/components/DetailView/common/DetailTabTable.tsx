@@ -4,6 +4,7 @@ import {
   MRT_PaginationState,
   MRT_Row,
   MRT_RowData,
+  MRT_TableInstance,
   MRT_TableOptions,
   MRT_VisibilityState,
   type MRT_ColumnDef,
@@ -128,6 +129,8 @@ type DetailTabTableEditProps<T extends MRT_RowData> = {
   muiTableBodyRowProps?: MRT_TableOptions<T>['muiTableBodyRowProps']
   tableName?: string
   tableContainerMaxHeight?: string | number
+  kmlExport?: (table: MRT_TableInstance<T>) => void | Promise<void>
+  svgExport?: (table: MRT_TableInstance<T>) => void | Promise<void>
 }
 
 type DetailTabTableProps<T extends MRT_RowData> = DetailTabTableReadSelectProps<T> | DetailTabTableEditProps<T>
@@ -199,6 +202,8 @@ const DetailTabEditableTable = <T extends MRT_RowData>({
   muiTableBodyRowProps,
   tableName = 'table',
   tableContainerMaxHeight = '60vh',
+  kmlExport,
+  svgExport,
 }: DetailTabTableEditProps<T>) => {
   const [pagination, setPagination] = useState<MRT_PaginationState>(paginationState ?? defaultEditPagination)
 
@@ -230,7 +235,9 @@ const DetailTabEditableTable = <T extends MRT_RowData>({
 
   return (
     <Box>
-      {enableTopToolbar && <DetailTabEditableToolbar table={table} tableName={tableName} />}
+      {enableTopToolbar && (
+        <DetailTabEditableToolbar table={table} tableName={tableName} kmlExport={kmlExport} svgExport={svgExport} />
+      )}
       <MaterialReactTable table={table} />
     </Box>
   )
@@ -239,9 +246,13 @@ const DetailTabEditableTable = <T extends MRT_RowData>({
 const DetailTabEditableToolbar = <T extends MRT_RowData>({
   table,
   tableName,
+  kmlExport,
+  svgExport,
 }: {
   table: ReturnType<typeof useMaterialReactTable<T>>
   tableName: string
+  kmlExport?: (table: MRT_TableInstance<T>) => void | Promise<void>
+  svgExport?: (table: MRT_TableInstance<T>) => void | Promise<void>
 }) => {
   const user = useUser()
 
@@ -251,7 +262,13 @@ const DetailTabEditableToolbar = <T extends MRT_RowData>({
     <div className="table-top-row">
       <Box display="flex" alignItems="center" gap={1}>
         <TableHelp showFiltering showSorting showMultiSorting showColumnVisibility showExport />
-        <TableToolBar<T> table={table} tableName={tableName} hideLeftButtons={true} />
+        <TableToolBar<T>
+          table={table}
+          tableName={tableName}
+          hideLeftButtons={true}
+          kmlExport={kmlExport}
+          svgExport={svgExport}
+        />
       </Box>
     </div>
   )

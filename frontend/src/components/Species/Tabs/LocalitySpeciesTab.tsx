@@ -4,7 +4,7 @@ import { EditingModal } from '@/components/DetailView/common/EditingModal'
 import { Grouped } from '@/components/DetailView/common/tabLayoutHelpers'
 import { useDetailContext } from '@/components/DetailView/Context/DetailContext'
 import { Box, TextField } from '@mui/material'
-import { MRT_ColumnDef, MRT_Row } from 'material-react-table'
+import { MRT_ColumnDef, MRT_Row, MRT_RowData, MRT_TableInstance } from 'material-react-table'
 import { matchesCountryOrContinent } from '@/shared/validators/countryContinents'
 import { useForm } from 'react-hook-form'
 import { calculateNormalizedMesowearScore } from '@/shared/utils/mesowear'
@@ -12,6 +12,9 @@ import { applyDefaultSpeciesOrdering, hasActiveSortingInSearch } from '@/compone
 import { useLocation } from 'react-router-dom'
 import { useMemo } from 'react'
 import { occurrenceLabels } from '@/constants/occurrenceLabels'
+import { generateKml } from '@/util/kml'
+import { currentDateAsString } from '@/shared/currentDateAsString'
+import { getUniqueMapExportLocalities } from '../localitySpeciesMapExport'
 
 const hasMesowearScoreInputs = (row: SpeciesLocality) => {
   return (
@@ -197,6 +200,32 @@ export const LocalitySpeciesTab = () => {
     return Object.keys(errors).length === 0
   }
 
+  const getExportLocalities = <T extends MRT_RowData>(table: MRT_TableInstance<T>) => {
+    const rows = table.getPrePaginationRowModel().rows.map(row => row.original as unknown as SpeciesLocality)
+    return getUniqueMapExportLocalities(rows)
+  }
+
+  const kmlExport = <T extends MRT_RowData>(table: MRT_TableInstance<T>) => {
+    const dataString = generateKml(getExportLocalities(table))
+    const blob = new Blob([dataString], { type: 'text/kml' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `locality-species-${currentDateAsString()}.kml`
+    a.click()
+  }
+
+  const svgExport = async <T extends MRT_RowData>(table: MRT_TableInstance<T>) => {
+    const { generateSvg } = await import('@/components/Map/generateSvg')
+    const dataString = generateSvg(getExportLocalities(table))
+    const blob = new Blob([dataString], { type: 'image/svg+xml' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `locality-species-map-${currentDateAsString()}.svg`
+    a.click()
+  }
+
   const editingModal = (
     <EditingModal buttonText={occurrenceLabels.addNewButton} onSave={onSave}>
       <Box sx={{ display: 'flex', flexDirection: 'column', gap: '1em' }}>
@@ -224,6 +253,8 @@ export const LocalitySpeciesTab = () => {
         url="occurrence"
         getDetailPath={row => `/occurrence/${row.lid}/${row.species_id}`}
         checkRowRestriction={row => Boolean(row.now_loc?.loc_status)}
+        kmlExport={kmlExport}
+        svgExport={svgExport}
       />
     </Grouped>
   )

@@ -1,6 +1,6 @@
 import { EditDataType, RowState } from '@/shared/types'
 import { CircularProgress, Box, Button, Tooltip } from '@mui/material'
-import { type MRT_ColumnDef, type MRT_Row, type MRT_RowData } from 'material-react-table'
+import { type MRT_ColumnDef, type MRT_Row, type MRT_RowData, type MRT_TableInstance } from 'material-react-table'
 import { useDetailContext } from '../Context/DetailContext'
 import RemoveCircleOutlineIcon from '@mui/icons-material/RemoveCircleOutline'
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline'
@@ -34,6 +34,8 @@ export const EditableTable = <
   url,
   getDetailPath,
   checkRowRestriction,
+  kmlExport,
+  svgExport,
 }: {
   tableData?: Array<T> | null
   editTableData?: Array<EditDataType<T>> | null
@@ -47,6 +49,8 @@ export const EditableTable = <
   url?: string
   getDetailPath?: (row: T) => string
   checkRowRestriction?: (row: T) => boolean
+  kmlExport?: (table: MRT_TableInstance<T>) => void | Promise<void>
+  svgExport?: (table: MRT_TableInstance<T>) => void | Promise<void>
 }) => {
   const { editData, setEditData, mode, data, validator, fieldsWithErrors, setFieldsWithErrors } =
     useDetailContext<ParentType>()
@@ -172,6 +176,8 @@ export const EditableTable = <
       enableSorting={enableAdvancedTableControls}
       enableRowActions={!mode.read || Boolean(checkRowRestriction)}
       renderRowActions={resolveRenderRowActions()}
+      kmlExport={kmlExport}
+      svgExport={svgExport}
       muiTableBodyRowProps={({ row }: { row: MRT_Row<T> }) => ({
         'data-cy': idFieldName ? `table-row-${String(row.original[idFieldName])}` : undefined,
         onClick: () => {
