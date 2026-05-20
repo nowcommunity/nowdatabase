@@ -83,4 +83,23 @@ describe('EditingForm select support', () => {
       expect(editAction).toHaveBeenCalledWith({ taxonomic_status: 'informal species', rowState: 'new' })
     })
   })
+
+  it('shows field information for known add-form fields', async () => {
+    const user = userEvent.setup()
+    const formFields: EditingFormField[] = [{ name: 'author_surname', label: 'Surname' }]
+
+    mockUseDetailContext.mockReturnValue(createContextValue())
+
+    render(
+      <EditingForm<{ author_surname: string }, ParentType>
+        buttonText="Add new author"
+        formFields={formFields}
+        editAction={jest.fn()}
+      />
+    )
+
+    await user.click(screen.getByRole('button', { name: /add new author/i }))
+
+    expect(screen.getByLabelText('Field information for Surname')).toBeTruthy()
+  })
 })
