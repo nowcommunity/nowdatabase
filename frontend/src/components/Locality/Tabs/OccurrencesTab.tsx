@@ -4,13 +4,18 @@ import { EditingModal } from '@/components/DetailView/common/EditingModal'
 import { Grouped } from '@/components/DetailView/common/tabLayoutHelpers'
 import { useDetailContext } from '@/components/DetailView/Context/DetailContext'
 import { Box, TextField } from '@mui/material'
-import { MRT_ColumnDef, MRT_Row } from 'material-react-table'
+import { MRT_ColumnDef, MRT_Row, MRT_RowData, MRT_TableInstance } from 'material-react-table'
 import { useForm } from 'react-hook-form'
 import { calculateNormalizedMesowearScore } from '@/shared/utils/mesowear'
 import { applyDefaultSpeciesOrdering, hasActiveSortingInSearch } from '@/components/DetailView/common/DetailTabTable'
 import { useLocation } from 'react-router-dom'
 import { useMemo } from 'react'
 import { occurrenceLabels } from '@/constants/occurrenceLabels'
+import {
+  exportOccurrenceMapKml,
+  exportOccurrenceMapSvg,
+  getUniqueLocalityOccurrenceMapExportLocalities,
+} from '@/components/Species/localitySpeciesMapExport'
 
 const hasMesowearScoreInputs = (row: LocalitySpecies) => {
   return (
@@ -215,6 +220,19 @@ export const OccurrencesTab = () => {
     return Object.keys(errors).length === 0
   }
 
+  const getExportLocalities = <T extends MRT_RowData>(table: MRT_TableInstance<T>) => {
+    const rows = table.getPrePaginationRowModel().rows.map(row => row.original as unknown as LocalitySpecies)
+    return getUniqueLocalityOccurrenceMapExportLocalities(data, rows)
+  }
+
+  const kmlExport = <T extends MRT_RowData>(table: MRT_TableInstance<T>) => {
+    exportOccurrenceMapKml(table, 'locality-occurrences', getExportLocalities)
+  }
+
+  const svgExport = async <T extends MRT_RowData>(table: MRT_TableInstance<T>) => {
+    await exportOccurrenceMapSvg(table, 'locality-occurrences-map', getExportLocalities)
+  }
+
   const editingModal = (
     <EditingModal buttonText={occurrenceLabels.addNewButton} onSave={onSave}>
       <Box sx={{ display: 'flex', flexDirection: 'column', gap: '1em' }}>
@@ -238,6 +256,8 @@ export const OccurrencesTab = () => {
         idFieldName="species_id"
         url="occurrence"
         getDetailPath={row => `/occurrence/${row.lid}/${row.species_id}`}
+        kmlExport={kmlExport}
+        svgExport={svgExport}
       />
     </Grouped>
   )
