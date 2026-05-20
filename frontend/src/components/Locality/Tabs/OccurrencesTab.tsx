@@ -11,9 +11,11 @@ import { applyDefaultSpeciesOrdering, hasActiveSortingInSearch } from '@/compone
 import { useLocation } from 'react-router-dom'
 import { useMemo } from 'react'
 import { occurrenceLabels } from '@/constants/occurrenceLabels'
-import { generateKml } from '@/util/kml'
-import { currentDateAsString } from '@/shared/currentDateAsString'
-import { getUniqueOccurrenceMapExportLocalities } from '@/components/Species/localitySpeciesMapExport'
+import {
+  exportOccurrenceMapKml,
+  exportOccurrenceMapSvg,
+  getUniqueLocalityOccurrenceMapExportLocalities,
+} from '@/components/Species/localitySpeciesMapExport'
 
 const hasMesowearScoreInputs = (row: LocalitySpecies) => {
   return (
@@ -220,28 +222,15 @@ export const OccurrencesTab = () => {
 
   const getExportLocalities = <T extends MRT_RowData>(table: MRT_TableInstance<T>) => {
     const rows = table.getPrePaginationRowModel().rows.map(row => row.original as unknown as LocalitySpecies)
-    return getUniqueOccurrenceMapExportLocalities(data, rows)
+    return getUniqueLocalityOccurrenceMapExportLocalities(data, rows)
   }
 
   const kmlExport = <T extends MRT_RowData>(table: MRT_TableInstance<T>) => {
-    const dataString = generateKml(getExportLocalities(table))
-    const blob = new Blob([dataString], { type: 'text/kml' })
-    const url = URL.createObjectURL(blob)
-    const a = document.createElement('a')
-    a.href = url
-    a.download = `locality-occurrences-${currentDateAsString()}.kml`
-    a.click()
+    exportOccurrenceMapKml(table, 'locality-occurrences', getExportLocalities)
   }
 
   const svgExport = async <T extends MRT_RowData>(table: MRT_TableInstance<T>) => {
-    const { generateSvg } = await import('@/components/Map/generateSvg')
-    const dataString = generateSvg(getExportLocalities(table))
-    const blob = new Blob([dataString], { type: 'image/svg+xml' })
-    const url = URL.createObjectURL(blob)
-    const a = document.createElement('a')
-    a.href = url
-    a.download = `locality-occurrences-map-${currentDateAsString()}.svg`
-    a.click()
+    await exportOccurrenceMapSvg(table, 'locality-occurrences-map', getExportLocalities)
   }
 
   const editingModal = (

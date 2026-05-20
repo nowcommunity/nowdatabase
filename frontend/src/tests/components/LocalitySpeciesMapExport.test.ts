@@ -2,7 +2,7 @@ import { describe, expect, it } from '@jest/globals'
 
 import {
   getUniqueCrossSearchMapExportLocalities,
-  getUniqueOccurrenceMapExportLocalities,
+  getUniqueLocalityOccurrenceMapExportLocalities,
   getUniqueSpeciesLocalityMapExportLocalities,
   toMapExportLocality,
 } from '@/components/Species/localitySpeciesMapExport'
@@ -51,45 +51,38 @@ describe('locality species map export helpers', () => {
       speciesLocality({ lid: 3, now_loc: { lid: 3, loc_name: 'C', dec_lat: 3, dec_long: 4 } }),
     ]
 
-    expect(getUniqueSpeciesLocalityMapExportLocalities(rows).map(locality => locality.lid)).toEqual([1, 3])
+    expect(
+      getUniqueSpeciesLocalityMapExportLocalities(
+        { species_id: 100, genus_name: 'Panthera', species_name: 'leo' },
+        rows
+      ).map(locality => locality.lid)
+    ).toEqual([1, 3])
   })
 
-  it('adds unique species names to species locality exports', () => {
+  it('uses the parent species name for species locality exports', () => {
     const rows = [
       speciesLocality({
         species_id: 100,
         lid: 1,
-        genus_name: 'Panthera',
-        species_name: 'leo',
-        unique_identifier: '-',
         now_loc: { lid: 1, loc_name: 'A', dec_lat: 1, dec_long: 2 },
       }),
       speciesLocality({
-        species_id: 101,
+        species_id: 100,
         lid: 1,
-        genus_name: 'Panthera',
-        species_name: 'pardus',
-        unique_identifier: 'cf.',
-        now_loc: { lid: 1, loc_name: 'A', dec_lat: 1, dec_long: 2 },
-      }),
-      speciesLocality({
-        species_id: 101,
-        lid: 1,
-        genus_name: 'Panthera',
-        species_name: 'pardus',
-        unique_identifier: 'cf.',
         now_loc: { lid: 1, loc_name: 'A', dec_lat: 1, dec_long: 2 },
       }),
     ]
 
-    expect(getUniqueSpeciesLocalityMapExportLocalities(rows)[0]?.species).toEqual([
-      'Panthera leo',
-      'Panthera pardus cf.',
-    ])
+    expect(
+      getUniqueSpeciesLocalityMapExportLocalities(
+        { species_id: 100, genus_name: 'Panthera', species_name: 'leo', unique_identifier: '-' },
+        rows
+      )[0]?.species
+    ).toEqual(['Panthera leo'])
   })
 
   it('adds species names from occurrence rows for a locality tab export', () => {
-    const result = getUniqueOccurrenceMapExportLocalities(
+    const result = getUniqueLocalityOccurrenceMapExportLocalities(
       locality({ lid: 1, loc_name: 'A', dec_lat: 1, dec_long: 2 }),
       [
         localitySpecies({

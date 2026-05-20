@@ -12,9 +12,11 @@ import { OccurrenceDwcExportMenuItem } from '@/components/Occurrence/OccurrenceD
 import { OccurrenceDwcDpExportMenuItem } from '@/components/Occurrence/OccurrenceDwcDpExportMenuItem'
 import { OccurrenceFullDarwinCoreExportMenuItem } from '@/components/Occurrence/OccurrenceFullDarwinCoreExportMenuItem'
 import { matchesCountryOrContinent } from '@/shared/validators/countryContinents'
-import { generateKml } from '@/util/kml'
-import { currentDateAsString } from '@/shared/currentDateAsString'
-import { getUniqueCrossSearchMapExportLocalities } from '@/components/Species/localitySpeciesMapExport'
+import {
+  exportOccurrenceMapKml,
+  exportOccurrenceMapSvg,
+  getUniqueCrossSearchMapExportLocalities,
+} from '@/components/Species/localitySpeciesMapExport'
 
 export const CrossSearchTable = ({ selectorFn }: { selectorFn?: (newObject: CrossSearch) => void }) => {
   const { sqlLimit, sqlOffset, sqlColumnFilters, sqlOrderBy } = usePageContext()
@@ -1081,24 +1083,11 @@ export const CrossSearchTable = ({ selectorFn }: { selectorFn?: (newObject: Cros
   }
 
   const kmlExport = <T extends MRT_RowData>(table: MRT_TableInstance<T>) => {
-    const dataString = generateKml(getExportLocalities(table))
-    const blob = new Blob([dataString], { type: 'text/kml' })
-    const url = URL.createObjectURL(blob)
-    const a = document.createElement('a')
-    a.href = url
-    a.download = `occurrences-${currentDateAsString()}.kml`
-    a.click()
+    exportOccurrenceMapKml(table, 'occurrences', getExportLocalities)
   }
 
   const svgExport = async <T extends MRT_RowData>(table: MRT_TableInstance<T>) => {
-    const { generateSvg } = await import('@/components/Map/generateSvg')
-    const dataString = generateSvg(getExportLocalities(table))
-    const blob = new Blob([dataString], { type: 'image/svg+xml' })
-    const url = URL.createObjectURL(blob)
-    const a = document.createElement('a')
-    a.href = url
-    a.download = `occurrences-map-${currentDateAsString()}.svg`
-    a.click()
+    await exportOccurrenceMapSvg(table, 'occurrences-map', getExportLocalities)
   }
 
   return (

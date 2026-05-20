@@ -12,9 +12,11 @@ import { applyDefaultSpeciesOrdering, hasActiveSortingInSearch } from '@/compone
 import { useLocation } from 'react-router-dom'
 import { useMemo } from 'react'
 import { occurrenceLabels } from '@/constants/occurrenceLabels'
-import { generateKml } from '@/util/kml'
-import { currentDateAsString } from '@/shared/currentDateAsString'
-import { getUniqueSpeciesLocalityMapExportLocalities } from '../localitySpeciesMapExport'
+import {
+  exportOccurrenceMapKml,
+  exportOccurrenceMapSvg,
+  getUniqueSpeciesLocalityMapExportLocalities,
+} from '../localitySpeciesMapExport'
 
 const hasMesowearScoreInputs = (row: SpeciesLocality) => {
   return (
@@ -202,28 +204,15 @@ export const LocalitySpeciesTab = () => {
 
   const getExportLocalities = <T extends MRT_RowData>(table: MRT_TableInstance<T>) => {
     const rows = table.getPrePaginationRowModel().rows.map(row => row.original as unknown as SpeciesLocality)
-    return getUniqueSpeciesLocalityMapExportLocalities(rows)
+    return getUniqueSpeciesLocalityMapExportLocalities(data, rows)
   }
 
   const kmlExport = <T extends MRT_RowData>(table: MRT_TableInstance<T>) => {
-    const dataString = generateKml(getExportLocalities(table))
-    const blob = new Blob([dataString], { type: 'text/kml' })
-    const url = URL.createObjectURL(blob)
-    const a = document.createElement('a')
-    a.href = url
-    a.download = `locality-species-${currentDateAsString()}.kml`
-    a.click()
+    exportOccurrenceMapKml(table, 'locality-species', getExportLocalities)
   }
 
   const svgExport = async <T extends MRT_RowData>(table: MRT_TableInstance<T>) => {
-    const { generateSvg } = await import('@/components/Map/generateSvg')
-    const dataString = generateSvg(getExportLocalities(table))
-    const blob = new Blob([dataString], { type: 'image/svg+xml' })
-    const url = URL.createObjectURL(blob)
-    const a = document.createElement('a')
-    a.href = url
-    a.download = `locality-species-map-${currentDateAsString()}.svg`
-    a.click()
+    await exportOccurrenceMapSvg(table, 'locality-species-map', getExportLocalities)
   }
 
   const editingModal = (

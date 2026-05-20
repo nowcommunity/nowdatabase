@@ -1,4 +1,7 @@
 import type { CrossSearch, Locality, LocalityDetailsType, LocalitySpecies, SpeciesLocality } from '@/shared/types'
+import { generateKml } from '@/util/kml'
+import { currentDateAsString } from '@/shared/currentDateAsString'
+import type { MRT_RowData, MRT_TableInstance } from 'material-react-table'
 
 type SpeciesSource = {
   species_id?: number | null
@@ -9,6 +12,11 @@ type SpeciesSource = {
 
 export type MapExportLocality = Locality & {
   species?: string[]
+}
+
+type OccurrenceMapExportRow = {
+  locality: MapExportLocalitySource | null | undefined
+  species: SpeciesSource | null
 }
 
 type MapExportLocalitySource = {
@@ -68,6 +76,21 @@ const addSpecies = (locality: MapExportLocality, species: SpeciesSource | null) 
   }
 }
 
+const getUniqueOccurrenceMapExportLocalities = (rows: OccurrenceMapExportRow[]): MapExportLocality[] => {
+  const localitiesById = new Map<number, MapExportLocality>()
+
+  rows.forEach(row => {
+    const locality = toMapExportLocality(row.locality)
+    if (!locality) return
+
+    const exportLocality = localitiesById.get(locality.lid) ?? locality
+    addSpecies(exportLocality, row.species)
+    localitiesById.set(locality.lid, exportLocality)
+  })
+
+  return [...localitiesById.values()]
+}
+
 export const toMapExportLocality = (locality: MapExportLocalitySource | null | undefined): MapExportLocality | null => {
   if (!locality) return null
 
@@ -93,66 +116,72 @@ export const toMapExportLocality = (locality: MapExportLocalitySource | null | u
   } as unknown as MapExportLocality
 }
 
-export const getUniqueSpeciesLocalityMapExportLocalities = (rows: SpeciesLocality[]): MapExportLocality[] => {
-  const localitiesById = new Map<number, MapExportLocality>()
+export const getUniqueSpeciesLocalityMapExportLocalities = (
+  species: SpeciesSource,
+  rows: SpeciesLocality[]
+): MapExportLocality[] =>
+  getUniqueOccurrenceMapExportLocalities(
+    rows.map(row => ({
+      locality: { ...row.now_loc, lid: row.now_loc?.lid ?? row.lid },
+      species,
+    }))
+  )
 
-  rows.forEach(row => {
-    const locality = toMapExportLocality({ ...row.now_loc, lid: row.now_loc?.lid ?? row.lid })
-    if (locality) {
-      const exportLocality = localitiesById.get(locality.lid) ?? locality
-      addSpecies(exportLocality, row)
-      localitiesById.set(locality.lid, exportLocality)
-    }
-  })
-
-  return [...localitiesById.values()]
-}
-
-export const getUniqueOccurrenceMapExportLocalities = (
+export const getUniqueLocalityOccurrenceMapExportLocalities = (
   locality: LocalityDetailsType,
   rows: LocalitySpecies[]
-): MapExportLocality[] => {
-  const exportLocality = toMapExportLocality(locality)
-  if (!exportLocality) return []
+): MapExportLocality[] =>
+  getUniqueOccurrenceMapExportLocalities(rows.map(row => ({ locality, species: row.com_species })))
 
-  rows.forEach(row => {
-    addSpecies(exportLocality, row.com_species)
-  })
+export const getUniqueCrossSearchMapExportLocalities = (rows: CrossSearch[]): MapExportLocality[] =>
+  getUniqueOccurrenceMapExportLocalities(
+    rows.map(row => ({
+      locality: {
+        lid: row.lid_now_loc,
+        loc_name: row.loc_name,
+        country: row.country,
+        dms_lat: row.dms_lat,
+        dms_long: row.dms_long,
+        dec_lat: row.dec_lat,
+        dec_long: row.dec_long,
+        bfa_max: row.bfa_max,
+        bfa_min: row.bfa_min,
+        max_age: row.max_age,
+        min_age: row.min_age,
+        altitude: row.altitude,
+        appr_num_spm: row.appr_num_spm,
+      },
+      species: {
+        species_id: row.species_id_com_species,
+        genus_name: row.genus_name,
+        species_name: row.species_name,
+        unique_identifier: row.unique_identifier,
+      },
+    }))
+  )
 
-  return [exportLocality]
+const downloadTextFile = (dataString: string, type: string, filename: string) => {
+  const blob = new Blob([dataString], { type })
+  const url = URL.createObjectURL(blob)
+  const a = document.createElement('a')
+  a.href = url
+  a.download = filename
+  a.click()
 }
 
-export const getUniqueCrossSearchMapExportLocalities = (rows: CrossSearch[]): MapExportLocality[] => {
-  const localitiesById = new Map<number, MapExportLocality>()
+export const exportOccurrenceMapKml = <T extends MRT_RowData>(
+  table: MRT_TableInstance<T>,
+  filenamePrefix: string,
+  getLocalities: (table: MRT_TableInstance<T>) => MapExportLocality[]
+) => {
+  downloadTextFile(generateKml(getLocalities(table)), 'text/kml', `${filenamePrefix}-${currentDateAsString()}.kml`)
+}
 
-  rows.forEach(row => {
-    const locality = toMapExportLocality({
-      lid: row.lid_now_loc,
-      loc_name: row.loc_name,
-      country: row.country,
-      dms_lat: row.dms_lat,
-      dms_long: row.dms_long,
-      dec_lat: row.dec_lat,
-      dec_long: row.dec_long,
-      bfa_max: row.bfa_max,
-      bfa_min: row.bfa_min,
-      max_age: row.max_age,
-      min_age: row.min_age,
-      altitude: row.altitude,
-      appr_num_spm: row.appr_num_spm,
-    })
-
-    if (!locality) return
-
-    const exportLocality = localitiesById.get(locality.lid) ?? locality
-    addSpecies(exportLocality, {
-      species_id: row.species_id_com_species,
-      genus_name: row.genus_name,
-      species_name: row.species_name,
-      unique_identifier: row.unique_identifier,
-    })
-    localitiesById.set(locality.lid, exportLocality)
-  })
-
-  return [...localitiesById.values()]
+export const exportOccurrenceMapSvg = async <T extends MRT_RowData>(
+  table: MRT_TableInstance<T>,
+  filenamePrefix: string,
+  getLocalities: (table: MRT_TableInstance<T>) => MapExportLocality[]
+) => {
+  const { generateSvg } = await import('@/components/Map/generateSvg')
+  downloadTextFile(generateSvg(getLocalities(table)), 'image/svg+xml', `${filenamePrefix}-${currentDateAsString()}.svg`)
 }
