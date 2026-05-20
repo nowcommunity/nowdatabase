@@ -1,6 +1,7 @@
 import Prisma from '../../prisma/generated/now_test_client'
 import JSZip from 'jszip'
 import { toDwcCsvString, writeDwcCsvString } from './utils/dwcCsv'
+import { getFieldInfoText } from '../../../frontend/src/shared/fieldInfo'
 
 const isMeaningfulString = (value: unknown): value is string => {
   if (typeof value !== 'string') return false
@@ -347,6 +348,8 @@ const formatFunctionalCrownType = (source: SpeciesForMeasurementExport): string 
   return [source.fct_al, source.fct_ol, source.fct_sf, source.fct_ot, source.fct_cm].map(mapCrownSegment).join('')
 }
 
+const getMeasurementMethod = (field: keyof SpeciesForMeasurementExport): string => getFieldInfoText(String(field)) ?? ''
+
 const MEASUREMENT_FIELD_MAPPINGS: Array<{
   field: keyof SpeciesForMeasurementExport
   measurementType: string
@@ -381,48 +384,43 @@ const MEASUREMENT_FIELD_MAPPINGS: Array<{
     field: 'body_mass',
     measurementType: 'body mass',
     measurementUnit: 'g',
-    measurementMethod:
-      'The average adult body mass estimated for the species, in grams. Where there is sexual dimorphism in size, put the mean of the two sexes here and record the masses per sex, if known, in the Comment field. Confidence intervals, if known, can also be put there.',
+    measurementMethod: getMeasurementMethod('body_mass'),
   },
   {
     field: 'brain_mass',
     measurementType: 'brain mass',
     measurementUnit: 'g',
-    measurementMethod:
-      'The average adult brain mass estimated for the species, in grams. Where there is sexual dimorphism in size, put the mean of the two sexes here and record the masses per sex, if known, in the Comment field. Confidence intervals, if known, can also be put there.',
+    measurementMethod: getMeasurementMethod('brain_mass'),
   },
   {
     field: 'sv_length',
     measurementType: 'snout-vent length',
     measurementUnit: '',
-    measurementMethod:
-      'For many species body-mass values will be unavailable or cannot be estimated with any confidence. However, every species should be classifiable into one of the gross size ranges listed below. This field will allow at least a crude characterization of body sizes for any fossil locality.',
+    measurementMethod: getMeasurementMethod('sv_length'),
   },
   {
     field: 'sd_size',
     measurementType: 'sexual dimorphism - size',
     measurementUnit: '',
-    measurementMethod: 'Whether there is sexual dimorphism in overall body size.',
+    measurementMethod: getMeasurementMethod('sd_size'),
   },
   {
     field: 'sd_display',
     measurementType: 'sexual dimorphism - display',
     measurementUnit: '',
-    measurementMethod:
-      'Whether there is evidence of sexual dimorphism in display (or sexual combat) structures. (e. g., horns, antlers, dome-heads, canines). If the presence of these features is unknown, leave the field blank rather than enter "n."',
+    measurementMethod: getMeasurementMethod('sd_display'),
   },
   {
     field: 'tshm',
     measurementType: 'tooth shape -- multicuspid',
     measurementUnit: '',
-    measurementMethod:
-      'A description of the morphology of the tooth crown, for multicusped teeth (if present). In concert with the other tooth morphology fields, this may allow functional interpretations to be made independently of whatever has been entered in the diet fields. Terminology for tooth-crown morphology is most highly developed for extant and fossil mammals, but no system has gained universal acceptance. The following reflects a compromise among many competing traditional systems, and is based partly on Fortelius (1985) and Janis and Fortelius (1988). This field is currently subject to further development. Improved nomenclature for some mammal groups, such as rodents and insectivores, might be more functionally indicative. Also, an expanded list of terms would be useful to characterize more fully the variation found among nonmammalian terrestrial vertebrates -- dinosaurs and therapsids in particular. The similar Molar Crown Type field is based on an alternative descriptive classification scheme, and currently applies only to mammals.',
+    measurementMethod: getMeasurementMethod('tshm'),
   },
   {
     field: 'symph_mob',
     measurementType: 'symphyseal mobility',
     measurementUnit: '',
-    measurementMethod: 'Whether or not the mandibular symphysis is mobile.',
+    measurementMethod: getMeasurementMethod('symph_mob'),
   },
   {
     field: 'relative_blade_length',
@@ -435,29 +433,25 @@ const MEASUREMENT_FIELD_MAPPINGS: Array<{
     field: 'tht',
     measurementType: 'tooth height',
     measurementUnit: '',
-    measurementMethod:
-      'An indication of hypsodonty (tooth crown height) or the nature of other adaptations to deal with the problem of lifetime tooth wear. Tooth replacement, Tooth plates, and Hypselodont (ever-growing teeth) are absolute descriptors. The terms Brachydont, Mesodont and Hypsodont refer to different degrees of crown height of (mammalian) cheek teeth, and are subject to a variety of interpretations. Hypsodont (high-crowned) teeth may be defined objectively as those where the antero-posterior length is exceeded by the dorso-ventral height (Janis & Fortelius, 1988). "Somewhat hypsodont" teeth, intermediate between brachydont and hypsodont, are referred to as "mesodont," but there is no corresponding objective definition of this term. Quantitative indices of hypsodonty have been used (Janis, 1988), and might prove superior to the classification scheme presented here. Thus, this field is currently subject to further development.',
+    measurementMethod: getMeasurementMethod('tht'),
   },
   {
     field: 'diet1',
     measurementType: 'diet category 1',
     measurementUnit: '',
-    measurementMethod:
-      'The predominant food type in the diet of the species, at the coarsest level of resolution: Animal, Plant, Omnivore. See also Diet 3, Diet 2, Relative Fiber Content, Selectivity, Food Processing Mode, Digestion.',
+    measurementMethod: getMeasurementMethod('diet1'),
   },
   {
     field: 'diet2',
     measurementType: 'diet category 2',
     measurementUnit: '',
-    measurementMethod:
-      'The predominant food type in the diet of the species, at an intermediate level of resolution. See also Diet 1, Diet 3, Relative Fiber Content, Selectivity, Food Processing Mode, Digestion.',
+    measurementMethod: getMeasurementMethod('diet2'),
   },
   {
     field: 'diet3',
     measurementType: 'diet category 3',
     measurementUnit: '',
-    measurementMethod:
-      'The predominant, or most important or most characteristic, food type in the diet of the species, at a detailed level of resolution. At this scale, the diets of many species will not be clearly distinguishable from one another using only a single term for the most common dietary component. Nevertheless, highly variable food-type categories often delineate distinct ecological/adaptive/functional types (as in the case of mixed browsing/grazing ungulates). That is, calling something a "frugivore" may not explicitly describe other components of its diet, some of which may be of adaptive importance to the species; it does not allow one to distinguish among species within the frugivore category, either. But it does allow one to place the species between omnivores or insectivores, on the one hand, and browsers, on the other.',
+    measurementMethod: getMeasurementMethod('diet3'),
   },
   {
     field: 'diet_description',
@@ -470,99 +464,85 @@ const MEASUREMENT_FIELD_MAPPINGS: Array<{
     field: 'rel_fib',
     measurementType: 'relative fiber content',
     measurementUnit: '',
-    measurementMethod:
-      'The relative amount of plant fiber in the food of the species. Plant food can be divided into cell contents such as sugars, proteins and storage carbohydrates, which are directly digestible by vertebrates. Plant cell-walls, however, are composed of material ("fiber") partially digestible only by microbial fermentation. Thus, the higher the fiber content, relative to the amount of energy contained in the easily-digested portion, the harder it is to obtain energy from the forage and the poorer the "quality" of the food on a per-unit basis. In addition, the proportion of the fiber digestible by fermentation also varies among plant species, plant parts, and growth stages. This field describes the food as having high, medium, and low levels of fiber. It is intended as a rough indication of the nutritional quality of a species\' diet. It refers only to herbivorous diets, or the plant portions of omnivorous diets. (The field basically functions to group various Diet 3 categories by relative fiber content.)',
+    measurementMethod: getMeasurementMethod('rel_fib'),
   },
   {
     field: 'selectivity',
     measurementType: 'selectivity',
     measurementUnit: '',
-    measurementMethod:
-      'Within its food-type category (Diet 1-3) a species may feed selectively or unselectively. Thus this field applies to any dietary category. Some food types impose selectivity restrictions on the species that feed on them. For example, most large grazers are less selective than mixed feeders or browsers. This is not what this field is meant to indicate! Rather, it applies within dietary categories. It could, for example, be used to distinguish between relatively selective and relatively unselective grazers.',
+    measurementMethod: getMeasurementMethod('selectivity'),
   },
   {
     field: 'digestion',
     measurementType: 'digestion',
     measurementUnit: '',
-    measurementMethod:
-      'There are different broad strategies for breaking down plant material by means of microbial activity in the gut. Hindgut fermenters (hg) and foregut fermenters (fg) are found in a variety of living taxa. True ruminants (ru) are confined to the ruminant artiodactyls; they are separated here from other foregut fermenters, of which they form a special derived subclass.',
+    measurementMethod: getMeasurementMethod('digestion'),
   },
   {
     field: 'feedinghab1',
     measurementType: 'feeding habitat 1',
     measurementUnit: '',
-    measurementMethod:
-      'The general habitat from which the species obtains the major part of its trophic resources, and in which it ordinarily spends time feeding. The allowed values are identical to those for Shelter Habitat 1. See also Feeding Habitat 2.',
+    measurementMethod: getMeasurementMethod('feedinghab1'),
   },
   {
     field: 'feedinghab2',
     measurementType: 'feeding habitat 2',
     measurementUnit: '',
-    measurementMethod:
-      'For the Terrestrial (te) entry in Feeding Habitat 1 only, a further breakdown into more specific feeding habitats. They are described more fully below.',
+    measurementMethod: getMeasurementMethod('feedinghab2'),
   },
   {
     field: 'shelterhab1',
     measurementType: 'shelter habitat 1',
     measurementUnit: '',
-    measurementMethod:
-      'The general habitat in which the animal sleeps, shelters, or avoids predation when not feeding. The allowed values are identical to those for Feeding Habitat 1. See also Shelter Habitat 2.',
+    measurementMethod: getMeasurementMethod('shelterhab1'),
   },
   {
     field: 'shelterhab2',
     measurementType: 'shelter habitat 2',
     measurementUnit: '',
-    measurementMethod:
-      'For the Terrestrial (te) entry in Shelter Habitat 1 only, a further breakdown into more specific shelter habitats. They are described more fully below, and are mostly identical to the fields for Feeding Habitat 2.',
+    measurementMethod: getMeasurementMethod('shelterhab2'),
   },
   {
     field: 'locomo1',
     measurementType: 'locomotion 1',
     measurementUnit: '',
-    measurementMethod:
-      'The general substrate upon which locomotion characteristically takes place. These categories are the same as those in Feeding Habitat 1 and Shelter Habitat 1.',
+    measurementMethod: getMeasurementMethod('locomo1'),
   },
   {
     field: 'locomo2',
     measurementType: 'locomotion 2',
     measurementUnit: '',
-    measurementMethod:
-      'For non-aquatic, non-aerial species the terrestrial substrate upon which locomotion characteristically takes place. "Arboreal" describes species that almost never come to the ground, or, if they do, it is almost always for the purpose of dispersing to another tree or trees. "Scansorial" is a broad category including those species that habitually use both trees and the ground in their movements. At the non-arboreal extreme, it includes species that rarely in practice use the trees, but are not morphologically prevented from doing so. [This category may eventually have to be split to distinguish species that exhibit some arboreal adaptations (e.g., squirrels), from those that could climb in a limited way if they had to (e.g., lions).] "Surficial" refers to those creatures who use only the ground surface in locomotion (e.g., sauropods, wildebeeste).',
+    measurementMethod: getMeasurementMethod('locomo2'),
   },
   {
     field: 'locomo3',
     measurementType: 'locomotion 3',
     measurementUnit: '',
-    measurementMethod:
-      'The predominant mode of locomotor activity. [These categories are not necessarily complete at this time.] The categorization of flight locomotion in Locomotion 2 and Locomotion 3 is based on Norberg (1985).',
+    measurementMethod: getMeasurementMethod('locomo3'),
   },
   {
     field: 'hunt_forage',
     measurementType: 'hunt/forage',
     measurementUnit: '',
-    measurementMethod:
-      'The predominant hunting or foraging mode for carnivores. These categories are based upon those of Van Valkenburgh (1985) and are described more fully there. This field might also be of eventual use in describing foraging modes of non-carnivores, but at present these cannot be determined directly upon morphological criteria (such inferences as can be made are already taken care of in Feeding Habitat, Diet and Locomotion.)',
+    measurementMethod: getMeasurementMethod('hunt_forage'),
   },
   {
     field: 'activity',
     measurementType: 'activity',
     measurementUnit: '',
-    measurementMethod:
-      'The primary time of day during which the species was active. Choices are Diurnal, Crepuscular, or Nocturnal.',
+    measurementMethod: getMeasurementMethod('activity'),
   },
   {
     field: 'crowntype',
     measurementType: 'crown type',
     measurementUnit: '',
-    measurementMethod:
-      'This field describes the morphology of mammalian molar crowns, and is complimentary to the Tooth Shape - Multicuspid field. The latter presents a traditional classification of molar crown types (and other multicusped teeth) for vertebrates. Molar Crown Type, in contrast, uses a more recently developed classification scheme that is currently restricted to mammals. The scheme is phylogenetically neutral and descriptive, allowing functional interpretations and interpretations of underlying developmental mechanisms (see Jernvall, 1995). Currently, the values for the field consist of five-letter alphanumeric codes, described in Jernvall, et al. (1996), and the reader is referred to that paper for further explanation.',
+    measurementMethod: getMeasurementMethod('crowntype'),
   },
   {
     field: 'microwear',
     measurementType: 'microwear',
     measurementUnit: '',
-    measurementMethod:
-      "This field describes the kind of microwear (in terms of striations or pits) revealed by microscopic examination of the wear facets of the tooth crowns of the species. A considerable literature exists concerning the ways to infer aspects of a species' diet from patterns of microwear.",
+    measurementMethod: getMeasurementMethod('microwear'),
   },
   {
     field: 'horizodonty',
@@ -718,8 +698,7 @@ const MEASUREMENT_FIELD_MAPPINGS: Array<{
     field: 'pop_struc',
     measurementType: 'population structure',
     measurementUnit: '',
-    measurementMethod:
-      'Occasionally there will be evidence of herding or other gregarious behavior for a species. This could include evidence from mass deaths, well-preserved trace fossils (e.g., trackways), nesting-site or burrow aggregations, or association of individuals in burrows. It could also be based, less directly, on other aspects of the organism\'s biology -- for example, sexual dimorphism in sexual display or combat features. If so, indicate "soc" here and give details briefly in the Comment field. The choice "sol" (solitary) is allowed for completeness, but ordinarily there will be no positive evidence for solitary behavior, so the alternative to "soc" is usually a blank.',
+    measurementMethod: getMeasurementMethod('pop_struc'),
   },
   {
     field: 'sp_status',

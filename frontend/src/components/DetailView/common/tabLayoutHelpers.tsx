@@ -1,8 +1,39 @@
-import { Card, Typography, Box, Divider } from '@mui/material'
+import HelpOutlineIcon from '@mui/icons-material/HelpOutline'
+import { Card, Typography, Box, Divider, IconButton, Tooltip } from '@mui/material'
 import Grid from '@mui/material/Grid2'
-import { ReactNode } from 'react'
+import { isValidElement, ReactNode } from 'react'
 import { useDetailContext } from '../Context/DetailContext'
 import { EditDataType } from '@/shared/types'
+import { getFieldInfoText } from '@/shared/fieldInfo'
+
+const getFieldFromNode = (node: ReactNode): string | undefined => {
+  if (!isValidElement(node)) return undefined
+  const props = node.props as { field?: unknown }
+  return typeof props.field === 'string' ? props.field : undefined
+}
+
+const FieldLabel = ({ label, field }: { label: string; field?: string }) => {
+  const fieldInfo = field ? getFieldInfoText(field) : undefined
+
+  return (
+    <Box component="span" sx={{ display: 'inline-flex', alignItems: 'center', minWidth: 0 }}>
+      <Box component="span" sx={{ fontWeight: 700, overflowWrap: 'anywhere', whiteSpace: 'normal' }}>
+        {label}
+      </Box>
+      {fieldInfo && (
+        <Tooltip title={fieldInfo} placement="top" arrow>
+          <IconButton
+            aria-label={`Field information for ${label}`}
+            size="small"
+            sx={{ ml: 0.5, p: 0.25, color: 'text.secondary', flexShrink: 0 }}
+          >
+            <HelpOutlineIcon fontSize="inherit" />
+          </IconButton>
+        </Tooltip>
+      )}
+    </Box>
+  )
+}
 
 export const ArrayToTable = ({ array, half }: { array: Array<Array<ReactNode>>; half?: boolean }) => {
   const maxRowLength = Math.max(...array.map(row => row.length))
@@ -30,11 +61,7 @@ export const ArrayToTable = ({ array, half }: { array: Array<Array<ReactNode>>; 
               }}
               padding="5px"
             >
-              {typeof item === 'string' ? (
-                <b style={{ overflowWrap: 'anywhere', whiteSpace: 'normal' }}>{item}</b>
-              ) : (
-                item
-              )}
+              {typeof item === 'string' ? <FieldLabel label={item} field={getFieldFromNode(row[index + 1])} /> : item}
             </Grid>
           ))}
         </Grid>
