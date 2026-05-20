@@ -4,7 +4,7 @@ import { EditingModal } from '@/components/DetailView/common/EditingModal'
 import { Grouped } from '@/components/DetailView/common/tabLayoutHelpers'
 import { useDetailContext } from '@/components/DetailView/Context/DetailContext'
 import { Box, TextField } from '@mui/material'
-import { MRT_ColumnDef, MRT_Row } from 'material-react-table'
+import { MRT_ColumnDef, MRT_Row, MRT_RowData, MRT_TableInstance } from 'material-react-table'
 import { matchesCountryOrContinent } from '@/shared/validators/countryContinents'
 import { useForm } from 'react-hook-form'
 import { calculateNormalizedMesowearScore } from '@/shared/utils/mesowear'
@@ -12,6 +12,11 @@ import { applyDefaultSpeciesOrdering, hasActiveSortingInSearch } from '@/compone
 import { useLocation } from 'react-router-dom'
 import { useMemo } from 'react'
 import { occurrenceLabels } from '@/constants/occurrenceLabels'
+import {
+  exportOccurrenceMapKml,
+  exportOccurrenceMapSvg,
+  getUniqueSpeciesLocalityMapExportLocalities,
+} from '../localitySpeciesMapExport'
 
 const hasMesowearScoreInputs = (row: SpeciesLocality) => {
   return (
@@ -197,6 +202,19 @@ export const LocalitySpeciesTab = () => {
     return Object.keys(errors).length === 0
   }
 
+  const getExportLocalities = <T extends MRT_RowData>(table: MRT_TableInstance<T>) => {
+    const rows = table.getPrePaginationRowModel().rows.map(row => row.original as unknown as SpeciesLocality)
+    return getUniqueSpeciesLocalityMapExportLocalities(data, rows)
+  }
+
+  const kmlExport = <T extends MRT_RowData>(table: MRT_TableInstance<T>) => {
+    exportOccurrenceMapKml(table, 'locality-species', getExportLocalities)
+  }
+
+  const svgExport = async <T extends MRT_RowData>(table: MRT_TableInstance<T>) => {
+    await exportOccurrenceMapSvg(table, 'locality-species-map', getExportLocalities)
+  }
+
   const editingModal = (
     <EditingModal buttonText={occurrenceLabels.addNewButton} onSave={onSave}>
       <Box sx={{ display: 'flex', flexDirection: 'column', gap: '1em' }}>
@@ -224,6 +242,8 @@ export const LocalitySpeciesTab = () => {
         url="occurrence"
         getDetailPath={row => `/occurrence/${row.lid}/${row.species_id}`}
         checkRowRestriction={row => Boolean(row.now_loc?.loc_status)}
+        kmlExport={kmlExport}
+        svgExport={svgExport}
       />
     </Grouped>
   )

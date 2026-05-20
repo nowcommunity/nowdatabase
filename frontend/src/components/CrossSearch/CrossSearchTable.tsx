@@ -1,5 +1,5 @@
 import { useMemo } from 'react'
-import { type MRT_ColumnDef } from 'material-react-table'
+import { type MRT_ColumnDef, type MRT_RowData, type MRT_TableInstance } from 'material-react-table'
 import { CrossSearch, formatDevelopmentalCrownType } from '@/shared/types'
 import { TableView } from '../TableView/TableView'
 import type { ColumnVisibilityGroup } from '../TableView/TableToolBar'
@@ -12,6 +12,11 @@ import { OccurrenceDwcExportMenuItem } from '@/components/Occurrence/OccurrenceD
 import { OccurrenceDwcDpExportMenuItem } from '@/components/Occurrence/OccurrenceDwcDpExportMenuItem'
 import { OccurrenceFullDarwinCoreExportMenuItem } from '@/components/Occurrence/OccurrenceFullDarwinCoreExportMenuItem'
 import { matchesCountryOrContinent } from '@/shared/validators/countryContinents'
+import {
+  exportOccurrenceMapKml,
+  exportOccurrenceMapSvg,
+  getUniqueCrossSearchMapExportLocalities,
+} from '@/components/Species/localitySpeciesMapExport'
 
 export const CrossSearchTable = ({ selectorFn }: { selectorFn?: (newObject: CrossSearch) => void }) => {
   const { sqlLimit, sqlOffset, sqlColumnFilters, sqlOrderBy } = usePageContext()
@@ -1072,6 +1077,19 @@ export const CrossSearchTable = ({ selectorFn }: { selectorFn?: (newObject: Cros
     return !!row.loc_status
   }
 
+  const getExportLocalities = <T extends MRT_RowData>(table: MRT_TableInstance<T>) => {
+    const rows = table.getPrePaginationRowModel().rows.map(row => row.original as unknown as CrossSearch)
+    return getUniqueCrossSearchMapExportLocalities(rows)
+  }
+
+  const kmlExport = <T extends MRT_RowData>(table: MRT_TableInstance<T>) => {
+    exportOccurrenceMapKml(table, 'occurrences', getExportLocalities)
+  }
+
+  const svgExport = async <T extends MRT_RowData>(table: MRT_TableInstance<T>) => {
+    await exportOccurrenceMapSvg(table, 'occurrences-map', getExportLocalities)
+  }
+
   return (
     <>
       <LocalitiesMap localities={localitiesData} isFetching={localitiesFetching || isFetching} />
@@ -1090,6 +1108,8 @@ export const CrossSearchTable = ({ selectorFn }: { selectorFn?: (newObject: Cros
         enableColumnFilterModes={true}
         serverSidePagination={true}
         isCrossSearchTable={true}
+        kmlExport={kmlExport}
+        svgExport={svgExport}
         isError={isError}
         error={error}
         renderExtraExportMenuItems={handleClose => (
