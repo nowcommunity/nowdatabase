@@ -167,6 +167,72 @@ describe('TableView table help integration', () => {
     expect(window.sessionStorage.getItem(`nowdatabase-table-state:${stateId}`)).toBeTruthy()
   })
 
+  it('restores table state from a short URL without overwriting it with defaults first', async () => {
+    const setSqlColumnFilters = jest.fn()
+    const setSqlOrderBy = jest.fn()
+    const setSqlLimit = jest.fn()
+    const setSqlOffset = jest.fn()
+    const storedState = {
+      columnfilters: [{ id: 'name', value: 'Alpha' }],
+      sorting: [{ id: 'name', desc: true }],
+      pagination: { pageIndex: 2, pageSize: 50 },
+    }
+
+    mockLocationSearch = '?tableState=stored-state'
+    window.sessionStorage.setItem('nowdatabase-table-state:stored-state', JSON.stringify(storedState))
+    mockUsePageContext.mockReturnValue({
+      editRights: {},
+      idList: [],
+      idFieldName: 'id',
+      viewName: 'test',
+      previousTableUrls: [],
+      createTitle: () => '',
+      createSubtitle: () => '',
+      sqlLimit: 25,
+      sqlOffset: 0,
+      sqlColumnFilters: [],
+      sqlOrderBy: [],
+      setIdList: jest.fn(),
+      setSqlLimit,
+      setSqlOffset,
+      setSqlColumnFilters,
+      setSqlOrderBy,
+      setPreviousTableUrls: jest.fn(),
+    })
+
+    render(
+      <TableView<TestRow>
+        title="Test Table"
+        idFieldName="id"
+        columns={[
+          { header: 'Name', accessorKey: 'name' },
+          { header: 'Id', accessorKey: 'id' },
+        ]}
+        visibleColumns={{ name: true, id: true }}
+        data={[
+          {
+            id: '1',
+            name: 'Alpha',
+            full_count: 1,
+          },
+        ]}
+        url="test"
+        isFetching={false}
+      />
+    )
+
+    await waitFor(() => {
+      expect(setSqlColumnFilters).toHaveBeenLastCalledWith(storedState.columnfilters)
+      expect(setSqlOrderBy).toHaveBeenLastCalledWith(storedState.sorting)
+      expect(setSqlLimit).toHaveBeenLastCalledWith(50)
+      expect(setSqlOffset).toHaveBeenLastCalledWith(100)
+    })
+
+    expect(JSON.parse(window.sessionStorage.getItem('nowdatabase-table-state:stored-state') ?? '{}')).toEqual(
+      storedState
+    )
+  })
+
   it('shows help with multi-sort guidance for regular tables', () => {
     const { getByRole, getByText } = render(
       <TableView<TestRow>
