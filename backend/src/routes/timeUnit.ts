@@ -26,8 +26,13 @@ import {
 import { fixBigInt } from '../utils/common'
 import { writeTimeBound } from '../services/write/timeBound'
 import { parseTabListQuery } from '../services/tabularQuery'
+import { validateTabListQuery } from '../middlewares/tabListQueryValidator'
 
 const router = Router()
+
+const timeUnitLocalitiesTabQueryValidation = validateTabListQuery({
+  allowedSortingColumns: ['loc_name', 'country', 'max_age', 'min_age', 'lid'],
+})
 
 router.get('/all', async (_req, res) => {
   try {
@@ -51,7 +56,7 @@ router.get('/:id', async (req, res) => {
   }
 })
 
-router.get('/localities/:id', async (req, res) => {
+router.get('/localities/:id', ...timeUnitLocalitiesTabQueryValidation, async (req, res) => {
   const id = req.params.id
   const parsedQuery = parseTabListQuery({
     query: req.query,

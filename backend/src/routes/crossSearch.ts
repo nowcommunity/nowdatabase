@@ -1,4 +1,5 @@
-import { Request, Response, Router } from 'express'
+import { Request, RequestHandler, Response, Router } from 'express'
+import { body, param, validationResult, ValidationChain } from 'express-validator'
 import {
   getCrossSearchRawSql,
   getCrossSearchLocalitiesRawSql,
@@ -14,6 +15,39 @@ import { CrossSearch } from '../../../frontend/src/shared/types'
 import { once } from 'events'
 
 const router = Router()
+
+const parseArrayRouteParameter = (value: string, message: string) => {
+  const parsedValue = JSON.parse(value) as unknown
+  if (!Array.isArray(parsedValue)) throw new Error(message)
+  return true
+}
+
+const handleRequestValidationErrors: RequestHandler = (req, res, next) => {
+  const errors = validationResult(req)
+  if (errors.isEmpty()) return next()
+
+  const firstError = errors.array()[0]
+  return res.status(403).send({ error: String(firstError.msg) })
+}
+
+const crossSearchBodyValidators: ValidationChain[] = [
+  body('limit').optional().isInt().withMessage('Limit is not a number.'),
+  body('offset').optional().isInt().withMessage('Offset is not a number.'),
+  body('columnFilters').isArray().withMessage('ColumnFilters is not an array.'),
+  body('sorting').isArray().withMessage('Sorting is not an array.'),
+]
+
+const crossSearchRowsRouteValidators: ValidationChain[] = [
+  param('limit').isInt().withMessage('Limit is not a number.'),
+  param('offset').isInt().withMessage('Offset is not a number.'),
+  param('columnfilters').custom(value => parseArrayRouteParameter(value as string, 'ColumnFilters is not an array.')),
+  param('sorting').custom(value => parseArrayRouteParameter(value as string, 'Sorting is not an array.')),
+]
+
+const crossSearchLocalitiesRouteValidators: ValidationChain[] = [
+  param('columnfilters').custom(value => parseArrayRouteParameter(value as string, 'ColumnFilters is not an array.')),
+  param('sorting').custom(value => parseArrayRouteParameter(value as string, 'Sorting is not an array.')),
+]
 
 const transformFunction = (row: CrossSearch & { full_count?: number }) => {
   const transformedRow: { [key: string]: string | number | boolean | null } = {}
@@ -95,29 +129,39 @@ const sendCrossSearchLocalities = async (req: Request, res: Response, parameters
   }
 }
 
-router.post(`/all`, async (req, res) => {
+router.post(`/all`, ...crossSearchBodyValidators, handleRequestValidationErrors, async (req, res) => {
   return sendCrossSearchRows(req, res, req.body as CrossSearchRequestParameters)
 })
 
-router.get(`/all/:limit/:offset/:columnfilters/:sorting`, async (req, res) => {
-  return sendCrossSearchRows(req, res, {
-    limit: req.params.limit,
-    offset: req.params.offset,
-    columnFilters: req.params.columnfilters,
-    sorting: req.params.sorting,
-  })
-})
+router.get(
+  `/all/:limit/:offset/:columnfilters/:sorting`,
+  ...crossSearchRowsRouteValidators,
+  handleRequestValidationErrors,
+  async (req, res) => {
+    return sendCrossSearchRows(req, res, {
+      limit: req.params.limit,
+      offset: req.params.offset,
+      columnFilters: req.params.columnfilters,
+      sorting: req.params.sorting,
+    })
+  }
+)
 
-router.post(`/localities`, async (req, res) => {
+router.post(`/localities`, ...crossSearchBodyValidators, handleRequestValidationErrors, async (req, res) => {
   return sendCrossSearchLocalities(req, res, req.body as CrossSearchRequestParameters)
 })
 
-router.get(`/localities/:columnfilters/:sorting`, async (req, res) => {
-  return sendCrossSearchLocalities(req, res, {
-    columnFilters: req.params.columnfilters,
-    sorting: req.params.sorting,
-  })
-})
+router.get(
+  `/localities/:columnfilters/:sorting`,
+  ...crossSearchLocalitiesRouteValidators,
+  handleRequestValidationErrors,
+  async (req, res) => {
+    return sendCrossSearchLocalities(req, res, {
+      columnFilters: req.params.columnfilters,
+      sorting: req.params.sorting,
+    })
+  }
+)
 
 const streamCrossSearchExport = async (req: Request, res: Response, parameters: CrossSearchRequestParameters) => {
   let parsedValues
@@ -184,15 +228,20 @@ const streamCrossSearchExport = async (req: Request, res: Response, parameters: 
   return stream.end()
 }
 
-router.post(`/export`, async (req, res) => {
+router.post(`/export`, ...crossSearchBodyValidators, handleRequestValidationErrors, async (req, res) => {
   return streamCrossSearchExport(req, res, req.body as CrossSearchRequestParameters)
 })
 
-router.get(`/export/:columnfilters/:sorting`, async (req, res) => {
-  return streamCrossSearchExport(req, res, {
-    columnFilters: req.params.columnfilters,
-    sorting: req.params.sorting,
-  })
-})
+router.get(
+  `/export/:columnfilters/:sorting`,
+  ...crossSearchLocalitiesRouteValidators,
+  handleRequestValidationErrors,
+  async (req, res) => {
+    return streamCrossSearchExport(req, res, {
+      columnFilters: req.params.columnfilters,
+      sorting: req.params.sorting,
+    })
+  }
+)
 
 export default router
