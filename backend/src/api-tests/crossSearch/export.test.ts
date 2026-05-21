@@ -16,6 +16,12 @@ describe('Getting cross-search export', () => {
     expect(response.body).toEqual({ error: 'ColumnFilters is not an array.' })
   })
 
+  it('with invalid POST column filters type does not work', async () => {
+    const response = await send(`crosssearch/export`, 'POST', { columnFilters: '"not an array"', sorting: [] })
+    expect(response.status).toEqual(403)
+    expect(response.body).toEqual({ error: 'ColumnFilters is not an array.' })
+  })
+
   it('with invalid column filters content does not work', async () => {
     const { body: responseBody1, status: responseStatus1 } = await send(
       `crosssearch/export/[{"id": "not_a_column", "value": "Dmanisi"}]/[]`,

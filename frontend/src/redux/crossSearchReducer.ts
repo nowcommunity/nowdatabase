@@ -9,7 +9,9 @@ const crossSearchApi = api.injectEndpoints({
       { limit: number; offset: number; columnFilters: MRT_ColumnFiltersState; sorting: MRT_SortingState }
     >({
       query: ({ limit, offset, columnFilters, sorting }) => ({
-        url: `/crosssearch/all/${limit}/${offset}/${JSON.stringify(columnFilters)}/${JSON.stringify(sorting)}`,
+        url: `/crosssearch/all`,
+        method: 'POST',
+        body: { limit, offset, columnFilters, sorting },
       }),
       providesTags: result => (result ? [{ type: 'localities' }] : []),
     }),
@@ -18,7 +20,9 @@ const crossSearchApi = api.injectEndpoints({
       { columnFilters: MRT_ColumnFiltersState; sorting: MRT_SortingState }
     >({
       query: ({ columnFilters, sorting }) => ({
-        url: `/crosssearch/localities/${JSON.stringify(columnFilters)}/${JSON.stringify(sorting)}`,
+        url: `/crosssearch/localities`,
+        method: 'POST',
+        body: { columnFilters, sorting },
       }),
       providesTags: result => (result ? [{ type: 'localities' }] : []),
     }),

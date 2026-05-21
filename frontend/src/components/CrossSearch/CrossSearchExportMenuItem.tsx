@@ -19,14 +19,20 @@ export const CrossSearchExportMenuItem = ({ handleClose }: { handleClose: () => 
 
   const fetchCSVFile = async () => {
     setLoading(true)
-    const URIColumnFilters = encodeURIComponent(JSON.stringify(sqlColumnFilters))
-    const URIOrderBy = encodeURIComponent(JSON.stringify(sqlOrderBy))
 
     try {
       await downloadExportFileWithProgress({
-        url: `${BACKEND_URL}/crosssearch/export/${URIColumnFilters}/${URIOrderBy}`,
+        url: `${BACKEND_URL}/crosssearch/export`,
         filename,
-        fetchOptions,
+        fetchOptions: {
+          ...fetchOptions,
+          method: 'POST',
+          headers: {
+            ...fetchOptions.headers,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ columnFilters: sqlColumnFilters, sorting: sqlOrderBy }),
+        },
         notify,
         setNotificationMessage,
         startMessage: 'Generating cross-search CSV export...',

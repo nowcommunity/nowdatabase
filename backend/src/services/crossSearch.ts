@@ -13,6 +13,13 @@ import { generateCrossSearchLocalitiesSql, generateCrossSearchSql } from './quer
 import { ValidationObject } from '../../../frontend/src/shared/validators/validator'
 import { validateCrossSearchRouteParams } from '../../../frontend/src/shared/validators/crossSearch'
 
+export type CrossSearchRequestParameters = {
+  limit?: string | number
+  offset?: string | number
+  columnFilters: unknown
+  sorting: unknown
+}
+
 const getAllowedLocalities = async (user: User) => {
   const usersProjects = await nowDb.now_proj_people.findMany({
     where: { initials: user.initials },
@@ -195,22 +202,27 @@ export const getCrossSearchLocalitiesRawSql = async (
   return result
 }
 
-export const parseAndValidateCrossSearchRouteParameters = (parameters: CrossSearchRouteParameters) => {
+const parseOptionalNumber = (value: string | number | undefined, name: string) => {
+  if (value === undefined) return undefined
+  const parsedValue = typeof value === 'number' ? value : parseInt(value)
+  if (isNaN(parsedValue)) throw new Error(`${name} is not a number.`)
+  return parsedValue
+}
+
+const parseArrayParameter = (value: unknown, name: string) => {
+  const parsedValue: unknown = typeof value === 'string' ? (JSON.parse(value) as unknown) : value
+  if (!Array.isArray(parsedValue)) throw new Error(`${name} is not an array.`)
+  return parsedValue as unknown[]
+}
+
+export const parseAndValidateCrossSearchRouteParameters = (
+  parameters: CrossSearchRouteParameters | CrossSearchRequestParameters
+) => {
   const { limit, offset, columnFilters, sorting } = parameters
-  let parsedLimit
-  let parsedOffset
-  if (limit) {
-    parsedLimit = parseInt(limit)
-    if (isNaN(parsedLimit)) throw new Error('Limit is not a number.')
-  }
-  if (offset) {
-    parsedOffset = parseInt(offset)
-    if (isNaN(parsedOffset)) throw new Error('Offset is not a number.')
-  }
-  const parsedColumnFilters = JSON.parse(columnFilters) as unknown
-  if (!Array.isArray(parsedColumnFilters)) throw new Error('ColumnFilters is not an array.')
-  const parsedSorting = JSON.parse(sorting) as unknown
-  if (!Array.isArray(parsedSorting)) throw new Error('Sorting is not an array.')
+  const parsedLimit = parseOptionalNumber(limit, 'Limit')
+  const parsedOffset = parseOptionalNumber(offset, 'Offset')
+  const parsedColumnFilters = parseArrayParameter(columnFilters, 'ColumnFilters')
+  const parsedSorting = parseArrayParameter(sorting, 'Sorting')
 
   const parsedParameters = {
     limit: parsedLimit,
