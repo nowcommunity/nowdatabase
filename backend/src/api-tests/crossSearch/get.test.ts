@@ -62,6 +62,19 @@ describe('Getting cross-search data', () => {
       expect(response2.body.length).toEqual(10)
     })
 
+    it('Requesting get all with POST body has correct data', async () => {
+      const { body, status } = await send<CrossSearch[]>(`crosssearch/all`, 'POST', {
+        limit: 20,
+        offset: 0,
+        columnFilters: [{ id: 'country', value: 'Spain' }],
+        sorting: [{ id: 'loc_name', desc: false }],
+      })
+
+      expect(status).toEqual(200)
+      expect(body).toHaveLength(10)
+      expect(body.every(row => row.country === 'Spain')).toBe(true)
+    })
+
     it('Requesting get all with column filters has correct data', async () => {
       const { body: responseBody1, status: responseStatus1 } = await send<CrossSearch[]>(
         `crosssearch/all/20/0/[{"id": "lid_now_loc", "value": "21050"}]/[]`,
@@ -130,6 +143,18 @@ describe('Getting cross-search data', () => {
       expect(firstCountries).toEqual(['Georgia', 'Georgia', 'Georgia', 'Georgia', 'Georgia'])
       const lastCountries = responseBody2.slice(5, 10).map(row => row.country)
       expect(lastCountries).toEqual(['Japan', 'Japan', 'Japan', 'Japan', 'Japan'])
+    })
+
+    it('Requesting localities with POST body has correct data', async () => {
+      const legacyResponse = await send(`crosssearch/localities/[{"id": "country", "value": "Spain"}]/[]`, 'GET')
+      const { body, status } = await send(`crosssearch/localities`, 'POST', {
+        columnFilters: [{ id: 'country', value: 'Spain' }],
+        sorting: [],
+      })
+
+      expect(status).toEqual(200)
+      expect(body.length).toBeGreaterThan(0)
+      expect(body).toEqual(legacyResponse.body)
     })
 
     it('Requesting get all with column filtering does not allow invalid arrays or column names', async () => {
