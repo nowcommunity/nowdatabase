@@ -16,6 +16,7 @@ import { Role, EditMetaData, ReferenceDetailsType, EditDataType } from '../../..
 import { deleteReference, writeReference } from '../services/write/reference'
 import { fixBigInt } from '../utils/common'
 import { parseTabListQuery } from '../services/tabularQuery'
+import { validateTabListQuery } from '../middlewares/tabListQueryValidator'
 
 const router = Router()
 
@@ -61,7 +62,15 @@ router.get('/:id', async (req, res) => {
   return res.status(200).send(reference)
 })
 
-router.get('/localities/:id', async (req, res) => {
+const referenceLocalitiesTabQueryValidation = validateTabListQuery({
+  allowedSortingColumns: ['loc_name', 'country', 'max_age', 'min_age', 'lid'],
+})
+
+const referenceSpeciesTabQueryValidation = validateTabListQuery({
+  allowedSortingColumns: ['order_name', 'family_name', 'genus_name', 'species_name', 'species_id'],
+})
+
+router.get('/localities/:id', ...referenceLocalitiesTabQueryValidation, async (req, res) => {
   const id = req.params.id
   const parsedQuery = parseTabListQuery({
     query: req.query,
@@ -77,7 +86,7 @@ router.get('/localities/:id', async (req, res) => {
   return res.status(200).send(fixBigInt(localities))
 })
 
-router.get('/species/:id', async (req, res) => {
+router.get('/species/:id', ...referenceSpeciesTabQueryValidation, async (req, res) => {
   const id = req.params.id
   const parsedQuery = parseTabListQuery({
     query: req.query,

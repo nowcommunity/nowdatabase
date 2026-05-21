@@ -10,7 +10,7 @@ describe('Tab list query validation and pagination', () => {
   beforeEach(async () => {
     await resetDatabase()
     await login()
-  })
+  }, resetDatabaseTimeout)
 
   afterAll(async () => {
     await pool.end()
@@ -38,6 +38,28 @@ describe('Tab list query validation and pagination', () => {
     expect(body.errors).toContain(
       'Server-side columnfilters are not supported for this endpoint. Use client-side filtering.'
     )
+  })
+
+  it('rejects invalid pagination for museum localities endpoint', async () => {
+    const { body, status } = await send<{ message: string; errors: string[] }>(
+      'museum/RGM?pagination=%7B%22pageIndex%22%3A0%2C%22pageSize%22%3A999%7D',
+      'GET'
+    )
+
+    expect(status).toBe(400)
+    expect(body.message).toBe('Invalid query parameters')
+    expect(body.errors).toContain('pagination.pageSize must be an integer between 1 and 500.')
+  })
+
+  it('rejects invalid sorting for time bound time-units endpoint', async () => {
+    const { body, status } = await send<{ message: string; errors: string[] }>(
+      'time-bound/time-units/1?sorting=%5B%7B%22id%22%3A%22invalid%22%2C%22desc%22%3Afalse%7D%5D',
+      'GET'
+    )
+
+    expect(status).toBe(400)
+    expect(body.message).toBe('Invalid query parameters')
+    expect(body.errors[0]).toContain('sorting.id must be one of')
   })
 
   it('applies pagination and sorting to reference species endpoint', async () => {

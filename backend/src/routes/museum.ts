@@ -5,15 +5,20 @@ import { requireOneOf } from '../middlewares/authorizer'
 import { Role, EditDataType, EditMetaData, Museum } from '../../../frontend/src/shared/types'
 import { DuplicateMuseumCodeError, writeMuseum } from '../services/write/museum'
 import { parseTabListQuery } from '../services/tabularQuery'
+import { validateTabListQuery } from '../middlewares/tabListQueryValidator'
 
 const router = Router()
+
+const museumLocalitiesTabQueryValidation = validateTabListQuery({
+  allowedSortingColumns: ['loc_name', 'country', 'max_age', 'min_age', 'lid'],
+})
 
 router.get('/all', async (_req, res) => {
   const museums = await getAllMuseums()
   return res.status(200).send(museums)
 })
 
-router.get('/:id', async (req, res) => {
+router.get('/:id', ...museumLocalitiesTabQueryValidation, async (req, res) => {
   const id = req.params.id
   const parsedQuery = parseTabListQuery({
     query: req.query,

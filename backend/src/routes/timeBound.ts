@@ -10,8 +10,13 @@ import {
 import { deleteTimeBound, writeTimeBound } from '../services/write/timeBound'
 import { fixBigInt } from '../utils/common'
 import { parseTabListQuery } from '../services/tabularQuery'
+import { validateTabListQuery } from '../middlewares/tabListQueryValidator'
 
 const router = Router()
+
+const timeBoundTimeUnitsTabQueryValidation = validateTabListQuery({
+  allowedSortingColumns: ['tu_name', 'tu_display_name', 'rank', 'sequence', 'tu_comment', 'up_bnd', 'low_bnd'],
+})
 
 router.get('/all', async (_req, res) => {
   const time_bounds = await getAllTimeBounds()
@@ -25,7 +30,7 @@ router.get('/:id', async (req, res) => {
   return res.status(200).send(timeBound)
 })
 
-router.get('/time-units/:id', async (req, res) => {
+router.get('/time-units/:id', ...timeBoundTimeUnitsTabQueryValidation, async (req, res) => {
   const id = parseInt(req.params.id)
   const parsedQuery = parseTabListQuery({
     query: req.query,
