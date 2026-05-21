@@ -47,6 +47,132 @@ export const fieldInfoTexts = {
     "This field describes the kind of microwear (in terms of striations or pits) revealed by microscopic examination of the wear facets of the tooth crowns of the species. A considerable literature exists concerning the ways to infer aspects of a species' diet from patterns of microwear.",
   pop_struc:
     'Occasionally there will be evidence of herding or other gregarious behavior for a species. This could include evidence from mass deaths, well-preserved trace fossils (e.g., trackways), nesting-site or burrow aggregations, or association of individuals in burrows. It could also be based, less directly, on other aspects of the organism\'s biology -- for example, sexual dimorphism in sexual display or combat features. If so, indicate "soc" here and give details briefly in the Comment field. The choice "sol" (solitary) is allowed for completeness, but ordinarily there will be no positive evidence for solitary behavior, so the alternative to "soc" is usually a blank.',
+  loc_name:
+    'The name by which the locality is known, if any. Locality names do not need to be unique; they are useful display information, while the database tracks each locality by its unique LID.',
+  country: 'The country where the locality is found.',
+  state: 'The state or province, or other first-order national subdivision, where the locality is found.',
+  county:
+    'The county or parish, or other second-order national subdivision, where the locality is found. For U.S. counties, do not include an abbreviation for, or the word, "county" as part of the name.',
+  loc_detail:
+    'Any relevant details about the geographical location of the locality, or peculiarities of its situation.',
+  site_area: 'The approximate area covered by the actual fossil site. See also the General Locality field.',
+  gen_loc:
+    'Indicates whether the locality is a general locality: an area that contains other localities recorded separately in the database and can hold information not assignable to one specific primary locality.',
+  dms_lat:
+    'The latitude of the locality in degrees, minutes, seconds format. Include degrees, minutes, and seconds, separated with single spaces, and use N or S.',
+  dec_lat: 'The latitude of the locality in decimal degrees. North is positive and south is negative.',
+  dms_long:
+    'The longitude of the locality in degrees, minutes, seconds format. Include degrees, minutes, and seconds, separated with single spaces, and use E or W.',
+  dec_long: 'The longitude of the locality in decimal degrees. East is positive and west is negative.',
+  date_meth:
+    'The method used to assign the geologic age range to the locality. Values distinguish time-unit, absolute, and composite dating approaches.',
+  min_age:
+    'The minimum, or youngest, age that the locality is thought to possess, in millions of years before present (Ma). For absolute ages, use value minus error term.',
+  max_age:
+    'The maximum, or oldest, age that the locality is thought to possess, in millions of years before present (Ma). For absolute ages, use value plus error term.',
+  bfa_min:
+    'The basis for the minimum age assignment. Non-absolute terms must match a time unit in the time_unit table; absolute terms must be paired with numerical ages.',
+  bfa_max:
+    'The basis for the maximum age assignment. Non-absolute terms must match a time unit in the time_unit table; absolute terms must be paired with numerical ages.',
+  bfa_min_abs: 'The absolute dating method used as the basis for the minimum age assignment.',
+  bfa_max_abs: 'The absolute dating method used as the basis for the maximum age assignment.',
+  frac_min:
+    'A specified fraction of the non-absolute time unit used for the minimum age, written as segment:denominator and counted from the oldest segment.',
+  frac_max:
+    'A specified fraction of the non-absolute time unit used for the maximum age, written as segment:denominator and counted from the oldest segment.',
+  chron:
+    'A chronostratigraphic unit, chron, biozone, biostratigraphic unit, or similar assignment for the locality, independent of the age fields.',
+  age_comm:
+    'A comment on the age assignment of the locality, including information relevant to dating method, basis for age, fractions, and chronostratigraphic age.',
+  lgroup:
+    'The stratigraphic group in which the locality is found. Use flexibly for the highest useful hierarchical stratigraphic designation.',
+  formation:
+    'The name of the stratigraphic formation in which the locality is found. Do not include the word "Formation" as part of the name.',
+  member:
+    'The name of the member of a formation in which the locality is found. Do not include the word "Member" as part of the name.',
+  bed: 'The stratigraphic bed in which the fossils are found, interpreted broadly for the lowest-order local stratigraphic unit.',
+  datum_plane:
+    'A short description of the datum plane used to place the locality in a measured section and interpret top and bottom sample-unit distances.',
+  tos: 'The distance, in meters, from the datum plane to the top of the fossil sample unit. It may be positive or negative relative to the datum plane.',
+  bos: 'The distance, in meters, from the datum plane to the bottom of the fossil sample unit. It may be positive or negative relative to the datum plane.',
+  rock_type: 'A single term describing the general rock type in which the fossils are found.',
+  rt_adj: 'One or two short adjectives that describe the rock type, such as calcareous, gray laminated, or red.',
+  lith_comm:
+    'A short miscellaneous description of the lithology of the locality, especially the fossil-bearing deposit.',
+  sed_env_1: 'The general sedimentary environmental setting of the locality.',
+  sed_env_2:
+    'The specific sedimentary environment of the locality, hierarchically subordinate to Sedimentary Environment 1.',
+  event_circum:
+    'The more specific sedimentological event or circumstance associated with the formation of the fossil deposit.',
+  se_comm: 'Brief comments on the sedimentary environment, augmenting the other sedimentary-environment fields.',
+  climate_type: 'The general climatic regime inferred for the locality.',
+  temperature:
+    'The general temperature regime characteristic of the overall environment. This mainly refers to climate and can be used independently of modern climate-type categories.',
+  moisture:
+    'The amount of moisture characteristic of the overall environment, mainly climate, rainfall, and evaporation.',
+  disturb:
+    'The natural agents of major and recurring vegetation disturbance in the ecosystem, limited to water, fire, wind, or combinations of those terms.',
+  v_envi_det: 'Additional detail about the inferred environmental and vegetation setting of the locality.',
+  seasonality: 'The combination of water, light, and temperature seasonality exhibited by the environment.',
+  seas_intens:
+    'The intensity values that modify the Seasonality field. The order and number of entries should match the corresponding entries in Seasonality.',
+  biome:
+    'The biome inferred for the locality eco-environment, a major terrestrial ecosystem type based primarily on vegetation formation and associated physical factors.',
+  v_ht: 'The average height of the vegetation, as opposed to the height of any particular plant species.',
+  v_struct: 'The overall structure of the vegetation.',
+  pri_prod: 'The general level of annual primary productivity inferred for the locality, based on available evidence.',
+  nutrients: 'Availability of nutrients to the plants of a locality.',
+  water:
+    'The amount of water available to the plants or vegetation sampled by a plant locality, which may differ from the overall regional moisture.',
+  assem_fm:
+    'The basic mode of formation of the fossil assemblage, derived from taphonomic and sedimentological evidence.',
+  transport:
+    'The extent and nature of taphonomic transport processes that have affected the assemblage, such as transport, winnowing, or both.',
+  trans_mod: 'The degree of abrasion observed on the fossil remains at the locality: unabraded, mixed, or abraded.',
+  weath_trmp: 'The existence of different levels of weathering and trampling damage to fossils.',
+  pt_conc:
+    'The concentration of specimens in the fossil deposit, used as an indication of richness of organic remains at the site.',
+  size_type: 'Whether the locality yields primarily microfossils, macrofossils, or a relatively even mixture of both.',
+  vert_pres:
+    'The predominant state of disarticulation and preservation of skeletal remains of vertebrates at the locality.',
+  time_rep:
+    'The approximate amount of time represented by the fossil deposit, inferred from sedimentological and taphonomic criteria.',
+  appr_num_spm:
+    'The approximate number of collected specimens from the locality on which database inferences are based.',
+  num_spm:
+    'The exact total number of specimens collected from the locality, if known. If exact number is known, the approximate number should also be filled.',
+  num_quad:
+    'The total number of standardized quadrats, squares, samples, or other sampling units on which abundance counts are based.',
+  true_quant:
+    'Whether the species list or abundance values are likely to be a fair sample of what was available, given the collecting techniques used.',
+  complete:
+    'Indicates known incompleteness of the species list when additional identified or compilable taxa are expected to be added later.',
+  ref_type_id: 'The kind of reference record being entered.',
+  title_primary: 'The title of the reference, entered in Paleobiology format where applicable.',
+  title_secondary:
+    'A secondary title for the reference, such as a book, edited volume, series, or containing work title when applicable.',
+  title_series: 'A series title for the reference when applicable.',
+  date_primary:
+    'The year of publication, or the year the information was obtained if this is not a published reference.',
+  date_secondary: 'A secondary publication year or date value for reference types that need one.',
+  exact_date:
+    'The exact date associated with the reference when a full date is needed in addition to the publication year.',
+  authors_primary:
+    'The primary author list for the reference. These names are commonly used with publication year to locate references.',
+  authors_secondary:
+    'A secondary author list for the reference, such as editors or other contributor roles depending on reference type.',
+  authors_series: 'A series editor or series contributor list for the reference when applicable.',
+  author_surname: 'The last name of an author. Author surnames are used to retrieve references, so spelling matters.',
+  author_initials: 'The initials of an author.',
+  journal_title: 'The journal or publication title used as part of the full citation of the reference.',
+  volume: 'The volume information used as part of the full citation of the reference.',
+  issue: 'The issue information used as part of the full citation of the reference.',
+  start_page: 'The first page of the reference, used as part of the full citation.',
+  end_page: 'The last page of the reference, used as part of the full citation.',
+  publisher: 'The publisher information used as part of a book or edited-volume citation.',
+  pub_place: 'The publication place used as part of a book or edited-volume citation.',
+  gen_notes:
+    'General notes about the reference, for source details or other useful context not captured by the structured citation fields.',
 } as const
 
 export type FieldInfoKey = keyof typeof fieldInfoTexts

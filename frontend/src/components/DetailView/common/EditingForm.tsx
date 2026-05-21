@@ -1,9 +1,11 @@
-import { Box, MenuItem, TextField } from '@mui/material'
+import HelpOutlineIcon from '@mui/icons-material/HelpOutline'
+import { Box, IconButton, InputAdornment, MenuItem, TextField, Tooltip } from '@mui/material'
 import { EditingModal } from './EditingModal'
 import { useForm } from 'react-hook-form'
 import { Editable, EditDataType } from '@/shared/types'
 import { useDetailContext } from '../Context/DetailContext'
 import { useEffect } from 'react'
+import { getFieldInfoText } from '@/shared/fieldInfo'
 
 export type EditingFormSelectOption = { value: string | number; label: string }
 
@@ -85,30 +87,54 @@ export const EditingForm = <T extends object, ParentType extends object>({
     <EditingModal {...{ dataCy, buttonText, onSave }}>
       <Box sx={{ display: 'flex', flexDirection: 'column', gap: '1em' }}>
         {copyTaxonomyButton}
-        {formFields.map(field => (
-          <TextField
-            key={field.name}
-            slotProps={{ inputLabel: { shrink: true } }}
-            select={!!field.selectOptions}
-            defaultValue={defaultValues[field.name] ?? (field.selectOptions ? '' : undefined)}
-            {...register(field.name, {
-              required: field.required ? 'This field is required' : false,
-              ...(field.type === 'number' &&
-                !field.selectOptions && {
-                  pattern: { value: /^(0|[1-9]\d*)(\.\d+)?$/, message: 'Value must be a valid number' },
-                }),
-            })}
-            error={!!errors[field.name]}
-            helperText={errors[field.name]?.message}
-            {...{ label: field.label, required: field.required }}
-          >
-            {field.selectOptions?.map(option => (
-              <MenuItem key={option.value} value={option.value}>
-                {option.label}
-              </MenuItem>
-            ))}
-          </TextField>
-        ))}
+        {formFields.map(field => {
+          const fieldInfo = getFieldInfoText(field.name)
+
+          return (
+            <TextField
+              key={field.name}
+              slotProps={{
+                inputLabel: { shrink: true },
+                input:
+                  fieldInfo && !field.selectOptions
+                    ? {
+                        endAdornment: (
+                          <InputAdornment position="end">
+                            <Tooltip title={fieldInfo} placement="top" arrow>
+                              <IconButton
+                                aria-label={`Field information for ${field.label}`}
+                                size="small"
+                                sx={{ color: 'text.secondary' }}
+                              >
+                                <HelpOutlineIcon fontSize="inherit" />
+                              </IconButton>
+                            </Tooltip>
+                          </InputAdornment>
+                        ),
+                      }
+                    : undefined,
+              }}
+              select={!!field.selectOptions}
+              defaultValue={defaultValues[field.name] ?? (field.selectOptions ? '' : undefined)}
+              {...register(field.name, {
+                required: field.required ? 'This field is required' : false,
+                ...(field.type === 'number' &&
+                  !field.selectOptions && {
+                    pattern: { value: /^(0|[1-9]\d*)(\.\d+)?$/, message: 'Value must be a valid number' },
+                  }),
+              })}
+              error={!!errors[field.name]}
+              helperText={errors[field.name]?.message}
+              {...{ label: field.label, required: field.required }}
+            >
+              {field.selectOptions?.map(option => (
+                <MenuItem key={option.value} value={option.value}>
+                  {option.label}
+                </MenuItem>
+              ))}
+            </TextField>
+          )
+        })}
       </Box>
     </EditingModal>
   )

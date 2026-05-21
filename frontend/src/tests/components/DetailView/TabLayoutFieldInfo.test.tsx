@@ -10,6 +10,20 @@ describe('ArrayToTable field info labels', () => {
     expect(screen.getByLabelText('Field information for Body mass')).toBeInTheDocument()
   })
 
+  it('shows field information for locality and reference fields', () => {
+    render(
+      <ArrayToTable
+        array={[
+          ['Locality name', <FieldElement key="loc_name" field="loc_name" />],
+          ['Reference title', <FieldElement key="title_primary" field="title_primary" />],
+        ]}
+      />
+    )
+
+    expect(screen.getByLabelText('Field information for Locality name')).toBeInTheDocument()
+    expect(screen.getByLabelText('Field information for Reference title')).toBeInTheDocument()
+  })
+
   it('does not show field information for labels next to unknown fields', () => {
     render(<ArrayToTable array={[['Unknown field', <FieldElement key="unknown_field" field="unknown_field" />]]} />)
 
