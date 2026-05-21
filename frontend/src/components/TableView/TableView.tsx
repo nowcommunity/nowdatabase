@@ -240,6 +240,7 @@ export const TableView = <T extends MRT_RowData>({
     const searchParams = new URLSearchParams(location.search)
     return searchParams.get(TABLE_STATE_URL_PARAM) ?? createTableStateId()
   })
+  const [hasLoadedTableState, setHasLoadedTableState] = useState(Boolean(selectorFn))
   const user = useUser()
   const { setIdList } = usePageContext<T>()
 
@@ -614,19 +615,20 @@ export const TableView = <T extends MRT_RowData>({
     setColumnFilters(loadStateFromUrl('columnfilters', []))
     setSorting(loadStateFromUrl('sorting', defaultSorting ?? []))
     setPagination(loadStateFromUrl('pagination', defaultPagination))
+    setHasLoadedTableState(true)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   // Save state to url whenever it changes
   useEffect(() => {
-    if (selectorFn) return
+    if (selectorFn || !hasLoadedTableState) return
     const sanitizedFilters = sanitizeColumnFilters(columnFilters)
     saveStoredTableState({ columnfilters: sanitizedFilters, sorting, pagination })
     navigate(buildTableStateUrl(), {
       replace: true,
     })
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [columnFilters, sorting, pagination, selectorFn, table, idFieldName, navigate, tableStateId])
+  }, [columnFilters, sorting, pagination, selectorFn, table, idFieldName, navigate, tableStateId, hasLoadedTableState])
 
   useEffect(() => {
     if (selectorFn) {
