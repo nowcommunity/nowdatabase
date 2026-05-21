@@ -31,9 +31,16 @@ import { resolveErrorMessage, resolveErrorStatus } from './errorUtils'
 import type { ColumnVisibilityGroup } from './TableToolBar'
 
 type TableStateInUrl = 'sorting' | 'columnfilters' | 'pagination'
+type StoredTableState = {
+  columnfilters: MRT_ColumnFiltersState
+  sorting: MRT_SortingState
+  pagination: MRT_PaginationState
+}
 
 const TEXT_FILTER_MODE_OPTIONS = ['equals', 'contains', 'startsWith'] as const
 type TextFilterModeOption = (typeof TEXT_FILTER_MODE_OPTIONS)[number]
+const TABLE_STATE_URL_PARAM = 'tableState'
+const TABLE_STATE_STORAGE_PREFIX = 'nowdatabase-table-state'
 
 const isEmptyFilterValue = (value: unknown): boolean => {
   if (Array.isArray(value)) {
@@ -59,6 +66,11 @@ const toTableCellTitle = (value: unknown): string | undefined => {
 
 const sanitizeColumnFilters = (filters: MRT_ColumnFiltersState): MRT_ColumnFiltersState => {
   return filters.filter(filter => !isEmptyFilterValue(filter.value))
+}
+
+const createTableStateId = () => {
+  if (window.crypto?.randomUUID) return window.crypto.randomUUID()
+  return `${Date.now()}-${Math.random().toString(36).slice(2)}`
 }
 
 const getColumnId = <T extends MRT_RowData>(column: MRT_ColumnDef<T>) => {
@@ -224,6 +236,10 @@ export const TableView = <T extends MRT_RowData>({
   const [pagination, setPagination] = useState<MRT_PaginationState>(
     selectorFn ? defaultPaginationSmall : defaultPagination
   )
+  const [tableStateId] = useState(() => {
+    const searchParams = new URLSearchParams(location.search)
+    return searchParams.get(TABLE_STATE_URL_PARAM) ?? createTableStateId()
+  })
   const user = useUser()
   const { setIdList } = usePageContext<T>()
 
@@ -287,33 +303,79 @@ export const TableView = <T extends MRT_RowData>({
     return typeof candidate.pageIndex === 'number' && typeof candidate.pageSize === 'number'
   }
 
+  const normalizeColumnFilters = (filters: MRT_ColumnFiltersState): MRT_ColumnFiltersState => {
+    // The range filters are written as "null" if they are empty because undefined is not valid JSON.
+    // This changes those to empty strings when loading stored state.
+    return filters.map(columnFilter => {
+      if (Array.isArray(columnFilter.value)) {
+        return {
+          ...columnFilter,
+          value: columnFilter.value.map((val: string | number | null) => (val === null ? '' : val)),
+        }
+      }
+      return columnFilter
+    })
+  }
+
+  const isStoredTableState = (value: unknown): value is StoredTableState => {
+    if (typeof value !== 'object' || value === null) return false
+    const candidate = value as Partial<StoredTableState>
+    return (
+      isColumnFiltersState(candidate.columnfilters) &&
+      isSortingState(candidate.sorting) &&
+      isPaginationState(candidate.pagination)
+    )
+  }
+
+  const getTableStateStorageKey = (stateId: string) => `${TABLE_STATE_STORAGE_PREFIX}:${stateId}`
+
+  const loadStoredTableState = (stateId: string) => {
+    const storedValue = window.sessionStorage.getItem(getTableStateStorageKey(stateId))
+    if (!storedValue) return
+
+    const parsed = safeJsonParse(storedValue)
+    return isStoredTableState(parsed) ? parsed : undefined
+  }
+
+  const saveStoredTableState = (state: StoredTableState) => {
+    window.sessionStorage.setItem(getTableStateStorageKey(tableStateId), JSON.stringify(state))
+  }
+
+  const buildTableStateUrl = () => `${location.pathname}?${TABLE_STATE_URL_PARAM}=${encodeURIComponent(tableStateId)}`
+
   const loadStateFromUrl = <TState extends MRT_ColumnFiltersState | MRT_SortingState | MRT_PaginationState>(
     state: TableStateInUrl,
     defaultState: TState
   ): TState => {
     const searchParams = new URLSearchParams(location.search)
+    const stateIdFromUrl = searchParams.get(TABLE_STATE_URL_PARAM)
+    const storedState = stateIdFromUrl ? loadStoredTableState(stateIdFromUrl) : undefined
+    const stateFromStorage = storedState?.[state]
     const stateFromUrl = searchParams.get(state)
+
+    if (stateFromStorage) {
+      if (state === 'columnfilters') {
+        return normalizeColumnFilters(stateFromStorage as MRT_ColumnFiltersState) as unknown as TState
+      }
+      if (state === 'sorting') {
+        const fallback = defaultState as unknown as MRT_SortingState
+        if ((stateFromStorage as MRT_SortingState).length === 0 && fallback.length > 0) {
+          return defaultState
+        }
+      }
+      return stateFromStorage as unknown as TState
+    }
+
     if (!stateFromUrl) return defaultState
     const parsed = safeJsonParse(stateFromUrl)
     if (parsed === undefined) {
       return defaultState
     }
     if (state === 'columnfilters') {
-      // The range filters are written as "null" if they are empty because undefined is not valid JSON.
-      // This changes those to empty strings when loading the url to state.
       if (!isColumnFiltersState(parsed)) {
         return defaultState
       }
-      const normalizedFilters = parsed.map(columnFilter => {
-        if (Array.isArray(columnFilter.value)) {
-          return {
-            ...columnFilter,
-            value: columnFilter.value.map((val: string | number | null) => (val === null ? '' : val)),
-          }
-        }
-        return columnFilter
-      })
-      return normalizedFilters as unknown as TState
+      return normalizeColumnFilters(parsed) as unknown as TState
     }
     if (state === 'sorting') {
       if (!isSortingState(parsed)) {
@@ -360,16 +422,10 @@ export const TableView = <T extends MRT_RowData>({
           return
         }
 
-        const sanitizedFilters = sanitizeColumnFilters(columnFilters)
-        const columnFilterToUrl = `columnfilters=${JSON.stringify(sanitizedFilters)}`
-        const sortingToUrl = `sorting=${JSON.stringify(sorting)}`
-        const paginationToUrl = `pagination=${JSON.stringify(pagination)}`
-        setPreviousTableUrls([
-          ...previousTableUrls,
-          `${location.pathname}?&${columnFilterToUrl}&${sortingToUrl}&${paginationToUrl}`,
-        ])
+        const tableStateUrl = buildTableStateUrl()
+        setPreviousTableUrls([...previousTableUrls, tableStateUrl])
         navigate(resolveDetailPath(row.original), {
-          state: { returnTo: `${location.pathname}${location.search}` },
+          state: { returnTo: tableStateUrl },
         })
       },
       sx: {
@@ -565,14 +621,12 @@ export const TableView = <T extends MRT_RowData>({
   useEffect(() => {
     if (selectorFn) return
     const sanitizedFilters = sanitizeColumnFilters(columnFilters)
-    const columnFilterToUrl = `columnfilters=${JSON.stringify(sanitizedFilters)}`
-    const sortingToUrl = `sorting=${JSON.stringify(sorting)}`
-    const paginationToUrl = `pagination=${JSON.stringify(pagination)}`
-    navigate(`${location.pathname}?&${columnFilterToUrl}&${sortingToUrl}&${paginationToUrl}`, {
+    saveStoredTableState({ columnfilters: sanitizedFilters, sorting, pagination })
+    navigate(buildTableStateUrl(), {
       replace: true,
     })
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [columnFilters, sorting, pagination, selectorFn, table, idFieldName, navigate])
+  }, [columnFilters, sorting, pagination, selectorFn, table, idFieldName, navigate, tableStateId])
 
   useEffect(() => {
     if (selectorFn) {
