@@ -133,7 +133,8 @@ export const getCrossSearchRawSql = async (
         offset,
         convertedColumnFilters,
         convertedOrderBy,
-        descendingOrder
+        descendingOrder,
+        false
       )
       const result: Partial<CrossSearch>[] = await nowDb.$queryRaw(sql)
       if (result.length === 0) break

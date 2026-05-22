@@ -15,6 +15,8 @@ import { CrossSearch } from '../../../frontend/src/shared/types'
 import { once } from 'events'
 
 const router = Router()
+const lineBreakPattern = /[\r\n]+/
+const globalLineBreakPattern = /[\r\n]+/g
 
 const parseArrayRouteParameter = (value: string, message: string) => {
   const parsedValue = JSON.parse(value) as unknown
@@ -49,17 +51,13 @@ const crossSearchLocalitiesRouteValidators: ValidationChain[] = [
   param('sorting').custom(value => parseArrayRouteParameter(value as string, 'Sorting is not an array.')),
 ]
 
-const transformFunction = (row: CrossSearch & { full_count?: number }) => {
+const transformFunction = (row: CrossSearch) => {
   const transformedRow: { [key: string]: string | number | boolean | null } = {}
-  const keys = Object.keys(row) as Array<keyof (CrossSearch & { full_count?: number })>
+  const keys = Object.keys(row) as Array<keyof CrossSearch>
   for (const key of keys) {
-    if (key === 'full_count') {
-      delete row['full_count']
-      continue
-    }
     const value = row[key]
     if (typeof value === 'string') {
-      transformedRow[key] = value.replace(/[\r\n]+/g, ' ')
+      transformedRow[key] = lineBreakPattern.test(value) ? value.replace(globalLineBreakPattern, ' ') : value
     } else {
       transformedRow[key] = row[key]
     }

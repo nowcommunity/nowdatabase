@@ -102,7 +102,8 @@ export const generateCrossSearchSql = (
   offset: number | undefined,
   columnFilters: ColumnFilter[],
   orderBy: string | undefined,
-  descendingOrder: boolean
+  descendingOrder: boolean,
+  includeFullCount = true
 ) => {
   const whereClause = generateWhereClause(showAll, allowedLocalities, columnFilters)
 
@@ -310,8 +311,8 @@ export const generateCrossSearchSql = (
       now_loc.cultural_stage_3,
       now_loc.regional_culture_1,
       now_loc.regional_culture_2,
-      now_loc.regional_culture_3,
-  COUNT(*) OVER() AS full_count
+      now_loc.regional_culture_3
+  ${includeFullCount ? Prisma.sql`, COUNT(*) OVER() AS full_count` : Prisma.empty}
   FROM com_species
   INNER JOIN now_ls ON com_species.species_id = now_ls.species_id
   INNER JOIN now_loc ON now_ls.lid = now_loc.lid
