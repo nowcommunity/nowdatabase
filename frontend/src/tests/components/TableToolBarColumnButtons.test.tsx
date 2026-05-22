@@ -2,6 +2,7 @@ import { describe, expect, it, jest } from '@jest/globals'
 import '@testing-library/jest-dom'
 import { fireEvent, render, screen } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
+import { NotificationContextProvider } from '@/components/Notification'
 import { PageContextProvider } from '@/components/Page'
 import { TableToolBar } from '@/components/TableView/TableToolBar'
 
@@ -63,15 +64,17 @@ const renderToolbar = (props?: Partial<React.ComponentProps<typeof TableToolBar>
 
   return render(
     <MemoryRouter>
-      <PageContextProvider
-        editRights={{}}
-        idFieldName="id"
-        viewName="test"
-        createTitle={() => ''}
-        createSubtitle={() => ''}
-      >
-        <TableToolBar table={table} tableName={tableName} hideLeftButtons={true} {...props} />
-      </PageContextProvider>
+      <NotificationContextProvider>
+        <PageContextProvider
+          editRights={{}}
+          idFieldName="id"
+          viewName="test"
+          createTitle={() => ''}
+          createSubtitle={() => ''}
+        >
+          <TableToolBar table={table} tableName={tableName} hideLeftButtons={true} {...props} />
+        </PageContextProvider>
+      </NotificationContextProvider>
     </MemoryRouter>
   )
 }
