@@ -6,6 +6,18 @@ import { applyDefaultSpeciesOrdering, DetailTabTable, hasActiveSortingInSearch }
 const tableViewMock = jest.fn<(props: Record<string, unknown>) => JSX.Element>()
 const useMaterialReactTableMock = jest.fn<(options: Record<string, unknown>) => Record<string, unknown>>()
 
+type CapturedMrtOptions = {
+  muiTableProps?: {
+    'data-cy'?: string
+  }
+  muiTableHeadCellProps?: (args: { column: { id: string } }) => {
+    'data-cy'?: string
+  }
+  muiTableBodyCellProps?: (args: { cell: { column: { id: string } } }) => {
+    'data-cy'?: string
+  }
+}
+
 jest.mock('@/components/TableView/TableView', () => ({
   TableView: (props: Record<string, unknown>) => tableViewMock(props),
 }))
@@ -64,6 +76,7 @@ describe('DetailTabTable', () => {
         columns={[{ accessorKey: 'name', header: 'Name' }]}
         enableSorting={false}
         enableColumnActions={false}
+        tableName="Editable table"
       />
     )
 
@@ -75,6 +88,11 @@ describe('DetailTabTable', () => {
         enablePagination: true,
       })
     )
+
+    const options = useMaterialReactTableMock.mock.calls[0]?.[0] as CapturedMrtOptions | undefined
+    expect(options?.muiTableProps?.['data-cy']).toEqual('Editable-table-table')
+    expect(options?.muiTableHeadCellProps?.({ column: { id: 'name' } })['data-cy']).toEqual('table-header-name')
+    expect(options?.muiTableBodyCellProps?.({ cell: { column: { id: 'name' } } })['data-cy']).toEqual('table-cell-name')
   })
 })
 

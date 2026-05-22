@@ -64,6 +64,18 @@ const toTableCellTitle = (value: unknown): string | undefined => {
   return
 }
 
+const toDataCyPart = (value: unknown): string => {
+  const normalized = String(value)
+    .trim()
+    .replace(/[^A-Za-z0-9_-]+/g, '-')
+  return normalized || 'unknown'
+}
+
+const withDataCy = <TProps extends object>(props: TProps, dataCy: string): TProps & { 'data-cy': string } => ({
+  ...props,
+  'data-cy': dataCy,
+})
+
 const sanitizeColumnFilters = (filters: MRT_ColumnFiltersState): MRT_ColumnFiltersState => {
   return filters.filter(filter => !isEmptyFilterValue(filter.value))
 }
@@ -438,41 +450,52 @@ export const TableView = <T extends MRT_RowData>({
   const table = useMaterialReactTable({
     columns: preparedColumns,
     data: data || [],
-    muiTableProps: {
-      sx: {
-        tableLayout: 'fixed',
-      },
-    },
-    muiTableHeadCellProps: {
-      sx: {
-        whiteSpace: 'nowrap',
-        overflow: 'hidden',
-        textOverflow: 'ellipsis',
-        '& .MuiTableSortLabel-root': {
-          // Reserve space for the sort icon so toggling sorting doesn't shift column widths.
-          position: 'relative',
-          paddingRight: '1.25em',
-        },
-        '& .MuiTableSortLabel-icon': {
-          // Keep the icon from affecting layout when it appears.
-          position: 'absolute',
-          right: 0,
-          margin: 0,
+    muiTableProps: withDataCy(
+      {
+        sx: {
+          tableLayout: 'fixed',
         },
       },
-    },
-    muiTableBodyCellProps: ({ cell }) => ({
-      ...(cell.column.id === 'mrt-row-actions' ? {} : { title: toTableCellTitle(cell.getValue()) }),
-      sx: {
-        whiteSpace: 'nowrap',
-        overflow: 'hidden',
-        textOverflow: 'ellipsis',
-        '&.row-actions-cell': {
-          overflow: 'visible',
-          textOverflow: 'clip',
+      `${toDataCyPart(title)}-table`
+    ),
+    muiTableHeadCellProps: ({ column }) =>
+      withDataCy(
+        {
+          sx: {
+            whiteSpace: 'nowrap',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            '& .MuiTableSortLabel-root': {
+              // Reserve space for the sort icon so toggling sorting doesn't shift column widths.
+              position: 'relative',
+              paddingRight: '1.25em',
+            },
+            '& .MuiTableSortLabel-icon': {
+              // Keep the icon from affecting layout when it appears.
+              position: 'absolute',
+              right: 0,
+              margin: 0,
+            },
+          },
         },
-      },
-    }),
+        `table-header-${toDataCyPart(column.id)}`
+      ),
+    muiTableBodyCellProps: ({ cell }) =>
+      withDataCy(
+        {
+          ...(cell.column.id === 'mrt-row-actions' ? {} : { title: toTableCellTitle(cell.getValue()) }),
+          sx: {
+            whiteSpace: 'nowrap',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            '&.row-actions-cell': {
+              overflow: 'visible',
+              textOverflow: 'clip',
+            },
+          },
+        },
+        `table-cell-${toDataCyPart(cell.column.id)}`
+      ),
     muiTableBodyRowProps: clickableRows || selectorFn ? muiTableBodyRowProps : undefined,
     muiTableContainerProps: tableContainerMaxHeight
       ? {
@@ -565,13 +588,11 @@ export const TableView = <T extends MRT_RowData>({
       'mrt-row-actions': {
         size: 36,
         header: '',
-        muiTableHeadCellProps: {
-          align: 'right',
-        },
-        muiTableBodyCellProps: {
-          align: 'right',
-          className: 'row-actions-cell',
-        },
+        muiTableHeadCellProps: withDataCy({ align: 'right' as const }, 'table-header-row-actions'),
+        muiTableBodyCellProps: withDataCy(
+          { align: 'right' as const, className: 'row-actions-cell' },
+          'table-cell-row-actions'
+        ),
       },
     },
     positionActionsColumn: 'last',
