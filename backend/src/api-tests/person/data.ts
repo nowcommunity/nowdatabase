@@ -1,6 +1,6 @@
 import { PersonDetailsType } from '../../../../frontend/src/shared/types'
 
-export const existingPerson: Omit<PersonDetailsType, 'user'> = {
+export const existingPerson: Omit<PersonDetailsType, 'user' | 'project_relations' | 'coordinator_relations'> = {
   initials: 'AD',
   first_name: 'adf',
   surname: 'ads',

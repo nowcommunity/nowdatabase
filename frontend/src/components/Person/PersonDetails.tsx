@@ -1,5 +1,6 @@
 import { useParams, useNavigate } from 'react-router-dom'
 import {
+  useDeletePersonMutation,
   useEditPersonMutation,
   useGetPersonDetailsIdMutation,
   useGetPersonDetailsQuery,
@@ -7,17 +8,37 @@ import {
 import { CircularProgress } from '@mui/material'
 import { DetailView, TabType } from '../DetailView/DetailView'
 import { PersonTab } from './Tabs/PersonTab'
+import { PersonRelationsTab } from './Tabs/PersonRelationsTab'
 import { useUser } from '@/hooks/user'
 import { EditDataType, PersonDetailsType, Role, ValidationErrors } from '@/shared/types'
 import { validatePerson } from '@/shared/validators/person'
 import { useNotify } from '@/hooks/notification'
 import { useEffect } from 'react'
 import { emptyPerson } from '../DetailView/common/defaultValues'
+import type { FetchBaseQueryError } from '@reduxjs/toolkit/query'
+
+const getDeleteErrorMessage = (error: unknown): string => {
+  const fetchError = error as FetchBaseQueryError
+  if (
+    fetchError &&
+    typeof fetchError === 'object' &&
+    'data' in fetchError &&
+    fetchError.data &&
+    typeof fetchError.data === 'object' &&
+    'message' in fetchError.data &&
+    typeof fetchError.data.message === 'string'
+  ) {
+    return fetchError.data.message
+  }
+
+  return 'Could not delete person.'
+}
 
 export const PersonDetails = () => {
   const { id: idFromUrl } = useParams()
   const user = useUser()
   const [editPersonRequest, { isLoading: mutationLoading }] = useEditPersonMutation()
+  const [deletePersonRequest, { isLoading: deleteLoading }] = useDeletePersonMutation()
   const { notify } = useNotify()
   const navigate = useNavigate()
 
@@ -70,14 +91,30 @@ export const PersonDetails = () => {
   }
 
   if (isError) return <div>Error loading data</div>
-  if (isLoading || (!data && !isNew) || mutationLoading) return <CircularProgress />
+  if (isLoading || (!data && !isNew) || mutationLoading || deleteLoading) return <CircularProgress />
 
   document.title = isNew ? 'New person' : `User - ${data!.user?.user_name}`
+
+  const deleteFunction = async () => {
+    if (!id) return
+
+    try {
+      await deletePersonRequest(id).unwrap()
+      notify('Deleted person successfully.')
+      navigate('/person')
+    } catch (error) {
+      notify(getDeleteErrorMessage(error), 'error')
+    }
+  }
 
   const tabs: TabType[] = [
     {
       title: 'Person',
       content: <PersonTab />,
+    },
+    {
+      title: 'Relations',
+      content: <PersonRelationsTab />,
     },
   ]
 
@@ -90,6 +127,7 @@ export const PersonDetails = () => {
       tabs={tabs}
       data={isNew ? emptyPerson : data!}
       validator={validatePerson}
+      deleteFunction={deleteFunction}
     />
   )
 }
