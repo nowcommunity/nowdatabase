@@ -28,8 +28,20 @@ const personsApi = api.injectEndpoints({
       }),
       invalidatesTags: (result, _error, { initials }) => (result ? [{ type: 'person', id: initials }, 'persons'] : []),
     }),
+    deletePerson: builder.mutation<void, string>({
+      query: initials => ({
+        url: `/person/${initials}`,
+        method: 'DELETE',
+      }),
+      invalidatesTags: (_result, _error, initials) => [{ type: 'person', id: initials }, 'persons'],
+    }),
   }),
 })
 
-export const { useGetAllPersonsQuery, useGetPersonDetailsQuery, useEditPersonMutation, useGetPersonDetailsIdMutation } =
-  personsApi
+export const {
+  useGetAllPersonsQuery,
+  useGetPersonDetailsQuery,
+  useEditPersonMutation,
+  useGetPersonDetailsIdMutation,
+  useDeletePersonMutation,
+} = personsApi

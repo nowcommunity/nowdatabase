@@ -1,5 +1,5 @@
 import { Router, Request } from 'express'
-import { getAllPersons, getPersonDetails, validateEntirePerson } from '../services/person'
+import { deletePerson, getAllPersons, getPersonDetails, validateEntirePerson } from '../services/person'
 import {
   Role,
   PersonDetailsType,
@@ -72,5 +72,15 @@ router.put(
     return res.status(200).send({ initials })
   }
 )
+
+router.delete('/:id', requireOneOf([Role.Admin]), async (req, res) => {
+  const result = await deletePerson(req.params.id, req.user!.initials)
+
+  if (!result.deleted) {
+    return res.status(result.status).send({ message: result.message, blockers: result.blockers })
+  }
+
+  return res.status(200).send()
+})
 
 export default router
