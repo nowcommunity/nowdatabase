@@ -39,7 +39,7 @@ export const referenceTableColumns: MRT_ColumnDef<Reference>[] = [
     size: 20,
   },
   {
-    accessorFn: ({ ref_authors }) => ref_authors.find(author => author.au_num === 1)?.author_surname ?? 'Not found',
+    accessorFn: ({ ref_authors }) => ref_authors?.find(author => author.au_num === 1)?.author_surname ?? 'Not found',
     Cell,
     header: 'Author',
     maxSize: 60,
