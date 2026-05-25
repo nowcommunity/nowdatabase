@@ -108,7 +108,10 @@ describe('PersonDetails', () => {
         Promise.reject(
           Object.assign(new Error('Delete blocked'), {
             status: 409,
-            data: { message: 'Person cannot be deleted because they are still linked to database data.' },
+            data: {
+              message:
+                'Person cannot be deleted because they are linked to: person has data update history; person is assigned to projects or coordinator groups.',
+            },
           })
         ),
     })
@@ -119,7 +122,7 @@ describe('PersonDetails', () => {
 
     await waitFor(() => {
       expect(mockNotify).toHaveBeenCalledWith(
-        'Person cannot be deleted because they are still linked to database data.',
+        'Person cannot be deleted because they are linked to: person has data update history; person is assigned to projects or coordinator groups.',
         'error'
       )
     })

@@ -63,7 +63,7 @@ describe('Deleting person works', () => {
 
     expect(deleteResult.status).toEqual(409)
     expect(deleteResult.body.message).toEqual(
-      'Person cannot be deleted because they are still linked to database data.'
+      'Person cannot be deleted because they are linked to: person has data update history; person is assigned to projects or coordinator groups.'
     )
     expect(deleteResult.body.blockers).toEqual([
       'person has data update history',

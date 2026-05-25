@@ -4,7 +4,7 @@ import Prisma from '../../prisma/generated/now_test_client'
 import { ValidationObject } from '../../../frontend/src/shared/validators/validator'
 import { validatePerson } from '../../../frontend/src/shared/validators/person'
 
-export const PERSON_DELETE_BLOCKED_MESSAGE = 'Person cannot be deleted because they are still linked to database data.'
+const PERSON_DELETE_BLOCKED_PREFIX = 'Person cannot be deleted because they are linked to'
 export const PERSON_DELETE_SELF_MESSAGE = 'You cannot delete your own person record.'
 
 export const getAllPersons = async () => {
@@ -82,6 +82,11 @@ export const getPersonDeleteBlockers = async (initials: string): Promise<string[
   return blockers
 }
 
+export const formatPersonDeleteBlockedMessage = (blockers: string[]): string => {
+  if (blockers.length === 0) return 'Person cannot be deleted.'
+  return `${PERSON_DELETE_BLOCKED_PREFIX}: ${blockers.join('; ')}.`
+}
+
 export const deletePerson = async (initials: string, currentUserInitials: string) => {
   if (initials === currentUserInitials) {
     return { deleted: false, status: 409 as const, message: PERSON_DELETE_SELF_MESSAGE, blockers: ['self'] }
@@ -98,7 +103,12 @@ export const deletePerson = async (initials: string, currentUserInitials: string
 
   const blockers = await getPersonDeleteBlockers(initials)
   if (blockers.length > 0) {
-    return { deleted: false, status: 409 as const, message: PERSON_DELETE_BLOCKED_MESSAGE, blockers }
+    return {
+      deleted: false,
+      status: 409 as const,
+      message: formatPersonDeleteBlockedMessage(blockers),
+      blockers,
+    }
   }
 
   await nowDb.$transaction(async prisma => {
