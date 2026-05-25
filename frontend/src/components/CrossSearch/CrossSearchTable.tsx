@@ -1,11 +1,10 @@
-import { useMemo } from 'react'
+import { lazy, Suspense, useMemo } from 'react'
 import { type MRT_ColumnDef, type MRT_RowData, type MRT_TableInstance } from 'material-react-table'
 import { CrossSearch, formatDevelopmentalCrownType } from '@/shared/types'
 import { TableView } from '../TableView/TableView'
 import type { ColumnVisibilityGroup } from '../TableView/TableToolBar'
 import { useGetAllCrossSearchQuery, useGetAllCrossSearchLocalitiesQuery } from '@/redux/crossSearchReducer'
 import { usePageContext } from '../Page'
-import { LocalitiesMap } from '../Map/LocalitiesMap'
 import { formatWithMaxThreeDecimals } from '@/util/numberFormatting'
 import { occurrenceLabels } from '@/constants/occurrenceLabels'
 import { OccurrenceDwcExportMenuItem } from '@/components/Occurrence/OccurrenceDwcExportMenuItem'
@@ -17,6 +16,11 @@ import {
   exportOccurrenceMapSvg,
   getUniqueCrossSearchMapExportLocalities,
 } from '@/components/Species/localitySpeciesMapExport'
+
+const LocalitiesMap = lazy(async () => {
+  const module = await import('../Map/LocalitiesMap')
+  return { default: module.LocalitiesMap }
+})
 
 export const CrossSearchTable = ({ selectorFn }: { selectorFn?: (newObject: CrossSearch) => void }) => {
   const { sqlLimit, sqlOffset, sqlColumnFilters, sqlOrderBy } = usePageContext()
@@ -1092,7 +1096,9 @@ export const CrossSearchTable = ({ selectorFn }: { selectorFn?: (newObject: Cros
 
   return (
     <>
-      <LocalitiesMap localities={localitiesData} isFetching={localitiesFetching || isFetching} />
+      <Suspense fallback={<div />}>
+        <LocalitiesMap localities={localitiesData} isFetching={localitiesFetching || isFetching} />
+      </Suspense>
       <TableView<CrossSearch>
         title={occurrenceLabels.crossSearchTitle}
         selectorFn={selectorFn}
