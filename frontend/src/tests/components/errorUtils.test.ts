@@ -22,6 +22,22 @@ describe('table view error utilities', () => {
     expect(resolveErrorMessage(status, error, true)).toBe('You do not have permission to view this data.')
   })
 
+  it('returns timeout copy for unanswered requests', () => {
+    const error: FetchBaseQueryError = { status: 'TIMEOUT_ERROR', error: 'AbortError' }
+    const status = resolveErrorStatus(error)
+    expect(resolveErrorMessage(status, error, true)).toBe(
+      'The request took too long to answer. Please try again later.'
+    )
+  })
+
+  it('returns network copy for fetch failures', () => {
+    const error: FetchBaseQueryError = { status: 'FETCH_ERROR', error: 'TypeError: Failed to fetch' }
+    const status = resolveErrorStatus(error)
+    expect(resolveErrorMessage(status, error, true)).toBe(
+      'We could not reach the server. Please check your connection and try again.'
+    )
+  })
+
   it('returns null when not in error state', () => {
     const error = { status: 403, data: {} }
     const status = resolveErrorStatus(error)

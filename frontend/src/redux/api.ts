@@ -16,8 +16,11 @@ type RefreshTokenResult = {
   meta?: FetchBaseQueryMeta
 }
 
+const REQUEST_TIMEOUT_MS = 60_000
+
 const baseQuery = fetchBaseQuery({
   baseUrl: BACKEND_URL,
+  timeout: REQUEST_TIMEOUT_MS,
   prepareHeaders: (headers, { getState }) => {
     const token = (getState() as RootState).user.token
     if (token) {

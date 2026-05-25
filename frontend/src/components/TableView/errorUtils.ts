@@ -28,6 +28,22 @@ const extractMessageFromData = (data: unknown): string | null => {
   return null
 }
 
+const resolveFetchBaseQueryErrorMessage = (error: FetchBaseQueryError): string | null => {
+  if (typeof error.status === 'number') {
+    return null
+  }
+
+  if (error.status === 'TIMEOUT_ERROR') {
+    return 'The request took too long to answer. Please try again later.'
+  }
+
+  if (error.status === 'FETCH_ERROR') {
+    return 'We could not reach the server. Please check your connection and try again.'
+  }
+
+  return null
+}
+
 export const resolveErrorStatus = (error: FetchBaseQueryError | SerializedError | undefined): number | null => {
   if (!error || !isFetchBaseQueryError(error)) {
     return null
@@ -46,6 +62,11 @@ export const resolveErrorMessage = (
   }
 
   if (error && isFetchBaseQueryError(error)) {
+    const queryErrorMessage = resolveFetchBaseQueryErrorMessage(error)
+    if (queryErrorMessage) {
+      return queryErrorMessage
+    }
+
     const message = extractMessageFromData(error.data)
     if (message) {
       return message
