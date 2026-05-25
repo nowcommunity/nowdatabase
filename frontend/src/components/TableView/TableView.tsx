@@ -36,6 +36,10 @@ type StoredTableState = {
   sorting: MRT_SortingState
   pagination: MRT_PaginationState
 }
+type StoredTablePreferences = {
+  columnfilters: MRT_ColumnFiltersState
+  columnVisibility: MRT_VisibilityState
+}
 
 const TEXT_FILTER_MODE_OPTIONS = ['equals', 'contains', 'startsWith'] as const
 type TextFilterModeOption = (typeof TEXT_FILTER_MODE_OPTIONS)[number]
@@ -249,6 +253,7 @@ export const TableView = <T extends MRT_RowData>({
   const [pagination, setPagination] = useState<MRT_PaginationState>(
     selectorFn ? defaultPaginationSmall : defaultPagination
   )
+  const [columnVisibility, setColumnVisibility] = useState<MRT_VisibilityState>(visibleColumns)
   const [tableStateId] = useState(() => {
     const searchParams = new URLSearchParams(location.search)
     return searchParams.get(TABLE_STATE_URL_PARAM) ?? createTableStateId()
@@ -341,6 +346,32 @@ export const TableView = <T extends MRT_RowData>({
     )
   }
 
+  const isColumnVisibilityState = (value: unknown): value is MRT_VisibilityState => {
+    if (typeof value !== 'object' || value === null || Array.isArray(value)) return false
+    return Object.values(value).every(item => typeof item === 'boolean')
+  }
+
+  const isStoredTablePreferences = (value: unknown): value is StoredTablePreferences => {
+    if (typeof value !== 'object' || value === null) return false
+    const candidate = value as Partial<StoredTablePreferences>
+    return isColumnFiltersState(candidate.columnfilters) && isColumnVisibilityState(candidate.columnVisibility)
+  }
+
+  const showFilteredColumns = (
+    visibility: MRT_VisibilityState,
+    filters: MRT_ColumnFiltersState
+  ): MRT_VisibilityState => {
+    if (filters.length === 0) return visibility
+
+    return filters.reduce<MRT_VisibilityState>(
+      (nextVisibility, filter) => ({
+        ...nextVisibility,
+        [filter.id]: true,
+      }),
+      visibility
+    )
+  }
+
   const getTableStateStorageKey = (stateId: string) => `${TABLE_STATE_STORAGE_PREFIX}:${stateId}`
   const getPersistentColumnFiltersStorageKey = () => `${TABLE_FILTERS_STORAGE_PREFIX}:${url ?? location.pathname}`
 
@@ -352,26 +383,39 @@ export const TableView = <T extends MRT_RowData>({
     return isStoredTableState(parsed) ? parsed : undefined
   }
 
-  const loadPersistentColumnFilters = () => {
+  const loadPersistentTablePreferences = (): StoredTablePreferences | undefined => {
     const storedValue = window.localStorage.getItem(getPersistentColumnFiltersStorageKey())
     if (!storedValue) return
 
     const parsed = safeJsonParse(storedValue)
-    return isColumnFiltersState(parsed) ? normalizeColumnFilters(parsed) : undefined
+    if (isStoredTablePreferences(parsed)) {
+      const columnfilters = normalizeColumnFilters(parsed.columnfilters)
+      return {
+        columnfilters,
+        columnVisibility: showFilteredColumns(parsed.columnVisibility, columnfilters),
+      }
+    }
+
+    if (isColumnFiltersState(parsed)) {
+      const columnfilters = normalizeColumnFilters(parsed)
+      return {
+        columnfilters,
+        columnVisibility: showFilteredColumns(visibleColumns, columnfilters),
+      }
+    }
+
+    return undefined
   }
 
   const saveStoredTableState = (state: StoredTableState) => {
     window.sessionStorage.setItem(getTableStateStorageKey(tableStateId), JSON.stringify(state))
   }
 
-  const savePersistentColumnFilters = (filters: MRT_ColumnFiltersState) => {
-    const storageKey = getPersistentColumnFiltersStorageKey()
-    if (filters.length === 0) {
-      window.localStorage.removeItem(storageKey)
-      return
-    }
-
-    window.localStorage.setItem(storageKey, JSON.stringify(filters))
+  const savePersistentTablePreferences = (filters: MRT_ColumnFiltersState, visibility: MRT_VisibilityState) => {
+    window.localStorage.setItem(
+      getPersistentColumnFiltersStorageKey(),
+      JSON.stringify({ columnfilters: filters, columnVisibility: showFilteredColumns(visibility, filters) })
+    )
   }
 
   const buildTableStateUrl = () => `${location.pathname}?${TABLE_STATE_URL_PARAM}=${encodeURIComponent(tableStateId)}`
@@ -401,7 +445,7 @@ export const TableView = <T extends MRT_RowData>({
 
     if (!stateFromUrl) {
       if (state === 'columnfilters') {
-        return (loadPersistentColumnFilters() ?? defaultState) as TState
+        return (loadPersistentTablePreferences()?.columnfilters ?? defaultState) as TState
       }
 
       return defaultState
@@ -533,6 +577,7 @@ export const TableView = <T extends MRT_RowData>({
       : undefined,
     enableStickyHeader: Boolean(tableContainerMaxHeight),
     state: {
+      columnVisibility,
       columnFilters,
       showColumnFilters: true,
       isLoading: isFetching,
@@ -541,10 +586,10 @@ export const TableView = <T extends MRT_RowData>({
       density: 'compact',
     },
     initialState: {
-      columnVisibility: visibleColumns,
       columnFilterFns: initialColumnFilterFns,
     },
     onColumnFiltersChange: setColumnFilters,
+    onColumnVisibilityChange: setColumnVisibility,
     /**
      * Row action audit (Task T1):
      *
@@ -659,6 +704,10 @@ export const TableView = <T extends MRT_RowData>({
   // Load state from url only on first render
   useEffect(() => {
     if (selectorFn) return
+    const persistentPreferences = loadPersistentTablePreferences()
+    if (persistentPreferences) {
+      setColumnVisibility(persistentPreferences.columnVisibility)
+    }
     setColumnFilters(loadStateFromUrl('columnfilters', []))
     setSorting(loadStateFromUrl('sorting', defaultSorting ?? []))
     setPagination(loadStateFromUrl('pagination', defaultPagination))
@@ -671,12 +720,23 @@ export const TableView = <T extends MRT_RowData>({
     if (selectorFn || !hasLoadedTableState) return
     const sanitizedFilters = sanitizeColumnFilters(columnFilters)
     saveStoredTableState({ columnfilters: sanitizedFilters, sorting, pagination })
-    savePersistentColumnFilters(sanitizedFilters)
+    savePersistentTablePreferences(sanitizedFilters, columnVisibility)
     navigate(buildTableStateUrl(), {
       replace: true,
     })
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [columnFilters, sorting, pagination, selectorFn, table, idFieldName, navigate, tableStateId, hasLoadedTableState])
+  }, [
+    columnFilters,
+    sorting,
+    pagination,
+    columnVisibility,
+    selectorFn,
+    table,
+    idFieldName,
+    navigate,
+    tableStateId,
+    hasLoadedTableState,
+  ])
 
   useEffect(() => {
     if (selectorFn) {

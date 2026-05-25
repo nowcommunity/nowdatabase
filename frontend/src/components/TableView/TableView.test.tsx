@@ -8,6 +8,10 @@ import { useUser } from '@/hooks/user'
 
 type CapturedTableOptions = {
   onColumnFiltersChange?: (filters: Array<{ id: string; value: unknown }>) => void
+  onColumnVisibilityChange?: (visibility: Record<string, boolean>) => void
+  state?: {
+    columnVisibility?: Record<string, boolean>
+  }
 }
 
 let lastMaterialReactTableOptions: CapturedTableOptions | null = null
@@ -46,6 +50,7 @@ jest.mock('./TableToolBar', () => ({
 type TestRow = {
   id: string
   name: string
+  basin?: string
   full_count?: number
 }
 
@@ -295,7 +300,34 @@ describe('TableView table help integration', () => {
     })
   })
 
-  it('persists changed column filters for later table visits', async () => {
+  it('restores persisted column visibility with persisted column filters', async () => {
+    const setSqlColumnFilters = jest.fn()
+    const persistedPreferences = {
+      columnfilters: [{ id: 'basin', value: 'Basin A' }],
+      columnVisibility: { id: true, name: true, basin: false },
+    }
+
+    window.localStorage.setItem('nowdatabase-table-columnfilters:test', JSON.stringify(persistedPreferences))
+    mockUsePageContext.mockReturnValue({
+      editRights: {},
+      idList: [],
+      idFieldName: 'id',
+      viewName: 'test',
+      previousTableUrls: [],
+      createTitle: () => '',
+      createSubtitle: () => '',
+      sqlLimit: 25,
+      sqlOffset: 0,
+      sqlColumnFilters: [],
+      sqlOrderBy: [],
+      setIdList: jest.fn(),
+      setSqlLimit: jest.fn(),
+      setSqlOffset: jest.fn(),
+      setSqlColumnFilters,
+      setSqlOrderBy: jest.fn(),
+      setPreviousTableUrls: jest.fn(),
+    })
+
     render(
       <TableView<TestRow>
         title="Test Table"
@@ -303,12 +335,48 @@ describe('TableView table help integration', () => {
         columns={[
           { header: 'Name', accessorKey: 'name' },
           { header: 'Id', accessorKey: 'id' },
+          { header: 'Basin', accessorKey: 'basin' },
         ]}
-        visibleColumns={{ name: true, id: true }}
+        visibleColumns={{ name: true, id: true, basin: false }}
         data={[
           {
             id: '1',
             name: 'Alpha',
+            basin: 'Basin A',
+            full_count: 1,
+          },
+        ]}
+        url="test"
+        isFetching={false}
+      />
+    )
+
+    await waitFor(() => {
+      expect(setSqlColumnFilters).toHaveBeenLastCalledWith(persistedPreferences.columnfilters)
+      expect(lastMaterialReactTableOptions?.state?.columnVisibility).toEqual({
+        id: true,
+        name: true,
+        basin: true,
+      })
+    })
+  })
+
+  it('persists changed column filters and column visibility for later table visits', async () => {
+    render(
+      <TableView<TestRow>
+        title="Test Table"
+        idFieldName="id"
+        columns={[
+          { header: 'Name', accessorKey: 'name' },
+          { header: 'Id', accessorKey: 'id' },
+          { header: 'Basin', accessorKey: 'basin' },
+        ]}
+        visibleColumns={{ name: true, id: true, basin: false }}
+        data={[
+          {
+            id: '1',
+            name: 'Alpha',
+            basin: 'Basin A',
             full_count: 1,
           },
         ]}
@@ -318,13 +386,18 @@ describe('TableView table help integration', () => {
     )
 
     act(() => {
-      lastMaterialReactTableOptions?.onColumnFiltersChange?.([{ id: 'name', value: 'Alpha' }])
+      lastMaterialReactTableOptions?.onColumnVisibilityChange?.({ name: true, id: true, basin: true })
+      lastMaterialReactTableOptions?.onColumnFiltersChange?.([{ id: 'basin', value: 'Basin A' }])
     })
 
     await waitFor(() => {
-      expect(window.localStorage.getItem('nowdatabase-table-columnfilters:test')).toEqual(
-        JSON.stringify([{ id: 'name', value: 'Alpha' }])
+      const storedValue: unknown = JSON.parse(
+        window.localStorage.getItem('nowdatabase-table-columnfilters:test') ?? '{}'
       )
+      expect(storedValue).toEqual({
+        columnfilters: [{ id: 'basin', value: 'Basin A' }],
+        columnVisibility: { name: true, id: true, basin: true },
+      })
     })
   })
 
