@@ -20,6 +20,18 @@ const defaultEditPagination: MRT_PaginationState = { pageIndex: 0, pageSize: 15 
 
 const speciesDefaultSortFields = ['order_name', 'family_name', 'genus_name', 'species_name'] as const
 
+const toDataCyPart = (value: unknown): string => {
+  const normalized = String(value)
+    .trim()
+    .replace(/[^A-Za-z0-9_-]+/g, '-')
+  return normalized || 'unknown'
+}
+
+const withDataCy = <TProps extends object>(props: TProps, dataCy: string): TProps & { 'data-cy': string } => ({
+  ...props,
+  'data-cy': dataCy,
+})
+
 const getNestedValue = (row: MRT_RowData, path: string): unknown => {
   return path.split('.').reduce<unknown>((acc, segment) => {
     if (typeof acc !== 'object' || acc === null || !(segment in acc)) {
@@ -213,6 +225,9 @@ const DetailTabEditableTable = <T extends MRT_RowData>({
   const table = useMaterialReactTable({
     columns,
     data,
+    muiTableProps: withDataCy({ sx: undefined }, `${toDataCyPart(tableName)}-table`),
+    muiTableHeadCellProps: ({ column }) => withDataCy({ sx: undefined }, `table-header-${toDataCyPart(column.id)}`),
+    muiTableBodyCellProps: ({ cell }) => withDataCy({ sx: undefined }, `table-cell-${toDataCyPart(cell.column.id)}`),
     enableTopToolbar: false,
     enableColumnActions,
     enableSorting,

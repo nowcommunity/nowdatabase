@@ -12,6 +12,22 @@ import { NotificationContextProvider } from '@/components/Notification'
 type CapturedMrtOptions = {
   enableColumnFilterModes?: boolean
   columnFilterModeOptions?: string[]
+  muiTableProps?: {
+    'data-cy'?: string
+  }
+  muiTableHeadCellProps?: (args: { column: { id: string } }) => {
+    'data-cy'?: string
+  }
+  muiTableBodyCellProps?: (args: { cell: { column: { id: string }; getValue: () => unknown } }) => {
+    'data-cy'?: string
+    title?: string
+  }
+  displayColumnDefOptions?: {
+    'mrt-row-actions'?: {
+      muiTableHeadCellProps?: { 'data-cy'?: string }
+      muiTableBodyCellProps?: { 'data-cy'?: string }
+    }
+  }
   columns: Array<{
     accessorKey?: string
     enableColumnFilterModes?: boolean
@@ -93,5 +109,28 @@ describe('TableView filter modes', () => {
     expect(options.initialState?.columnFilterFns?.rid).toEqual('equals')
     expect(options.initialState?.columnFilterFns?.title).toEqual('equals')
     expect(options.initialState?.columnFilterFns?.year).toBeUndefined()
+  })
+
+  it('adds stable data-cy selectors to reusable table elements', () => {
+    renderTable([
+      { accessorKey: 'rid', header: 'Id' },
+      { accessorKey: 'title', header: 'Title' },
+    ])
+
+    const options = getLastMaterialReactTableOptions<CapturedMrtOptions>()
+    expect(options).toBeTruthy()
+    if (!options) return
+
+    expect(options.muiTableProps?.['data-cy']).toEqual('Test-table')
+    expect(options.muiTableHeadCellProps?.({ column: { id: 'title' } })['data-cy']).toEqual('table-header-title')
+    expect(
+      options.muiTableBodyCellProps?.({ cell: { column: { id: 'title' }, getValue: () => 'Example' } })['data-cy']
+    ).toEqual('table-cell-title')
+    expect(options.displayColumnDefOptions?.['mrt-row-actions']?.muiTableHeadCellProps?.['data-cy']).toEqual(
+      'table-header-row-actions'
+    )
+    expect(options.displayColumnDefOptions?.['mrt-row-actions']?.muiTableBodyCellProps?.['data-cy']).toEqual(
+      'table-cell-row-actions'
+    )
   })
 })
