@@ -18,6 +18,10 @@ jest.mock('@/components/Person/Tabs/PersonTab', () => ({
   PersonTab: () => <div data-testid="person-tab" />,
 }))
 
+jest.mock('@/components/Person/Tabs/PersonRelationsTab', () => ({
+  PersonRelationsTab: () => <div data-testid="person-relations-tab" />,
+}))
+
 const mockUseGetPersonDetailsQuery = jest.fn()
 const mockUseGetPersonDetailsIdMutation = jest.fn()
 const mockUseEditPersonMutation = jest.fn()
@@ -66,6 +70,8 @@ const person: PersonDetailsType = {
   used_gene: null,
   user: null,
   now_user_group: '',
+  project_relations: [],
+  coordinator_relations: [],
 }
 
 const renderPersonDetails = () => {

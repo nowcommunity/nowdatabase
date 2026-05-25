@@ -8,6 +8,7 @@ import {
 import { CircularProgress } from '@mui/material'
 import { DetailView, TabType } from '../DetailView/DetailView'
 import { PersonTab } from './Tabs/PersonTab'
+import { PersonRelationsTab } from './Tabs/PersonRelationsTab'
 import { useUser } from '@/hooks/user'
 import { EditDataType, PersonDetailsType, Role, ValidationErrors } from '@/shared/types'
 import { validatePerson } from '@/shared/validators/person'
@@ -110,6 +111,10 @@ export const PersonDetails = () => {
     {
       title: 'Person',
       content: <PersonTab />,
+    },
+    {
+      title: 'Relations',
+      content: <PersonRelationsTab />,
     },
   ]
 

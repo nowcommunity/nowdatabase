@@ -31,6 +31,37 @@ describe('Updating person works', () => {
     updatedPerson = body
   })
 
+  it('returns project and coordinator relations for a person', async () => {
+    const { body, status } = await send<PersonDetailsType>('person/ER', 'GET')
+
+    expect(status).toEqual(200)
+    expect(body.project_relations).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          pid: 3,
+          relation: 'Member',
+          proj_code: 'NOW',
+          proj_name: 'NOW Database',
+        }),
+      ])
+    )
+    expect(body.coordinator_relations).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          id: 2,
+          type: 'Region',
+          name: 'region 44524b6e',
+        }),
+        expect.objectContaining({
+          id: 7,
+          type: 'Taxa',
+          name: 'group bb181839',
+          details: 'Carnivora / Felidae',
+        }),
+      ])
+    )
+  })
+
   it('Contains correct data and full name is automatically updated', () => {
     const { initials, first_name, surname, full_name, email, organization, country } = updatedPerson!
     expect(initials).toEqual(existingPerson.initials)

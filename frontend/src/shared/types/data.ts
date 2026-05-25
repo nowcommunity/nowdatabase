@@ -113,8 +113,25 @@ export type LocalityUpdate = Prisma.now_lau & { now_lr: LocalityReference[] } & 
 export type SpeciesUpdate = Prisma.now_sau & { now_sr: SpeciesReference[] } & { updates: UpdateLog[] }
 export type Museum = Omit<Prisma.com_mlist, 'used_morph' | 'used_now' | 'used_gene'>
 export type MuseumLocalities = Prisma.com_mlist & { localities: Prisma.now_loc[] }
+export type PersonProjectRelation = {
+  pid: number
+  proj_code: string | null
+  proj_name: string | null
+  proj_status: string | null
+  relation: 'Contact' | 'Member'
+}
+
+export type PersonCoordinatorRelation = {
+  id: number
+  type: 'Region' | 'Taxa' | 'Stratigraphy'
+  name: string
+  details?: string
+}
+
 export type PersonDetailsType = Prisma.com_people & { user: Omit<Prisma.com_users, 'password, newpassword'> | null } & {
   now_user_group: string
+  project_relations?: PersonProjectRelation[]
+  coordinator_relations?: PersonCoordinatorRelation[]
 }
 // allow components to attach the included person details and a UI-only row state
 export type ProjectPeople = Prisma.now_proj_people & {

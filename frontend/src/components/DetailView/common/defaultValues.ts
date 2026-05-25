@@ -271,6 +271,8 @@ export const emptyPerson = {
   email: '',
   organization: '',
   country: '',
+  project_relations: [],
+  coordinator_relations: [],
 } as unknown as PersonDetailsType
 
 export const defaultPagination: MRT_PaginationState = { pageIndex: 0, pageSize: 15 }
