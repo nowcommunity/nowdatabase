@@ -77,11 +77,6 @@
   width: 100%;
 }
 
-#front-page .map-container:hover .map img {
-  transform: translateX(calc(var(--x) * (-1 / 1.5))) translateY(calc(var(--y) * (-1 / 1.5))) scale(1.5);
-  transform-origin: 0 0;
-}
-
 #front-page .additional-info {
   display: flex;
   justify-content: stretch;

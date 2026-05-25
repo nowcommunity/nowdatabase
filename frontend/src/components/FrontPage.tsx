@@ -4,7 +4,6 @@ import {
   useGetStatisticsQuery,
 } from '../redux/statisticsReducer'
 import { ENV } from '@/util/config'
-import { useEffect, useRef } from 'react'
 
 import mapSvg from '../resource/map.svg'
 import logo from '../resource/nowlogo.jpg'
@@ -14,7 +13,6 @@ import { useGetChangelogQuery } from '@/redux/changelogReducer'
 import { useUser } from '@/hooks/user'
 
 export const FrontPage = () => {
-  const mapContainerRef = useRef<HTMLDivElement | null>(null)
   const user = useUser()
   const isLoggedIn = Boolean(user.token)
   const { data: statisticsQueryData } = useGetStatisticsQuery()
@@ -23,20 +21,6 @@ export const FrontPage = () => {
   const { data: localityStatisticsQueryData, isFetching: localityStatisticsQueryIsFetching } =
     useGetLocalityStatisticsQuery()
   const { data: changelogData } = useGetChangelogQuery(undefined, { skip: !isLoggedIn })
-
-  // Map hover effect
-  useEffect(() => {
-    if (!mapContainerRef.current) return
-    mapContainerRef.current.onmousemove = (e: MouseEvent) => {
-      if (!mapContainerRef.current) return
-      const rect = mapContainerRef.current.getBoundingClientRect()
-      const height = rect.bottom - rect.top
-      const width = rect.right - rect.left
-
-      mapContainerRef.current?.style.setProperty('--x', `${((e.clientX - rect.left) / width) * 100}%`)
-      mapContainerRef.current?.style.setProperty('--y', `${((e.clientY - rect.top) / height) * 100}%`)
-    }
-  }, [])
 
   if (ENV === 'dev') {
     document.title = 'NOW Database (dev)'
@@ -81,7 +65,7 @@ export const FrontPage = () => {
           <b>{occurrenceLabels.plural}</b> {statisticsQueryData && statisticsQueryData.localitySpeciesCount}
         </span>
       </div>
-      <div className="map-container" ref={mapContainerRef}>
+      <div className="map-container">
         <div className="map">
           <img src={mapSvg} />
         </div>
