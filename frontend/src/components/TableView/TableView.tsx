@@ -41,6 +41,7 @@ const TEXT_FILTER_MODE_OPTIONS = ['equals', 'contains', 'startsWith'] as const
 type TextFilterModeOption = (typeof TEXT_FILTER_MODE_OPTIONS)[number]
 const TABLE_STATE_URL_PARAM = 'tableState'
 const TABLE_STATE_STORAGE_PREFIX = 'nowdatabase-table-state'
+const TABLE_FILTERS_STORAGE_PREFIX = 'nowdatabase-table-columnfilters'
 
 const isEmptyFilterValue = (value: unknown): boolean => {
   if (Array.isArray(value)) {
@@ -341,6 +342,7 @@ export const TableView = <T extends MRT_RowData>({
   }
 
   const getTableStateStorageKey = (stateId: string) => `${TABLE_STATE_STORAGE_PREFIX}:${stateId}`
+  const getPersistentColumnFiltersStorageKey = () => `${TABLE_FILTERS_STORAGE_PREFIX}:${url ?? location.pathname}`
 
   const loadStoredTableState = (stateId: string) => {
     const storedValue = window.sessionStorage.getItem(getTableStateStorageKey(stateId))
@@ -350,8 +352,26 @@ export const TableView = <T extends MRT_RowData>({
     return isStoredTableState(parsed) ? parsed : undefined
   }
 
+  const loadPersistentColumnFilters = () => {
+    const storedValue = window.localStorage.getItem(getPersistentColumnFiltersStorageKey())
+    if (!storedValue) return
+
+    const parsed = safeJsonParse(storedValue)
+    return isColumnFiltersState(parsed) ? normalizeColumnFilters(parsed) : undefined
+  }
+
   const saveStoredTableState = (state: StoredTableState) => {
     window.sessionStorage.setItem(getTableStateStorageKey(tableStateId), JSON.stringify(state))
+  }
+
+  const savePersistentColumnFilters = (filters: MRT_ColumnFiltersState) => {
+    const storageKey = getPersistentColumnFiltersStorageKey()
+    if (filters.length === 0) {
+      window.localStorage.removeItem(storageKey)
+      return
+    }
+
+    window.localStorage.setItem(storageKey, JSON.stringify(filters))
   }
 
   const buildTableStateUrl = () => `${location.pathname}?${TABLE_STATE_URL_PARAM}=${encodeURIComponent(tableStateId)}`
@@ -379,7 +399,13 @@ export const TableView = <T extends MRT_RowData>({
       return stateFromStorage as unknown as TState
     }
 
-    if (!stateFromUrl) return defaultState
+    if (!stateFromUrl) {
+      if (state === 'columnfilters') {
+        return (loadPersistentColumnFilters() ?? defaultState) as TState
+      }
+
+      return defaultState
+    }
     const parsed = safeJsonParse(stateFromUrl)
     if (parsed === undefined) {
       return defaultState
@@ -645,6 +671,7 @@ export const TableView = <T extends MRT_RowData>({
     if (selectorFn || !hasLoadedTableState) return
     const sanitizedFilters = sanitizeColumnFilters(columnFilters)
     saveStoredTableState({ columnfilters: sanitizedFilters, sorting, pagination })
+    savePersistentColumnFilters(sanitizedFilters)
     navigate(buildTableStateUrl(), {
       replace: true,
     })

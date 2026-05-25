@@ -1,15 +1,24 @@
 import { describe, expect, it, jest, beforeEach } from '@jest/globals'
 import '@testing-library/jest-dom'
-import { fireEvent, render, waitFor } from '@testing-library/react'
+import { act, fireEvent, render, waitFor } from '@testing-library/react'
 import { Role } from '@/shared/types'
 import { TableView } from './TableView'
 import { usePageContext } from '../Page'
 import { useUser } from '@/hooks/user'
 
+type CapturedTableOptions = {
+  onColumnFiltersChange?: (filters: Array<{ id: string; value: unknown }>) => void
+}
+
+let lastMaterialReactTableOptions: CapturedTableOptions | null = null
+
 jest.mock('material-react-table', () => ({
-  useMaterialReactTable: () => ({
-    getPrePaginationRowModel: () => ({ rows: [] }),
-  }),
+  useMaterialReactTable: (options: CapturedTableOptions) => {
+    lastMaterialReactTableOptions = options
+    return {
+      getPrePaginationRowModel: () => ({ rows: [] }),
+    }
+  },
   MaterialReactTable: () => <div data-testid="material-react-table" />,
 }))
 
@@ -48,6 +57,8 @@ describe('TableView table help integration', () => {
     mockLocationSearch = ''
     mockNavigate = jest.fn()
     window.sessionStorage.clear()
+    window.localStorage.clear()
+    lastMaterialReactTableOptions = null
     mockUsePageContext.mockReturnValue({
       editRights: {},
       idList: [],
@@ -231,6 +242,90 @@ describe('TableView table help integration', () => {
     expect(JSON.parse(window.sessionStorage.getItem('nowdatabase-table-state:stored-state') ?? '{}')).toEqual(
       storedState
     )
+  })
+
+  it('restores persisted column filters for normal table visits', async () => {
+    const setSqlColumnFilters = jest.fn()
+    const persistedFilters = [{ id: 'name', value: 'Alpha' }]
+
+    window.localStorage.setItem('nowdatabase-table-columnfilters:test', JSON.stringify(persistedFilters))
+    mockUsePageContext.mockReturnValue({
+      editRights: {},
+      idList: [],
+      idFieldName: 'id',
+      viewName: 'test',
+      previousTableUrls: [],
+      createTitle: () => '',
+      createSubtitle: () => '',
+      sqlLimit: 25,
+      sqlOffset: 0,
+      sqlColumnFilters: [],
+      sqlOrderBy: [],
+      setIdList: jest.fn(),
+      setSqlLimit: jest.fn(),
+      setSqlOffset: jest.fn(),
+      setSqlColumnFilters,
+      setSqlOrderBy: jest.fn(),
+      setPreviousTableUrls: jest.fn(),
+    })
+
+    render(
+      <TableView<TestRow>
+        title="Test Table"
+        idFieldName="id"
+        columns={[
+          { header: 'Name', accessorKey: 'name' },
+          { header: 'Id', accessorKey: 'id' },
+        ]}
+        visibleColumns={{ name: true, id: true }}
+        data={[
+          {
+            id: '1',
+            name: 'Alpha',
+            full_count: 1,
+          },
+        ]}
+        url="test"
+        isFetching={false}
+      />
+    )
+
+    await waitFor(() => {
+      expect(setSqlColumnFilters).toHaveBeenLastCalledWith(persistedFilters)
+    })
+  })
+
+  it('persists changed column filters for later table visits', async () => {
+    render(
+      <TableView<TestRow>
+        title="Test Table"
+        idFieldName="id"
+        columns={[
+          { header: 'Name', accessorKey: 'name' },
+          { header: 'Id', accessorKey: 'id' },
+        ]}
+        visibleColumns={{ name: true, id: true }}
+        data={[
+          {
+            id: '1',
+            name: 'Alpha',
+            full_count: 1,
+          },
+        ]}
+        url="test"
+        isFetching={false}
+      />
+    )
+
+    act(() => {
+      lastMaterialReactTableOptions?.onColumnFiltersChange?.([{ id: 'name', value: 'Alpha' }])
+    })
+
+    await waitFor(() => {
+      expect(window.localStorage.getItem('nowdatabase-table-columnfilters:test')).toEqual(
+        JSON.stringify([{ id: 'name', value: 'Alpha' }])
+      )
+    })
   })
 
   it('shows help with multi-sort guidance for regular tables', () => {
