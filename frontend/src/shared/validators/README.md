@@ -13,6 +13,8 @@ Validators are created as objects with the following fields. Only `name` is requ
 - `condition` used to set some condition for when a validator is run. Happens before the check for if a value is required. Used for example in references to only run validators for for certain fields since they are only mandatory on some reference types, not all. Although using 'required' instead may now be possible after changes to it.
 - `useEditData` A boolean for if you want to pass editData to the different checks of a validator instead of just the data of the field being validated. Used in references since some validators need to pass editData to a common function. Again, using 'required' instead may be possible after its changes
 
+Use `validator(...)` when validating one edited field. Use `validateFields(...)` for full-object validation, such as backend create/update checks, so validators run for every configured field even when a required key is missing from the submitted data.
+
 Example:
 
 ```
@@ -30,6 +32,4 @@ To know if user is creating a new entry or editing existing one, check if the id
 
 ### Note!
 
-At the moment you can only create validators for existing and defined fields of editData. This is limiting in some cases and creating validators that check multiple fields (as is necessary in references) requires some trickery. Similarly you cannot create multiple validators for the same field.
-
-Validators are only run if the data is defined! If the value of a key of editData == undefined, the data is not checked even if it is set as required in the validator. Similarly if a key does not exist in editData, it will not be checked even if the data would be required. This is also the case in backend. This may lead to mistakes getting into the db if some data must be set but it is not defined at all.
+For full-object validation, do not iterate over `Object.keys(editData)`. That only checks fields included in the payload. Instead, call `validateFields(...)`, which iterates over the configured validator keys and catches required fields that are `undefined` or missing entirely.
