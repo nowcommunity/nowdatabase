@@ -57,6 +57,28 @@ export const createUpdateEntry = async (
   return result[idField] as number
 }
 
+export const createTimeUpdateSummary = async (
+  writeHandler: WriteHandler,
+  tuName: string | number,
+  tuid: number,
+  coordinator: string,
+  authorizer: string,
+  comment: string
+) => {
+  await writeHandler.createObject(
+    'now_time_update',
+    {
+      tu_name: String(tuName),
+      tuid,
+      coordinator,
+      authorizer,
+      date: getFormattedDate(),
+      comment,
+    },
+    ['time_update_id']
+  )
+}
+
 export const writeReferences = async (
   writeHandler: WriteHandler,
   updateEntries: UpdateEntry[],

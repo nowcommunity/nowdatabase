@@ -3,7 +3,7 @@ import { COORDINATOR } from '../../../../utils/config'
 import { AllowedTables, ActionType, Item, LogRow, PrimaryTables, WriteItem, UpdateEntry } from '../types'
 import { WriteHandler } from '../writeHandler'
 import { filterRelevantLogRows, prefixToIdColumn, primaryTableToUpdatePrefix, tableToUpdateTargets } from './utils'
-import { createUpdateEntry, writeLogRows, writeReferences } from './writeUpdates'
+import { createTimeUpdateSummary, createUpdateEntry, writeLogRows, writeReferences } from './writeUpdates'
 
 export const logAllUpdates = async (
   writeHandler: WriteHandler,
@@ -157,6 +157,9 @@ const writeUpdateEntries = async (
     const prefix = primaryTableToUpdatePrefix[updateEntry.table]
     const createdId = await createUpdateEntry(writeHandler, prefix, COORDINATOR, authorizer, comment, updateEntry.id)
     updateEntry.entryId = createdId
+    if (updateEntry.table === 'now_time_unit') {
+      await createTimeUpdateSummary(writeHandler, updateEntry.id, createdId, COORDINATOR, authorizer, comment)
+    }
   }
   return updateEntries
 }

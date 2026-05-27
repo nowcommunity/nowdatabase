@@ -25,6 +25,7 @@ const timeUnitData = {
   tu_comment: '',
   now_tu_sequence: { sequence: 'seq-1', seq_name: 'Sequence 1' },
   now_tau: [],
+  now_time_update: [],
   up_bound: { bid: 1, b_name: 'Upper', age: 20, b_comment: '' },
   low_bound: { bid: 2, b_name: 'Lower', age: 10, b_comment: '' },
 } as unknown as TimeUnitDetailsType

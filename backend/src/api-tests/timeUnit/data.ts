@@ -43,6 +43,7 @@ export const newTimeUnitBasis: EditDataType<TimeUnitDetailsType & EditMetaData> 
   sequence: 'chlma',
   tu_comment: 'test comment',
   now_tau: [],
+  now_time_update: [],
   comment: 'test create time unit',
   references: references,
 }
@@ -56,6 +57,7 @@ export const editedTimeUnit: EditDataType<TimeUnitDetailsType & EditMetaData> = 
   sequence: 'gcss',
   tu_comment: 'test comment edited',
   now_tau: [],
+  now_time_update: [],
   comment: 'test updating time unit',
   references: references,
 }
@@ -69,6 +71,7 @@ export const conflictingTimeUnit: EditDataType<TimeUnitDetailsType & EditMetaDat
   sequence: 'magneticpolarityts',
   tu_comment: 'C2n',
   now_tau: [],
+  now_time_update: [],
   comment: 'test updating time unit',
   references: references,
 }

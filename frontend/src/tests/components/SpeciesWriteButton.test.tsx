@@ -185,7 +185,7 @@ describe('WriteButton taxonomy handling', () => {
       expect(onWrite).toHaveBeenCalledTimes(1)
     })
 
-    expect(onWrite).toHaveBeenCalledWith(expect.objectContaining({ sp_comment: null }), expect.any(Function))
+    expect(onWrite).toHaveBeenCalledWith(expect.objectContaining({ sp_comment: null }), expect.any(Function), undefined)
     expect(setEditData).toHaveBeenCalledWith(expect.objectContaining({ sp_comment: null }))
   })
 

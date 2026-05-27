@@ -60,24 +60,80 @@ export const getTimeUnitDetails = async (id: string) => {
           },
         },
       },
+      now_time_update: {
+        include: {
+          now_tau: {
+            include: {
+              now_tr: {
+                include: {
+                  ref_ref: {
+                    select: referenceWithoutExactDateSelect,
+                  },
+                },
+              },
+            },
+          },
+          now_bau_now_time_update_lower_buidTonow_bau: {
+            include: {
+              now_br: {
+                include: {
+                  ref_ref: {
+                    select: referenceWithoutExactDateSelect,
+                  },
+                },
+              },
+            },
+          },
+          now_bau_now_time_update_upper_buidTonow_bau: {
+            include: {
+              now_br: {
+                include: {
+                  ref_ref: {
+                    select: referenceWithoutExactDateSelect,
+                  },
+                },
+              },
+            },
+          },
+        },
+        orderBy: [{ date: 'asc' }, { time_update_id: 'asc' }],
+      },
     },
   })
 
   if (!result) return null
 
   const tuids = result.now_tau.map(tau => tau.tuid)
-
-  const logResult = await logDb.log.findMany({ where: { tuid: { in: tuids } } })
-
-  const peopleLookup = await buildPersonLookupByInitials(
-    result.now_tau.flatMap(tau => [tau.tau_coordinator, tau.tau_authorizer])
+  const timeUpdateTuids = result.now_time_update.flatMap(update => (update.tuid ? [update.tuid] : []))
+  const timeUpdateBuids = result.now_time_update.flatMap(update =>
+    [update.lower_buid, update.upper_buid].filter((buid): buid is number => typeof buid === 'number')
   )
 
-  result.now_tau = result.now_tau.map(tau => {
+  const [timeUnitLogRows, timeBoundLogRows] = await Promise.all([
+    logDb.log.findMany({ where: { tuid: { in: Array.from(new Set([...tuids, ...timeUpdateTuids])) } } }),
+    logDb.log.findMany({ where: { buid: { in: Array.from(new Set(timeUpdateBuids)) } } }),
+  ])
+
+  const peopleLookup = await buildPersonLookupByInitials(
+    [
+      ...result.now_tau.flatMap(tau => [tau.tau_coordinator, tau.tau_authorizer]),
+      ...result.now_time_update.flatMap(update => [update.coordinator, update.authorizer]),
+      ...result.now_time_update.flatMap(update => [
+        update.now_tau?.tau_coordinator,
+        update.now_tau?.tau_authorizer,
+        update.now_bau_now_time_update_lower_buidTonow_bau?.bau_coordinator,
+        update.now_bau_now_time_update_lower_buidTonow_bau?.bau_authorizer,
+        update.now_bau_now_time_update_upper_buidTonow_bau?.bau_coordinator,
+        update.now_bau_now_time_update_upper_buidTonow_bau?.bau_authorizer,
+      ]),
+    ].filter((initials): initials is string => typeof initials === 'string')
+  )
+
+  const formatTimeUnitUpdate = (tau: (typeof result.now_tau)[number]) => {
     const coordinatorPerson = getPersonFromLookup(peopleLookup, tau.tau_coordinator)
     const authorizerPerson = getPersonFromLookup(peopleLookup, tau.tau_authorizer)
 
-    const updates = logResult.filter((logRow: (typeof logResult)[number]) => logRow.tuid === tau.tuid)
+    const updates = timeUnitLogRows.filter((logRow: (typeof timeUnitLogRows)[number]) => logRow.tuid === tau.tuid)
 
     return {
       ...tau,
@@ -86,14 +142,56 @@ export const getTimeUnitDetails = async (id: string) => {
       now_tr: addNullExactDateToReferenceJoins(tau.now_tr),
       updates,
     }
+  }
+
+  const formatTimeBoundUpdate = (
+    bau:
+      | (typeof result.now_time_update)[number]['now_bau_now_time_update_lower_buidTonow_bau']
+      | (typeof result.now_time_update)[number]['now_bau_now_time_update_upper_buidTonow_bau']
+  ) => {
+    if (!bau) return null
+
+    const coordinatorPerson = getPersonFromLookup(peopleLookup, bau.bau_coordinator)
+    const authorizerPerson = getPersonFromLookup(peopleLookup, bau.bau_authorizer)
+    const updates = timeBoundLogRows.filter((logRow: (typeof timeBoundLogRows)[number]) => logRow.buid === bau.buid)
+
+    return {
+      ...bau,
+      bau_coordinator: getPersonDisplayName(coordinatorPerson, bau.bau_coordinator),
+      bau_authorizer: getPersonDisplayName(authorizerPerson, bau.bau_authorizer),
+      now_br: addNullExactDateToReferenceJoins(bau.now_br),
+      updates,
+    }
+  }
+
+  const nowTau = result.now_tau.map(formatTimeUnitUpdate)
+  const nowTimeUpdate = result.now_time_update.map(update => {
+    const {
+      now_bau_now_time_update_lower_buidTonow_bau: lowerBoundUpdate,
+      now_bau_now_time_update_upper_buidTonow_bau: upperBoundUpdate,
+      ...timeUpdate
+    } = update
+    const coordinatorPerson = getPersonFromLookup(peopleLookup, update.coordinator)
+    const authorizerPerson = getPersonFromLookup(peopleLookup, update.authorizer)
+
+    return {
+      ...timeUpdate,
+      coordinator: getPersonDisplayName(coordinatorPerson, update.coordinator),
+      authorizer: getPersonDisplayName(authorizerPerson, update.authorizer),
+      now_tau: update.now_tau ? formatTimeUnitUpdate(update.now_tau) : null,
+      lower_bound_update: formatTimeBoundUpdate(lowerBoundUpdate),
+      upper_bound_update: formatTimeBoundUpdate(upperBoundUpdate),
+    }
   })
 
   const {
+    now_tau: _nowTau,
+    now_time_update: _nowTimeUpdate,
     now_tu_bound_now_time_unit_low_bndTonow_tu_bound: low_bound,
     now_tu_bound_now_time_unit_up_bndTonow_tu_bound: up_bound,
     ...rest
   } = result
-  return { ...rest, low_bound, up_bound }
+  return { ...rest, now_tau: nowTau, now_time_update: nowTimeUpdate, low_bound, up_bound }
 }
 
 export const getTimeUnitLocalities = async (id: string, options?: TabListQueryOptions) => {

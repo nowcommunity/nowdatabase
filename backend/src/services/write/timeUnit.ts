@@ -134,7 +134,7 @@ const getTimeUnitWriteHandler = (type: ActionType) => {
     dbName: NOW_DB_NAME,
     table: 'now_time_unit',
     idColumn: 'tu_name',
-    allowedColumns: getFieldsOfTables(['now_time_unit', 'now_tu_sequence', 'now_tau', 'now_tr']),
+    allowedColumns: getFieldsOfTables(['now_time_unit', 'now_tu_sequence', 'now_tau', 'now_tr', 'now_time_update']),
     type,
   })
 }
@@ -160,12 +160,14 @@ export const writeTimeUnit = async (
     low_bound?: unknown
     references?: unknown
     comment?: unknown
+    now_time_update?: unknown
   }
   const {
     up_bound: _upBound,
     low_bound: _lowBound,
     references: _references,
     comment: _comment,
+    now_time_update: _nowTimeUpdate,
     ...persistableTimeUnit
   } = normalizedTimeUnit
 
@@ -177,11 +179,14 @@ export const writeTimeUnit = async (
   try {
     await writeHandler.start()
 
-    const timeUnitToPersist: EditDataType<TimeUnitDetailsType> = { ...persistableTimeUnit }
+    const timeUnitToPersist = { ...persistableTimeUnit }
 
     if (timeUnitToPersist.tu_name) {
       await writeHandler.updateObject('now_time_unit', timeUnitToPersist, ['tu_name'])
-      const { cascadeErrors, calculatorErrors, localitiesToUpdate } = await checkTimeUnitCascade(timeUnitToPersist)
+      const { cascadeErrors, calculatorErrors, localitiesToUpdate } = await checkTimeUnitCascade({
+        ...normalizedTimeUnit,
+        now_time_update: normalizedTimeUnit.now_time_update ?? [],
+      } as EditDataType<TimeUnitDetailsType>)
 
       if (calculatorErrors.length > 0 || cascadeErrors.length > 0) {
         const calculatorErrorsString =

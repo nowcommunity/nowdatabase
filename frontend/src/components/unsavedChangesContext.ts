@@ -6,6 +6,7 @@ export type UnsavedChangesContextValue = {
   setDirty: (dirty: boolean) => void
   setMessage: (message: string) => void
   resetMessage: () => void
+  allowNextNavigation?: () => void
 }
 
 export const UnsavedChangesContext = createContext<UnsavedChangesContextValue | null>(null)

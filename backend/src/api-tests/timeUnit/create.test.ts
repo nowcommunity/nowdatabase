@@ -71,7 +71,15 @@ describe('Creating new time unit', () => {
 
     it('Update logs are correct', () => {
       const lastUpdate = createdTimeUnit!.now_tau[createdTimeUnit!.now_tau.length - 1]
+      const lastSummary = createdTimeUnit!.now_time_update[createdTimeUnit!.now_time_update.length - 1]
       expect(lastUpdate.tau_comment).toEqual(newTimeUnitBasis.comment) // 'Comment is correct'
+      expect(lastSummary).toEqual(
+        expect.objectContaining({
+          tu_name: createdTimeUnit!.tu_name,
+          tuid: lastUpdate.tuid,
+          now_tau: expect.objectContaining({ tuid: lastUpdate.tuid }),
+        })
+      )
       const logRows = lastUpdate.updates
       const expectedLogRows: Partial<LogRow>[] = [
         {

@@ -17,19 +17,36 @@ import { finalizeEntry } from '@/services/entryApi'
 import { checkFieldErrors } from './common/checkFieldErrors'
 export { ReturnButton } from '@/components/common/ReturnButton'
 
+export type AfterWriteCallback = () => void
+export type WriteResult = AfterWriteCallback | void
+
 export const WriteButton = <T,>({
   onWrite,
   taxonomy,
   hasStagingMode = false,
   disabled = false,
 }: {
-  onWrite: (editData: EditDataType<T>, setEditData: (editData: EditDataType<T>) => void) => Promise<void>
+  onWrite: (
+    editData: EditDataType<T>,
+    setEditData: (editData: EditDataType<T>) => void,
+    markEditDataClean?: (editData?: EditDataType<T>) => void
+  ) => Promise<WriteResult>
   taxonomy?: boolean
   hasStagingMode?: boolean
   disabled?: boolean
 }) => {
-  const { data, editData, setEditData, mode, setMode, validator, fieldsWithErrors, setFieldsWithErrors, isDirty } =
-    useDetailContext<T>()
+  const {
+    data,
+    editData,
+    setEditData,
+    mode,
+    setMode,
+    validator,
+    fieldsWithErrors,
+    setFieldsWithErrors,
+    isDirty,
+    markEditDataClean,
+  } = useDetailContext<T>()
   const user = useUser()
   const [loading, setLoading] = useState(false)
   const { notify } = useNotify()
@@ -173,8 +190,9 @@ export const WriteButton = <T,>({
       }
     }
 
-    await onWrite((speciesEditData as EditDataType<T>) ?? editData, setEditData)
+    const afterWrite = await onWrite((speciesEditData as EditDataType<T>) ?? editData, setEditData, markEditDataClean)
     setMode('read')
+    setTimeout(() => afterWrite?.(), 0)
   }
 
   const handleWriteButtonClick = async () => {
@@ -193,9 +211,10 @@ export const WriteButton = <T,>({
       }
 
       setLoading(true)
-      await onWrite(editData, setEditData)
+      const afterWrite = await onWrite(editData, setEditData, markEditDataClean)
       setLoading(false)
       setMode('read')
+      setTimeout(() => afterWrite?.(), 0)
     }
 
     const result = await finalizeEntry({

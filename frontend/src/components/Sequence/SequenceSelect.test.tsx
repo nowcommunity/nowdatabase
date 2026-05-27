@@ -51,6 +51,7 @@ const renderWithContext = ({ children, data, mode = 'edit' }: ContextWrapperProp
       seq_name: 'Central Paratethys',
     },
     now_tau: [],
+    now_time_update: [],
     low_bound: {
       bid: 1,
       b_name: 'low',

@@ -2,21 +2,23 @@ import { EditDataType, TimeUnitDetailsType } from '@/shared/types'
 import { useNotify } from '@/hooks/notification'
 import { CircularProgress } from '@mui/material'
 import { useNavigate, useParams } from 'react-router-dom'
+import { useContext } from 'react'
 import {
   formatTimeUnitWriteError,
   useEditTimeUnitMutation,
   useGetTimeUnitDetailsQuery,
 } from '../../redux/timeUnitReducer'
 import { emptyTimeUnit } from '../DetailView/common/defaultValues'
-import { UpdateTab } from '../DetailView/common/UpdateTab'
 import { DetailView, TabType } from '../DetailView/DetailView'
 import { LocalityTab } from './Tabs/LocalityTab'
 import { TimeUnitTab } from './Tabs/TimeUnitTab'
+import { TimeUnitUpdateTab } from './Tabs/TimeUnitUpdateTab'
 import { validateTimeUnit } from '@/shared/validators/timeUnit'
 import { makeEditData } from '../DetailView/Context/DetailContext'
 import { useDeleteTimeUnit } from '@/hooks/useDeleteTimeUnit'
 import { getApiErrorMessage, isDuplicateNameError } from '@/utils/api'
 import { useTimeUnitForm } from '@/hooks/useTimeUnitForm'
+import { UnsavedChangesContext } from '../unsavedChangesContext'
 
 export const TimeUnitDetails = ({
   wrapWithUnsavedChangesProvider = true,
@@ -32,6 +34,7 @@ export const TimeUnitDetails = ({
   const [editTimeUnitRequest] = useEditTimeUnitMutation()
 
   const { notify } = useNotify()
+  const unsavedChanges = useContext(UnsavedChangesContext)
   const navigate = useNavigate()
   const { deleteTimeUnit } = useDeleteTimeUnit({
     onSuccess: () => navigate('/time-unit'),
@@ -50,13 +53,22 @@ export const TimeUnitDetails = ({
 
   const onWrite = async (
     editData: EditDataType<TimeUnitDetailsType>,
-    setEditData: (editData: EditDataType<TimeUnitDetailsType>) => void
+    setEditData: (editData: EditDataType<TimeUnitDetailsType>) => void,
+    markEditDataClean?: (editData?: EditDataType<TimeUnitDetailsType>) => void
   ) => {
     try {
       const normalizedEditData = normalizeRank(editData)
       const { tu_name } = await editTimeUnitRequest(normalizedEditData).unwrap()
-      setTimeout(() => navigate(`/time-unit/${tu_name}`), 15)
+      markEditDataClean?.({
+        ...normalizedEditData,
+        tu_name,
+      })
+      unsavedChanges?.setDirty(false)
       notify('Edited item successfully.')
+      return () => {
+        unsavedChanges?.allowNextNavigation?.()
+        navigate(`/time-unit/${tu_name}`)
+      }
     } catch (e) {
       if (data) {
         setEditData(makeEditData(data))
@@ -87,12 +99,13 @@ export const TimeUnitDetails = ({
     },
     {
       title: 'Updates',
-      content: <UpdateTab refFieldName="now_tr" updatesFieldName="now_tau" prefix="tau" />,
+      content: <TimeUnitUpdateTab />,
     },
   ]
 
   return (
     <DetailView
+      key={isNew ? 'new' : data!.tu_name}
       tabs={tabs}
       isNew={isNew}
       hasStagingMode
