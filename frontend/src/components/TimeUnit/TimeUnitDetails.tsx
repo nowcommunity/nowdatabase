@@ -2,6 +2,7 @@ import { EditDataType, TimeUnitDetailsType } from '@/shared/types'
 import { useNotify } from '@/hooks/notification'
 import { CircularProgress } from '@mui/material'
 import { useNavigate, useParams } from 'react-router-dom'
+import { useContext } from 'react'
 import {
   formatTimeUnitWriteError,
   useEditTimeUnitMutation,
@@ -17,6 +18,7 @@ import { makeEditData } from '../DetailView/Context/DetailContext'
 import { useDeleteTimeUnit } from '@/hooks/useDeleteTimeUnit'
 import { getApiErrorMessage, isDuplicateNameError } from '@/utils/api'
 import { useTimeUnitForm } from '@/hooks/useTimeUnitForm'
+import { UnsavedChangesContext } from '../unsavedChangesContext'
 
 export const TimeUnitDetails = ({
   wrapWithUnsavedChangesProvider = true,
@@ -32,6 +34,7 @@ export const TimeUnitDetails = ({
   const [editTimeUnitRequest] = useEditTimeUnitMutation()
 
   const { notify } = useNotify()
+  const unsavedChanges = useContext(UnsavedChangesContext)
   const navigate = useNavigate()
   const { deleteTimeUnit } = useDeleteTimeUnit({
     onSuccess: () => navigate('/time-unit'),
@@ -55,6 +58,7 @@ export const TimeUnitDetails = ({
     try {
       const normalizedEditData = normalizeRank(editData)
       const { tu_name } = await editTimeUnitRequest(normalizedEditData).unwrap()
+      unsavedChanges?.setDirty(false)
       setTimeout(() => navigate(`/time-unit/${tu_name}`), 15)
       notify('Edited item successfully.')
     } catch (e) {
@@ -93,6 +97,7 @@ export const TimeUnitDetails = ({
 
   return (
     <DetailView
+      key={isNew ? 'new' : data!.tu_name}
       tabs={tabs}
       isNew={isNew}
       hasStagingMode
