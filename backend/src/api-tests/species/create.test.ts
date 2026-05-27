@@ -12,56 +12,48 @@ describe('Creating new species works', () => {
     await resetDatabase()
   }, resetDatabaseTimeout)
   beforeEach(async () => {
-    await resetDatabase()
     await login()
-    createdSpecies = null
-  }, resetDatabaseTimeout)
+  })
   afterAll(async () => {
     await pool.end()
   })
 
-  describe('after creating a species successfully', () => {
-    beforeEach(async () => {
-      const { body: resultBody } = await send<{ species_id: number }>('species', 'PUT', {
-        species: { ...newSpeciesBasis, comment: 'species test' },
-      })
-      const { species_id: createdId } = resultBody
-
-      expect(typeof createdId).toEqual('number') // `Invalid result returned on write: ${createdId}`
-
-      const { body } = await send<SpeciesDetailsType>(`species/${createdId}`, 'GET')
-      createdSpecies = body
+  it('Request succeeds and returns valid number id', async () => {
+    const { body: resultBody } = await send<{ species_id: number }>('species', 'PUT', {
+      species: { ...newSpeciesBasis, comment: 'species test' },
     })
+    const { species_id: createdId } = resultBody
 
-    it('Request succeeds and returns valid number id', () => {
-      expect(typeof createdSpecies?.species_id).toEqual('number')
-    })
+    expect(typeof createdId).toEqual('number') // `Invalid result returned on write: ${createdId}`
 
-    it('Contains correct data', () => {
-      const { species_name, now_ls } = createdSpecies!
-      expect(species_name).toEqual(newSpeciesBasis.species_name) // 'Name is different'
-      const locality = now_ls.find(ls => ls.now_loc.lid === 24750)
-      expect(!!locality).toEqual(true) // 'Locality in locality-species not found'
-    })
+    const { body } = await send<SpeciesDetailsType>(`species/${createdId}`, 'GET')
+    createdSpecies = body
+  })
 
-    it('Locality-species change was updated also to locality', async () => {
-      const localityFound = createdSpecies!.now_ls.find(ls => ls.now_loc.loc_name.startsWith('Romany'))
-      if (!localityFound) throw new Error('Locality was not found in now_ls')
-      const speciesResult = await send<LocalityDetailsType>(`locality/24750`, 'GET')
-      const update = speciesResult.body.now_lau.find(lau => lau.lid === 24750 && lau.lau_comment === 'species test')
-      if (!update) throw new Error('Update not found')
-      const logRows = update.updates
-      const expectedLogRows: Partial<LogRow>[] = [
-        {
-          oldValue: null,
-          value: '24750',
-          type: 'add',
-          column: 'lid',
-          table: 'now_ls',
-        },
-      ]
-      testLogRows(logRows, expectedLogRows, 2)
-    })
+  it('Contains correct data', () => {
+    const { species_name, now_ls } = createdSpecies!
+    expect(species_name).toEqual(newSpeciesBasis.species_name) // 'Name is different'
+    const locality = now_ls.find(ls => ls.now_loc.lid === 24750)
+    expect(!!locality).toEqual(true) // 'Locality in locality-species not found'
+  })
+
+  it('Locality-species change was updated also to locality', async () => {
+    const localityFound = createdSpecies!.now_ls.find(ls => ls.now_loc.loc_name.startsWith('Romany'))
+    if (!localityFound) throw new Error('Locality was not found in now_ls')
+    const speciesResult = await send<LocalityDetailsType>(`locality/24750`, 'GET')
+    const update = speciesResult.body.now_lau.find(lau => lau.lid === 24750 && lau.lau_comment === 'species test')
+    if (!update) throw new Error('Update not found')
+    const logRows = update.updates
+    const expectedLogRows: Partial<LogRow>[] = [
+      {
+        oldValue: null,
+        value: '24750',
+        type: 'add',
+        column: 'lid',
+        table: 'now_ls',
+      },
+    ]
+    testLogRows(logRows, expectedLogRows, 2)
   })
 
   it('Species without required fields fails', async () => {
@@ -72,10 +64,11 @@ describe('Creating new species works', () => {
   })
 
   it('Creation fails without reference', async () => {
+    await resetDatabase()
     const resultNoRef = await send('species', 'PUT', {
       species: { ...newSpeciesBasis, references: [] },
     })
-    expect(resultNoRef.status).toEqual(403) // can't create one without a reference
+    expect(resultNoRef.status).toEqual(403) // can't create species without a reference
 
     const resultWithRef = await send('species', 'PUT', {
       species: { ...newSpeciesBasis },
@@ -83,16 +76,14 @@ describe('Creating new species works', () => {
     expect(resultWithRef.status).toEqual(200)
   })
 
-  it('Creation fails without permissions for non-authenticated users', async () => {
+  it('Creation fails without permissions for non-authenticated and non-privileged users', async () => {
     logout()
     const result1 = await send('species', 'PUT', {
       species: { ...newSpeciesBasis, comment: 'species test' },
     })
     expect(result1.body).toEqual(noPermError)
     expect(result1.status).toEqual(403)
-  })
 
-  it('Creation succeeds for EditRestricted users', async () => {
     logout()
     await login('testEr', 'test')
     const result2 = await send('species', 'PUT', {
