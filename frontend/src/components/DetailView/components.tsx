@@ -2,7 +2,7 @@
 import { Button, Box, Typography, CircularProgress, Divider, alpha, List, ListItemText, Tooltip } from '@mui/material'
 import { useDetailContext } from './Context/DetailContext'
 import { EditDataType, Editable, Reference, Role, Species } from '@/shared/types'
-import { useState, useEffect, Fragment } from 'react'
+import { useState, useEffect, Fragment, useContext } from 'react'
 import SaveIcon from '@mui/icons-material/Save'
 import { referenceValidator } from '@/shared/validators/validator'
 import { checkSpeciesTaxonomy, convertSpeciesTaxonomyFields, hasTaxonomyChanges } from '../../util/taxonomyUtilities'
@@ -15,6 +15,7 @@ import { OutOfBoundsWarningModal, OutOfBoundsWarningModalState } from './OutOfBo
 import { skipToken } from '@reduxjs/toolkit/query'
 import { finalizeEntry } from '@/services/entryApi'
 import { checkFieldErrors } from './common/checkFieldErrors'
+import { UnsavedChangesContext } from '../unsavedChangesContext'
 export { ReturnButton } from '@/components/common/ReturnButton'
 
 export const WriteButton = <T,>({
@@ -33,6 +34,7 @@ export const WriteButton = <T,>({
   const user = useUser()
   const [loading, setLoading] = useState(false)
   const { notify } = useNotify()
+  const unsavedChanges = useContext(UnsavedChangesContext)
   const { data: speciesData } = useGetAllSpeciesQuery(!taxonomy ? skipToken : undefined)
   const { data: synonymData } = useGetAllSynonymsQuery(!taxonomy ? skipToken : undefined)
 
@@ -174,6 +176,7 @@ export const WriteButton = <T,>({
     }
 
     await onWrite((speciesEditData as EditDataType<T>) ?? editData, setEditData)
+    unsavedChanges?.setDirty(false)
     setMode('read')
   }
 
@@ -195,6 +198,7 @@ export const WriteButton = <T,>({
       setLoading(true)
       await onWrite(editData, setEditData)
       setLoading(false)
+      unsavedChanges?.setDirty(false)
       setMode('read')
     }
 
