@@ -3,7 +3,7 @@ import { Editable, Reference } from '../types'
 export type ValidationError = string | null | undefined
 export type ValidationObject = { name: string; error: ValidationError }
 
-type Validator = {
+export type Validator = {
   name: string
   required?: (() => ValidationError) | boolean
   minLength?: number
@@ -86,6 +86,15 @@ export const validator = <T>(
   const validationError = validate(fieldValidator, fieldValidator.useEditData ? editData : editData[fieldName])
   return { name: fieldValidator.name, error: validationError }
 }
+
+export const validateFields = <T>(
+  validators: Validators<Partial<T>>,
+  editData: Partial<T>,
+  fieldNames: Array<keyof T> = Object.keys(validators) as Array<keyof T>
+): ValidationObject[] =>
+  fieldNames
+    .map(fieldName => validator<T>(validators, editData, fieldName))
+    .filter((validationObject): validationObject is ValidationObject => Boolean(validationObject.error))
 
 export const referenceValidator: (references: Editable<Reference>[]) => ValidationError = (
   references: Editable<Reference>[]
