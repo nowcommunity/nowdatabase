@@ -489,17 +489,24 @@ export type TimeBound = {
 
 export type TimeBoundDetailsType = Prisma.now_tu_bound & { now_bau: TimeBoundUpdate[] }
 
-export type TimeBoundUpdate = Prisma.now_bau & { now_br: Prisma.now_br } & { updates: UpdateLog[] }
+export type TimeBoundUpdate = Prisma.now_bau & { now_br: TimeBoundReference[] } & { updates: UpdateLog[] }
 
 /* Time Unit */
 export type TimeUnitSequence = Prisma.now_tu_sequence
 
 export type TimeUnitUpdate = Prisma.now_tau & {
-  now_tr: Prisma.now_tr & { ref_ref: { ref_authors: string; ref_journal: string }[] }
+  now_tr: TimeUnitReference[]
 } & { updates: UpdateLog[] }
+
+export type TimeUnitUpdateSummary = Prisma.now_time_update & {
+  now_tau: TimeUnitUpdate | null
+  lower_bound_update: TimeBoundUpdate | null
+  upper_bound_update: TimeBoundUpdate | null
+}
 
 export type TimeUnitDetailsType = Prisma.now_time_unit & { now_tu_sequence: SequenceDetailsType } & {
   now_tau: Array<TimeUnitUpdate>
+  now_time_update: Array<TimeUnitUpdateSummary>
 } & {
   low_bound: Prisma.now_tu_bound
   up_bound: Prisma.now_tu_bound

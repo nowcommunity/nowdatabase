@@ -39,6 +39,28 @@ describe('GET /time-unit endpoints', () => {
     expect(body).toEqual({ message: 'Time unit not found' })
   })
 
+  it('returns legacy time update summary rows with linked bound updates', async () => {
+    const { body, status } = await send<{
+      now_time_update: Array<{
+        time_update_id: number
+        tuid: number | null
+        lower_buid: number | null
+        lower_bound_update: { buid: number; updates: unknown[] } | null
+      }>
+    }>('time-unit/langhian', 'GET')
+
+    expect(status).toBe(200)
+
+    const lowerBoundSummary = body.now_time_update.find(update => update.time_update_id === 460)
+
+    expect(lowerBoundSummary).toMatchObject({
+      tuid: null,
+      lower_buid: 403,
+      lower_bound_update: { buid: 403 },
+    })
+    expect(lowerBoundSummary?.lower_bound_update?.updates).toEqual([])
+  })
+
   it('handles unexpected failures gracefully', async () => {
     const spy = jest.spyOn(timeUnitService, 'getAllTimeUnits').mockRejectedValueOnce(new Error('db unavailable'))
 

@@ -206,6 +206,7 @@ export const emptyTimeUnit = {
     seq_name: '',
   },
   now_tau: [],
+  now_time_update: [],
 } as unknown as TimeUnitDetailsType
 
 export const emptyTimeBound = {

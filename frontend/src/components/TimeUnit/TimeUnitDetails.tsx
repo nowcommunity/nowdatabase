@@ -8,10 +8,10 @@ import {
   useGetTimeUnitDetailsQuery,
 } from '../../redux/timeUnitReducer'
 import { emptyTimeUnit } from '../DetailView/common/defaultValues'
-import { UpdateTab } from '../DetailView/common/UpdateTab'
 import { DetailView, TabType } from '../DetailView/DetailView'
 import { LocalityTab } from './Tabs/LocalityTab'
 import { TimeUnitTab } from './Tabs/TimeUnitTab'
+import { TimeUnitUpdateTab } from './Tabs/TimeUnitUpdateTab'
 import { validateTimeUnit } from '@/shared/validators/timeUnit'
 import { makeEditData } from '../DetailView/Context/DetailContext'
 import { useDeleteTimeUnit } from '@/hooks/useDeleteTimeUnit'
@@ -87,7 +87,7 @@ export const TimeUnitDetails = ({
     },
     {
       title: 'Updates',
-      content: <UpdateTab refFieldName="now_tr" updatesFieldName="now_tau" prefix="tau" />,
+      content: <TimeUnitUpdateTab />,
     },
   ]
 
