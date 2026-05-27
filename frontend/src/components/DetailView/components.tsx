@@ -17,6 +17,9 @@ import { finalizeEntry } from '@/services/entryApi'
 import { checkFieldErrors } from './common/checkFieldErrors'
 export { ReturnButton } from '@/components/common/ReturnButton'
 
+export type AfterWriteCallback = () => void
+export type WriteResult = AfterWriteCallback | void
+
 export const WriteButton = <T,>({
   onWrite,
   taxonomy,
@@ -27,7 +30,7 @@ export const WriteButton = <T,>({
     editData: EditDataType<T>,
     setEditData: (editData: EditDataType<T>) => void,
     markEditDataClean?: (editData?: EditDataType<T>) => void
-  ) => Promise<void>
+  ) => Promise<WriteResult>
   taxonomy?: boolean
   hasStagingMode?: boolean
   disabled?: boolean
@@ -187,8 +190,9 @@ export const WriteButton = <T,>({
       }
     }
 
-    await onWrite((speciesEditData as EditDataType<T>) ?? editData, setEditData, markEditDataClean)
+    const afterWrite = await onWrite((speciesEditData as EditDataType<T>) ?? editData, setEditData, markEditDataClean)
     setMode('read')
+    setTimeout(() => afterWrite?.(), 0)
   }
 
   const handleWriteButtonClick = async () => {
@@ -207,9 +211,10 @@ export const WriteButton = <T,>({
       }
 
       setLoading(true)
-      await onWrite(editData, setEditData, markEditDataClean)
+      const afterWrite = await onWrite(editData, setEditData, markEditDataClean)
       setLoading(false)
       setMode('read')
+      setTimeout(() => afterWrite?.(), 0)
     }
 
     const result = await finalizeEntry({

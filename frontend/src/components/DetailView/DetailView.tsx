@@ -20,7 +20,7 @@ import {
 } from './common/editingComponents'
 import { DetailBrowser } from './DetailBrowser'
 import { StagingView } from './StagingView'
-import { ErrorBox, ReturnButton, WriteButton } from './components'
+import { ErrorBox, ReturnButton, WriteButton, type WriteResult } from './components'
 import { ValidationObject } from '@/shared/validators/validator'
 import { EditDataType } from '@/shared/types'
 import { usePageContext } from '../Page'
@@ -122,7 +122,7 @@ export const DetailView = <T extends object>({
     editData: EditDataType<T>,
     setEditData: (editData: EditDataType<T>) => void,
     markEditDataClean?: (editData?: EditDataType<T>) => void
-  ) => Promise<void>
+  ) => Promise<WriteResult>
   validator: (editData: EditDataType<T>, field: keyof EditDataType<T>) => ValidationObject
   isNew?: boolean
   isUserPage?: boolean

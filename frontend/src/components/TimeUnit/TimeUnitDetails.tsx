@@ -64,8 +64,8 @@ export const TimeUnitDetails = ({
         tu_name,
       })
       unsavedChanges?.setDirty(false)
-      setTimeout(() => navigate(`/time-unit/${tu_name}`), 15)
       notify('Edited item successfully.')
+      return () => navigate(`/time-unit/${tu_name}`)
     } catch (e) {
       if (data) {
         setEditData(makeEditData(data))
