@@ -118,7 +118,11 @@ export const DetailView = <T extends object>({
 }: {
   tabs: TabType[]
   data: T
-  onWrite?: (editData: EditDataType<T>, setEditData: (editData: EditDataType<T>) => void) => Promise<void>
+  onWrite?: (
+    editData: EditDataType<T>,
+    setEditData: (editData: EditDataType<T>) => void,
+    markEditDataClean?: (editData?: EditDataType<T>) => void
+  ) => Promise<void>
   validator: (editData: EditDataType<T>, field: keyof EditDataType<T>) => ValidationObject
   isNew?: boolean
   isUserPage?: boolean

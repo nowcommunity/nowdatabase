@@ -139,6 +139,7 @@ export type DetailContextType<T> = {
   setFieldsWithErrors: SetFieldsWithErrorsType
   isDirty: boolean
   resetEditData: () => void
+  markEditDataClean?: (editData?: unknown) => void
 }
 
 export type SetEditDataType<T> = (editData: EditDataType<T>) => void
@@ -191,6 +192,14 @@ export const DetailContextProvider = <T extends object>({
     setEditData(cloneDeep(initialEditData))
     setIsDirty(false)
   }
+
+  const markEditDataClean = (nextEditData?: unknown) => {
+    const cleanEditData = cloneDeep((nextEditData as EditDataType<T> | undefined) ?? editData)
+    setInitialEditData(cleanEditData)
+    setEditData(cloneDeep(cleanEditData))
+    setIsDirty(false)
+  }
+
   return (
     <DetailContext.Provider
       value={{
@@ -199,6 +208,7 @@ export const DetailContextProvider = <T extends object>({
         setEditData: handleSetEditData,
         isDirty,
         resetEditData,
+        markEditDataClean,
         validator: (editData: unknown, fieldName: keyof EditDataType<T>) =>
           contextState.validator(editData as EditDataType<T>, fieldName),
       }}

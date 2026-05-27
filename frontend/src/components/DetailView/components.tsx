@@ -23,13 +23,27 @@ export const WriteButton = <T,>({
   hasStagingMode = false,
   disabled = false,
 }: {
-  onWrite: (editData: EditDataType<T>, setEditData: (editData: EditDataType<T>) => void) => Promise<void>
+  onWrite: (
+    editData: EditDataType<T>,
+    setEditData: (editData: EditDataType<T>) => void,
+    markEditDataClean?: (editData?: EditDataType<T>) => void
+  ) => Promise<void>
   taxonomy?: boolean
   hasStagingMode?: boolean
   disabled?: boolean
 }) => {
-  const { data, editData, setEditData, mode, setMode, validator, fieldsWithErrors, setFieldsWithErrors, isDirty } =
-    useDetailContext<T>()
+  const {
+    data,
+    editData,
+    setEditData,
+    mode,
+    setMode,
+    validator,
+    fieldsWithErrors,
+    setFieldsWithErrors,
+    isDirty,
+    markEditDataClean,
+  } = useDetailContext<T>()
   const user = useUser()
   const [loading, setLoading] = useState(false)
   const { notify } = useNotify()
@@ -173,7 +187,7 @@ export const WriteButton = <T,>({
       }
     }
 
-    await onWrite((speciesEditData as EditDataType<T>) ?? editData, setEditData)
+    await onWrite((speciesEditData as EditDataType<T>) ?? editData, setEditData, markEditDataClean)
     setMode('read')
   }
 
@@ -193,7 +207,7 @@ export const WriteButton = <T,>({
       }
 
       setLoading(true)
-      await onWrite(editData, setEditData)
+      await onWrite(editData, setEditData, markEditDataClean)
       setLoading(false)
       setMode('read')
     }

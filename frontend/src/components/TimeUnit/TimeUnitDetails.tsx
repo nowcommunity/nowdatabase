@@ -53,11 +53,16 @@ export const TimeUnitDetails = ({
 
   const onWrite = async (
     editData: EditDataType<TimeUnitDetailsType>,
-    setEditData: (editData: EditDataType<TimeUnitDetailsType>) => void
+    setEditData: (editData: EditDataType<TimeUnitDetailsType>) => void,
+    markEditDataClean?: (editData?: EditDataType<TimeUnitDetailsType>) => void
   ) => {
     try {
       const normalizedEditData = normalizeRank(editData)
       const { tu_name } = await editTimeUnitRequest(normalizedEditData).unwrap()
+      markEditDataClean?.({
+        ...normalizedEditData,
+        tu_name,
+      })
       unsavedChanges?.setDirty(false)
       setTimeout(() => navigate(`/time-unit/${tu_name}`), 15)
       notify('Edited item successfully.')
