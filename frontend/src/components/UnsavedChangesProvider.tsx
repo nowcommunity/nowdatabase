@@ -1,4 +1,4 @@
-import { useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react'
+import { useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import { UNSAFE_DataRouterContext, useBlocker } from 'react-router-dom'
 
 import { UnsavedChangesDialog } from './UnsavedChangesDialog'
@@ -20,12 +20,13 @@ const unblockedState = {
 }
 
 type BlockerState = typeof unblockedState | ReturnType<typeof useBlocker>
+type BlockerPredicate = Parameters<typeof useBlocker>[0]
 
 const BlockerBridge = ({
   shouldBlock,
   onChange,
 }: {
-  shouldBlock: boolean
+  shouldBlock: BlockerPredicate
   onChange: (blocker: ReturnType<typeof useBlocker>) => void
 }) => {
   const blocker = useBlocker(shouldBlock)
@@ -45,6 +46,7 @@ export const UnsavedChangesProvider = ({
   const [isDirty, setDirty] = useState(false)
   const [message, setMessage] = useState(defaultMessage)
   const [blocker, setBlocker] = useState<BlockerState>(unblockedState)
+  const allowNextNavigationRef = useRef(false)
   const dataRouterContext = useContext(UNSAFE_DataRouterContext)
 
   const isSamePathNavigation = blocker.state === 'blocked' && blocker.location?.pathname === window.location.pathname
@@ -53,6 +55,20 @@ export const UnsavedChangesProvider = ({
   const resetMessage = useCallback(() => {
     setMessage(defaultMessage)
   }, [defaultMessage])
+
+  const allowNextNavigation = useCallback(() => {
+    allowNextNavigationRef.current = true
+    setDirty(false)
+  }, [])
+
+  const shouldBlockNavigation = useCallback(() => {
+    if (!isDirty) return false
+    if (allowNextNavigationRef.current) {
+      allowNextNavigationRef.current = false
+      return false
+    }
+    return true
+  }, [isDirty])
 
   const handleConfirm = useCallback(() => {
     if (blocker.state === 'blocked') {
@@ -87,13 +103,14 @@ export const UnsavedChangesProvider = ({
       setDirty,
       setMessage,
       resetMessage,
+      allowNextNavigation,
     }),
-    [isDirty, message, resetMessage]
+    [allowNextNavigation, isDirty, message, resetMessage]
   )
 
   return (
     <UnsavedChangesContext.Provider value={value}>
-      {dataRouterContext ? <BlockerBridge shouldBlock={isDirty} onChange={setBlocker} /> : null}
+      {dataRouterContext ? <BlockerBridge shouldBlock={shouldBlockNavigation} onChange={setBlocker} /> : null}
       {children}
       <UnsavedChangesDialog
         open={showDialog}
