@@ -17,6 +17,7 @@ export type AllowedTables =
   | 'now_sau'
   | 'now_tau'
   | 'now_bau'
+  | 'now_time_update'
 
 export type PrimaryTables = 'now_loc' | 'com_species' | 'now_time_unit' | 'now_tu_bound' | 'ref_ref'
 
