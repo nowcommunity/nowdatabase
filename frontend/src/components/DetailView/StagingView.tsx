@@ -51,7 +51,7 @@ const NewReferenceDialogContent = ({
     const nextFieldsWithErrors: FieldsWithErrorsType = {}
 
     for (const errorObject of validateReferenceFields(editData)) {
-      nextFieldsWithErrors[String(errorObject.name)] = errorObject
+      nextFieldsWithErrors[String(errorObject.field ?? errorObject.name)] = errorObject
     }
 
     setFieldsWithErrors(() => nextFieldsWithErrors)

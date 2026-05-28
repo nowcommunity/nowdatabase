@@ -1,7 +1,7 @@
 import { Editable, Reference } from '../types'
 
 export type ValidationError = string | null | undefined
-export type ValidationObject = { name: string; error: ValidationError }
+export type ValidationObject = { name: string; error: ValidationError; field?: string }
 
 export type Validator = {
   name: string
@@ -17,6 +17,15 @@ export type Validator = {
 }
 
 export type Validators<T> = { [field in keyof T]: Validator } & { [key: string]: Validator }
+
+const validationObject = (name: string, error: ValidationError, field: string): ValidationObject => {
+  const object: ValidationObject = { name, error }
+  Object.defineProperty(object, 'field', {
+    value: field,
+    enumerable: false,
+  })
+  return object
+}
 
 const validate: (validator: Validator, value: unknown) => ValidationError = (validator: Validator, value: unknown) => {
   const { required, minLength, maxLength, asNumber, asString, miscCheck, miscArray } = validator
@@ -80,11 +89,11 @@ export const validator = <T>(
   const fieldValidator = validators[fieldName]
 
   if (!fieldValidator || (fieldValidator.condition && !fieldValidator.condition(editData))) {
-    return { name: fieldName as string, error: null }
+    return validationObject(fieldName as string, null, fieldName as string)
   }
 
   const validationError = validate(fieldValidator, fieldValidator.useEditData ? editData : editData[fieldName])
-  return { name: fieldValidator.name, error: validationError }
+  return validationObject(fieldValidator.name, validationError, fieldName as string)
 }
 
 export const validateFields = <T>(

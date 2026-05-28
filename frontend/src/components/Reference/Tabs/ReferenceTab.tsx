@@ -34,7 +34,7 @@ export const ReferenceTab = () => {
           }
 
           for (const errorObject of validationErrors) {
-            nextFieldsWithErrors[String(errorObject.name)] = errorObject
+            nextFieldsWithErrors[String(errorObject.field ?? errorObject.name)] = errorObject
           }
 
           return nextFieldsWithErrors

@@ -132,7 +132,7 @@ export const TimeUnitTab = () => {
       )}
       <ArrayFrame array={timeUnit} title="Time Unit" />
       <>
-        <Grouped title="Upper Bound" error={'up_bnd' in fieldsWithErrors}>
+        <Grouped title="Upper Bound" error={'up_bound' in fieldsWithErrors}>
           {!mode.read && (
             <Box display="flex" gap={1} marginBottom={'15px'}>
               <EditingForm<TimeBound, TimeUnitDetailsType>
@@ -158,7 +158,7 @@ export const TimeUnitTab = () => {
           )}
           <ArrayFrame array={upBound} title={'Selected Upper Bound'} />
         </Grouped>
-        <Grouped title="Lower Bound" error={'low_bnd' in fieldsWithErrors}>
+        <Grouped title="Lower Bound" error={'low_bound' in fieldsWithErrors}>
           {!mode.read && (
             <Box display="flex" gap={1} marginBottom={'15px'}>
               <EditingForm<TimeBound, TimeUnitDetailsType>
