@@ -1,194 +1,201 @@
 import { taxonStatusOptions } from '../taxonStatusOptions'
 import { EditDataType, SpeciesDetailsType } from '../types'
-import { Validators, validator } from './validator'
+import { Validators, validateFields, validator } from './validator'
 
 const isEmptyUniqIdentifier = (unique_identifier: string) => {
   if (unique_identifier === '' || unique_identifier === '-') return true
   return false
 }
 
+const validatePositiveInteger = (name: string, value: number) => {
+  if (!Number.isInteger(value) || value < 1) return `${name} must be a positive integer.`
+  return
+}
+
+const validateNonNegativeInteger = (name: string, value: number) => {
+  if (!Number.isInteger(value) || value < 0) return `${name} must be a non-negative integer.`
+  return
+}
+
+const validateIntegerInRange = (name: string, value: number, min: number, max: number) => {
+  if (!Number.isInteger(value)) return `${name} must be a whole number.`
+  if (value < min || value > max) return `${name} must be between ${min} and ${max}.`
+  return
+}
+
+const createSpeciesValidators = (
+  editData: EditDataType<SpeciesDetailsType>
+): Validators<Partial<EditDataType<SpeciesDetailsType>>> => ({
+  subclass_or_superorder_name: {
+    name: 'Subclass or Superorder',
+    asString: (subClassName: string) => {
+      if (subClassName.indexOf(' ') !== -1) return 'Subclass must not contain any spaces.'
+      if (subClassName.indexOf('/') !== -1 && editData.taxonomic_status !== 'informal species')
+        return 'Subclass must not contain a forward slash (/), unless Taxonomic Status is set to "informal species".'
+      return
+    },
+  },
+  order_name: {
+    name: 'Order',
+    required: true,
+    asString: (orderName: string) => {
+      if (orderName !== 'incertae sedis' && orderName.indexOf(' ') !== -1)
+        return 'Order must not contain any spaces, unless the value is "incertae sedis".'
+      if (orderName.indexOf('/') !== -1 && editData.taxonomic_status !== 'informal species')
+        return 'Order must not contain a forward slash (/), unless Taxonomic Status is set to "informal species".'
+      return
+    },
+  },
+  suborder_or_superfamily_name: {
+    name: 'Suborder or Superfamily',
+    asString: (subOrderName: string) => {
+      if (subOrderName.indexOf(' ') !== -1) return 'Suborder must not contain any spaces.'
+      if (subOrderName.indexOf('/') !== -1 && editData.taxonomic_status !== 'informal species')
+        return 'Suborder must not contain a forward slash (/), unless Taxonomic Status is set to "informal species".'
+      return
+    },
+  },
+  family_name: {
+    name: 'Family',
+    required: true,
+    asString: (familyName: string) => {
+      if (familyName !== 'incertae sedis' && familyName.indexOf(' ') !== -1)
+        return 'Family must not contain any spaces, unless the value is "incertae sedis".'
+      if (familyName !== 'indet.' && editData.order_name === 'indet.')
+        return 'when the Family is indet., Genus must also be indet.'
+      if (familyName.indexOf('/') !== -1 && editData.taxonomic_status !== 'informal species')
+        return 'Family must not contain a forward slash (/), unless Taxonomic Status is set to "informal species".'
+      return
+    },
+  },
+  subfamily_name: {
+    name: 'Subfamily or Tribe',
+    asString: (subFamilyName: string) => {
+      if (subFamilyName.indexOf(' ') !== -1) return 'Subfamily must not contain any spaces.'
+      if (subFamilyName.indexOf('/') !== -1 && editData.taxonomic_status !== 'informal species')
+        return 'Subfamily must not contain a forward slash (/), unless Taxonomic Status is set to "informal species".'
+      return
+    },
+  },
+  genus_name: {
+    name: 'Genus',
+    required: true,
+    asString: (genusName: string) => {
+      if (genusName.indexOf(' ') !== -1) return 'Genus must not contain any spaces.'
+      if (genusName !== 'indet.' && editData.family_name === 'indet.')
+        return 'when the Family is indet., Genus must also be indet.'
+      if (genusName !== 'gen.' && editData.family_name === 'fam.') return 'when the Family is fam., Genus must be gen.'
+      if (genusName.indexOf('/') !== -1 && editData.taxonomic_status !== 'informal species')
+        return 'Genus must not contain a forward slash (/), unless Taxonomic Status is set to "informal species".'
+      return
+    },
+  },
+  species_name: {
+    name: 'Species',
+    required: true,
+    asString: (speciesName: string) => {
+      if (speciesName.indexOf(' ') !== -1) return 'Species name must not contain any spaces.'
+      if (speciesName !== 'indet.' && editData.genus_name === 'indet.')
+        return 'when the Genus is indet., Species must also be indet.'
+      if (speciesName !== 'sp.' && editData.genus_name === 'gen.') return 'when the Genus is gen., Species must be sp.'
+      if (speciesName.indexOf('/') !== -1 && editData.taxonomic_status !== 'informal species')
+        return 'Species must not contain a forward slash (/), unless Taxonomic Status is set to "informal species".'
+      return
+    },
+  },
+  taxonomic_status: {
+    name: 'Taxonomic Status',
+    asString: (taxonomicStatus: string) => {
+      const allowedTaxonStatuses = taxonStatusOptions
+        .slice(1)
+        .filter((option): option is string => typeof option === 'string')
+
+      if (!allowedTaxonStatuses.includes(taxonomicStatus) && taxonomicStatus !== '')
+        return `Taxonomic Status must be one of the following (or left empty): ${allowedTaxonStatuses.join(', ')}.`
+      return
+    },
+  },
+  body_mass: {
+    name: 'Body Mass (g)',
+    asNumber: (value: number) => validatePositiveInteger('Body Mass (g)', value),
+  },
+  brain_mass: {
+    name: 'Brain Mass (g)',
+    asNumber: (value: number) => validatePositiveInteger('Brain Mass (g)', value),
+  },
+  mw_or_low: {
+    name: 'Cusp Relief Low (OR%)',
+    asNumber: (value: number) => validateIntegerInRange('Cusp Relief Low (OR%)', value, 0, 100),
+  },
+  mw_or_high: {
+    name: 'Cusp Relief High (OR%)',
+    asNumber: (value: number) => validateIntegerInRange('Cusp Relief High (OR%)', value, 0, 100),
+  },
+  mw_cs_sharp: {
+    name: 'Cusp Shape Sharp (CS%)',
+    asNumber: (value: number) => validateIntegerInRange('Cusp Shape Sharp (CS%)', value, 0, 100),
+  },
+  mw_cs_round: {
+    name: 'Cusp Shape Rounded (CS%)',
+    asNumber: (value: number) => validateIntegerInRange('Cusp Shape Rounded (CS%)', value, 0, 100),
+  },
+  mw_cs_blunt: {
+    name: 'Cusp Shape Blunt (CS%)',
+    asNumber: (value: number) => validateIntegerInRange('Cusp Shape Blunt (CS%)', value, 0, 100),
+  },
+
+  mw_scale_min: {
+    name: 'Scale Minimum',
+    asNumber: (value: number) => {
+      const nonNegativeError = validateNonNegativeInteger('Scale Minimum', value)
+      if (nonNegativeError) return nonNegativeError
+      if (typeof editData.mw_scale_max === 'number' && value > editData.mw_scale_max)
+        return 'Scale Minimum cannot be greater than Scale Maximum.'
+      return
+    },
+  },
+  mw_scale_max: {
+    name: 'Scale Maximum',
+    asNumber: (value: number) => {
+      const nonNegativeError = validateNonNegativeInteger('Scale Maximum', value)
+      if (nonNegativeError) return nonNegativeError
+      if (typeof editData.mw_scale_min === 'number' && value < editData.mw_scale_min)
+        return 'Scale Maximum cannot be less than Scale Minimum.'
+      return
+    },
+  },
+  mw_value: {
+    name: 'Reported Value',
+    asNumber: (value: number) => {
+      if (value < 0) return 'Reported Value cannot be negative.'
+      if (typeof editData.mw_scale_min === 'number' && value < editData.mw_scale_min)
+        return 'Reported Value must be between Scale Minimum and Scale Maximum.'
+      if (typeof editData.mw_scale_max === 'number' && value > editData.mw_scale_max)
+        return 'Reported Value must be between Scale Minimum and Scale Maximum.'
+      return
+    },
+  },
+  unique_identifier: {
+    name: 'Unique Identifier',
+    required: true,
+    asString: (uniqueIdentifier: string) => {
+      if (editData.species_name === 'sp.' && isEmptyUniqIdentifier(uniqueIdentifier ?? ''))
+        return 'when the species is sp., Unique Identifier must have a value.'
+      return
+    },
+  },
+})
+
 export const validateSpecies = (
   editData: EditDataType<SpeciesDetailsType>,
   fieldName: keyof EditDataType<SpeciesDetailsType>
 ) => {
-  const validatePositiveInteger = (name: string, value: number) => {
-    if (!Number.isInteger(value) || value < 1) return `${name} must be a positive integer.`
-    return
-  }
-
-  const validateNonNegativeInteger = (name: string, value: number) => {
-    if (!Number.isInteger(value) || value < 0) return `${name} must be a non-negative integer.`
-    return
-  }
-
-  const validateIntegerInRange = (name: string, value: number, min: number, max: number) => {
-    if (!Number.isInteger(value)) return `${name} must be a whole number.`
-    if (value < min || value > max) return `${name} must be between ${min} and ${max}.`
-    return
-  }
-
-  const validators: Validators<Partial<EditDataType<SpeciesDetailsType>>> = {
-    subclass_or_superorder_name: {
-      name: 'Subclass or Superorder',
-      asString: (subClassName: string) => {
-        if (subClassName.indexOf(' ') !== -1) return 'Subclass must not contain any spaces.'
-        if (subClassName.indexOf('/') !== -1 && editData.taxonomic_status !== 'informal species')
-          return 'Subclass must not contain a forward slash (/), unless Taxonomic Status is set to "informal species".'
-        return
-      },
-    },
-    order_name: {
-      name: 'Order',
-      required: true,
-      asString: (orderName: string) => {
-        if (orderName !== 'incertae sedis' && orderName.indexOf(' ') !== -1)
-          return 'Order must not contain any spaces, unless the value is "incertae sedis".'
-        if (orderName.indexOf('/') !== -1 && editData.taxonomic_status !== 'informal species')
-          return 'Order must not contain a forward slash (/), unless Taxonomic Status is set to "informal species".'
-        return
-      },
-    },
-    suborder_or_superfamily_name: {
-      name: 'Suborder or Superfamily',
-      asString: (subOrderName: string) => {
-        if (subOrderName.indexOf(' ') !== -1) return 'Suborder must not contain any spaces.'
-        if (subOrderName.indexOf('/') !== -1 && editData.taxonomic_status !== 'informal species')
-          return 'Suborder must not contain a forward slash (/), unless Taxonomic Status is set to "informal species".'
-        return
-      },
-    },
-    family_name: {
-      name: 'Family',
-      required: true,
-      asString: (familyName: string) => {
-        if (familyName !== 'incertae sedis' && familyName.indexOf(' ') !== -1)
-          return 'Family must not contain any spaces, unless the value is "incertae sedis".'
-        if (familyName !== 'indet.' && editData.order_name === 'indet.')
-          return 'when the Family is indet., Genus must also be indet.'
-        if (familyName.indexOf('/') !== -1 && editData.taxonomic_status !== 'informal species')
-          return 'Family must not contain a forward slash (/), unless Taxonomic Status is set to "informal species".'
-        return
-      },
-    },
-    subfamily_name: {
-      name: 'Subfamily or Tribe',
-      asString: (subFamilyName: string) => {
-        if (subFamilyName.indexOf(' ') !== -1) return 'Subfamily must not contain any spaces.'
-        if (subFamilyName.indexOf('/') !== -1 && editData.taxonomic_status !== 'informal species')
-          return 'Subfamily must not contain a forward slash (/), unless Taxonomic Status is set to "informal species".'
-        return
-      },
-    },
-    genus_name: {
-      name: 'Genus',
-      required: true,
-      asString: (genusName: string) => {
-        if (genusName.indexOf(' ') !== -1) return 'Genus must not contain any spaces.'
-        if (genusName !== 'indet.' && editData.family_name === 'indet.')
-          return 'when the Family is indet., Genus must also be indet.'
-        if (genusName !== 'gen.' && editData.family_name === 'fam.')
-          return 'when the Family is fam., Genus must be gen.'
-        if (genusName.indexOf('/') !== -1 && editData.taxonomic_status !== 'informal species')
-          return 'Genus must not contain a forward slash (/), unless Taxonomic Status is set to "informal species".'
-        return
-      },
-    },
-    species_name: {
-      name: 'Species',
-      required: true,
-      asString: (speciesName: string) => {
-        if (speciesName.indexOf(' ') !== -1) return 'Species name must not contain any spaces.'
-        if (speciesName !== 'indet.' && editData.genus_name === 'indet.')
-          return 'when the Genus is indet., Species must also be indet.'
-        if (speciesName !== 'sp.' && editData.genus_name === 'gen.')
-          return 'when the Genus is gen., Species must be sp.'
-        if (speciesName.indexOf('/') !== -1 && editData.taxonomic_status !== 'informal species')
-          return 'Species must not contain a forward slash (/), unless Taxonomic Status is set to "informal species".'
-        return
-      },
-    },
-    taxonomic_status: {
-      name: 'Taxonomic Status',
-      asString: (taxonomicStatus: string) => {
-        const allowedTaxonStatuses = taxonStatusOptions
-          .slice(1)
-          .filter((option): option is string => typeof option === 'string')
-
-        if (!allowedTaxonStatuses.includes(taxonomicStatus) && taxonomicStatus !== '')
-          return `Taxonomic Status must be one of the following (or left empty): ${allowedTaxonStatuses.join(', ')}.`
-        return
-      },
-    },
-    body_mass: {
-      name: 'Body Mass (g)',
-      asNumber: (value: number) => validatePositiveInteger('Body Mass (g)', value),
-    },
-    brain_mass: {
-      name: 'Brain Mass (g)',
-      asNumber: (value: number) => validatePositiveInteger('Brain Mass (g)', value),
-    },
-    mw_or_low: {
-      name: 'Cusp Relief Low (OR%)',
-      asNumber: (value: number) => validateIntegerInRange('Cusp Relief Low (OR%)', value, 0, 100),
-    },
-    mw_or_high: {
-      name: 'Cusp Relief High (OR%)',
-      asNumber: (value: number) => validateIntegerInRange('Cusp Relief High (OR%)', value, 0, 100),
-    },
-    mw_cs_sharp: {
-      name: 'Cusp Shape Sharp (CS%)',
-      asNumber: (value: number) => validateIntegerInRange('Cusp Shape Sharp (CS%)', value, 0, 100),
-    },
-    mw_cs_round: {
-      name: 'Cusp Shape Rounded (CS%)',
-      asNumber: (value: number) => validateIntegerInRange('Cusp Shape Rounded (CS%)', value, 0, 100),
-    },
-    mw_cs_blunt: {
-      name: 'Cusp Shape Blunt (CS%)',
-      asNumber: (value: number) => validateIntegerInRange('Cusp Shape Blunt (CS%)', value, 0, 100),
-    },
-
-    mw_scale_min: {
-      name: 'Scale Minimum',
-      asNumber: (value: number) => {
-        const nonNegativeError = validateNonNegativeInteger('Scale Minimum', value)
-        if (nonNegativeError) return nonNegativeError
-        if (typeof editData.mw_scale_max === 'number' && value > editData.mw_scale_max)
-          return 'Scale Minimum cannot be greater than Scale Maximum.'
-        return
-      },
-    },
-    mw_scale_max: {
-      name: 'Scale Maximum',
-      asNumber: (value: number) => {
-        const nonNegativeError = validateNonNegativeInteger('Scale Maximum', value)
-        if (nonNegativeError) return nonNegativeError
-        if (typeof editData.mw_scale_min === 'number' && value < editData.mw_scale_min)
-          return 'Scale Maximum cannot be less than Scale Minimum.'
-        return
-      },
-    },
-    mw_value: {
-      name: 'Reported Value',
-      asNumber: (value: number) => {
-        if (value < 0) return 'Reported Value cannot be negative.'
-        if (typeof editData.mw_scale_min === 'number' && value < editData.mw_scale_min)
-          return 'Reported Value must be between Scale Minimum and Scale Maximum.'
-        if (typeof editData.mw_scale_max === 'number' && value > editData.mw_scale_max)
-          return 'Reported Value must be between Scale Minimum and Scale Maximum.'
-        return
-      },
-    },
-    unique_identifier: {
-      name: 'Unique Identifier',
-      required: true,
-      asString: (uniqueIdentifier: string) => {
-        if (editData.species_name === 'sp.' && isEmptyUniqIdentifier(uniqueIdentifier ?? ''))
-          return 'when the species is sp., Unique Identifier must have a value.'
-        return
-      },
-    },
-  }
-
+  const validators = createSpeciesValidators(editData)
   return validator<EditDataType<SpeciesDetailsType>>(validators, editData, fieldName)
 }
+
+export const validateSpeciesFields = (editData: Partial<EditDataType<SpeciesDetailsType>>) =>
+  validateFields<EditDataType<SpeciesDetailsType>>(
+    createSpeciesValidators(editData as EditDataType<SpeciesDetailsType>),
+    editData
+  )

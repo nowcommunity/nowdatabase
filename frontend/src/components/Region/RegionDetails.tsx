@@ -5,7 +5,7 @@ import { DetailView, TabType } from '../DetailView/DetailView'
 import { CoordinatorTab } from './Tabs/CoordinatorTab'
 import { EditDataType, RegionDetails as RegionDetailsType, ValidationErrors } from '@/shared/types'
 import { useNotify } from '@/hooks/notification'
-import { validateRegion } from '@/shared/validators/region'
+import { validateRegion, validateRegionFields } from '@/shared/validators/region'
 import { useEffect } from 'react'
 import { emptyRegion } from '../DetailView/common/defaultValues'
 
@@ -66,6 +66,7 @@ export const RegionDetails = () => {
       data={isNew ? emptyRegion : data!}
       onWrite={onWrite}
       validator={validateRegion}
+      validateFields={validateRegionFields}
       deleteFunction={deleteFunction}
     />
   )

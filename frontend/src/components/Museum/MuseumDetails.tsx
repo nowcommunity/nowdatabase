@@ -2,7 +2,7 @@ import { useEditMuseumMutation, useGetMuseumDetailsQuery } from '../../redux/mus
 import { DetailView, TabType } from '../DetailView/DetailView'
 import { MuseumInfoTab } from './Tabs/MuseumInfoTab'
 import { emptyMuseum } from '../DetailView/common/defaultValues'
-import { validateMuseum } from '@/shared/validators/museum'
+import { validateMuseum, validateMuseumFields } from '@/shared/validators/museum'
 import { useNavigate, useParams } from 'react-router-dom'
 import { CircularProgress } from '@mui/material'
 import { Museum, EditDataType, ValidationErrors } from '@/shared/types'
@@ -58,6 +58,7 @@ export const MuseumDetails = ({
       onWrite={onWrite}
       isNew={isNew}
       validator={validateMuseum}
+      validateFields={validateMuseumFields}
       deleteFunction={undefined}
       wrapWithUnsavedChangesProvider={wrapWithUnsavedChangesProvider}
     />

@@ -1,5 +1,5 @@
 import { EditDataType, RegionCoordinator, RegionCountry, RegionDetails } from '../types'
-import { Validators, validator, ValidationError } from './validator'
+import { Validators, validateFields, validator, ValidationError } from './validator'
 
 const countryCheck = (countries: EditDataType<RegionCountry[]>) => {
   for (const country of countries) {
@@ -21,29 +21,32 @@ const coordinatorCheck = (coordinators: EditDataType<RegionCoordinator[]>) => {
   }
   return null as ValidationError
 }
-export const validateRegion = (editData: EditDataType<RegionDetails>, fieldName: keyof EditDataType<RegionDetails>) => {
-  const validators: Validators<Partial<EditDataType<RegionDetails>>> = {
-    reg_coord_id: {
-      name: 'reg_coord_id',
-      required: true,
+const regionValidators: Validators<Partial<EditDataType<RegionDetails>>> = {
+  reg_coord_id: {
+    name: 'reg_coord_id',
+    required: true,
+  },
+  region: {
+    name: 'Region',
+    required: true,
+    asString: value => {
+      if (value.trim().length === 0) return 'Region name must not be empty'
+      return null
     },
-    region: {
-      name: 'Region',
-      required: true,
-      asString: value => {
-        if (value.trim().length === 0) return 'Region name must not be empty'
-        return null
-      },
-    },
-    now_reg_coord_country: {
-      name: 'Countries',
-      miscArray: countryCheck,
-    },
-    now_reg_coord_people: {
-      name: 'Region Coordinators',
-      miscArray: coordinatorCheck,
-    },
-  }
-
-  return validator<EditDataType<RegionDetails>>(validators, editData, fieldName)
+  },
+  now_reg_coord_country: {
+    name: 'Countries',
+    miscArray: countryCheck,
+  },
+  now_reg_coord_people: {
+    name: 'Region Coordinators',
+    miscArray: coordinatorCheck,
+  },
 }
+
+export const validateRegion = (editData: EditDataType<RegionDetails>, fieldName: keyof EditDataType<RegionDetails>) => {
+  return validator<EditDataType<RegionDetails>>(regionValidators, editData, fieldName)
+}
+
+export const validateRegionFields = (editData: Partial<EditDataType<RegionDetails>>) =>
+  validateFields<EditDataType<RegionDetails>>(regionValidators, editData)
