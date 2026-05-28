@@ -58,12 +58,21 @@ describe('entity full-field validators', () => {
       expect.arrayContaining([
         { name: 'Name', error: 'This field is required' },
         { name: 'Sequence', error: 'This field is required' },
-        { name: 'New Upper Bound', error: 'This field is required' },
-        { name: 'New Lower Bound', error: 'This field is required' },
         { name: 'Upper Bound', error: 'This field is required' },
         { name: 'Lower Bound', error: 'This field is required' },
       ])
     )
+  })
+
+  it('does not require Time Unit helper bound ids when resolved bounds exist', () => {
+    const errors = validateTimeUnitFields({
+      tu_display_name: 'Test time unit',
+      sequence: 'ALMA',
+      up_bound: { bid: 11, b_name: 'C2N-y', age: 4.37, b_comment: '' },
+      low_bound: { bid: 14, b_name: 'C2N-o', age: 4.631, b_comment: '' },
+    })
+
+    expect(errors).toEqual([])
   })
 
   it('reports missing simple entity required fields', () => {

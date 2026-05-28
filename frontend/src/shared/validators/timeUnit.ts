@@ -14,7 +14,6 @@ const createTimeUnitValidators = (
   },
   up_bnd: {
     name: 'New Upper Bound',
-    required: true,
     asNumber: (num: number) => {
       if (num === editData.low_bnd) return 'Upper and lower bounds cannot be the same'
       return
@@ -22,7 +21,6 @@ const createTimeUnitValidators = (
   },
   low_bnd: {
     name: 'New Lower Bound',
-    required: true,
     asNumber: (num: number) => {
       if (num === editData.up_bnd) return 'Upper and lower bounds cannot be the same'
       return
