@@ -135,6 +135,7 @@ export type DetailContextType<T> = {
     optionalRadioSelectionProps?: OptionalRadioSelectionProps
   ) => JSX.Element
   validator: (editData: EditDataType<T>, field: keyof EditDataType<T>) => ValidationObject
+  validateFields?: (editData: EditDataType<T>) => ValidationObject[]
   fieldsWithErrors: FieldsWithErrorsType
   setFieldsWithErrors: SetFieldsWithErrorsType
   isDirty: boolean
@@ -211,6 +212,9 @@ export const DetailContextProvider = <T extends object>({
         markEditDataClean,
         validator: (editData: unknown, fieldName: keyof EditDataType<T>) =>
           contextState.validator(editData as EditDataType<T>, fieldName),
+        validateFields: contextState.validateFields
+          ? (editData: unknown) => contextState.validateFields?.(editData as EditDataType<T>) ?? []
+          : undefined,
       }}
     >
       {children}

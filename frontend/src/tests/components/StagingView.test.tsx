@@ -75,6 +75,7 @@ jest.mock('@/components/Reference/Tabs/ReferenceTab', () => ({
 
 jest.mock('@/shared/validators/reference', () => ({
   createReferenceValidatorWithLabels: () => (_editData: unknown, field: string) => ({ name: field, error: null }),
+  createReferenceFieldsValidatorWithLabels: () => () => [],
 }))
 
 jest.mock('@/hooks/notification', () => ({

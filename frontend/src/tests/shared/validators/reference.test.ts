@@ -1,6 +1,9 @@
 import { describe, expect, it, jest } from '@jest/globals'
 
-import { createReferenceValidatorWithLabels } from '@/shared/validators/reference'
+import {
+  createReferenceFieldsValidatorWithLabels,
+  createReferenceValidatorWithLabels,
+} from '@/shared/validators/reference'
 import type { EditDataType, ReferenceDetailsType } from '@/shared/types'
 
 const createReferenceDetails = (
@@ -83,6 +86,24 @@ describe('validateReference display labels', () => {
     const result = validator(createReferenceDetails({ ref_type_id: 4, title_primary: '', gen_notes: '' }), 'gen_notes')
 
     expect(result.error).toBe('At least one of the following fields is required: Subject, Notes')
+  })
+})
+
+describe('validateReferenceFields', () => {
+  it('runs validators for configured fields missing from editData', () => {
+    const validateFields = createReferenceFieldsValidatorWithLabels()
+
+    const errors = validateFields({
+      ref_type_id: 1,
+      title_primary: 'Article title',
+    } as EditDataType<ReferenceDetailsType>)
+
+    expect(errors).toEqual(
+      expect.arrayContaining([
+        { name: 'date_primary', error: 'This field is required' },
+        { name: 'ref_authors', error: 'This field is required' },
+      ])
+    )
   })
 })
 

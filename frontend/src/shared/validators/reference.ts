@@ -1,5 +1,5 @@
 import { EditDataType, ReferenceDetailsType, ReferenceAuthorType, ReferenceJournalType } from '../types'
-import { Validators, validator, ValidationError } from './validator'
+import { Validators, validateFields, validator, ValidationError } from './validator'
 
 const authorCheck: (data: ReferenceAuthorType[]) => ValidationError = (data: ReferenceAuthorType[]) => {
   if (data.length === 0) {
@@ -173,109 +173,122 @@ const orCheck = (
   return null
 }
 
+const createReferenceValidators = (
+  editData: EditDataType<ReferenceDetailsType>,
+  options?: ReferenceValidationOptions
+): Validators<Partial<EditDataType<ReferenceDetailsType>>> => ({
+  title_primary: {
+    name: 'title_primary',
+    useEditData: true,
+    miscCheck: (obj: object) => {
+      return orCheck(obj as EditDataType<ReferenceDetailsType>, 'title_primary', options)
+    },
+  },
+  title_secondary: {
+    name: 'title_secondary',
+    useEditData: true,
+    miscCheck: (obj: object) => {
+      return orCheck(obj as EditDataType<ReferenceDetailsType>, 'title_secondary', options)
+    },
+  },
+  title_series: {
+    name: 'title_series',
+    useEditData: true,
+    miscCheck: (obj: object) => {
+      return orCheck(obj as EditDataType<ReferenceDetailsType>, 'title_series', options)
+    },
+  },
+  gen_notes: {
+    name: 'gen_notes',
+    useEditData: true,
+    miscCheck: (obj: object) => {
+      return orCheck(obj as EditDataType<ReferenceDetailsType>, 'gen_notes', options)
+    },
+  },
+  ref_type_id: {
+    name: 'ref_type_id',
+    required: true,
+    asNumber: true,
+  },
+  date_primary: {
+    name: 'date_primary',
+    required: true,
+    asNumber: yearCheck,
+    condition: (data: Partial<EditDataType<ReferenceDetailsType>>) => {
+      const ids: number[] = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14]
+      return data.ref_type_id != null && ids.includes(data.ref_type_id)
+    },
+  },
+  start_page: {
+    name: 'start_page',
+    required: false,
+    asNumber: (num: number) => positiveIntegerCheck('start_page', num),
+  },
+  end_page: {
+    name: 'end_page',
+    required: false,
+    asNumber: (num: number) => {
+      const base = positiveIntegerCheck('end_page', num)
+      if (base) return base
+      if (typeof editData.start_page === 'number' && num < editData.start_page) {
+        return 'end_page must be greater than or equal to start_page'
+      }
+      return null
+    },
+  },
+  date_secondary: {
+    name: 'date_secondary',
+    required: false,
+    asNumber: yearCheck,
+  },
+  ref_authors: {
+    name: 'ref_authors',
+    required: true,
+    minLength: 1,
+    miscArray: authorCheck,
+    condition: (data: Partial<EditDataType<ReferenceDetailsType>>) => {
+      const ids: number[] = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14]
+      return data.ref_type_id != null && ids.includes(data.ref_type_id)
+    },
+  },
+  ref_journal: {
+    name: 'ref_journal',
+    miscCheck: journalCheck,
+    condition: (data: Partial<EditDataType<ReferenceDetailsType>>) => {
+      const ids: number[] = [1, 5, 14]
+      return data.ref_type_id != null && ids.includes(data.ref_type_id)
+    },
+  },
+  exact_date: {
+    name: 'exact_date',
+    required: true,
+    asString: dateCheck,
+    condition: (data: Partial<EditDataType<ReferenceDetailsType>>) => {
+      const ids: number[] = [6, 7, 10, 11, 12, 13, 14]
+      return data.ref_type_id != null && ids.includes(data.ref_type_id)
+    },
+  },
+})
+
 export const validateReference = (
   editData: EditDataType<ReferenceDetailsType>,
   fieldName: keyof EditDataType<ReferenceDetailsType>,
   options?: ReferenceValidationOptions
 ) => {
-  const validators: Validators<Partial<EditDataType<ReferenceDetailsType>>> = {
-    title_primary: {
-      name: 'title_primary',
-      useEditData: true,
-      miscCheck: (obj: object) => {
-        return orCheck(obj as EditDataType<ReferenceDetailsType>, 'title_primary', options)
-      },
-    },
-    title_secondary: {
-      name: 'title_secondary',
-      useEditData: true,
-      miscCheck: (obj: object) => {
-        return orCheck(obj as EditDataType<ReferenceDetailsType>, 'title_secondary', options)
-      },
-    },
-    title_series: {
-      name: 'title_series',
-      useEditData: true,
-      miscCheck: (obj: object) => {
-        return orCheck(obj as EditDataType<ReferenceDetailsType>, 'title_series', options)
-      },
-    },
-    gen_notes: {
-      name: 'gen_notes',
-      useEditData: true,
-      miscCheck: (obj: object) => {
-        return orCheck(obj as EditDataType<ReferenceDetailsType>, 'gen_notes', options)
-      },
-    },
-    ref_type_id: {
-      name: 'ref_type_id',
-      required: true,
-      asNumber: true,
-    },
-    date_primary: {
-      name: 'date_primary',
-      required: true,
-      asNumber: yearCheck,
-      condition: (data: Partial<EditDataType<ReferenceDetailsType>>) => {
-        const ids: number[] = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14]
-        return data.ref_type_id != null && ids.includes(data.ref_type_id)
-      },
-    },
-    start_page: {
-      name: 'start_page',
-      required: false,
-      asNumber: (num: number) => positiveIntegerCheck('start_page', num),
-    },
-    end_page: {
-      name: 'end_page',
-      required: false,
-      asNumber: (num: number) => {
-        const base = positiveIntegerCheck('end_page', num)
-        if (base) return base
-        if (typeof editData.start_page === 'number' && num < editData.start_page) {
-          return 'end_page must be greater than or equal to start_page'
-        }
-        return null
-      },
-    },
-    date_secondary: {
-      name: 'date_secondary',
-      required: false,
-      asNumber: yearCheck,
-    },
-    ref_authors: {
-      name: 'ref_authors',
-      required: true,
-      minLength: 1,
-      miscArray: authorCheck,
-      condition: (data: Partial<EditDataType<ReferenceDetailsType>>) => {
-        const ids: number[] = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14]
-        return data.ref_type_id != null && ids.includes(data.ref_type_id)
-      },
-    },
-    ref_journal: {
-      name: 'ref_journal',
-      miscCheck: journalCheck,
-      condition: (data: Partial<EditDataType<ReferenceDetailsType>>) => {
-        const ids: number[] = [1, 5, 14]
-        return data.ref_type_id != null && ids.includes(data.ref_type_id)
-      },
-    },
-    exact_date: {
-      name: 'exact_date',
-      required: true,
-      asString: dateCheck,
-      condition: (data: Partial<EditDataType<ReferenceDetailsType>>) => {
-        const ids: number[] = [6, 7, 10, 11, 12, 13, 14]
-        return data.ref_type_id != null && ids.includes(data.ref_type_id)
-      },
-    },
-  }
-
+  const validators = createReferenceValidators(editData, options)
   return validator<EditDataType<ReferenceDetailsType>>(validators, editData, fieldName)
 }
+
+export const validateReferenceFields = (
+  editData: EditDataType<ReferenceDetailsType>,
+  options?: ReferenceValidationOptions
+) => validateFields<EditDataType<ReferenceDetailsType>>(createReferenceValidators(editData, options), editData)
 
 export const createReferenceValidatorWithLabels =
   (displayLabelMap?: ReferenceDisplayLabelMap) =>
   (editData: EditDataType<ReferenceDetailsType>, fieldName: keyof EditDataType<ReferenceDetailsType>) =>
     validateReference(editData, fieldName, { displayLabelMap })
+
+export const createReferenceFieldsValidatorWithLabels =
+  (displayLabelMap?: ReferenceDisplayLabelMap) => (editData: EditDataType<ReferenceDetailsType>) =>
+    validateReferenceFields(editData, { displayLabelMap })

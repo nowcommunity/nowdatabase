@@ -42,6 +42,7 @@ export const WriteButton = <T,>({
     mode,
     setMode,
     validator,
+    validateFields,
     fieldsWithErrors,
     setFieldsWithErrors,
     isDirty,
@@ -108,10 +109,27 @@ export const WriteButton = <T,>({
 
   useEffect(() => {
     if (mode.option === 'edit' || mode.option === 'new') {
-      for (const field in editData) {
-        const fieldAsString = String(field)
-        const errorObject = validator(editData, field)
-        checkFieldErrors(fieldAsString, errorObject, fieldsWithErrors, setFieldsWithErrors)
+      if (validateFields) {
+        const validationErrors = validateFields(editData)
+        setFieldsWithErrors(prevFieldsWithErrors => {
+          const nextFieldsWithErrors = { ...prevFieldsWithErrors }
+
+          for (const field of Object.keys(nextFieldsWithErrors)) {
+            if (field !== 'mandatoryReference') delete nextFieldsWithErrors[field]
+          }
+
+          for (const errorObject of validationErrors) {
+            nextFieldsWithErrors[String(errorObject.name)] = errorObject
+          }
+
+          return nextFieldsWithErrors
+        })
+      } else {
+        for (const field in editData) {
+          const fieldAsString = String(field)
+          const errorObject = validator(editData, field)
+          checkFieldErrors(fieldAsString, errorObject, fieldsWithErrors, setFieldsWithErrors)
+        }
       }
     }
     if (mode.staging == true) {
