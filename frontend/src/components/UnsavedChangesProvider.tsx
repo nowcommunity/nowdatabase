@@ -72,8 +72,8 @@ export const UnsavedChangesProvider = ({
 
   const handleConfirm = useCallback(() => {
     if (blocker.state === 'blocked') {
-      setDirty(false)
       blocker.proceed?.()
+      setDirty(false)
     }
   }, [blocker, setDirty])
 
@@ -91,7 +91,7 @@ export const UnsavedChangesProvider = ({
 
   useEffect(() => {
     const proceed = blocker.proceed as (() => void) | undefined
-    if (isSamePathNavigation && proceed) {
+    if (isSamePathNavigation && proceed && blocker.state === 'blocked') {
       proceed()
     }
   }, [blocker, isSamePathNavigation])
