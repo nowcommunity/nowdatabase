@@ -113,11 +113,9 @@ export const LocalitiesMap = ({ localities, isFetching }: Props) => {
   useEffect(() => {
     if (!map || !countryPolygons || !borderLayerRef.current) return
 
-    if (borderLayerRef.current.getLayers().length > 0) return
+    borderLayerRef.current.clearLayers()
 
     countryPolygons.forEach(countryBorder => {
-      L.polygon(countryBorder as LatLngExpression[], { color: 'gray', weight: 1 }).addTo(map)
-
       const polygon = L.polygon(countryBorder as LatLngExpression[], {
         color: '#136f94',
         fillOpacity: 0.3,
