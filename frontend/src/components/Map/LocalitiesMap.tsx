@@ -1,7 +1,6 @@
 import { useGetLocalityDetailsQuery } from '../../redux/localityReducer'
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import 'leaflet/dist/leaflet.css'
-import { countryPolygons } from '../../country_data/countryPolygons.ts'
 import L, { LatLngExpression } from 'leaflet'
 import { SimplifiedLocality } from '../../shared/types/data.js'
 import { skipToken } from '@reduxjs/toolkit/query'
@@ -34,6 +33,51 @@ export const LocalitiesMap = ({ localities, isFetching }: Props) => {
     selectedLocality ?? skipToken
   )
 
+  // Lazy load country polygons to avoid blocking the main thread with 4.4MB of data
+  const [countryPolygons, setCountryPolygons] = useState<unknown[] | null>(null)
+
+  useEffect(() => {
+    // Dynamically import country polygons to avoid blocking on initial load
+    void import('../../country_data/countryPolygons.ts').then(module => {
+      setCountryPolygons(module.countryPolygons)
+    })
+  }, [])
+
+  const addCountryBorders = useCallback(
+    (mapInstance: L.Map) => {
+      if (!countryPolygons) return
+
+      // Create a polygon layer for the country borders that is in layer control panel.
+      const borderLayer = L.layerGroup()
+      countryPolygons.forEach(countryBorder => {
+        L.polygon(countryBorder as LatLngExpression[], { color: 'gray', weight: 1 }).addTo(mapInstance)
+
+        const polygon = L.polygon(countryBorder as LatLngExpression[], {
+          color: '#136f94',
+          fillOpacity: 0.3,
+          weight: 1,
+        })
+        borderLayer.addLayer(polygon)
+      })
+
+      const baseMaps = {
+        OpenTopoMap: L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', {
+          attribution: 'Map data: © <a href="https://opentopomap.org">OpenTopoMap</a> (CC-BY-SA)',
+          noWrap: true,
+        }).addTo(mapInstance),
+        OpenStreetMap: L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+          attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+          noWrap: true,
+        }),
+        Countries: borderLayer,
+      }
+
+      // Layer control
+      L.control.layers(baseMaps, {}, { position: 'topright' }).addTo(mapInstance)
+    },
+    [countryPolygons]
+  )
+
   useEffect(() => {
     if (!mapRef.current) return
 
@@ -46,43 +90,19 @@ export const LocalitiesMap = ({ localities, isFetching }: Props) => {
     // ---- Base maps ----
 
     // OpenTopoMap
-    const topomap = L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', {
+    L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', {
       attribution: 'Map data: © <a href="https://opentopomap.org">OpenTopoMap</a> (CC-BY-SA)',
       noWrap: true,
     }).addTo(mapInstance)
 
     // OpenStreetMap
-    const osm = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
       noWrap: true,
     })
 
-    // ---- Layers on top of base maps ----
-
-    // Create a polygon layer for the country borders that is in layer control panel.
-    const borderLayer = L.layerGroup()
-    countryPolygons.forEach(countryBorder => {
-      L.polygon(countryBorder as LatLngExpression[], { color: 'gray', weight: 1 }).addTo(mapInstance)
-
-      const polygon = L.polygon(countryBorder as LatLngExpression[], {
-        color: '#136f94',
-        fillOpacity: 0.3,
-        weight: 1,
-      })
-      borderLayer.addLayer(polygon)
-    })
-
-    const baseMaps = {
-      OpenTopoMap: topomap,
-      OpenStreetMap: osm,
-      Countries: borderLayer,
-    }
-
     // Scale bar
     L.control.scale({ position: 'bottomright' }).addTo(mapInstance)
-
-    // Layer control
-    L.control.layers(baseMaps, {}, { position: 'topright' }).addTo(mapInstance)
 
     // North-arrow
     const northArrowControl = L.Control.extend({
@@ -96,10 +116,13 @@ export const LocalitiesMap = ({ localities, isFetching }: Props) => {
     const northArrow = new northArrowControl({ position: 'bottomright' })
     northArrow.addTo(mapInstance)
 
+    // Add country borders once they're loaded
+    addCountryBorders(mapInstance)
+
     return () => {
       mapInstance.remove()
     }
-  }, [])
+  }, [addCountryBorders])
 
   useEffect(() => {
     if (!map || isFetching) return
