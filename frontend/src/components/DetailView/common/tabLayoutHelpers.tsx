@@ -5,6 +5,7 @@ import { isValidElement, ReactNode } from 'react'
 import { useDetailContext } from '../Context/DetailContext'
 import { EditDataType } from '@/shared/types'
 import { getFieldInfoText } from '@/shared/fieldInfo'
+import { FieldUpdateHistory } from './FieldUpdateHistory'
 
 const getFieldFromNode = (node: ReactNode): string | undefined => {
   if (!isValidElement(node)) return undefined
@@ -31,6 +32,7 @@ const FieldLabel = ({ label, field }: { label: string; field?: string }) => {
           </IconButton>
         </Tooltip>
       )}
+      {field && <FieldUpdateHistory field={field} label={label} />}
     </Box>
   )
 }
