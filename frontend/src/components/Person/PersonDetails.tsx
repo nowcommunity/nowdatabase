@@ -11,7 +11,7 @@ import { PersonTab } from './Tabs/PersonTab'
 import { PersonRelationsTab } from './Tabs/PersonRelationsTab'
 import { useUser } from '@/hooks/user'
 import { EditDataType, PersonDetailsType, Role, ValidationErrors } from '@/shared/types'
-import { validatePerson } from '@/shared/validators/person'
+import { validatePerson, validatePersonFields } from '@/shared/validators/person'
 import { useNotify } from '@/hooks/notification'
 import { useEffect } from 'react'
 import { emptyPerson } from '../DetailView/common/defaultValues'
@@ -127,6 +127,7 @@ export const PersonDetails = () => {
       tabs={tabs}
       data={isNew ? emptyPerson : data!}
       validator={validatePerson}
+      validateFields={validatePersonFields}
       deleteFunction={deleteFunction}
     />
   )

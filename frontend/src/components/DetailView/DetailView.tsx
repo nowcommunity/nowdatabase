@@ -108,6 +108,7 @@ export const DetailView = <T extends object>({
   data,
   onWrite,
   validator,
+  validateFields,
   isNew = false,
   isUserPage = false,
   isPersonPage = false,
@@ -124,6 +125,7 @@ export const DetailView = <T extends object>({
     markEditDataClean?: (editData?: EditDataType<T>) => void
   ) => Promise<WriteResult>
   validator: (editData: EditDataType<T>, field: keyof EditDataType<T>) => ValidationObject
+  validateFields?: (editData: EditDataType<T>) => ValidationObject[]
   isNew?: boolean
   isUserPage?: boolean
   isPersonPage?: boolean
@@ -193,6 +195,7 @@ export const DetailView = <T extends object>({
     radioSelection,
     bigTextField,
     validator,
+    validateFields,
     fieldsWithErrors,
     setFieldsWithErrors,
   }

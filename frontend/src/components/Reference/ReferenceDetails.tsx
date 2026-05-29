@@ -13,6 +13,7 @@ import {
 import { EditDataType, ReferenceDetailsType } from '@/shared/types'
 import { emptyReference } from '../DetailView/common/defaultValues'
 import {
+  createReferenceFieldsValidatorWithLabels,
   createReferenceValidatorWithLabels,
   ReferenceFieldDisplayNames,
   ReferenceDisplayLabelMap,
@@ -82,6 +83,10 @@ export const ReferenceDetails = ({
     () => createReferenceValidatorWithLabels(referenceFieldDisplayLabelMap),
     [referenceFieldDisplayLabelMap]
   )
+  const validateReferenceFields = useMemo(
+    () => createReferenceFieldsValidatorWithLabels(referenceFieldDisplayLabelMap),
+    [referenceFieldDisplayLabelMap]
+  )
 
   useEffect(() => {
     if (deleteSuccess) {
@@ -138,6 +143,7 @@ export const ReferenceDetails = ({
       data={isNew ? emptyReference : data!}
       onWrite={onWrite}
       validator={referenceValidator}
+      validateFields={validateReferenceFields}
       deleteFunction={deleteFunction}
       wrapWithUnsavedChangesProvider={wrapWithUnsavedChangesProvider}
     />

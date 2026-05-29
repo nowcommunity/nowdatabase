@@ -22,6 +22,7 @@ import type { DropdownOption } from './common/editingComponents'
 import type { FieldsWithErrorsType, OptionalRadioSelectionProps, TextFieldOptions } from './DetailView'
 import type { ValidationObject } from '@/shared/validators/validator'
 import {
+  createReferenceFieldsValidatorWithLabels,
   createReferenceValidatorWithLabels,
   ReferenceDisplayLabelMap,
   ReferenceFieldDisplayNames,
@@ -32,16 +33,13 @@ import { formatReferenceValidationErrorMessage } from '@/components/Reference/re
 const NewReferenceDialogContent = ({
   onClose,
   onCreated,
-  referenceValidator,
+  validateReferenceFields,
   referenceFieldDisplayLabelMap,
   referenceTypes,
 }: {
   onClose: () => void
   onCreated: (reference: ReferenceDetailsType) => void
-  referenceValidator: (
-    editData: EditDataType<ReferenceDetailsType>,
-    field: keyof EditDataType<ReferenceDetailsType>
-  ) => ValidationObject
+  validateReferenceFields: (editData: EditDataType<ReferenceDetailsType>) => ValidationObject[]
   referenceFieldDisplayLabelMap?: ReferenceDisplayLabelMap
   referenceTypes?: ReferenceType[]
 }) => {
@@ -52,12 +50,8 @@ const NewReferenceDialogContent = ({
   const validateAllFields = () => {
     const nextFieldsWithErrors: FieldsWithErrorsType = {}
 
-    for (const field in editData) {
-      const fieldKey = field as keyof EditDataType<ReferenceDetailsType>
-      const errorObject = referenceValidator(editData, fieldKey)
-      if (errorObject.error) {
-        nextFieldsWithErrors[String(fieldKey)] = errorObject
-      }
+    for (const errorObject of validateReferenceFields(editData)) {
+      nextFieldsWithErrors[String(errorObject.field ?? errorObject.name)] = errorObject
     }
 
     setFieldsWithErrors(() => nextFieldsWithErrors)
@@ -136,6 +130,10 @@ const NewReferenceDialog = ({
     () => createReferenceValidatorWithLabels(referenceFieldDisplayLabelMap),
     [referenceFieldDisplayLabelMap]
   )
+  const validateReferenceFields = useMemo(
+    () => createReferenceFieldsValidatorWithLabels(referenceFieldDisplayLabelMap),
+    [referenceFieldDisplayLabelMap]
+  )
 
   const textField = (field: keyof EditDataType<ReferenceDetailsType>, options?: TextFieldOptions) => (
     <EditableTextField<ReferenceDetailsType> field={field} {...options} />
@@ -193,6 +191,7 @@ const NewReferenceDialog = ({
             radioSelection,
             bigTextField,
             validator: referenceValidator,
+            validateFields: validateReferenceFields,
             fieldsWithErrors,
             setFieldsWithErrors,
           }}
@@ -200,7 +199,7 @@ const NewReferenceDialog = ({
           <NewReferenceDialogContent
             onClose={onClose}
             onCreated={onCreated}
-            referenceValidator={referenceValidator}
+            validateReferenceFields={validateReferenceFields}
             referenceFieldDisplayLabelMap={referenceFieldDisplayLabelMap}
             referenceTypes={referenceTypes}
           />

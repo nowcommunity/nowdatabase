@@ -8,28 +8,55 @@ import { JournalTab } from './JournalTab'
 import { useEffect } from 'react'
 
 export const ReferenceTab = () => {
-  const { dropdown, data, editData, mode, textField, bigTextField, fieldsWithErrors, validator, setFieldsWithErrors } =
-    useDetailContext<ReferenceDetailsType>()
+  const {
+    dropdown,
+    data,
+    editData,
+    mode,
+    textField,
+    bigTextField,
+    fieldsWithErrors,
+    validator,
+    validateFields,
+    setFieldsWithErrors,
+  } = useDetailContext<ReferenceDetailsType>()
   const { data: referenceTypes } = useGetReferenceTypesQuery()
 
   useEffect(() => {
     if (mode.option === 'edit' || mode.option === 'new') {
-      for (const field in editData) {
-        const fieldAsKey = field as keyof typeof editData
-        const fieldAsString = String(fieldAsKey)
-        const errorObject = validator(editData, fieldAsKey)
-        if (errorObject.error) {
-          if (!(fieldAsString in fieldsWithErrors)) {
+      if (validateFields) {
+        const validationErrors = validateFields(editData)
+        setFieldsWithErrors(prevFieldsWithErrors => {
+          const nextFieldsWithErrors = { ...prevFieldsWithErrors }
+
+          for (const field of Object.keys(nextFieldsWithErrors)) {
+            if (field !== 'mandatoryReference') delete nextFieldsWithErrors[field]
+          }
+
+          for (const errorObject of validationErrors) {
+            nextFieldsWithErrors[String(errorObject.field ?? errorObject.name)] = errorObject
+          }
+
+          return nextFieldsWithErrors
+        })
+      } else {
+        for (const field in editData) {
+          const fieldAsKey = field as keyof typeof editData
+          const fieldAsString = String(fieldAsKey)
+          const errorObject = validator(editData, fieldAsKey)
+          if (errorObject.error) {
+            if (!(fieldAsString in fieldsWithErrors)) {
+              setFieldsWithErrors(prevFieldsWithErrors => {
+                return { ...prevFieldsWithErrors, [fieldAsString]: errorObject }
+              })
+            }
+          } else if (!errorObject.error && fieldAsString in fieldsWithErrors) {
             setFieldsWithErrors(prevFieldsWithErrors => {
-              return { ...prevFieldsWithErrors, [fieldAsString]: errorObject }
+              const newFieldsWithErrors = { ...prevFieldsWithErrors }
+              delete newFieldsWithErrors[fieldAsString]
+              return newFieldsWithErrors
             })
           }
-        } else if (!errorObject.error && fieldAsString in fieldsWithErrors) {
-          setFieldsWithErrors(prevFieldsWithErrors => {
-            const newFieldsWithErrors = { ...prevFieldsWithErrors }
-            delete newFieldsWithErrors[fieldAsString]
-            return newFieldsWithErrors
-          })
         }
       }
     }

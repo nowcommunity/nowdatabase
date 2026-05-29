@@ -12,7 +12,7 @@ import { TaxonomyTab } from './Tabs/TaxonomyTab'
 import { TeethTab } from './Tabs/TeethTab'
 import { UpdateTab } from '../DetailView/common/UpdateTab'
 import { EditDataType, SpeciesDetailsType, ValidationErrors } from '@/shared/types'
-import { validateSpecies } from '@/shared/validators/species'
+import { validateSpecies, validateSpeciesFields } from '@/shared/validators/species'
 import { emptySpecies } from '../DetailView/common/defaultValues'
 import { useNotify } from '@/hooks/notification'
 import { useEffect, useState } from 'react'
@@ -124,6 +124,7 @@ export const SpeciesDetails = ({
       taxonomy={true}
       hasStagingMode
       validator={validateSpecies}
+      validateFields={validateSpeciesFields}
       deleteFunction={deleteFunction}
       wrapWithUnsavedChangesProvider={wrapWithUnsavedChangesProvider}
     />

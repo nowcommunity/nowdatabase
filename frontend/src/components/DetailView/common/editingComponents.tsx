@@ -557,10 +557,8 @@ export const TimeBoundSelection = ({
 }) => {
   const { editData, setEditData, validator, fieldsWithErrors, setFieldsWithErrors } =
     useDetailContext<TimeUnitDetailsType>()
-  const errorObject = validator(
-    editData,
-    (targetField === 'up_bnd' ? 'up_bound' : 'low_bound') as keyof EditDataType<TimeUnitDetailsType>
-  )
+  const boundField = (targetField === 'up_bnd' ? 'up_bound' : 'low_bound') as keyof EditDataType<TimeUnitDetailsType>
+  const errorObject = validator(editData, boundField)
   const [open, setOpen] = useState(false)
 
   const selectorFn = (selected: TimeBoundDetailsType) => {
@@ -573,7 +571,7 @@ export const TimeBoundSelection = ({
   }
 
   useEffect(() => {
-    checkFieldErrors(String(targetField), errorObject, fieldsWithErrors, setFieldsWithErrors)
+    checkFieldErrors(String(boundField), errorObject, fieldsWithErrors, setFieldsWithErrors)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [errorObject])
 

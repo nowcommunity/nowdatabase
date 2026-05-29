@@ -1,64 +1,72 @@
 import { EditDataType, TimeUnitDetailsType } from '../types'
-import { Validators, validator } from './validator'
+import { Validators, validateFields, validator } from './validator'
+
+const createTimeUnitValidators = (
+  editData: EditDataType<TimeUnitDetailsType>
+): Validators<EditDataType<Partial<TimeUnitDetailsType>>> => ({
+  tu_display_name: {
+    name: 'Name',
+    required: true,
+  },
+  sequence: {
+    name: 'Sequence',
+    required: true,
+  },
+  up_bnd: {
+    name: 'New Upper Bound',
+    asNumber: (num: number) => {
+      if (num === editData.low_bnd) return 'Upper and lower bounds cannot be the same'
+      return
+    },
+  },
+  low_bnd: {
+    name: 'New Lower Bound',
+    asNumber: (num: number) => {
+      if (num === editData.up_bnd) return 'Upper and lower bounds cannot be the same'
+      return
+    },
+  },
+  up_bound: {
+    name: 'Upper Bound',
+    required: () =>
+      editData.up_bnd !== undefined && editData.up_bnd !== null
+        ? `Upper bound with ID ${editData.up_bnd} does not exist`
+        : 'This field is required',
+    miscCheck: () => {
+      if (editData.low_bound && editData.low_bound.age! === editData.up_bound!.age!) {
+        return 'Upper bound age cannot be the same as lower bound age'
+      }
+      if (editData.low_bound && editData.low_bound.age! < editData.up_bound!.age!) {
+        return 'Upper bound age has to be lower than lower bound age'
+      }
+      return
+    },
+  },
+  low_bound: {
+    name: 'Lower Bound',
+    required: () =>
+      editData.low_bnd !== undefined && editData.low_bnd !== null
+        ? `Lower bound with ID ${editData.low_bnd} does not exist`
+        : 'This field is required',
+    miscCheck: () => {
+      if (editData.up_bound && editData.up_bound.age! === editData.low_bound!.age!) {
+        return 'Lower bound age cannot be the same as upper bound age'
+      }
+      if (editData.up_bound && editData.up_bound.age! > editData.low_bound!.age!) {
+        return 'Lower bound age has to be higher than upper bound age'
+      }
+      return
+    },
+  },
+})
 
 export const validateTimeUnit = (editData: EditDataType<TimeUnitDetailsType>, fieldName: keyof TimeUnitDetailsType) => {
-  const validators: Validators<EditDataType<Partial<TimeUnitDetailsType>>> = {
-    tu_display_name: {
-      name: 'Name',
-      required: true,
-    },
-    sequence: {
-      name: 'Sequence',
-      required: true,
-    },
-    up_bnd: {
-      name: 'New Upper Bound',
-      required: true,
-      asNumber: (num: number) => {
-        if (num === editData.low_bnd) return 'Upper and lower bounds cannot be the same'
-        return
-      },
-    },
-    low_bnd: {
-      name: 'New Lower Bound',
-      required: true,
-      asNumber: (num: number) => {
-        if (num === editData.up_bnd) return 'Upper and lower bounds cannot be the same'
-        return
-      },
-    },
-    up_bound: {
-      name: 'Upper Bound',
-      required: () =>
-        editData.up_bnd !== undefined && editData.up_bnd !== null
-          ? `Upper bound with ID ${editData.up_bnd} does not exist`
-          : 'This field is required',
-      miscCheck: () => {
-        if (editData.low_bound && editData.low_bound.age! === editData.up_bound!.age!) {
-          return 'Upper bound age cannot be the same as lower bound age'
-        }
-        if (editData.low_bound && editData.low_bound.age! < editData.up_bound!.age!) {
-          return 'Upper bound age has to be lower than lower bound age'
-        }
-        return
-      },
-    },
-    low_bound: {
-      name: 'Lower Bound',
-      required: () =>
-        editData.low_bnd !== undefined && editData.low_bnd !== null
-          ? `Lower bound with ID ${editData.low_bnd} does not exist`
-          : 'This field is required',
-      miscCheck: () => {
-        if (editData.up_bound && editData.up_bound.age! === editData.low_bound!.age!) {
-          return 'Lower bound age cannot be the same as upper bound age'
-        }
-        if (editData.up_bound && editData.up_bound.age! > editData.low_bound!.age!) {
-          return 'Lower bound age has to be higher than upper bound age'
-        }
-        return
-      },
-    },
-  }
+  const validators = createTimeUnitValidators(editData)
   return validator<EditDataType<TimeUnitDetailsType>>(validators, editData, fieldName)
 }
+
+export const validateTimeUnitFields = (editData: Partial<EditDataType<TimeUnitDetailsType>>) =>
+  validateFields<EditDataType<TimeUnitDetailsType>>(
+    createTimeUnitValidators(editData as EditDataType<TimeUnitDetailsType>),
+    editData
+  )

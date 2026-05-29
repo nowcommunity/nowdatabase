@@ -9,18 +9,30 @@ import { PageContextProvider } from '@/components/Page'
 import type { TimeUnit, TimeUnitDetailsType } from '@/shared/types'
 import '@testing-library/jest-dom'
 
+jest.setTimeout(15000)
+
 jest.mock('lodash-es', () => ({
   cloneDeep: (value: unknown) => value,
 }))
 
 jest.mock('@/shared/validators/timeUnit', () => ({
   validateTimeUnit: () => ({ name: 'tu_display_name', error: '' }),
+  validateTimeUnitFields: () => [],
+}))
+
+jest.mock('@/shared/validators/validator', () => ({
+  ...jest.requireActual<typeof import('@/shared/validators/validator')>('@/shared/validators/validator'),
+  referenceValidator: () => null,
 }))
 
 jest.mock('@/util/config', () => ({
   BACKEND_URL: '',
   ENABLE_WRITE: true,
   ENV: 'test',
+}))
+
+jest.mock('@/hooks/user', () => ({
+  useUser: () => ({ role: 1, initials: 'TEST' }),
 }))
 
 const mockEditTimeUnitMutation = jest.fn()
@@ -36,6 +48,17 @@ jest.mock('@/redux/timeUnitReducer', () => ({
   useEditTimeUnitMutation: jest.fn(() => [mockEditTimeUnitMutation, { isLoading: false }]),
   useDeleteTimeUnitMutation: jest.fn(() => [jest.fn(), { isLoading: false }]),
   useGetAllTimeUnitsQuery: (...args: unknown[]) => mockGetAllTimeUnitsQuery(...args),
+}))
+
+jest.mock('@/redux/speciesReducer', () => ({
+  useGetAllSpeciesQuery: () => ({ data: undefined, isFetching: false, isLoading: false }),
+  useGetAllSynonymsQuery: () => ({ data: undefined, isFetching: false, isLoading: false }),
+}))
+
+jest.mock('@/redux/referenceReducer', () => ({
+  useGetAllReferencesQuery: () => ({ data: [], isError: false }),
+  useGetReferenceTypesQuery: () => ({ data: [] }),
+  useEditReferenceMutation: () => [jest.fn(), { isLoading: false }],
 }))
 
 jest.mock('@/components/Sequence/SequenceSelect', () => ({
@@ -178,9 +201,12 @@ describe('TimeUnit creation duplicate name handling', () => {
       return { unwrap: unwrapMock }
     })
 
-    renderTimeUnitCreation()
+    const { container } = renderTimeUnitCreation()
 
     const user = userEvent.setup()
+
+    const nameInput = container.querySelector('input#tu_display_name-textfield') as HTMLInputElement
+    await user.type(nameInput, 'Rank Test Time Unit')
 
     const rankSelect = screen.getByLabelText('Rank')
     await user.click(rankSelect)

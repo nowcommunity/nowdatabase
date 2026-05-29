@@ -167,6 +167,7 @@ jest.mock('@/util/taxonomyUtilities', () => ({
 
 jest.mock('@/shared/validators/species', () => ({
   validateSpecies: jest.fn(() => ({ name: '', error: null })),
+  validateSpeciesFields: jest.fn(() => []),
 }))
 
 const mockUseDetailContext = useDetailContext as jest.MockedFunction<() => DetailContextType<LocalityDetailsType>>

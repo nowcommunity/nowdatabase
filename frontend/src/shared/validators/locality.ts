@@ -1,5 +1,5 @@
 import { EditDataType, LocalityDetailsType } from '../types'
-import { Validators, validator } from './validator'
+import { Validators, validateFields, validator } from './validator'
 import { validCountries } from './countryList'
 
 const pollenFields = ['pers_pollen_ap', 'pers_pollen_nap', 'pers_pollen_other'] as const
@@ -58,10 +58,9 @@ const validatePollenRecordTotal = (editData: Partial<EditDataType<LocalityDetail
   return
 }
 
-export const validateLocality = (
-  editData: EditDataType<LocalityDetailsType>,
-  fieldName: keyof EditDataType<LocalityDetailsType>
-) => {
+const createLocalityValidators = (
+  editData: EditDataType<LocalityDetailsType>
+): Validators<Partial<EditDataType<LocalityDetailsType>>> => {
   const isAbsoluteDatingMethod = editData.date_meth === 'absolute'
   const isTimeUnitDatingMethod = editData.date_meth === 'time_unit'
   const isCompositeDatingMethod = editData.date_meth === 'composite'
@@ -80,7 +79,7 @@ export const validateLocality = (
 
   const compositeDatingMethodRequiredText = 'One age row must follow the rules for Absolute, the other for Time Unit'
 
-  const validators: Validators<Partial<EditDataType<LocalityDetailsType>>> = {
+  return {
     // const isNew = editData.lid === undefined
     date_meth: {
       name: 'Dating method',
@@ -266,6 +265,18 @@ export const validateLocality = (
       asString: (value: string) => validateFraction('Maximum fraction', value),
     },
   }
+}
 
+export const validateLocality = (
+  editData: EditDataType<LocalityDetailsType>,
+  fieldName: keyof EditDataType<LocalityDetailsType>
+) => {
+  const validators = createLocalityValidators(editData)
   return validator<EditDataType<LocalityDetailsType>>(validators, editData, fieldName)
 }
+
+export const validateLocalityFields = (editData: Partial<EditDataType<LocalityDetailsType>>) =>
+  validateFields<EditDataType<LocalityDetailsType>>(
+    createLocalityValidators(editData as EditDataType<LocalityDetailsType>),
+    editData
+  )

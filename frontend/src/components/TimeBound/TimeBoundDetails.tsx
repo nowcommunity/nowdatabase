@@ -13,7 +13,7 @@ import { UpdateTab } from '../DetailView/common/UpdateTab'
 import { DetailView, TabType } from '../DetailView/DetailView'
 import { BoundTab } from './Tabs/BoundTab'
 import { TimeUnitTab } from './Tabs/TimeUnitTab.tsx'
-import { validateTimeBound } from '@/shared/validators/timeBound'
+import { validateTimeBound, validateTimeBoundFields } from '@/shared/validators/timeBound'
 
 export const TimeBoundDetails = ({
   wrapWithUnsavedChangesProvider = true,
@@ -108,6 +108,7 @@ export const TimeBoundDetails = ({
       isNew={isNew}
       onWrite={onWrite}
       validator={validateTimeBound}
+      validateFields={validateTimeBoundFields}
       deleteFunction={deleteFunction}
       wrapWithUnsavedChangesProvider={wrapWithUnsavedChangesProvider}
     />

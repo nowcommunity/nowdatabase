@@ -18,7 +18,7 @@ import { ProjectTab } from './Tabs/ProjectTab'
 import { SpeciesTab } from './Tabs/SpeciesTab'
 import { TaphonomyTab } from './Tabs/TaphonomyTab'
 import { EditDataType, LocalityDetailsType, ValidationErrors } from '@/shared/types'
-import { validateLocality } from '@/shared/validators/locality'
+import { validateLocality, validateLocalityFields } from '@/shared/validators/locality'
 import { UpdateTab } from '../DetailView/common/UpdateTab'
 import { emptyLocality } from '../DetailView/common/defaultValues'
 import { useNotify } from '@/hooks/notification'
@@ -164,6 +164,7 @@ export const LocalityDetails = ({
       isNew={isNew}
       onWrite={onWrite}
       validator={validateLocality}
+      validateFields={validateLocalityFields}
       deleteFunction={deleteFunction}
       hasStagingMode
       wrapWithUnsavedChangesProvider={wrapWithUnsavedChangesProvider}

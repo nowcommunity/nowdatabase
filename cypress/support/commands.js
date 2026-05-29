@@ -82,8 +82,9 @@ Cypress.Commands.add('pageForbidden', url => {
 })
 
 Cypress.Commands.add('resetDatabase', () => {
-  cy.task('waitForDbHealthy')
-  cy.request(Cypress.env('databaseResetUrl')).its('status').should('eq', 200)
+  const dbWaitTimeoutMs = Number(Cypress.env('dbWaitTimeoutMs') ?? 30000)
+  cy.task('waitForDbHealthy', undefined, { timeout: dbWaitTimeoutMs })
+  cy.request({ url: Cypress.env('databaseResetUrl'), timeout: dbWaitTimeoutMs }).its('status').should('eq', 200)
 })
 
 // Optimized database reset that only resets once per test file
@@ -118,9 +119,14 @@ Cypress.Commands.add('loginWithSession', (username) => {
     })
   }, {
     validate: () => {
-      // Validate the session is still valid by checking for the username box
-      cy.visit('/')
-      cy.contains('.username-box', username, { timeout: 10000 }).should('be.visible')
+      cy.window().should(window => {
+        const storedUserState = window.localStorage.getItem('userState')
+        expect(storedUserState, 'stored user state').to.not.be.null
+
+        const parsedUserState = JSON.parse(storedUserState)
+        expect(parsedUserState?.username, 'stored username').to.eq(username)
+        expect(parsedUserState?.token, 'stored login token').to.be.a('string').and.not.be.empty
+      })
     },
   })
 })

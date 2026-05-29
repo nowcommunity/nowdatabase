@@ -13,7 +13,7 @@ import { DetailView, TabType } from '../DetailView/DetailView'
 import { LocalityTab } from './Tabs/LocalityTab'
 import { TimeUnitTab } from './Tabs/TimeUnitTab'
 import { TimeUnitUpdateTab } from './Tabs/TimeUnitUpdateTab'
-import { validateTimeUnit } from '@/shared/validators/timeUnit'
+import { validateTimeUnit, validateTimeUnitFields } from '@/shared/validators/timeUnit'
 import { makeEditData } from '../DetailView/Context/DetailContext'
 import { useDeleteTimeUnit } from '@/hooks/useDeleteTimeUnit'
 import { getApiErrorMessage, isDuplicateNameError } from '@/utils/api'
@@ -112,6 +112,7 @@ export const TimeUnitDetails = ({
       data={isNew ? emptyTimeUnit : data!}
       onWrite={onWrite}
       validator={validateTimeUnit}
+      validateFields={validateTimeUnitFields}
       deleteFunction={deleteFunction}
       wrapWithUnsavedChangesProvider={wrapWithUnsavedChangesProvider}
     />
