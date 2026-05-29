@@ -1,17 +1,11 @@
 import { useRouteError } from 'react-router-dom'
 
+import { ENV } from '@/util/config'
+import { getRouterErrorMessage } from './RouterErrorMessages'
+
 export const RouterError = () => {
   const error = useRouteError()
-
-  // Handle different error types that useRouteError can return
-  const errorMessage =
-    error instanceof Error
-      ? error.message
-      : error instanceof Response
-        ? `${error.status} ${error.statusText}`
-        : typeof error === 'string'
-          ? error
-          : 'An unknown error occurred'
+  const errorMessage = getRouterErrorMessage(error, ENV === 'dev')
 
   return (
     <div style={styles.container}>
