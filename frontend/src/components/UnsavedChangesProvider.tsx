@@ -91,7 +91,7 @@ export const UnsavedChangesProvider = ({
 
   useEffect(() => {
     const proceed = blocker.proceed as (() => void) | undefined
-    if (isSamePathNavigation && proceed && blocker.state === 'blocked') {
+    if (isSamePathNavigation && proceed) {
       proceed()
     }
   }, [blocker, isSamePathNavigation])
