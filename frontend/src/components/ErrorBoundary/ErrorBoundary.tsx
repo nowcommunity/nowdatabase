@@ -26,6 +26,9 @@ export class ErrorBoundary extends Component<Props, State> {
 
   public render(): ReactNode {
     if (this.state.hasError) {
+      // Only show error details in development mode to avoid leaking implementation details
+      const isDev = import.meta.env.DEV
+
       return (
         <div style={styles.container}>
           <h1 style={styles.heading}>Something went wrong</h1>
@@ -33,7 +36,7 @@ export class ErrorBoundary extends Component<Props, State> {
           <button style={styles.button} onClick={() => window.location.reload()}>
             Reload Application
           </button>
-          {this.state.error && (
+          {isDev && this.state.error && (
             <details style={styles.details}>
               <summary style={styles.summary}>Error Details</summary>
               <pre style={styles.pre}>{this.state.error.toString()}</pre>
