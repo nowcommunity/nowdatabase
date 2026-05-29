@@ -1,5 +1,5 @@
 import { useGetLocalityDetailsQuery } from '../../redux/localityReducer'
-import { useState, useEffect, useRef, useCallback } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import 'leaflet/dist/leaflet.css'
 import L, { LatLngExpression } from 'leaflet'
 import { SimplifiedLocality } from '../../shared/types/data.js'
@@ -24,6 +24,7 @@ export const LocalitiesMap = ({ localities, isFetching }: Props) => {
   const [selectedLocality, setSelectedLocality] = useState<string | null>(null)
   const mapRef = useRef<HTMLDivElement | null>(null)
   const [map, setMap] = useState<L.Map | null>(null)
+  const borderLayerRef = useRef<L.LayerGroup | null>(null)
   const [isOpen, setIsOpen] = useState(false)
   const [localityDetailsIsOpen, setLocalityDetailsIsOpen] = useState(false)
   const [clusteringEnabled, setClusteringEnabled] = useState(true)
@@ -37,46 +38,21 @@ export const LocalitiesMap = ({ localities, isFetching }: Props) => {
   const [countryPolygons, setCountryPolygons] = useState<unknown[] | null>(null)
 
   useEffect(() => {
+    let mounted = true
+
     // Dynamically import country polygons to avoid blocking on initial load
-    void import('../../country_data/countryPolygons.ts').then(module => {
-      setCountryPolygons(module.countryPolygons)
-    })
-  }, [])
-
-  const addCountryBorders = useCallback(
-    (mapInstance: L.Map) => {
-      if (!countryPolygons) return
-
-      // Create a polygon layer for the country borders that is in layer control panel.
-      const borderLayer = L.layerGroup()
-      countryPolygons.forEach(countryBorder => {
-        L.polygon(countryBorder as LatLngExpression[], { color: 'gray', weight: 1 }).addTo(mapInstance)
-
-        const polygon = L.polygon(countryBorder as LatLngExpression[], {
-          color: '#136f94',
-          fillOpacity: 0.3,
-          weight: 1,
-        })
-        borderLayer.addLayer(polygon)
+    void import('../../country_data/countryPolygons.ts')
+      .then(module => {
+        if (mounted) setCountryPolygons(module.countryPolygons)
+      })
+      .catch(() => {
+        if (mounted) setCountryPolygons([])
       })
 
-      const baseMaps = {
-        OpenTopoMap: L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', {
-          attribution: 'Map data: © <a href="https://opentopomap.org">OpenTopoMap</a> (CC-BY-SA)',
-          noWrap: true,
-        }).addTo(mapInstance),
-        OpenStreetMap: L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-          attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-          noWrap: true,
-        }),
-        Countries: borderLayer,
-      }
-
-      // Layer control
-      L.control.layers(baseMaps, {}, { position: 'topright' }).addTo(mapInstance)
-    },
-    [countryPolygons]
-  )
+    return () => {
+      mounted = false
+    }
+  }, [])
 
   useEffect(() => {
     if (!mapRef.current) return
@@ -90,19 +66,31 @@ export const LocalitiesMap = ({ localities, isFetching }: Props) => {
     // ---- Base maps ----
 
     // OpenTopoMap
-    L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', {
+    const topomap = L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', {
       attribution: 'Map data: © <a href="https://opentopomap.org">OpenTopoMap</a> (CC-BY-SA)',
       noWrap: true,
     }).addTo(mapInstance)
 
     // OpenStreetMap
-    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    const osm = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
       noWrap: true,
     })
 
+    // Create a polygon layer for the country borders that is in layer control panel.
+    const borderLayer = L.layerGroup()
+    borderLayerRef.current = borderLayer
+    const baseMaps = {
+      OpenTopoMap: topomap,
+      OpenStreetMap: osm,
+      Countries: borderLayer,
+    }
+
     // Scale bar
     L.control.scale({ position: 'bottomright' }).addTo(mapInstance)
+
+    // Layer control
+    L.control.layers(baseMaps, {}, { position: 'topright' }).addTo(mapInstance)
 
     // North-arrow
     const northArrowControl = L.Control.extend({
@@ -116,13 +104,28 @@ export const LocalitiesMap = ({ localities, isFetching }: Props) => {
     const northArrow = new northArrowControl({ position: 'bottomright' })
     northArrow.addTo(mapInstance)
 
-    // Add country borders once they're loaded
-    addCountryBorders(mapInstance)
-
     return () => {
+      borderLayerRef.current = null
       mapInstance.remove()
     }
-  }, [addCountryBorders])
+  }, [])
+
+  useEffect(() => {
+    if (!map || !countryPolygons || !borderLayerRef.current) return
+
+    if (borderLayerRef.current.getLayers().length > 0) return
+
+    countryPolygons.forEach(countryBorder => {
+      L.polygon(countryBorder as LatLngExpression[], { color: 'gray', weight: 1 }).addTo(map)
+
+      const polygon = L.polygon(countryBorder as LatLngExpression[], {
+        color: '#136f94',
+        fillOpacity: 0.3,
+        weight: 1,
+      })
+      borderLayerRef.current?.addLayer(polygon)
+    })
+  }, [countryPolygons, map])
 
   useEffect(() => {
     if (!map || isFetching) return
