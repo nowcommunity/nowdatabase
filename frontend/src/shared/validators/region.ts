@@ -25,6 +25,7 @@ const regionValidators: Validators<Partial<EditDataType<RegionDetails>>> = {
   reg_coord_id: {
     name: 'reg_coord_id',
     required: true,
+    condition: editData => 'reg_coord_id' in editData,
   },
   region: {
     name: 'Region',

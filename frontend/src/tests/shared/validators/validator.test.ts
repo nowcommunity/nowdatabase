@@ -93,10 +93,7 @@ describe('entity full-field validators', () => {
     )
 
     expect(validateRegionFields({})).toEqual(
-      expect.arrayContaining([
-        { name: 'reg_coord_id', error: 'This field is required' },
-        { name: 'Region', error: 'This field is required' },
-      ])
+      expect.arrayContaining([{ name: 'Region', error: 'This field is required' }])
     )
   })
 
