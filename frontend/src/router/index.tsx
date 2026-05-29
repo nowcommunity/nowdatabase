@@ -1,5 +1,6 @@
 import { Navigate, createBrowserRouter } from 'react-router-dom'
 import App from '../App'
+import { RouterError } from '../components/ErrorBoundary/RouterError'
 
 const loadPagesElement = async (
   key:
@@ -25,6 +26,7 @@ const router = createBrowserRouter([
   {
     path: '/',
     element: <App />,
+    errorElement: <RouterError />,
     children: [
       {
         index: true,
