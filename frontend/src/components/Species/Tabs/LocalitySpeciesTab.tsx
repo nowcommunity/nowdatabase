@@ -17,6 +17,7 @@ import {
   exportOccurrenceMapSvg,
   getUniqueSpeciesLocalityMapExportLocalities,
 } from '../localitySpeciesMapExport'
+import { EntryUpdateHistory } from '@/components/DetailView/common/FieldUpdateHistory'
 
 const hasMesowearScoreInputs = (row: SpeciesLocality) => {
   return (
@@ -244,6 +245,15 @@ export const LocalitySpeciesTab = () => {
         checkRowRestriction={row => Boolean(row.now_loc?.loc_status)}
         kmlExport={kmlExport}
         svgExport={svgExport}
+        renderReadRowActions={({ row }) => (
+          <EntryUpdateHistory
+            row={row.original}
+            label={`occurrence ${row.original.lid}/${row.original.species_id}`}
+            tableName="now_ls"
+            getRowValue={occurrence => occurrence.lid}
+            getPkValues={occurrence => [occurrence.lid, occurrence.species_id]}
+          />
+        )}
       />
     </Grouped>
   )

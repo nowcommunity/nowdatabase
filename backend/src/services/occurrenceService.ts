@@ -111,6 +111,16 @@ const getOccurrenceLogRows = (rows: RawOccurrenceLogRow[], speciesPk: string): O
   return occurrenceRows
 }
 
+const getOccurrenceLogRowsForKey = (rows: RawOccurrenceLogRow[], lid: number, speciesId: number) => {
+  const lidPk = `${lid.toString().length}.${lid};`
+  const speciesPk = `${speciesId.toString().length}.${speciesId};`
+
+  return getOccurrenceLogRows(
+    rows.filter(row => isOccurrenceLogCandidate(row) && row.pk_data.includes(lidPk)),
+    speciesPk
+  )
+}
+
 type OccurrenceUpdate = {
   occ_date: Date | null
   occ_authorizer: string
@@ -118,6 +128,16 @@ type OccurrenceUpdate = {
   occ_comment: string
   references: AnyReference[]
   updates: OccurrenceLogRow[]
+}
+
+const OCCURRENCE_LOG_QUERY_BATCH_SIZE = 100
+
+const chunkArray = <T>(values: T[], size: number) => {
+  const chunks: T[][] = []
+  for (let index = 0; index < values.length; index += size) {
+    chunks.push(values.slice(index, index + size))
+  }
+  return chunks
 }
 
 const stringifyLogValue = (value: unknown) => {
@@ -170,18 +190,32 @@ const deduplicateOccurrenceUpdates = (updates: OccurrenceUpdate[]) => {
   return Array.from(deduplicated.values())
 }
 
-const getOccurrenceUpdates = async (lid: number, speciesId: number) => {
-  const lidPk = `${lid.toString().length}.${lid};`
-  const speciesPk = `${speciesId.toString().length}.${speciesId};`
+export const getOccurrenceUpdatesForRows = async (keys: Array<{ lid: number; species_id: number }>) => {
+  const uniqueKeys = Array.from(new Map(keys.map(key => [`${key.lid}:${key.species_id}`, key] as const)).values())
 
-  const candidateLogsRaw = await logDb.log.findMany({
-    where: {
-      table_name: 'now_ls',
-      pk_data: { contains: lidPk },
-    },
-  })
+  if (uniqueKeys.length === 0) return new Map<string, OccurrenceUpdate[]>()
 
-  const nowLsLogs = getOccurrenceLogRows(candidateLogsRaw, speciesPk)
+  const uniqueLidPks = Array.from(new Set(uniqueKeys.map(({ lid }) => `${lid.toString().length}.${lid};`)))
+  const candidateLogsRaw: RawOccurrenceLogRow[] = []
+
+  for (const lidPkBatch of chunkArray(uniqueLidPks, OCCURRENCE_LOG_QUERY_BATCH_SIZE)) {
+    candidateLogsRaw.push(
+      ...(await logDb.log.findMany({
+        where: {
+          table_name: 'now_ls',
+          OR: lidPkBatch.map(lidPk => ({ pk_data: { contains: lidPk } })),
+        },
+      }))
+    )
+  }
+
+  const logsByKey = new Map<string, OccurrenceLogRow[]>()
+
+  for (const { lid, species_id: speciesId } of uniqueKeys) {
+    logsByKey.set(`${lid}:${speciesId}`, getOccurrenceLogRowsForKey(candidateLogsRaw, lid, speciesId))
+  }
+
+  const nowLsLogs = Array.from(logsByKey.values()).flat()
 
   const luids = collectUniqueIds(nowLsLogs, 'luid')
   const suids = collectUniqueIds(nowLsLogs, 'suid')
@@ -217,47 +251,67 @@ const getOccurrenceUpdates = async (lid: number, speciesId: number) => {
       : Promise.resolve([]),
   ])
 
+  const localityUpdateById = new Map(localityUpdates.map(update => [update.luid, update] as const))
+  const speciesUpdateById = new Map(speciesUpdates.map(update => [update.suid, update] as const))
+
   const peopleLookup = await buildPersonLookupByInitials([
     ...localityUpdates.flatMap(update => [update.lau_authorizer, update.lau_coordinator]),
     ...speciesUpdates.flatMap(update => [update.sau_authorizer, update.sau_coordinator]),
   ])
 
-  const occurrenceUpdates = deduplicateOccurrenceUpdates([
-    ...localityUpdates.map(update => ({
-      occ_date: update.lau_date,
-      occ_authorizer: getPersonDisplayName(
-        getPersonFromLookup(peopleLookup, update.lau_authorizer),
-        update.lau_authorizer
-      ),
-      occ_coordinator: getPersonDisplayName(
-        getPersonFromLookup(peopleLookup, update.lau_coordinator),
-        update.lau_coordinator
-      ),
-      occ_comment: update.lau_comment ?? '',
-      references: addNullExactDateToReferenceJoins(update.now_lr) as unknown as AnyReference[],
-      updates: nowLsLogs.filter(logRow => logRow.luid === update.luid),
-    })),
-    ...speciesUpdates.map(update => ({
-      occ_date: update.sau_date,
-      occ_authorizer: getPersonDisplayName(
-        getPersonFromLookup(peopleLookup, update.sau_authorizer),
-        update.sau_authorizer
-      ),
-      occ_coordinator: getPersonDisplayName(
-        getPersonFromLookup(peopleLookup, update.sau_coordinator),
-        update.sau_coordinator
-      ),
-      occ_comment: update.sau_comment ?? '',
-      references: addNullExactDateToReferenceJoins(update.now_sr) as unknown as AnyReference[],
-      updates: nowLsLogs.filter(logRow => logRow.suid === update.suid),
-    })),
-  ])
+  const occurrenceUpdatesByKey = new Map<string, OccurrenceUpdate[]>()
 
-  return occurrenceUpdates.sort((a, b) => {
-    const timeA = a.occ_date ? new Date(a.occ_date).getTime() : 0
-    const timeB = b.occ_date ? new Date(b.occ_date).getTime() : 0
-    return timeB - timeA
-  })
+  for (const [key, logs] of logsByKey) {
+    const occurrenceUpdates = deduplicateOccurrenceUpdates([
+      ...Array.from(new Set(logs.map(log => log.luid).filter((luid): luid is number => luid !== null)))
+        .map(luid => localityUpdateById.get(luid))
+        .filter((update): update is NonNullable<typeof update> => Boolean(update))
+        .map(update => ({
+          occ_date: update.lau_date,
+          occ_authorizer: getPersonDisplayName(
+            getPersonFromLookup(peopleLookup, update.lau_authorizer),
+            update.lau_authorizer
+          ),
+          occ_coordinator: getPersonDisplayName(
+            getPersonFromLookup(peopleLookup, update.lau_coordinator),
+            update.lau_coordinator
+          ),
+          occ_comment: update.lau_comment ?? '',
+          references: addNullExactDateToReferenceJoins(update.now_lr) as unknown as AnyReference[],
+          updates: logs.filter(logRow => logRow.luid === update.luid),
+        })),
+      ...Array.from(new Set(logs.map(log => log.suid).filter((suid): suid is number => suid !== null)))
+        .map(suid => speciesUpdateById.get(suid))
+        .filter((update): update is NonNullable<typeof update> => Boolean(update))
+        .map(update => ({
+          occ_date: update.sau_date,
+          occ_authorizer: getPersonDisplayName(
+            getPersonFromLookup(peopleLookup, update.sau_authorizer),
+            update.sau_authorizer
+          ),
+          occ_coordinator: getPersonDisplayName(
+            getPersonFromLookup(peopleLookup, update.sau_coordinator),
+            update.sau_coordinator
+          ),
+          occ_comment: update.sau_comment ?? '',
+          references: addNullExactDateToReferenceJoins(update.now_sr) as unknown as AnyReference[],
+          updates: logs.filter(logRow => logRow.suid === update.suid),
+        })),
+    ]).sort((a, b) => {
+      const timeA = a.occ_date ? new Date(a.occ_date).getTime() : 0
+      const timeB = b.occ_date ? new Date(b.occ_date).getTime() : 0
+      return timeB - timeA
+    })
+
+    occurrenceUpdatesByKey.set(key, occurrenceUpdates)
+  }
+
+  return occurrenceUpdatesByKey
+}
+
+const getOccurrenceUpdates = async (lid: number, speciesId: number) => {
+  const updatesByKey = await getOccurrenceUpdatesForRows([{ lid, species_id: speciesId }])
+  return updatesByKey.get(`${lid}:${speciesId}`) ?? []
 }
 
 export const getOccurrenceByCompositeKey = async (lid: number, speciesId: number, user?: User) => {

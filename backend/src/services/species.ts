@@ -7,6 +7,7 @@ import { logDb, nowDb } from '../utils/db'
 import { getReferenceDetails } from './reference'
 import { buildPersonLookupByInitials, getPersonDisplayName, getPersonFromLookup } from './utils/person'
 import { getIdsOfUsersProjects } from './locality'
+import { getOccurrenceUpdatesForRows } from './occurrenceService'
 
 const TAXONOMIC_FIELDS: Array<keyof Prisma.com_species> = ['genus_name', 'species_name', 'unique_identifier']
 
@@ -236,7 +237,13 @@ export const getSpeciesDetails = async (id: number, user?: User) => {
   })
 
   const filteredLocalities = await filterSpeciesLocalitiesByUser(result.now_ls as SpeciesDetailsType['now_ls'], user)
-  const sanitizedLocalities = stripLocalityProjectLinks(filteredLocalities)
+  const occurrenceUpdatesByKey = await getOccurrenceUpdatesForRows(filteredLocalities)
+  const localitiesWithOccurrenceUpdates = filteredLocalities.map(occurrence => ({
+    ...occurrence,
+    now_oau: (occurrenceUpdatesByKey.get(`${occurrence.lid}:${occurrence.species_id}`) ??
+      []) as unknown as SpeciesDetailsType['now_ls'][number]['now_oau'],
+  }))
+  const sanitizedLocalities = stripLocalityProjectLinks(localitiesWithOccurrenceUpdates)
 
   return fixBigInt({ ...result, now_ls: sanitizedLocalities, com_taxa_synonym: synonyms || [] }) as SpeciesDetailsType
 }

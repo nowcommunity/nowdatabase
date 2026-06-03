@@ -16,6 +16,7 @@ import {
   exportOccurrenceMapSvg,
   getUniqueLocalityOccurrenceMapExportLocalities,
 } from '@/components/Species/localitySpeciesMapExport'
+import { EntryUpdateHistory } from '@/components/DetailView/common/FieldUpdateHistory'
 
 const hasMesowearScoreInputs = (row: LocalitySpecies) => {
   return (
@@ -258,6 +259,15 @@ export const OccurrencesTab = () => {
         getDetailPath={row => `/occurrence/${row.lid}/${row.species_id}`}
         kmlExport={kmlExport}
         svgExport={svgExport}
+        renderReadRowActions={({ row }) => (
+          <EntryUpdateHistory
+            row={row.original}
+            label={`occurrence ${row.original.lid}/${row.original.species_id}`}
+            tableName="now_ls"
+            getRowValue={occurrence => occurrence.species_id}
+            getPkValues={occurrence => [occurrence.lid, occurrence.species_id]}
+          />
+        )}
       />
     </Grouped>
   )

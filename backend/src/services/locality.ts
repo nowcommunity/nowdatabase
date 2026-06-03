@@ -21,6 +21,7 @@ import { validateCollectingMethodValues } from '../utils/validation/collectingMe
 import { buildPersonLookupByInitials, getPersonDisplayName, getPersonFromLookup } from './utils/person'
 import { getReferenceDetails } from './reference'
 import { addNullExactDateToReferenceJoins, referenceWithoutExactDateSelect } from './utils/referenceDate'
+import { getOccurrenceUpdatesForRows } from './occurrenceService'
 
 const normalizeNumberField = (value: unknown) => {
   if (typeof value === 'string') {
@@ -301,6 +302,13 @@ export const getLocalityDetails = async (id: number, user: User | undefined) => 
       if (!result.now_plr.find(proj => usersProjects.has(proj.pid))) throw new AccessError()
     }
   }
+
+  const occurrenceUpdatesByKey = await getOccurrenceUpdatesForRows(result.now_ls)
+  result.now_ls = result.now_ls.map(occurrence => ({
+    ...occurrence,
+    now_oau: (occurrenceUpdatesByKey.get(`${occurrence.lid}:${occurrence.species_id}`) ??
+      []) as unknown as LocalitySpeciesDetailsType['now_oau'],
+  }))
 
   const {
     now_time_unit_now_loc_bfa_minTonow_time_unit: minTimeUnit,
