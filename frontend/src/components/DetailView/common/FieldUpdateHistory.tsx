@@ -1,6 +1,6 @@
 import HistoryIcon from '@mui/icons-material/History'
 import { Box, Card, Divider, IconButton, Popover, Tooltip, Typography } from '@mui/material'
-import { createContext, useContext, useMemo, useState, type Context, type MouseEvent } from 'react'
+import { useContext, useMemo, useState, type Context, type MouseEvent } from 'react'
 import { DetailContext, type DetailContextType } from '@/components/DetailView/Context/DetailContext'
 import type { AnyReference, UpdateLog } from '@/shared/types'
 import { ReferenceList } from './ReferenceList'
@@ -14,15 +14,13 @@ type FieldUpdate = {
   container: UpdateContainer
 }
 
-const SafeDetailContext =
-  (DetailContext as unknown as Context<DetailContextType<Record<string, unknown>> | null> | undefined) ??
-  createContext<DetailContextType<Record<string, unknown>> | null>(null)
+const SafeDetailContext = DetailContext as unknown as Context<DetailContextType<Record<string, unknown>> | null>
 
 const isObject = (value: unknown): value is Record<string, unknown> =>
   typeof value === 'object' && value !== null && !Array.isArray(value)
 
 const isUpdateLog = (value: unknown): value is UpdateLog =>
-  isObject(value) && ('column_name' in value || 'old_data' in value || 'new_data' in value || 'log_action' in value)
+  isObject(value) && 'column_name' in value && 'log_action' in value
 
 const isUpdateContainer = (value: unknown): value is UpdateContainer =>
   isObject(value) && Array.isArray(value.updates) && value.updates.every(isUpdateLog)
@@ -53,19 +51,19 @@ const getFieldUpdates = (data: unknown, field: string): FieldUpdate[] =>
       }))
   )
 
-const formatDate = (value: unknown): string => {
-  if (!value) return 'No date'
-  const date = new Date(value as string | number | Date)
-  if (Number.isNaN(date.getTime())) return formatValue(value)
-  return date.toISOString().split('T')[0]
-}
-
 const formatValue = (value: unknown): string => {
   if (value === null || value === undefined) return ''
   if (typeof value === 'string') return value
   if (typeof value === 'number' || typeof value === 'boolean') return String(value)
   if (value instanceof Date) return value.toISOString()
   return JSON.stringify(value)
+}
+
+const formatDate = (value: unknown): string => {
+  if (!value) return 'No date'
+  const date = new Date(value as string | number | Date)
+  if (Number.isNaN(date.getTime())) return formatValue(value)
+  return date.toISOString().split('T')[0]
 }
 
 const findFirstBySuffix = (container: UpdateContainer, suffix: string): unknown => {
@@ -149,7 +147,7 @@ export const FieldUpdateHistory = ({ field, label }: { field: string; label: str
           {updates.map(({ log, container }, index) => {
             const references = collectReferences(container)
             return (
-              <Card key={`${log.log_id ?? index}-${log.column_name ?? field}`} sx={{ p: 1.5 }}>
+              <Card key={`${index}-${log.log_id ?? ''}-${log.column_name ?? field}`} sx={{ p: 1.5 }}>
                 <Typography variant="body2">
                   <b>Date:</b> {formatDate(getDate(container))}
                 </Typography>

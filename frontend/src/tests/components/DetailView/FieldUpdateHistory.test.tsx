@@ -18,32 +18,38 @@ const reference = {
   },
 }
 
+const detailData = {
+  body_mass: 10,
+  now_sau: [
+    {
+      sau_date: '2026-05-29',
+      sau_authorizer: 'ED',
+      sau_coordinator: 'CO',
+      sau_comment: 'Updated body mass',
+      now_sr: [reference],
+      updates: [
+        {
+          log_id: 1,
+          column_name: 'body_mass',
+          log_action: 3,
+          old_data: '10',
+          new_data: '12',
+        },
+      ],
+    },
+  ],
+}
+
 const contextValue = {
-  data: {
-    body_mass: 10,
-    now_sau: [
-      {
-        sau_date: '2026-05-29',
-        sau_authorizer: 'ED',
-        sau_coordinator: 'CO',
-        sau_comment: 'Updated body mass',
-        now_sr: [reference],
-        updates: [
-          {
-            log_id: 1,
-            column_name: 'body_mass',
-            log_action: 3,
-            old_data: '10',
-            new_data: '12',
-          },
-        ],
-      },
-    ],
-  },
+  data: detailData,
   mode: { read: true, staging: false, new: false, option: 'read' },
 } as unknown as ContextType<typeof DetailContext>
 
 describe('FieldUpdateHistory', () => {
+  beforeEach(() => {
+    jest.restoreAllMocks()
+  })
+
   it('shows field-specific update history from detail data', async () => {
     const user = userEvent.setup()
 
@@ -76,5 +82,61 @@ describe('FieldUpdateHistory', () => {
     )
 
     expect(screen.queryByLabelText('Show update history for Diet')).not.toBeInTheDocument()
+  })
+
+  it('does not show the history icon in edit mode', () => {
+    render(
+      <MemoryRouter>
+        <DetailContext.Provider
+          value={{ ...contextValue, mode: { read: false, staging: false, new: false, option: 'edit' } }}
+        >
+          <ArrayToTable array={[['Body mass', <FieldElement key="body_mass" field="body_mass" />]]} />
+        </DetailContext.Provider>
+      </MemoryRouter>
+    )
+
+    expect(screen.queryByLabelText('Show update history for Body mass')).not.toBeInTheDocument()
+  })
+
+  it('renders multiple same-field updates without duplicate key warnings', async () => {
+    const user = userEvent.setup()
+    const consoleError = jest.spyOn(console, 'error').mockImplementation(() => undefined)
+    const duplicateLogContext = {
+      ...contextValue,
+      data: {
+        ...detailData,
+        now_sau: [
+          detailData.now_sau[0],
+          {
+            ...detailData.now_sau[0],
+            sau_date: '2026-05-30',
+            sau_comment: 'Updated body mass again',
+            updates: [
+              {
+                log_id: 1,
+                column_name: 'body_mass',
+                log_action: 3,
+                old_data: '12',
+                new_data: '14',
+              },
+            ],
+          },
+        ],
+      },
+    } as unknown as ContextType<typeof DetailContext>
+
+    render(
+      <MemoryRouter>
+        <DetailContext.Provider value={duplicateLogContext}>
+          <ArrayToTable array={[['Body mass', <FieldElement key="body_mass" field="body_mass" />]]} />
+        </DetailContext.Provider>
+      </MemoryRouter>
+    )
+
+    await user.click(screen.getByLabelText('Show update history for Body mass'))
+
+    expect(screen.getByText('Updated body mass')).toBeInTheDocument()
+    expect(screen.getByText('Updated body mass again')).toBeInTheDocument()
+    expect(consoleError).not.toHaveBeenCalledWith(expect.stringContaining('Encountered two children with the same key'))
   })
 })
