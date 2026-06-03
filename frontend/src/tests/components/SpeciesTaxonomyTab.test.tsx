@@ -11,6 +11,7 @@ import { taxonStatusOptions } from '@/shared/taxonStatusOptions'
 import { useGetAllSpeciesQuery } from '@/redux/speciesReducer'
 
 jest.mock('@/components/DetailView/Context/DetailContext', () => ({
+  DetailContext: jest.requireActual<typeof import('react')>('react').createContext(null),
   useDetailContext: jest.fn(),
   modeOptionToMode: {
     new: { read: false, staging: false, new: true, option: 'new' },
