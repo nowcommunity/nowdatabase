@@ -4,6 +4,7 @@ import type { ContextType } from 'react'
 import { MemoryRouter } from 'react-router-dom'
 import { ArrayToTable } from '@/components/DetailView/common/tabLayoutHelpers'
 import { DetailContext } from '@/components/DetailView/Context/DetailContext'
+import { EntryUpdateHistory } from '@/components/DetailView/common/FieldUpdateHistory'
 
 const FieldElement = (_props: { field: string }) => <span>field value</span>
 
@@ -20,6 +21,54 @@ const reference = {
 
 const detailData = {
   body_mass: 10,
+  now_ss: [{ lid: 100, sed_struct: 'cross-bedding' }],
+  now_lau: [
+    {
+      lau_date: '2026-06-03',
+      lau_authorizer: 'ED',
+      lau_coordinator: 'CO',
+      lau_comment: 'Added sedimentary structure',
+      now_lr: [reference],
+      updates: [
+        {
+          log_id: 2,
+          table_name: 'now_ss',
+          pk_data: '3.100;13.cross-bedding;',
+          column_name: 'sed_struct',
+          log_action: 2,
+          old_data: null,
+          new_data: 'cross-bedding',
+        },
+        {
+          log_id: 3,
+          table_name: 'now_ss',
+          pk_data: '3.100;13.cross-bedding;',
+          column_name: 'ss_comment',
+          log_action: 3,
+          old_data: 'old row comment',
+          new_data: 'new row comment',
+        },
+        {
+          log_id: 4,
+          table_name: 'now_ss',
+          pk_data: '3.101;13.cross-bedding;',
+          column_name: 'sed_struct',
+          log_action: 2,
+          old_data: null,
+          new_data: 'cross-bedding',
+        },
+        {
+          log_id: 5,
+          table_name: 'now_ss',
+          pk_data: '3.100;19.cross bedding/layer;',
+          column_name: 'sed_struct',
+          log_action: 2,
+          old_data: null,
+          new_data: 'cross bedding/layer',
+        },
+      ],
+    },
+  ],
   now_sau: [
     {
       sau_date: '2026-05-29',
@@ -96,6 +145,84 @@ describe('FieldUpdateHistory', () => {
     )
 
     expect(screen.queryByLabelText('Show update history for Body mass')).not.toBeInTheDocument()
+  })
+
+  it('shows entry-specific update history for a matching relation row', async () => {
+    const user = userEvent.setup()
+
+    render(
+      <MemoryRouter>
+        <DetailContext.Provider value={contextValue}>
+          <EntryUpdateHistory
+            row={{ lid: 100, sed_struct: 'cross-bedding' }}
+            label="sedimentary structure cross-bedding"
+            tableName="now_ss"
+            getRowValue={row => row.sed_struct}
+            getPkValues={row => [row.lid, row.sed_struct]}
+          />
+        </DetailContext.Provider>
+      </MemoryRouter>
+    )
+
+    await user.click(screen.getByLabelText('Show entry history for sedimentary structure cross-bedding'))
+
+    expect(screen.getByRole('heading', { name: 'sedimentary structure cross-bedding entry history' })).toBeTruthy()
+    expect(screen.getAllByText('Added sedimentary structure')).toHaveLength(2)
+    expect(screen.getAllByText(/Field update reference/)).toHaveLength(2)
+    const tableRow = screen.getAllByText('Table:')[0].closest('p')
+    expect(tableRow).toBeTruthy()
+    expect(within(tableRow as HTMLElement).getByText('now_ss')).toBeInTheDocument()
+    expect(screen.getByText('old row comment')).toBeInTheDocument()
+    expect(screen.getByText('new row comment')).toBeInTheDocument()
+    expect(screen.queryByText('101')).not.toBeInTheDocument()
+  })
+
+  it('uses a safe popover id for entry values with spaces or punctuation', async () => {
+    const user = userEvent.setup()
+
+    render(
+      <MemoryRouter>
+        <DetailContext.Provider value={contextValue}>
+          <EntryUpdateHistory
+            row={{ lid: 100, sed_struct: 'cross bedding/layer' }}
+            label="sedimentary structure cross bedding/layer"
+            tableName="now_ss"
+            getRowValue={row => row.sed_struct}
+            getPkValues={row => [row.lid, row.sed_struct]}
+          />
+        </DetailContext.Provider>
+      </MemoryRouter>
+    )
+
+    const button = screen.getByLabelText('Show entry history for sedimentary structure cross bedding/layer')
+    await user.click(button)
+
+    expect(button).toHaveAttribute('aria-describedby', 'now_ss-cross-bedding-layer-update-history-popover')
+  })
+
+  it('does not bubble entry history clicks to the relation row', async () => {
+    const user = userEvent.setup()
+    const handleRowClick = jest.fn()
+
+    render(
+      <MemoryRouter>
+        <DetailContext.Provider value={contextValue}>
+          <div role="button" tabIndex={0} onClick={handleRowClick} onKeyDown={() => undefined}>
+            <EntryUpdateHistory
+              row={{ lid: 100, sed_struct: 'cross-bedding' }}
+              label="sedimentary structure cross-bedding"
+              tableName="now_ss"
+              getRowValue={row => row.sed_struct}
+              getPkValues={row => [row.lid, row.sed_struct]}
+            />
+          </div>
+        </DetailContext.Provider>
+      </MemoryRouter>
+    )
+
+    await user.click(screen.getByLabelText('Show entry history for sedimentary structure cross-bedding'))
+
+    expect(handleRowClick).not.toHaveBeenCalled()
   })
 
   it('renders multiple same-field updates without duplicate key warnings', async () => {

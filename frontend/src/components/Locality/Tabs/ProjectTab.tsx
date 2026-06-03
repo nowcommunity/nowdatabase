@@ -10,6 +10,9 @@ import { SelectingTable } from '@/components/DetailView/common/SelectingTable'
 import { useDetailContext } from '@/components/DetailView/Context/DetailContext'
 import { useGetAllProjectsQuery } from '@/redux/projectReducer'
 import { usePageContext } from '@/components/Page'
+import { EntryUpdateHistory } from '@/components/DetailView/common/FieldUpdateHistory'
+
+const getRelationLid = (row: unknown) => (row as { lid?: unknown }).lid
 
 export const ProjectTab = () => {
   const { mode, editData, setEditData } = useDetailContext<LocalityDetailsType>()
@@ -89,6 +92,15 @@ export const ProjectTab = () => {
         enableAdvancedTableControls={true}
         idFieldName="pid"
         url="project"
+        renderReadRowActions={({ row }) => (
+          <EntryUpdateHistory
+            row={row.original}
+            label={`project ${row.original.pid ?? ''}`.trim()}
+            tableName="now_plr"
+            getRowValue={project => project.pid}
+            getPkValues={project => [getRelationLid(project), project.pid]}
+          />
+        )}
       />
     </Grouped>
   )

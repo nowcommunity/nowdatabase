@@ -14,6 +14,15 @@ type FieldUpdate = {
   container: UpdateContainer
 }
 
+type EntryUpdateHistoryProps<TRow> = {
+  row: TRow
+  label: string
+  tableName: string
+  columnName?: string
+  getRowValue: (row: TRow) => unknown
+  getPkValues?: (row: TRow) => unknown[]
+}
+
 const SafeDetailContext = DetailContext as unknown as Context<DetailContextType<Record<string, unknown>> | null>
 
 const isObject = (value: unknown): value is Record<string, unknown> =>
@@ -21,6 +30,8 @@ const isObject = (value: unknown): value is Record<string, unknown> =>
 
 const isUpdateLog = (value: unknown): value is UpdateLog =>
   isObject(value) && 'column_name' in value && 'log_action' in value
+
+const getPkData = (log: UpdateLog & { pk_data?: unknown }) => log.pk_data
 
 const isUpdateContainer = (value: unknown): value is UpdateContainer =>
   isObject(value) && Array.isArray(value.updates) && value.updates.every(isUpdateLog)
@@ -50,6 +61,76 @@ const getFieldUpdates = (data: unknown, field: string): FieldUpdate[] =>
         container,
       }))
   )
+
+const stringifyComparableValue = (value: unknown): string | undefined => {
+  if (value === null || value === undefined || value === '') return undefined
+  if (typeof value === 'string') return value
+  if (typeof value === 'number' || typeof value === 'boolean' || typeof value === 'bigint') return String(value)
+  if (value instanceof Date) return value.toISOString()
+  return undefined
+}
+
+const getEncodedPkSegment = (value: unknown) => {
+  const text = stringifyComparableValue(value)
+  if (!text) return undefined
+  return `${text.length}.${text};`
+}
+
+const isString = (value: unknown): value is string => typeof value === 'string'
+
+const getEncodedPkSegments = (values: unknown[]) => values.map(getEncodedPkSegment).filter(isString)
+
+const toSafeDomIdPart = (value: unknown): string => {
+  const text = stringifyComparableValue(value) ?? formatValue(value)
+  const sanitized = text.trim().replace(/[^A-Za-z0-9_-]+/g, '-')
+  return sanitized.replace(/^-+|-+$/g, '') || 'entry'
+}
+
+const valuesMatch = (left: unknown, right: unknown) => {
+  const leftText = stringifyComparableValue(left)
+  const rightText = stringifyComparableValue(right)
+  return Boolean(leftText && rightText && leftText === rightText)
+}
+
+const getEntryUpdates = (
+  data: unknown,
+  tableName: string,
+  columnName: string | undefined,
+  rowValue: unknown,
+  pkValues: unknown[]
+): FieldUpdate[] => {
+  const encodedPkSegments = getEncodedPkSegments(pkValues)
+  const fallbackPkSegment = getEncodedPkSegment(rowValue)
+
+  return collectUpdateContainers(data).flatMap(container =>
+    container.updates
+      .filter(log => {
+        if (log.table_name !== tableName) return false
+
+        const pkData = getPkData(log)
+        const pkDataMatches =
+          typeof pkData === 'string' && encodedPkSegments.length > 0
+            ? encodedPkSegments.every(segment => pkData.includes(segment))
+            : false
+        if (pkDataMatches) return true
+        if (typeof pkData === 'string' && encodedPkSegments.length > 0) return false
+
+        const fallbackPkDataMatches =
+          typeof pkData === 'string' && encodedPkSegments.length === 0 && fallbackPkSegment
+            ? pkData.includes(fallbackPkSegment)
+            : false
+        if (fallbackPkDataMatches) return true
+
+        if (columnName && log.column_name !== columnName) return false
+
+        return valuesMatch(log.new_data, rowValue) || valuesMatch(log.old_data, rowValue)
+      })
+      .map(log => ({
+        log,
+        container,
+      }))
+  )
+}
 
 const formatValue = (value: unknown): string => {
   if (value === null || value === undefined) return ''
@@ -101,17 +182,28 @@ const formatAction = (action: number | null | undefined) => {
   return 'Add'
 }
 
-export const FieldUpdateHistory = ({ field, label }: { field: string; label: string }) => {
-  const detailContext = useContext(SafeDetailContext)
+const UpdateHistoryPopover = ({
+  idPrefix,
+  title,
+  tooltip,
+  ariaLabel,
+  updates,
+  onOpen,
+}: {
+  idPrefix: string
+  title: string
+  tooltip: string
+  ariaLabel: string
+  updates: FieldUpdate[]
+  onOpen?: (event: MouseEvent<HTMLElement>) => void
+}) => {
   const [anchorElement, setAnchorElement] = useState<HTMLElement | null>(null)
-  const updates = useMemo(() => getFieldUpdates(detailContext?.data, field), [detailContext?.data, field])
-
-  if (!detailContext?.mode.read || updates.length === 0) return null
 
   const open = Boolean(anchorElement)
-  const id = open ? `${field}-update-history-popover` : undefined
+  const id = open ? `${idPrefix}-update-history-popover` : undefined
 
   const handleOpen = (event: MouseEvent<HTMLElement>) => {
+    onOpen?.(event)
     setAnchorElement(event.currentTarget)
   }
 
@@ -121,9 +213,9 @@ export const FieldUpdateHistory = ({ field, label }: { field: string; label: str
 
   return (
     <>
-      <Tooltip title={`Show update history for ${label}`}>
+      <Tooltip title={tooltip}>
         <IconButton
-          aria-label={`Show update history for ${label}`}
+          aria-label={ariaLabel}
           aria-describedby={id}
           size="small"
           onClick={handleOpen}
@@ -142,12 +234,12 @@ export const FieldUpdateHistory = ({ field, label }: { field: string; label: str
       >
         <Box p={2} maxWidth={560} display="flex" flexDirection="column" gap={1.5}>
           <Typography variant="subtitle1" component="h2">
-            {label} update history
+            {title}
           </Typography>
           {updates.map(({ log, container }, index) => {
             const references = collectReferences(container)
             return (
-              <Card key={`${index}-${log.log_id ?? ''}-${log.column_name ?? field}`} sx={{ p: 1.5 }}>
+              <Card key={`${index}-${log.log_id ?? ''}-${log.column_name ?? idPrefix}`} sx={{ p: 1.5 }}>
                 <Typography variant="body2">
                   <b>Date:</b> {formatDate(getDate(container))}
                 </Typography>
@@ -159,6 +251,9 @@ export const FieldUpdateHistory = ({ field, label }: { field: string; label: str
                 </Typography>
                 <Typography variant="body2">
                   <b>Action:</b> {formatAction(log.log_action)}
+                </Typography>
+                <Typography variant="body2">
+                  <b>Table:</b> {formatValue(log.table_name)}
                 </Typography>
                 <Typography variant="body2">
                   <b>Before:</b> {log.old_data ?? ''}
@@ -183,5 +278,56 @@ export const FieldUpdateHistory = ({ field, label }: { field: string; label: str
         </Box>
       </Popover>
     </>
+  )
+}
+
+export const FieldUpdateHistory = ({ field, label }: { field: string; label: string }) => {
+  const detailContext = useContext(SafeDetailContext)
+  const updates = useMemo(() => getFieldUpdates(detailContext?.data, field), [detailContext?.data, field])
+
+  if (!detailContext?.mode.read || updates.length === 0) return null
+
+  return (
+    <UpdateHistoryPopover
+      idPrefix={field}
+      title={`${label} update history`}
+      tooltip={`Show update history for ${label}`}
+      ariaLabel={`Show update history for ${label}`}
+      updates={updates}
+    />
+  )
+}
+
+export const EntryUpdateHistory = <TRow,>({
+  row,
+  label,
+  tableName,
+  columnName,
+  getRowValue,
+  getPkValues,
+}: EntryUpdateHistoryProps<TRow>) => {
+  const detailContext = useContext(SafeDetailContext)
+  const rowValue = getRowValue(row)
+  const pkValues = useMemo(() => getPkValues?.(row) ?? [rowValue], [getPkValues, row, rowValue])
+  const updates = useMemo(
+    () => getEntryUpdates(detailContext?.data, tableName, columnName, rowValue, pkValues),
+    [columnName, detailContext?.data, pkValues, rowValue, tableName]
+  )
+
+  if (!detailContext?.mode.read || updates.length === 0) return null
+
+  const handleOpen = (event: MouseEvent<HTMLElement>) => {
+    event.stopPropagation()
+  }
+
+  return (
+    <UpdateHistoryPopover
+      idPrefix={[tableName, columnName, rowValue].filter(Boolean).map(toSafeDomIdPart).join('-')}
+      title={`${label} entry history`}
+      tooltip={`Show entry history for ${label}`}
+      ariaLabel={`Show entry history for ${label}`}
+      updates={updates}
+      onOpen={handleOpen}
+    />
   )
 }

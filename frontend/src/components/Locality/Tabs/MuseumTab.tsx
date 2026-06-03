@@ -11,6 +11,9 @@ import { EditingModal } from '@/components/DetailView/common/EditingModal'
 import { useForm } from 'react-hook-form'
 import { useNotify } from '@/hooks/notification'
 import { validCountries } from '@/shared/validators/countryList'
+import { EntryUpdateHistory } from '@/components/DetailView/common/FieldUpdateHistory'
+
+const getRelationLid = (row: unknown) => (row as { lid?: unknown }).lid
 
 export const MuseumTab = () => {
   const { mode, editData, setEditData } = useDetailContext<LocalityDetailsType>()
@@ -242,6 +245,15 @@ export const MuseumTab = () => {
         enableAdvancedTableControls={true}
         idFieldName="museum"
         url="museum"
+        renderReadRowActions={({ row }) => (
+          <EntryUpdateHistory
+            row={row.original}
+            label={`museum ${row.original.museum ?? ''}`.trim()}
+            tableName="now_mus"
+            getRowValue={museum => museum.museum}
+            getPkValues={museum => [getRelationLid(museum), museum.museum]}
+          />
+        )}
       />
     </Grouped>
   )

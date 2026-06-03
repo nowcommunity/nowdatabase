@@ -5,7 +5,7 @@ import { useDetailContext } from '../Context/DetailContext'
 import RemoveCircleOutlineIcon from '@mui/icons-material/RemoveCircleOutline'
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline'
 import PolicyIcon from '@mui/icons-material/Policy'
-import { useEffect } from 'react'
+import { useEffect, type ReactNode } from 'react'
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom'
 import { usePageContext } from '@/components/Page'
 import { checkFieldErrors } from './checkFieldErrors'
@@ -34,6 +34,7 @@ export const EditableTable = <
   url,
   getDetailPath,
   checkRowRestriction,
+  renderReadRowActions,
   kmlExport,
   svgExport,
 }: {
@@ -49,6 +50,7 @@ export const EditableTable = <
   url?: string
   getDetailPath?: (row: T) => string
   checkRowRestriction?: (row: T) => boolean
+  renderReadRowActions?: (props: { row: MRT_Row<T> }) => ReactNode
   kmlExport?: (table: MRT_TableInstance<T>) => void | Promise<void>
   svgExport?: (table: MRT_TableInstance<T>) => void | Promise<void>
 }) => {
@@ -134,13 +136,26 @@ export const EditableTable = <
 
     return (
       <Tooltip placement="top" title="This item has restricted visibility">
-        <PolicyIcon aria-label="Restricted visibility indicator" color="primary" fontSize="medium" />
+        <Box component="span" onClick={event => event.stopPropagation()} sx={{ display: 'inline-flex' }}>
+          <PolicyIcon aria-label="Restricted visibility indicator" color="primary" fontSize="medium" />
+        </Box>
       </Tooltip>
     )
   }
 
+  const readRowActions = ({ row }: { row: MRT_Row<T> }) => (
+    <Box className="row-actions-column">
+      {renderReadRowActions?.({ row })}
+      {restrictionIndicator({ row })}
+    </Box>
+  )
+
   const resolveRenderRowActions = () => {
-    if (mode.read) return checkRowRestriction ? restrictionIndicator : undefined
+    if (mode.read) {
+      if (!checkRowRestriction && !renderReadRowActions) return undefined
+
+      return readRowActions
+    }
 
     return actionRow
   }
@@ -166,6 +181,22 @@ export const EditableTable = <
     return tableData
   }
 
+  const muiTableBodyRowProps = ({ row }: { row: MRT_Row<T> }) => ({
+    'data-cy': idFieldName ? `table-row-${String(row.original[idFieldName])}` : undefined,
+    onClick: () => {
+      if (mode.read && idFieldName && url) {
+        setPreviousTableUrls([...previousTableUrls, `${location.pathname}?tab=${searchParams.get('tab')}`])
+        navigate(resolveDetailPath(row.original), {
+          state: { returnTo: `${location.pathname}${location.search}` },
+        })
+      }
+    },
+    sx: {
+      backgroundColor: rowStateToColor(row.original.rowState),
+      cursor: mode.read && idFieldName && url ? 'pointer' : undefined,
+    },
+  })
+
   return (
     <DetailTabTable<T>
       mode="edit"
@@ -174,25 +205,11 @@ export const EditableTable = <
       enableTopToolbar={enableAdvancedTableControls}
       enableColumnActions={enableAdvancedTableControls}
       enableSorting={enableAdvancedTableControls}
-      enableRowActions={!mode.read || Boolean(checkRowRestriction)}
+      enableRowActions={!mode.read || Boolean(checkRowRestriction) || Boolean(renderReadRowActions)}
       renderRowActions={resolveRenderRowActions()}
       kmlExport={kmlExport}
       svgExport={svgExport}
-      muiTableBodyRowProps={({ row }: { row: MRT_Row<T> }) => ({
-        'data-cy': idFieldName ? `table-row-${String(row.original[idFieldName])}` : undefined,
-        onClick: () => {
-          if (mode.read && idFieldName && url) {
-            setPreviousTableUrls([...previousTableUrls, `${location.pathname}?tab=${searchParams.get('tab')}`])
-            navigate(resolveDetailPath(row.original), {
-              state: { returnTo: `${location.pathname}${location.search}` },
-            })
-          }
-        },
-        sx: {
-          backgroundColor: rowStateToColor(row.original.rowState),
-          cursor: mode.read && idFieldName && url ? 'pointer' : undefined,
-        },
-      })}
+      muiTableBodyRowProps={muiTableBodyRowProps}
     />
   )
 }

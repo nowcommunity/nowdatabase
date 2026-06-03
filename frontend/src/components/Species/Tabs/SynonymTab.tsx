@@ -10,6 +10,7 @@ import { convertSynonymTaxonomyFields } from '@/util/taxonomyUtilities'
 import { useGetAllSpeciesQuery } from '@/redux/speciesReducer'
 import { skipToken } from '@reduxjs/toolkit/query'
 import { CircularProgress } from '@mui/material'
+import { EntryUpdateHistory } from '@/components/DetailView/common/FieldUpdateHistory'
 
 export const SynonymTab = () => {
   const { mode, setEditData, editData } = useDetailContext<SpeciesDetailsType>()
@@ -113,7 +114,21 @@ export const SynonymTab = () => {
     <>
       <Grouped title="Synonyms">
         {!mode.read && editingForm}
-        <EditableTable<Editable<SpeciesSynonym>, SpeciesDetailsType> columns={columns} field="com_taxa_synonym" />
+        <EditableTable<Editable<SpeciesSynonym>, SpeciesDetailsType>
+          columns={columns}
+          field="com_taxa_synonym"
+          renderReadRowActions={({ row }) => (
+            <EntryUpdateHistory
+              row={row.original}
+              label={`species synonym ${row.original.syn_genus_name ?? ''} ${
+                row.original.syn_species_name ?? ''
+              }`.trim()}
+              tableName="com_taxa_synonym"
+              getRowValue={synonym => synonym.synonym_id}
+              getPkValues={synonym => [synonym.synonym_id, synonym.species_id]}
+            />
+          )}
+        />
       </Grouped>
     </>
   )

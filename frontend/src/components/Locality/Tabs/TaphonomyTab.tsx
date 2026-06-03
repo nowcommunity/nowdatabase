@@ -7,6 +7,7 @@ import { emptyOption } from '@/components/DetailView/common/misc'
 import { LookupSelectingTable } from '@/components/shared/LookupSelectingTable'
 import { useGetAllCollectingMethodValuesQuery } from '@/redux/collectingMethodValuesReducer'
 import { skipToken } from '@reduxjs/toolkit/query'
+import { EntryUpdateHistory } from '@/components/DetailView/common/FieldUpdateHistory'
 
 export const TaphonomyTab = () => {
   const { textField, dropdown, mode, editData } = useDetailContext<LocalityDetailsType>()
@@ -165,7 +166,19 @@ export const TaphonomyTab = () => {
               selectedValues={editData.now_coll_meth.map(method => method.coll_meth ?? '')}
             />
           )}
-          <EditableTable<Editable<CollectingMethod>, LocalityDetailsType> columns={columns} field="now_coll_meth" />
+          <EditableTable<Editable<CollectingMethod>, LocalityDetailsType>
+            columns={columns}
+            field="now_coll_meth"
+            renderReadRowActions={({ row }) => (
+              <EntryUpdateHistory
+                row={row.original}
+                label={`collecting method ${row.original.coll_meth ?? ''}`.trim()}
+                tableName="now_coll_meth"
+                getRowValue={collectingMethod => collectingMethod.coll_meth}
+                getPkValues={collectingMethod => [collectingMethod.lid, collectingMethod.coll_meth]}
+              />
+            )}
+          />
         </Grouped>
         <></>
       </HalfFrames>
