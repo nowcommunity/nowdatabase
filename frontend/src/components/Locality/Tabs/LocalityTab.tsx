@@ -11,6 +11,7 @@ import { emptyOption } from '@/components/DetailView/common/misc'
 import { convertDmsToDec, convertDecToDms } from '@/util/coordinateConversion'
 import { validCountries } from '@/shared/validators/countryList'
 import { useNotify } from '@/hooks/notification'
+import { EntryUpdateHistory } from '@/components/DetailView/common/FieldUpdateHistory'
 
 const CoordinateSelectionMap = lazy(async () => {
   const module = await import('@/components/Map/CoordinateSelectionMap')
@@ -274,7 +275,19 @@ export const LocalityTab = () => {
 
       <Grouped title="Synonyms">
         {!mode.read && editingModal}
-        <EditableTable<Editable<LocalitySynonym>, LocalityDetailsType> columns={columns} field="now_syn_loc" />
+        <EditableTable<Editable<LocalitySynonym>, LocalityDetailsType>
+          columns={columns}
+          field="now_syn_loc"
+          renderReadRowActions={({ row }) => (
+            <EntryUpdateHistory
+              row={row.original}
+              label={`locality synonym ${row.original.synonym ?? ''}`.trim()}
+              tableName="now_syn_loc"
+              getRowValue={synonym => synonym.syn_id}
+              getPkValues={synonym => [synonym.lid, synonym.syn_id]}
+            />
+          )}
+        />
       </Grouped>
     </>
   )

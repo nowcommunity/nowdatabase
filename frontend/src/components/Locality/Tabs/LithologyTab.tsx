@@ -7,6 +7,7 @@ import { useDetailContext } from '@/components/DetailView/Context/DetailContext'
 import { useGetAllSedimentaryStructuresQuery } from '@/redux/sedimentaryStructureReducer'
 import { skipToken } from '@reduxjs/toolkit/query'
 import { MRT_ColumnDef } from 'material-react-table'
+import { EntryUpdateHistory } from '@/components/DetailView/common/FieldUpdateHistory'
 
 export const LithologyTab = () => {
   const { mode, textField, dropdown, editData, bigTextField } = useDetailContext<LocalityDetailsType>()
@@ -202,7 +203,20 @@ export const LithologyTab = () => {
               selectedValues={editData.now_ss.map(ss => ss.sed_struct ?? '')} // TODO ss.sed_struct may be null. is empty string ok default?
             />
           )}
-          <EditableTable<Editable<SedimentaryStructure>, LocalityDetailsType> columns={columns} field="now_ss" />
+          <EditableTable<Editable<SedimentaryStructure>, LocalityDetailsType>
+            columns={columns}
+            field="now_ss"
+            renderReadRowActions={({ row }) => (
+              <EntryUpdateHistory
+                row={row.original}
+                label={`sedimentary structure ${row.original.sed_struct ?? ''}`.trim()}
+                tableName="now_ss"
+                columnName="sed_struct"
+                getRowValue={sedimentaryStructure => sedimentaryStructure.sed_struct}
+                getPkValues={sedimentaryStructure => [sedimentaryStructure.lid, sedimentaryStructure.sed_struct]}
+              />
+            )}
+          />
         </Grouped>
         <ArrayFrame half array={depositionalContext} title="Depositional Context" />
       </HalfFrames>
