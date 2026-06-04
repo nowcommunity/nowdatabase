@@ -19,10 +19,14 @@ export type SedimentaryStructureValues = Prisma.now_ss_values
 export type CollectingMethod = Prisma.now_coll_meth
 export type CollectingMethodValues = Prisma.now_coll_meth_values
 export type LocalityProject = Prisma.now_plr & { now_proj: Prisma.now_proj }
-export type LocalitySpecies = FixBigInt<Prisma.now_ls> & { com_species: SpeciesType }
-export type LocalitySpeciesDetailsType = FixBigInt<Prisma.now_ls> & { com_species: SpeciesDetailsType }
+export type LocalitySpecies = FixBigInt<Prisma.now_ls> & { com_species: SpeciesType; now_oau?: OccurrenceUpdate[] }
+export type LocalitySpeciesDetailsType = FixBigInt<Prisma.now_ls> & {
+  com_species: SpeciesDetailsType
+  now_oau?: OccurrenceUpdate[]
+}
 export type SpeciesLocality = FixBigInt<Prisma.now_ls> & {
   now_loc: Prisma.now_loc
+  now_oau?: OccurrenceUpdate[]
   // Explicitly required in the Species locality payload because MW Score is
   // calculated client-side from these values in the occurrence table.
   mw_scale_min: number | null

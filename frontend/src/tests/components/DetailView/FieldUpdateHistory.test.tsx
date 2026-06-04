@@ -69,6 +69,62 @@ const detailData = {
       ],
     },
   ],
+  now_oau: [
+    {
+      occ_date: '2026-06-04',
+      occ_authorizer: 'ED',
+      occ_coordinator: 'CO',
+      occ_comment: 'Occurrence row changed',
+      references: [reference],
+      updates: [
+        {
+          log_id: 6,
+          table_name: 'now_ls',
+          pk_data: '3.100;3.200;',
+          column_name: 'lid',
+          log_action: 3,
+          old_data: '100',
+          new_data: '101',
+        },
+        {
+          log_id: 7,
+          table_name: 'now_ls',
+          pk_data: '3.100;3.200;',
+          column_name: 'species_id',
+          log_action: 3,
+          old_data: '200',
+          new_data: '201',
+        },
+      ],
+    },
+    {
+      occ_date: '2026-06-04',
+      occ_authorizer: 'ED',
+      occ_coordinator: 'CO',
+      occ_comment: 'Occurrence row changed',
+      references: [reference],
+      updates: [
+        {
+          log_id: 8,
+          table_name: 'now_ls',
+          pk_data: '3.100;3.200;',
+          column_name: 'lid',
+          log_action: 3,
+          old_data: '100',
+          new_data: '101',
+        },
+        {
+          log_id: 9,
+          table_name: 'now_ls',
+          pk_data: '3.100;3.200;',
+          column_name: 'species_id',
+          log_action: 3,
+          old_data: '200',
+          new_data: '201',
+        },
+      ],
+    },
+  ],
   now_sau: [
     {
       sau_date: '2026-05-29',
@@ -167,14 +223,39 @@ describe('FieldUpdateHistory', () => {
     await user.click(screen.getByLabelText('Show entry history for sedimentary structure cross-bedding'))
 
     expect(screen.getByRole('heading', { name: 'sedimentary structure cross-bedding entry history' })).toBeTruthy()
-    expect(screen.getAllByText('Added sedimentary structure')).toHaveLength(2)
-    expect(screen.getAllByText(/Field update reference/)).toHaveLength(2)
+    expect(screen.getAllByText('Added sedimentary structure')).toHaveLength(1)
+    expect(screen.getAllByText(/Field update reference/)).toHaveLength(1)
     const tableRow = screen.getAllByText('Table:')[0].closest('p')
     expect(tableRow).toBeTruthy()
     expect(within(tableRow as HTMLElement).getByText('now_ss')).toBeInTheDocument()
-    expect(screen.getByText('old row comment')).toBeInTheDocument()
-    expect(screen.getByText('new row comment')).toBeInTheDocument()
+    expect(screen.getByText('ss_comment:').closest('p')).toHaveTextContent('old row comment -> new row comment')
     expect(screen.queryByText('101')).not.toBeInTheDocument()
+  })
+
+  it('groups duplicate occurrence row update logs into one history entry', async () => {
+    const user = userEvent.setup()
+
+    render(
+      <MemoryRouter>
+        <DetailContext.Provider value={contextValue}>
+          <EntryUpdateHistory
+            row={{ lid: 100, species_id: 200 }}
+            label="occurrence 100/200"
+            tableName="now_ls"
+            getRowValue={row => row.species_id}
+            getPkValues={row => [row.lid, row.species_id]}
+          />
+        </DetailContext.Provider>
+      </MemoryRouter>
+    )
+
+    await user.click(screen.getByLabelText('Show entry history for occurrence 100/200'))
+
+    expect(screen.getByRole('heading', { name: 'occurrence 100/200 entry history' })).toBeTruthy()
+    expect(screen.getAllByText('Occurrence row changed')).toHaveLength(1)
+    expect(screen.getAllByText(/Field update reference/)).toHaveLength(1)
+    expect(screen.getByText('lid:').closest('p')).toHaveTextContent('100 -> 101')
+    expect(screen.getByText('species_id:').closest('p')).toHaveTextContent('200 -> 201')
   })
 
   it('uses a safe popover id for entry values with spaces or punctuation', async () => {

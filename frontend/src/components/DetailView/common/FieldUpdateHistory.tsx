@@ -9,8 +9,8 @@ type UpdateContainer = Record<string, unknown> & {
   updates: UpdateLog[]
 }
 
-type FieldUpdate = {
-  log: UpdateLog
+type HistoryUpdate = {
+  logs: UpdateLog[]
   container: UpdateContainer
 }
 
@@ -52,12 +52,12 @@ const collectUpdateContainers = (value: unknown, seen = new Set<unknown>()): Upd
   return containers
 }
 
-const getFieldUpdates = (data: unknown, field: string): FieldUpdate[] =>
+const getFieldUpdates = (data: unknown, field: string): HistoryUpdate[] =>
   collectUpdateContainers(data).flatMap(container =>
     container.updates
       .filter(log => log.column_name === field)
       .map(log => ({
-        log,
+        logs: [log],
         container,
       }))
   )
@@ -98,38 +98,37 @@ const getEntryUpdates = (
   columnName: string | undefined,
   rowValue: unknown,
   pkValues: unknown[]
-): FieldUpdate[] => {
+): HistoryUpdate[] => {
   const encodedPkSegments = getEncodedPkSegments(pkValues)
   const fallbackPkSegment = getEncodedPkSegment(rowValue)
 
-  return collectUpdateContainers(data).flatMap(container =>
-    container.updates
-      .filter(log => {
-        if (log.table_name !== tableName) return false
+  const updates = collectUpdateContainers(data).flatMap(container => {
+    const logs = container.updates.filter(log => {
+      if (log.table_name !== tableName) return false
 
-        const pkData = getPkData(log)
-        const pkDataMatches =
-          typeof pkData === 'string' && encodedPkSegments.length > 0
-            ? encodedPkSegments.every(segment => pkData.includes(segment))
-            : false
-        if (pkDataMatches) return true
-        if (typeof pkData === 'string' && encodedPkSegments.length > 0) return false
+      const pkData = getPkData(log)
+      const pkDataMatches =
+        typeof pkData === 'string' && encodedPkSegments.length > 0
+          ? encodedPkSegments.every(segment => pkData.includes(segment))
+          : false
+      if (pkDataMatches) return true
+      if (typeof pkData === 'string' && encodedPkSegments.length > 0) return false
 
-        const fallbackPkDataMatches =
-          typeof pkData === 'string' && encodedPkSegments.length === 0 && fallbackPkSegment
-            ? pkData.includes(fallbackPkSegment)
-            : false
-        if (fallbackPkDataMatches) return true
+      const fallbackPkDataMatches =
+        typeof pkData === 'string' && encodedPkSegments.length === 0 && fallbackPkSegment
+          ? pkData.includes(fallbackPkSegment)
+          : false
+      if (fallbackPkDataMatches) return true
 
-        if (columnName && log.column_name !== columnName) return false
+      if (columnName && log.column_name !== columnName) return false
 
-        return valuesMatch(log.new_data, rowValue) || valuesMatch(log.old_data, rowValue)
-      })
-      .map(log => ({
-        log,
-        container,
-      }))
-  )
+      return valuesMatch(log.new_data, rowValue) || valuesMatch(log.old_data, rowValue)
+    })
+
+    return logs.length > 0 ? [{ logs, container }] : []
+  })
+
+  return deduplicateHistoryUpdates(updates)
 }
 
 const formatValue = (value: unknown): string => {
@@ -176,10 +175,56 @@ const collectReferences = (value: unknown, seen = new Set<unknown>()): AnyRefere
     .flatMap(([, nestedValue]) => collectReferences(nestedValue, seen))
 }
 
+const getLogSignature = (log: UpdateLog) =>
+  [
+    formatValue(log.table_name),
+    formatValue(log.column_name),
+    formatValue(log.log_action),
+    formatValue(getPkData(log)),
+    formatValue(log.old_data),
+    formatValue(log.new_data),
+  ].join('|')
+
+const getReferencesSignature = (container: UpdateContainer) =>
+  collectReferences(container)
+    .map(reference => formatValue(reference.rid))
+    .sort()
+    .join(',')
+
+const getHistoryUpdateSignature = ({ logs, container }: HistoryUpdate) =>
+  [
+    formatDate(getDate(container)),
+    formatValue(getEditor(container)),
+    formatValue(getCoordinator(container)),
+    formatValue(getComment(container)),
+    getReferencesSignature(container),
+    [...logs].map(getLogSignature).sort().join('||'),
+  ].join('\n')
+
+const deduplicateHistoryUpdates = (updates: HistoryUpdate[]) => {
+  const seen = new Set<string>()
+  return updates.filter(update => {
+    const signature = getHistoryUpdateSignature(update)
+    if (seen.has(signature)) return false
+    seen.add(signature)
+    return true
+  })
+}
+
 const formatAction = (action: number | null | undefined) => {
   if (action === 1) return 'Delete'
   if (action === 3) return 'Update'
   return 'Add'
+}
+
+const formatActions = (logs: UpdateLog[]) => {
+  const actions = Array.from(new Set(logs.map(log => formatAction(log.log_action))))
+  return actions.join(', ')
+}
+
+const formatTables = (logs: UpdateLog[]) => {
+  const tables = Array.from(new Set(logs.map(log => formatValue(log.table_name)).filter(Boolean)))
+  return tables.join(', ')
 }
 
 const UpdateHistoryPopover = ({
@@ -194,7 +239,7 @@ const UpdateHistoryPopover = ({
   title: string
   tooltip: string
   ariaLabel: string
-  updates: FieldUpdate[]
+  updates: HistoryUpdate[]
   onOpen?: (event: MouseEvent<HTMLElement>) => void
 }) => {
   const [anchorElement, setAnchorElement] = useState<HTMLElement | null>(null)
@@ -236,10 +281,11 @@ const UpdateHistoryPopover = ({
           <Typography variant="subtitle1" component="h2">
             {title}
           </Typography>
-          {updates.map(({ log, container }, index) => {
+          {updates.map(({ logs, container }, index) => {
+            const primaryLog = logs[0]
             const references = collectReferences(container)
             return (
-              <Card key={`${index}-${log.log_id ?? ''}-${log.column_name ?? idPrefix}`} sx={{ p: 1.5 }}>
+              <Card key={`${index}-${primaryLog.log_id ?? ''}-${primaryLog.column_name ?? idPrefix}`} sx={{ p: 1.5 }}>
                 <Typography variant="body2">
                   <b>Date:</b> {formatDate(getDate(container))}
                 </Typography>
@@ -250,17 +296,37 @@ const UpdateHistoryPopover = ({
                   <b>Coordinator:</b> {formatValue(getCoordinator(container))}
                 </Typography>
                 <Typography variant="body2">
-                  <b>Action:</b> {formatAction(log.log_action)}
+                  <b>Action:</b> {formatActions(logs)}
                 </Typography>
                 <Typography variant="body2">
-                  <b>Table:</b> {formatValue(log.table_name)}
+                  <b>Table:</b> {formatTables(logs)}
                 </Typography>
-                <Typography variant="body2">
-                  <b>Before:</b> {log.old_data ?? ''}
-                </Typography>
-                <Typography variant="body2">
-                  <b>After:</b> {log.new_data ?? ''}
-                </Typography>
+                {logs.length === 1 ? (
+                  <>
+                    <Typography variant="body2">
+                      <b>Before:</b> {logs[0].old_data ?? ''}
+                    </Typography>
+                    <Typography variant="body2">
+                      <b>After:</b> {logs[0].new_data ?? ''}
+                    </Typography>
+                  </>
+                ) : (
+                  <Box>
+                    <Typography variant="body2">
+                      <b>Changes:</b>
+                    </Typography>
+                    {logs.map((log, logIndex) => (
+                      <Typography
+                        key={`${logIndex}-${log.log_id ?? ''}-${log.column_name ?? ''}`}
+                        variant="body2"
+                        sx={{ pl: 1 }}
+                      >
+                        <b>{formatValue(log.column_name)}:</b> {formatValue(log.old_data)} -&gt;{' '}
+                        {formatValue(log.new_data)}
+                      </Typography>
+                    ))}
+                  </Box>
+                )}
                 {getComment(container) ? (
                   <Typography variant="body2">
                     <b>Comment:</b> {formatValue(getComment(container))}
