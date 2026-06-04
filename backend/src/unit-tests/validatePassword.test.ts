@@ -8,6 +8,10 @@ describe('Password validation utils', () => {
   it('Accepts correct password with symbols', () => {
     expect(validatePassword('thisisav~!%ali&dpas$sword').isValid).toBeTruthy()
   })
+  it('Accepts generated password symbols', () => {
+    expect(validatePassword('valid^password').isValid).toBeTruthy()
+    expect(validatePassword('valid?password').isValid).toBeTruthy()
+  })
   it('Rejects invalid password with unsupported symbols in the middle', () => {
     expect(validatePassword('thisisav~%a€li&dpas$sword').isValid).toBeFalsy()
   })
