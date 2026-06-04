@@ -19,7 +19,7 @@ export const usePasswordValidation = () => {
         return { isValid: false, error: requirements[0] }
       }
 
-      if (!/^[0-9A-Za-z$%&~!]+$/.test(password)) {
+      if (!/^[0-9A-Za-z^?$%&~!]+$/.test(password)) {
         return { isValid: false, error: requirements[1] }
       }
 
