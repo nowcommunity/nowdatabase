@@ -15,7 +15,7 @@ import {
 import { Alert, Box, CircularProgress, Paper, Tooltip } from '@mui/material'
 import type { FetchBaseQueryError } from '@reduxjs/toolkit/query'
 import type { SerializedError } from '@reduxjs/toolkit'
-import type { FilterFn } from '@tanstack/table-core'
+import { type FilterFn } from '@tanstack/table-core'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { ActionComponent } from './ActionComponent'
 import { usePageContext } from '../Page'
@@ -249,6 +249,7 @@ export const TableView = <T extends MRT_RowData>({
   } = usePageContext()
   const [columnFilters, setColumnFilters] = useState<MRT_ColumnFiltersState>([])
   const [sorting, setSorting] = useState<MRT_SortingState>(defaultSorting ?? [])
+  const [rowCount, setRowCount] = useState(data ? data.length : 0)
   const navigate = useNavigate()
   const [pagination, setPagination] = useState<MRT_PaginationState>(
     selectorFn ? defaultPaginationSmall : defaultPagination
@@ -483,10 +484,8 @@ export const TableView = <T extends MRT_RowData>({
     document.title = `${title}`
   }
 
-  let rowCount = undefined
   if (data && data.length > 0) {
-    if (serverSidePagination) rowCount = data[0].full_count as number
-    else rowCount = data.length
+    if (serverSidePagination) setRowCount(data[0].full_count as number)
   }
 
   const resolveDetailPath = (row: T) => {
@@ -743,6 +742,7 @@ export const TableView = <T extends MRT_RowData>({
       return
     }
     setIdList(table.getPrePaginationRowModel().rows.map(row => row.original[idFieldName] as string))
+    setRowCount(table.getPrePaginationRowModel().rows.length)
 
     // Don't put setIdList in the dependency array: it will cause re-render loop.
     // eslint-disable-next-line react-hooks/exhaustive-deps
