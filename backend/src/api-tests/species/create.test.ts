@@ -78,8 +78,9 @@ describe('Creating new species works', () => {
 
   it('Creation fails without permissions for non-authenticated and non-privileged users', async () => {
     logout()
+    const newSpeciesBasis2 = { ...newSpeciesBasis, species_name: 'aspecies' }
     const result1 = await send('species', 'PUT', {
-      species: { ...newSpeciesBasis, comment: 'species test' },
+      species: { ...newSpeciesBasis2, comment: 'species test' },
     })
     expect(result1.body).toEqual(noPermError)
     expect(result1.status).toEqual(403)
@@ -87,7 +88,7 @@ describe('Creating new species works', () => {
     logout()
     await login('testEr', 'test')
     const result2 = await send('species', 'PUT', {
-      species: { ...newSpeciesBasis, comment: 'species test' },
+      species: { ...newSpeciesBasis2, comment: 'species edit test' },
     })
     expect(result2.status).toEqual(200)
   })
