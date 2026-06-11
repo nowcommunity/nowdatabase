@@ -1291,29 +1291,29 @@ export const buildLocalityEmlXml = (publicationDateIso: string): string => {
 <eml:eml
   xmlns:eml="eml://ecoinformatics.org/eml-2.1.1"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  packageId="nowdatabase-dwc-locality-test-export"
+  packageId="nowdatabase-dwc-locality-export"
   system="nowdatabase"
   xsi:schemaLocation="eml://ecoinformatics.org/eml-2.1.1 https://eml.ecoinformatics.org/eml-2.1.1/eml.xsd"
 >
   <!-- TODO(#1150): Replace placeholder metadata with real dataset-level EML generation. -->
   <dataset>
-    <title>NOW database Darwin Core test export (localities)</title>
+    <title>NOW database Darwin Core export (localities)</title>
     <creator>
       <individualName>
-        <surName>NOW database</surName>
+        <surName>The NOW Community</surName>
       </individualName>
     </creator>
     <contact>
       <individualName>
-        <surName>NOW database</surName>
+        <surName>The NOW Community</surName>
       </individualName>
     </contact>
     <pubDate>${publicationDateIso}</pubDate>
     <abstract>
-      <para>Admin-only test Darwin Core Archive export for localities, mapping Location + GeologicalContext + MeasurementOrFact terms. Field mappings are intentionally limited for v1.</para>
+      <para>Production Darwin Core Archive export for NOW locality records, mapping Location, GeologicalContext, and MeasurementOrFact terms. Field mappings are intentionally limited for v1.</para>
     </abstract>
     <intellectualRights>
-      <para>TODO(#1150): Add rights / license information.</para>
+      <para>This dataset is made available under the Creative Commons Attribution 4.0 International License (CC BY 4.0): https://creativecommons.org/licenses/by/4.0/.</para>
     </intellectualRights>
   </dataset>
 </eml:eml>

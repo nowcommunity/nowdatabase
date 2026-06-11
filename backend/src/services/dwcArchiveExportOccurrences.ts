@@ -514,29 +514,29 @@ export const buildOccurrenceEmlXml = (publicationDateIso: string): string => {
 <eml:eml
   xmlns:eml="eml://ecoinformatics.org/eml-2.1.1"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  packageId="nowdatabase-dwc-occurrence-test-export"
+  packageId="nowdatabase-dwc-occurrence-export"
   system="nowdatabase"
   xsi:schemaLocation="eml://ecoinformatics.org/eml-2.1.1 https://eml.ecoinformatics.org/eml-2.1.1/eml.xsd"
 >
   <!-- TODO(#1150): Replace placeholder metadata with real dataset-level EML generation. -->
   <dataset>
-    <title>NOW database Darwin Core test export (occurrences)</title>
+    <title>NOW database Darwin Core export (occurrences)</title>
     <creator>
       <individualName>
-        <surName>NOW database</surName>
+        <surName>The NOW Community</surName>
       </individualName>
     </creator>
     <contact>
       <individualName>
-        <surName>NOW database</surName>
+        <surName>The NOW Community</surName>
       </individualName>
     </contact>
     <pubDate>${publicationDateIso}</pubDate>
     <abstract>
-      <para>Admin-only test Darwin Core Archive export for occurrence records from now_ls. Location and taxon lookup files are included with the same structures as the locality and taxon exports.</para>
+      <para>Production Darwin Core Archive export for occurrence records from the NOW database. Location and taxon lookup files are included with the same structures as the locality and taxon exports.</para>
     </abstract>
     <intellectualRights>
-      <para>TODO(#1150): Add rights / license information.</para>
+      <para>This dataset is made available under the Creative Commons Attribution 4.0 International License (CC BY 4.0): https://creativecommons.org/licenses/by/4.0/.</para>
     </intellectualRights>
   </dataset>
 </eml:eml>

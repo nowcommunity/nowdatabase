@@ -42,7 +42,7 @@ describe('DwC-A species export (admin-only)', () => {
 
     expect(result.status).toEqual(200)
     expect(result.headers['content-type']).toMatch(/application\/zip/i)
-    expect(result.headers['content-disposition']).toMatch(/attachment;\s*filename="now_dwc_test_export_/i)
+    expect(result.headers['content-disposition']).toMatch(/attachment;\s*filename="now_dwc_export_/i)
 
     const zip = await JSZip.loadAsync(result.body as unknown as Buffer)
     expect(zip.file('taxon.csv')).toBeTruthy()

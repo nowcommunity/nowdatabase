@@ -42,7 +42,7 @@ describe('DwC-A occurrence export (admin-only)', () => {
 
     expect(result.status).toEqual(200)
     expect(result.headers['content-type']).toMatch(/application\/zip/i)
-    expect(result.headers['content-disposition']).toMatch(/attachment;\s*filename="now_dwc_occurrences_test_export_/i)
+    expect(result.headers['content-disposition']).toMatch(/attachment;\s*filename="now_dwc_occurrences_export_/i)
 
     const zip = await JSZip.loadAsync(result.body as unknown as Buffer)
     expect(zip.file('location.csv')).toBeTruthy()
@@ -80,7 +80,7 @@ describe('DwC-A occurrence export (admin-only)', () => {
 
     expect(result.status).toEqual(200)
     expect(result.headers['content-type']).toMatch(/application\/zip/i)
-    expect(result.headers['content-disposition']).toMatch(/attachment;\s*filename="now_dwc_dp_test_export_/i)
+    expect(result.headers['content-disposition']).toMatch(/attachment;\s*filename="now_dwc_dp_export_/i)
 
     const zip = await JSZip.loadAsync(result.body as unknown as Buffer)
     expect(zip.file('datapackage.json')).toBeTruthy()
@@ -110,7 +110,7 @@ describe('DwC-A occurrence export (admin-only)', () => {
 
     expect(result.status).toEqual(200)
     expect(result.headers['content-type']).toMatch(/application\/zip/i)
-    expect(result.headers['content-disposition']).toMatch(/attachment;\s*filename="now_dwc_full_test_export_/i)
+    expect(result.headers['content-disposition']).toMatch(/attachment;\s*filename="now_dwc_full_export_/i)
 
     const zip = await JSZip.loadAsync(result.body as unknown as Buffer)
     expect(zip.file('README.txt')).toBeTruthy()
