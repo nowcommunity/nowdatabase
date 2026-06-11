@@ -1,4 +1,4 @@
-import { Request, Router } from 'express'
+import { Request, Response, Router } from 'express'
 import {
   getAllLocalities,
   canEditRestrictedWriteLocality,
@@ -15,19 +15,38 @@ import { currentDateAsString } from '../../../frontend/src/shared/currentDateAsS
 
 const router = Router()
 
+const parseNumericIds = (value: unknown): number[] | undefined => {
+  if (value === undefined) return undefined
+  if (!Array.isArray(value)) throw new Error('ids must be an array.')
+  return value.map(id => {
+    const parsed = typeof id === 'number' ? id : typeof id === 'string' ? parseInt(id, 10) : NaN
+    if (!Number.isInteger(parsed)) throw new Error('ids must contain only integers.')
+    return parsed
+  })
+}
+
 router.get('/all', async (req, res) => {
   const localities = await getAllLocalities(req.user)
   return res.status(200).send(fixBigInt(localities))
 })
 
-router.get('/export/dwc-archive', requireOneOf([Role.Admin]), async (_req, res) => {
-  const zipBuffer = await buildDwcLocalityArchiveZipBuffer()
+const sendDwcArchive = async (ids: number[] | undefined, res: Response) => {
+  const zipBuffer = await buildDwcLocalityArchiveZipBuffer(ids)
   res.setHeader('Content-Type', 'application/zip')
-  res.setHeader(
-    'Content-Disposition',
-    `attachment; filename="now_dwc_localities_test_export_${currentDateAsString()}.zip"`
-  )
+  res.setHeader('Content-Disposition', `attachment; filename="now_dwc_localities_export_${currentDateAsString()}.zip"`)
   return res.status(200).send(zipBuffer)
+}
+
+router.get('/export/dwc-archive', requireOneOf([Role.Admin]), async (_req, res) => {
+  return sendDwcArchive(undefined, res)
+})
+
+router.post('/export/dwc-archive', requireOneOf([Role.Admin]), async (req, res) => {
+  try {
+    return await sendDwcArchive(parseNumericIds((req.body as { ids?: unknown }).ids), res)
+  } catch (error) {
+    return res.status(403).send({ error: error instanceof Error ? error.message : 'Invalid export filters.' })
+  }
 })
 
 router.get('/:id', async (req, res) => {

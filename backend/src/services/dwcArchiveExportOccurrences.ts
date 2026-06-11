@@ -93,6 +93,11 @@ type DwcOccurrenceArchiveStream = {
   cleanup: () => Promise<void>
 }
 
+export type DwcOccurrenceKey = {
+  lid: number
+  speciesId: number
+}
+
 export type DwcOccurrenceExportProgress = {
   stage: 'occurrences' | 'localities' | 'taxa' | 'zipping' | 'complete'
   generated: number
@@ -385,8 +390,33 @@ const localityLookupSelect = {
 
 const speciesLookupSelect = occurrenceSelect.com_species.select
 
-async function* iterateOccurrenceRows(): AsyncGenerator<OccurrenceForExport> {
+const sortOccurrenceKeys = (keys: DwcOccurrenceKey[]): DwcOccurrenceKey[] =>
+  [...keys].sort((a, b) => a.lid - b.lid || a.speciesId - b.speciesId)
+
+async function* iterateOccurrenceRows(occurrenceKeys?: DwcOccurrenceKey[]): AsyncGenerator<OccurrenceForExport> {
   const { nowDb } = await import('../utils/db')
+
+  if (occurrenceKeys) {
+    for (const keys of chunk(sortOccurrenceKeys(occurrenceKeys), LOOKUP_EXPORT_CHUNK_SIZE)) {
+      if (keys.length === 0) continue
+      const page = await nowDb.now_ls.findMany({
+        where: {
+          OR: keys.map(key => ({
+            lid: key.lid,
+            species_id: key.speciesId,
+          })),
+        },
+        orderBy: [{ lid: 'asc' }, { species_id: 'asc' }],
+        select: occurrenceSelect,
+      })
+
+      for (const occurrence of page) {
+        yield occurrence as unknown as OccurrenceForExport
+      }
+    }
+    return
+  }
+
   let cursor: { lid: number; species_id: number } | undefined
 
   while (true) {
@@ -408,7 +438,8 @@ async function* iterateOccurrenceRows(): AsyncGenerator<OccurrenceForExport> {
   }
 }
 
-const countOccurrenceRows = async (): Promise<number> => {
+const countOccurrenceRows = async (occurrenceKeys?: DwcOccurrenceKey[]): Promise<number> => {
+  if (occurrenceKeys) return occurrenceKeys.length
   const { nowDb } = await import('../utils/db')
   return await nowDb.now_ls.count()
 }
@@ -551,16 +582,18 @@ const writeOccurrenceAndMeasurementFiles = async ({
   occurrenceFilePath,
   measurementFilePath,
   reportProgress,
+  occurrenceKeys,
 }: {
   occurrenceFilePath: string
   measurementFilePath: string
   reportProgress?: DwcOccurrenceExportProgressReporter
+  occurrenceKeys?: DwcOccurrenceKey[]
 }): Promise<{ localityIds: number[]; speciesIds: number[] }> => {
   const occurrenceWriter = await createDwcCsvFileWriter(occurrenceFilePath, OCCURRENCE_HEADERS)
   const measurementWriter = await createDwcCsvFileWriter(measurementFilePath, MEASUREMENT_HEADERS)
   const localityIds = new Set<number>()
   const speciesIds = new Set<number>()
-  const totalOccurrences = await countOccurrenceRows()
+  const totalOccurrences = await countOccurrenceRows(occurrenceKeys)
   let generatedOccurrences = 0
 
   reportProgress?.({
@@ -571,7 +604,7 @@ const writeOccurrenceAndMeasurementFiles = async ({
   })
 
   try {
-    for await (const occurrence of iterateOccurrenceRows()) {
+    for await (const occurrence of iterateOccurrenceRows(occurrenceKeys)) {
       localityIds.add(occurrence.lid)
       speciesIds.add(occurrence.species_id)
       await occurrenceWriter.writeRow(mapOccurrenceToOccurrenceRow(occurrence))
@@ -699,8 +732,10 @@ const writeTaxonLookupFile = async ({
 
 export const buildDwcOccurrenceArchiveZipStream = async ({
   reportProgress,
+  occurrenceKeys,
 }: {
   reportProgress?: DwcOccurrenceExportProgressReporter
+  occurrenceKeys?: DwcOccurrenceKey[]
 } = {}): Promise<DwcOccurrenceArchiveStream> => {
   const tempDirectory = await mkdtemp(path.join(tmpdir(), 'now-dwc-occurrences-'))
   const files = {
@@ -716,6 +751,7 @@ export const buildDwcOccurrenceArchiveZipStream = async ({
       occurrenceFilePath: files.occurrence,
       measurementFilePath: files.measurement,
       reportProgress,
+      occurrenceKeys,
     })
     await writeLocalityLookupFiles({
       localityIds,

@@ -248,3 +248,31 @@ export const parseAndValidateCrossSearchRouteParameters = (
     validationErrors: errors,
   }
 }
+
+export const getFilteredCrossSearchOccurrenceKeys = async (
+  user: User | undefined,
+  parameters: CrossSearchRequestParameters
+) => {
+  const { validationErrors, validatedColumnFilters, validatedSorting } =
+    parseAndValidateCrossSearchRouteParameters(parameters)
+  if (validationErrors.length > 0) {
+    return { validationErrors }
+  }
+
+  const resultPages = (await getCrossSearchRawSql(
+    user,
+    undefined,
+    undefined,
+    validatedColumnFilters,
+    validatedSorting
+  )) as Array<Array<Partial<CrossSearch>>>
+
+  const keysById = new Map<string, { lid: number; speciesId: number }>()
+  for (const row of resultPages.flat()) {
+    if (typeof row.lid_now_loc !== 'number' || typeof row.species_id_com_species !== 'number') continue
+    const key = { lid: row.lid_now_loc, speciesId: row.species_id_com_species }
+    keysById.set(`${key.lid}:${key.speciesId}`, key)
+  }
+
+  return { occurrenceKeys: [...keysById.values()] }
+}

@@ -24,7 +24,10 @@ export const toDwcCsvString = (value: unknown): string => {
   return ''
 }
 
-export const dwcCsvCell = (value: unknown): string => `"${toDwcCsvString(value).replace(/"/g, '""')}"`
+export const dwcCsvCell = (value: unknown): string => {
+  const csvValue = toDwcCsvString(value)
+  return `"${(csvValue === '' ? '\\N' : csvValue).replace(/"/g, '""')}"`
+}
 
 export const dwcCsvLine = (headers: readonly string[], row: Record<string, unknown>): string =>
   `${headers.map(header => dwcCsvCell(row[header])).join(',')}\n`

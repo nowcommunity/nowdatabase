@@ -1,4 +1,4 @@
-import { Request, Router } from 'express'
+import { Request, Response, Router } from 'express'
 import { getAllSpecies, getAllSynonyms, getSpeciesDetails, validateEntireSpecies } from '../services/species'
 import { fixBigInt } from '../utils/common'
 import { EditMetaData, SpeciesDetailsType, Role } from '../../../frontend/src/shared/types'
@@ -8,6 +8,16 @@ import { buildDwcArchiveZipBuffer } from '../services/dwcArchiveExport'
 import { currentDateAsString } from '../../../frontend/src/shared/currentDateAsString'
 
 const router = Router()
+
+const parseNumericIds = (value: unknown): number[] | undefined => {
+  if (value === undefined) return undefined
+  if (!Array.isArray(value)) throw new Error('ids must be an array.')
+  return value.map(id => {
+    const parsed = typeof id === 'number' ? id : typeof id === 'string' ? parseInt(id, 10) : NaN
+    if (!Number.isInteger(parsed)) throw new Error('ids must contain only integers.')
+    return parsed
+  })
+}
 
 router.get('/all', async (_req, res) => {
   const species = await getAllSpecies()
@@ -19,11 +29,23 @@ router.get('/synonyms', async (_req, res) => {
   return res.status(200).send(fixBigInt(synonyms))
 })
 
-router.get('/export/dwc-archive', requireOneOf([Role.Admin]), async (_req, res) => {
-  const zipBuffer = await buildDwcArchiveZipBuffer()
+const sendDwcArchive = async (ids: number[] | undefined, res: Response) => {
+  const zipBuffer = await buildDwcArchiveZipBuffer(ids)
   res.setHeader('Content-Type', 'application/zip')
-  res.setHeader('Content-Disposition', `attachment; filename="now_dwc_test_export_${currentDateAsString()}.zip"`)
+  res.setHeader('Content-Disposition', `attachment; filename="now_dwc_export_${currentDateAsString()}.zip"`)
   return res.status(200).send(zipBuffer)
+}
+
+router.get('/export/dwc-archive', requireOneOf([Role.Admin]), async (_req, res) => {
+  return sendDwcArchive(undefined, res)
+})
+
+router.post('/export/dwc-archive', requireOneOf([Role.Admin]), async (req, res) => {
+  try {
+    return await sendDwcArchive(parseNumericIds((req.body as { ids?: unknown }).ids), res)
+  } catch (error) {
+    return res.status(403).send({ error: error instanceof Error ? error.message : 'Invalid export filters.' })
+  }
 })
 
 router.get('/:id', async (req, res) => {
