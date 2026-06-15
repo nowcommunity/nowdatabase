@@ -64,32 +64,33 @@ describe('Creating new species works', () => {
   })
 
   it('Creation fails without reference', async () => {
-    await resetDatabase()
+    const speciesWithoutRef = { ...newSpeciesBasis, species_name: 'anotherspecies', references: [] }
     const resultNoRef = await send('species', 'PUT', {
-      species: { ...newSpeciesBasis, references: [] },
+      species: { ...speciesWithoutRef },
     })
     expect(resultNoRef.status).toEqual(403) // can't create species without a reference
 
+    const speciesWithRef = { ...newSpeciesBasis, species_name: 'anotherspecies' }
     const resultWithRef = await send('species', 'PUT', {
-      species: { ...newSpeciesBasis },
+      species: { ...speciesWithRef },
     })
     expect(resultWithRef.status).toEqual(200)
   })
 
-  it('Creation fails without permissions for non-authenticated and non-privileged users', async () => {
+  it('Creation fails for unauthenticated users and succeeds for EditRestricted users', async () => {
     logout()
-    const newSpeciesBasis2 = { ...newSpeciesBasis, species_name: 'aspecies' }
-    const result1 = await send('species', 'PUT', {
-      species: { ...newSpeciesBasis2, comment: 'species test' },
+    const newSpeciesBasis3 = { ...newSpeciesBasis, species_name: 'yetanotherspecies' }
+    const resultNoAuth = await send('species', 'PUT', {
+      species: { ...newSpeciesBasis3, comment: 'species test' },
     })
-    expect(result1.body).toEqual(noPermError)
-    expect(result1.status).toEqual(403)
+    expect(resultNoAuth.body).toEqual(noPermError)
+    expect(resultNoAuth.status).toEqual(403)
 
     logout()
     await login('testEr', 'test')
-    const result2 = await send('species', 'PUT', {
-      species: { ...newSpeciesBasis2, comment: 'species edit test' },
+    const resultEr = await send('species', 'PUT', {
+      species: { ...newSpeciesBasis3, comment: 'species edit test' },
     })
-    expect(result2.status).toEqual(200)
+    expect(resultEr.status).toEqual(200)
   })
 })
