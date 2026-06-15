@@ -39,6 +39,7 @@ export const OccurrenceDwcExportMenuItem = ({ handleClose }: { handleClose: () =
         progressUrl: `${BACKEND_URL}/occurrence/export/dwc-archive/progress/${exportId}`,
         filename,
         fetchOptions: filteredFetchOptions,
+        progressFetchOptions: fetchOptions,
         notify,
         setNotificationMessage,
         startMessage: 'Generating DwC-A occurrence ZIP export...',

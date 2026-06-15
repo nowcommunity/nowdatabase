@@ -45,7 +45,7 @@ const resolveOccurrenceKeysForExport = async (req: Request): Promise<DwcOccurren
 }
 
 const handleExportFilterError = (error: unknown, res: Response) => {
-  return res.status(403).send({ error: error instanceof Error ? error.message : 'Invalid export filters.' })
+  return res.status(400).send({ error: error instanceof Error ? error.message : 'Invalid export filters.' })
 }
 
 router.get('/export/dwc-archive/progress/:exportId', requireOneOf([Role.Admin]), (req, res) => {

@@ -268,10 +268,12 @@ export const getFilteredCrossSearchOccurrenceKeys = async (
   )) as Array<Array<Partial<CrossSearch>>>
 
   const keysById = new Map<string, { lid: number; speciesId: number }>()
-  for (const row of resultPages.flat()) {
-    if (typeof row.lid_now_loc !== 'number' || typeof row.species_id_com_species !== 'number') continue
-    const key = { lid: row.lid_now_loc, speciesId: row.species_id_com_species }
-    keysById.set(`${key.lid}:${key.speciesId}`, key)
+  for (const page of resultPages) {
+    for (const row of page) {
+      if (typeof row.lid_now_loc !== 'number' || typeof row.species_id_com_species !== 'number') continue
+      const key = { lid: row.lid_now_loc, speciesId: row.species_id_com_species }
+      keysById.set(`${key.lid}:${key.speciesId}`, key)
+    }
   }
 
   return { occurrenceKeys: [...keysById.values()] }

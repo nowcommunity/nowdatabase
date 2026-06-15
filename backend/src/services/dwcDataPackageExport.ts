@@ -38,6 +38,20 @@ const occurrenceIdForRow = (lid: number, speciesId: number): string => `NOW:OCC:
 type LocalityForDwcDpExport = Parameters<typeof mapLocalityToMeasurementRows>[0]
 type OccurrenceForDwcDpExport = Parameters<typeof mapOccurrenceToOccurrenceRow>[0]
 
+const LOOKUP_EXPORT_CHUNK_SIZE = 1000
+
+const chunk = <T>(values: T[], size: number): T[][] => {
+  const chunks: T[][] = []
+  for (let index = 0; index < values.length; index += size) {
+    chunks.push(values.slice(index, index + size))
+  }
+  return chunks
+}
+
+const sortOccurrenceKeys = (occurrenceKeys: DwcOccurrenceKey[]): DwcOccurrenceKey[] => {
+  return [...occurrenceKeys].sort((a, b) => a.lid - b.lid || a.speciesId - b.speciesId)
+}
+
 export const DWC_DP_EVENT_HEADERS = [
   'eventID',
   'parentEventID',
@@ -334,7 +348,7 @@ const FIELD_DESCRIPTIONS: Record<string, string> = {
   taxonID: 'Stable NOW taxon identifier; this joins to dwc-a-taxa/taxon.csv in the full export.',
   scientificName: 'Scientific name assembled from curated NOW taxonomic fields.',
   scientificNameAuthorship: 'Scientific name authorship where curated.',
-  taxonRank: 'Taxonomic rank when available; currently reserved for future enrichment.',
+  taxonRank: 'Taxonomic rank derived from curated NOW taxonomic fields when available.',
   identificationVerificationStatus: 'Curated identification status or qualifier.',
   assertionID: 'Stable assertion identifier derived from the source database field and owning event or occurrence.',
   verbatimAssertionType:
@@ -913,15 +927,26 @@ const fetchOccurrencesForDwcDataPackageExport = async (
 ): Promise<OccurrenceForDwcDpExport[]> => {
   if (occurrenceKeys && occurrenceKeys.length === 0) return []
   const { nowDb } = await import('../utils/db')
-  const occurrences = await nowDb.now_ls.findMany({
-    where: occurrenceKeys
-      ? {
-          OR: occurrenceKeys.map(key => ({
+
+  if (occurrenceKeys) {
+    const occurrences: OccurrenceForDwcDpExport[] = []
+    for (const keys of chunk(sortOccurrenceKeys(occurrenceKeys), LOOKUP_EXPORT_CHUNK_SIZE)) {
+      const chunkOccurrences = await nowDb.now_ls.findMany({
+        where: {
+          OR: keys.map(key => ({
             lid: key.lid,
             species_id: key.speciesId,
           })),
-        }
-      : undefined,
+        },
+        orderBy: [{ lid: 'asc' }, { species_id: 'asc' }],
+        select: occurrenceSelect,
+      })
+      occurrences.push(...(chunkOccurrences as unknown as OccurrenceForDwcDpExport[]))
+    }
+    return occurrences
+  }
+
+  const occurrences = await nowDb.now_ls.findMany({
     orderBy: [{ lid: 'asc' }, { species_id: 'asc' }],
     select: occurrenceSelect,
   })

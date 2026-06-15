@@ -9,6 +9,7 @@ type DownloadExportParams = {
   url: string
   filename: string
   fetchOptions?: RequestInit
+  progressFetchOptions?: RequestInit
   notify: Notify
   setNotificationMessage: (message: string) => void
   startMessage: string
@@ -30,6 +31,7 @@ export const downloadExportFileWithProgress = async ({
   url,
   filename,
   fetchOptions = {},
+  progressFetchOptions,
   notify,
   setNotificationMessage,
   startMessage,
@@ -53,7 +55,7 @@ export const downloadExportFileWithProgress = async ({
     if (!progressUrl) return false
 
     try {
-      const response = await fetch(progressUrl, fetchOptions)
+      const response = await fetch(progressUrl, progressFetchOptions ?? fetchOptions)
       if (!response.ok) return false
 
       const progress = (await response.json()) as ExportProgress
