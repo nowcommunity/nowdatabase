@@ -733,15 +733,13 @@ export const TableView = <T extends MRT_RowData>({
   ])
 
   useEffect(() => {
-    if (serverSidePagination) {
-      if (data && data.length > 0) {
-        setRowCount(data[0].full_count as number)
-      } else {
-        setRowCount(0)
-      }
+    if (!serverSidePagination) return
+    if (data && data.length > 0) {
+      setRowCount(data[0].full_count as number)
+    } else {
+      setRowCount(0)
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [data])
+  }, [data, serverSidePagination])
 
   useEffect(() => {
     if (selectorFn) {
