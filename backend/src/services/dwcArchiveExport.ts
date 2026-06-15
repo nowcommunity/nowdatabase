@@ -2,15 +2,16 @@ import Prisma from '../../prisma/generated/now_test_client'
 import JSZip from 'jszip'
 import { toDwcCsvString, writeDwcCsvString } from './utils/dwcCsv'
 import { getFieldInfoText } from '../../../frontend/src/shared/fieldInfo'
-
-const DATASET_TITLE = 'NOW database Darwin Core export'
-const DATASET_NAME = 'now-darwincore-export'
-const DATASET_VERSION = '1.0.0'
-const DATASET_DOI = 'https://doi.org/10.5281/zenodo.4268068'
-const DATASET_LICENSE_URL = 'https://creativecommons.org/licenses/by/4.0/'
-const DATASET_LICENSE_TITLE = 'Creative Commons Attribution 4.0 International'
-const DATASET_CREATOR = 'The NOW Community'
-const MISSING_VALUE = '\\N'
+import {
+  DATASET_CREATOR,
+  DATASET_DOI,
+  DATASET_LICENSE_TITLE,
+  DATASET_LICENSE_URL,
+  DATASET_NAME,
+  DATASET_TITLE,
+  DATASET_VERSION,
+  MISSING_VALUE,
+} from './dwcMetadata'
 
 const isMeaningfulString = (value: unknown): value is string => {
   if (typeof value !== 'string') return false

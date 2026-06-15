@@ -62,6 +62,57 @@ describe('DwC-A occurrence export (admin-only)', () => {
     expect(measurementCsv).toContain('"verbatimMeasurementType"')
   })
 
+  it('returns a filtered ZIP archive for POST requests', async () => {
+    const loginResult = await send<{ token: string }>('user/login', 'POST', { username: 'testSu', password: 'test' })
+    expect(loginResult.status).toEqual(200)
+
+    const result = await request(app)
+      .post('/occurrence/export/dwc-archive')
+      .set('authorization', `bearer ${loginResult.body.token}`)
+      .send({ columnFilters: [{ id: 'lid_now_loc', value: '21050' }], sorting: [] })
+      .buffer(true)
+      .parse(parseBinary)
+
+    expect(result.status).toEqual(200)
+    expect(result.headers['content-type']).toMatch(/application\/zip/i)
+
+    const zip = await JSZip.loadAsync(result.body as unknown as Buffer)
+    const occurrenceCsv = await zip.file('occurrence.csv')!.async('string')
+    expect(occurrenceCsv).toContain('NOW:OCC:21050:')
+    expect(occurrenceCsv).not.toContain('NOW:OCC:24750:')
+  })
+
+  it('returns an empty filtered DwC-DP ZIP archive for POST requests', async () => {
+    const loginResult = await send<{ token: string }>('user/login', 'POST', { username: 'testSu', password: 'test' })
+    expect(loginResult.status).toEqual(200)
+
+    const result = await request(app)
+      .post('/occurrence/export/dwc-data-package')
+      .set('authorization', `bearer ${loginResult.body.token}`)
+      .send({ columnFilters: [{ id: 'lid_now_loc', value: '9999999' }], sorting: [] })
+      .buffer(true)
+      .parse(parseBinary)
+
+    expect(result.status).toEqual(200)
+    const zip = await JSZip.loadAsync(result.body as unknown as Buffer)
+    const occurrenceCsv = await zip.file('occurrence.csv')!.async('string')
+    expect(occurrenceCsv).toContain('"occurrenceID"')
+    expect(occurrenceCsv).not.toContain('NOW:OCC:')
+  })
+
+  it('returns structured validation errors for invalid POST filters', async () => {
+    const loginResult = await send<{ token: string }>('user/login', 'POST', { username: 'testSu', password: 'test' })
+    expect(loginResult.status).toEqual(200)
+
+    const result = await request(app)
+      .post('/occurrence/export/dwc-data-package')
+      .set('authorization', `bearer ${loginResult.body.token}`)
+      .send({ columnFilters: [{ id: '', value: '21050' }], sorting: [] })
+
+    expect(result.status).toEqual(400)
+    expect(result.body).toEqual([{ name: 'Column Filters', error: 'Invalid or missing id field in filter' }])
+  })
+
   it('rejects non-admin requests', async () => {
     const result = await request(app).get('/occurrence/export/dwc-archive')
     expect(result.status).toEqual(403)

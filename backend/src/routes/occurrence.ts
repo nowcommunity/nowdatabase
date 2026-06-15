@@ -12,6 +12,7 @@ import { buildDwcDataPackageZipBuffer, buildFullDarwinCoreExportZipBuffer } from
 import { currentDateAsString } from '../../../frontend/src/shared/currentDateAsString'
 import { logger } from '../utils/logger'
 import { getFilteredCrossSearchOccurrenceKeys, type CrossSearchRequestParameters } from '../services/crossSearch'
+import type { ValidationObject } from '../../../frontend/src/shared/validators/validator'
 
 const router = Router()
 
@@ -31,6 +32,15 @@ const defaultCrossSearchExportFilters = {
   sorting: [],
 } satisfies CrossSearchRequestParameters
 
+class ExportFilterValidationError extends Error {
+  validationErrors: ValidationObject[]
+
+  constructor(validationErrors: ValidationObject[]) {
+    super('Invalid export filters.')
+    this.validationErrors = validationErrors
+  }
+}
+
 const resolveOccurrenceKeysForExport = async (req: Request): Promise<DwcOccurrenceKey[] | undefined> => {
   if (req.method === 'GET') return undefined
   const body = req.body as Partial<CrossSearchRequestParameters> | undefined
@@ -38,13 +48,16 @@ const resolveOccurrenceKeysForExport = async (req: Request): Promise<DwcOccurren
     columnFilters: body?.columnFilters ?? defaultCrossSearchExportFilters.columnFilters,
     sorting: body?.sorting ?? defaultCrossSearchExportFilters.sorting,
   })
-  if ('validationErrors' in result) {
-    throw new Error(JSON.stringify(result.validationErrors))
+  if ('validationErrors' in result && Array.isArray(result.validationErrors)) {
+    throw new ExportFilterValidationError(result.validationErrors)
   }
   return result.occurrenceKeys
 }
 
 const handleExportFilterError = (error: unknown, res: Response) => {
+  if (error instanceof ExportFilterValidationError) {
+    return res.status(400).send(error.validationErrors)
+  }
   return res.status(400).send({ error: error instanceof Error ? error.message : 'Invalid export filters.' })
 }
 

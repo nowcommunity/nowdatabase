@@ -13,6 +13,16 @@ import {
 } from './dwcArchiveExportOccurrences'
 import { buildDwcArchiveZipBuffer, resolveTaxonRank, type MeasurementCsvRow } from './dwcArchiveExport'
 import { writeDwcCsvString } from './utils/dwcCsv'
+import {
+  DATASET_CREATOR,
+  DATASET_DOI,
+  DATASET_LICENSE_TITLE,
+  DATASET_LICENSE_URL,
+  DATASET_NAME,
+  DATASET_TITLE,
+  DATASET_VERSION,
+  MISSING_VALUE,
+} from './dwcMetadata'
 
 const isMeaningfulString = (value: unknown): value is string => {
   if (typeof value !== 'string') return false
@@ -132,14 +142,6 @@ const ASSERTION_HEADERS = [
 
 const DWC_DP_EVENT_ASSERTION_HEADERS = ['eventID', ...ASSERTION_HEADERS] as const
 const DWC_DP_OCCURRENCE_ASSERTION_HEADERS = ['occurrenceID', ...ASSERTION_HEADERS] as const
-const DATASET_TITLE = 'NOW database Darwin Core export'
-const DATASET_NAME = 'now-darwincore-export'
-const DATASET_VERSION = '1.0.0'
-const DATASET_DOI = 'https://doi.org/10.5281/zenodo.4268068'
-const DATASET_LICENSE_URL = 'https://creativecommons.org/licenses/by/4.0/'
-const DATASET_LICENSE_TITLE = 'Creative Commons Attribution 4.0 International'
-const DATASET_CREATOR = 'The NOW Community'
-const MISSING_VALUE = '\\N'
 
 type AssertionHeader = (typeof ASSERTION_HEADERS)[number]
 type AssertionColumns = Record<AssertionHeader, string>
@@ -474,8 +476,7 @@ export const buildDwcDataPackageJson = (publicationDateIso: string): string => {
       'occurrence data',
       'taxon traits',
     ],
-    citation:
-      'The NOW Community. NOW database Darwin Core export, version 1.0.0. https://doi.org/10.5281/zenodo.4268068. The DOI describes the NOW database generally rather than a single frozen export version; include the export date when citing a downloaded archive.',
+    citation: `${DATASET_CREATOR}. ${DATASET_TITLE}, version ${DATASET_VERSION}. ${DATASET_DOI}. The DOI describes the NOW database generally rather than a single frozen export version; include the export date when citing a downloaded archive.`,
     description:
       'Production Darwin Core Data Package export from the NOW database for relational event, occurrence, geological context, and assertion data. The NOW database is a continuously curated, globally scoped fossil mammal database with Cenozoic emphasis, spanning approximately the last 66 million years.',
     missingValues: [MISSING_VALUE],
