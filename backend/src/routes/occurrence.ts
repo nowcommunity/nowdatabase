@@ -136,11 +136,13 @@ router.get('/export/dwc-data-package', requireOneOf([Role.Admin]), async (_req, 
 })
 
 router.post('/export/dwc-data-package', requireOneOf([Role.Admin]), async (req, res) => {
+  let occurrenceKeys: DwcOccurrenceKey[] | undefined
   try {
-    return await sendDwcDataPackage(await resolveOccurrenceKeysForExport(req), res)
+    occurrenceKeys = await resolveOccurrenceKeysForExport(req)
   } catch (error) {
     return handleExportFilterError(error, res)
   }
+  return sendDwcDataPackage(occurrenceKeys, res)
 })
 
 const sendFullDarwinCorePackage = async (occurrenceKeys: DwcOccurrenceKey[] | undefined, res: Response) => {
@@ -155,11 +157,13 @@ router.get('/export/dwc-full-package', requireOneOf([Role.Admin]), async (_req, 
 })
 
 router.post('/export/dwc-full-package', requireOneOf([Role.Admin]), async (req, res) => {
+  let occurrenceKeys: DwcOccurrenceKey[] | undefined
   try {
-    return await sendFullDarwinCorePackage(await resolveOccurrenceKeysForExport(req), res)
+    occurrenceKeys = await resolveOccurrenceKeysForExport(req)
   } catch (error) {
     return handleExportFilterError(error, res)
   }
+  return sendFullDarwinCorePackage(occurrenceKeys, res)
 })
 
 router.get('/:lid/:speciesId', getOccurrenceDetail)

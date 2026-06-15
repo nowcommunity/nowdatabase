@@ -9,3 +9,9 @@ export const parseNumericIds = (value: unknown): number[] | undefined => {
     return parsed
   })
 }
+
+export const parseRequiredNumericIdsBody = (body: unknown): number[] => {
+  const exportBody = body as { ids?: unknown } | undefined
+  if (!exportBody || !('ids' in exportBody)) throw new Error('ids must be an array.')
+  return parseNumericIds(exportBody.ids) ?? []
+}

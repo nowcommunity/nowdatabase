@@ -1,5 +1,6 @@
 import { createWriteStream } from 'fs'
 import { once } from 'events'
+import { MISSING_VALUE } from '../dwcMetadata'
 
 export const normalizeDwcCsvValue = (value: string): string => value.replace(/\r\n|\r|\n/g, ' ').replace(/[ \t]+/g, ' ')
 
@@ -26,7 +27,7 @@ export const toDwcCsvString = (value: unknown): string => {
 
 export const dwcCsvCell = (value: unknown): string => {
   const csvValue = toDwcCsvString(value)
-  return `"${(csvValue === '' ? '\\N' : csvValue).replace(/"/g, '""')}"`
+  return `"${(csvValue === '' ? MISSING_VALUE : csvValue).replace(/"/g, '""')}"`
 }
 
 export const dwcCsvLine = (headers: readonly string[], row: Record<string, unknown>): string =>

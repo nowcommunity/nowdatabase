@@ -6,7 +6,7 @@ import { deleteSpecies, writeSpecies } from '../services/write/species'
 import { requireOneOf } from '../middlewares/authorizer'
 import { buildDwcArchiveZipBuffer } from '../services/dwcArchiveExport'
 import { currentDateAsString } from '../../../frontend/src/shared/currentDateAsString'
-import { parseNumericIds } from './utils/exportFilters'
+import { parseRequiredNumericIdsBody } from './utils/exportFilters'
 
 const router = Router()
 
@@ -32,13 +32,13 @@ router.get('/export/dwc-archive', requireOneOf([Role.Admin]), async (_req, res) 
 })
 
 router.post('/export/dwc-archive', requireOneOf([Role.Admin]), async (req, res) => {
+  let ids: number[]
   try {
-    const body = req.body as { ids?: unknown } | undefined
-    if (!body || !('ids' in body)) throw new Error('ids must be an array.')
-    return await sendDwcArchive(parseNumericIds(body.ids), res)
+    ids = parseRequiredNumericIdsBody(req.body)
   } catch (error) {
     return res.status(400).send({ error: error instanceof Error ? error.message : 'Invalid export filters.' })
   }
+  return sendDwcArchive(ids, res)
 })
 
 router.get('/:id', async (req, res) => {
