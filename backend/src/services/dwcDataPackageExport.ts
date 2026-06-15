@@ -956,11 +956,18 @@ const fetchOccurrencesForDwcDataPackageExport = async (
 }
 
 export const buildDwcDataPackageZipBuffer = async (occurrenceKeys?: DwcOccurrenceKey[]): Promise<Buffer> => {
-  const { nowDb } = await import('../utils/db')
   const occurrences = await fetchOccurrencesForDwcDataPackageExport(occurrenceKeys)
-  const localityIds = occurrenceKeys ? [...new Set(occurrences.map(occurrence => occurrence.lid))] : undefined
+  return await buildDwcDataPackageZipBufferFromOccurrences(occurrences, Boolean(occurrenceKeys))
+}
+
+const buildDwcDataPackageZipBufferFromOccurrences = async (
+  occurrences: OccurrenceForDwcDpExport[],
+  isFilteredExport: boolean
+): Promise<Buffer> => {
+  const { nowDb } = await import('../utils/db')
+  const localityIds = isFilteredExport ? [...new Set(occurrences.map(occurrence => occurrence.lid))] : undefined
   const localities = (await nowDb.now_loc.findMany({
-    where: localityIds ? { lid: { in: localityIds } } : undefined,
+    where: isFilteredExport ? { lid: { in: localityIds } } : undefined,
     orderBy: { lid: 'asc' },
     select: localitySelect,
   })) as unknown as LocalityForDwcDpExport[]
@@ -1129,13 +1136,9 @@ export const buildFullDarwinCoreExportZipBufferFromArchives = async ({
 
 export const buildFullDarwinCoreExportZipBuffer = async (occurrenceKeys?: DwcOccurrenceKey[]): Promise<Buffer> => {
   const occurrences = occurrenceKeys ? await fetchOccurrencesForDwcDataPackageExport(occurrenceKeys) : undefined
-  const filteredOccurrenceKeys = occurrences?.map(occurrence => ({
-    lid: occurrence.lid,
-    speciesId: occurrence.species_id,
-  }))
   const speciesIds = occurrences ? [...new Set(occurrences.map(occurrence => occurrence.species_id))] : undefined
   const [dwcDataPackageZipBuffer, dwcTaxonArchiveZipBuffer] = await Promise.all([
-    buildDwcDataPackageZipBuffer(filteredOccurrenceKeys),
+    occurrences ? buildDwcDataPackageZipBufferFromOccurrences(occurrences, true) : buildDwcDataPackageZipBuffer(),
     buildDwcArchiveZipBuffer(speciesIds),
   ])
 

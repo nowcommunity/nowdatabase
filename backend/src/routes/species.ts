@@ -33,7 +33,9 @@ router.get('/export/dwc-archive', requireOneOf([Role.Admin]), async (_req, res) 
 
 router.post('/export/dwc-archive', requireOneOf([Role.Admin]), async (req, res) => {
   try {
-    return await sendDwcArchive(parseNumericIds((req.body as { ids?: unknown }).ids), res)
+    const body = req.body as { ids?: unknown } | undefined
+    if (!body || !('ids' in body)) throw new Error('ids must be an array.')
+    return await sendDwcArchive(parseNumericIds(body.ids), res)
   } catch (error) {
     return res.status(400).send({ error: error instanceof Error ? error.message : 'Invalid export filters.' })
   }

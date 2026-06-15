@@ -66,6 +66,39 @@ describe('DwC-A species export (admin-only)', () => {
     expect(metaXml).toContain('<extension')
   })
 
+  it('returns a filtered ZIP archive for POST requests', async () => {
+    const loginResult = await send<{ token: string }>('user/login', 'POST', { username: 'testSu', password: 'test' })
+    expect(loginResult.status).toEqual(200)
+
+    const result = await request(app)
+      .post('/species/export/dwc-archive')
+      .set('authorization', `bearer ${loginResult.body.token}`)
+      .send({ ids: [85729] })
+      .buffer(true)
+      .parse(parseBinary)
+
+    expect(result.status).toEqual(200)
+    expect(result.headers['content-type']).toMatch(/application\/zip/i)
+
+    const zip = await JSZip.loadAsync(result.body as unknown as Buffer)
+    const taxonCsv = await zip.file('taxon.csv')!.async('string')
+    expect(taxonCsv).toContain('NOW:85729')
+    expect(taxonCsv).not.toContain('NOW:85730')
+  })
+
+  it('returns 400 for invalid POST id payloads', async () => {
+    const loginResult = await send<{ token: string }>('user/login', 'POST', { username: 'testSu', password: 'test' })
+    expect(loginResult.status).toEqual(200)
+
+    const result = await request(app)
+      .post('/species/export/dwc-archive')
+      .set('authorization', `bearer ${loginResult.body.token}`)
+      .send({ ids: ['85729abc'] })
+
+    expect(result.status).toEqual(400)
+    expect(result.body).toEqual({ error: 'ids must contain only integers.' })
+  })
+
   it('rejects non-admin requests', async () => {
     const result = await request(app).get('/species/export/dwc-archive')
     expect(result.status).toEqual(403)
