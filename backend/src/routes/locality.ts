@@ -1,4 +1,4 @@
-import { Request, Router } from 'express'
+import { Request, Response, Router } from 'express'
 import {
   getAllLocalities,
   canEditRestrictedWriteLocality,
@@ -12,6 +12,7 @@ import { AccessError, requireOneOf } from '../middlewares/authorizer'
 import { deleteLocality, writeLocality } from '../services/write/locality'
 import { buildDwcLocalityArchiveZipBuffer } from '../services/dwcArchiveExportLocalities'
 import { currentDateAsString } from '../../../frontend/src/shared/currentDateAsString'
+import { parseRequiredNumericIdsBody } from './utils/exportFilters'
 
 const router = Router()
 
@@ -20,14 +21,25 @@ router.get('/all', async (req, res) => {
   return res.status(200).send(fixBigInt(localities))
 })
 
-router.get('/export/dwc-archive', requireOneOf([Role.Admin]), async (_req, res) => {
-  const zipBuffer = await buildDwcLocalityArchiveZipBuffer()
+const sendDwcArchive = async (ids: number[] | undefined, res: Response) => {
+  const zipBuffer = await buildDwcLocalityArchiveZipBuffer(ids)
   res.setHeader('Content-Type', 'application/zip')
-  res.setHeader(
-    'Content-Disposition',
-    `attachment; filename="now_dwc_localities_test_export_${currentDateAsString()}.zip"`
-  )
+  res.setHeader('Content-Disposition', `attachment; filename="now_dwc_localities_export_${currentDateAsString()}.zip"`)
   return res.status(200).send(zipBuffer)
+}
+
+router.get('/export/dwc-archive', requireOneOf([Role.Admin]), async (_req, res) => {
+  return sendDwcArchive(undefined, res)
+})
+
+router.post('/export/dwc-archive', requireOneOf([Role.Admin]), async (req, res) => {
+  let ids: number[]
+  try {
+    ids = parseRequiredNumericIdsBody(req.body)
+  } catch (error) {
+    return res.status(400).send({ error: error instanceof Error ? error.message : 'Invalid export filters.' })
+  }
+  return sendDwcArchive(ids, res)
 })
 
 router.get('/:id', async (req, res) => {

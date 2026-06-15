@@ -1,0 +1,8 @@
+export const DATASET_TITLE = 'NOW database Darwin Core export'
+export const DATASET_NAME = 'now-darwincore-export'
+export const DATASET_VERSION = '1.0.0'
+export const DATASET_DOI = 'https://doi.org/10.5281/zenodo.4268068'
+export const DATASET_LICENSE_URL = 'https://creativecommons.org/licenses/by/4.0/'
+export const DATASET_LICENSE_TITLE = 'Creative Commons Attribution 4.0 International'
+export const DATASET_CREATOR = 'The NOW Community'
+export const MISSING_VALUE = '\\N'

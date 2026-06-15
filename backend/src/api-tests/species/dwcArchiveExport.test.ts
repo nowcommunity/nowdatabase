@@ -42,7 +42,7 @@ describe('DwC-A species export (admin-only)', () => {
 
     expect(result.status).toEqual(200)
     expect(result.headers['content-type']).toMatch(/application\/zip/i)
-    expect(result.headers['content-disposition']).toMatch(/attachment;\s*filename="now_dwc_test_export_/i)
+    expect(result.headers['content-disposition']).toMatch(/attachment;\s*filename="now_dwc_export_/i)
 
     const zip = await JSZip.loadAsync(result.body as unknown as Buffer)
     expect(zip.file('taxon.csv')).toBeTruthy()
@@ -64,6 +64,39 @@ describe('DwC-A species export (admin-only)', () => {
     const metaXml = await zip.file('meta.xml')!.async('string')
     expect(metaXml).toContain('<core')
     expect(metaXml).toContain('<extension')
+  })
+
+  it('returns a filtered ZIP archive for POST requests', async () => {
+    const loginResult = await send<{ token: string }>('user/login', 'POST', { username: 'testSu', password: 'test' })
+    expect(loginResult.status).toEqual(200)
+
+    const result = await request(app)
+      .post('/species/export/dwc-archive')
+      .set('authorization', `bearer ${loginResult.body.token}`)
+      .send({ ids: [85729] })
+      .buffer(true)
+      .parse(parseBinary)
+
+    expect(result.status).toEqual(200)
+    expect(result.headers['content-type']).toMatch(/application\/zip/i)
+
+    const zip = await JSZip.loadAsync(result.body as unknown as Buffer)
+    const taxonCsv = await zip.file('taxon.csv')!.async('string')
+    expect(taxonCsv).toContain('NOW:85729')
+    expect(taxonCsv).not.toContain('NOW:85730')
+  })
+
+  it('returns 400 for invalid POST id payloads', async () => {
+    const loginResult = await send<{ token: string }>('user/login', 'POST', { username: 'testSu', password: 'test' })
+    expect(loginResult.status).toEqual(200)
+
+    const result = await request(app)
+      .post('/species/export/dwc-archive')
+      .set('authorization', `bearer ${loginResult.body.token}`)
+      .send({ ids: ['85729abc'] })
+
+    expect(result.status).toEqual(400)
+    expect(result.body).toEqual({ error: 'ids must contain only integers.' })
   })
 
   it('rejects non-admin requests', async () => {

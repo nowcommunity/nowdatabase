@@ -1,4 +1,4 @@
-import { Request, Router } from 'express'
+import { Request, Response, Router } from 'express'
 import { getAllSpecies, getAllSynonyms, getSpeciesDetails, validateEntireSpecies } from '../services/species'
 import { fixBigInt } from '../utils/common'
 import { EditMetaData, SpeciesDetailsType, Role } from '../../../frontend/src/shared/types'
@@ -6,6 +6,7 @@ import { deleteSpecies, writeSpecies } from '../services/write/species'
 import { requireOneOf } from '../middlewares/authorizer'
 import { buildDwcArchiveZipBuffer } from '../services/dwcArchiveExport'
 import { currentDateAsString } from '../../../frontend/src/shared/currentDateAsString'
+import { parseRequiredNumericIdsBody } from './utils/exportFilters'
 
 const router = Router()
 
@@ -19,11 +20,25 @@ router.get('/synonyms', async (_req, res) => {
   return res.status(200).send(fixBigInt(synonyms))
 })
 
-router.get('/export/dwc-archive', requireOneOf([Role.Admin]), async (_req, res) => {
-  const zipBuffer = await buildDwcArchiveZipBuffer()
+const sendDwcArchive = async (ids: number[] | undefined, res: Response) => {
+  const zipBuffer = await buildDwcArchiveZipBuffer(ids)
   res.setHeader('Content-Type', 'application/zip')
-  res.setHeader('Content-Disposition', `attachment; filename="now_dwc_test_export_${currentDateAsString()}.zip"`)
+  res.setHeader('Content-Disposition', `attachment; filename="now_dwc_export_${currentDateAsString()}.zip"`)
   return res.status(200).send(zipBuffer)
+}
+
+router.get('/export/dwc-archive', requireOneOf([Role.Admin]), async (_req, res) => {
+  return sendDwcArchive(undefined, res)
+})
+
+router.post('/export/dwc-archive', requireOneOf([Role.Admin]), async (req, res) => {
+  let ids: number[]
+  try {
+    ids = parseRequiredNumericIdsBody(req.body)
+  } catch (error) {
+    return res.status(400).send({ error: error instanceof Error ? error.message : 'Invalid export filters.' })
+  }
+  return sendDwcArchive(ids, res)
 })
 
 router.get('/:id', async (req, res) => {

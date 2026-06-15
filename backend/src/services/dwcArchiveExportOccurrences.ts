@@ -93,6 +93,11 @@ type DwcOccurrenceArchiveStream = {
   cleanup: () => Promise<void>
 }
 
+export type DwcOccurrenceKey = {
+  lid: number
+  speciesId: number
+}
+
 export type DwcOccurrenceExportProgress = {
   stage: 'occurrences' | 'localities' | 'taxa' | 'zipping' | 'complete'
   generated: number
@@ -385,8 +390,33 @@ const localityLookupSelect = {
 
 const speciesLookupSelect = occurrenceSelect.com_species.select
 
-async function* iterateOccurrenceRows(): AsyncGenerator<OccurrenceForExport> {
+const sortOccurrenceKeys = (keys: DwcOccurrenceKey[]): DwcOccurrenceKey[] =>
+  [...keys].sort((a, b) => a.lid - b.lid || a.speciesId - b.speciesId)
+
+async function* iterateOccurrenceRows(occurrenceKeys?: DwcOccurrenceKey[]): AsyncGenerator<OccurrenceForExport> {
   const { nowDb } = await import('../utils/db')
+
+  if (occurrenceKeys) {
+    for (const keys of chunk(sortOccurrenceKeys(occurrenceKeys), LOOKUP_EXPORT_CHUNK_SIZE)) {
+      if (keys.length === 0) continue
+      const page = await nowDb.now_ls.findMany({
+        where: {
+          OR: keys.map(key => ({
+            lid: key.lid,
+            species_id: key.speciesId,
+          })),
+        },
+        orderBy: [{ lid: 'asc' }, { species_id: 'asc' }],
+        select: occurrenceSelect,
+      })
+
+      for (const occurrence of page) {
+        yield occurrence as unknown as OccurrenceForExport
+      }
+    }
+    return
+  }
+
   let cursor: { lid: number; species_id: number } | undefined
 
   while (true) {
@@ -408,7 +438,8 @@ async function* iterateOccurrenceRows(): AsyncGenerator<OccurrenceForExport> {
   }
 }
 
-const countOccurrenceRows = async (): Promise<number> => {
+const countOccurrenceRows = async (occurrenceKeys?: DwcOccurrenceKey[]): Promise<number> => {
+  if (occurrenceKeys) return occurrenceKeys.length
   const { nowDb } = await import('../utils/db')
   return await nowDb.now_ls.count()
 }
@@ -483,29 +514,29 @@ export const buildOccurrenceEmlXml = (publicationDateIso: string): string => {
 <eml:eml
   xmlns:eml="eml://ecoinformatics.org/eml-2.1.1"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  packageId="nowdatabase-dwc-occurrence-test-export"
+  packageId="nowdatabase-dwc-occurrence-export"
   system="nowdatabase"
   xsi:schemaLocation="eml://ecoinformatics.org/eml-2.1.1 https://eml.ecoinformatics.org/eml-2.1.1/eml.xsd"
 >
   <!-- TODO(#1150): Replace placeholder metadata with real dataset-level EML generation. -->
   <dataset>
-    <title>NOW database Darwin Core test export (occurrences)</title>
+    <title>NOW database Darwin Core export (occurrences)</title>
     <creator>
       <individualName>
-        <surName>NOW database</surName>
+        <surName>The NOW Community</surName>
       </individualName>
     </creator>
     <contact>
       <individualName>
-        <surName>NOW database</surName>
+        <surName>The NOW Community</surName>
       </individualName>
     </contact>
     <pubDate>${publicationDateIso}</pubDate>
     <abstract>
-      <para>Admin-only test Darwin Core Archive export for occurrence records from now_ls. Location and taxon lookup files are included with the same structures as the locality and taxon exports.</para>
+      <para>Production Darwin Core Archive export for occurrence records from the NOW database. Location and taxon lookup files are included with the same structures as the locality and taxon exports.</para>
     </abstract>
     <intellectualRights>
-      <para>TODO(#1150): Add rights / license information.</para>
+      <para>This dataset is made available under the Creative Commons Attribution 4.0 International License (CC BY 4.0): https://creativecommons.org/licenses/by/4.0/.</para>
     </intellectualRights>
   </dataset>
 </eml:eml>
@@ -551,16 +582,18 @@ const writeOccurrenceAndMeasurementFiles = async ({
   occurrenceFilePath,
   measurementFilePath,
   reportProgress,
+  occurrenceKeys,
 }: {
   occurrenceFilePath: string
   measurementFilePath: string
   reportProgress?: DwcOccurrenceExportProgressReporter
+  occurrenceKeys?: DwcOccurrenceKey[]
 }): Promise<{ localityIds: number[]; speciesIds: number[] }> => {
   const occurrenceWriter = await createDwcCsvFileWriter(occurrenceFilePath, OCCURRENCE_HEADERS)
   const measurementWriter = await createDwcCsvFileWriter(measurementFilePath, MEASUREMENT_HEADERS)
   const localityIds = new Set<number>()
   const speciesIds = new Set<number>()
-  const totalOccurrences = await countOccurrenceRows()
+  const totalOccurrences = await countOccurrenceRows(occurrenceKeys)
   let generatedOccurrences = 0
 
   reportProgress?.({
@@ -571,7 +604,7 @@ const writeOccurrenceAndMeasurementFiles = async ({
   })
 
   try {
-    for await (const occurrence of iterateOccurrenceRows()) {
+    for await (const occurrence of iterateOccurrenceRows(occurrenceKeys)) {
       localityIds.add(occurrence.lid)
       speciesIds.add(occurrence.species_id)
       await occurrenceWriter.writeRow(mapOccurrenceToOccurrenceRow(occurrence))
@@ -699,8 +732,10 @@ const writeTaxonLookupFile = async ({
 
 export const buildDwcOccurrenceArchiveZipStream = async ({
   reportProgress,
+  occurrenceKeys,
 }: {
   reportProgress?: DwcOccurrenceExportProgressReporter
+  occurrenceKeys?: DwcOccurrenceKey[]
 } = {}): Promise<DwcOccurrenceArchiveStream> => {
   const tempDirectory = await mkdtemp(path.join(tmpdir(), 'now-dwc-occurrences-'))
   const files = {
@@ -716,6 +751,7 @@ export const buildDwcOccurrenceArchiveZipStream = async ({
       occurrenceFilePath: files.occurrence,
       measurementFilePath: files.measurement,
       reportProgress,
+      occurrenceKeys,
     })
     await writeLocalityLookupFiles({
       localityIds,

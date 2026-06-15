@@ -2,6 +2,16 @@ import Prisma from '../../prisma/generated/now_test_client'
 import JSZip from 'jszip'
 import { toDwcCsvString, writeDwcCsvString } from './utils/dwcCsv'
 import { getFieldInfoText } from '../../../frontend/src/shared/fieldInfo'
+import {
+  DATASET_CREATOR,
+  DATASET_DOI,
+  DATASET_LICENSE_TITLE,
+  DATASET_LICENSE_URL,
+  DATASET_NAME,
+  DATASET_TITLE,
+  DATASET_VERSION,
+  MISSING_VALUE,
+} from './dwcMetadata'
 
 const isMeaningfulString = (value: unknown): value is string => {
   if (typeof value !== 'string') return false
@@ -88,7 +98,7 @@ const isSpeciesSp = (value: string): boolean => /^sp\.?$/i.test(value.trim())
 
 const includesIndet = (value: string): boolean => value.toLowerCase().includes('indet.')
 
-const resolveTaxonRank = ({
+export const resolveTaxonRank = ({
   family,
   genus,
   specificEpithet,
@@ -866,30 +876,121 @@ export const buildEmlXml = (publicationDateIso: string): string => {
 <eml:eml
   xmlns:eml="eml://ecoinformatics.org/eml-2.1.1"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  packageId="nowdatabase-dwc-test-export"
+  packageId="${DATASET_NAME}-dwc-a-taxa-${DATASET_VERSION}"
   system="nowdatabase"
   xsi:schemaLocation="eml://ecoinformatics.org/eml-2.1.1 https://eml.ecoinformatics.org/eml-2.1.1/eml.xsd"
 >
-  <!-- TODO(#1150): Replace placeholder metadata with real dataset-level EML generation. -->
   <dataset>
-    <title>NOW database Darwin Core test export</title>
+    <title>${DATASET_TITLE}</title>
     <creator>
-      <individualName>
-        <surName>NOW database</surName>
-      </individualName>
+      <organizationName>${DATASET_CREATOR}</organizationName>
+      <onlineUrl>https://nowdatabase.org/</onlineUrl>
     </creator>
-    <contact>
-      <individualName>
-        <surName>NOW database</surName>
-      </individualName>
-    </contact>
+    <metadataProvider>
+      <organizationName>${DATASET_CREATOR}</organizationName>
+      <onlineUrl>https://nowdatabase.org/</onlineUrl>
+    </metadataProvider>
+    <associatedParty>
+      <organizationName>${DATASET_CREATOR}</organizationName>
+      <role>publisher</role>
+      <onlineUrl>https://nowdatabase.org/</onlineUrl>
+    </associatedParty>
     <pubDate>${publicationDateIso}</pubDate>
+    <language>eng</language>
+    <series>NOW database Darwin Core export</series>
     <abstract>
-      <para>Admin-only test Darwin Core Archive export from NOW database. Field mappings are intentionally limited for v1.</para>
+      <para>This Darwin Core Archive is the taxon and synthesized taxon-level trait component of the production NOW database Darwin Core export. It contains taxonomic records and MeasurementOrFact rows generated directly from curated NOW taxon fields.</para>
+      <para>The NOW database is a continuously curated global fossil mammal database supporting large-scale paleobiological and paleontological research. The database spans approximately the last 66 million years, Cenozoic, while maintaining global coverage.</para>
     </abstract>
+    <keywordSet>
+      <keyword>Darwin Core Archive</keyword>
+      <keyword>MeasurementOrFact</keyword>
+      <keyword>taxon traits</keyword>
+      <keyword>fossil mammals</keyword>
+      <keyword>Cenozoic</keyword>
+      <keyword>paleobiology</keyword>
+      <keyword>paleontology</keyword>
+      <keywordThesaurus>NOW database export keywords</keywordThesaurus>
+    </keywordSet>
+    <additionalInfo>
+      <para>Recommended citation: ${DATASET_CREATOR}. ${DATASET_TITLE}, version ${DATASET_VERSION}. ${DATASET_DOI}. The DOI describes the NOW database generally rather than a single frozen dataset export version; include the export date (${publicationDateIso}) when citing a downloaded archive.</para>
+      <para>Missing values in CSV files are serialized as ${MISSING_VALUE}. The taxonID values in this archive join to dwc-dp/occurrence.csv taxonID in the full export bundle.</para>
+      <para>Future exports may add richer semantic mappings, ontology IRIs, agent identifiers, protocol identifiers, and provenance structures while preserving existing CSV columns wherever possible.</para>
+    </additionalInfo>
     <intellectualRights>
-      <para>TODO(#1150): Add rights / license information.</para>
+      <para>Copyright ${DATASET_CREATOR}. This export is licensed under ${DATASET_LICENSE_TITLE} (${DATASET_LICENSE_URL}). Users may share and adapt the data with appropriate attribution.</para>
     </intellectualRights>
+    <distribution>
+      <online>
+        <url function="information">https://nowdatabase.org/</url>
+      </online>
+    </distribution>
+    <coverage>
+      <geographicCoverage>
+        <geographicDescription>Global, reflecting the geographic scope of the NOW database fossil mammal occurrence records that support the taxon and trait synthesis.</geographicDescription>
+        <boundingCoordinates>
+          <westBoundingCoordinate>-180</westBoundingCoordinate>
+          <eastBoundingCoordinate>180</eastBoundingCoordinate>
+          <northBoundingCoordinate>90</northBoundingCoordinate>
+          <southBoundingCoordinate>-90</southBoundingCoordinate>
+        </boundingCoordinates>
+      </geographicCoverage>
+      <temporalCoverage>
+        <singleDateTime>
+          <alternativeTimeScale>
+            <timeScaleName>Geologic time</timeScaleName>
+            <timeScaleAgeEstimate>Cenozoic, approximately the last 66 million years</timeScaleAgeEstimate>
+            <timeScaleAgeUncertainty>Temporal coverage varies by taxon and associated occurrence evidence.</timeScaleAgeUncertainty>
+            <timeScaleAgeExplanation>Taxon and trait records are synthesized from NOW database curation linked to fossil mammal occurrences and literature sources.</timeScaleAgeExplanation>
+          </alternativeTimeScale>
+        </singleDateTime>
+      </temporalCoverage>
+      <taxonomicCoverage>
+        <generalTaxonomicCoverage>Fossil mammal taxa and selected curated or synthesized taxon-level traits.</generalTaxonomicCoverage>
+        <taxonomicClassification>
+          <taxonRankName>class</taxonRankName>
+          <taxonRankValue>Mammalia</taxonRankValue>
+          <commonName>mammals</commonName>
+        </taxonomicClassification>
+      </taxonomicCoverage>
+    </coverage>
+    <maintenance>
+      <description>
+        <para>The NOW database is continuously curated. This export represents a production snapshot generated from the live curated database rather than a frozen version-specific dataset associated with the DOI.</para>
+      </description>
+      <maintenanceUpdateFrequency>continual</maintenanceUpdateFrequency>
+    </maintenance>
+    <contact>
+      <organizationName>${DATASET_CREATOR}</organizationName>
+      <onlineUrl>https://nowdatabase.org/</onlineUrl>
+    </contact>
+    <methods>
+      <methodStep>
+        <description>
+          <para>Taxon rows are generated from curated NOW species records. Stable taxon identifiers are derived from NOW database species identifiers and are used as the core identifiers for the archive.</para>
+        </description>
+      </methodStep>
+      <methodStep>
+        <description>
+          <para>Taxon-level traits in measurementorfact.csv are generated directly from curated database fields. They remain in DwC-A MeasurementOrFact because these synthesized values are associated with taxa rather than with individual specimen, material sample, event, or occurrence source entities.</para>
+        </description>
+      </methodStep>
+      <qualityControl>
+        <description>
+          <para>NOW data are expert curated from literature and community expertise. Trait values should be interpreted in the context of the field descriptions, source curation practices, and the companion relational DwC-DP export.</para>
+        </description>
+      </qualityControl>
+    </methods>
+    <project>
+      <title>New and Old Worlds Database of Fossil Mammals</title>
+      <personnel>
+        <organizationName>${DATASET_CREATOR}</organizationName>
+        <role>data curator</role>
+      </personnel>
+      <abstract>
+        <para>The NOW database supports research on Cenozoic mammal evolution, biogeography, environments, and fossil occurrence patterns at global scale.</para>
+      </abstract>
+    </project>
   </dataset>
 </eml:eml>
 `
@@ -916,13 +1017,16 @@ export const buildDwcArchiveZipBufferFromSpecies = async (
   return await zip.generateAsync({ type: 'nodebuffer', compression: 'DEFLATE', compressionOptions: { level: 6 } })
 }
 
-export const fetchSpeciesForDwcExport = async (): Promise<
-  Array<SpeciesForTaxonExport & SpeciesForMeasurementExport>
-> => {
+export const fetchSpeciesForDwcExport = async (
+  speciesIds?: number[]
+): Promise<Array<SpeciesForTaxonExport & SpeciesForMeasurementExport>> => {
+  if (speciesIds && speciesIds.length === 0) return []
   const { nowDb } = await import('../utils/db')
   // NOTE: v1 intentionally exports only com_species rows as taxa.
   // TODO(#1150): Add synonym export from com_taxa_synonym.
   return await nowDb.com_species.findMany({
+    where: speciesIds ? { species_id: { in: speciesIds } } : undefined,
+    orderBy: { species_id: 'asc' },
     select: {
       species_id: true,
       class_name: true,
@@ -994,7 +1098,7 @@ export const fetchSpeciesForDwcExport = async (): Promise<
   })
 }
 
-export const buildDwcArchiveZipBuffer = async (): Promise<Buffer> => {
-  const speciesRows = await fetchSpeciesForDwcExport()
+export const buildDwcArchiveZipBuffer = async (speciesIds?: number[]): Promise<Buffer> => {
+  const speciesRows = await fetchSpeciesForDwcExport(speciesIds)
   return await buildDwcArchiveZipBufferFromSpecies(speciesRows)
 }

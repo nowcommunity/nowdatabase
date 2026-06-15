@@ -13,6 +13,8 @@ import { generateCrossSearchLocalitiesSql, generateCrossSearchSql } from './quer
 import { ValidationObject } from '../../../frontend/src/shared/validators/validator'
 import { validateCrossSearchRouteParams } from '../../../frontend/src/shared/validators/crossSearch'
 
+const CROSS_SEARCH_EXPORT_PAGE_SIZE = 20000
+
 export type CrossSearchRequestParameters = {
   limit?: string | number
   offset?: string | number
@@ -122,7 +124,7 @@ export const getCrossSearchRawSql = async (
 
   if (!limit) {
     // this is only ran when exporting the cross-search table
-    limit = 20000
+    limit = CROSS_SEARCH_EXPORT_PAGE_SIZE
     offset = 0
     const results = []
     while (true) {
@@ -247,4 +249,39 @@ export const parseAndValidateCrossSearchRouteParameters = (
     validatedSorting,
     validationErrors: errors,
   }
+}
+
+export const getFilteredCrossSearchOccurrenceKeys = async (
+  user: User | undefined,
+  parameters: CrossSearchRequestParameters
+) => {
+  const { validationErrors, validatedColumnFilters, validatedSorting } =
+    parseAndValidateCrossSearchRouteParameters(parameters)
+  if (validationErrors.length > 0) {
+    return { validationErrors }
+  }
+
+  const keysById = new Map<string, { lid: number; speciesId: number }>()
+  let offset = 0
+  while (true) {
+    const page = (await getCrossSearchRawSql(
+      user,
+      CROSS_SEARCH_EXPORT_PAGE_SIZE,
+      offset,
+      validatedColumnFilters,
+      validatedSorting
+    )) as Array<Partial<CrossSearch>>
+    if (page.length === 0) break
+
+    for (const row of page) {
+      if (typeof row.lid_now_loc !== 'number' || typeof row.species_id_com_species !== 'number') continue
+      const key = { lid: row.lid_now_loc, speciesId: row.species_id_com_species }
+      keysById.set(`${key.lid}:${key.speciesId}`, key)
+    }
+
+    if (page.length < CROSS_SEARCH_EXPORT_PAGE_SIZE) break
+    offset += CROSS_SEARCH_EXPORT_PAGE_SIZE
+  }
+
+  return { occurrenceKeys: [...keysById.values()] }
 }

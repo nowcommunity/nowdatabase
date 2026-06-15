@@ -42,7 +42,7 @@ describe('DwC-A occurrence export (admin-only)', () => {
 
     expect(result.status).toEqual(200)
     expect(result.headers['content-type']).toMatch(/application\/zip/i)
-    expect(result.headers['content-disposition']).toMatch(/attachment;\s*filename="now_dwc_occurrences_test_export_/i)
+    expect(result.headers['content-disposition']).toMatch(/attachment;\s*filename="now_dwc_occurrences_export_/i)
 
     const zip = await JSZip.loadAsync(result.body as unknown as Buffer)
     expect(zip.file('location.csv')).toBeTruthy()
@@ -60,6 +60,75 @@ describe('DwC-A occurrence export (admin-only)', () => {
 
     const measurementCsv = await zip.file('measurementorfact.csv')!.async('string')
     expect(measurementCsv).toContain('"verbatimMeasurementType"')
+  })
+
+  it('returns a filtered ZIP archive for POST requests', async () => {
+    const loginResult = await send<{ token: string }>('user/login', 'POST', { username: 'testSu', password: 'test' })
+    expect(loginResult.status).toEqual(200)
+
+    const result = await request(app)
+      .post('/occurrence/export/dwc-archive')
+      .set('authorization', `bearer ${loginResult.body.token}`)
+      .send({ columnFilters: [{ id: 'lid_now_loc', value: '21050' }], sorting: [] })
+      .buffer(true)
+      .parse(parseBinary)
+
+    expect(result.status).toEqual(200)
+    expect(result.headers['content-type']).toMatch(/application\/zip/i)
+
+    const zip = await JSZip.loadAsync(result.body as unknown as Buffer)
+    const occurrenceCsv = await zip.file('occurrence.csv')!.async('string')
+    expect(occurrenceCsv).toContain('NOW:OCC:21050:')
+    expect(occurrenceCsv).not.toContain('NOW:OCC:24750:')
+  })
+
+  it('uses the unfiltered export path for empty POST filters', async () => {
+    const loginResult = await send<{ token: string }>('user/login', 'POST', { username: 'testSu', password: 'test' })
+    expect(loginResult.status).toEqual(200)
+
+    const result = await request(app)
+      .post('/occurrence/export/dwc-archive')
+      .set('authorization', `bearer ${loginResult.body.token}`)
+      .send({ columnFilters: [], sorting: [] })
+      .buffer(true)
+      .parse(parseBinary)
+
+    expect(result.status).toEqual(200)
+    const zip = await JSZip.loadAsync(result.body as unknown as Buffer)
+    const occurrenceCsv = await zip.file('occurrence.csv')!.async('string')
+    expect(occurrenceCsv).toContain('NOW:OCC:21050:')
+    expect(occurrenceCsv).toContain('NOW:OCC:24750:')
+  })
+
+  it('returns an empty filtered DwC-DP ZIP archive for POST requests', async () => {
+    const loginResult = await send<{ token: string }>('user/login', 'POST', { username: 'testSu', password: 'test' })
+    expect(loginResult.status).toEqual(200)
+
+    const result = await request(app)
+      .post('/occurrence/export/dwc-data-package')
+      .set('authorization', `bearer ${loginResult.body.token}`)
+      .send({ columnFilters: [{ id: 'lid_now_loc', value: '9999999' }], sorting: [] })
+      .buffer(true)
+      .parse(parseBinary)
+
+    expect(result.status).toEqual(200)
+    const zip = await JSZip.loadAsync(result.body as unknown as Buffer)
+    const occurrenceCsv = await zip.file('occurrence.csv')!.async('string')
+    expect(occurrenceCsv).toContain('"occurrenceID"')
+    expect(occurrenceCsv).not.toContain('NOW:OCC:')
+  })
+
+  it('returns structured validation errors for invalid POST filters', async () => {
+    const loginResult = await send<{ token: string }>('user/login', 'POST', { username: 'testSu', password: 'test' })
+    expect(loginResult.status).toEqual(200)
+
+    const result = await request(app)
+      .post('/occurrence/export/dwc-data-package')
+      .set('authorization', `bearer ${loginResult.body.token}`)
+      .send({ columnFilters: [{ id: '', value: '21050' }], sorting: [] })
+
+    expect(result.status).toEqual(400)
+    expect(result.body).toEqual([{ name: 'Column Filters', error: 'Invalid or missing id field in filter' }])
   })
 
   it('rejects non-admin requests', async () => {
@@ -80,7 +149,7 @@ describe('DwC-A occurrence export (admin-only)', () => {
 
     expect(result.status).toEqual(200)
     expect(result.headers['content-type']).toMatch(/application\/zip/i)
-    expect(result.headers['content-disposition']).toMatch(/attachment;\s*filename="now_dwc_dp_test_export_/i)
+    expect(result.headers['content-disposition']).toMatch(/attachment;\s*filename="now_dwc_dp_export_/i)
 
     const zip = await JSZip.loadAsync(result.body as unknown as Buffer)
     expect(zip.file('datapackage.json')).toBeTruthy()
@@ -110,7 +179,7 @@ describe('DwC-A occurrence export (admin-only)', () => {
 
     expect(result.status).toEqual(200)
     expect(result.headers['content-type']).toMatch(/application\/zip/i)
-    expect(result.headers['content-disposition']).toMatch(/attachment;\s*filename="now_dwc_full_test_export_/i)
+    expect(result.headers['content-disposition']).toMatch(/attachment;\s*filename="now_dwc_full_export_/i)
 
     const zip = await JSZip.loadAsync(result.body as unknown as Buffer)
     expect(zip.file('README.txt')).toBeTruthy()

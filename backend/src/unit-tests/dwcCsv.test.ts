@@ -7,6 +7,12 @@ describe('DwC CSV writer', () => {
     expect(dwcCsvCell('first\n"second"')).toEqual('"first ""second"""')
   })
 
+  it('serializes missing values as a backslash-N marker', () => {
+    expect(dwcCsvCell('')).toEqual('"\\N"')
+    expect(dwcCsvCell(null)).toEqual('"\\N"')
+    expect(dwcCsvCell(undefined)).toEqual('"\\N"')
+  })
+
   it('writes one physical line per row even when source values contain line breaks', () => {
     const csv = writeDwcCsvString(
       ['id', 'remarks'],

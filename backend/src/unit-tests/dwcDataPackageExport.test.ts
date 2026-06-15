@@ -143,6 +143,7 @@ describe('DwC-DP export mapping', () => {
         eventID: 'NOW:EVENT:42',
         taxonID: 'NOW:21052',
         scientificName: 'Simplomys simplicidens Test Author',
+        taxonRank: 'species',
         identificationVerificationStatus: 'confirmed',
       })
     )
@@ -186,8 +187,20 @@ describe('DwC-DP export mapping', () => {
     expect(eventCsv.trimEnd().split('\n')).toHaveLength(2)
 
     const dataPackageJson = JSON.parse(await zip.file(DWC_DP_TABLES.dataPackage)!.async('string')) as {
-      resources: Array<{ name: string; schema: { foreignKeys?: unknown[] } }>
+      name: string
+      title: string
+      version: string
+      licenses: Array<{ name: string }>
+      resources: Array<{
+        name: string
+        mediatype?: string
+        schema: { fields: Array<{ name: string; title: string }>; foreignKeys?: unknown[]; missingValues?: string[] }
+      }>
     }
+    expect(dataPackageJson.name).toBe('now-darwincore-export')
+    expect(dataPackageJson.title).toBe('NOW database Darwin Core export')
+    expect(dataPackageJson.version).toBe('1.0.0')
+    expect(dataPackageJson.licenses).toEqual(expect.arrayContaining([expect.objectContaining({ name: 'CC-BY-4.0' })]))
     expect(dataPackageJson.resources.map(resource => resource.name)).toEqual([
       'event',
       'geological-context',
@@ -195,9 +208,22 @@ describe('DwC-DP export mapping', () => {
       'event-assertion',
       'occurrence-assertion',
     ])
+    expect(dataPackageJson.resources.every(resource => resource.mediatype === 'text/csv')).toBe(true)
+    expect(dataPackageJson.resources.every(resource => resource.schema.missingValues?.includes('\\N'))).toBe(true)
+    expect(
+      dataPackageJson.resources
+        .find(resource => resource.name === 'event')
+        ?.schema.fields.find(field => field.name === 'eventID')?.title
+    ).toBe('Event ID')
+    expect(
+      dataPackageJson.resources
+        .find(resource => resource.name === 'event-assertion')
+        ?.schema.fields.find(field => field.name === 'assertionTypeIRI')?.title
+    ).toBe('Assertion Type IRI')
     expect(dataPackageJson.resources.find(resource => resource.name === 'occurrence')?.schema.foreignKeys).toEqual([
       {
         fields: 'eventID',
+        predicate: 'happened during',
         reference: { resource: 'event', fields: 'eventID' },
       },
     ])
