@@ -194,7 +194,7 @@ describe('DwC-DP export mapping', () => {
       resources: Array<{
         name: string
         mediatype?: string
-        schema: { foreignKeys?: unknown[]; missingValues?: string[] }
+        schema: { fields: Array<{ name: string; title: string }>; foreignKeys?: unknown[]; missingValues?: string[] }
       }>
     }
     expect(dataPackageJson.name).toBe('now-darwincore-export')
@@ -210,6 +210,16 @@ describe('DwC-DP export mapping', () => {
     ])
     expect(dataPackageJson.resources.every(resource => resource.mediatype === 'text/csv')).toBe(true)
     expect(dataPackageJson.resources.every(resource => resource.schema.missingValues?.includes('\\N'))).toBe(true)
+    expect(
+      dataPackageJson.resources
+        .find(resource => resource.name === 'event')
+        ?.schema.fields.find(field => field.name === 'eventID')?.title
+    ).toBe('Event ID')
+    expect(
+      dataPackageJson.resources
+        .find(resource => resource.name === 'event-assertion')
+        ?.schema.fields.find(field => field.name === 'assertionTypeIRI')?.title
+    ).toBe('Assertion Type IRI')
     expect(dataPackageJson.resources.find(resource => resource.name === 'occurrence')?.schema.foreignKeys).toEqual([
       {
         fields: 'eventID',

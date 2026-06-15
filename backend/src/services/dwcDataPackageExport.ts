@@ -415,9 +415,12 @@ const DWC_TERM_IRIS: Record<string, string> = {
   identificationVerificationStatus: 'http://rs.tdwg.org/dwc/terms/identificationVerificationStatus',
 }
 
+const fieldTitle = (name: string): string =>
+  name.replace(/([a-z0-9])([A-Z])/g, '$1 $2').replace(/^./, first => first.toUpperCase())
+
 const field = (name: string, type = 'string') => ({
   name,
-  title: name.replace(/([A-Z])/g, ' $1').replace(/^./, first => first.toUpperCase()),
+  title: fieldTitle(name),
   description: FIELD_DESCRIPTIONS[name] ?? `Curated NOW database value for ${name}.`,
   type,
   format: 'default',
