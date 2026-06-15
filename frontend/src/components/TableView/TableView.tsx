@@ -484,10 +484,6 @@ export const TableView = <T extends MRT_RowData>({
     document.title = `${title}`
   }
 
-  if (data && data.length > 0) {
-    if (serverSidePagination) setRowCount(data[0].full_count as number)
-  }
-
   const resolveDetailPath = (row: T) => {
     if (getDetailPath) return getDetailPath(row)
     return `/${url}/${row[idFieldName] as string | number}`
@@ -672,8 +668,8 @@ export const TableView = <T extends MRT_RowData>({
     onPaginationChange: setPagination,
     manualPagination: serverSidePagination,
     manualSorting: serverSidePagination,
-    rowCount: rowCount,
-    autoResetPageIndex: true,
+    rowCount: serverSidePagination ? rowCount : undefined,
+    autoResetPageIndex: !serverSidePagination,
     positionPagination: paginationPlacement ?? (selectorFn ? 'top' : 'both'),
     paginationDisplayMode: 'pages',
     muiTablePaperProps: {
@@ -738,12 +734,27 @@ export const TableView = <T extends MRT_RowData>({
   ])
 
   useEffect(() => {
+    if (serverSidePagination) {
+      if (data && data.length > 0) {
+        setRowCount(data[0].full_count as number)
+      } else {
+        setRowCount(0)
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [data])
+
+  useEffect(() => {
     if (selectorFn) {
       return
     }
     setIdList(table.getPrePaginationRowModel().rows.map(row => row.original[idFieldName] as string))
-    setRowCount(table.getPrePaginationRowModel().rows.length)
-
+    // resets pagination when filters or sorting change
+    if (serverSidePagination) {
+      setPagination(selectorFn ? defaultPaginationSmall : defaultPagination)
+    } else {
+      setRowCount(table.getPrePaginationRowModel().rows.length)
+    }
     // Don't put setIdList in the dependency array: it will cause re-render loop.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [table, columnFilters, sorting])
