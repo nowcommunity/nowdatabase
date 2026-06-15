@@ -32,6 +32,12 @@ const defaultCrossSearchExportFilters = {
   sorting: [],
 } satisfies CrossSearchRequestParameters
 
+const hasEmptyExportFilters = (parameters: Partial<CrossSearchRequestParameters>): boolean => {
+  const columnFilters = parameters.columnFilters ?? defaultCrossSearchExportFilters.columnFilters
+  const sorting = parameters.sorting ?? defaultCrossSearchExportFilters.sorting
+  return Array.isArray(columnFilters) && columnFilters.length === 0 && Array.isArray(sorting) && sorting.length === 0
+}
+
 class ExportFilterValidationError extends Error {
   validationErrors: ValidationObject[]
 
@@ -44,6 +50,7 @@ class ExportFilterValidationError extends Error {
 const resolveOccurrenceKeysForExport = async (req: Request): Promise<DwcOccurrenceKey[] | undefined> => {
   if (req.method === 'GET') return undefined
   const body = req.body as Partial<CrossSearchRequestParameters> | undefined
+  if (!body || hasEmptyExportFilters(body)) return undefined
   const result = await getFilteredCrossSearchOccurrenceKeys(req.user, {
     columnFilters: body?.columnFilters ?? defaultCrossSearchExportFilters.columnFilters,
     sorting: body?.sorting ?? defaultCrossSearchExportFilters.sorting,
