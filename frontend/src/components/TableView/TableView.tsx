@@ -723,7 +723,6 @@ export const TableView = <T extends MRT_RowData>({
   }, [
     columnFilters,
     sorting,
-    pagination,
     columnVisibility,
     selectorFn,
     table,
