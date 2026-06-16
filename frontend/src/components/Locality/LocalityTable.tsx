@@ -522,7 +522,7 @@ export const LocalityTable = ({ selectorFn }: { selectorFn?: (newObject: Localit
         url="locality"
         kmlExport={kmlExport}
         svgExport={svgExport}
-        renderExtraExportMenuItems={handleClose => <LocalityDwcExportMenuItem handleClose={handleClose} />}
+        renderExtraExportMenuItems={[handleClose => <LocalityDwcExportMenuItem handleClose={handleClose} />]}
         enableColumnFilterModes={true}
         tableRowAction={handleLocalityRowActionClick}
       />

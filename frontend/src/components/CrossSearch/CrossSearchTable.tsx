@@ -1118,13 +1118,11 @@ export const CrossSearchTable = ({ selectorFn }: { selectorFn?: (newObject: Cros
         svgExport={svgExport}
         isError={isError}
         error={error}
-        renderExtraExportMenuItems={handleClose => (
-          <>
-            <OccurrenceDwcExportMenuItem handleClose={handleClose} />
-            <OccurrenceDwcDpExportMenuItem handleClose={handleClose} />
-            <OccurrenceFullDarwinCoreExportMenuItem handleClose={handleClose} />
-          </>
-        )}
+        renderExtraExportMenuItems={[
+          handleClose => <OccurrenceDwcExportMenuItem handleClose={handleClose} />,
+          handleClose => <OccurrenceDwcDpExportMenuItem handleClose={handleClose} />,
+          handleClose => <OccurrenceFullDarwinCoreExportMenuItem handleClose={handleClose} />,
+        ]}
       />
     </>
   )

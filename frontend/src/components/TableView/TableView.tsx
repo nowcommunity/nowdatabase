@@ -232,7 +232,7 @@ export const TableView = <T extends MRT_RowData>({
   error?: FetchBaseQueryError | SerializedError
   filterFns?: Record<string, MRT_FilterFn<T>>
   renderRowActionExtras?: ({ row }: { row: MRT_Row<T> }) => ReactNode
-  renderExtraExportMenuItems?: (handleClose: () => void) => ReactNode
+  renderExtraExportMenuItems?: Array<{ (handleClose: () => void): ReactNode }>
   paginationPlacement?: 'top' | 'bottom' | 'both'
   tableContainerMaxHeight?: string | number
   columnVisibilityGroups?: ColumnVisibilityGroup[]
