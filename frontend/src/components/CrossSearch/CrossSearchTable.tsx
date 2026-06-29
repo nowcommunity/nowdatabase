@@ -1119,9 +1119,9 @@ export const CrossSearchTable = ({ selectorFn }: { selectorFn?: (newObject: Cros
         isError={isError}
         error={error}
         renderExtraExportMenuItems={[
-          handleClose => <OccurrenceDwcExportMenuItem handleClose={handleClose} />,
-          handleClose => <OccurrenceDwcDpExportMenuItem handleClose={handleClose} />,
-          handleClose => <OccurrenceFullDarwinCoreExportMenuItem handleClose={handleClose} />,
+          (handleClose, key) => <OccurrenceDwcExportMenuItem handleClose={handleClose} key={key} />,
+          (handleClose, key) => <OccurrenceDwcDpExportMenuItem handleClose={handleClose} key={key} />,
+          (handleClose, key) => <OccurrenceFullDarwinCoreExportMenuItem handleClose={handleClose} key={key} />,
         ]}
       />
     </>

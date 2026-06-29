@@ -567,7 +567,9 @@ export const SpeciesTable = ({ selectorFn }: { selectorFn?: (id: Species) => voi
         tableRowAction={handleSpeciesRowActionClick}
         filterFns={synonymFilterFns}
         renderRowActionExtras={renderCommentAction}
-        renderExtraExportMenuItems={[handleClose => <SpeciesDwcExportMenuItem handleClose={handleClose} />]}
+        renderExtraExportMenuItems={[
+          (handleClose, key) => <SpeciesDwcExportMenuItem handleClose={handleClose} key={key} />,
+        ]}
       />
       <SpeciesCommentDialog
         open={commentModalOpen}

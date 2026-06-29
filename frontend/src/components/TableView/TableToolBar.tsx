@@ -5,7 +5,7 @@ import { ContactForm } from '../DetailView/common/ContactForm'
 import FileDownloadIcon from '@mui/icons-material/FileDownload'
 import ViewColumnIcon from '@mui/icons-material/ViewColumn'
 import '../../styles/TableToolBar.css'
-import { Fragment, useState, type ReactNode } from 'react'
+import { useState, type ReactNode } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import AddCircleIcon from '@mui/icons-material/AddCircle'
 import { CrossSearchExportMenuItem } from '../CrossSearch/CrossSearchExportMenuItem'
@@ -50,7 +50,7 @@ export const TableToolBar = <T extends MRT_RowData>({
   showNewButton?: boolean
   hideLeftButtons?: boolean
   columnVisibilityGroups?: ColumnVisibilityGroup[]
-  renderExtraExportMenuItems?: ((handleClose: () => void) => ReactNode)[]
+  renderExtraExportMenuItems?: ((handleClose: () => void, key: number) => ReactNode)[]
 }) => {
   const { previousTableUrls, setPreviousTableUrls } = usePageContext<T>()
   const { notify, setMessage: setNotificationMessage } = useNotify()
@@ -318,9 +318,7 @@ export const TableToolBar = <T extends MRT_RowData>({
           )}
 
           {renderExtraExportMenuItems
-            ? renderExtraExportMenuItems.map((renderFn, index) => (
-                <Fragment key={index}>{renderFn(handleClose)}</Fragment>
-              ))
+            ? renderExtraExportMenuItems.map((renderFn, index) => renderFn(handleClose, index))
             : null}
 
           {kmlExport && (
