@@ -3,6 +3,7 @@
 This document shows what each user role can and cannot do.
 
 Previously, there were 7 different user roles:
+
 - Admin (su)
 - EditUnrestricted (eu)
 - EditRestricted (er)
@@ -12,6 +13,7 @@ Previously, there were 7 different user roles:
 - ReadOnly (ro)
 
 In the new UI platform, there are 4 user roles:
+
 - Admin (su)
 - EditUnrestricted (eu)
 - EditRestricted (er, pl, plp, no)
@@ -41,6 +43,15 @@ Users with the **EditUnrestricted** role are not limited by project membership w
 - Deleting a species requires the **Admin** or **EditUnrestricted** roles.
 - Deleting a species synonym requires the **Admin**, **EditUnrestricted**, or **EditRestricted** roles.
 - Merging species requires the **Admin** role (via `/admin/species-merge`).
+
+## Occurrence (Cross-Search)
+
+- Any user can get a list of occurrences.
+- Any user can view the details of an occurrence.
+- Creating or updating an occurrence requires the **Admin**, **EditUnrestricted**, or **EditRestricted** roles.
+- Deleting an occurrence is not possible.
+
+NOTE: Users with the **EditRestricted** role can only update occurrences that relate to a locality created by that user. Otherwise, they have reading rights only.
 
 ## References
 
@@ -98,7 +109,6 @@ Users with the **EditUnrestricted** role are not limited by project membership w
 - Any user can send an email
 
 ## User Rights Table
-
 
 | User group       | Locality | Species | References | Time Units | Time Bounds | Regions | Persons | Projects | Museums | Sedimentary Structures | Sending Email |
 | ---------------- | -------- | ------- | ---------- | ---------- | ----------- | ------- | ------- | -------- | ------- | ---------------------- | ------------- |

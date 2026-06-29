@@ -1,5 +1,5 @@
 import { afterAll, beforeAll, describe, expect, it } from '@jest/globals'
-import { login, noPermError, resetDatabase, resetDatabaseTimeout, send } from '../utils'
+import { login, logout, noPermError, resetDatabase, resetDatabaseTimeout, send } from '../utils'
 import { pool } from '../../utils/db'
 
 type CollectingMethodValue = { coll_meth_value: string }
@@ -28,11 +28,19 @@ describe('GET /collecting-method-values/all', () => {
   })
 
   it('rejects users without locality edit access', async () => {
-    await login('testPl', 'test')
+    logout()
+    const { body: noUserBody, status: noUserStatus } = await send('collecting-method-values/all', 'GET')
+    expect(noUserStatus).toBe(403)
+    expect(noUserBody).toEqual(noPermError)
+  })
 
-    const { body, status } = await send('collecting-method-values/all', 'GET')
+  it('accepts users with locality edit access', async () => {
+    await login('testEr', 'test')
+    const { status: erStatus } = await send('collecting-method-values/all', 'GET')
+    expect(erStatus).toBe(200)
 
-    expect(status).toBe(403)
-    expect(body).toEqual(noPermError)
+    await login('testEu', 'test')
+    const { status: euStatus } = await send('collecting-method-values/all', 'GET')
+    expect(euStatus).toBe(200)
   })
 })
