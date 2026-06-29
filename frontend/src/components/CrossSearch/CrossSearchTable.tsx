@@ -16,7 +16,6 @@ import {
   exportOccurrenceMapSvg,
   getUniqueCrossSearchMapExportLocalities,
 } from '@/components/Species/localitySpeciesMapExport'
-import { Box } from '@mui/material'
 
 const LocalitiesMap = lazy(async () => {
   const module = await import('../Map/LocalitiesMap')
