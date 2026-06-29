@@ -16,7 +16,6 @@ import {
   exportOccurrenceMapSvg,
   getUniqueCrossSearchMapExportLocalities,
 } from '@/components/Species/localitySpeciesMapExport'
-import { Box } from '@mui/material'
 
 const LocalitiesMap = lazy(async () => {
   const module = await import('../Map/LocalitiesMap')
@@ -1119,13 +1118,11 @@ export const CrossSearchTable = ({ selectorFn }: { selectorFn?: (newObject: Cros
         svgExport={svgExport}
         isError={isError}
         error={error}
-        renderExtraExportMenuItems={handleClose => (
-          <Box>
-            <OccurrenceDwcExportMenuItem handleClose={handleClose} />
-            <OccurrenceDwcDpExportMenuItem handleClose={handleClose} />
-            <OccurrenceFullDarwinCoreExportMenuItem handleClose={handleClose} />
-          </Box>
-        )}
+        renderExtraExportMenuItems={[
+          handleClose => <OccurrenceDwcExportMenuItem handleClose={handleClose} />,
+          handleClose => <OccurrenceDwcDpExportMenuItem handleClose={handleClose} />,
+          handleClose => <OccurrenceFullDarwinCoreExportMenuItem handleClose={handleClose} />,
+        ]}
       />
     </>
   )
