@@ -240,7 +240,7 @@ describe('Getting cross-search data', () => {
   })
 
   describe('does not show drafts without proper user rights', () => {
-    it('Get all with admin has correct amount of data', async () => {
+    it('Get all with admin has correct data', async () => {
       await login()
       const response = await send<CrossSearch[]>(`crosssearch/all/999/0/[]/[]`, 'GET')
       expect(response.status).toEqual(200)
