@@ -15,7 +15,7 @@ import {
 import { Alert, Box, CircularProgress, Paper, Tooltip } from '@mui/material'
 import type { FetchBaseQueryError } from '@reduxjs/toolkit/query'
 import type { SerializedError } from '@reduxjs/toolkit'
-import type { FilterFn } from '@tanstack/table-core'
+import { type FilterFn } from '@tanstack/table-core'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { ActionComponent } from './ActionComponent'
 import { usePageContext } from '../Page'
@@ -249,6 +249,7 @@ export const TableView = <T extends MRT_RowData>({
   } = usePageContext()
   const [columnFilters, setColumnFilters] = useState<MRT_ColumnFiltersState>([])
   const [sorting, setSorting] = useState<MRT_SortingState>(defaultSorting ?? [])
+  const [rowCount, setRowCount] = useState(data ? data.length : 0)
   const navigate = useNavigate()
   const [pagination, setPagination] = useState<MRT_PaginationState>(
     selectorFn ? defaultPaginationSmall : defaultPagination
@@ -483,12 +484,6 @@ export const TableView = <T extends MRT_RowData>({
     document.title = `${title}`
   }
 
-  let rowCount = undefined
-  if (data && data.length > 0) {
-    if (serverSidePagination) rowCount = data[0].full_count as number
-    else rowCount = data.length
-  }
-
   const resolveDetailPath = (row: T) => {
     if (getDetailPath) return getDetailPath(row)
     return `/${url}/${row[idFieldName] as string | number}`
@@ -673,8 +668,8 @@ export const TableView = <T extends MRT_RowData>({
     onPaginationChange: setPagination,
     manualPagination: serverSidePagination,
     manualSorting: serverSidePagination,
-    rowCount: rowCount,
-    autoResetPageIndex: true,
+    rowCount: serverSidePagination ? rowCount : undefined,
+    autoResetPageIndex: !serverSidePagination,
     positionPagination: paginationPlacement ?? (selectorFn ? 'top' : 'both'),
     paginationDisplayMode: 'pages',
     muiTablePaperProps: {
@@ -728,7 +723,6 @@ export const TableView = <T extends MRT_RowData>({
   }, [
     columnFilters,
     sorting,
-    pagination,
     columnVisibility,
     selectorFn,
     table,
@@ -739,11 +733,23 @@ export const TableView = <T extends MRT_RowData>({
   ])
 
   useEffect(() => {
+    if (!serverSidePagination) return
+    if (data && data.length > 0) {
+      setRowCount(data[0].full_count as number)
+    } else {
+      setRowCount(0)
+    }
+  }, [data, serverSidePagination])
+
+  useEffect(() => {
     if (selectorFn) {
       return
     }
     setIdList(table.getPrePaginationRowModel().rows.map(row => row.original[idFieldName] as string))
-
+    if (serverSidePagination) {
+      // resets pagination when filters or sorting change
+      setPagination(selectorFn ? defaultPaginationSmall : defaultPagination)
+    }
     // Don't put setIdList in the dependency array: it will cause re-render loop.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [table, columnFilters, sorting])
