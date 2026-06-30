@@ -232,8 +232,6 @@ export const editedLocality = {
       com_species: { species_id: 85730 } as SpeciesDetailsType,
     },
   ],
-  projects: [],
-  now_plr: [],
   now_ss: [],
   now_coll_meth: [],
   now_lau: [],
