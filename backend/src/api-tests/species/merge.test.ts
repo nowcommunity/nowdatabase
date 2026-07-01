@@ -1,6 +1,6 @@
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from '@jest/globals'
 import { pool } from '../../utils/db'
-import { login, noPermError, resetDatabaseTimeout, send, setToken } from '../utils'
+import { login, logout, noPermError, resetDatabase, resetDatabaseTimeout, send } from '../utils'
 import { cloneSpeciesData } from './data'
 import { OCCURRENCE_MERGE_FIELDS } from '../../services/speciesMerge'
 import { SpeciesDetailsType } from '../../../../frontend/src/shared/types'
@@ -12,6 +12,14 @@ type MergeResponse = {
   editor: string
   date: string
   comment: string
+}
+
+const buildSpeciesPayload = (overrides: Record<string, unknown> = {}) => {
+  return {
+    ...cloneSpeciesData(),
+    now_ls: [],
+    ...overrides,
+  }
 }
 
 const buildOccurrenceChoices = (
@@ -37,19 +45,11 @@ const buildOccurrenceChoices = (
 
 describe('Species merge endpoint', () => {
   beforeAll(async () => {
-    const resetResult = await send('test/reset-test-database', 'GET')
-    expect(resetResult.status).toEqual(200)
-    const createUsersResult = await send('test/create-test-users', 'GET')
-    expect(createUsersResult.status).toEqual(200)
-    const loginResult = await send<{ token: string }>('user/login', 'POST', { username: 'testSu', password: 'test' })
-    expect(loginResult.status).toEqual(200)
-    setToken(loginResult.body.token)
+    await resetDatabase()
   }, resetDatabaseTimeout)
 
   beforeEach(async () => {
-    const loginResult = await send<{ token: string }>('user/login', 'POST', { username: 'testSu', password: 'test' })
-    expect(loginResult.status).toEqual(200)
-    setToken(loginResult.body.token)
+    await login()
   })
 
   afterAll(async () => {
@@ -59,11 +59,9 @@ describe('Species merge endpoint', () => {
   it('merges species, migrates synonyms, and deletes obsolete species', async () => {
     const references = cloneSpeciesData().references
 
-    const acceptedPayload = {
-      ...cloneSpeciesData(),
+    const acceptedPayload = buildSpeciesPayload({
       genus_name: 'MergeAcceptedGenus',
       species_name: 'mergeAccepted',
-      unique_identifier: 'merge-accepted',
       diet1: 'a',
       now_ls: [
         {
@@ -75,15 +73,11 @@ describe('Species merge endpoint', () => {
         },
       ],
       com_taxa_synonym: [],
-      comment: 'create accepted',
-      references,
-    }
+    })
 
-    const obsoletePayload = {
-      ...cloneSpeciesData(),
+    const obsoletePayload = buildSpeciesPayload({
       genus_name: 'MergeObsoleteGenus',
       species_name: 'mergeObsolete',
-      unique_identifier: 'merge-obsolete',
       diet1: 'b',
       now_ls: [
         {
@@ -102,9 +96,7 @@ describe('Species merge endpoint', () => {
           syn_comment: 'legacy synonym',
         },
       ],
-      comment: 'create obsolete',
-      references,
-    }
+    })
 
     const acceptedCreate = await send<{ species_id: number }>('species', 'PUT', { species: acceptedPayload })
     const obsoleteCreate = await send<{ species_id: number }>('species', 'PUT', { species: obsoletePayload })
@@ -164,29 +156,12 @@ describe('Species merge endpoint', () => {
   })
 
   it('requires references', async () => {
-    const references = cloneSpeciesData().references
     const acceptedCreate = await send<{ species_id: number }>('species', 'PUT', {
-      species: {
-        ...cloneSpeciesData(),
-        genus_name: 'RefAcceptGenus',
-        species_name: 'refAccept',
-        unique_identifier: 'ref-accept',
-        now_ls: [],
-        comment: 'create accepted',
-        references,
-      },
+      species: buildSpeciesPayload({ genus_name: 'RefAcceptGenus' }),
     })
 
     const obsoleteCreate = await send<{ species_id: number }>('species', 'PUT', {
-      species: {
-        ...cloneSpeciesData(),
-        genus_name: 'RefObsoleteGenus',
-        species_name: 'refObsolete',
-        unique_identifier: 'ref-obsolete',
-        now_ls: [],
-        comment: 'create obsolete',
-        references,
-      },
+      species: buildSpeciesPayload({ genus_name: 'RefObsoleteGenus' }),
     })
 
     const mergeResult = await send('admin/species-merge', 'POST', {
@@ -208,32 +183,12 @@ describe('Species merge endpoint', () => {
   })
 
   it('summary includes non-taxonomic fields and omits taxonomic fields', async () => {
-    const references = cloneSpeciesData().references
-
     const acceptedCreate = await send<{ species_id: number }>('species', 'PUT', {
-      species: {
-        ...cloneSpeciesData(),
-        genus_name: 'SummaryAcceptGenus',
-        species_name: 'summaryAccept',
-        unique_identifier: 'summary-accept',
-        diet_description: 'accept diet description',
-        now_ls: [],
-        comment: 'create accepted',
-        references,
-      },
+      species: buildSpeciesPayload({ genus_name: 'SummaryAcceptGenus' }),
     })
 
     const obsoleteCreate = await send<{ species_id: number }>('species', 'PUT', {
-      species: {
-        ...cloneSpeciesData(),
-        genus_name: 'SummaryObsoleteGenus',
-        species_name: 'summaryObsolete',
-        unique_identifier: 'summary-obsolete',
-        diet_description: 'obsolete diet description',
-        now_ls: [],
-        comment: 'create obsolete',
-        references,
-      },
+      species: buildSpeciesPayload({ genus_name: 'SummaryObsoleteGenus' }),
     })
 
     const summaryResult = await send<{
@@ -256,29 +211,11 @@ describe('Species merge endpoint', () => {
     const references = cloneSpeciesData().references
 
     const acceptedCreate = await send<{ species_id: number }>('species', 'PUT', {
-      species: {
-        ...cloneSpeciesData(),
-        genus_name: 'BoolAcceptGenus',
-        species_name: 'boolAccept',
-        unique_identifier: 'bool-accept',
-        body_mass: 10,
-        now_ls: [],
-        comment: 'create accepted',
-        references,
-      },
+      species: buildSpeciesPayload({ genus_name: 'BoolAcceptGenus', body_mass: 10 }),
     })
 
     const obsoleteCreate = await send<{ species_id: number }>('species', 'PUT', {
-      species: {
-        ...cloneSpeciesData(),
-        genus_name: 'BoolObsoleteGenus',
-        species_name: 'boolObsolete',
-        unique_identifier: 'bool-obsolete',
-        body_mass: 99,
-        now_ls: [],
-        comment: 'create obsolete',
-        references,
-      },
+      species: buildSpeciesPayload({ genus_name: 'BoolObsoleteGenus', body_mass: 99 }),
     })
 
     const acceptedId = acceptedCreate.body.species_id
@@ -307,19 +244,60 @@ describe('Species merge endpoint', () => {
   })
 
   it('rejects non-admin users', async () => {
-    await login('testEr')
-    const result = await send('admin/species-merge', 'POST', {
-      obsoleteSpeciesId: 1,
-      acceptedSpeciesId: 2,
+    const acceptedCreateResult = await send<{ species_id: number }>('species', 'PUT', {
+      species: buildSpeciesPayload({ genus_name: 'UserRightTestAcceptedGenus' }),
+    })
+    expect(acceptedCreateResult.status).toEqual(200)
+
+    const obsoleteCreateResult = await send<{ species_id: number }>('species', 'PUT', {
+      species: buildSpeciesPayload({ genus_name: 'UserRightTestObsoleteGenus' }),
+    })
+    expect(obsoleteCreateResult.status).toEqual(200)
+
+    const acceptedId = acceptedCreateResult.body.species_id
+    const obsoleteId = obsoleteCreateResult.body.species_id
+    const references = cloneSpeciesData().references
+
+    logout()
+    const anonymousUserResult = await send('admin/species-merge', 'POST', {
+      obsoleteSpeciesId: obsoleteId,
+      acceptedSpeciesId: acceptedId,
       selectedSpeciesFieldValues: {},
       occurrenceFieldChoices: [],
       addObsoleteAsSynonym: false,
       addSourceNameToOccurrences: false,
       comment: 'merge species',
-      references: [],
+      references,
     })
+    expect(anonymousUserResult.body).toEqual(noPermError)
+    expect(anonymousUserResult.status).toEqual(403)
 
-    expect(result.status).toEqual(403)
-    expect(result.body).toEqual(noPermError)
+    await login('testEr')
+    const erResult = await send('admin/species-merge', 'POST', {
+      obsoleteSpeciesId: obsoleteId,
+      acceptedSpeciesId: acceptedId,
+      selectedSpeciesFieldValues: {},
+      occurrenceFieldChoices: [],
+      addObsoleteAsSynonym: false,
+      addSourceNameToOccurrences: false,
+      comment: 'merge species',
+      references,
+    })
+    expect(erResult.status).toEqual(403)
+    expect(erResult.body).toEqual(noPermError)
+
+    await login('testEu')
+    const euResult = await send('admin/species-merge', 'POST', {
+      obsoleteSpeciesId: obsoleteId,
+      acceptedSpeciesId: acceptedId,
+      selectedSpeciesFieldValues: {},
+      occurrenceFieldChoices: [],
+      addObsoleteAsSynonym: false,
+      addSourceNameToOccurrences: false,
+      comment: 'merge species',
+      references,
+    })
+    expect(euResult.status).toEqual(403)
+    expect(euResult.body).toEqual(noPermError)
   })
 })
