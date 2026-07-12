@@ -14,7 +14,7 @@ type MergeResponse = {
   comment: string
 }
 
-const buildSpeciesPayload = (overrides: Record<string, unknown> = {}) => {
+const buildSpeciesPayload = (overrides: Partial<ReturnType<typeof cloneSpeciesData>> = {}) => {
   return {
     ...cloneSpeciesData(),
     now_ls: [],
@@ -211,11 +211,11 @@ describe('Species merge endpoint', () => {
     const references = cloneSpeciesData().references
 
     const acceptedCreate = await send<{ species_id: number }>('species', 'PUT', {
-      species: buildSpeciesPayload({ genus_name: 'BoolAcceptGenus', body_mass: 10 }),
+      species: buildSpeciesPayload({ genus_name: 'BoolAcceptGenus', body_mass: 10n }),
     })
 
     const obsoleteCreate = await send<{ species_id: number }>('species', 'PUT', {
-      species: buildSpeciesPayload({ genus_name: 'BoolObsoleteGenus', body_mass: 99 }),
+      species: buildSpeciesPayload({ genus_name: 'BoolObsoleteGenus', body_mass: 99n }),
     })
 
     const acceptedId = acceptedCreate.body.species_id

@@ -27,7 +27,7 @@ describe('GET /collecting-method-values/all', () => {
     expect(values).toEqual(sorted)
   })
 
-  it('rejects users without locality edit access', async () => {
+  it('rejects anonymous users', async () => {
     logout()
     const { body: noUserBody, status: noUserStatus } = await send('collecting-method-values/all', 'GET')
     expect(noUserStatus).toBe(403)
