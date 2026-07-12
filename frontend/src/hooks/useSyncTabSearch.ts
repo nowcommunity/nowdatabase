@@ -18,15 +18,13 @@ export const useSyncTabSearch = (tab: number) => {
   }, [location.key, location.state])
 
   useEffect(() => {
-    const nextSearch = `?tab=${tab}`
-    if (location.search === nextSearch) {
-      return
-    }
+    const params = new URLSearchParams(location.search)
+    if (params.get('tab') === String(tab)) return
 
     navigate(
       {
         pathname: location.pathname,
-        search: nextSearch,
+        search: `?tab=${tab}`,
       },
       {
         replace: true,

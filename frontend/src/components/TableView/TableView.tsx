@@ -419,7 +419,11 @@ export const TableView = <T extends MRT_RowData>({
     )
   }
 
-  const buildTableStateUrl = () => `${location.pathname}?${TABLE_STATE_URL_PARAM}=${encodeURIComponent(tableStateId)}`
+  const buildTableStateUrl = () => {
+    const params = new URLSearchParams(location.search)
+    params.set(TABLE_STATE_URL_PARAM, tableStateId)
+    return `${location.pathname}?${params.toString()}`
+  }
 
   const loadStateFromUrl = <TState extends MRT_ColumnFiltersState | MRT_SortingState | MRT_PaginationState>(
     state: TableStateInUrl,
