@@ -75,13 +75,16 @@ const getActiveProjectIds = (locality: EditDataType<LocalityDetailsType>) => {
 
 export const canEditRestrictedWriteLocality = async (locality: EditDataType<LocalityDetailsType>, user: User) => {
   const userProjectIds = await getIdsOfUsersProjects(user)
-  let activeProjectIds = getActiveProjectIds(locality)
 
-  if (activeProjectIds.length === 0 && locality.lid) {
+  let activeProjectIds: number[] = []
+  if (locality.lid) {
+    // this ensures that a user without edit rights cannot simply add the needed projects to the locality while editing it
     const existingLocality = await getLocalityDetails(locality.lid, user)
     if (existingLocality) {
       activeProjectIds = existingLocality.now_plr.map(link => link.pid)
     }
+  } else {
+    activeProjectIds = getActiveProjectIds(locality)
   }
 
   if (activeProjectIds.length === 0) return false

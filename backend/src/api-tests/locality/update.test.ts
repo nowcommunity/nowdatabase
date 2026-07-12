@@ -9,7 +9,7 @@ import {
   invalidPollenUpdateLocality,
   newLocalityBasis,
 } from './data'
-import { login, logout, resetDatabase, send, resetDatabaseTimeout } from '../utils'
+import { login, logout, resetDatabase, send, resetDatabaseTimeout, noPermError } from '../utils'
 import { pool } from '../../utils/db'
 
 let resultLocality: LocalityDetailsType | null = null
@@ -35,7 +35,24 @@ describe('Locality update', () => {
   describe('works and updates data correctly', () => {
     beforeAll(async () => {
       await login()
-      const writeResult = await send<{ id: number }>('locality', 'PUT', { locality: buildUpdatePayload() })
+      const writeResult = await send<{ id: number }>('locality', 'PUT', {
+        locality: buildUpdatePayload({
+          now_ls: [
+            {
+              rowState: 'new',
+              species_id: 21052,
+              lid: 21050,
+              com_species: { species_id: 21052 },
+            },
+            {
+              rowState: 'removed',
+              species_id: 85730,
+              lid: 21050,
+              com_species: { species_id: 85730 },
+            },
+          ],
+        }),
+      })
 
       expect(writeResult.status).toEqual(200)
       expect(writeResult.body.id).toEqual(editedLocality.lid) // `Invalid result returned on write: ${writeResult.body.id}`
@@ -117,9 +134,17 @@ describe('Locality update', () => {
   })
 
   describe('works with edge cases, and fails with invalid values or permissions', () => {
-    beforeEach(async () => {
+    beforeAll(async () => {
       await resetDatabase()
+      await login()
+      const writeResult = await send<{ id: number }>('locality', 'PUT', {
+        locality: buildUpdatePayload(),
+      })
+
+      expect(writeResult.status).toEqual(200)
+      expect(writeResult.body.id).toEqual(editedLocality.lid) // `Invalid result returned on write: ${writeResult.body.id}`
     })
+
     it('Clearing an optional text field persists null', async () => {
       const writeResult = await send<{ id: number }>('locality', 'PUT', {
         locality: buildUpdatePayload({ rock_type: '' }),
@@ -187,7 +212,8 @@ describe('Locality update', () => {
       expect(writeResult.body.id).toEqual(editedLocality.lid) // `Invalid result returned on write: ${writeResult.body.id}
     })
 
-    it('Editing locality as an editrestricted user that belongs in the same project as the locality should succeed', async () => {
+    it('Editing locality as an editrestricted user that belongs in the same project as the locality succeeds', async () => {
+      logout()
       await login('testEr', 'test')
       const erWriteResult = await send<{ id: number }>('locality', 'PUT', { locality: buildUpdatePayload() })
       // testEr belongs to the NOW Database project, which is already linked to the locality
@@ -200,8 +226,25 @@ describe('Locality update', () => {
       expect(writeResult.status).toEqual(403)
     })
 
-    it.todo(
-      'Editing locality fails as an EditRestricted user, when the locality is not in the same project as the user'
-    )
+    it('Editing locality fails as an EditRestricted user, when the locality is not in the same project as the user', async () => {
+      const changeProjectResult = await send<{ id: number }>('locality', 'PUT', {
+        locality: buildUpdatePayload({ now_plr: [{ pid: 35, rowState: 'new' }] }),
+      })
+      expect(changeProjectResult.status).toBe(200)
+
+      logout()
+      await login('testEr', 'test')
+      const resultEr = await send('locality', 'PUT', {
+        locality: buildUpdatePayload(),
+      })
+      expect(resultEr.body).toEqual(noPermError)
+      expect(resultEr.status).toEqual(403)
+
+      const resultErWithAddedPlr = await send('locality', 'PUT', {
+        locality: buildUpdatePayload({ now_plr: [{ pid: 3, rowState: 'new' }] }),
+      })
+      expect(resultErWithAddedPlr.body).toEqual(noPermError)
+      expect(resultErWithAddedPlr.status).toEqual(403)
+    })
   })
 })
