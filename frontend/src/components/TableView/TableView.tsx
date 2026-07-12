@@ -421,7 +421,7 @@ export const TableView = <T extends MRT_RowData>({
 
   const buildTableStateUrl = () => {
     const params = new URLSearchParams(location.search)
-    params.set(TABLE_STATE_URL_PARAM, `${encodeURIComponent(tableStateId)}`)
+    params.set(TABLE_STATE_URL_PARAM, tableStateId)
     return `${location.pathname}?${params.toString()}`
   }
 

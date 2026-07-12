@@ -19,7 +19,7 @@ export const useSyncTabSearch = (tab: number) => {
 
   useEffect(() => {
     const params = new URLSearchParams(location.search)
-    if (params.get('tab') === encodeURIComponent(tab)) return
+    if (params.get('tab') === String(tab)) return
 
     navigate(
       {
