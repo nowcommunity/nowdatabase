@@ -47,14 +47,7 @@ describe('Updating museum works', () => {
     expect(resultBody.length).toEqual(1) //There should be 1 validation error
   })
 
-  it('Updating fails without permissions', async () => {
-    logout()
-    const { body: resultBodyNoPerm, status: resultStatusNoPerm } = await send('museum/', 'PUT', {
-      museum: { ...editedMuseum, institution: 'New Museum 2' },
-    })
-    expect(resultBodyNoPerm).toEqual(noPermError)
-    expect(resultStatusNoPerm).toEqual(403)
-
+  it('Updating succeeds for all logged in users', async () => {
     await login('testEr')
     const { body: resultBodyEr, status: resultStatusEr } = await send<{ museum: string }>('museum/', 'PUT', {
       museum: { ...editedMuseum, institution: 'New Museum 2' },
@@ -64,9 +57,18 @@ describe('Updating museum works', () => {
 
     await login('testEu')
     const { body: resultBodyEu, status: resultStatusEu } = await send<{ museum: string }>('museum/', 'PUT', {
-      museum: { ...editedMuseum, institution: 'New Museum 2' },
+      museum: { ...editedMuseum, institution: 'NM3' },
     })
     expect(resultStatusEu).toEqual(200)
     expect(typeof resultBodyEu.museum).toEqual('string')
+  })
+
+  it('Updating fails for anonymous users', async () => {
+    logout()
+    const { body: resultBodyNoPerm, status: resultStatusNoPerm } = await send('museum/', 'PUT', {
+      museum: { ...editedMuseum, institution: 'NM4' },
+    })
+    expect(resultBodyNoPerm).toEqual(noPermError)
+    expect(resultStatusNoPerm).toEqual(403)
   })
 })
