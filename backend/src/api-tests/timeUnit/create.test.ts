@@ -128,23 +128,6 @@ describe('Creating new time unit', () => {
     })
   })
 
-  it('Creation fails without permissions', async () => {
-    logout()
-    const resultNoPerm = await send('time-unit', 'PUT', {
-      timeUnit: { ...newTimeUnitBasis },
-    })
-    expect(resultNoPerm.body).toEqual(noPermError)
-    expect(resultNoPerm.status).toEqual(403)
-
-    logout()
-    await login('testEr', 'test')
-    const resultEr = await send('time-unit', 'PUT', {
-      timeUnit: { ...newTimeUnitBasis },
-    })
-    expect(resultEr.body).toEqual(noPermError)
-    expect(resultEr.status).toEqual(403)
-  })
-
   it('Creation fails without reference', async () => {
     const resultNoRef = await send('time-unit', 'PUT', {
       timeUnit: { ...newTimeUnitBasis, tu_display_name: 'Bahean Test 2', references: [] },
@@ -233,6 +216,23 @@ describe('Creating new time unit', () => {
       expect(getReqStatus).toEqual(403)
       expect(getReqStatus).not.toEqual(500)
       expect(hasStructuredErrorPayload(resultBody)).toBe(true)
+    })
+
+    it('Creation fails without permissions', async () => {
+      logout()
+      const resultNoPerm = await send('time-unit', 'PUT', {
+        timeUnit: { ...newTimeUnitBasis },
+      })
+      expect(resultNoPerm.body).toEqual(noPermError)
+      expect(resultNoPerm.status).toEqual(403)
+
+      logout()
+      await login('testEr', 'test')
+      const resultEr = await send('time-unit', 'PUT', {
+        timeUnit: { ...newTimeUnitBasis },
+      })
+      expect(resultEr.body).toEqual(noPermError)
+      expect(resultEr.status).toEqual(403)
     })
   })
 })

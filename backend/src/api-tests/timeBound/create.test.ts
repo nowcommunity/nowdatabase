@@ -51,6 +51,22 @@ describe('Creating new time bound works', () => {
     expect(resultWithRef.status).toEqual(200)
   })
 
+  it('Update logs are correct', () => {
+    const lastUpdate = createdTimeBound!.now_bau[createdTimeBound!.now_bau.length - 1]
+    expect(lastUpdate.bau_comment).toEqual(newTimeBoundBasis.comment) // 'Comment is correct'
+    const logRows = lastUpdate.updates
+    const expectedLogRows: Partial<LogRow>[] = [
+      {
+        table: 'now_tu_bound',
+        column: 'b_name',
+        oldValue: null,
+        value: newTimeBoundBasis.b_name!,
+        type: 'add',
+      },
+    ]
+    testLogRows(logRows, expectedLogRows, 3)
+  })
+
   it('Creation fails without permissions', async () => {
     logout()
     const resultNoPerm = await send('time-bound', 'PUT', {
@@ -66,21 +82,5 @@ describe('Creating new time bound works', () => {
     })
     expect(resultEr.body).toEqual(noPermError)
     expect(resultEr.status).toEqual(403)
-  })
-
-  it('Update logs are correct', () => {
-    const lastUpdate = createdTimeBound!.now_bau[createdTimeBound!.now_bau.length - 1]
-    expect(lastUpdate.bau_comment).toEqual(newTimeBoundBasis.comment) // 'Comment is correct'
-    const logRows = lastUpdate.updates
-    const expectedLogRows: Partial<LogRow>[] = [
-      {
-        table: 'now_tu_bound',
-        column: 'b_name',
-        oldValue: null,
-        value: newTimeBoundBasis.b_name!,
-        type: 'add',
-      },
-    ]
-    testLogRows(logRows, expectedLogRows, 3)
   })
 })
