@@ -211,11 +211,13 @@ describe('Species merge endpoint', () => {
     const references = cloneSpeciesData().references
 
     const acceptedCreate = await send<{ species_id: number }>('species', 'PUT', {
-      species: buildSpeciesPayload({ genus_name: 'BoolAcceptGenus', body_mass: 10n }),
+      //@ts-expect-error body_mass is expected to be a BigInt
+      species: buildSpeciesPayload({ genus_name: 'BoolAcceptGenus', body_mass: 10 }),
     })
 
     const obsoleteCreate = await send<{ species_id: number }>('species', 'PUT', {
-      species: buildSpeciesPayload({ genus_name: 'BoolObsoleteGenus', body_mass: 99n }),
+      //@ts-expect-error body_mass is expected to be a BigInt
+      species: buildSpeciesPayload({ genus_name: 'BoolObsoleteGenus', body_mass: 99 }),
     })
 
     const acceptedId = acceptedCreate.body.species_id
