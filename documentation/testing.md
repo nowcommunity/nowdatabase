@@ -74,3 +74,8 @@ Your feedback is essential to improving the user experience—thank you for part
 - The Cypress env variable `databaseResetUrl` points to `http://localhost:4000/test/reset-test-database` by default. Hitting this endpoint (for example with `curl http://localhost:4000/test/reset-test-database`) resets seeded data before running the suite.
 - When running inside Docker, the provided scripts already pass through the defaults; override with `CYPRESS_databaseResetUrl` if the API host/port differs.
 
+## Jest API Tests
+
+See [commands.md](devops/commands.md) for commands to run API tests.
+
+NOTE: When writing API tests, make sure to test that the error messages of failed requests are correct, along with the status code. Both invalid user rights and incorrect requests (invalid or missing values when creating entities etc.) result in error code 403, which might be misleading if only the code is checked. 
