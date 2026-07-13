@@ -85,7 +85,9 @@ NOTE: Users with the **EditRestricted** role can only update occurrences that re
 ## Person
 
 - Viewing a list of every person requires the **Admin** role.
-- Any user can get their information using their ID, but cannot view other people's information (unless they have the **Admin** role)
+- Any user can get their own information using their ID, but cannot view other people's information (unless they have the **Admin** role)
+- Any user can update their own information, but cannot update anyone else's (unless they have the **Admin** role)
+- Deleting a Person requires the **Admin** role.
 
 ## Project
 

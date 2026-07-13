@@ -94,6 +94,11 @@ describe('Deleting person works', () => {
     expect(deleteResultEr.status).toEqual(403)
     expect(deleteResultEr.body).toEqual(noPermError)
 
+    await login('testEu')
+    const deleteResultEu = await send('person/DEL-PERM', 'DELETE')
+    expect(deleteResultEu.status).toEqual(403)
+    expect(deleteResultEu.body).toEqual(noPermError)
+
     const person = await nowDb.com_people.findUnique({ where: { initials: 'DEL-PERM' } })
     expect(person).not.toBeNull()
   })
