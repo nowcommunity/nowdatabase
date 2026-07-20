@@ -1,5 +1,5 @@
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from '@jest/globals'
-import { login, resetDatabase, resetDatabaseTimeout, send } from '../utils'
+import { login, logout, noPermError, resetDatabase, resetDatabaseTimeout, send } from '../utils'
 import { pool } from '../../utils/db'
 
 describe('PUT /projects/:id', () => {
@@ -9,6 +9,7 @@ describe('PUT /projects/:id', () => {
 
   beforeEach(async () => {
     await resetDatabase()
+    await login('testSu', 'test')
   })
 
   afterAll(async () => {
@@ -16,8 +17,6 @@ describe('PUT /projects/:id', () => {
   })
 
   it('updates coordinator and members', async () => {
-    await login('testSu', 'test')
-
     const createResult = await send<{ pid: number }>('projects', 'POST', {
       projectCode: 'PRJ-UPDATE',
       projectName: 'Project To Update',
@@ -47,8 +46,6 @@ describe('PUT /projects/:id', () => {
   })
 
   it('returns validation error for invalid members', async () => {
-    await login('testSu', 'test')
-
     const createResult = await send<{ pid: number }>('projects', 'POST', {
       projectCode: 'PRJ-INV1',
       projectName: 'Project Invalid Members',
@@ -64,8 +61,6 @@ describe('PUT /projects/:id', () => {
   })
 
   it('returns validation error for too-long project code', async () => {
-    await login('testSu', 'test')
-
     const createResult = await send<{ pid: number }>('projects', 'POST', {
       projectCode: 'PRJ-LONG1',
       projectName: 'Project Long Code',
@@ -82,12 +77,26 @@ describe('PUT /projects/:id', () => {
   })
 
   it('denies non-admin users', async () => {
+    const unauthorizedUpdate = { projectName: 'Unauthorized Update' }
+
     await login('testPl', 'test')
+    const plResult = await send('projects/1', 'PUT', unauthorizedUpdate)
+    expect(plResult.status).toEqual(403)
+    expect(plResult.body).toEqual(noPermError)
 
-    const result = await send('projects/1', 'PUT', {
-      projectName: 'Unauthorized Update',
-    })
+    await login('testEu', 'test')
+    const euResult = await send('projects/1', 'PUT', unauthorizedUpdate)
+    expect(euResult.status).toEqual(403)
+    expect(euResult.body).toEqual(noPermError)
 
-    expect(result.status).toEqual(403)
+    await login('testEr', 'test')
+    const erResult = await send('projects/1', 'PUT', unauthorizedUpdate)
+    expect(erResult.status).toEqual(403)
+    expect(erResult.body).toEqual(noPermError)
+
+    logout()
+    const anonResult = await send('projects/1', 'PUT', unauthorizedUpdate)
+    expect(anonResult.status).toEqual(403)
+    expect(anonResult.body).toEqual(noPermError)
   })
 })
