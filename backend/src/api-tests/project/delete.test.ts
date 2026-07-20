@@ -60,6 +60,6 @@ describe('DELETE /project/:id', () => {
     await login('testSu', 'test')
     const fetchAfterAttempts = await send(`project/${createdProject.body.pid}`, 'GET')
     expect(fetchAfterAttempts.status).toEqual(200)
-    expect(fetchAfterAttempts.body).toHaveProperty('pid', 38)
+    expect(fetchAfterAttempts.body).toHaveProperty('pid', createdProject.body.pid)
   })
 })
