@@ -54,6 +54,7 @@ describe('Creating new museum works', () => {
     expect(getReqStatus).toEqual(409)
     expect(resultBody.code).toEqual('duplicate_museum_code')
   })
+
   it('Creation fails with empty museum code', async () => {
     const { body: resultBody, status: getReqStatus } = await send('museum/', 'PUT', {
       museum: { ...newMuseumBasis, museum: null },
@@ -62,26 +63,29 @@ describe('Creating new museum works', () => {
     expect(resultBody.length).toEqual(1) //There should be 1 validation error
   })
 
-  it('Creation fails without permissions', async () => {
+  it('Creation succeeds for all logged in users', async () => {
     logout()
-    const { body: resultBodyNoPerm, status: resultStatusNoPerm } = await send('museum/', 'PUT', {
-      museum: { ...newMuseumBasis, museum: 'New Museum 2' },
-    })
-    expect(resultBodyNoPerm).toEqual(noPermError)
-    expect(resultStatusNoPerm).toEqual(403)
-
     await login('testEr')
     const { body: resultBodyEr, status: resultStatusEr } = await send<{ museum: string }>('museum/', 'PUT', {
-      museum: { ...newMuseumBasis, museum: 'NM3' },
+      museum: { ...newMuseumBasis, museum: 'NewMuseum2' },
     })
     expect(resultStatusEr).toEqual(200)
     expect(typeof resultBodyEr.museum).toEqual('string')
 
     await login('testEu')
     const { body: resultBodyEu, status: resultStatusEu } = await send<{ museum: string }>('museum/', 'PUT', {
-      museum: { ...newMuseumBasis, museum: 'NM4' },
+      museum: { ...newMuseumBasis, museum: 'NM3' },
     })
     expect(resultStatusEu).toEqual(200)
     expect(typeof resultBodyEu.museum).toEqual('string')
+  })
+
+  it('Creation fails for anonymous users', async () => {
+    logout()
+    const { body: resultBodyNoPerm, status: resultStatusNoPerm } = await send('museum/', 'PUT', {
+      museum: { ...newMuseumBasis, museum: 'NM4' },
+    })
+    expect(resultBodyNoPerm).toEqual(noPermError)
+    expect(resultStatusNoPerm).toEqual(403)
   })
 })

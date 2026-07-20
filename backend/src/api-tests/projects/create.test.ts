@@ -1,5 +1,5 @@
 import { afterAll, beforeAll, describe, expect, it } from '@jest/globals'
-import { login, resetDatabase, resetDatabaseTimeout, send } from '../utils'
+import { login, logout, noPermError, resetDatabase, resetDatabaseTimeout, send } from '../utils'
 import { pool } from '../../utils/db'
 
 describe('POST /projects', () => {
@@ -59,14 +59,30 @@ describe('POST /projects', () => {
   })
 
   it('denies non-admin users', async () => {
-    await login('testPl', 'test')
-
-    const result = await send('projects', 'POST', {
+    const unauthorizedProject = {
       projectCode: 'PRJ-004',
       projectName: 'Unauthorized Create',
       coordinatorUserId: 163,
-    })
+    }
 
-    expect(result.status).toEqual(403)
+    await login('testPl', 'test')
+    const plResult = await send('projects', 'POST', unauthorizedProject)
+    expect(plResult.status).toEqual(403)
+    expect(plResult.body).toEqual(noPermError)
+
+    await login('testEu', 'test')
+    const euResult = await send('projects', 'POST', unauthorizedProject)
+    expect(euResult.status).toEqual(403)
+    expect(euResult.body).toEqual(noPermError)
+
+    await login('testEr', 'test')
+    const erResult = await send('projects', 'POST', unauthorizedProject)
+    expect(erResult.status).toEqual(403)
+    expect(erResult.body).toEqual(noPermError)
+
+    logout()
+    const anonResult = await send('projects', 'POST', unauthorizedProject)
+    expect(anonResult.status).toEqual(403)
+    expect(anonResult.body).toEqual(noPermError)
   })
 })

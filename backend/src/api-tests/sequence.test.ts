@@ -1,5 +1,6 @@
-import { beforeAll, describe, expect, it } from '@jest/globals'
+import { beforeAll, afterAll, describe, expect, it } from '@jest/globals'
 import { login, resetDatabase, resetDatabaseTimeout, send } from './utils'
+import { pool } from '../utils/db'
 
 type SequenceResponse = {
   rows: Array<{ sequence: string; seq_name: string; display_value: string }>
@@ -13,6 +14,10 @@ describe('Sequence API', () => {
     await resetDatabase()
     await login()
   }, resetDatabaseTimeout)
+
+  afterAll(async () => {
+    await pool.end()
+  })
 
   it('returns sequences with display labels', async () => {
     const { body, status } = await send<SequenceResponse>('time-unit/sequences', 'GET')

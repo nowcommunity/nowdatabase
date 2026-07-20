@@ -1,5 +1,5 @@
 import { beforeAll, beforeEach, afterAll, describe, it, expect } from '@jest/globals'
-import { login, logout, send, resetDatabase, resetDatabaseTimeout } from '../utils'
+import { login, logout, send, resetDatabase, resetDatabaseTimeout, noPermError } from '../utils'
 import { pool } from '../../utils/db'
 import { newTimeBoundBasis } from './data'
 
@@ -37,10 +37,12 @@ describe('Deleting a time bound', () => {
   it('without permissions fails', async () => {
     logout()
     const deleteResultNoPerm = await send<{ id: number }>('time-bound/11', 'DELETE')
+    expect(deleteResultNoPerm.body).toEqual(noPermError)
     expect(deleteResultNoPerm.status).toEqual(403)
 
     await login('testEr')
     const deleteResultEr = await send<{ id: number }>('time-bound/11', 'DELETE')
+    expect(deleteResultEr.body).toEqual(noPermError)
     expect(deleteResultEr.status).toEqual(403)
   })
 })

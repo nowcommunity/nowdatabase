@@ -1,5 +1,5 @@
 import { beforeEach, beforeAll, afterAll, describe, it, expect } from '@jest/globals'
-import { login, logout, resetDatabase, send, resetDatabaseTimeout } from '../utils'
+import { login, logout, resetDatabase, send, resetDatabaseTimeout, noPermError } from '../utils'
 import { pool } from '../../utils/db'
 
 describe('Deleting a region works', () => {
@@ -23,14 +23,17 @@ describe('Deleting a region works', () => {
   it('Deleting fails without permissions', async () => {
     logout()
     const deleteResultNoPerm = await send<{ id: number }>('region/2', 'DELETE')
+    expect(deleteResultNoPerm.body).toEqual(noPermError)
     expect(deleteResultNoPerm.status).toEqual(403)
 
     await login('testEr')
     const deleteResultEr = await send<{ id: number }>('region/2', 'DELETE')
+    expect(deleteResultEr.body).toEqual(noPermError)
     expect(deleteResultEr.status).toEqual(403)
 
     await login('testEu')
     const deleteResultEu = await send<{ id: number }>('region/2', 'DELETE')
+    expect(deleteResultEu.body).toEqual(noPermError)
     expect(deleteResultEu.status).toEqual(403)
 
     await login()

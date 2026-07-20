@@ -1,5 +1,5 @@
 import { afterAll, beforeAll, describe, expect, it } from '@jest/globals'
-import { login, resetDatabase, resetDatabaseTimeout, send } from '../utils'
+import { login, logout, noPermError, resetDatabase, resetDatabaseTimeout, send } from '../utils'
 import { pool } from '../../utils/db'
 
 describe('DELETE /project/:id', () => {
@@ -38,8 +38,28 @@ describe('DELETE /project/:id', () => {
     })
 
     await login('testPl', 'test')
-    const deleteAttempt = await send(`project/${createdProject.body.pid}`, 'DELETE')
+    const plDeleteAttempt = await send(`project/${createdProject.body.pid}`, 'DELETE')
+    expect(plDeleteAttempt.status).toEqual(403)
+    expect(plDeleteAttempt.body).toEqual(noPermError)
 
-    expect(deleteAttempt.status).toEqual(403)
+    await login('testEu', 'test')
+    const euDeleteAttempt = await send(`project/${createdProject.body.pid}`, 'DELETE')
+    expect(euDeleteAttempt.status).toEqual(403)
+    expect(euDeleteAttempt.body).toEqual(noPermError)
+
+    await login('testEr', 'test')
+    const erDeleteAttempt = await send(`project/${createdProject.body.pid}`, 'DELETE')
+    expect(erDeleteAttempt.status).toEqual(403)
+    expect(erDeleteAttempt.body).toEqual(noPermError)
+
+    logout()
+    const anonDeleteAttempt = await send(`project/${createdProject.body.pid}`, 'DELETE')
+    expect(anonDeleteAttempt.status).toEqual(403)
+    expect(anonDeleteAttempt.body).toEqual(noPermError)
+
+    await login('testSu', 'test')
+    const fetchAfterAttempts = await send(`project/${createdProject.body.pid}`, 'GET')
+    expect(fetchAfterAttempts.status).toEqual(200)
+    expect(fetchAfterAttempts.body).toHaveProperty('pid', createdProject.body.pid)
   })
 })
