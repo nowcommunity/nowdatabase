@@ -2,7 +2,7 @@ import { afterAll, beforeAll, describe, expect, it } from '@jest/globals'
 import { login, logout, noPermError, resetDatabase, resetDatabaseTimeout, send } from '../utils'
 import { pool } from '../../utils/db'
 
-describe('GET /projects/', () => {
+describe('GET /project/:id', () => {
   beforeAll(async () => {
     await resetDatabase()
   }, resetDatabaseTimeout)
