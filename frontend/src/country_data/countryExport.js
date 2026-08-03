@@ -40,6 +40,8 @@ function main() {
 
   const polygons = []
   const boundingBoxes = {}
+  const countriesWithNoGeometry = []
+
   borders.features.forEach(feature => {
     const bounds = {
       top: null,
@@ -55,35 +57,46 @@ function main() {
       right: null,
     }
 
-    feature.geometry.coordinates.forEach(poly => {
-      polygons.push(
-        poly[0].map(coord => {
-          const lat = coord[1]
-          const long = coord[0]
+    if (feature.geometry) {
+      let polygonArray
+      if (feature.geometry.type === 'MultiPolygon') {
+        polygonArray = feature.geometry.coordinates[0]
+      } else {
+        polygonArray = feature.geometry.coordinates
+      }
 
-          if (!bounds.top) bounds.top = lat
-          if (!bounds.bottom) bounds.bottom = lat
-          if (!bounds.left) bounds.left = long
-          if (!bounds.right) bounds.right = long
-          bounds.top = Math.min(bounds.top, lat)
-          bounds.bottom = Math.max(bounds.bottom, lat)
-          bounds.left = Math.min(bounds.left, long)
-          bounds.right = Math.max(bounds.right, long)
+      polygonArray.forEach(poly => {
+        polygons.push(
+          poly.map(coord => {
+            const lat = coord[1]
+            const long = coord[0]
 
-          if (!halvedBounds.top) halvedBounds.top = lat
-          if (!halvedBounds.bottom) halvedBounds.bottom = lat
-          if (!halvedBounds.right) halvedBounds.right = -180
-          if (!halvedBounds.left) halvedBounds.left = long
-          halvedBounds.top = Math.min(halvedBounds.top, lat)
-          halvedBounds.bottom = Math.max(halvedBounds.bottom, lat)
+            if (!bounds.top) bounds.top = lat
+            if (!bounds.bottom) bounds.bottom = lat
+            if (!bounds.left) bounds.left = long
+            if (!bounds.right) bounds.right = long
+            bounds.top = Math.min(bounds.top, lat)
+            bounds.bottom = Math.max(bounds.bottom, lat)
+            bounds.left = Math.min(bounds.left, long)
+            bounds.right = Math.max(bounds.right, long)
 
-          if (long < 0) halvedBounds.right = Math.max(halvedBounds.right, long)
-          else halvedBounds.left = Math.min(halvedBounds.left, long)
+            if (!halvedBounds.top) halvedBounds.top = lat
+            if (!halvedBounds.bottom) halvedBounds.bottom = lat
+            if (!halvedBounds.right) halvedBounds.right = -180
+            if (!halvedBounds.left) halvedBounds.left = long
+            halvedBounds.top = Math.min(halvedBounds.top, lat)
+            halvedBounds.bottom = Math.max(halvedBounds.bottom, lat)
 
-          return [lat, long]
-        })
-      )
-    })
+            if (long < 0) halvedBounds.right = Math.max(halvedBounds.right, long)
+            else halvedBounds.left = Math.min(halvedBounds.left, long)
+
+            return [lat, long]
+          })
+        )
+      })
+    } else {
+      countriesWithNoGeometry.push(feature.properties.name)
+    }
 
     let country = feature.properties.name
     if (country in nameMappings) country = nameMappings[country]
@@ -112,6 +125,13 @@ export type CountryBoundingBoxes =
     boundsType + 'export const countryBoundingBoxes: CountryBoundingBoxes = ' + JSON.stringify(boundingBoxes) + ';'
   fs.writeFileSync('countryPolygons.ts', polygonString)
   fs.writeFileSync('countryBoundingBoxes.ts', boundsString)
+
+  if (countriesWithNoGeometry.length > 0) {
+    console.log(
+      'The following countries have no geometry in the supplied .geojson file (probably due to too much simplification in mapshaper): '
+    )
+    console.log(countriesWithNoGeometry.join(', '))
+  }
 }
 
 main()
