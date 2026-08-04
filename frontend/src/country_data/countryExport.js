@@ -28,6 +28,53 @@ const nameMappings = {
   'United States Virgin Islands': 'Virgin Islands',
 }
 
+function isCoordinatePair(value) {
+  return Array.isArray(value) && value.length >= 2 && typeof value[0] === 'number' && typeof value[1] === 'number'
+}
+
+function isLinearRing(value) {
+  return Array.isArray(value) && value.length > 0 && isCoordinatePair(value[0])
+}
+
+function collectOuterRings(value) {
+  if (!Array.isArray(value) || value.length === 0) {
+    return []
+  }
+  if (isLinearRing(value)) {
+    return [value]
+  }
+  if (Array.isArray(value[0]) && isLinearRing(value[0])) {
+    return [value[0]]
+  }
+  return value.flatMap(collectOuterRings)
+}
+
+function updateBounds(bounds, halvedBounds, coord) {
+  const lat = coord[1]
+  const long = coord[0]
+
+  if (bounds.top === null) bounds.top = lat
+  if (bounds.bottom === null) bounds.bottom = lat
+  if (bounds.left === null) bounds.left = long
+  if (bounds.right === null) bounds.right = long
+  bounds.top = Math.min(bounds.top, lat)
+  bounds.bottom = Math.max(bounds.bottom, lat)
+  bounds.left = Math.min(bounds.left, long)
+  bounds.right = Math.max(bounds.right, long)
+
+  if (halvedBounds.top === null) halvedBounds.top = lat
+  if (halvedBounds.bottom === null) halvedBounds.bottom = lat
+  if (halvedBounds.right === null) halvedBounds.right = -180
+  if (halvedBounds.left === null) halvedBounds.left = long
+  halvedBounds.top = Math.min(halvedBounds.top, lat)
+  halvedBounds.bottom = Math.max(halvedBounds.bottom, lat)
+
+  if (long < 0) halvedBounds.right = Math.max(halvedBounds.right, long)
+  else halvedBounds.left = Math.min(halvedBounds.left, long)
+
+  return [lat, long]
+}
+
 function main() {
   if (process.argv.length != 3) {
     console.log('Usage: node countryDataExportTool.js [administrative boundaries .geojson file]')
@@ -58,39 +105,11 @@ function main() {
     }
 
     if (feature.geometry) {
-      let polygonArray
-      if (feature.geometry.type === 'MultiPolygon') {
-        polygonArray = feature.geometry.coordinates[0]
-      } else {
-        polygonArray = feature.geometry.coordinates
-      }
-
-      polygonArray.forEach(poly => {
+      const polygonArray = collectOuterRings(feature.geometry.coordinates)
+      polygonArray.forEach(polygon => {
         polygons.push(
-          poly.map(coord => {
-            const lat = coord[1]
-            const long = coord[0]
-
-            if (!bounds.top) bounds.top = lat
-            if (!bounds.bottom) bounds.bottom = lat
-            if (!bounds.left) bounds.left = long
-            if (!bounds.right) bounds.right = long
-            bounds.top = Math.min(bounds.top, lat)
-            bounds.bottom = Math.max(bounds.bottom, lat)
-            bounds.left = Math.min(bounds.left, long)
-            bounds.right = Math.max(bounds.right, long)
-
-            if (!halvedBounds.top) halvedBounds.top = lat
-            if (!halvedBounds.bottom) halvedBounds.bottom = lat
-            if (!halvedBounds.right) halvedBounds.right = -180
-            if (!halvedBounds.left) halvedBounds.left = long
-            halvedBounds.top = Math.min(halvedBounds.top, lat)
-            halvedBounds.bottom = Math.max(halvedBounds.bottom, lat)
-
-            if (long < 0) halvedBounds.right = Math.max(halvedBounds.right, long)
-            else halvedBounds.left = Math.min(halvedBounds.left, long)
-
-            return [lat, long]
+          polygon.map(coord => {
+            return updateBounds(bounds, halvedBounds, coord)
           })
         )
       })
