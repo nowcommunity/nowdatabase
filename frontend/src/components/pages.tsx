@@ -1,4 +1,4 @@
-import { EditRights } from './Page'
+import type { EditRights } from './Page'
 import { UserState } from '@/redux/userReducer'
 
 export const noRights: EditRights = {}
