@@ -9,8 +9,8 @@ export const CoordinatorTab = () => {
 
   const projectInformation = [
     ['Project Id', textField('pid', { type: 'text', readonly: true, disabled: true })],
-    ['Project Code', textField('proj_code')],
-    ['Project Name', textField('proj_name')],
+    ['Project Code', textField('proj_code', { trim: true })],
+    ['Project Name', textField('proj_name', { trim: true })],
     ['Coordinator', <CoordinatorSelect key="coordinator-select" variant="detail" />],
     [
       'Project Status',
