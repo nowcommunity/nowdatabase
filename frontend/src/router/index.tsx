@@ -1,26 +1,6 @@
-import { Navigate, createBrowserRouter } from 'react-router-dom'
+import { createBrowserRouter } from 'react-router-dom'
 import App from '../App'
 import { RouterError } from '../components/ErrorBoundary/RouterError'
-
-const loadPagesElement = async (
-  key:
-    | 'crossSearchPage'
-    | 'localityPage'
-    | 'museumPage'
-    | 'personPage'
-    | 'projectPage'
-    | 'referencePage'
-    | 'regionPage'
-    | 'speciesPage'
-    | 'timeBoundPage'
-    | 'timeUnitPage'
-) => {
-  const pagesModule = await import('../components/pages')
-
-  return {
-    Component: () => pagesModule[key],
-  }
-}
 
 const router = createBrowserRouter([
   {
@@ -31,22 +11,87 @@ const router = createBrowserRouter([
       {
         index: true,
         lazy: async () => {
-          const { FrontPage } = await import('../components/FrontPage')
+          const { FrontPage } = await import('../pages/FrontPage')
           return { Component: FrontPage }
         },
       },
-      { path: 'occurrence/:lid/:speciesId', lazy: () => loadPagesElement('crossSearchPage') },
-      { path: 'occurrence/:id', element: <Navigate to="/occurrence" replace /> },
-      { path: 'occurrence', lazy: () => loadPagesElement('crossSearchPage') },
-      { path: 'crosssearch/:id?', lazy: () => loadPagesElement('crossSearchPage') },
-      { path: 'locality/:id?', lazy: () => loadPagesElement('localityPage') },
-      { path: 'species/:id?', lazy: () => loadPagesElement('speciesPage') },
-      { path: 'museum/:id?', lazy: () => loadPagesElement('museumPage') },
-      { path: 'reference/:id?', lazy: () => loadPagesElement('referencePage') },
-      { path: 'time-unit/:id?', lazy: () => loadPagesElement('timeUnitPage') },
-      { path: 'time-bound/:id?', lazy: () => loadPagesElement('timeBoundPage') },
-      { path: 'region/:id?', lazy: () => loadPagesElement('regionPage') },
-      { path: 'person/:id?', lazy: () => loadPagesElement('personPage') },
+      {
+        path: 'locality/:id?',
+        lazy: async () => {
+          const { LocalityPage } = await import('../pages/LocalityPage')
+          return { Component: LocalityPage }
+        },
+      },
+      {
+        path: 'species/:id?',
+        lazy: async () => {
+          const { SpeciesPage } = await import('../pages/SpeciesPage')
+          return { Component: SpeciesPage }
+        },
+      },
+      {
+        path: 'occurrence/:lid/:speciesId',
+        lazy: async () => {
+          const { OccurrencesPage } = await import('../pages/OccurrencesPage')
+          return { Component: OccurrencesPage }
+        },
+      },
+      {
+        path: 'occurrence',
+        lazy: async () => {
+          const { OccurrencesPage } = await import('../pages/OccurrencesPage')
+          return { Component: OccurrencesPage }
+        },
+      },
+      {
+        path: 'museum/:id?',
+        lazy: async () => {
+          const { MuseumPage } = await import('../pages/MuseumPage')
+          return { Component: MuseumPage }
+        },
+      },
+      {
+        path: 'reference/:id?',
+        lazy: async () => {
+          const { ReferencePage } = await import('../pages/ReferencePage')
+          return { Component: ReferencePage }
+        },
+      },
+      {
+        path: 'time-unit/:id?',
+        lazy: async () => {
+          const { TimeUnitPage } = await import('../pages/TimeUnitPage')
+          return { Component: TimeUnitPage }
+        },
+      },
+      {
+        path: 'time-bound/:id?',
+        lazy: async () => {
+          const { TimeBoundPage } = await import('../pages/TimeBoundPage')
+          return { Component: TimeBoundPage }
+        },
+      },
+      {
+        path: 'region/:id?',
+        lazy: async () => {
+          const { RegionPage } = await import('../pages/RegionPage')
+          return { Component: RegionPage }
+        },
+      },
+      {
+        path: 'person/:id?',
+        lazy: async () => {
+          const { PersonPage } = await import('../pages/PersonPage')
+          return { Component: PersonPage }
+        },
+      },
+      {
+        path: 'project/:id?',
+        lazy: async () => {
+          const { ProjectPage } = await import('../pages/ProjectPage')
+          return { Component: ProjectPage }
+        },
+      },
       {
         path: 'project/new',
         lazy: async () => {
@@ -61,7 +106,6 @@ const router = createBrowserRouter([
           return { Component: ProjectEditPage }
         },
       },
-      { path: 'project/:id?', lazy: () => loadPagesElement('projectPage') },
       {
         path: 'email',
         lazy: async () => {
