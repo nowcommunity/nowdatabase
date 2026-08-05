@@ -26,14 +26,6 @@ const projectsApi = api.injectEndpoints({
       }),
       providesTags: result => (result ? [{ type: 'project', id: result.pid }] : []),
     }),
-    createProject: builder.mutation<ProjectDetailsType, CreateProjectPayload>({
-      query: body => ({
-        url: `/projects`,
-        method: 'POST',
-        body,
-      }),
-      invalidatesTags: ['projects'],
-    }),
     updateProject: builder.mutation<ProjectDetailsType, EditDataType<ProjectDetailsType>>({
       query: project => ({
         url: `/projects`,

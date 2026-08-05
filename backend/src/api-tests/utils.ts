@@ -23,7 +23,11 @@ export const send = async <T extends Record<string, unknown> | Array<Record<stri
 
       // TODO remove this when fixBigInt is refactored. Also lint-ignore is then not needed
       // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-      response.body = response.text ? JSON.parse(response.text) : response.body
+      try {
+        response.body = response.text ? JSON.parse(response.text) : response.body
+      } catch {
+        response.body = response.text
+      }
       break
 
     case 'POST':

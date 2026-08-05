@@ -1,4 +1,4 @@
-import { ensureValidMemberIds, ValidationError } from 'src/validators/projectsValidator'
+import { ensureValidMemberIds, ValidationError } from '../../validators/projectsValidator'
 import { EditDataType, ProjectDetailsType } from '../../../../frontend/src/shared/types'
 import Prisma from '../../../prisma/generated/now_test_client'
 import { getFieldsOfTables, nowDb } from '../../utils/db'
@@ -36,7 +36,7 @@ export const writeProject = async (project: EditDataType<ProjectDetailsType>) =>
   const uniqueMemberIds = ensureValidMemberIds(memberUserIds)
   const members = await loadMembersByIds(uniqueMemberIds)
 
-  const existingProject = await getProjectDetails(filteredProject.pid)
+  const existingProject = filteredProject.pid ? await getProjectDetails(filteredProject.pid) : null
   if (!existingProject) {
     const newProject = await nowDb.now_proj.create({
       data: {

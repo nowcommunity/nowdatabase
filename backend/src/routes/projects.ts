@@ -1,6 +1,6 @@
 import { Request, Router } from 'express'
-import { validateEntireProject } from 'src/services/project'
-import { writeProject } from 'src/services/write/project'
+import { validateEntireProject } from '../services/project'
+import { writeProject } from '../services/write/project'
 import { EditDataType, EditMetaData, ProjectDetailsType, Role } from '../../../frontend/src/shared/types'
 import { requireOneOf } from '../middlewares/authorizer'
 
@@ -16,8 +16,8 @@ router.put(
       if (validationErrors.length > 0) {
         return res.status(403).send(validationErrors)
       }
-      const project = await writeProject(editedProject)
-      return res.status(200).send({ project })
+      const pid = await writeProject(editedProject)
+      return res.status(200).send({ pid })
     } catch (error) {
       return res.status(500).send({ message: 'Failed to write project' })
     }

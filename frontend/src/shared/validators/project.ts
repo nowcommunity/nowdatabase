@@ -11,10 +11,6 @@ import { Validators, validateFields, validator } from './validator'
   */
 
 const projectValidators: Validators<Partial<EditDataType<ProjectDetailsType>>> = {
-  pid: {
-    name: 'Project Id',
-    required: true,
-  },
   contact: {
     name: 'Coordinator',
     required: true,
@@ -22,6 +18,8 @@ const projectValidators: Validators<Partial<EditDataType<ProjectDetailsType>>> =
   proj_code: {
     name: 'Project Code',
     required: true,
+    maxLength: 10,
+    asString: true,
   },
   proj_name: {
     name: 'Project Name',
@@ -38,6 +36,10 @@ const projectValidators: Validators<Partial<EditDataType<ProjectDetailsType>>> =
   },
   proj_records: {
     name: 'Record Status',
+    required: true,
+  },
+  now_proj_people: {
+    name: 'Members',
     required: true,
   },
 }
