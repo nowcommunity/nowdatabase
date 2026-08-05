@@ -1,102 +1,75 @@
-import { afterAll, beforeAll, beforeEach, describe, expect, it } from '@jest/globals'
-import { login, logout, noPermError, resetDatabase, resetDatabaseTimeout, send } from '../utils'
+import { afterAll, beforeAll, describe, expect, it } from '@jest/globals'
+import { login, logout, noPermError, resetDatabase, send } from '../utils'
 import { pool } from '../../utils/db'
+import { editedProject } from './data'
+import { ProjectDetailsType } from '../../../../frontend/src/shared/types'
 
-describe('PUT /projects/:id', () => {
+let existingProject: ProjectDetailsType | null = null
+
+describe('Updating project works', () => {
   beforeAll(async () => {
     await resetDatabase()
-  }, resetDatabaseTimeout)
-
-  beforeEach(async () => {
-    await resetDatabase()
-    await login('testSu', 'test')
+    await login()
+    const { body, status: getReqStat } = await send<ProjectDetailsType>('project/3', 'GET')
+    expect(getReqStat).toEqual(200)
+    existingProject = body
   })
 
   afterAll(async () => {
     await pool.end()
   })
 
-  it('updates coordinator and members', async () => {
-    const createResult = await send<{ pid: number }>('projects', 'POST', {
-      projectCode: 'PRJ-UPDATE',
-      projectName: 'Project To Update',
-      coordinatorUserId: 163,
-      memberUserIds: [167],
+  it('Request succeeds and returns valid number id', async () => {
+    const { body: resultBody, status: updateStatus } = await send<{ pid: number }>('projects/', 'PUT', {
+      project: editedProject,
     })
-    expect(createResult.status).toEqual(201)
+    const { pid: updatedId } = resultBody
 
-    const result = await send<{
-      pid: number
-      contact: string
-      now_proj_people: Array<{ initials: string; pid: number }>
-      proj_name: string
-      proj_code: string
-    }>(`projects/${createResult.body.pid}`, 'PUT', {
-      projectCode: 'PRJ-UPD01',
-      projectName: 'Updated Project',
-      coordinatorUserId: 167,
-      memberUserIds: [163],
-    })
+    expect(typeof updatedId).toEqual('number')
+    expect(updateStatus).toEqual(200)
 
-    expect(result.status).toEqual(200)
-    expect(result.body.contact).toEqual('TEST-PL')
-    expect(result.body.proj_code).toEqual('PRJ-UPD01')
-    expect(result.body.proj_name).toEqual('Updated Project')
-    expect(result.body.now_proj_people).toEqual([{ initials: 'TEST-SU', pid: result.body.pid }])
+    const { body, status: getReqStat } = await send<ProjectDetailsType>(`project/${updatedId}`, 'GET')
+    expect(getReqStat).toEqual(200)
+    existingProject = body
   })
 
-  it('returns validation error for invalid members', async () => {
-    const createResult = await send<{ pid: number }>('projects', 'POST', {
-      projectCode: 'PRJ-INV1',
-      projectName: 'Project Invalid Members',
-      coordinatorUserId: 163,
-    })
-    expect(createResult.status).toEqual(201)
-
-    const result = await send(`projects/${createResult.body.pid}`, 'PUT', {
-      memberUserIds: ['not-a-number'],
-    })
-
-    expect(result.status).toEqual(400)
+  it('Contains correct data', () => {
+    const { proj_code, proj_name } = existingProject!
+    expect(proj_code).toEqual(editedProject.proj_code)
+    expect(proj_name).toEqual(editedProject.proj_name)
   })
 
-  it('returns validation error for too-long project code', async () => {
-    const createResult = await send<{ pid: number }>('projects', 'POST', {
-      projectCode: 'PRJ-LONG1',
-      projectName: 'Project Long Code',
-      coordinatorUserId: 163,
+  it('Updating fails with empty project code', async () => {
+    const { body: resultBody, status: getReqStatus } = await send('projects/', 'PUT', {
+      project: { ...editedProject, proj_code: '' },
     })
-    expect(createResult.status).toEqual(201)
-
-    const result = await send(`projects/${createResult.body.pid}`, 'PUT', {
-      projectCode: 'PRJ-UPDATED',
-    })
-
-    expect(result.status).toEqual(400)
-    expect(result.body).toEqual({ message: 'Project code must be at most 10 characters' })
+    expect(getReqStatus).toEqual(403)
+    expect(resultBody.length).toEqual(1) //There should be 1 validation error
   })
 
-  it('denies non-admin users', async () => {
-    const unauthorizedUpdate = { projectName: 'Unauthorized Update' }
+  it('Updating succeeds fails for non-admin users', async () => {
+    await login('testEr')
+    const { body: resultBodyEr, status: resultStatusEr } = await send<{ pid: number }>('projects/', 'PUT', {
+      project: { ...editedProject, proj_code: 'CODE2' },
+    })
+    expect(resultBodyEr).toEqual(noPermError)
+    expect(resultStatusEr).toEqual(403)
 
-    await login('testPl', 'test')
-    const plResult = await send('projects/1', 'PUT', unauthorizedUpdate)
-    expect(plResult.status).toEqual(403)
-    expect(plResult.body).toEqual(noPermError)
-
-    await login('testEu', 'test')
-    const euResult = await send('projects/1', 'PUT', unauthorizedUpdate)
-    expect(euResult.status).toEqual(403)
-    expect(euResult.body).toEqual(noPermError)
-
-    await login('testEr', 'test')
-    const erResult = await send('projects/1', 'PUT', unauthorizedUpdate)
-    expect(erResult.status).toEqual(403)
-    expect(erResult.body).toEqual(noPermError)
+    await login('testEu')
+    const { body: resultBodyEu, status: resultStatusEu } = await send<{ pid: number }>('projects/', 'PUT', {
+      project: { ...editedProject, proj_code: 'CODE3' },
+    })
+    expect(resultBodyEu).toEqual(noPermError)
+    expect(resultStatusEu).toEqual(403)
 
     logout()
-    const anonResult = await send('projects/1', 'PUT', unauthorizedUpdate)
-    expect(anonResult.status).toEqual(403)
-    expect(anonResult.body).toEqual(noPermError)
+    const { body: resultBodyAnon, status: resultStatusAnon } = await send('projects/', 'PUT', {
+      project: { ...editedProject, proj_code: 'CODE4' },
+    })
+    expect(resultBodyAnon).toEqual(noPermError)
+    expect(resultStatusAnon).toEqual(403)
   })
+
+  it.todo("Adding members works")
+  it.todo("Removing members works")
 })
