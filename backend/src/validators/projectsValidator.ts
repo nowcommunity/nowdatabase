@@ -32,19 +32,19 @@ export const ensureNonEmptyString = (value: unknown, fieldName: string, maxLengt
   return trimmedValue
 }
 
-export const ensureValidUserId = (value: unknown, fieldName: string) => {
-  if (typeof value !== 'number' || !Number.isInteger(value)) {
+export const ensureValidUserId = (id: unknown, fieldName: string) => {
+  if (typeof id !== 'number' || !Number.isInteger(id)) {
     throw new ValidationError(`${fieldName} must be a valid number`)
   }
 
-  return value
+  return id
 }
 
 export const ensureValidMemberIds = (memberUserIds: unknown) => {
-  if (memberUserIds === undefined) return [] as number[]
+  if (memberUserIds === null) return [] as number[]
 
   if (!Array.isArray(memberUserIds)) {
-    throw new ValidationError('Project members must be an array of user IDs')
+    throw new ValidationError('Project members must be an array of persons')
   }
 
   const numericIds = memberUserIds.filter((id): id is number => typeof id === 'number' && Number.isInteger(id))
