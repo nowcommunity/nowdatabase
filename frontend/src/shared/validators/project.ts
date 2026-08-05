@@ -1,4 +1,4 @@
-import { EditDataType, Project } from '../types'
+import { EditDataType, ProjectDetailsType } from '../types'
 import { Validators, validateFields, validator } from './validator'
 
 /*
@@ -10,7 +10,7 @@ import { Validators, validateFields, validator } from './validator'
  proj_records: boolean | null;
   */
 
-const projectValidators: Validators<Partial<EditDataType<Project>>> = {
+const projectValidators: Validators<Partial<EditDataType<ProjectDetailsType>>> = {
   pid: {
     name: 'Project Id',
     required: true,
@@ -39,16 +39,15 @@ const projectValidators: Validators<Partial<EditDataType<Project>>> = {
   proj_records: {
     name: 'Record Status',
     required: true,
-    asString: value => {
-      if (!['public', 'private'].includes(value)) return 'Record Status must be either true or false.'
-      return null
-    },
   },
 }
 
-export const validateProject = (editData: EditDataType<Project>, fieldName: keyof EditDataType<Project>) => {
-  return validator<EditDataType<Project>>(projectValidators, editData, fieldName)
+export const validateProject = (
+  editData: EditDataType<ProjectDetailsType>,
+  fieldName: keyof EditDataType<ProjectDetailsType>
+) => {
+  return validator<EditDataType<ProjectDetailsType>>(projectValidators, editData, fieldName)
 }
 
-export const validateProjectFields = (editData: Partial<EditDataType<Project>>) =>
-  validateFields<EditDataType<Project>>(projectValidators, editData)
+export const validateProjectFields = (editData: Partial<EditDataType<ProjectDetailsType>>) =>
+  validateFields<EditDataType<ProjectDetailsType>>(projectValidators, editData)
