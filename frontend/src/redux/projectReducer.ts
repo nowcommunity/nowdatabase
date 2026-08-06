@@ -1,5 +1,5 @@
-import { api } from './api'
 import { EditDataType, Project, ProjectDetailsType } from '@/shared/types'
+import { api } from './api'
 
 export type CreateProjectPayload = {
   projectCode: string
@@ -26,7 +26,7 @@ const projectsApi = api.injectEndpoints({
       }),
       providesTags: result => (result ? [{ type: 'project', id: result.pid }] : []),
     }),
-    updateProject: builder.mutation<ProjectDetailsType, EditDataType<ProjectDetailsType>>({
+    editProject: builder.mutation<ProjectDetailsType, EditDataType<ProjectDetailsType>>({
       query: project => ({
         url: `/projects`,
         method: 'PUT',
@@ -46,10 +46,5 @@ const projectsApi = api.injectEndpoints({
   }),
 })
 
-export const {
-  useGetAllProjectsQuery,
-  useGetProjectDetailsQuery,
-  useCreateProjectMutation,
-  useUpdateProjectMutation,
-  useDeleteProjectMutation,
-} = projectsApi
+export const { useGetAllProjectsQuery, useGetProjectDetailsQuery, useEditProjectMutation, useDeleteProjectMutation } =
+  projectsApi
