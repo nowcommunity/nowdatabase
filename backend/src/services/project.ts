@@ -1,5 +1,5 @@
 import { EditDataType, EditMetaData, ProjectDetailsType, Role, User } from '../../../frontend/src/shared/types'
-import { validateProject } from '../../../frontend/src/shared/validators/project'
+import { validateProjectFields } from '../../../frontend/src/shared/validators/project'
 import { ValidationObject } from '../../../frontend/src/shared/validators/validator'
 import { nowDb } from '../utils/db'
 
@@ -64,11 +64,6 @@ export const deleteProject = async (projectId: number) => {
 }
 
 export const validateEntireProject = (editedFields: EditDataType<ProjectDetailsType> & EditMetaData) => {
-  const keys = Object.keys(editedFields)
-  const errors: ValidationObject[] = []
-  for (const key of keys) {
-    const error = validateProject(editedFields as EditDataType<ProjectDetailsType>, key as keyof ProjectDetailsType)
-    if (error.error) errors.push(error)
-  }
+  const errors: ValidationObject[] = validateProjectFields(editedFields)
   return errors
 }
