@@ -9,7 +9,7 @@ import { DetailView, TabType } from '../DetailView/DetailView'
 import { CoordinatorTab } from './Tabs/CoordinatorTab'
 
 import type { EditDataType, ProjectDetailsType } from '@/shared/types'
-import type { FetchBaseQueryError } from '@reduxjs/toolkit/query'
+import { ValidationErrors } from '@/shared/types'
 
 export const ProjectDetails = () => {
   const { id } = useParams()
@@ -53,19 +53,9 @@ export const ProjectDetails = () => {
     try {
       await updateProject(editData).unwrap()
       notify('Saved project successfully.')
-    } catch (error) {
-      const fetchError = error as FetchBaseQueryError
-      const message =
-        fetchError &&
-        typeof fetchError === 'object' &&
-        'data' in fetchError &&
-        fetchError.data &&
-        typeof fetchError.data === 'object' &&
-        'error' in fetchError.data &&
-        typeof fetchError.data.error === 'string'
-          ? fetchError.data.error
-          : 'Could not save project.'
-      notify(message, 'error')
+    } catch (e) {
+      const error = e as ValidationErrors
+      notify('Following validators failed: ' + error.data.map(e => e.name).join(', '), 'error')
     }
   }
 

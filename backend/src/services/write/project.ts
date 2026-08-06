@@ -30,9 +30,13 @@ export const writeProject = async (project: EditDataType<ProjectDetailsType>) =>
     throw new ValidationError('Contact does not exist')
   }
 
+  if (!project.now_proj_people.every(member => member.com_people && member.com_people.user_id)) {
+    throw new ValidationError('One or more members in the member array do not have user IDs')
+  }
+
   const memberUserIds = project.now_proj_people
-    .filter(person => person.rowState !== 'removed')
-    .map(person => person.com_people?.user_id)
+    .filter(member => member.rowState !== 'removed')
+    .map(member => member.com_people!.user_id)
   const uniqueMemberIds = ensureValidMemberIds(memberUserIds)
   const members = await loadMembersByIds(uniqueMemberIds)
 

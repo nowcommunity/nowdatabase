@@ -70,6 +70,6 @@ describe('Updating project works', () => {
     expect(resultStatusAnon).toEqual(403)
   })
 
-  it.todo("Adding members works")
-  it.todo("Removing members works")
+  it.todo('Adding members works')
+  it.todo('Removing members works')
 })
