@@ -100,13 +100,6 @@ const router = createBrowserRouter([
         },
       },
       {
-        path: 'project/:id/edit',
-        lazy: async () => {
-          const { ProjectEditPage } = await import('../pages/projects/ProjectEditPage')
-          return { Component: ProjectEditPage }
-        },
-      },
-      {
         path: 'email',
         lazy: async () => {
           const { EmailPage } = await import('../components/EmailPage')
