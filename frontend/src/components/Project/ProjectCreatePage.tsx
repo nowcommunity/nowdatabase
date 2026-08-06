@@ -1,30 +1,33 @@
-import { useEffect, useMemo, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
 import { CircularProgress, Stack, Typography } from '@mui/material'
+import { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 
 import { PermissionDenied } from '@/components/PermissionDenied'
 import { ProjectForm, type ProjectFormValues } from '@/components/Project/ProjectForm'
 import { UnsavedChangesProvider } from '@/components/UnsavedChangesProvider'
 import { useNotify } from '@/hooks/notification'
 import { useUsersApi } from '@/hooks/useUsersApi'
-import { useProjectsApi } from '@/hooks/useProjectsApi'
 import { useUser } from '@/hooks/user'
-import { Role } from '@/shared/types'
-import type { FetchBaseQueryError } from '@reduxjs/toolkit/query'
+import { useGetAllPersonsQuery } from '@/redux/personReducer'
+import { useEditProjectMutation } from '@/redux/projectReducer'
+import { Role, ValidationErrors } from '@/shared/types'
 
 export const ProjectCreatePage = () => {
   const user = useUser()
   const navigate = useNavigate()
   const { notify } = useNotify()
   const { users, isLoading: personsLoading, isError: personsError } = useUsersApi()
-  const { createProject, isSubmitting } = useProjectsApi()
+  const { data: personQueryData, isLoading: personQueryIsLoading } = useGetAllPersonsQuery()
+  const [editProject] = useEditProjectMutation()
   const [submitError, setSubmitError] = useState<string | null>(null)
 
   useEffect(() => {
     document.title = 'New project'
   }, [])
 
-  const userOptions = useMemo(() => users, [users])
+  if (personQueryIsLoading) {
+    return <CircularProgress />
+  }
 
   if (!user.token) {
     return (
@@ -66,31 +69,37 @@ export const ProjectCreatePage = () => {
 
   const handleSubmit = async (values: ProjectFormValues) => {
     setSubmitError(null)
+
+    const coordinator = users.find(user => user.userId === values.coordinatorUserId!)
+    if (coordinator === undefined) {
+      setSubmitError('Selected coordinator is not a valid user')
+    }
+
+    const filteredPersons = personQueryData!.filter(
+      person => person.user && values.memberUserIds.includes(person.user.user_id)
+    )
+    const nowProjPeople = filteredPersons.map(person => {
+      return {
+        initials: person.initials,
+        com_people: person,
+      }
+    })
+
     try {
-      const createdProject = await createProject({
-        projectCode: values.projectCode.trim(),
-        projectName: values.projectName.trim(),
-        coordinatorUserId: values.coordinatorUserId!,
-        projectStatus: values.projectStatus,
-        recordStatus: values.recordStatus as boolean,
-        memberUserIds: values.memberUserIds.length ? values.memberUserIds : undefined,
+      const createdProject = await editProject({
+        proj_code: values.projectCode.trim(),
+        proj_name: values.projectName.trim(),
+        contact: coordinator!.initials,
+        proj_status: values.projectStatus,
+        proj_records: values.recordStatus as boolean,
+        now_proj_people: nowProjPeople,
       }).unwrap()
 
       notify('Project created successfully.')
       navigate(`/project/${createdProject.pid}`)
-    } catch (error) {
-      const fetchError = error as FetchBaseQueryError
-      const message =
-        fetchError &&
-        typeof fetchError === 'object' &&
-        'data' in fetchError &&
-        fetchError.data &&
-        typeof fetchError.data === 'object' &&
-        'error' in fetchError.data &&
-        typeof fetchError.data.error === 'string'
-          ? fetchError.data.error
-          : 'Failed to create project.'
-      setSubmitError(message)
+    } catch (e) {
+      const error = e as ValidationErrors
+      notify('Following validators failed: ' + error.data.map(e => e.name).join(', '), 'error')
     }
   }
 
@@ -104,13 +113,7 @@ export const ProjectCreatePage = () => {
           Provide project information and choose the coordinator and members from existing users.
         </Typography>
 
-        <ProjectForm
-          users={userOptions}
-          onSubmit={handleSubmit}
-          isSubmitting={isSubmitting}
-          serverError={submitError}
-          submitLabel="Create Project"
-        />
+        <ProjectForm users={users} onSubmit={handleSubmit} serverError={submitError} submitLabel="Create Project" />
       </Stack>
     </UnsavedChangesProvider>
   )

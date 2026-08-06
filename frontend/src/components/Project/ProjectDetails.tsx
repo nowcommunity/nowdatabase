@@ -2,7 +2,7 @@ import { useMemo } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 
 import { useNotify } from '@/hooks/notification'
-import { useDeleteProjectMutation, useGetProjectDetailsQuery, useUpdateProjectMutation } from '@/redux/projectReducer'
+import { useDeleteProjectMutation, useEditProjectMutation, useGetProjectDetailsQuery } from '@/redux/projectReducer'
 import { validateProject, validateProjectFields } from '@/shared/validators/project'
 import { CircularProgress } from '@mui/material'
 import { DetailView, TabType } from '../DetailView/DetailView'
@@ -16,7 +16,7 @@ export const ProjectDetails = () => {
   const projectId = useMemo(() => (id ? parseInt(id) : null), [id])
   const { isLoading, isError, data } = useGetProjectDetailsQuery(id!, { skip: !projectId })
   const [deleteProject, { isLoading: isDeleting }] = useDeleteProjectMutation()
-  const [updateProject, { isLoading: isUpdating }] = useUpdateProjectMutation()
+  const [editProject, { isLoading: isUpdating }] = useEditProjectMutation()
   const { notify } = useNotify()
   const navigate = useNavigate()
 
@@ -51,7 +51,7 @@ export const ProjectDetails = () => {
     if (!projectId) return
 
     try {
-      await updateProject(editData).unwrap()
+      await editProject(editData).unwrap()
       notify('Saved project successfully.')
     } catch (e) {
       const error = e as ValidationErrors
