@@ -201,7 +201,10 @@ export const ProjectForm = ({
                 <Controller
                   control={control}
                   name="recordStatus"
-                  rules={{ validate: value => value !== null && value !== undefined && value !== '' }}
+                  rules={{
+                    validate: value =>
+                      value !== null && value !== undefined && value !== '' ? true : 'Record status is required',
+                  }}
                   render={({ field }) => (
                     <Select
                       {...field}

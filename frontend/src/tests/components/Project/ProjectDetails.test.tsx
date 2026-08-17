@@ -39,15 +39,17 @@ jest.mock('@/components/Project/Tabs/CoordinatorTab', () => ({
 
 const mockUseGetProjectDetailsQuery = jest.fn()
 const mockUseDeleteProjectMutation = jest.fn()
+const mockUseEditProjectMutation = jest.fn()
 const mockUseUsersApi = jest.fn()
 const mockNotify = jest.fn()
 const mockNavigate = jest.fn()
 let deleteProjectMock: jest.Mock
+let editProjectMock: jest.Mock
 
 jest.mock('@/redux/projectReducer', () => ({
   useGetProjectDetailsQuery: (id: string) => mockUseGetProjectDetailsQuery(id),
   useDeleteProjectMutation: () => mockUseDeleteProjectMutation(),
-  useUpdateProjectMutation: () => [jest.fn(), { isLoading: false }],
+  useEditProjectMutation: () => mockUseEditProjectMutation(),
 }))
 
 jest.mock('@/hooks/notification', () => ({
@@ -120,7 +122,9 @@ describe('ProjectDetails', () => {
   beforeEach(() => {
     mockUseGetProjectDetailsQuery.mockReturnValue({ data: baseProject, isLoading: false, isError: false })
     deleteProjectMock = jest.fn(() => ({ unwrap: () => Promise.resolve() }))
+    editProjectMock = jest.fn(() => ({ unwrap: () => Promise.resolve() }))
     mockUseDeleteProjectMutation.mockReturnValue([deleteProjectMock, { isLoading: false }])
+    mockUseEditProjectMutation.mockReturnValue([editProjectMock, { isLoading: false }])
     mockUseUsersApi.mockReturnValue({ users: [], isLoading: false, isError: false })
     mockNotify.mockReset()
     mockNavigate.mockReset()
