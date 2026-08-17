@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "[ -d node_modules ] && npx vite --host || npm ci && npx vite --host",
-    "test": "jest src/tests",
+    "test": "jest src/tests --runInBand",
     "build": "vite build",
     "lint": "eslint --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
