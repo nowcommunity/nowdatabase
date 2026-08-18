@@ -162,7 +162,10 @@ describe('Broadly test what different user rights see', () => {
     it('Direct routes to protected views do not work', () => {
       cy.pageForbidden('/region')
       cy.pageForbidden('/time-bound')
-      cy.pageForbidden('/project')
+    })
+
+    it('Direct route to project details does not work', () => {
+      cy.pageForbidden('/project/1')
     })
 
     it('Direct routes to create new pages do not work', () => {
