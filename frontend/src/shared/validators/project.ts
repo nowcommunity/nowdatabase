@@ -1,5 +1,5 @@
 import { EditDataType, ProjectDetailsType } from '../types'
-import { Validators, validateFields, validator } from './validator'
+import { ValidationError, Validators, validateFields, validator } from './validator'
 
 /*
  pid: number;
@@ -9,6 +9,28 @@ import { Validators, validateFields, validator } from './validator'
  proj_status: string | null;
  proj_records: boolean | null;
   */
+
+const memberArrayCheck = (people: object[]) => {
+  const errors = new Set<string>()
+  people.forEach(person => {
+    if (!('initials' in person) || typeof person.initials !== 'string' || person.initials.length === 0) {
+      errors.add('Member initials must be a non-empty string')
+    }
+    if (
+      !('com_people' in person) ||
+      !person.com_people ||
+      typeof person.com_people !== 'object' ||
+      !('user_id' in person.com_people) ||
+      typeof person.com_people.user_id !== 'number'
+    ) {
+      errors.add('Member must have a com_people object with valid user ID')
+    }
+  })
+  if (errors.size > 0) {
+    return ('Project members gave the following errors: ' + Array.from(errors).join(', ')) as ValidationError
+  }
+  return null
+}
 
 const projectValidators: Validators<Partial<EditDataType<ProjectDetailsType>>> = {
   contact: {
@@ -41,6 +63,7 @@ const projectValidators: Validators<Partial<EditDataType<ProjectDetailsType>>> =
   now_proj_people: {
     name: 'Members',
     required: true,
+    miscArray: memberArrayCheck,
   },
 }
 

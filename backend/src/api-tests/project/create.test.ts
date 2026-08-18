@@ -3,13 +3,16 @@ import { ProjectDetailsType } from '../../../../frontend/src/shared/types'
 import { pool } from '../../utils/db'
 import { login, logout, noPermError, resetDatabase, resetDatabaseTimeout, send } from '../utils'
 import {
+  existingPerson,
+  invalidMemberArrayError1,
+  invalidMemberArrayError2,
   newProjectBasis,
-  newProjectBasisWithInvalidMembers,
   newProjectBasisWithoutCoordinator,
   newProjectBasisWithoutMemberArray,
   noCoordinatorError,
   noMemberArrayError,
 } from './data'
+import { ValidationError } from 'express-validator'
 
 let createdProject: ProjectDetailsType | null = null
 
@@ -65,14 +68,6 @@ describe('Creating new project works', () => {
     expect(getReqStatus).toEqual(403)
   })
 
-  it('Creation fails with member list containing members with no user ID information', async () => {
-    const { status: getReqStatus } = await send('projects/', 'PUT', {
-      project: { ...newProjectBasisWithInvalidMembers },
-    })
-
-    expect(getReqStatus).toEqual(500)
-  })
-
   it('Creation succeeds with empty member list', async () => {
     const { status: getReqStatus } = await send<{ pid: number }>('projects/', 'PUT', {
       project: { ...newProjectBasis, now_proj_people: [] },
@@ -120,5 +115,21 @@ describe('Creating new project works', () => {
     })
     expect(resultBodyEu).toEqual(noPermError)
     expect(resultStatusEu).toEqual(403)
+  })
+
+  it('Creation fails with members without required fields', async () => {
+    const { body: putReqBody, status: putReqStatus } = await send('projects/', 'PUT', {
+      project: { ...newProjectBasis, now_proj_people: [{ initials: existingPerson.initials }] },
+    })
+    expect(putReqStatus).toEqual(403)
+    expect(putReqBody).toHaveLength(1)
+    expect((putReqBody as Array<ValidationError>)[0]).toEqual(invalidMemberArrayError1)
+
+    const { body: putReqBody2, status: putReqStatus2 } = await send('projects/', 'PUT', {
+      project: { ...newProjectBasis, now_proj_people: [{ com_people: existingPerson }] },
+    })
+    expect(putReqStatus2).toEqual(403)
+    expect(putReqBody2).toHaveLength(1)
+    expect((putReqBody2 as Array<ValidationError>)[0]).toEqual(invalidMemberArrayError2)
   })
 })
