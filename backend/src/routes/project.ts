@@ -1,7 +1,8 @@
-import { Router } from 'express'
-import { deleteProject, getAllProjects, getProjectDetails } from '../services/project'
+import { Request, Router } from 'express'
+import { deleteProject, getAllProjects, getProjectDetails, validateEntireProject } from '../services/project'
 import { requireOneOf } from '../middlewares/authorizer'
-import { Role } from '../../../frontend/src/shared/types'
+import { EditDataType, EditMetaData, ProjectDetailsType, Role } from '../../../frontend/src/shared/types'
+import { writeProject } from 'src/services/write/project'
 
 const router = Router()
 
@@ -16,6 +17,24 @@ router.get('/:id', requireOneOf([Role.Admin]), async (req, res) => {
   if (!project) return res.status(404).send()
   return res.status(200).send(project)
 })
+
+router.put(
+  '/',
+  requireOneOf([Role.Admin]),
+  async (req: Request<object, object, { project: EditDataType<ProjectDetailsType> & EditMetaData }>, res) => {
+    try {
+      const { ...editedProject } = req.body.project
+      const validationErrors = validateEntireProject({ ...editedProject })
+      if (validationErrors.length > 0) {
+        return res.status(403).send(validationErrors)
+      }
+      const pid = await writeProject(editedProject)
+      return res.status(200).send({ pid })
+    } catch (error) {
+      return res.status(500).send({ message: 'Failed to write project' })
+    }
+  }
+)
 
 router.delete('/:id', requireOneOf([Role.Admin]), async (req, res) => {
   const id = parseInt(req.params.id)

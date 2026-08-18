@@ -28,7 +28,7 @@ const projectsApi = api.injectEndpoints({
     }),
     editProject: builder.mutation<ProjectDetailsType, EditDataType<ProjectDetailsType>>({
       query: project => ({
-        url: `/projects`,
+        url: `/project`,
         method: 'PUT',
         body: { project },
       }),

@@ -11,7 +11,6 @@ import collectingMethodValuesRouter from './routes/collectingMethodValues'
 import regionRouter from './routes/region'
 import personRouter from './routes/person'
 import projectRouter from './routes/project'
-import projectsRouter from './routes/projects'
 import speciesRouter from './routes/species'
 import localitySpeciesRouter from './routes/localitySpecies'
 import refreshTokenRouter from './routes/refresh'
@@ -72,7 +71,6 @@ app.use('/time-bound', requireOneOf([Role.Admin, Role.EditUnrestricted]), timeBo
 app.use('/region', requireOneOf([Role.Admin]), regionRouter)
 app.use('/person', personRouter)
 app.use('/project', projectRouter)
-app.use('/projects', requireOneOf([Role.Admin]), projectsRouter)
 app.use('/museum', museumRouter)
 app.use('/sedimentary-structure', sedimentaryStructureRouter)
 app.use('/collecting-method-values', collectingMethodValuesRouter)
