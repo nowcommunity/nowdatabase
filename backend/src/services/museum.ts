@@ -119,7 +119,7 @@ export const validateEntireMuseum = (editedFields: EditDataType<Prisma.com_mlist
   const keys = Object.keys(editedFields)
   const errors: ValidationObject[] = []
   for (const key of keys) {
-    const error = validateMuseum(editedFields as EditDataType<Museum>, key as keyof Museum)
+    const error = validateMuseum(editedFields, key as keyof Museum)
     if (error.error) errors.push(error)
   }
   return errors

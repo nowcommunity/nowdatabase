@@ -81,7 +81,7 @@ export const getTimeBoundTimeUnits = async (id: number, options?: TabListQueryOp
 }
 
 export const validateEntireTimeBound = async (editedFields: EditDataType<Prisma.now_bau> & EditMetaData) => {
-  const errors: ValidationObject[] = validateTimeBoundFields(editedFields as EditDataType<TimeBoundDetailsType>)
+  const errors: ValidationObject[] = validateTimeBoundFields(editedFields)
   let error = null
   if ('references' in editedFields && editedFields.references) {
     error = referenceValidator(editedFields.references)
