@@ -26,13 +26,13 @@ export const NavBar = () => {
     { title: 'Time Units', url: '/time-unit' },
     { title: 'Time Bounds', url: '/time-bound', allowedRoles: [Role.Admin, Role.EditUnrestricted] },
     { title: 'Museums', url: '/museum' },
+    { title: 'Projects', url: '/project' },
     {
       title: 'Admin',
       url: '/admin',
       allowedRoles: [Role.Admin],
       children: [
         { title: 'Regions', url: '/region' },
-        { title: 'Projects', url: '/project' },
         { title: 'People', url: '/person' },
         { title: 'Email', url: '/email' },
         { title: 'Merge Species', url: '/admin/merge-species' },

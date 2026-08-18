@@ -14,13 +14,18 @@ import { ValidationErrors } from '@/shared/types'
 export const ProjectDetails = () => {
   const { id } = useParams()
   const projectId = useMemo(() => (id ? parseInt(id) : null), [id])
-  const { isLoading, isError, data } = useGetProjectDetailsQuery(id!, { skip: !projectId })
+  const { isLoading, isError, error, data } = useGetProjectDetailsQuery(id!, { skip: !projectId })
   const [deleteProject, { isLoading: isDeleting }] = useDeleteProjectMutation()
   const [editProject, { isLoading: isUpdating }] = useEditProjectMutation()
   const { notify } = useNotify()
   const navigate = useNavigate()
 
-  if (isError) return <div>Error loading data</div>
+  if (isError) {
+    if ('status' in error && error.status === 403) {
+      return <div>Your user is not authorized to view this page.</div>
+    }
+    return <div>Error loading data</div>
+  }
   if (isLoading || !data || isDeleting || isUpdating) return <CircularProgress />
   if (data) {
     document.title = `Project - ${data.proj_name}`
