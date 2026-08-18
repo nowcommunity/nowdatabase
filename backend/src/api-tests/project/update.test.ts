@@ -31,7 +31,7 @@ describe('Updating project works', () => {
   })
 
   it('Request succeeds and returns valid number id', async () => {
-    const { body: resultBody, status: updateStatus } = await send<{ pid: number }>('projects/', 'PUT', {
+    const { body: resultBody, status: updateStatus } = await send<{ pid: number }>('project/', 'PUT', {
       project: editedProject,
     })
     const { pid: updatedId } = resultBody
@@ -51,7 +51,7 @@ describe('Updating project works', () => {
   })
 
   it('Updating fails with empty project code', async () => {
-    const { body: resultBody, status: getReqStatus } = await send('projects/', 'PUT', {
+    const { body: resultBody, status: getReqStatus } = await send('project/', 'PUT', {
       project: { ...editedProject, proj_code: '' },
     })
     expect(getReqStatus).toEqual(403)
@@ -60,21 +60,21 @@ describe('Updating project works', () => {
 
   it('Updating fails for non-admin users', async () => {
     await login('testEr')
-    const { body: resultBodyEr, status: resultStatusEr } = await send<{ pid: number }>('projects/', 'PUT', {
+    const { body: resultBodyEr, status: resultStatusEr } = await send<{ pid: number }>('project/', 'PUT', {
       project: { ...editedProject, proj_code: 'CODE2' },
     })
     expect(resultBodyEr).toEqual(noPermError)
     expect(resultStatusEr).toEqual(403)
 
     await login('testEu')
-    const { body: resultBodyEu, status: resultStatusEu } = await send<{ pid: number }>('projects/', 'PUT', {
+    const { body: resultBodyEu, status: resultStatusEu } = await send<{ pid: number }>('project/', 'PUT', {
       project: { ...editedProject, proj_code: 'CODE3' },
     })
     expect(resultBodyEu).toEqual(noPermError)
     expect(resultStatusEu).toEqual(403)
 
     logout()
-    const { body: resultBodyAnon, status: resultStatusAnon } = await send('projects/', 'PUT', {
+    const { body: resultBodyAnon, status: resultStatusAnon } = await send('project/', 'PUT', {
       project: { ...editedProject, proj_code: 'CODE4' },
     })
     expect(resultBodyAnon).toEqual(noPermError)
@@ -82,7 +82,7 @@ describe('Updating project works', () => {
   })
 
   it('Adding members works', async () => {
-    const { status: putResultStatus } = await send<ProjectDetailsType>('projects/', 'PUT', {
+    const { status: putResultStatus } = await send<ProjectDetailsType>('project/', 'PUT', {
       project: {
         ...editedProject,
         now_proj_people: [
@@ -103,7 +103,7 @@ describe('Updating project works', () => {
 
   it('Removing members works', async () => {
     expect(existingProject!.now_proj_people).toHaveLength(2) // set in previous test
-    const { status: putResultStatus } = await send<ProjectDetailsType>('projects/', 'PUT', {
+    const { status: putResultStatus } = await send<ProjectDetailsType>('project/', 'PUT', {
       project: { ...editedProject, now_proj_people: newProjectBasis.now_proj_people },
     })
     expect(putResultStatus).toEqual(200)
@@ -113,7 +113,7 @@ describe('Updating project works', () => {
     expect(getResultBody.now_proj_people).toHaveLength(1)
     expect(getResultBody.now_proj_people[0].initials).toEqual(existingPerson.initials)
 
-    const { status: putResultStatus2 } = await send<ProjectDetailsType>('projects/', 'PUT', {
+    const { status: putResultStatus2 } = await send<ProjectDetailsType>('project/', 'PUT', {
       project: { ...editedProject, now_proj_people: [] },
     })
     expect(putResultStatus2).toEqual(200)
@@ -124,7 +124,7 @@ describe('Updating project works', () => {
   })
 
   it('Adding members without required fields does not work', async () => {
-    const { body: putResultBody, status: putResultStatus } = await send('projects/', 'PUT', {
+    const { body: putResultBody, status: putResultStatus } = await send('project/', 'PUT', {
       project: {
         ...editedProject,
         now_proj_people: [{ initials: existingPerson2.initials }],
@@ -134,7 +134,7 @@ describe('Updating project works', () => {
     expect(putResultBody).toHaveLength(1)
     expect((putResultBody as Array<ValidationError>)[0]).toEqual(invalidMemberArrayError1)
 
-    const { body: putResultBody2, status: putResultStatus2 } = await send('projects/', 'PUT', {
+    const { body: putResultBody2, status: putResultStatus2 } = await send('project/', 'PUT', {
       project: {
         ...editedProject,
         now_proj_people: [{ com_people: existingPerson2 }],

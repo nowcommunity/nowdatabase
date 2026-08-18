@@ -12,7 +12,6 @@ import {
   noCoordinatorError,
   noMemberArrayError,
 } from './data'
-import { ValidationError } from 'express-validator'
 
 let createdProject: ProjectDetailsType | null = null
 
@@ -28,7 +27,7 @@ describe('Creating new project works', () => {
   })
 
   it('Request succeeds and returns valid number id', async () => {
-    const { body: resultBody, status: getReqStatus } = await send<{ pid: number }>('projects/', 'PUT', {
+    const { body: resultBody, status: getReqStatus } = await send<{ pid: number }>('project/', 'PUT', {
       project: newProjectBasis,
     })
     const { pid: createdId } = resultBody
@@ -51,7 +50,7 @@ describe('Creating new project works', () => {
   })
 
   it('Creation succeeds with empty member list', async () => {
-    const { status: getReqStatus } = await send<{ pid: number }>('projects/', 'PUT', {
+    const { status: getReqStatus } = await send<{ pid: number }>('project/', 'PUT', {
       project: { ...newProjectBasis, now_proj_people: [] },
     })
 
@@ -59,7 +58,7 @@ describe('Creating new project works', () => {
   })
 
   it('Creation fails with no member list', async () => {
-    const { body: resultBody, status: getReqStatus } = await send('projects/', 'PUT', {
+    const { body: resultBody, status: getReqStatus } = await send('project/', 'PUT', {
       project: { ...newProjectBasisWithoutMemberArray },
     })
 
@@ -69,7 +68,7 @@ describe('Creating new project works', () => {
   })
 
   it('Creation succeeds with empty member list', async () => {
-    const { status: getReqStatus } = await send<{ pid: number }>('projects/', 'PUT', {
+    const { status: getReqStatus } = await send<{ pid: number }>('project/', 'PUT', {
       project: { ...newProjectBasis, now_proj_people: [] },
     })
 
@@ -77,7 +76,7 @@ describe('Creating new project works', () => {
   })
 
   it('Creation fails with no coordinator', async () => {
-    const { body: resultBody, status: getReqStatus } = await send<{ pid: number }>('projects/', 'PUT', {
+    const { body: resultBody, status: getReqStatus } = await send<{ pid: number }>('project/', 'PUT', {
       project: { ...newProjectBasisWithoutCoordinator },
     })
 
@@ -87,7 +86,7 @@ describe('Creating new project works', () => {
   })
 
   it('Creation fails with coordinator that does not have a matching user', async () => {
-    const { status: getReqStatus } = await send<{ pid: number }>('projects/', 'PUT', {
+    const { status: getReqStatus } = await send<{ pid: number }>('project/', 'PUT', {
       project: { ...newProjectBasis, contact: 'NOTEXIST' },
     })
 
@@ -96,21 +95,21 @@ describe('Creating new project works', () => {
 
   it('Creation fails for non-admin users', async () => {
     logout()
-    const { body: resultBodyAnon, status: resultStatusAnon } = await send<{ pid: number }>('projects/', 'PUT', {
+    const { body: resultBodyAnon, status: resultStatusAnon } = await send<{ pid: number }>('project/', 'PUT', {
       project: newProjectBasis,
     })
     expect(resultBodyAnon).toEqual(noPermError)
     expect(resultStatusAnon).toEqual(403)
 
     await login('testEr')
-    const { body: resultBodyEr, status: resultStatusEr } = await send<{ pid: number }>('projects/', 'PUT', {
+    const { body: resultBodyEr, status: resultStatusEr } = await send<{ pid: number }>('project/', 'PUT', {
       project: newProjectBasis,
     })
     expect(resultBodyEr).toEqual(noPermError)
     expect(resultStatusEr).toEqual(403)
 
     await login('testEu')
-    const { body: resultBodyEu, status: resultStatusEu } = await send<{ pid: number }>('projects/', 'PUT', {
+    const { body: resultBodyEu, status: resultStatusEu } = await send<{ pid: number }>('project/', 'PUT', {
       project: newProjectBasis,
     })
     expect(resultBodyEu).toEqual(noPermError)
@@ -118,18 +117,18 @@ describe('Creating new project works', () => {
   })
 
   it('Creation fails with members without required fields', async () => {
-    const { body: putReqBody, status: putReqStatus } = await send('projects/', 'PUT', {
+    const { body: putReqBody, status: putReqStatus } = await send('project/', 'PUT', {
       project: { ...newProjectBasis, now_proj_people: [{ initials: existingPerson.initials }] },
     })
     expect(putReqStatus).toEqual(403)
     expect(putReqBody).toHaveLength(1)
-    expect((putReqBody as Array<ValidationError>)[0]).toEqual(invalidMemberArrayError1)
+    expect((putReqBody as Array<object>)[0]).toEqual(invalidMemberArrayError1)
 
-    const { body: putReqBody2, status: putReqStatus2 } = await send('projects/', 'PUT', {
+    const { body: putReqBody2, status: putReqStatus2 } = await send('project/', 'PUT', {
       project: { ...newProjectBasis, now_proj_people: [{ com_people: existingPerson }] },
     })
     expect(putReqStatus2).toEqual(403)
     expect(putReqBody2).toHaveLength(1)
-    expect((putReqBody2 as Array<ValidationError>)[0]).toEqual(invalidMemberArrayError2)
+    expect((putReqBody2 as Array<object>)[0]).toEqual(invalidMemberArrayError2)
   })
 })
