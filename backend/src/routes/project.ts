@@ -2,7 +2,7 @@ import { Request, Router } from 'express'
 import { deleteProject, getAllProjects, getProjectDetails, validateEntireProject } from '../services/project'
 import { requireOneOf } from '../middlewares/authorizer'
 import { EditDataType, EditMetaData, ProjectDetailsType, Role } from '../../../frontend/src/shared/types'
-import { writeProject } from 'src/services/write/project'
+import { writeProject } from '../services/write/project'
 
 const router = Router()
 
