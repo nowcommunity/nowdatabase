@@ -1,4 +1,3 @@
-import { ensureValidMemberIds, ValidationError } from '../../validators/projectsValidator'
 import { EditDataType, ProjectDetailsType } from '../../../../frontend/src/shared/types'
 import Prisma from '../../../prisma/generated/now_test_client'
 import { getFieldsOfTables, nowDb } from '../../utils/db'
@@ -14,7 +13,7 @@ const loadMembersByIds = async (memberIds: number[]) => {
   })
 
   if (members.length !== memberIds.length) {
-    throw new ValidationError('One or more project members do not exist')
+    throw new Error('One or more project members do not exist')
   }
 
   return members
@@ -27,14 +26,13 @@ export const writeProject = async (project: EditDataType<ProjectDetailsType>) =>
 
   const contactPerson = await nowDb.com_people.findFirst({ where: { initials: project.contact } })
   if (!contactPerson) {
-    throw new ValidationError('Contact does not exist')
+    throw new Error('Contact does not exist')
   }
 
   const memberUserIds = project.now_proj_people
     .filter(member => member.rowState !== 'removed')
-    .map(member => member.com_people!.user_id)
-  const uniqueMemberIds = ensureValidMemberIds(memberUserIds)
-  const members = await loadMembersByIds(uniqueMemberIds)
+    .map(member => member.com_people!.user_id!)
+  const members = await loadMembersByIds(memberUserIds)
 
   const existingProject = filteredProject.pid ? await getProjectDetails(filteredProject.pid) : null
   if (!existingProject) {

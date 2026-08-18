@@ -18,10 +18,10 @@ const memberArrayCheck = (people: object[]) => {
     }
     if (
       !('com_people' in person) ||
-      !person.com_people ||
+      person.com_people === null ||
       typeof person.com_people !== 'object' ||
       !('user_id' in person.com_people) ||
-      typeof person.com_people.user_id !== 'number'
+      !Number.isInteger(person.com_people.user_id)
     ) {
       errors.add('Member must have a com_people object with valid user ID')
     }
