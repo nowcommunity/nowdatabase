@@ -140,7 +140,7 @@ const applyColumnFilterModeDefaults = <T extends MRT_RowData>(
       columnFilterFns[columnId] = 'equals'
       return {
         ...column,
-        filterFn: typeof column.filterFn === 'function' ? column.filterFn : column.filterFn ?? 'equals',
+        filterFn: typeof column.filterFn === 'function' ? column.filterFn : (column.filterFn ?? 'equals'),
         enableColumnFilterModes: false,
         columnFilterModeOptions: ['equals'],
       }
@@ -150,7 +150,7 @@ const applyColumnFilterModeDefaults = <T extends MRT_RowData>(
       columnFilterFns[columnId] = 'equals'
       return {
         ...column,
-        filterFn: typeof column.filterFn === 'function' ? column.filterFn : column.filterFn ?? 'equals',
+        filterFn: typeof column.filterFn === 'function' ? column.filterFn : (column.filterFn ?? 'equals'),
         enableColumnFilterModes: false,
         columnFilterModeOptions: ['equals'],
       }

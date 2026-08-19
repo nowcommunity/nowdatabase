@@ -278,9 +278,9 @@ const MultiSelector = <T extends object>({
 export const EditableTextField = <T extends object>(props: EditableTextFieldProps<T>) => {
   const { field, disabled = false, big = false, readonly = false, handleSetEditData } = props
   const type = props.type ?? 'text'
-  const trim = type === 'text' ? (props as EditableTextFieldTextProps<T>).trim ?? false : false
+  const trim = type === 'text' ? ((props as EditableTextFieldTextProps<T>).trim ?? false) : false
   const round = type === 'number' ? (props as EditableTextFieldNumberProps<T>).round : undefined
-  const integerOnly = type === 'number' ? (props as EditableTextFieldNumberProps<T>).integerOnly ?? false : false
+  const integerOnly = type === 'number' ? ((props as EditableTextFieldNumberProps<T>).integerOnly ?? false) : false
   const min = type === 'number' ? (props as EditableTextFieldNumberProps<T>).min : undefined
   const { setEditData, editData, validator, fieldsWithErrors, setFieldsWithErrors } = useDetailContext<T>()
   const errorObject = validator(editData, field)
@@ -402,7 +402,7 @@ export const EditableTextField = <T extends object>(props: EditableTextFieldProp
         if (integerOnly && event.key === '.') event.preventDefault()
       }}
       id={`${String(field)}-textfield`}
-      value={type === 'number' ? numberInputValue : editData[field] ?? ''}
+      value={type === 'number' ? numberInputValue : (editData[field] ?? '')}
       variant="outlined"
       size="small"
       error={!!error}
@@ -458,9 +458,7 @@ type EditableTextFieldDateProps<T extends object> = EditableTextFieldCommonProps
 }
 
 export type EditableTextFieldProps<T extends object> =
-  | EditableTextFieldTextProps<T>
-  | EditableTextFieldNumberProps<T>
-  | EditableTextFieldDateProps<T>
+  EditableTextFieldTextProps<T> | EditableTextFieldNumberProps<T> | EditableTextFieldDateProps<T>
 
 export const FieldWithTableSelection = <T extends object, ParentType extends object>({
   targetField,

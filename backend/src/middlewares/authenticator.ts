@@ -49,7 +49,7 @@ export const userExtractor: Middleware = async (req, res, next) => {
   }
 
   try {
-    const decodedUser = (await verify(req.token, SECRET as Secret)) as { username: string }
+    const decodedUser = (await verify(req.token, SECRET)) as { username: string }
     const username = decodedUser.username
     if (!username) throw new Error('Invalid token')
 

@@ -44,7 +44,7 @@ describe('DwC-A species export (admin-only)', () => {
     expect(result.headers['content-type']).toMatch(/application\/zip/i)
     expect(result.headers['content-disposition']).toMatch(/attachment;\s*filename="now_dwc_export_/i)
 
-    const zip = await JSZip.loadAsync(result.body as unknown as Buffer)
+    const zip = await JSZip.loadAsync(result.body as Buffer<ArrayBufferLike>)
     expect(zip.file('taxon.csv')).toBeTruthy()
     expect(zip.file('measurementorfact.csv')).toBeTruthy()
     expect(zip.file('meta.xml')).toBeTruthy()
@@ -80,7 +80,7 @@ describe('DwC-A species export (admin-only)', () => {
     expect(result.status).toEqual(200)
     expect(result.headers['content-type']).toMatch(/application\/zip/i)
 
-    const zip = await JSZip.loadAsync(result.body as unknown as Buffer)
+    const zip = await JSZip.loadAsync(result.body as Buffer<ArrayBufferLike>)
     const taxonCsv = await zip.file('taxon.csv')!.async('string')
     expect(taxonCsv).toContain('NOW:85729')
     expect(taxonCsv).not.toContain('NOW:85730')

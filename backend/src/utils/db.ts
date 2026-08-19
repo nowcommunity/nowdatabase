@@ -143,13 +143,13 @@ ensureLogClient()
 
 export const getCrossSearchFields = () => {
   const nowLsKeys = Object.keys(
-    (nowDb['now_ls' as keyof object] as unknown as Record<string, { fields: object }>).fields as never
+    (nowDb['now_ls' as keyof object] as unknown as Record<string, { fields: object }>).fields
   )
   const nowLocKeys = Object.keys(
-    (nowDb['now_loc' as keyof object] as unknown as Record<string, { fields: object }>).fields as never
+    (nowDb['now_loc' as keyof object] as unknown as Record<string, { fields: object }>).fields
   )
   const comSpeciesKeys = Object.keys(
-    (nowDb['com_species' as keyof object] as unknown as Record<string, { fields: object }>).fields as never
+    (nowDb['com_species' as keyof object] as unknown as Record<string, { fields: object }>).fields
   )
   return [
     ...nowLsKeys.map(key => `now_ls.${key}`),

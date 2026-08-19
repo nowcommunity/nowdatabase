@@ -22,49 +22,47 @@ jest.mock('@/shared/types', () => ({}))
 
 type TestPageContext = PageContextType<unknown>
 
-const createPageContextValue = (overrides: Partial<TestPageContext> = {}): TestPageContext =>
-  ({
-    idList: [],
-    setIdList: () => {},
-    idFieldName: 'rid',
-    viewName: 'reference',
-    previousTableUrls: [],
-    setPreviousTableUrls: () => {},
-    createTitle: () => '',
-    createSubtitle: () => '',
-    editRights: {},
-    sqlLimit: 25,
-    sqlOffset: 0,
-    sqlColumnFilters: [],
-    sqlOrderBy: [],
-    setSqlLimit: () => {},
-    setSqlOffset: () => {},
-    setSqlColumnFilters: () => {},
-    setSqlOrderBy: () => {},
-    ...overrides,
-  }) as TestPageContext
+const createPageContextValue = (overrides: Partial<TestPageContext> = {}): TestPageContext => ({
+  idList: [],
+  setIdList: () => {},
+  idFieldName: 'rid',
+  viewName: 'reference',
+  previousTableUrls: [],
+  setPreviousTableUrls: () => {},
+  createTitle: () => '',
+  createSubtitle: () => '',
+  editRights: {},
+  sqlLimit: 25,
+  sqlOffset: 0,
+  sqlColumnFilters: [],
+  sqlOrderBy: [],
+  setSqlLimit: () => {},
+  setSqlOffset: () => {},
+  setSqlColumnFilters: () => {},
+  setSqlOrderBy: () => {},
+  ...overrides,
+})
 
 type TestDetailContext = DetailContextType<unknown>
 
-const createDetailContextValue = (overrides: Partial<TestDetailContext> = {}): TestDetailContext =>
-  ({
-    data: {},
-    mode: modeOptionToMode.read,
-    setMode: () => {},
-    editData: {} as TestDetailContext['editData'],
-    setEditData: (() => {}) as TestDetailContext['setEditData'],
-    isDirty: false,
-    resetEditData: () => {},
-    textField: (() => <></>) as TestDetailContext['textField'],
-    bigTextField: (() => <></>) as TestDetailContext['bigTextField'],
-    dropdown: (() => <></>) as TestDetailContext['dropdown'],
-    dropdownWithSearch: (() => <></>) as TestDetailContext['dropdownWithSearch'],
-    radioSelection: (() => <></>) as TestDetailContext['radioSelection'],
-    validator: () => ({ name: 'field', error: null }),
-    fieldsWithErrors: {},
-    setFieldsWithErrors: () => {},
-    ...overrides,
-  }) as TestDetailContext
+const createDetailContextValue = (overrides: Partial<TestDetailContext> = {}): TestDetailContext => ({
+  data: {},
+  mode: modeOptionToMode.read,
+  setMode: () => {},
+  editData: {},
+  setEditData: () => {},
+  isDirty: false,
+  resetEditData: () => {},
+  textField: () => <></>,
+  bigTextField: () => <></>,
+  dropdown: () => <></>,
+  dropdownWithSearch: () => <></>,
+  radioSelection: () => <></>,
+  validator: () => ({ name: 'field', error: null }),
+  fieldsWithErrors: {},
+  setFieldsWithErrors: () => {},
+  ...overrides,
+})
 
 const pageContextValue: TestPageContext = createPageContextValue()
 

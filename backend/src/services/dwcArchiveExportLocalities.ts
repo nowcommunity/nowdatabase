@@ -1483,5 +1483,5 @@ export const buildDwcLocalityArchiveZipBuffer = async (localityIds?: number[]): 
     select: localityExportSelect,
   })
 
-  return await buildDwcLocalityArchiveZipBufferFromLocalities(localities as unknown as LocalityForExport[])
+  return await buildDwcLocalityArchiveZipBufferFromLocalities(localities)
 }

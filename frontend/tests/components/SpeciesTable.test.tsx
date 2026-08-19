@@ -207,8 +207,8 @@ describe('SpeciesTable synonym filtering', () => {
     expect(speciesWithSynonyms).toBeDefined()
     const row = { original: speciesWithSynonyms! }
 
-    expect(genusFilter!(row as { original: Species }, 'genus_name', 'lupus')).toBe(true)
-    expect(genusFilter!(row as { original: Species }, 'genus_name', 'unknown')).toBe(false)
+    expect(genusFilter!(row, 'genus_name', 'lupus')).toBe(true)
+    expect(genusFilter!(row, 'genus_name', 'unknown')).toBe(false)
   })
 
   it('matches rows when the species filter value appears in a synonym', () => {
@@ -223,8 +223,8 @@ describe('SpeciesTable synonym filtering', () => {
     expect(speciesWithSynonyms).toBeDefined()
     const row = { original: speciesWithSynonyms! }
 
-    expect(speciesFilter!(row as { original: Species }, 'species_name', 'fami')).toBe(true)
-    expect(speciesFilter!(row as { original: Species }, 'species_name', 'absent')).toBe(false)
+    expect(speciesFilter!(row, 'species_name', 'fami')).toBe(true)
+    expect(speciesFilter!(row, 'species_name', 'absent')).toBe(false)
   })
 
   it('provides unique column identifiers', () => {

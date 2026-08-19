@@ -50,7 +50,7 @@ export const SpeciesDetails = ({
     // this should be removed if validators are improved in the future
     if (data) {
       const fixedSpeciesData = fixNullValuesInTaxonomyFields(data)
-      setModifiedData(fixedSpeciesData as SpeciesDetailsType)
+      setModifiedData(fixedSpeciesData)
     }
   }, [data])
 

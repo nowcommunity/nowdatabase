@@ -117,8 +117,9 @@ const taxonomyFields = new Set([
 ])
 
 const isEmptyValue = (value: unknown) => value === null || value === undefined || value === ''
-const normalizeValue = (value: unknown) => (isEmptyValue(value) ? '' : String(value))
-const isSameValue = (left: unknown, right: unknown) => normalizeValue(left) === normalizeValue(right)
+const normalizeValue = (value: string | number | boolean | null) => (isEmptyValue(value) ? '' : String(value))
+const isSameValue = (left: string | number | boolean | null, right: string | number | boolean | null) =>
+  normalizeValue(left) === normalizeValue(right)
 
 const resolveMergeErrorMessage = (error: unknown): string => {
   if (error && typeof error === 'object' && 'data' in error) {

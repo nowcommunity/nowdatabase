@@ -72,14 +72,14 @@ export const CrossSearchTable = ({ selectorFn }: { selectorFn?: (newObject: Cros
         header: 'Dec lat',
         filterVariant: 'range',
         enableColumnFilterModes: false,
-        Cell: ({ cell }) => formatWithMaxThreeDecimals(cell.getValue() as number),
+        Cell: ({ cell }) => formatWithMaxThreeDecimals(cell.getValue()),
       },
       {
         accessorKey: 'dec_long',
         header: 'Dec long',
         filterVariant: 'range',
         enableColumnFilterModes: false,
-        Cell: ({ cell }) => formatWithMaxThreeDecimals(cell.getValue() as number),
+        Cell: ({ cell }) => formatWithMaxThreeDecimals(cell.getValue()),
       },
       {
         accessorKey: 'altitude',
@@ -462,7 +462,7 @@ export const CrossSearchTable = ({ selectorFn }: { selectorFn?: (newObject: Cros
         size: 20,
         filterVariant: 'range',
         enableColumnFilterModes: false,
-        Cell: ({ cell }) => formatWithMaxThreeDecimals(cell.getValue() as number),
+        Cell: ({ cell }) => formatWithMaxThreeDecimals(cell.getValue()),
       },
       {
         accessorKey: 'dc13_n',
@@ -477,7 +477,7 @@ export const CrossSearchTable = ({ selectorFn }: { selectorFn?: (newObject: Cros
         size: 20,
         filterVariant: 'range',
         enableColumnFilterModes: false,
-        Cell: ({ cell }) => formatWithMaxThreeDecimals(cell.getValue() as number),
+        Cell: ({ cell }) => formatWithMaxThreeDecimals(cell.getValue()),
       },
       {
         accessorKey: 'dc13_min',
@@ -485,7 +485,7 @@ export const CrossSearchTable = ({ selectorFn }: { selectorFn?: (newObject: Cros
         size: 20,
         filterVariant: 'range',
         enableColumnFilterModes: false,
-        Cell: ({ cell }) => formatWithMaxThreeDecimals(cell.getValue() as number),
+        Cell: ({ cell }) => formatWithMaxThreeDecimals(cell.getValue()),
       },
       {
         accessorKey: 'dc13_stdev',
@@ -493,7 +493,7 @@ export const CrossSearchTable = ({ selectorFn }: { selectorFn?: (newObject: Cros
         size: 20,
         filterVariant: 'range',
         enableColumnFilterModes: false,
-        Cell: ({ cell }) => formatWithMaxThreeDecimals(cell.getValue() as number),
+        Cell: ({ cell }) => formatWithMaxThreeDecimals(cell.getValue()),
       },
       {
         accessorKey: 'do18_mean',
@@ -501,7 +501,7 @@ export const CrossSearchTable = ({ selectorFn }: { selectorFn?: (newObject: Cros
         size: 20,
         filterVariant: 'range',
         enableColumnFilterModes: false,
-        Cell: ({ cell }) => formatWithMaxThreeDecimals(cell.getValue() as number),
+        Cell: ({ cell }) => formatWithMaxThreeDecimals(cell.getValue()),
       },
       {
         accessorKey: 'do18_n',
@@ -516,7 +516,7 @@ export const CrossSearchTable = ({ selectorFn }: { selectorFn?: (newObject: Cros
         size: 20,
         filterVariant: 'range',
         enableColumnFilterModes: false,
-        Cell: ({ cell }) => formatWithMaxThreeDecimals(cell.getValue() as number),
+        Cell: ({ cell }) => formatWithMaxThreeDecimals(cell.getValue()),
       },
       {
         accessorKey: 'do18_min',
@@ -524,7 +524,7 @@ export const CrossSearchTable = ({ selectorFn }: { selectorFn?: (newObject: Cros
         size: 20,
         filterVariant: 'range',
         enableColumnFilterModes: false,
-        Cell: ({ cell }) => formatWithMaxThreeDecimals(cell.getValue() as number),
+        Cell: ({ cell }) => formatWithMaxThreeDecimals(cell.getValue()),
       },
       {
         accessorKey: 'do18_stdev',
@@ -532,7 +532,7 @@ export const CrossSearchTable = ({ selectorFn }: { selectorFn?: (newObject: Cros
         size: 20,
         filterVariant: 'range',
         enableColumnFilterModes: false,
-        Cell: ({ cell }) => formatWithMaxThreeDecimals(cell.getValue() as number),
+        Cell: ({ cell }) => formatWithMaxThreeDecimals(cell.getValue()),
       },
       {
         id: 'microwear_now_ls',

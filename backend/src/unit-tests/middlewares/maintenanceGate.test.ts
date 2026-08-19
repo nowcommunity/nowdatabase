@@ -17,8 +17,8 @@ type ResponseDouble = {
 
 const createResponse = () => {
   const res = {} as ResponseDouble
-  res.status = jest.fn((_code: number) => res) as unknown as ResponseDouble['status']
-  res.json = jest.fn((_body: unknown) => res) as unknown as ResponseDouble['json']
+  res.status = jest.fn((_code: number) => res)
+  res.json = jest.fn((_body: unknown) => res)
 
   return res
 }

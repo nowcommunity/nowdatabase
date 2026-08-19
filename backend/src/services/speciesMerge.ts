@@ -409,7 +409,7 @@ const validateReferences = async (references: Reference[]) => {
   const invalidReferences: number[] = []
   for (const reference of references) {
     if (typeof reference.rid !== 'number') {
-      invalidReferences.push(reference.rid as number)
+      invalidReferences.push(reference.rid)
       continue
     }
     const result = await getReferenceDetails(reference.rid)

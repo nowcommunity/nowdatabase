@@ -14,7 +14,7 @@ router.post('/refreshToken', async (req: Request<object, { token: string }, { to
     username,
     exp,
     id: userId,
-  } = (await verify(oldToken, SECRET as Secret, true)) as { username: string; exp: number; id: number }
+  } = (await verify(oldToken, SECRET, true)) as { username: string; exp: number; id: number }
 
   const now = new Date().getTime()
 

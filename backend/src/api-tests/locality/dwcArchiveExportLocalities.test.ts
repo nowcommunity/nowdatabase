@@ -5,6 +5,7 @@ import type { Response } from 'superagent'
 import app from '../../app'
 import { pool } from '../../utils/db'
 import { noPermError, resetDatabase, resetDatabaseTimeout, send } from '../utils'
+import type InputFileFormat from 'jszip'
 
 type ResponseStream = {
   on: (event: 'data', handler: (chunk: Buffer) => void) => void
@@ -44,7 +45,7 @@ describe('DwC-A locality export (admin-only)', () => {
     expect(result.headers['content-type']).toMatch(/application\/zip/i)
     expect(result.headers['content-disposition']).toMatch(/attachment;\s*filename="now_dwc_localities_export_/i)
 
-    const zip = await JSZip.loadAsync(result.body as unknown as Buffer)
+    const zip = await JSZip.loadAsync(result.body as Buffer<ArrayBufferLike>)
     expect(zip.file('location.csv')).toBeTruthy()
     expect(zip.file('geologicalcontext.csv')).toBeTruthy()
     expect(zip.file('measurementorfact.csv')).toBeTruthy()
@@ -71,7 +72,7 @@ describe('DwC-A locality export (admin-only)', () => {
     expect(result.status).toEqual(200)
     expect(result.headers['content-type']).toMatch(/application\/zip/i)
 
-    const zip = await JSZip.loadAsync(result.body as unknown as Buffer)
+    const zip = await JSZip.loadAsync(result.body as Buffer<ArrayBufferLike>)
     const locationCsv = await zip.file('location.csv')!.async('string')
     expect(locationCsv).toContain('NOW:LOC:21050')
     expect(locationCsv).not.toContain('NOW:LOC:24750')
