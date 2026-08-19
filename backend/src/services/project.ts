@@ -1,4 +1,6 @@
-import { Role, User } from '../../../frontend/src/shared/types'
+import { EditDataType, EditMetaData, ProjectDetailsType, Role, User } from '../../../frontend/src/shared/types'
+import { validateProjectFields } from '../../../frontend/src/shared/validators/project'
+import { ValidationObject } from '../../../frontend/src/shared/validators/validator'
 import { nowDb } from '../utils/db'
 
 export const getAllProjects = async (user?: User) => {
@@ -20,7 +22,6 @@ export const getAllProjects = async (user?: User) => {
 
 export const getProjectDetails = async (id: number) => {
   // TODO: Check if user has access
-
   const result = await nowDb.now_proj.findUnique({
     where: { pid: id },
     include: {
@@ -60,4 +61,9 @@ export const deleteProject = async (projectId: number) => {
   })
 
   return true
+}
+
+export const validateEntireProject = (editedFields: EditDataType<ProjectDetailsType> & EditMetaData) => {
+  const errors: ValidationObject[] = validateProjectFields(editedFields)
+  return errors
 }

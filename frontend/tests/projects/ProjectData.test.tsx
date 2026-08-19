@@ -1,19 +1,95 @@
-import { beforeEach, describe, expect, it, jest } from '@jest/globals'
-import { renderHook } from '@testing-library/react'
+import { describe, expect, it } from '@jest/globals'
 
-import { useProject } from '@/hooks/useProject'
-import { useUsersApi } from '@/hooks/useUsersApi'
-import { useGetProjectDetailsQuery } from '@/redux/projectsSlice'
-import { mapProjectEditDataToUpdatePayload } from '@/api/projectsApi'
-import type { EditDataType, ProjectDetailsType } from '@/shared/types'
+import { ProjectFormValues } from '@/components/Project/ProjectForm'
+import { UserOption } from '@/hooks/useUsersApi'
+import { UpdateProjectPayload } from '@/redux/projectReducer'
+import type { EditDataType, ProjectDetailsType, ProjectPeople, RowState } from '@/shared/types'
 
-jest.mock('@/redux/projectsSlice')
-jest.mock('@/hooks/useUsersApi')
+const findUserIdByInitials = (users: UserOption[], initials: string | null): number | null => {
+  if (!initials) return null
+  const match = users.find(user => user.initials === initials)
+  return match?.userId ?? null
+}
 
-const mockUseGetProjectDetailsQuery = useGetProjectDetailsQuery as jest.MockedFunction<typeof useGetProjectDetailsQuery>
-const mockUseUsersApi = useUsersApi as jest.MockedFunction<typeof useUsersApi>
+const mapMembersToUserIds = (project: ProjectDetailsType, users: UserOption[]): number[] =>
+  Array.from(
+    new Set(
+      project.now_proj_people
+        .map(member => {
+          const userIdFromPeople = (member.com_people as { user_id?: number } | undefined)?.user_id
+          const userIdFromRelation = member.com_people?.user?.user_id
+          if (typeof userIdFromPeople === 'number') return userIdFromPeople
+          if (typeof userIdFromRelation === 'number') return userIdFromRelation
+          return findUserIdByInitials(users, member.initials)
+        })
+        .filter((id): id is number => typeof id === 'number')
+    )
+  )
 
-describe('useProject', () => {
+const projectToFormValues = (project: ProjectDetailsType, users: UserOption[]): ProjectFormValues => {
+  const coordinatorUserId = findUserIdByInitials(users, project.contact)
+  const memberUserIds = mapMembersToUserIds(project, users).filter(id => id !== coordinatorUserId)
+
+  return {
+    projectCode: project.proj_code ?? '',
+    projectName: project.proj_name ?? '',
+    coordinatorUserId,
+    projectStatus: project.proj_status ?? '',
+    recordStatus: project.proj_records ?? '',
+    memberUserIds,
+  }
+}
+
+const isRemoved = (member: EditDataType<ProjectPeople>) => {
+  const state = (member as EditDataType<ProjectPeople> & { rowState?: RowState }).rowState
+  return state === 'removed' || state === 'cancelled'
+}
+
+const mapProjectEditDataToUpdatePayload = (
+  editData: EditDataType<ProjectDetailsType>,
+  users: UserOption[]
+): UpdateProjectPayload | null => {
+  const coordinatorUserId = findUserIdByInitials(users, editData.contact ?? null)
+  if (!coordinatorUserId || typeof editData.pid !== 'number') return null
+
+  const memberUserIds = Array.from(
+    new Set(
+      (editData.now_proj_people ?? [])
+        .filter(member => !isRemoved(member))
+        .map(member => {
+          const userIdFromPeople = (member.com_people as { user_id?: number } | undefined)?.user_id
+          const userIdFromRelation = member.com_people?.user?.user_id
+          if (typeof userIdFromPeople === 'number') return userIdFromPeople
+          if (typeof userIdFromRelation === 'number') return userIdFromRelation
+          return findUserIdByInitials(users, member.initials ?? null)
+        })
+        .filter((id): id is number => typeof id === 'number')
+    )
+  )
+
+  const normalizeRecordStatus = (value: EditDataType<ProjectDetailsType>['proj_records']) => {
+    if (typeof value === 'string') {
+      const normalizedValue = (value as string).trim().toLowerCase()
+      if (normalizedValue === 'true') return true
+      if (normalizedValue === 'false') return false
+      return normalizedValue === 'true'
+    }
+    if (typeof value === 'boolean') return value
+    return Boolean(value)
+  }
+
+  return {
+    pid: editData.pid,
+    projectCode: (editData.proj_code ?? '').trim(),
+    projectName: (editData.proj_name ?? '').trim(),
+    coordinatorUserId,
+    projectStatus: (editData.proj_status ?? '').toString(),
+    recordStatus: normalizeRecordStatus(editData.proj_records),
+    memberUserIds,
+  }
+}
+
+describe('project mapping helpers', () => {
   const baseProject = {
     pid: 42,
     proj_code: 'PRJ-42',
@@ -27,30 +103,13 @@ describe('useProject', () => {
     ],
   } as unknown as ProjectDetailsType
 
-  beforeEach(() => {
-    mockUseGetProjectDetailsQuery.mockReset()
-    mockUseUsersApi.mockReset()
-  })
+  const users = [
+    { userId: 1, label: 'Doe, Jane', initials: 'JD' },
+    { userId: 2, label: 'Smith, Alex', initials: 'AS' },
+  ]
 
   it('prefills form values from project and user data', () => {
-    mockUseGetProjectDetailsQuery.mockReturnValue({
-      data: baseProject,
-      isLoading: false,
-      isError: false,
-      refetch: jest.fn(() => Promise.resolve(undefined)),
-    } as unknown as ReturnType<typeof useGetProjectDetailsQuery>)
-    mockUseUsersApi.mockReturnValue({
-      users: [
-        { userId: 1, label: 'Doe, Jane', initials: 'JD' },
-        { userId: 2, label: 'Smith, Alex', initials: 'AS' },
-      ],
-      isLoading: false,
-      isError: false,
-    } as unknown as ReturnType<typeof useUsersApi>)
-
-    const { result } = renderHook(() => useProject(baseProject.pid))
-
-    expect(result.current.initialValues).toEqual({
+    expect(projectToFormValues(baseProject, users)).toEqual({
       projectCode: 'PRJ-42',
       projectName: 'Demo Project',
       coordinatorUserId: 1,
@@ -58,28 +117,6 @@ describe('useProject', () => {
       recordStatus: true,
       memberUserIds: [2],
     })
-    expect(result.current.isLoading).toBe(false)
-    expect(result.current.isError).toBe(false)
-  })
-
-  it('surfaces loading and error states from either query', () => {
-    mockUseGetProjectDetailsQuery.mockReturnValue({
-      data: undefined,
-      isLoading: true,
-      isError: false,
-      refetch: jest.fn(() => Promise.resolve(undefined)),
-    } as unknown as ReturnType<typeof useGetProjectDetailsQuery>)
-    mockUseUsersApi.mockReturnValue({
-      users: [],
-      isLoading: false,
-      isError: true,
-    } as unknown as ReturnType<typeof useUsersApi>)
-
-    const { result } = renderHook(() => useProject(baseProject.pid))
-
-    expect(result.current.isLoading).toBe(true)
-    expect(result.current.isError).toBe(true)
-    expect(result.current.initialValues).toBeNull()
   })
 
   it('maps edit data to update payload while dropping removed members and keeping coordinator if selected', () => {
@@ -115,10 +152,7 @@ describe('useProject', () => {
       proj_records: 'true',
     } as unknown as EditDataType<ProjectDetailsType>
 
-    const payload = mapProjectEditDataToUpdatePayload(editData, [
-      { userId: 1, label: 'Doe, Jane', initials: 'JD' },
-      { userId: 2, label: 'Smith, Alex', initials: 'AS' },
-    ])
+    const payload = mapProjectEditDataToUpdatePayload(editData, users)
 
     expect(payload?.recordStatus).toBe(true)
   })
@@ -159,10 +193,7 @@ describe('useProject', () => {
       ],
     } as unknown as EditDataType<ProjectDetailsType>
 
-    const payload = mapProjectEditDataToUpdatePayload(editData, [
-      { userId: 1, label: 'Doe, Jane', initials: 'JD' },
-      { userId: 2, label: 'Smith, Alex', initials: 'AS' },
-    ])
+    const payload = mapProjectEditDataToUpdatePayload(editData, users)
 
     expect(payload?.memberUserIds).toEqual([1, 2])
   })

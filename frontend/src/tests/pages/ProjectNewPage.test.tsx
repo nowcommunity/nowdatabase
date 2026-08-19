@@ -5,16 +5,17 @@ import { Link, MemoryRouter, Route, RouterProvider, Routes, createMemoryRouter, 
 import { act, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { Provider } from 'react-redux'
-import { Role } from '@/shared/types'
+import { ProjectDetailsType, Role } from '@/shared/types'
 import { ProjectNewPage } from '@/pages/ProjectNewPage'
-import type { ProjectFormValues } from '@/components/Project/ProjectForm'
 import { store } from '@/redux/store'
 
 const mockUseUser = jest.fn()
 const mockUseUsersApi = jest.fn()
-const mockUseProjectsApi = jest.fn()
 const mockNotify = jest.fn()
 const mockNavigate = jest.fn()
+const mockEditProject = jest.fn((_payload: ProjectDetailsType) => ({
+  unwrap: () => Promise.resolve({ pid: 7 }),
+}))
 
 jest.mock('@/hooks/user', () => ({
   useUser: () => mockUseUser(),
@@ -24,12 +25,28 @@ jest.mock('@/hooks/useUsersApi', () => ({
   useUsersApi: (arg?: unknown) => mockUseUsersApi(arg),
 }))
 
-jest.mock('@/hooks/useProjectsApi', () => ({
-  useProjectsApi: () => mockUseProjectsApi(),
-}))
-
 jest.mock('@/hooks/notification', () => ({
   useNotify: () => ({ notify: mockNotify }),
+}))
+
+jest.mock('@/redux/projectReducer', () => ({
+  useEditProjectMutation: () => [mockEditProject],
+}))
+
+jest.mock('@/redux/personReducer', () => ({
+  useGetAllPersonsQuery: () => ({
+    data: [
+      {
+        initials: 'JD',
+        user: { user_id: 1 },
+      },
+      {
+        initials: 'AS',
+        user: { user_id: 2 },
+      },
+    ],
+    isLoading: false,
+  }),
 }))
 
 jest.mock('react-router-dom', () => {
@@ -100,20 +117,17 @@ describe('ProjectNewPage', () => {
   beforeEach(() => {
     mockUseUser.mockReturnValue({ token: 'token-123', role: Role.Admin })
     mockUseUsersApi.mockReturnValue({ users: [userFactory()], isLoading: false, isError: false })
-    mockUseProjectsApi.mockReturnValue({
-      createProject: jest.fn(() => ({ unwrap: () => Promise.resolve({ pid: 42 }) })),
-      isSubmitting: false,
-    })
     mockNotify.mockReset()
     mockNavigate.mockReset()
   })
 
-  it('blocks visitors without a session', () => {
+  it('blocks visitors without a session', async () => {
     mockUseUser.mockReturnValue({ token: null, role: Role.ReadOnly })
 
     renderWithRouter()
-
-    expect(screen.getByText('Sign in to create a project')).toBeTruthy()
+    await waitFor(() => {
+      expect(screen.getByText('Sign in to create a project')).toBeTruthy()
+    })
   })
 
   it('requires required fields before submitting', async () => {
@@ -136,10 +150,6 @@ describe('ProjectNewPage', () => {
 
   it('submits form data and navigates to the new project', async () => {
     const user = userEvent.setup()
-    const createProject = jest.fn((payload: ProjectFormValues) => ({
-      unwrap: () => Promise.resolve({ pid: 7, ...payload }),
-    }))
-    mockUseProjectsApi.mockReturnValue({ createProject, isSubmitting: false })
     const otherUser = userFactory({ userId: 2, label: 'Smith, Alex', initials: 'AS' })
     mockUseUsersApi.mockReturnValue({
       users: [userFactory(), otherUser],
@@ -147,7 +157,9 @@ describe('ProjectNewPage', () => {
       isError: false,
     })
 
-    renderWithRouter()
+    act(() => {
+      renderWithRouter()
+    })
 
     await user.type(screen.getByLabelText('Project Code'), 'PRJ-001')
     await user.type(screen.getByLabelText('Project Name'), 'New Project')
@@ -163,7 +175,7 @@ describe('ProjectNewPage', () => {
 
     await user.click(screen.getByTestId('select-members'))
     await user.click(screen.getByText('Smith, Alex'))
-    await user.click(screen.getByRole('button', { name: /done/i }))
+    await user.click(screen.getByText('Done'))
 
     const form = document.querySelector('form')
     expect(form).toBeTruthy()
@@ -172,13 +184,13 @@ describe('ProjectNewPage', () => {
     })
 
     await waitFor(() => {
-      expect(createProject).toHaveBeenCalledWith({
-        projectCode: 'PRJ-001',
-        projectName: 'New Project',
-        coordinatorUserId: 1,
-        projectStatus: 'current',
-        recordStatus: true,
-        memberUserIds: [2],
+      expect(mockEditProject).toHaveBeenCalledWith({
+        proj_code: 'PRJ-001',
+        proj_name: 'New Project',
+        contact: 'JD',
+        proj_status: 'current',
+        proj_records: true,
+        now_proj_people: [{ initials: 'AS', com_people: { initials: 'AS', user: { user_id: 2 } } }],
       })
     })
 

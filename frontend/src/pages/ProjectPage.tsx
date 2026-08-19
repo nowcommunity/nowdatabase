@@ -9,7 +9,6 @@ import { Page } from '../components/Page'
 export const ProjectPage = () => {
   return (
     <Page
-      allowedRoles={[Role.Admin]}
       tableView={<ProjectTable />}
       detailView={<ProjectDetails />}
       viewName="project"

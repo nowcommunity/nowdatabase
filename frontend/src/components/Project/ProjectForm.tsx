@@ -1,4 +1,7 @@
-import { useEffect, useMemo } from 'react'
+import type { RecordStatusValue } from '@/constants/projectStatus'
+import { projectStatusOptions, recordStatusOptions } from '@/constants/projectStatus'
+import { useUnsavedChangesPrompt } from '@/hooks/useUnsavedChangesPrompt'
+import type { UserOption } from '@/hooks/useUsersApi'
 import {
   Alert,
   Box,
@@ -17,11 +20,8 @@ import {
   Typography,
 } from '@mui/material'
 import Grid from '@mui/material/Grid2'
+import { useEffect, useMemo } from 'react'
 import { Controller, useForm } from 'react-hook-form'
-import { recordStatusOptions, projectStatusOptions } from '@/constants/projectStatus'
-import type { RecordStatusValue } from '@/constants/projectStatus'
-import type { UserOption } from '@/hooks/useUsersApi'
-import { useUnsavedChangesPrompt } from '@/hooks/useUnsavedChangesPrompt'
 import { CoordinatorSelect } from './CoordinatorSelect'
 import { MembersMultiSelect } from './MembersMultiSelect'
 
@@ -125,7 +125,17 @@ export const ProjectForm = ({
               <TextField
                 label="Project Code"
                 fullWidth
-                {...register('projectCode', { required: 'Project code is required' })}
+                {...register('projectCode', {
+                  required: 'Project code is required',
+                  validate: value => {
+                    if (value.trim() === '') {
+                      return 'Project code is required'
+                    }
+                    if (value.length > 10) {
+                      return 'Project code must be 10 characters or under'
+                    }
+                  },
+                })}
                 error={Boolean(errors.projectCode)}
                 helperText={errors.projectCode?.message}
                 disabled={isSubmitting}
@@ -135,7 +145,10 @@ export const ProjectForm = ({
               <TextField
                 label="Project Name"
                 fullWidth
-                {...register('projectName', { required: 'Project name is required' })}
+                {...register('projectName', {
+                  required: 'Project name is required',
+                  validate: value => (value.trim() !== '' ? true : 'Project name is required'),
+                })}
                 error={Boolean(errors.projectName)}
                 helperText={errors.projectName?.message}
                 disabled={isSubmitting}
@@ -188,7 +201,10 @@ export const ProjectForm = ({
                 <Controller
                   control={control}
                   name="recordStatus"
-                  rules={{ required: 'Record status is required' }}
+                  rules={{
+                    validate: value =>
+                      value !== null && value !== undefined && value !== '' ? true : 'Record status is required',
+                  }}
                   render={({ field }) => (
                     <Select
                       {...field}

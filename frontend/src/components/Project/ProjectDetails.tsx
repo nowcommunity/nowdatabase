@@ -1,28 +1,32 @@
 import { useMemo } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
+
+import { useNotify } from '@/hooks/notification'
+import { useDeleteProjectMutation, useEditProjectMutation, useGetProjectDetailsQuery } from '@/redux/projectReducer'
+import { validateProject, validateProjectFields } from '@/shared/validators/project'
 import { CircularProgress } from '@mui/material'
 import { DetailView, TabType } from '../DetailView/DetailView'
 import { CoordinatorTab } from './Tabs/CoordinatorTab'
-import { useDeleteProjectMutation, useGetProjectDetailsQuery, useUpdateProjectMutation } from '@/redux/projectReducer'
-import { useNotify } from '@/hooks/notification'
-import { useUsersApi } from '@/hooks/useUsersApi'
-import { mapProjectEditDataToUpdatePayload } from '@/api/projectsApi'
+
 import type { EditDataType, ProjectDetailsType } from '@/shared/types'
-import type { ValidationObject } from '@/shared/validators/validator'
-import type { FetchBaseQueryError } from '@reduxjs/toolkit/query'
+import { ValidationErrors } from '@/shared/types'
 
 export const ProjectDetails = () => {
   const { id } = useParams()
   const projectId = useMemo(() => (id ? parseInt(id) : null), [id])
-  const { isLoading, isError, data } = useGetProjectDetailsQuery(id!, { skip: !projectId })
-  const { users, isLoading: isUsersLoading, isError: isUsersError } = useUsersApi()
+  const { isLoading, isError, error, data } = useGetProjectDetailsQuery(id!, { skip: !projectId })
   const [deleteProject, { isLoading: isDeleting }] = useDeleteProjectMutation()
-  const [updateProject, { isLoading: isUpdating }] = useUpdateProjectMutation()
+  const [editProject, { isLoading: isUpdating }] = useEditProjectMutation()
   const { notify } = useNotify()
   const navigate = useNavigate()
 
-  if (isError || isUsersError) return <div>Error loading data</div>
-  if (isLoading || !data || isDeleting || isUsersLoading || isUpdating) return <CircularProgress />
+  if (isError) {
+    if ('status' in error && error.status === 403) {
+      return <div>Your user is not authorized to view this page.</div>
+    }
+    return <div>Error loading data</div>
+  }
+  if (isLoading || !data || isDeleting || isUpdating) return <CircularProgress />
   if (data) {
     document.title = `Project - ${data.proj_name}`
   }
@@ -48,41 +52,26 @@ export const ProjectDetails = () => {
     },
   ]
 
-  const validator = (
-    _editData: EditDataType<ProjectDetailsType>,
-    field: keyof EditDataType<ProjectDetailsType>
-  ): ValidationObject => ({
-    name: String(field),
-    error: null,
-  })
-
   const onWrite = async (editData: EditDataType<ProjectDetailsType>) => {
     if (!projectId) return
-    const payload = mapProjectEditDataToUpdatePayload(editData, users)
-
-    if (!payload) {
-      notify('Coordinator selection is required to save project changes.', 'error')
-      return
-    }
 
     try {
-      await updateProject(payload).unwrap()
+      await editProject(editData).unwrap()
       notify('Saved project successfully.')
-    } catch (error) {
-      const fetchError = error as FetchBaseQueryError
-      const message =
-        fetchError &&
-        typeof fetchError === 'object' &&
-        'data' in fetchError &&
-        fetchError.data &&
-        typeof fetchError.data === 'object' &&
-        'error' in fetchError.data &&
-        typeof fetchError.data.error === 'string'
-          ? fetchError.data.error
-          : 'Could not save project.'
-      notify(message, 'error')
+    } catch (e) {
+      const error = e as ValidationErrors
+      notify('Following validators failed: ' + error.data.map(e => e.name).join(', '), 'error')
     }
   }
 
-  return <DetailView tabs={tabs} data={data} validator={validator} deleteFunction={deleteFunction} onWrite={onWrite} />
+  return (
+    <DetailView
+      tabs={tabs}
+      data={data}
+      validator={validateProject}
+      validateFields={validateProjectFields}
+      deleteFunction={deleteFunction}
+      onWrite={onWrite}
+    />
+  )
 }
