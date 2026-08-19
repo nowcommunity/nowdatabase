@@ -15,7 +15,7 @@ const validateOccurrenceDetail = (
   editData: EditDataType<OccurrenceDetailsType>,
   fieldName: keyof EditDataType<OccurrenceDetailsType>
 ): ValidationObject => {
-  return validateOccurrence(editData as EditableOccurrenceData, fieldName as keyof EditableOccurrenceData)
+  return validateOccurrence(editData, fieldName as keyof EditableOccurrenceData)
 }
 
 const emptyOccurrence: OccurrenceDetailsType = {

@@ -20,10 +20,7 @@ export const SynonymTab = () => {
   const convertAndCheckNewSynonymTaxonomy = (newSynonym: EditDataType<SpeciesSynonym>) => {
     const errors = []
     for (const field in newSynonym) {
-      const errorObject = validateSynonym(
-        newSynonym as unknown as EditDataType<SpeciesSynonym>,
-        field as unknown as keyof EditDataType<SpeciesSynonym>
-      )
+      const errorObject = validateSynonym(newSynonym, field as unknown as keyof EditDataType<SpeciesSynonym>)
       const { error } = errorObject
       if (error) errors.push(errorObject)
     }

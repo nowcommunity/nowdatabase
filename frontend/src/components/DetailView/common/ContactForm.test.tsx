@@ -38,7 +38,7 @@ const createMockDetailContext = (reference: ReferenceDetailsType): DetailContext
     data: reference,
     mode: readMode,
     setMode,
-    editData: reference as EditDataType<ReferenceDetailsType>,
+    editData: reference,
     setEditData,
     isDirty: false,
     resetEditData,

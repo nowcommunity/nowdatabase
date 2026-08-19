@@ -63,7 +63,7 @@ const TimeUnitTabContent = () => {
           onClick={() =>
             setEditData({
               ...editData,
-              up_bound: { ...(editData.up_bound ?? {}), age: 99 } as TimeUnitDetailsType['up_bound'],
+              up_bound: { ...(editData.up_bound ?? {}), age: 99 },
             })
           }
         >

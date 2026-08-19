@@ -41,7 +41,7 @@ export const LocalityTable = ({ selectorFn }: { selectorFn?: (newObject: Localit
 
     if (validIds.length > 0)
       setFilteredLocalities(localitiesQueryData?.filter(locality => validIds.includes(locality.lid)))
-    else setFilteredLocalities(localitiesQueryData as SimplifiedLocality[])
+    else setFilteredLocalities(localitiesQueryData)
   }, [columnFilters, localitiesQueryData])
 
   const columns = useMemo<MRT_ColumnDef<Locality>[]>(
@@ -87,14 +87,14 @@ export const LocalityTable = ({ selectorFn }: { selectorFn?: (newObject: Localit
         header: 'Dec lat',
         filterVariant: 'range',
         enableColumnFilterModes: false,
-        Cell: ({ cell }) => formatWithMaxThreeDecimals(cell.getValue() as number),
+        Cell: ({ cell }) => formatWithMaxThreeDecimals(cell.getValue()),
       },
       {
         accessorKey: 'dec_long',
         header: 'Dec long',
         filterVariant: 'range',
         enableColumnFilterModes: false,
-        Cell: ({ cell }) => formatWithMaxThreeDecimals(cell.getValue() as number),
+        Cell: ({ cell }) => formatWithMaxThreeDecimals(cell.getValue()),
       },
       {
         accessorKey: 'altitude',
@@ -106,7 +106,7 @@ export const LocalityTable = ({ selectorFn }: { selectorFn?: (newObject: Localit
         header: 'Max age',
         filterVariant: 'range',
         enableColumnFilterModes: false,
-        Cell: ({ cell }) => formatWithMaxThreeDecimals(cell.getValue() as number),
+        Cell: ({ cell }) => formatWithMaxThreeDecimals(cell.getValue()),
       },
       {
         id: 'bfa_max',
@@ -130,7 +130,7 @@ export const LocalityTable = ({ selectorFn }: { selectorFn?: (newObject: Localit
         header: 'Min age',
         filterVariant: 'range',
         enableColumnFilterModes: false,
-        Cell: ({ cell }) => formatWithMaxThreeDecimals(cell.getValue() as number),
+        Cell: ({ cell }) => formatWithMaxThreeDecimals(cell.getValue()),
       },
       {
         id: 'bfa_min',

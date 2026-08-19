@@ -1,6 +1,15 @@
 // Polyfill for React Router's data router in Jest environment
 // See: https://github.com/remix-run/react-router/discussions/9851
 import '@testing-library/jest-dom'
+import { TextDecoder, TextEncoder } from 'util'
+
+if (typeof global.TextEncoder === 'undefined') {
+  global.TextEncoder = TextEncoder
+}
+
+if (typeof global.TextDecoder === 'undefined') {
+  global.TextDecoder = TextDecoder
+}
 
 if (typeof global.Request === 'undefined') {
   global.Request = class Request {
@@ -49,5 +58,5 @@ if (typeof global.fetch === 'undefined') {
 }
 
 if (typeof global.structuredClone === 'undefined') {
-  global.structuredClone = (<T>(value: T) => JSON.parse(JSON.stringify(value)) as T) as typeof structuredClone
+  global.structuredClone = <T>(value: T) => JSON.parse(JSON.stringify(value)) as T
 }

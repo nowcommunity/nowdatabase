@@ -73,7 +73,7 @@ export const UpdateTab = <T, UpdateType extends MRT_RowData & { updates: UpdateL
           authorizer={row.original[`${prefix}_authorizer`] as string}
           coordinator={row.original[`${prefix}_coordinator`] as string}
           updates={row.original.updates}
-          comment={row.original[`${prefix}_comment` as keyof UpdateType] as string}
+          comment={row.original[`${prefix}_comment` as keyof UpdateType]}
           references={row.original[refFieldName]}
         />
       ),

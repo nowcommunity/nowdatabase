@@ -63,7 +63,7 @@ jest.mock('@/components/Reference/Tabs/ReferenceTab', () => ({
                 },
               ],
               ref_journal: undefined,
-            } as unknown as EditDataType<ReferenceDetailsType>)
+            })
           }
         >
           Fill reference
@@ -117,7 +117,7 @@ const renderStagingView = () => {
         data: { references: [], comment: '' },
         mode: modeOptionToMode['staging-new'],
         setMode: jest.fn(),
-        editData: { references: [], comment: '' } as EditDataType<StagingData>,
+        editData: { references: [], comment: '' },
         textField: jest.fn(() => <input aria-label="field" />),
         bigTextField: jest.fn(() => <textarea aria-label="comment" />),
         dropdown: jest.fn(() => <select aria-label="dropdown" />),

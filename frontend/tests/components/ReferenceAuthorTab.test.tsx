@@ -48,32 +48,30 @@ jest.mock('@/components/DetailView/Context/DetailContext', () => ({
 
 const createDetailContextValue = (
   overrides: Partial<DetailContextType<ReferenceDetailsType>> = {}
-): DetailContextType<ReferenceDetailsType> =>
-  ({
-    data: {} as ReferenceDetailsType,
-    mode: modeOptionToMode.edit,
-    setMode: () => {},
-    editData: { rid: 1, ref_authors: [] } as unknown as EditDataType<ReferenceDetailsType>,
-    setEditData: () => {},
-    textField: () => <></>,
-    bigTextField: () => <></>,
-    dropdown: () => <></>,
-    dropdownWithSearch: () => <></>,
-    radioSelection: () => <></>,
-    validator: () => ({ name: '', error: null }),
-    fieldsWithErrors: {},
-    setFieldsWithErrors: () => {},
-    isDirty: false,
-    resetEditData: () => {},
-    ...overrides,
-  }) as DetailContextType<ReferenceDetailsType>
+): DetailContextType<ReferenceDetailsType> => ({
+  data: {} as ReferenceDetailsType,
+  mode: modeOptionToMode.edit,
+  setMode: () => {},
+  editData: { rid: 1, ref_authors: [] },
+  setEditData: () => {},
+  textField: () => <></>,
+  bigTextField: () => <></>,
+  dropdown: () => <></>,
+  dropdownWithSearch: () => <></>,
+  radioSelection: () => <></>,
+  validator: () => ({ name: '', error: null }),
+  fieldsWithErrors: {},
+  setFieldsWithErrors: () => {},
+  isDirty: false,
+  resetEditData: () => {},
+  ...overrides,
+})
 
-const buildAuthor = (overrides: Partial<ReferenceAuthorType> = {}): ReferenceAuthorType =>
-  ({
-    author_surname: 'Cande',
-    author_initials: 'S.C.',
-    ...overrides,
-  }) as ReferenceAuthorType
+const buildAuthor = (overrides: Partial<ReferenceAuthorType> = {}): ReferenceAuthorType => ({
+  author_surname: 'Cande',
+  author_initials: 'S.C.',
+  ...overrides,
+})
 
 describe('AuthorTab', () => {
   it('filters out already-selected authors from the selector list', () => {

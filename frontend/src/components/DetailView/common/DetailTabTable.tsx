@@ -92,8 +92,8 @@ export const applyDefaultSpeciesOrdering = <T extends MRT_RowData>(
 
   return [...rows].sort((leftRow, rightRow) => {
     for (const field of fields) {
-      const left = normalizeSortValue(getNestedValue(leftRow as MRT_RowData, field))
-      const right = normalizeSortValue(getNestedValue(rightRow as MRT_RowData, field))
+      const left = normalizeSortValue(getNestedValue(leftRow, field))
+      const right = normalizeSortValue(getNestedValue(rightRow, field))
 
       const compared = left.localeCompare(right)
       if (compared !== 0) {

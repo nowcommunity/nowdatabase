@@ -128,7 +128,7 @@ describe('ProjectDetails', () => {
     mockUseUsersApi.mockReturnValue({ users: [], isLoading: false, isError: false })
     mockNotify.mockReset()
     mockNavigate.mockReset()
-    window.confirm = jest.fn(() => true) as unknown as typeof window.confirm
+    window.confirm = jest.fn(() => true)
   })
 
   it('deletes the project and navigates back to the list', async () => {

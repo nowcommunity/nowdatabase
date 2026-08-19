@@ -61,7 +61,7 @@ const createContextValue = (overrides: ContextOverrides = {}): TestDetailContext
     data,
     mode: overrides.mode ?? modeOptionToMode.read,
     setMode: jest.fn(),
-    editData: overrides.editData ?? (data as EditDataType<LocalityDetailsType>),
+    editData: overrides.editData ?? data,
     setEditData: overrides.setEditData ?? jest.fn(),
     textField: () => <input aria-label="text-field" readOnly />,
     bigTextField: () => <textarea aria-label="big-text-field" readOnly />,
