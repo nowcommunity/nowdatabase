@@ -1,15 +1,15 @@
 import { CircularProgress } from '@mui/material'
-import { useParams } from 'react-router-dom'
+import { useParams, useSearchParams } from 'react-router-dom'
 import { DetailView, TabType } from '@/components/DetailView/DetailView'
 import { UpdateTab } from '@/components/DetailView/common/UpdateTab'
 import { OccurrenceCoreTab } from './Tabs/OccurrenceCoreTab'
 import { OccurrenceWearTab } from './Tabs/OccurrenceWearTab'
 import { OccurrenceIsotopeTab } from './Tabs/OccurrenceIsotopeTab'
-import { useOccurrenceDetails } from '@/hooks/useOccurrenceDetails'
 import { EditDataType, EditableOccurrenceData, OccurrenceDetailsType } from '@/shared/types'
 import { validateOccurrence } from '@/shared/validators/occurrence'
 import { getErrorMessage, useNotify } from '@/hooks/notification'
 import { ValidationObject } from '@/shared/validators/validator'
+import { useEditOccurrenceMutation, useGetOccurrenceDetailsQuery } from '@/redux/api'
 
 const validateOccurrenceDetail = (
   editData: EditDataType<OccurrenceDetailsType>,
@@ -67,20 +67,49 @@ const emptyOccurrence: OccurrenceDetailsType = {
 }
 
 export const OccurrenceDetails = () => {
-  const { lid, speciesId } = useParams()
-  const parsedLid = lid ? parseInt(lid, 10) : null
-  const parsedSpeciesId = speciesId ? parseInt(speciesId, 10) : null
-  const { occurrence, isLoading, isSaving, isError, saveOccurrence } = useOccurrenceDetails(parsedLid, parsedSpeciesId)
+  const { id, lid, speciesId } = useParams()
+  const [searchParams] = useSearchParams()
+  console.log(searchParams)
+  const isNew = id === 'new'
+  if (isNew) {
+    document.title = 'New locality'
+  }
+  const parsedLid = lid ? parseInt(lid, 10) : -1
+  const parsedSpeciesId = speciesId ? parseInt(speciesId, 10) : -1
+  const {
+    data: occurrenceData,
+    isLoading,
+    isError,
+  } = useGetOccurrenceDetailsQuery(
+    { lid: parsedLid, speciesId: parsedSpeciesId },
+    {
+      skip: isNew,
+    }
+  )
   const { notify } = useNotify()
+  const [editOccurrenceRequest, { isLoading: mutationLoading }] = useEditOccurrenceMutation()
+
+  const lidFromSearchParams = searchParams.get('lid')
+  const locNameFromSearchParams = searchParams.get('loc_name')
 
   if (isError) return <div>Error loading occurrence data</div>
-  if (isLoading || isSaving || !occurrence) return <CircularProgress />
+  if (isLoading || (!occurrenceData && !isNew) || mutationLoading) return <CircularProgress />
 
-  document.title = `Occurrence - ${occurrence.lid}/${occurrence.species_id}`
+  const initialOccurrence = emptyOccurrence
+
+  if (isNew) {
+    initialOccurrence.lid = parseInt(lidFromSearchParams!, 10)
+    initialOccurrence.loc_name = locNameFromSearchParams!
+  }
+
+  if (occurrenceData) {
+    document.title = `Occurrence - ${occurrenceData.lid}/${occurrenceData.species_id}`
+  }
 
   const onWrite = async (editData: EditDataType<OccurrenceDetailsType>) => {
     try {
-      await saveOccurrence(editData)
+      console.log(editData)
+      await editOccurrenceRequest(editData).unwrap()
       notify('Occurrence entry finalized successfully.')
     } catch (error) {
       notify(getErrorMessage(error, 'Could not finalize occurrence entry.'), 'error')
@@ -101,7 +130,8 @@ export const OccurrenceDetails = () => {
   return (
     <DetailView<OccurrenceDetailsType>
       tabs={tabs}
-      data={occurrence ?? emptyOccurrence}
+      data={occurrenceData ?? initialOccurrence}
+      isNew={isNew}
       validator={validateOccurrenceDetail}
       onWrite={onWrite}
       hasStagingMode

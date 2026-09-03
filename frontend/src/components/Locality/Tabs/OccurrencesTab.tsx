@@ -3,7 +3,7 @@ import { EditableTable } from '@/components/DetailView/common/EditableTable'
 import { EditingModal } from '@/components/DetailView/common/EditingModal'
 import { Grouped } from '@/components/DetailView/common/tabLayoutHelpers'
 import { useDetailContext } from '@/components/DetailView/Context/DetailContext'
-import { Box, TextField } from '@mui/material'
+import { Box, Button, TextField } from '@mui/material'
 import { MRT_ColumnDef, MRT_Row, MRT_RowData, MRT_TableInstance } from 'material-react-table'
 import { useForm } from 'react-hook-form'
 import { calculateNormalizedMesowearScore } from '@/shared/utils/mesowear'
@@ -248,6 +248,15 @@ export const OccurrencesTab = () => {
 
   return (
     <Grouped title={occurrenceLabels.informationSectionTitle}>
+      <Button
+        disabled={mode.new}
+        variant="contained"
+        onClick={() =>
+          window.open(`${window.location.origin}/occurrence/new?lid=${data.lid}&loc_name=${data.loc_name}`)
+        }
+      >
+        Create new occurrence
+      </Button>
       {!mode.read && editingModal}
       <EditableTable<Editable<LocalitySpecies>, LocalityDetailsType>
         columns={columns}
