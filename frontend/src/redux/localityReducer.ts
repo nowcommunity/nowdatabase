@@ -1,6 +1,6 @@
 import { api } from './api'
 import { addLocality } from '@/redux/userReducer'
-import { EditDataType, EditMetaData, Locality, LocalityDetailsType } from '@/shared/types'
+import { EditDataType, EditMetaData, Locality, LocalityDetailsType, LocalitySpeciesDetailsType } from '@/shared/types'
 
 const sanitizeLocalityProjects = (locality?: EditDataType<LocalityDetailsType>) => {
   if (!locality || !locality.now_plr) return [] as LocalityDetailsType['now_plr']
@@ -22,6 +22,9 @@ const localitiesApi = api.injectEndpoints({
         url: `/locality/${id}`,
       }),
       providesTags: result => (result ? [{ type: 'locality', id: result.lid }] : []),
+    }),
+    getLocalityOccurrences: builder.query<LocalitySpeciesDetailsType[], string>({
+      query: lid => `/locality/${lid}/occurrences`,
     }),
     editLocality: builder.mutation<{ id: number }, EditDataType<LocalityDetailsType> & EditMetaData>({
       query: locality => ({
@@ -68,6 +71,7 @@ const localitiesApi = api.injectEndpoints({
 export const {
   useGetAllLocalitiesQuery,
   useGetLocalityDetailsQuery,
+  useLazyGetLocalityOccurrencesQuery,
   useEditLocalityMutation,
   useDeleteLocalityMutation,
 } = localitiesApi
