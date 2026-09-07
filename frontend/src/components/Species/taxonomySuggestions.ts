@@ -1,6 +1,6 @@
 import type { Species } from '@/shared/types'
 
-export type TaxonomySuggestionField =
+export type TaxonomySuggestionFieldName =
   | 'subclass_or_superorder_name'
   | 'order_name'
   | 'suborder_or_superfamily_name'
@@ -11,7 +11,7 @@ export type TaxonomySuggestionField =
 
 export const buildTaxonomySuggestionOptions = (
   speciesData: Species[] | undefined,
-  field: TaxonomySuggestionField
+  field: TaxonomySuggestionFieldName
 ): string[] => {
   if (!speciesData) return []
 

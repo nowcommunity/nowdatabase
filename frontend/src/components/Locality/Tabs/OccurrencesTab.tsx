@@ -1,22 +1,23 @@
-import { Editable, LocalityDetailsType, LocalitySpecies } from '@/shared/types'
+import { applyDefaultSpeciesOrdering, hasActiveSortingInSearch } from '@/components/DetailView/common/DetailTabTable'
 import { EditableTable } from '@/components/DetailView/common/EditableTable'
-import { EditingModal } from '@/components/DetailView/common/EditingModal'
+import { EntryUpdateHistory } from '@/components/DetailView/common/FieldUpdateHistory'
 import { Grouped } from '@/components/DetailView/common/tabLayoutHelpers'
 import { useDetailContext } from '@/components/DetailView/Context/DetailContext'
-import { Box, TextField } from '@mui/material'
-import { MRT_ColumnDef, MRT_Row, MRT_RowData, MRT_TableInstance } from 'material-react-table'
-import { useForm } from 'react-hook-form'
-import { calculateNormalizedMesowearScore } from '@/shared/utils/mesowear'
-import { applyDefaultSpeciesOrdering, hasActiveSortingInSearch } from '@/components/DetailView/common/DetailTabTable'
-import { useLocation } from 'react-router-dom'
-import { useMemo } from 'react'
-import { occurrenceLabels } from '@/constants/occurrenceLabels'
 import {
   exportOccurrenceMapKml,
   exportOccurrenceMapSvg,
   getUniqueLocalityOccurrenceMapExportLocalities,
 } from '@/components/Species/localitySpeciesMapExport'
-import { EntryUpdateHistory } from '@/components/DetailView/common/FieldUpdateHistory'
+import { occurrenceLabels } from '@/constants/occurrenceLabels'
+import { useLazyGetLocalityOccurrencesQuery } from '@/redux/localityReducer'
+import { Editable, LocalityDetailsType, LocalitySpecies, RowState } from '@/shared/types'
+import { calculateNormalizedMesowearScore } from '@/shared/utils/mesowear'
+import RefreshIcon from '@mui/icons-material/Refresh'
+import { Box, Button } from '@mui/material'
+import { MRT_ColumnDef, MRT_Row, MRT_RowData, MRT_TableInstance } from 'material-react-table'
+import { useMemo } from 'react'
+import { useForm } from 'react-hook-form'
+import { useLocation } from 'react-router-dom'
 
 const hasMesowearScoreInputs = (row: LocalitySpecies) => {
   return (
@@ -30,12 +31,13 @@ const hasMesowearScoreInputs = (row: LocalitySpecies) => {
 }
 
 export const OccurrencesTab = () => {
-  const { mode, data, editData } = useDetailContext<LocalityDetailsType>()
+  const { mode, data, editData, setEditData } = useDetailContext<LocalityDetailsType>()
   const location = useLocation()
   const {
     register,
     formState: { errors },
   } = useForm()
+  const [refreshOccurrences, { isFetching }] = useLazyGetLocalityOccurrencesQuery()
 
   const sortedOccurrenceRows = useMemo(() => {
     const sourceRows = (mode.read ? data.now_ls : editData.now_ls) as unknown as Editable<LocalitySpecies>[]
@@ -215,12 +217,6 @@ export const OccurrencesTab = () => {
     },
   ]
 
-  // eslint-disable-next-line @typescript-eslint/require-await
-  const onSave = async () => {
-    // TODO: Saving logic here (add Occurrence to editData)
-    return Object.keys(errors).length === 0
-  }
-
   const getExportLocalities = <T extends MRT_RowData>(table: MRT_TableInstance<T>) => {
     const rows = table.getPrePaginationRowModel().rows.map(row => row.original as unknown as LocalitySpecies)
     return getUniqueLocalityOccurrenceMapExportLocalities(data, rows)
@@ -234,21 +230,48 @@ export const OccurrencesTab = () => {
     await exportOccurrenceMapSvg(table, 'locality-occurrences-map', getExportLocalities)
   }
 
-  const editingModal = (
-    <EditingModal buttonText={occurrenceLabels.addNewButton} onSave={onSave}>
-      <Box sx={{ display: 'flex', flexDirection: 'column', gap: '1em' }}>
-        <TextField {...register('com_species.order_name', { required: true })} label="Order" />
-        <TextField {...register('com_species.family_name', { required: true })} label="Family" />
-        <TextField {...register('com_species.genus_name', { required: true })} label="Genus" />
-        <TextField {...register('com_species.species_name', { required: true })} label="Species" />
-        <TextField {...register('com_species.unique_identifier', { required: true })} label="Unique Identifier" />
-      </Box>
-    </EditingModal>
-  )
+  const handleRefresh = async () => {
+    // Since Occurrences are created in a new tab when clicking the "Create new Occurrence" button
+    // in this tab, the data shown in this tab is not updated automatically by redux cache invalidation
+    // once the new occurrence is created. Thus refresh button.
+    const result = await refreshOccurrences(String(editData.lid)).unwrap()
+
+    const filteredResult = result.filter(row => {
+      const localRow = editData.now_ls.find(ls => ls.species_id == row.species_id)
+      return localRow?.rowState !== 'removed'
+    })
+
+    const refreshedRows = filteredResult.map(row => ({
+      ...row,
+      rowState: 'clean' as RowState,
+    }))
+
+    const removedRows = editData.now_ls.filter(row => row.rowState! === 'removed')
+
+    setEditData({
+      ...editData,
+      now_ls: [...refreshedRows, ...removedRows],
+    })
+  }
 
   return (
     <Grouped title={occurrenceLabels.informationSectionTitle}>
-      {!mode.read && editingModal}
+      {!mode.read && (
+        <Button
+          disabled={mode.new}
+          variant="contained"
+          onClick={() =>
+            window.open(`${window.location.origin}/occurrence/new?lid=${data.lid}&loc_name=${data.loc_name}`)
+          }
+        >
+          Create new occurrence
+        </Button>
+      )}
+      <Button onClick={() => void handleRefresh()} disabled={isFetching}>
+        <RefreshIcon></RefreshIcon>
+        Refresh Occurrences
+      </Button>
+
       <EditableTable<Editable<LocalitySpecies>, LocalityDetailsType>
         columns={columns}
         field="now_ls"
