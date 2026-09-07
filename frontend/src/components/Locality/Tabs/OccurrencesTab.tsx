@@ -231,6 +231,9 @@ export const OccurrencesTab = () => {
   }
 
   const handleRefresh = async () => {
+    // Since Occurrences are created in a new tab when clicking the "Create new Occurrence" button
+    // in this tab, the data shown in this tab is not updated automatically by redux cache invalidation
+    // once the new occurrence is created. Thus refresh button.
     const result = await refreshOccurrences(String(editData.lid)).unwrap()
 
     const filteredResult = result.filter(row => {
