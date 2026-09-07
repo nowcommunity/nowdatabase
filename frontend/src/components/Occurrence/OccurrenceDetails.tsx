@@ -1,15 +1,22 @@
 import { CircularProgress } from '@mui/material'
-import { useParams, useSearchParams } from 'react-router-dom'
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { DetailView, TabType } from '@/components/DetailView/DetailView'
 import { UpdateTab } from '@/components/DetailView/common/UpdateTab'
 import { OccurrenceCoreTab } from './Tabs/OccurrenceCoreTab'
 import { OccurrenceWearTab } from './Tabs/OccurrenceWearTab'
 import { OccurrenceIsotopeTab } from './Tabs/OccurrenceIsotopeTab'
-import { EditDataType, EditableOccurrenceData, OccurrenceDetailsType } from '@/shared/types'
+import {
+  EditDataType,
+  EditableOccurrenceData,
+  EditMetaData,
+  LocalityDetailsType,
+  OccurrenceDetailsType,
+} from '@/shared/types'
 import { validateOccurrence } from '@/shared/validators/occurrence'
 import { getErrorMessage, useNotify } from '@/hooks/notification'
 import { ValidationObject } from '@/shared/validators/validator'
-import { useEditOccurrenceMutation, useGetOccurrenceDetailsQuery } from '@/redux/api'
+import { useGetOccurrenceDetailsQuery } from '@/redux/api'
+import { useEditLocalityMutation, useGetLocalityDetailsQuery } from '@/redux/localityReducer'
 
 const validateOccurrenceDetail = (
   editData: EditDataType<OccurrenceDetailsType>,
@@ -66,10 +73,41 @@ const emptyOccurrence: OccurrenceDetailsType = {
   now_oau: [],
 }
 
+const occurrenceFields: Array<keyof EditableOccurrenceData> = [
+  'nis',
+  'pct',
+  'quad',
+  'mni',
+  'qua',
+  'id_status',
+  'orig_entry',
+  'source_name',
+  'body_mass',
+  'mesowear',
+  'mw_or_high',
+  'mw_or_low',
+  'mw_cs_sharp',
+  'mw_cs_round',
+  'mw_cs_blunt',
+  'mw_scale_min',
+  'mw_scale_max',
+  'mw_value',
+  'microwear',
+  'dc13_mean',
+  'dc13_n',
+  'dc13_max',
+  'dc13_min',
+  'dc13_stdev',
+  'do18_mean',
+  'do18_n',
+  'do18_max',
+  'do18_min',
+  'do18_stdev',
+]
+
 export const OccurrenceDetails = () => {
   const { id, lid, speciesId } = useParams()
   const [searchParams] = useSearchParams()
-  console.log(searchParams)
   const isNew = id === 'new'
   if (isNew) {
     document.title = 'New locality'
@@ -86,11 +124,15 @@ export const OccurrenceDetails = () => {
       skip: isNew,
     }
   )
+
   const { notify } = useNotify()
-  const [editOccurrenceRequest, { isLoading: mutationLoading }] = useEditOccurrenceMutation()
+  const navigate = useNavigate()
+  const [editLocalityRequest, { isLoading: mutationLoading }] = useEditLocalityMutation()
 
   const lidFromSearchParams = searchParams.get('lid')
   const locNameFromSearchParams = searchParams.get('loc_name')
+  const localityId = lidFromSearchParams ?? lid ?? ''
+  const { data: localityData } = useGetLocalityDetailsQuery(localityId)
 
   if (isError) return <div>Error loading occurrence data</div>
   if (isLoading || (!occurrenceData && !isNew) || mutationLoading) return <CircularProgress />
@@ -98,19 +140,58 @@ export const OccurrenceDetails = () => {
   const initialOccurrence = emptyOccurrence
 
   if (isNew) {
-    initialOccurrence.lid = parseInt(lidFromSearchParams!, 10)
-    initialOccurrence.loc_name = locNameFromSearchParams!
+    initialOccurrence.lid = parseInt(localityId, 10)
+    initialOccurrence.loc_name = locNameFromSearchParams ?? ''
   }
 
   if (occurrenceData) {
     document.title = `Occurrence - ${occurrenceData.lid}/${occurrenceData.species_id}`
   }
 
-  const onWrite = async (editData: EditDataType<OccurrenceDetailsType>) => {
+  const onWrite = async (editData: EditDataType<OccurrenceDetailsType> & EditMetaData) => {
     try {
-      console.log(editData)
-      await editOccurrenceRequest(editData).unwrap()
+      if (!localityData) throw new Error('Could not load the linked locality.')
+
+      const occurrenceSpeciesId = isNew ? editData.species_id : parsedSpeciesId
+      const existingOccurrence = localityData.now_ls.find(row => row.species_id === occurrenceSpeciesId)
+      const occurrenceData = occurrenceFields.reduce<Record<string, unknown>>((data, field) => {
+        if (field in editData) data[field] = editData[field]
+        return data
+      }, {})
+      const occurrence = {
+        ...(existingOccurrence ?? {}),
+        lid: localityData.lid,
+        species_id: occurrenceSpeciesId ?? existingOccurrence?.species_id,
+        ...occurrenceData,
+        ...(isNew
+          ? {
+              rowState: 'new' as const,
+              com_species: {
+                com_taxa_synonym: [],
+                now_sau: [],
+                species_id: editData.species_id,
+                family_name: editData.family_name,
+                genus_name: editData.genus_name,
+                species_name: editData.species_name,
+                unique_identifier: editData.unique_identifier,
+              },
+            }
+          : {}),
+      }
+
+      const nowLs = (
+        isNew
+          ? [...localityData.now_ls, occurrence]
+          : localityData.now_ls.map(row => (row.species_id === occurrenceSpeciesId ? occurrence : row))
+      ) as EditDataType<LocalityDetailsType>['now_ls']
+      await editLocalityRequest({
+        ...localityData,
+        now_ls: nowLs,
+        comment: editData.comment,
+        references: editData.references ?? [],
+      }).unwrap()
       notify('Occurrence entry finalized successfully.')
+      setTimeout(() => navigate(`/occurrence/${editData.lid}/${editData.species_id}`), 15)
     } catch (error) {
       notify(getErrorMessage(error, 'Could not finalize occurrence entry.'), 'error')
       throw error

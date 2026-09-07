@@ -248,16 +248,17 @@ export const OccurrencesTab = () => {
 
   return (
     <Grouped title={occurrenceLabels.informationSectionTitle}>
-      <Button
-        disabled={mode.new}
-        variant="contained"
-        onClick={() =>
-          window.open(`${window.location.origin}/occurrence/new?lid=${data.lid}&loc_name=${data.loc_name}`)
-        }
-      >
-        Create new occurrence
-      </Button>
-      {!mode.read && editingModal}
+      {!mode.read && (
+        <Button
+          disabled={mode.new}
+          variant="contained"
+          onClick={() =>
+            window.open(`${window.location.origin}/occurrence/new?lid=${data.lid}&loc_name=${data.loc_name}`)
+          }
+        >
+          Create new occurrence
+        </Button>
+      )}
       <EditableTable<Editable<LocalitySpecies>, LocalityDetailsType>
         columns={columns}
         field="now_ls"
