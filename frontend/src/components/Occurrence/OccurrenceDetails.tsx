@@ -109,9 +109,7 @@ export const OccurrenceDetails = () => {
   const { id, lid, speciesId } = useParams()
   const [searchParams] = useSearchParams()
   const isNew = id === 'new'
-  if (isNew) {
-    document.title = 'New locality'
-  }
+
   const parsedLid = lid ? parseInt(lid, 10) : -1
   const parsedSpeciesId = speciesId ? parseInt(speciesId, 10) : -1
   const {
@@ -129,8 +127,10 @@ export const OccurrenceDetails = () => {
   const navigate = useNavigate()
   const [editLocalityRequest, { isLoading: mutationLoading }] = useEditLocalityMutation()
 
+  // these two should exist if the occurrence is created through a locality's Occurrences tab
   const lidFromSearchParams = searchParams.get('lid')
   const locNameFromSearchParams = searchParams.get('loc_name')
+
   const localityId = lidFromSearchParams ?? lid ?? ''
   const { data: localityData } = useGetLocalityDetailsQuery(localityId)
 
@@ -142,6 +142,7 @@ export const OccurrenceDetails = () => {
   if (isNew) {
     initialOccurrence.lid = parseInt(localityId, 10)
     initialOccurrence.loc_name = locNameFromSearchParams ?? ''
+    document.title = `New Occurrence`
   }
 
   if (occurrenceData) {

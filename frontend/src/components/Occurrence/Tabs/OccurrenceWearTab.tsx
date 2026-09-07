@@ -13,8 +13,6 @@ export const OccurrenceWearTab = () => {
   )
   const normalizedScoreText = normalizedScore === null ? '-' : normalizedScore.toFixed(2)
 
-  console.log(editData)
-
   return (
     <HalfFrames>
       {[
