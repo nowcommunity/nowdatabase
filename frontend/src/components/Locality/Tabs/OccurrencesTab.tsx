@@ -1,23 +1,23 @@
-import { Editable, LocalityDetailsType, LocalitySpecies, RowState } from '@/shared/types'
+import { applyDefaultSpeciesOrdering, hasActiveSortingInSearch } from '@/components/DetailView/common/DetailTabTable'
 import { EditableTable } from '@/components/DetailView/common/EditableTable'
-import { EditingModal } from '@/components/DetailView/common/EditingModal'
+import { EntryUpdateHistory } from '@/components/DetailView/common/FieldUpdateHistory'
 import { Grouped } from '@/components/DetailView/common/tabLayoutHelpers'
 import { useDetailContext } from '@/components/DetailView/Context/DetailContext'
-import { Box, Button, TextField } from '@mui/material'
-import { MRT_ColumnDef, MRT_Row, MRT_RowData, MRT_TableInstance } from 'material-react-table'
-import { useForm } from 'react-hook-form'
-import { calculateNormalizedMesowearScore } from '@/shared/utils/mesowear'
-import { applyDefaultSpeciesOrdering, hasActiveSortingInSearch } from '@/components/DetailView/common/DetailTabTable'
-import { useLocation } from 'react-router-dom'
-import { useMemo } from 'react'
-import { occurrenceLabels } from '@/constants/occurrenceLabels'
 import {
   exportOccurrenceMapKml,
   exportOccurrenceMapSvg,
   getUniqueLocalityOccurrenceMapExportLocalities,
 } from '@/components/Species/localitySpeciesMapExport'
-import { EntryUpdateHistory } from '@/components/DetailView/common/FieldUpdateHistory'
+import { occurrenceLabels } from '@/constants/occurrenceLabels'
 import { useLazyGetLocalityOccurrencesQuery } from '@/redux/localityReducer'
+import { Editable, LocalityDetailsType, LocalitySpecies, RowState } from '@/shared/types'
+import { calculateNormalizedMesowearScore } from '@/shared/utils/mesowear'
+import RefreshIcon from '@mui/icons-material/Refresh'
+import { Box, Button } from '@mui/material'
+import { MRT_ColumnDef, MRT_Row, MRT_RowData, MRT_TableInstance } from 'material-react-table'
+import { useMemo } from 'react'
+import { useForm } from 'react-hook-form'
+import { useLocation } from 'react-router-dom'
 
 const hasMesowearScoreInputs = (row: LocalitySpecies) => {
   return (
@@ -256,9 +256,6 @@ export const OccurrencesTab = () => {
 
   return (
     <Grouped title={occurrenceLabels.informationSectionTitle}>
-      <Button onClick={() => void handleRefresh()} disabled={isFetching}>
-        Refresh Occurrences
-      </Button>
       {!mode.read && (
         <Button
           disabled={mode.new}
@@ -270,6 +267,11 @@ export const OccurrencesTab = () => {
           Create new occurrence
         </Button>
       )}
+      <Button onClick={() => void handleRefresh()} disabled={isFetching}>
+        <RefreshIcon></RefreshIcon>
+        Refresh Occurrences
+      </Button>
+
       <EditableTable<Editable<LocalitySpecies>, LocalityDetailsType>
         columns={columns}
         field="now_ls"
