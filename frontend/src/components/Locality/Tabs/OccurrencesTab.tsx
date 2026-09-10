@@ -16,7 +16,6 @@ import RefreshIcon from '@mui/icons-material/Refresh'
 import { Box, Button } from '@mui/material'
 import { MRT_ColumnDef, MRT_Row, MRT_RowData, MRT_TableInstance } from 'material-react-table'
 import { useMemo } from 'react'
-import { useForm } from 'react-hook-form'
 import { useLocation } from 'react-router-dom'
 
 const hasMesowearScoreInputs = (row: LocalitySpecies) => {
@@ -32,12 +31,8 @@ const hasMesowearScoreInputs = (row: LocalitySpecies) => {
 
 export const OccurrencesTab = () => {
   const { mode, data, editData, setEditData } = useDetailContext<LocalityDetailsType>()
-  const location = useLocation()
-  const {
-    register,
-    formState: { errors },
-  } = useForm()
   const [refreshOccurrences, { isFetching }] = useLazyGetLocalityOccurrencesQuery()
+  const location = useLocation()
 
   const sortedOccurrenceRows = useMemo(() => {
     const sourceRows = (mode.read ? data.now_ls : editData.now_ls) as unknown as Editable<LocalitySpecies>[]
