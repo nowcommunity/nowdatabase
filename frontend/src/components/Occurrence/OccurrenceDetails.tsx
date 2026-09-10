@@ -121,7 +121,7 @@ export const OccurrenceDetails = () => {
 
   const {
     data: occurrenceData,
-    isLoading,
+    isLoading: occurrenceDataLoading,
     isError: occurrenceQueryError,
   } = useGetOccurrenceDetailsQuery(
     { lid: parsedLid, speciesId: parsedSpeciesId },
@@ -149,7 +149,7 @@ export const OccurrenceDetails = () => {
   }
   if (occurrenceQueryError) return <div>Error loading occurrence data</div>
   if (localityQueryError) return <div>Error loading locality data</div>
-  if (isLoading || mutationLoading || localityDataLoading) return <CircularProgress />
+  if (occurrenceDataLoading || localityDataLoading || mutationLoading) return <CircularProgress />
 
   const initialOccurrence = emptyOccurrence
 
@@ -214,7 +214,7 @@ export const OccurrenceDetails = () => {
   }
 
   const tabs: TabType[] = [
-    { title: 'Occurrence', content: <OccurrenceCoreTab /> },
+    { title: 'Occurrence', content: <OccurrenceCoreTab existingOccurrences={localityData!.now_ls} /> },
     { title: 'Wear', content: <OccurrenceWearTab /> },
     { title: 'Isotopes', content: <OccurrenceIsotopeTab /> },
     {

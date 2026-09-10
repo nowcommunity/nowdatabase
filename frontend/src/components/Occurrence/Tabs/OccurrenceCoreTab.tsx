@@ -1,6 +1,6 @@
 import { useDetailContext } from '@/components/DetailView/Context/DetailContext'
 import { ArrayFrame, HalfFrames } from '@/components/DetailView/common/tabLayoutHelpers'
-import { EditDataType, LocalityDetailsType, OccurrenceDetailsType, Species, SpeciesDetailsType } from '@/shared/types'
+import { LocalitySpeciesDetailsType, OccurrenceDetailsType, Species } from '@/shared/types'
 import { Link } from 'react-router-dom'
 import { idStatusOptions, quantityOptions } from '../constants'
 import { useGetAllSpeciesQuery } from '@/redux/speciesReducer'
@@ -43,9 +43,11 @@ const speciesColumns: MRT_ColumnDef<Species>[] = [
     header: 'Taxon status',
   },
 ]
-export const OccurrenceCoreTab = () => {
+export const OccurrenceCoreTab = ({ existingOccurrences }: { existingOccurrences: LocalitySpeciesDetailsType[] }) => {
   const { data: speciesQueryData, isError } = useGetAllSpeciesQuery()
   const { data, editData, setEditData, mode, textField, dropdown } = useDetailContext<OccurrenceDetailsType>()
+
+  const existingOccurrenceSpeciesIds = existingOccurrences.map(occurrence => occurrence.species_id)
 
   return (
     <>
@@ -67,7 +69,9 @@ export const OccurrenceCoreTab = () => {
                     <SelectingTable
                       key={'selecting-table'}
                       buttonText="Select Species"
-                      data={speciesQueryData}
+                      data={speciesQueryData?.filter(
+                        species => !existingOccurrenceSpeciesIds.includes(species.species_id)
+                      )}
                       title="Species"
                       isError={isError}
                       columns={speciesColumns}
