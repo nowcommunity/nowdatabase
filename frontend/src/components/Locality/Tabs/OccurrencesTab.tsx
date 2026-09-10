@@ -256,21 +256,25 @@ export const OccurrencesTab = () => {
 
   return (
     <Grouped title={occurrenceLabels.informationSectionTitle}>
-      {!mode.read && (
-        <Button
-          disabled={mode.new}
-          variant="contained"
-          onClick={() =>
-            window.open(`${window.location.origin}/occurrence/new?lid=${data.lid}&loc_name=${data.loc_name}`)
-          }
-        >
-          Create new occurrence
+      <Box>
+        {!mode.read && (
+          <Button
+            id="create-occurrence-button"
+            disabled={mode.new}
+            variant="contained"
+            onClick={() =>
+              window.open(`${window.location.origin}/occurrence/new?lid=${data.lid}&loc_name=${data.loc_name}`)
+            }
+          >
+            Create new occurrence
+          </Button>
+        )}
+        <Button id="refresh-occurrences-button" onClick={() => void handleRefresh()} disabled={isFetching}>
+          <RefreshIcon></RefreshIcon>
+          Refresh Occurrences
         </Button>
-      )}
-      <Button onClick={() => void handleRefresh()} disabled={isFetching}>
-        <RefreshIcon></RefreshIcon>
-        Refresh Occurrences
-      </Button>
+        {mode.new && <p>Creating new occurrences is only possible after the locality is created.</p>}
+      </Box>
 
       <EditableTable<Editable<LocalitySpecies>, LocalityDetailsType>
         columns={columns}
