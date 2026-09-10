@@ -10,8 +10,13 @@ type OccurrenceRouteParams = {
 }
 
 export const getOccurrenceDetail = async (req: Request<OccurrenceRouteParams>, res: Response) => {
-  const { lid, speciesId } = parseOccurrenceRouteParams(req.params.lid, req.params.speciesId)
-  const occurrence = await getOccurrenceByCompositeKey(lid, speciesId, req.user)
+  let occurrence
+  try {
+    const { lid, speciesId } = parseOccurrenceRouteParams(req.params.lid, req.params.speciesId)
+    occurrence = await getOccurrenceByCompositeKey(lid, speciesId, req.user)
+  } catch (e) {
+    return res.status(400).send({ message: 'Unknown error' })
+  }
 
   if (!occurrence) {
     return res.status(404).json({ message: 'Occurrence not found' })

@@ -112,30 +112,44 @@ export const OccurrenceDetails = () => {
 
   const parsedLid = lid ? parseInt(lid, 10) : -1
   const parsedSpeciesId = speciesId ? parseInt(speciesId, 10) : -1
-  const {
-    data: occurrenceData,
-    isLoading,
-    isError,
-  } = useGetOccurrenceDetailsQuery(
-    { lid: parsedLid, speciesId: parsedSpeciesId },
-    {
-      skip: isNew,
-    }
-  )
-
-  const { notify } = useNotify()
-  const navigate = useNavigate()
-  const [editLocalityRequest, { isLoading: mutationLoading }] = useEditLocalityMutation()
 
   // these two should exist if the occurrence is created through a locality's Occurrences tab
   const lidFromSearchParams = searchParams.get('lid')
   const locNameFromSearchParams = searchParams.get('loc_name')
 
   const localityId = lidFromSearchParams ?? lid ?? ''
-  const { data: localityData } = useGetLocalityDetailsQuery(localityId)
 
-  if (isError) return <div>Error loading occurrence data</div>
-  if (isLoading || (!occurrenceData && !isNew) || mutationLoading) return <CircularProgress />
+  const {
+    data: occurrenceData,
+    isLoading,
+    isError: occurrenceQueryError,
+  } = useGetOccurrenceDetailsQuery(
+    { lid: parsedLid, speciesId: parsedSpeciesId },
+    {
+      skip: isNew || Number.isNaN(parsedLid) || Number.isNaN(parsedSpeciesId),
+    }
+  )
+
+  const {
+    data: localityData,
+    isLoading: localityDataLoading,
+    isError: localityQueryError,
+  } = useGetLocalityDetailsQuery(localityId)
+
+  const [editLocalityRequest, { isLoading: mutationLoading }] = useEditLocalityMutation()
+
+  const { notify } = useNotify()
+  const navigate = useNavigate()
+
+  if (isNew && (!lidFromSearchParams || !locNameFromSearchParams)) {
+    return <div>Missing search parameters for new occurrence</div>
+  }
+  if (isNew && (lid || speciesId)) {
+    return <div>Error loading data</div>
+  }
+  if (occurrenceQueryError) return <div>Error loading occurrence data</div>
+  if (localityQueryError) return <div>Error loading locality data</div>
+  if (isLoading || mutationLoading || localityDataLoading) return <CircularProgress />
 
   const initialOccurrence = emptyOccurrence
 
