@@ -94,6 +94,7 @@ export const OccurrenceCoreTab = ({ existingOccurrences }: { existingOccurrences
               ['Family', editData.family_name],
               ['Genus', editData.genus_name],
               ['Species', editData.species_name],
+              ['Unique Identifier', editData.unique_identifier],
               ['ID status', dropdown('id_status', idStatusOptions, 'ID status')],
               ['Additional Information', textField('orig_entry', { type: 'text' })],
               ['Source name', textField('source_name', { type: 'text' })],
