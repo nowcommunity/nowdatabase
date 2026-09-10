@@ -254,6 +254,13 @@ export const OccurrencesTab = () => {
     })
   }
 
+  let infoText
+  if (mode.new) infoText = 'Creating new occurrences is only possible after the locality is created.'
+  else if (!mode.read) {
+    infoText =
+      'Clicking the button opens a new tab. After the occurrence has been created successfully, click the refresh button to update this table.'
+  }
+
   return (
     <Grouped title={occurrenceLabels.informationSectionTitle}>
       <Box>
@@ -273,7 +280,7 @@ export const OccurrencesTab = () => {
           <RefreshIcon></RefreshIcon>
           Refresh Occurrences
         </Button>
-        {mode.new && <p>Creating new occurrences is only possible after the locality is created.</p>}
+        {infoText && <p>{infoText}</p>}
       </Box>
 
       <EditableTable<Editable<LocalitySpecies>, LocalityDetailsType>
