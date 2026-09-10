@@ -8,7 +8,7 @@ import {
 } from '@reduxjs/toolkit/query/react'
 import { BACKEND_URL } from '../util/config'
 import type { RootState } from './store'
-import { EditableOccurrenceData, OccurrenceDetailsType } from '@/shared/types'
+import { EditDataType, OccurrenceDetailsType } from '@/shared/types'
 
 type RefreshTokenResult = {
   data?: { token?: string }
@@ -116,16 +116,13 @@ const occurrenceApi = api.injectEndpoints({
       }),
       providesTags: result => (result ? [{ type: 'occurrence', id: `${result.lid}-${result.species_id}` }] : []),
     }),
-    editOccurrence: builder.mutation<
-      OccurrenceDetailsType,
-      { lid: number; speciesId: number; occurrence: EditableOccurrenceData }
-    >({
-      query: ({ lid, speciesId, occurrence }) => ({
-        url: `/occurrence/${lid}/${speciesId}`,
+    editOccurrence: builder.mutation<OccurrenceDetailsType, EditDataType<OccurrenceDetailsType>>({
+      query: occurrence => ({
+        url: `/occurrence/${occurrence.lid}/${occurrence.species_id}`,
         method: 'PUT',
         body: { occurrence },
       }),
-      invalidatesTags: (_result, _error, { lid, speciesId }) => [{ type: 'occurrence', id: `${lid}-${speciesId}` }],
+      invalidatesTags: (_result, _error, { lid, species_id }) => [{ type: 'occurrence', id: `${lid}-${species_id}` }],
     }),
   }),
 })

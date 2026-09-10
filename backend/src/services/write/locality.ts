@@ -82,6 +82,11 @@ export const writeLocality = async (
       localitySpecies.species_id = species_id as number
     }
 
+    for (const localitySpecies of locality.now_ls) {
+      if (localitySpecies.rowState === 'new' || localitySpecies.rowState === 'removed') continue
+      await writeHandler.updateObject('now_ls', localitySpecies, ['lid', 'species_id'])
+    }
+
     await writeHandler.applyListChanges('now_ls', locality.now_ls, ['lid', 'species_id'])
     await writeHandler.applyListChanges('now_mus', locality.now_mus, ['lid', 'museum'])
     await writeHandler.applyListChanges('now_ss', locality.now_ss, ['lid', 'sed_struct'])

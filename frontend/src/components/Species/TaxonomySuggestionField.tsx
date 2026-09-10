@@ -5,7 +5,7 @@ import { useDetailContext } from '@/components/DetailView/Context/DetailContext'
 import { checkFieldErrors } from '@/components/DetailView/common/checkFieldErrors'
 import { DataValue } from '@/components/DetailView/common/tabLayoutHelpers'
 import type { EditDataType, SpeciesDetailsType } from '@/shared/types'
-import type { TaxonomySuggestionField as TaxonomySuggestionFieldName } from './taxonomySuggestions'
+import type { TaxonomySuggestionFieldName } from './taxonomySuggestions'
 
 const FIELD_WIDTH = '14em'
 
