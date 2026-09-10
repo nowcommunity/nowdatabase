@@ -143,7 +143,7 @@ module.exports = defineConfig({
     specPattern: ['cypress/e2e/**/*.cy.{js,jsx,ts,tsx}', 'cypress/e2e/**/*.spec.{js,jsx,ts,tsx}'],
     // Performance optimizations
     experimentalMemoryManagement: true,
-    numTestsKeptInMemory: 0,
+    numTestsKeptInMemory: 20,
     defaultCommandTimeout: 8000,
     requestTimeout: 8000,
     responseTimeout: 8000,
