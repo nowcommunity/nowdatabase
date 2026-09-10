@@ -411,6 +411,10 @@ describe('Creating a new locality', () => {
     cy.get('[data-value=""]').click()
     cy.get('[id=max_age-textfield]').should('have.value', '15.97')
   })
+  it('and visiting the occurrence tabs shows the create new occurrence button as disabled', () => {
+    cy.visit('locality/new?tab=3')
+    cy.get('#create-occurrence-button').should('exist').should('be.disabled')
+  })
 })
 
 describe('Editing a locality', () => {
@@ -493,6 +497,37 @@ describe('Editing a locality', () => {
     cy.visit(`/locality/20920?tab=5`)
     cy.contains('wet_screen')
   })
+
+  it('and creating a new occurrence opens a new tab', () => {
+    cy.loginWithSession('testSu')
+    cy.visit('locality/20920?tab=3', {
+      onBeforeLoad(win) {
+        cy.stub(win, 'open').as('windowOpen')
+      },
+    })
+    cy.get('#edit-button').should('exist').click()
+    cy.get('#create-occurrence-button').should('not.be.disabled').click()
+    cy.get('@windowOpen').should('be.called')
+  })
+
+  it('and removing existing occurrence rows, then clicking the refresh occurrences button does not make the rows reappear', () => {
+    cy.loginWithSession('testSu')
+    cy.visit('locality/21050?tab=3')
+    cy.contains('meneghinii').should('exist')
+    cy.get('#edit-button').should('exist').click()
+
+    cy.get('[data-cy="table-row-85729"]').find('[data-testid=RemoveCircleOutlineIcon]').click()
+    cy.get('[data-cy="table-row-85729"]').find('[data-testid=AddCircleOutlineIcon]').should('exist')
+    cy.get('#refresh-occurrences-button').click()
+    cy.get('[data-cy="table-row-85729"]').find('[data-testid=AddCircleOutlineIcon]').should('exist')
+    cy.addReferenceAndSave()
+    cy.visit('locality/21050?tab=3')
+    cy.contains('meneghinii').should('not.exist')
+  })
+
+  it(
+    'TODO: adding occurrence to it (in another window), then clicking the refresh occurrences button makes the new occurrence appear'
+  )
 })
 
 describe('Locality table filtering', () => {

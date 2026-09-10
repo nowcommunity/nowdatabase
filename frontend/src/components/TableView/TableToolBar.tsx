@@ -209,6 +209,7 @@ export const TableToolBar = <T extends MRT_RowData>({
 
           {showNewButton && (
             <Button
+              id="new-button"
               variant="outlined"
               component={Link}
               to="new"

@@ -2,25 +2,6 @@ before('Reset database', () => {
   cy.resetDatabase()
 })
 
-describe('Adding occurrence through Locality -> Occurrences tab', () => {
-  it('opens a new tab', () => {
-    cy.loginWithSession('testSu')
-    cy.visit('locality/21050?tab=3', {
-      onBeforeLoad(win) {
-        cy.stub(win, 'open').as('windowOpen')
-      },
-    })
-    cy.get('#edit-button').should('exist').click()
-    cy.get('#create-occurrence-button').should('not.be.disabled').click()
-    cy.get('@windowOpen').should('be.called')
-  })
-  it('is not possible if the locality is being created', () => {
-    cy.loginWithSession('testSu')
-    cy.visit('locality/new?tab=3')
-    cy.get('#create-occurrence-button').should('exist').should('be.disabled')
-  })
-})
-
 describe('Occurrence editing', () => {
   it('allows admin to open edit mode and finalize flow', () => {
     cy.loginWithSession('testSu')
