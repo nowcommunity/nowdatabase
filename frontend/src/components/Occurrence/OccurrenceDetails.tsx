@@ -12,20 +12,12 @@ import {
   LocalityDetailsType,
   OccurrenceDetailsType,
 } from '@/shared/types'
-import { validateOccurrence } from '@/shared/validators/occurrence'
+import { validateOccurrence, validateOccurrenceFields } from '@/shared/validators/occurrence'
 import { getErrorMessage, useNotify } from '@/hooks/notification'
-import { ValidationObject } from '@/shared/validators/validator'
 import { useGetOccurrenceDetailsQuery } from '@/redux/api'
 import { useEditLocalityMutation, useGetLocalityDetailsQuery } from '@/redux/localityReducer'
 
-const validateOccurrenceDetail = (
-  editData: EditDataType<OccurrenceDetailsType>,
-  fieldName: keyof EditDataType<OccurrenceDetailsType>
-): ValidationObject => {
-  return validateOccurrence(editData as EditableOccurrenceData, fieldName as keyof EditableOccurrenceData)
-}
-
-const emptyOccurrence: OccurrenceDetailsType = {
+export const emptyOccurrence: OccurrenceDetailsType = {
   lid: 0,
   species_id: 0,
   loc_status: null,
@@ -214,7 +206,7 @@ export const OccurrenceDetails = () => {
   }
 
   const tabs: TabType[] = [
-    { title: 'Occurrence', content: <OccurrenceCoreTab existingOccurrences={localityData!.now_ls} /> },
+    { title: 'Occurrence', content: <OccurrenceCoreTab clickableLocName existingOccurrences={localityData?.now_ls ?? []} /> },
     { title: 'Wear', content: <OccurrenceWearTab /> },
     { title: 'Isotopes', content: <OccurrenceIsotopeTab /> },
     {
@@ -228,7 +220,8 @@ export const OccurrenceDetails = () => {
       tabs={tabs}
       data={occurrenceData ?? initialOccurrence}
       isNew={isNew}
-      validator={validateOccurrenceDetail}
+      validator={validateOccurrence}
+      validateFields={validateOccurrenceFields}
       onWrite={onWrite}
       hasStagingMode
     />
