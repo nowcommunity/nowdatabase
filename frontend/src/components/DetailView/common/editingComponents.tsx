@@ -313,6 +313,7 @@ export const EditableTextField = <T extends object>(props: EditableTextFieldProp
     const value = event?.currentTarget?.value
     if (type === 'number') {
       const setNumberValue = handleSetEditData as EditableTextFieldNumberProps<T>['handleSetEditData']
+      const allowNegative = min === undefined || min < 0
       if (value === '') {
         setNumberInputValue('')
         if (setNumberValue) {
@@ -325,12 +326,24 @@ export const EditableTextField = <T extends object>(props: EditableTextFieldProp
         return
       }
 
-      const asNumber = Number(value)
+      if (integerOnly) {
+        if (!isAllowedIntegerInputValue(value, allowNegative)) return
+      } else {
+        if (!isAllowedNumberInputValue(value)) return
+      }
+      setNumberInputValue(value)
 
-      if (setNumberValue && !Number.isNaN(asNumber)) {
+      const asNumber = Number(value)
+      if (
+        (integerOnly ? isPartialIntegerInputValue(value, allowNegative) : isPartialNumberInputValue(value)) ||
+        Number.isNaN(asNumber)
+      )
+        return
+
+      if (setNumberValue) {
         setNumberValue(asNumber)
       } else {
-        const nextEditData = { ...editData, [field]: value }
+        const nextEditData = { ...editData, [field]: asNumber }
         setEditData(nextEditData)
         updateFieldErrors(nextEditData)
       }
@@ -368,16 +381,12 @@ export const EditableTextField = <T extends object>(props: EditableTextFieldProp
     const setNumberValue = handleSetEditData as EditableTextFieldNumberProps<T>['handleSetEditData']
     if (value === '') return
     const allowNegative = min === undefined || min < 0
-    const invalidIntegerValue = integerOnly && !isAllowedIntegerInputValue(value, allowNegative)
-    const invalidDecimalValue = !integerOnly && !isAllowedNumberInputValue(value)
-
-    if (invalidIntegerValue || invalidDecimalValue) {
+    if (integerOnly ? isPartialIntegerInputValue(value, allowNegative) : isPartialNumberInputValue(value)) {
       setNumberInputValue('')
       if (setNumberValue) setNumberValue('')
       else setEditData({ ...editData, [field]: '' })
       return
     }
-
     const asNumber = Number(value)
     if (Number.isNaN(asNumber)) return
     setNumberInputValue(String(asNumber))
@@ -387,19 +396,25 @@ export const EditableTextField = <T extends object>(props: EditableTextFieldProp
     <TextField
       sx={{ width: fieldWidth, backgroundColor: disabled ? 'grey' : '' }}
       onChange={handleChange}
+      onKeyDown={event => {
+        if (type !== 'number') return
+        if (event.key === 'e' || event.key === 'E' || event.key === '+') event.preventDefault()
+        if (integerOnly && event.key === '.') event.preventDefault()
+      }}
       id={`${String(field)}-textfield`}
-      value={editData[field] ?? ''}
+      value={type === 'number' ? numberInputValue : editData[field] ?? ''}
       variant="outlined"
       size="small"
       error={!!error}
       helperText={error ?? ''}
+      type={type}
       multiline={big}
       disabled={disabled}
       onBlur={() => {
         if (type === 'number') handleNumberBlur()
         if (trim) trimValue()
       }}
-      slotProps={{ input: { readOnly: readonly ? true : false } }}
+      InputProps={readonly ? { readOnly: true } : { readOnly: false }}
     />
   )
 
