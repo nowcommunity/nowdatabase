@@ -368,25 +368,10 @@ export const EditableTextField = <T extends object>(props: EditableTextFieldProp
     const setNumberValue = handleSetEditData as EditableTextFieldNumberProps<T>['handleSetEditData']
     if (value === '') return
     const allowNegative = min === undefined || min < 0
-    if (
-      integerOnly
-        ? isAllowedIntegerInputValue(value, allowNegative) && !/^-?\d+$/.test(value)
-        : isAllowedNumberInputValue(value) && !/^(-?\d+(\.\d*)?|\d+\.\d+)$/.test(value)
-    ) {
-      setNumberInputValue('')
-      if (setNumberValue) setNumberValue('')
-      else setEditData({ ...editData, [field]: '' })
-      return
-    }
+    const invalidIntegerValue = integerOnly && !isAllowedIntegerInputValue(value, allowNegative)
+    const invalidDecimalValue = !integerOnly && !isAllowedNumberInputValue(value)
 
-    if (integerOnly && !isAllowedIntegerInputValue(value, allowNegative)) {
-      setNumberInputValue('')
-      if (setNumberValue) setNumberValue('')
-      else setEditData({ ...editData, [field]: '' })
-      return
-    }
-
-    if (!integerOnly && !isAllowedNumberInputValue(value)) {
+    if (invalidIntegerValue || invalidDecimalValue) {
       setNumberInputValue('')
       if (setNumberValue) setNumberValue('')
       else setEditData({ ...editData, [field]: '' })

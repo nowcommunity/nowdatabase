@@ -43,11 +43,26 @@ const speciesColumns: MRT_ColumnDef<Species>[] = [
     header: 'Taxon status',
   },
 ]
-export const OccurrenceCoreTab = ({ existingOccurrences }: { existingOccurrences: LocalitySpeciesDetailsType[] }) => {
+export const OccurrenceCoreTab = ({
+  clickableLocName = true,
+  existingOccurrences,
+}: {
+  clickableLocName?: boolean
+  existingOccurrences?: LocalitySpeciesDetailsType[]
+}) => {
   const { data: speciesQueryData, isError } = useGetAllSpeciesQuery()
   const { data, editData, setEditData, mode, textField, dropdown } = useDetailContext<OccurrenceDetailsType>()
 
-  const existingOccurrenceSpeciesIds = existingOccurrences.map(occurrence => occurrence.species_id)
+  const existingOccurrenceSpeciesIds = (existingOccurrences ?? []).map(occurrence => occurrence.species_id)
+
+  const locNameArray = clickableLocName
+    ? [
+        'Locality',
+        <Link key={`locality-${data.lid}`} to={`/locality/${data.lid}`}>
+          {toText(data.loc_name)}
+        </Link>,
+      ]
+    : ['Locality', toText(data.loc_name)]
 
   return (
     <>
@@ -57,12 +72,7 @@ export const OccurrenceCoreTab = ({ existingOccurrences }: { existingOccurrences
             key="identification"
             title="Identification"
             array={[
-              [
-                'Locality',
-                <Link key={`locality-${data.lid}`} to={`/locality/${data.lid}`}>
-                  {toText(data.loc_name)}
-                </Link>,
-              ],
+              locNameArray,
               !mode.read
                 ? [
                     '',
