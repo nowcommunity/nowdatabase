@@ -28,6 +28,8 @@ import {
   LocalitySpeciesDetailsType,
   LocalitySpecies,
   OccurrenceDetailsType,
+  EditableOccurrenceData,
+  SpeciesDetailsType,
 } from '@/shared/types'
 import { calculateNormalizedMesowearScore } from '@/shared/utils/mesowear'
 import { validateOccurrence, validateOccurrenceFields } from '@/shared/validators/occurrence'
@@ -55,13 +57,45 @@ const hasMesowearScoreInputs = (row: LocalitySpecies) => {
   )
 }
 
+const occurrenceFields: Array<keyof EditableOccurrenceData> = [
+  'nis',
+  'pct',
+  'quad',
+  'mni',
+  'qua',
+  'id_status',
+  'orig_entry',
+  'source_name',
+  'body_mass',
+  'mesowear',
+  'mw_or_high',
+  'mw_or_low',
+  'mw_cs_sharp',
+  'mw_cs_round',
+  'mw_cs_blunt',
+  'mw_scale_min',
+  'mw_scale_max',
+  'mw_value',
+  'microwear',
+  'dc13_mean',
+  'dc13_n',
+  'dc13_max',
+  'dc13_min',
+  'dc13_stdev',
+  'do18_mean',
+  'do18_n',
+  'do18_max',
+  'do18_min',
+  'do18_stdev',
+]
+
 const NewOccurrenceDialogContent = ({
   onSave,
   onClose,
   localityData,
   validateOccurrenceFields,
 }: {
-  onSave: (occurrence: EditDataType<OccurrenceDetailsType>) => void
+  onSave: (occurrenceSpecificFields: EditDataType<OccurrenceDetailsType>, comSpecies: SpeciesDetailsType) => void
   onClose: () => void
   localityData: EditDataType<LocalityDetailsType> | undefined
   validateOccurrenceFields: (editData: EditDataType<OccurrenceDetailsType>) => ValidationObject[]
@@ -87,14 +121,31 @@ const NewOccurrenceDialogContent = ({
     }
 
     try {
-      notify('Saved occurrence successfully.')
-      const occurrenceToSave: EditDataType<OccurrenceDetailsType> = {
-        ...editData,
-        lid: editData.lid ?? localityData?.lid ?? 0,
-        loc_name: editData.loc_name ?? localityData?.loc_name ?? '',
+      const occurrenceSpecificFields = occurrenceFields.reduce<Record<string, unknown>>((data, field) => {
+        if (field in editData) data[field] = editData[field]
+        return data
+      }, {})
+
+      const comSpecies = {
+        now_ls: [],
+        com_taxa_synonym: [],
+        now_sau: [],
+        species_id: editData.species_id ?? undefined,
+        class_name: undefined,
+        subclass_or_superorder_name: undefined,
+        order_name: undefined,
+        suborder_or_superfamily_name: undefined,
+        family_name: editData.family_name ?? undefined,
+        subfamily_name: undefined,
+        genus_name: editData.genus_name ?? undefined,
+        species_name: editData.species_name ?? undefined,
+        unique_identifier: editData.unique_identifier ?? undefined,
+        taxonomic_status: undefined,
+        sp_comment: undefined,
+        sp_author: undefined,
       }
 
-      onSave(occurrenceToSave)
+      onSave(occurrenceSpecificFields, comSpecies)
       onClose()
     } catch (e) {
       notify('something went wrong', 'error')
@@ -401,24 +452,18 @@ export const OccurrencesTab = () => {
                 <NewOccurrenceDialogContent
                   localityData={editData}
                   onClose={close}
-                  onSave={(newOccurrence: EditDataType<OccurrenceDetailsType>) => {
+                  onSave={(
+                    occurrenceSpesificFields: EditDataType<OccurrenceDetailsType>,
+                    comSpecies: SpeciesDetailsType
+                  ) => {
                     const appendedOccurrence = {
-                      ...newOccurrence,
+                      ...occurrenceSpesificFields,
                       lid: editData.lid,
-                      species_id: newOccurrence.species_id ?? 0,
+                      species_id: comSpecies.species_id ?? undefined,
+                      com_species: comSpecies,
                       rowState: 'new',
-                      com_species: {
-                        com_taxa_synonym: [],
-                        now_sau: [],
-                        species_id: newOccurrence.species_id ?? 0,
-                        family_name: newOccurrence.family_name ?? null,
-                        genus_name: newOccurrence.genus_name ?? null,
-                        species_name: newOccurrence.species_name ?? null,
-                        unique_identifier: newOccurrence.unique_identifier ?? null,
-                        now_ls: [],
-                      },
                     } as unknown as LocalitySpeciesDetailsType
-
+                    console.log(appendedOccurrence)
                     setEditData({
                       ...editData,
                       now_ls: [...editData.now_ls, appendedOccurrence],
