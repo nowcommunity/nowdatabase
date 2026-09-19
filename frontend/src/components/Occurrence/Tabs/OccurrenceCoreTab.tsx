@@ -79,6 +79,7 @@ export const OccurrenceCoreTab = ({
                     <SelectingTable
                       key={'selecting-table'}
                       buttonText="Select Species"
+                      closeOnSelect={true}
                       data={speciesQueryData?.filter(
                         species => !existingOccurrenceSpeciesIds.includes(species.species_id)
                       )}
