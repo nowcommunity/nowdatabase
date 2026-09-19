@@ -9,7 +9,6 @@ import {
   useDetailContext,
 } from '@/components/DetailView/Context/DetailContext'
 import { FieldsWithErrorsType, OptionalRadioSelectionProps, TextFieldOptions } from '@/components/DetailView/DetailView'
-import { emptyOccurrence } from '@/components/Occurrence/OccurrenceDetails'
 import { OccurrenceCoreTab } from '@/components/Occurrence/Tabs/OccurrenceCoreTab'
 import { OccurrenceIsotopeTab } from '@/components/Occurrence/Tabs/OccurrenceIsotopeTab'
 import { OccurrenceWearTab } from '@/components/Occurrence/Tabs/OccurrenceWearTab'
@@ -45,6 +44,8 @@ import {
   EditableTextField,
   RadioSelector,
 } from '@/components/DetailView/common/editingComponents'
+import { emptySpecies } from '@/components/DetailView/common/defaultValues'
+import { emptyOccurrence } from '@/components/Occurrence/emptyOccurrence'
 
 const hasMesowearScoreInputs = (row: LocalitySpecies) => {
   return (
@@ -126,29 +127,25 @@ const NewOccurrenceDialogContent = ({
         return data
       }, {})
 
-      const comSpecies = {
-        now_ls: [],
-        com_taxa_synonym: [],
-        now_sau: [],
-        species_id: editData.species_id ?? undefined,
-        class_name: undefined,
-        subclass_or_superorder_name: undefined,
-        order_name: undefined,
-        suborder_or_superfamily_name: undefined,
-        family_name: editData.family_name ?? undefined,
-        subfamily_name: undefined,
-        genus_name: editData.genus_name ?? undefined,
-        species_name: editData.species_name ?? undefined,
-        unique_identifier: editData.unique_identifier ?? undefined,
-        taxonomic_status: undefined,
-        sp_comment: undefined,
-        sp_author: undefined,
+      if (editData.species_id == null) {
+        notify('Creating new species for an Occurrence is not supported yet.', 'error')
+        return
       }
 
-      onSave(occurrenceSpecificFields, comSpecies)
+      const comSpecies: SpeciesDetailsType = {
+        ...emptySpecies,
+        species_id: editData.species_id ?? undefined,
+        order_name: editData.order_name ?? emptySpecies.order_name,
+        genus_name: editData.genus_name ?? emptySpecies.genus_name,
+        family_name: editData.family_name ?? emptySpecies.family_name,
+        species_name: editData.species_name ?? emptySpecies.species_name,
+        unique_identifier: editData.unique_identifier ?? emptySpecies.unique_identifier,
+      }
+
+      onSave({ ...occurrenceSpecificFields, now_oau: [] }, comSpecies)
       onClose()
     } catch (e) {
-      notify('something went wrong', 'error')
+      notify('Something went wrong when trying to add the Occurrence.', 'error')
     }
   }
 
@@ -216,6 +213,10 @@ export const OccurrencesTab = () => {
     {
       accessorKey: 'com_species.suborder_or_superfamily_name',
       header: 'Suborder or Superfamily',
+    },
+    {
+      accessorKey: 'com_species.subfamily_name',
+      header: 'Subfamily or Tribe',
     },
     {
       accessorKey: 'com_species.unique_identifier',
@@ -426,11 +427,25 @@ export const OccurrencesTab = () => {
     [editData.lid, editData.loc_name]
   )
 
+  const onSave = (occurrenceSpesificFields: EditDataType<OccurrenceDetailsType>, comSpecies: SpeciesDetailsType) => {
+    const appendedOccurrence = {
+      ...occurrenceSpesificFields,
+      lid: editData.lid,
+      species_id: comSpecies.species_id,
+      com_species: comSpecies,
+      rowState: 'new',
+    } as unknown as LocalitySpeciesDetailsType
+    setEditData({
+      ...editData,
+      now_ls: [...editData.now_ls, appendedOccurrence],
+    })
+  }
+
   return (
     <Grouped title={occurrenceLabels.informationSectionTitle}>
       <Box>
         {!mode.read && (
-          <EditingModal buttonText="Open occurrence creation view">
+          <EditingModal showCloseButton={false} buttonText="Open occurrence creation view">
             {({ close }) => (
               <DetailContextProvider<OccurrenceDetailsType>
                 contextState={{
@@ -452,23 +467,7 @@ export const OccurrencesTab = () => {
                 <NewOccurrenceDialogContent
                   localityData={editData}
                   onClose={close}
-                  onSave={(
-                    occurrenceSpesificFields: EditDataType<OccurrenceDetailsType>,
-                    comSpecies: SpeciesDetailsType
-                  ) => {
-                    const appendedOccurrence = {
-                      ...occurrenceSpesificFields,
-                      lid: editData.lid,
-                      species_id: comSpecies.species_id ?? undefined,
-                      com_species: comSpecies,
-                      rowState: 'new',
-                    } as unknown as LocalitySpeciesDetailsType
-                    console.log(appendedOccurrence)
-                    setEditData({
-                      ...editData,
-                      now_ls: [...editData.now_ls, appendedOccurrence],
-                    })
-                  }}
+                  onSave={onSave}
                   validateOccurrenceFields={validateOccurrenceFields}
                 />
               </DetailContextProvider>

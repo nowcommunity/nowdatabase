@@ -335,7 +335,7 @@ export const getLocalityDetails = async (id: number, user: User | undefined) => 
   return fixBigInt(localityWithTimeUnitDisplayValues) as LocalityDetailsType
 }
 
-// also validates possible new species that were added to this locality
+// also validates possible new species/occurrences that were added to this locality
 export const validateEntireLocality = async (editedFields: EditDataType<Prisma.now_loc> & EditMetaData) => {
   const localityForValidation = { ...editedFields }
 
