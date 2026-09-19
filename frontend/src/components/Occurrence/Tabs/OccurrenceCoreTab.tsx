@@ -92,10 +92,10 @@ export const OccurrenceCoreTab = ({
                       editingAction={(newSpecies: Species) => {
                         setEditData({
                           ...editData,
-                          order_name: newSpecies.order_name!,
-                          family_name: newSpecies.family_name!,
-                          genus_name: newSpecies.genus_name!,
-                          species_name: newSpecies.species_name!,
+                          order_name: newSpecies.order_name ?? '',
+                          family_name: newSpecies.family_name ?? '',
+                          genus_name: newSpecies.genus_name ?? '',
+                          species_name: newSpecies.species_name ?? '',
                           species_id: newSpecies.species_id,
                           unique_identifier: newSpecies.unique_identifier,
                         })
