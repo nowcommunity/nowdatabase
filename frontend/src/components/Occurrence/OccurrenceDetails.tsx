@@ -96,7 +96,7 @@ export const OccurrenceDetails = () => {
   if (localityQueryError) return <div>Error loading locality data</div>
   if (occurrenceDataLoading || localityDataLoading || mutationLoading) return <CircularProgress />
 
-  const initialOccurrence = emptyOccurrence
+  const initialOccurrence: OccurrenceDetailsType = { ...emptyOccurrence }
 
   if (isNew) {
     initialOccurrence.lid = parseInt(localityId, 10)

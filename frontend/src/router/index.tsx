@@ -37,14 +37,6 @@ const router = createBrowserRouter([
         },
       },
       {
-        path: 'occurrence/:id',
-        // Matches occurrence/new
-        lazy: async () => {
-          const { OccurrencesPage } = await import('../pages/OccurrencesPage')
-          return { Component: OccurrencesPage }
-        },
-      },
-      {
         path: 'occurrence',
         lazy: async () => {
           const { OccurrencesPage } = await import('../pages/OccurrencesPage')
