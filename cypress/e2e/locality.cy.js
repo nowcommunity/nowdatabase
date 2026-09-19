@@ -503,7 +503,6 @@ describe('Editing a locality', () => {
     cy.contains('Select Species').click()
     cy.get('[data-cy=table-cell-species_name]').first().click()
     cy.contains('simplicidens')
-    cy.contains('Close').click()
     cy.get('[id=nis-textfield]').type('1221')
     cy.contains('Save occurrence').click()
 
