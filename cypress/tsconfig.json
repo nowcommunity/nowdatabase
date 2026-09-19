@@ -1,9 +1,10 @@
 {
   "extends": "../frontend/tsconfig.json",
   "compilerOptions": {
+    "allowJs": true,
     "types": ["cypress", "node"],
     "isolatedModules": true,
     "noEmit": true
   },
-  "include": ["./**/*.ts", "./**/*.tsx", "./**/*.d.ts"]
+  "include": ["./**/*.js", "./**/*.ts", "./**/*.tsx", "./**/*.d.ts"]
 }

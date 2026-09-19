@@ -72,7 +72,13 @@ const renderToolbar = (props?: Partial<React.ComponentProps<typeof TableToolBar>
           createTitle={() => ''}
           createSubtitle={() => ''}
         >
-          <TableToolBar table={table} tableName={tableName} hideLeftButtons={true} {...props} />
+          <TableToolBar
+            table={table}
+            tableName={tableName}
+            showContactButton={false}
+            showNewButton={false}
+            {...props}
+          />
         </PageContextProvider>
       </NotificationContextProvider>
     </MemoryRouter>

@@ -1114,6 +1114,7 @@ export const CrossSearchTable = ({ selectorFn }: { selectorFn?: (newObject: Cros
         enableColumnFilterModes={true}
         serverSidePagination={true}
         isCrossSearchTable={true}
+        showNewButton={false}
         kmlExport={kmlExport}
         svgExport={svgExport}
         isError={isError}

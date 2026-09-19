@@ -1,22 +1,51 @@
-import { Editable, LocalityDetailsType, LocalitySpecies } from '@/shared/types'
+import { applyDefaultSpeciesOrdering, hasActiveSortingInSearch } from '@/components/DetailView/common/DetailTabTable'
 import { EditableTable } from '@/components/DetailView/common/EditableTable'
 import { EditingModal } from '@/components/DetailView/common/EditingModal'
+import { EntryUpdateHistory } from '@/components/DetailView/common/FieldUpdateHistory'
 import { Grouped } from '@/components/DetailView/common/tabLayoutHelpers'
-import { useDetailContext } from '@/components/DetailView/Context/DetailContext'
-import { Box, TextField } from '@mui/material'
-import { MRT_ColumnDef, MRT_Row, MRT_RowData, MRT_TableInstance } from 'material-react-table'
-import { useForm } from 'react-hook-form'
-import { calculateNormalizedMesowearScore } from '@/shared/utils/mesowear'
-import { applyDefaultSpeciesOrdering, hasActiveSortingInSearch } from '@/components/DetailView/common/DetailTabTable'
-import { useLocation } from 'react-router-dom'
-import { useMemo } from 'react'
-import { occurrenceLabels } from '@/constants/occurrenceLabels'
+import {
+  DetailContextProvider,
+  modeOptionToMode,
+  useDetailContext,
+} from '@/components/DetailView/Context/DetailContext'
+import { FieldsWithErrorsType, OptionalRadioSelectionProps, TextFieldOptions } from '@/components/DetailView/DetailView'
+import { OccurrenceCoreTab } from '@/components/Occurrence/Tabs/OccurrenceCoreTab'
+import { OccurrenceIsotopeTab } from '@/components/Occurrence/Tabs/OccurrenceIsotopeTab'
+import { OccurrenceWearTab } from '@/components/Occurrence/Tabs/OccurrenceWearTab'
 import {
   exportOccurrenceMapKml,
   exportOccurrenceMapSvg,
   getUniqueLocalityOccurrenceMapExportLocalities,
 } from '@/components/Species/localitySpeciesMapExport'
-import { EntryUpdateHistory } from '@/components/DetailView/common/FieldUpdateHistory'
+import { occurrenceLabels } from '@/constants/occurrenceLabels'
+import { useNotify } from '@/hooks/notification'
+import type { MRT_ColumnDef, MRT_Row, MRT_RowData, MRT_TableInstance } from 'material-react-table'
+import {
+  Editable,
+  EditDataType,
+  LocalityDetailsType,
+  LocalitySpeciesDetailsType,
+  LocalitySpecies,
+  OccurrenceDetailsType,
+  EditableOccurrenceData,
+  SpeciesDetailsType,
+} from '@/shared/types'
+import { calculateNormalizedMesowearScore } from '@/shared/utils/mesowear'
+import { validateOccurrence, validateOccurrenceFields } from '@/shared/validators/occurrence'
+import { ValidationObject } from '@/shared/validators/validator'
+import { Box, Button, DialogActions, DialogContent } from '@mui/material'
+import { useMemo, useState } from 'react'
+import { useLocation } from 'react-router-dom'
+import SaveIcon from '@mui/icons-material/Save'
+import {
+  DropdownSelector,
+  DropdownSelectorWithSearch,
+  DropdownOption,
+  EditableTextField,
+  RadioSelector,
+} from '@/components/DetailView/common/editingComponents'
+import { emptySpecies } from '@/components/DetailView/common/defaultValues'
+import { emptyOccurrence } from '@/components/Occurrence/emptyOccurrence'
 
 const hasMesowearScoreInputs = (row: LocalitySpecies) => {
   return (
@@ -29,17 +58,133 @@ const hasMesowearScoreInputs = (row: LocalitySpecies) => {
   )
 }
 
+const occurrenceFields: Array<keyof EditableOccurrenceData> = [
+  'nis',
+  'pct',
+  'quad',
+  'mni',
+  'qua',
+  'id_status',
+  'orig_entry',
+  'source_name',
+  'body_mass',
+  'mesowear',
+  'mw_or_high',
+  'mw_or_low',
+  'mw_cs_sharp',
+  'mw_cs_round',
+  'mw_cs_blunt',
+  'mw_scale_min',
+  'mw_scale_max',
+  'mw_value',
+  'microwear',
+  'dc13_mean',
+  'dc13_n',
+  'dc13_max',
+  'dc13_min',
+  'dc13_stdev',
+  'do18_mean',
+  'do18_n',
+  'do18_max',
+  'do18_min',
+  'do18_stdev',
+]
+
+const NewOccurrenceDialogContent = ({
+  onSave,
+  onClose,
+  localityData,
+  validateOccurrenceFields,
+}: {
+  onSave: (occurrenceSpecificFields: EditDataType<OccurrenceDetailsType>, comSpecies: SpeciesDetailsType) => void
+  onClose: () => void
+  localityData: EditDataType<LocalityDetailsType> | undefined
+  validateOccurrenceFields: (editData: EditDataType<OccurrenceDetailsType>) => ValidationObject[]
+}) => {
+  const { editData, fieldsWithErrors, setFieldsWithErrors } = useDetailContext<OccurrenceDetailsType>()
+  const { notify } = useNotify()
+
+  const validateAllFields = () => {
+    const nextFieldsWithErrors: FieldsWithErrorsType = {}
+
+    for (const errorObject of validateOccurrenceFields(editData)) {
+      nextFieldsWithErrors[String(errorObject.field ?? errorObject.name)] = errorObject
+    }
+
+    setFieldsWithErrors(() => nextFieldsWithErrors)
+    return Object.keys(nextFieldsWithErrors).length === 0
+  }
+
+  const speciesSelected = () => {
+    return editData.species_name && editData.species_name.length > 0
+  }
+
+  const handleSave = () => {
+    if (!validateAllFields()) {
+      notify('Please fix occurrence validation errors before saving.', 'error')
+      return
+    }
+
+    try {
+      const occurrenceSpecificFields = occurrenceFields.reduce<Record<string, unknown>>((data, field) => {
+        if (field in editData) data[field] = editData[field]
+        return data
+      }, {})
+
+      if (editData.species_id == null) {
+        notify('Creating new species for an Occurrence is not supported yet.', 'error')
+        return
+      }
+
+      const comSpecies: SpeciesDetailsType = {
+        ...emptySpecies,
+        species_id: editData.species_id ?? undefined,
+        order_name: editData.order_name ?? emptySpecies.order_name,
+        genus_name: editData.genus_name ?? emptySpecies.genus_name,
+        family_name: editData.family_name ?? emptySpecies.family_name,
+        species_name: editData.species_name ?? emptySpecies.species_name,
+        unique_identifier: editData.unique_identifier ?? emptySpecies.unique_identifier,
+      }
+
+      onSave({ ...occurrenceSpecificFields, now_oau: [] }, comSpecies)
+      onClose()
+    } catch (e) {
+      notify('Something went wrong when trying to add the Occurrence.', 'error')
+    }
+  }
+
+  return (
+    <>
+      <DialogContent dividers>
+        <OccurrenceCoreTab
+          clickableLocName={false}
+          existingOccurrences={(localityData?.now_ls ?? []) as Array<LocalitySpeciesDetailsType>}
+        />
+        <OccurrenceWearTab />
+        <OccurrenceIsotopeTab />
+      </DialogContent>
+      <DialogActions>
+        <Button onClick={onClose}>Cancel</Button>
+        <Button
+          disabled={!speciesSelected() || Object.keys(fieldsWithErrors).length > 0}
+          onClick={() => void handleSave()}
+          startIcon={<SaveIcon />}
+          variant="contained"
+        >
+          Save occurrence
+        </Button>
+      </DialogActions>
+    </>
+  )
+}
+
 export const OccurrencesTab = () => {
-  const { mode, data, editData } = useDetailContext<LocalityDetailsType>()
+  const { mode, data, editData, setEditData } = useDetailContext<LocalityDetailsType>()
+  const [fieldsWithErrors, setFieldsWithErrors] = useState<FieldsWithErrorsType>({})
   const location = useLocation()
-  const {
-    register,
-    formState: { errors },
-  } = useForm()
 
   const sortedOccurrenceRows = useMemo(() => {
     const sourceRows = (mode.read ? data.now_ls : editData.now_ls) as unknown as Editable<LocalitySpecies>[]
-
     return (
       applyDefaultSpeciesOrdering(sourceRows, {
         prefix: 'com_species',
@@ -72,6 +217,10 @@ export const OccurrencesTab = () => {
     {
       accessorKey: 'com_species.suborder_or_superfamily_name',
       header: 'Suborder or Superfamily',
+    },
+    {
+      accessorKey: 'com_species.subfamily_name',
+      header: 'Subfamily or Tribe',
     },
     {
       accessorKey: 'com_species.unique_identifier',
@@ -215,12 +364,6 @@ export const OccurrencesTab = () => {
     },
   ]
 
-  // eslint-disable-next-line @typescript-eslint/require-await
-  const onSave = async () => {
-    // TODO: Saving logic here (add Occurrence to editData)
-    return Object.keys(errors).length === 0
-  }
-
   const getExportLocalities = <T extends MRT_RowData>(table: MRT_TableInstance<T>) => {
     const rows = table.getPrePaginationRowModel().rows.map(row => row.original as unknown as LocalitySpecies)
     return getUniqueLocalityOccurrenceMapExportLocalities(data, rows)
@@ -234,21 +377,109 @@ export const OccurrencesTab = () => {
     await exportOccurrenceMapSvg(table, 'locality-occurrences-map', getExportLocalities)
   }
 
-  const editingModal = (
-    <EditingModal buttonText={occurrenceLabels.addNewButton} onSave={onSave}>
-      <Box sx={{ display: 'flex', flexDirection: 'column', gap: '1em' }}>
-        <TextField {...register('com_species.order_name', { required: true })} label="Order" />
-        <TextField {...register('com_species.family_name', { required: true })} label="Family" />
-        <TextField {...register('com_species.genus_name', { required: true })} label="Genus" />
-        <TextField {...register('com_species.species_name', { required: true })} label="Species" />
-        <TextField {...register('com_species.unique_identifier', { required: true })} label="Unique Identifier" />
-      </Box>
-    </EditingModal>
+  const textField = (field: keyof EditDataType<OccurrenceDetailsType>, options?: TextFieldOptions) => (
+    <EditableTextField<OccurrenceDetailsType> field={field} {...options} />
   )
+
+  const dropdown = (
+    field: keyof EditDataType<OccurrenceDetailsType>,
+    options: Array<DropdownOption | string>,
+    name: string,
+    disabled?: boolean
+  ) => <DropdownSelector<OccurrenceDetailsType> field={field} options={options} name={name} disabled={disabled} />
+
+  const dropdownWithSearch = (
+    field: keyof EditDataType<OccurrenceDetailsType>,
+    options: Array<DropdownOption | string>,
+    name: string,
+    disabled?: boolean,
+    label?: string
+  ) => (
+    <DropdownSelectorWithSearch<OccurrenceDetailsType>
+      field={field}
+      options={options}
+      name={name}
+      disabled={disabled}
+      label={label}
+    />
+  )
+
+  const radioSelection = (
+    field: keyof EditDataType<OccurrenceDetailsType>,
+    options: Array<DropdownOption | string>,
+    name: string,
+    optionalRadioSelectionProps?: OptionalRadioSelectionProps
+  ) => (
+    <RadioSelector<OccurrenceDetailsType>
+      field={field}
+      options={options}
+      name={name}
+      {...optionalRadioSelectionProps}
+    />
+  )
+
+  const bigTextField = (field: keyof EditDataType<OccurrenceDetailsType>) => (
+    <EditableTextField<OccurrenceDetailsType> field={field} type="text" big />
+  )
+
+  const newOccurrenceContextData = useMemo<OccurrenceDetailsType>(
+    () => ({
+      ...emptyOccurrence,
+      lid: editData.lid ?? 0,
+      loc_name: editData.loc_name ?? '',
+    }),
+    [editData.lid, editData.loc_name]
+  )
+
+  const onSave = (occurrenceSpesificFields: EditDataType<OccurrenceDetailsType>, comSpecies: SpeciesDetailsType) => {
+    const appendedOccurrence = {
+      ...occurrenceSpesificFields,
+      lid: editData.lid,
+      species_id: comSpecies.species_id,
+      com_species: comSpecies,
+      rowState: 'new',
+    } as unknown as LocalitySpeciesDetailsType
+    setEditData({
+      ...editData,
+      now_ls: [...editData.now_ls, appendedOccurrence],
+    })
+  }
 
   return (
     <Grouped title={occurrenceLabels.informationSectionTitle}>
-      {!mode.read && editingModal}
+      <Box>
+        {!mode.read && (
+          <EditingModal showCloseButton={false} buttonText="Open occurrence creation view">
+            {({ close }) => (
+              <DetailContextProvider<OccurrenceDetailsType>
+                contextState={{
+                  data: newOccurrenceContextData,
+                  mode: modeOptionToMode.new,
+                  setMode: () => undefined,
+                  editData: newOccurrenceContextData as EditDataType<OccurrenceDetailsType>,
+                  textField,
+                  dropdown,
+                  dropdownWithSearch,
+                  radioSelection,
+                  bigTextField,
+                  validator: validateOccurrence,
+                  validateFields: validateOccurrenceFields,
+                  fieldsWithErrors,
+                  setFieldsWithErrors,
+                }}
+              >
+                <NewOccurrenceDialogContent
+                  localityData={editData}
+                  onClose={close}
+                  onSave={onSave}
+                  validateOccurrenceFields={validateOccurrenceFields}
+                />
+              </DetailContextProvider>
+            )}
+          </EditingModal>
+        )}
+      </Box>
+
       <EditableTable<Editable<LocalitySpecies>, LocalityDetailsType>
         columns={columns}
         field="now_ls"
