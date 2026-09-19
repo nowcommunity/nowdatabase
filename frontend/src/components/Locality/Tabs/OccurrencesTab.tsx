@@ -115,6 +115,10 @@ const NewOccurrenceDialogContent = ({
     return Object.keys(nextFieldsWithErrors).length === 0
   }
 
+  const speciesSelected = () => {
+    return editData.species_name && editData.species_name.length > 0
+  }
+
   const handleSave = () => {
     if (!validateAllFields()) {
       notify('Please fix occurrence validation errors before saving.', 'error')
@@ -162,7 +166,7 @@ const NewOccurrenceDialogContent = ({
       <DialogActions>
         <Button onClick={onClose}>Cancel</Button>
         <Button
-          disabled={Object.keys(fieldsWithErrors).length > 0}
+          disabled={!speciesSelected() || Object.keys(fieldsWithErrors).length > 0}
           onClick={() => void handleSave()}
           startIcon={<SaveIcon />}
           variant="contained"

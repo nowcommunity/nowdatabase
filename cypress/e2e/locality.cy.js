@@ -493,6 +493,38 @@ describe('Editing a locality', () => {
     cy.visit(`/locality/20920?tab=5`)
     cy.contains('wet_screen')
   })
+
+  it('and creating a new Occurrence through the Occurrences tab works', () => {
+    cy.visit(`/locality/20920?tab=3`)
+    cy.get('[id=edit-button]').click()
+    cy.contains('Open occurrence creation view').click()
+    cy.contains('Save occurrence').should('be.disabled')
+
+    cy.contains('Select Species').click()
+    cy.get('[data-cy=table-cell-species_name]').first().click()
+    cy.contains('simplicidens')
+    cy.contains('Close').click()
+    cy.get('[id=nis-textfield]').type('1221')
+    cy.contains('Save occurrence').click()
+
+    cy.addReferenceAndSave()
+    cy.visit(`/locality/20920?tab=3`)
+    cy.contains('simplicidens')
+    cy.contains('1221')
+  })
+
+  it('and creating a new Occurrence does not show species that are already used in other Occurrences', () => {
+    cy.visit(`/locality/21050?tab=3`)
+    cy.contains('meneghinii')
+    cy.get('simplicidens').should('not.exist')
+    cy.get('legidensis').should('not.exist')
+    cy.get('[id=edit-button]').click()
+    cy.contains('Open occurrence creation view').click()
+    cy.contains('Select Species').click()
+    cy.get('meneghinii').should('not.exist')
+    cy.contains('simplicidens')
+    cy.contains('legidensis')
+  })
 })
 
 describe('Locality table filtering', () => {
