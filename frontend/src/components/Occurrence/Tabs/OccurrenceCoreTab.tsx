@@ -1,11 +1,12 @@
 import { useDetailContext } from '@/components/DetailView/Context/DetailContext'
 import { ArrayFrame, HalfFrames } from '@/components/DetailView/common/tabLayoutHelpers'
-import { LocalitySpeciesDetailsType, OccurrenceDetailsType, Species } from '@/shared/types'
+import { EditDataType, LocalitySpeciesDetailsType, OccurrenceDetailsType, Species } from '@/shared/types'
 import { Link } from 'react-router-dom'
 import { idStatusOptions, quantityOptions } from '../constants'
 import { useGetAllSpeciesQuery } from '@/redux/speciesReducer'
 import { SelectingTable } from '@/components/DetailView/common/SelectingTable'
 import { MRT_ColumnDef } from 'material-react-table'
+import { NewSpeciesForm } from '@/components/common/NewSpeciesForm'
 
 const toText = (value: string | number | null | undefined) =>
   value === null || value === undefined || value === '' ? '-' : String(value)
@@ -73,6 +74,25 @@ export const OccurrenceCoreTab = ({
             title="Identification"
             array={[
               locNameArray,
+              !mode.read
+                ? [
+                    '',
+                    <NewSpeciesForm
+                      key={'new-species-form'}
+                      afterTaxonomyCheck={(convertedSpecies: EditDataType<Species>) => {
+                        setEditData({
+                          ...editData,
+                          order_name: convertedSpecies.order_name ?? '',
+                          family_name: convertedSpecies.family_name ?? '',
+                          genus_name: convertedSpecies.genus_name ?? '',
+                          species_name: convertedSpecies.species_name ?? '',
+                          species_id: undefined,
+                          unique_identifier: convertedSpecies.unique_identifier,
+                        })
+                      }}
+                    />,
+                  ]
+                : [],
               !mode.read
                 ? [
                     '',

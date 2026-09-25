@@ -372,10 +372,10 @@ export const hasTaxonomyChanges = (editedSpecies: EditDataType<Species>, origina
 }
 
 type TaxonomyNullFixable = {
-  subclass_or_superorder_name: string | null
-  suborder_or_superfamily_name: string | null
-  subfamily_name: string | null
-  taxonomic_status: string | null
+  subclass_or_superorder_name?: string | null | undefined
+  suborder_or_superfamily_name?: string | null | undefined
+  subfamily_name?: string | null | undefined
+  taxonomic_status?: string | null | undefined
 }
 
 export const fixNullValuesInTaxonomyFields = <T extends TaxonomyNullFixable>(species: T) => {

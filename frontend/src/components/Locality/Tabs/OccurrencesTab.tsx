@@ -96,7 +96,10 @@ const NewOccurrenceDialogContent = ({
   localityData,
   validateOccurrenceFields,
 }: {
-  onSave: (occurrenceSpecificFields: EditDataType<OccurrenceDetailsType>, comSpecies: SpeciesDetailsType) => void
+  onSave: (
+    occurrenceSpecificFields: EditDataType<OccurrenceDetailsType>,
+    comSpecies: EditDataType<SpeciesDetailsType>
+  ) => void
   onClose: () => void
   localityData: EditDataType<LocalityDetailsType> | undefined
   validateOccurrenceFields: (editData: EditDataType<OccurrenceDetailsType>) => ValidationObject[]
@@ -131,12 +134,7 @@ const NewOccurrenceDialogContent = ({
         return data
       }, {})
 
-      if (editData.species_id == null) {
-        notify('Creating new species for an Occurrence is not supported yet.', 'error')
-        return
-      }
-
-      const comSpecies: SpeciesDetailsType = {
+      const comSpecies: EditDataType<SpeciesDetailsType> = {
         ...emptySpecies,
         species_id: editData.species_id ?? undefined,
         order_name: editData.order_name ?? emptySpecies.order_name,
@@ -431,7 +429,10 @@ export const OccurrencesTab = () => {
     [editData.lid, editData.loc_name]
   )
 
-  const onSave = (occurrenceSpesificFields: EditDataType<OccurrenceDetailsType>, comSpecies: SpeciesDetailsType) => {
+  const onSave = (
+    occurrenceSpesificFields: EditDataType<OccurrenceDetailsType>,
+    comSpecies: EditDataType<SpeciesDetailsType>
+  ) => {
     const appendedOccurrence = {
       ...occurrenceSpesificFields,
       lid: editData.lid,
