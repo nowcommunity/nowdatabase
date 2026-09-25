@@ -1,5 +1,13 @@
+import { emptySpecies } from '@/components/DetailView/common/defaultValues'
 import { applyDefaultSpeciesOrdering, hasActiveSortingInSearch } from '@/components/DetailView/common/DetailTabTable'
 import { EditableTable } from '@/components/DetailView/common/EditableTable'
+import {
+  DropdownOption,
+  DropdownSelector,
+  DropdownSelectorWithSearch,
+  EditableTextField,
+  RadioSelector,
+} from '@/components/DetailView/common/editingComponents'
 import { EditingModal } from '@/components/DetailView/common/EditingModal'
 import { EntryUpdateHistory } from '@/components/DetailView/common/FieldUpdateHistory'
 import { Grouped } from '@/components/DetailView/common/tabLayoutHelpers'
@@ -9,6 +17,7 @@ import {
   useDetailContext,
 } from '@/components/DetailView/Context/DetailContext'
 import { FieldsWithErrorsType, OptionalRadioSelectionProps, TextFieldOptions } from '@/components/DetailView/DetailView'
+import { emptyOccurrence } from '@/components/Occurrence/emptyOccurrence'
 import { OccurrenceCoreTab } from '@/components/Occurrence/Tabs/OccurrenceCoreTab'
 import { OccurrenceIsotopeTab } from '@/components/Occurrence/Tabs/OccurrenceIsotopeTab'
 import { OccurrenceWearTab } from '@/components/Occurrence/Tabs/OccurrenceWearTab'
@@ -19,33 +28,25 @@ import {
 } from '@/components/Species/localitySpeciesMapExport'
 import { occurrenceLabels } from '@/constants/occurrenceLabels'
 import { useNotify } from '@/hooks/notification'
-import type { MRT_ColumnDef, MRT_Row, MRT_RowData, MRT_TableInstance } from 'material-react-table'
 import {
   Editable,
+  EditableOccurrenceData,
   EditDataType,
   LocalityDetailsType,
-  LocalitySpeciesDetailsType,
   LocalitySpecies,
+  LocalitySpeciesDetailsType,
   OccurrenceDetailsType,
-  EditableOccurrenceData,
   SpeciesDetailsType,
 } from '@/shared/types'
 import { calculateNormalizedMesowearScore } from '@/shared/utils/mesowear'
 import { validateOccurrence, validateOccurrenceFields } from '@/shared/validators/occurrence'
 import { ValidationObject } from '@/shared/validators/validator'
-import { Box, Button, DialogActions, DialogContent } from '@mui/material'
-import { useMemo, useState } from 'react'
-import { useLocation } from 'react-router-dom'
+import ManageSearchIcon from '@mui/icons-material/ManageSearch'
 import SaveIcon from '@mui/icons-material/Save'
-import {
-  DropdownSelector,
-  DropdownSelectorWithSearch,
-  DropdownOption,
-  EditableTextField,
-  RadioSelector,
-} from '@/components/DetailView/common/editingComponents'
-import { emptySpecies } from '@/components/DetailView/common/defaultValues'
-import { emptyOccurrence } from '@/components/Occurrence/emptyOccurrence'
+import { Box, Button, DialogActions, DialogContent, Tooltip } from '@mui/material'
+import type { MRT_ColumnDef, MRT_Row, MRT_RowData, MRT_TableInstance } from 'material-react-table'
+import { useMemo, useState } from 'react'
+import { Link, useLocation } from 'react-router-dom'
 
 const hasMesowearScoreInputs = (row: LocalitySpecies) => {
   return (
@@ -494,13 +495,18 @@ export const OccurrencesTab = () => {
         kmlExport={kmlExport}
         svgExport={svgExport}
         renderReadRowActions={({ row }) => (
-          <EntryUpdateHistory
-            row={row.original}
-            label={`occurrence ${row.original.lid}/${row.original.species_id}`}
-            tableName="now_ls"
-            getRowValue={occurrence => occurrence.species_id}
-            getPkValues={occurrence => [occurrence.lid, occurrence.species_id]}
-          />
+          <>
+            <Tooltip title={`See details for species ${row.original.species_id}`}>
+              <Link to={`/species/${row.original.species_id}`}>{<ManageSearchIcon />}</Link>
+            </Tooltip>
+            <EntryUpdateHistory
+              row={row.original}
+              label={`occurrence ${row.original.lid}/${row.original.species_id}`}
+              tableName="now_ls"
+              getRowValue={occurrence => occurrence.species_id}
+              getPkValues={occurrence => [occurrence.lid, occurrence.species_id]}
+            />
+          </>
         )}
       />
     </Grouped>
