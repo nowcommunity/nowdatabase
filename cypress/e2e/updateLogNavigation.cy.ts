@@ -35,6 +35,7 @@ describe('Update log navigation', () => {
     cy.get('a[href^="/reference/"]').first().click()
 
     cy.url().should('include', '/reference/')
+    cy.contains('Reference type') // to make sure the redirect has happened
     cy.contains('button', 'Return to table').should('be.visible').click()
 
     cy.url().should('include', '/locality/21050')
