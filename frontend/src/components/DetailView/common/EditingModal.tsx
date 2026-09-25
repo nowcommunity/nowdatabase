@@ -60,12 +60,17 @@ export const EditingModal = ({
             {content}
           </Box>
           {onSave && (
-            <Button sx={{ marginRight: '0.5em' }} variant="contained" onClick={() => void closeWithSave()}>
+            <Button
+              id={'editing-modal-save-button'}
+              sx={{ marginRight: '0.5em' }}
+              variant="contained"
+              onClick={() => void closeWithSave()}
+            >
               Save
             </Button>
           )}
           {showCloseButton && (
-            <Button variant="contained" onClick={close}>
+            <Button id="editing-modal-cancel-button" variant="contained" onClick={close}>
               {onSave ? 'Cancel' : 'Close'}
             </Button>
           )}

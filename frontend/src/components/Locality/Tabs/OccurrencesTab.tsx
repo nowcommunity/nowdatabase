@@ -162,7 +162,9 @@ const NewOccurrenceDialogContent = ({
         <OccurrenceIsotopeTab />
       </DialogContent>
       <DialogActions>
-        <Button onClick={onClose}>Cancel</Button>
+        <Button id="occurrence-creation-modal-cancel-button" onClick={onClose}>
+          Cancel
+        </Button>
         <Button
           disabled={!speciesSelected() || Object.keys(fieldsWithErrors).length > 0}
           onClick={() => void handleSave()}
