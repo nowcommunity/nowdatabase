@@ -4,12 +4,16 @@ before('Reset database', () => {
 
 const buildLocalityName = (base = 'Bugat') => `${base} ${Date.now()}-${Math.floor(Math.random() * 1e6)}`
 
+
+// TODO: these tests are obsolete now that the Species tab has been removed from Locality details.
+// I'm leaving the code here in case it has to be re-enabled in the future.
+// Some of these tests should also probably be modified and copied over to the Occurrence tab testing.
 describe('Adding species in Locality -> Species tab for an existing locality', () => {
   beforeEach('Login as admin with session caching', () => {
     cy.loginWithSession('testSu')
   })
 
-  it('works with valid, unique species', () => {
+  it.skip('works with valid, unique species', () => {
     cy.visit(`/locality/20920?tab=2`)
     cy.contains('Lantian-Shuijiazui')
     cy.get('[id=edit-button]').click()
@@ -29,7 +33,7 @@ describe('Adding species in Locality -> Species tab for an existing locality', (
     cy.contains('somespecies')
   })
 
-  it('works through "copy species taxonomy" button', () => {
+  it.skip('works through "copy species taxonomy" button', () => {
     cy.visit(`/locality/20920?tab=2`)
     cy.contains('Lantian-Shuijiazui')
     cy.get('[id=edit-button]').click()
@@ -46,7 +50,7 @@ describe('Adding species in Locality -> Species tab for an existing locality', (
     cy.contains('newspecies')
   })
 
-  it('does not work with invalid species', () => {
+  it.skip('does not work with invalid species', () => {
     cy.visit(`/locality/20920?tab=2`)
     cy.contains('Lantian-Shuijiazui')
     cy.get('[id=edit-button]').click()
@@ -62,7 +66,7 @@ describe('Adding species in Locality -> Species tab for an existing locality', (
     cy.contains('Order must not contain any spaces, unless the value is "incertae sedis".')
   })
 
-  it('does not work if the species has already been added', () => {
+  it.skip('does not work if the species has already been added', () => {
     cy.visit(`/locality/20920?tab=2`)
     cy.contains('Lantian-Shuijiazui')
     cy.get('[id=edit-button]').click()
@@ -107,7 +111,7 @@ describe('Adding species in Locality -> Species tab for an existing locality', (
     cy.contains('The taxon already exists in the database.')
   })
 
-  it('does not work with species with invalid taxonomic order', () => {
+  it.skip('does not work with species with invalid taxonomic order', () => {
     cy.visit(`/locality/20920?tab=2`)
     cy.contains('Lantian-Shuijiazui')
     cy.get('[id=edit-button]').click()
@@ -145,7 +149,7 @@ describe('Adding species in Locality -> Species tab for an existing locality', (
     cy.contains('Genus Amblycoptus belongs to family Soricidae, not Bovidae.')
   })
 
-  it('minus action only marks the clicked species row as removed', () => {
+  it.skip('minus action only marks the clicked species row as removed', () => {
     cy.visit(`/locality/20920?tab=2`)
     cy.contains('Lantian-Shuijiazui')
     cy.get('[id=edit-button]').click()
@@ -178,7 +182,7 @@ describe('Adding species in Locality -> Species tab for an existing locality', (
       })
   })
 
-  it('does not work through "copy species taxonomy" button if nothing is changed', () => {
+  it.skip('does not work through "copy species taxonomy" button if nothing is changed', () => {
     cy.visit(`/locality/20920?tab=2`)
     cy.contains('Lantian-Shuijiazui')
     cy.get('[id=edit-button]').click()

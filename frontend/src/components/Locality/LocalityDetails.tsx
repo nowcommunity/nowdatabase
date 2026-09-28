@@ -15,7 +15,6 @@ import { LocalityTab } from './Tabs/LocalityTab'
 import { MuseumTab } from './Tabs/MuseumTab'
 import { OccurrencesTab } from './Tabs/OccurrencesTab'
 import { ProjectTab } from './Tabs/ProjectTab'
-import { SpeciesTab } from './Tabs/SpeciesTab'
 import { TaphonomyTab } from './Tabs/TaphonomyTab'
 import { EditDataType, LocalityDetailsType, ValidationErrors } from '@/shared/types'
 import { validateLocality, validateLocalityFields } from '@/shared/validators/locality'
@@ -114,10 +113,6 @@ export const LocalityDetails = ({
     {
       title: 'Locality',
       content: <LocalityTab />,
-    },
-    {
-      title: 'Species',
-      content: <SpeciesTab />,
     },
     {
       title: occurrenceLabels.plural,
