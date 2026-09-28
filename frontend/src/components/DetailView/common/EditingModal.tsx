@@ -61,7 +61,7 @@ export const EditingModal = ({
           </Box>
           {onSave && (
             <Button
-              id={'editing-modal-save-button'}
+              id="editing-modal-save-button"
               sx={{ marginRight: '0.5em' }}
               variant="contained"
               onClick={() => void closeWithSave()}

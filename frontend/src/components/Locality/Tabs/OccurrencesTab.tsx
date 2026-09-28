@@ -453,7 +453,7 @@ export const OccurrencesTab = () => {
     <Grouped title={occurrenceLabels.informationSectionTitle}>
       <Box>
         {!mode.read && (
-          <EditingModal showCloseButton={false} buttonText="Open occurrence creation view">
+          <EditingModal showCloseButton={false} buttonText="Create new occurrence">
             {({ close }) => (
               <DetailContextProvider<OccurrenceDetailsType>
                 contextState={{
