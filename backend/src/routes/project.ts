@@ -6,7 +6,7 @@ import { writeProject } from '../services/write/project'
 
 const router = Router()
 
-router.get('/all', async (req, res) => {
+router.get('/all', requireOneOf([Role.Admin]), async (req, res) => {
   const projects = await getAllProjects(req.user)
   return res.status(200).send(projects)
 })

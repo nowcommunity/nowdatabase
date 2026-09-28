@@ -91,7 +91,7 @@ NOTE: Users with the **EditRestricted** role can only update occurrences that re
 
 ## Project
 
-- Any user can get a list of Projects.
+- Viewing a list of projects requires the **Admin** role.
 - Viewing project details requires the **Admin** role.
 - Creating or updating a Project requires the **Admin** role.
 - Deleting a Project requires the **Admin** role.

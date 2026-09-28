@@ -26,7 +26,7 @@ export const NavBar = () => {
     { title: 'Time Units', url: '/time-unit' },
     { title: 'Time Bounds', url: '/time-bound', allowedRoles: [Role.Admin, Role.EditUnrestricted] },
     { title: 'Museums', url: '/museum' },
-    { title: 'Projects', url: '/project' },
+    { title: 'Projects', url: '/project', allowedRoles: [Role.Admin] },
     {
       title: 'Admin',
       url: '/admin',
