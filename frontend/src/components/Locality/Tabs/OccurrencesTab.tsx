@@ -205,10 +205,12 @@ export const OccurrencesTab = () => {
     },
     {
       accessorKey: 'com_species.genus_name',
+      enableHiding: false,
       header: 'Genus',
     },
     {
       accessorKey: 'com_species.species_name',
+      enableHiding: false,
       header: 'Species',
     },
     {
@@ -225,6 +227,7 @@ export const OccurrencesTab = () => {
     },
     {
       accessorKey: 'com_species.unique_identifier',
+      enableHiding: false,
       header: 'Unique Identifier',
     },
     {

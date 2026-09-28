@@ -426,6 +426,7 @@ export const CrossSearchTable = ({ selectorFn }: { selectorFn?: (newObject: Cros
         accessorFn: row => row.unique_identifier || '',
         header: 'Unique Identifier',
         size: 20,
+        enableHiding: false,
         filterFn: 'contains',
       },
       {
@@ -869,7 +870,7 @@ export const CrossSearchTable = ({ selectorFn }: { selectorFn?: (newObject: Cros
     suborder_or_superfamily_name: false,
     family_name: false,
     subfamily_name: false,
-    unique_identifier: false,
+    unique_identifier: true,
     taxonomic_status: false,
     orig_entry: false,
     source_name: false,
