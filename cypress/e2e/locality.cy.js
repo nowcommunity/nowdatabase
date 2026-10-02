@@ -4,7 +4,6 @@ before('Reset database', () => {
 
 const buildLocalityName = (base = 'Bugat') => `${base} ${Date.now()}-${Math.floor(Math.random() * 1e6)}`
 
-
 // TODO: these tests are obsolete now that the Species tab has been removed from Locality details.
 // I'm leaving the code here in case it has to be re-enabled in the future.
 // Some of these tests should also probably be modified and copied over to the Occurrence tab testing.
@@ -607,6 +606,64 @@ describe('Editing a locality', () => {
     cy.contains(speciesName)
   })
 
+  it('does not create a species already used by another, saved occurrence', () => {
+    const speciesName = `saveddoublespecies`
+
+    cy.visit(`/locality/20920?tab=2`)
+    cy.contains('Lantian-Shuijiazui')
+    cy.get('[id=edit-button]').click()
+    cy.get('[data-cy=new-occurrence-button]').click()
+    cy.contains('Add new Species').click()
+    cy.get('[name=order_name]').type('Neworder')
+    cy.get('[name=family_name]').type('Newfamily')
+    cy.get('[name=genus_name]').type('Newgenus')
+    cy.get('[name=species_name]').type(speciesName)
+    cy.get('[id=editing-modal-save-button]').click()
+    cy.contains('Save occurrence').should('not.be.disabled').click()
+    cy.addReferenceAndSave()
+
+    cy.visit(`/locality/20920?tab=2`)
+    cy.contains('Lantian-Shuijiazui')
+    cy.get('[id=edit-button]').click()
+    cy.contains(speciesName)
+    cy.get('[data-cy=new-occurrence-button]').click()
+    cy.contains('Add new Species').click()
+    cy.get('[name=order_name]').type('Neworder')
+    cy.get('[name=family_name]').type('Newfamily')
+    cy.get('[name=genus_name]').type('Newgenus')
+    cy.get('[name=species_name]').type(speciesName)
+    cy.get('[id=editing-modal-save-button]').click()
+    cy.contains('The taxon already exists in the database.').should('be.visible')
+    cy.contains('Save occurrence').should('be.disabled')
+  })
+
+  it('does not create a species already used by another, unsaved occurrence', () => {
+    const speciesName = `unsaveddoublespecies`
+
+    cy.visit(`/locality/20920?tab=2`)
+    cy.contains('Lantian-Shuijiazui')
+    cy.get('[id=edit-button]').click()
+    cy.get('[data-cy=new-occurrence-button]').click()
+    cy.contains('Add new Species').click()
+    cy.get('[name=order_name]').type('Neworder')
+    cy.get('[name=family_name]').type('Newfamily')
+    cy.get('[name=genus_name]').type('Newgenus')
+    cy.get('[name=species_name]').type(speciesName)
+    cy.get('[id=editing-modal-save-button]').click()
+    cy.contains('Save occurrence').should('not.be.disabled').click()
+    cy.contains(speciesName)
+
+    cy.get('[data-cy=new-occurrence-button]').click()
+    cy.contains('Add new Species').click()
+    cy.get('[name=order_name]').type('Neworder')
+    cy.get('[name=family_name]').type('Newfamily')
+    cy.get('[name=genus_name]').type('Newgenus')
+    cy.get('[name=species_name]').type(speciesName)
+    cy.get('[id=editing-modal-save-button]').click()
+    cy.contains('The taxon already exists in the database.').should('be.visible')
+    cy.contains('Save occurrence').should('be.disabled')
+  })
+
   it('shows taxonomy check error when copied taxonomy is unchanged', () => {
     cy.visit(`/locality/20920?tab=2`)
     cy.contains('Lantian-Shuijiazui')
@@ -748,7 +805,7 @@ describe('Linking projects to an existing locality', () => {
 
   beforeEach('Login as admin and open projects tab', () => {
     cy.loginWithSession('testSu')
-    cy.visit(`/locality/${localityId}?tab=10`)
+    cy.visit(`/locality/${localityId}?tab=9`)
     cy.contains('Dmanisi')
   })
 
@@ -763,7 +820,7 @@ describe('Linking projects to an existing locality', () => {
 
     cy.addReferenceAndSave()
     cy.contains('Edited item successfully.')
-    cy.visit(`/locality/${localityId}?tab=10`)
+    cy.visit(`/locality/${localityId}?tab=9`)
     cy.contains(newProjectCode)
 
     cy.get('[id=edit-button]').click()
@@ -771,7 +828,7 @@ describe('Linking projects to an existing locality', () => {
 
     cy.addReferenceAndSave()
     cy.contains('Edited item successfully.')
-    cy.visit(`/locality/${localityId}?tab=10`)
+    cy.visit(`/locality/${localityId}?tab=9`)
     cy.contains(newProjectCode).should('not.exist')
   })
 })

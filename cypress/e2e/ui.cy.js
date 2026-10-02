@@ -70,19 +70,29 @@ describe('Button Tests', () => {
     cy.contains('Updates').should('be.visible')
   })
 
-  it('Links between localities and species work', () => {
+  it('Links between localities and occurrences work', () => {
     cy.visit('/locality/21050')
-    cy.get('[role=tablist]').contains('Species').click()
-    cy.get('[data-cy="table-row-21426"]', { timeout: 10000 }).click()
+    cy.get('[role=tablist]').contains('Occurrences').click()
+    cy.get('[data-cy="table-row-21426"]').click()
+    cy.url().should('contain', '/occurrence/21050/21426')
+    cy.contains('Amblycoptus indet.')
+
+    cy.contains('a', 'Dmanisi').click()
+    cy.url.should('contain', '/locality/21050')
+    cy.contains('Dmanisi')
+  })
+
+  it.todo('Links between localities and species work', () => {
+    cy.visit('/locality/21050')
+    cy.get('[role=tablist]').contains('Occurrences').click()
+    cy.get('[id=go-to-species-21426]').click()
     cy.url().should('contain', '/species/21426')
     cy.contains('Amblycoptus indet.')
     cy.contains('Mammalia')
-    cy.contains('Diet')
+
     cy.get('[role=tablist]').contains('Localities').click()
-    cy.get('[data-cy="table-row-21050"]', { timeout: 10000 }).click()
+    cy.get('[data-cy="table-row-21050"]').click()
     cy.url().should('contain', '/locality/21050')
     cy.contains('Dmanisi')
-    cy.contains('Dating method')
-    cy.contains('Lithology')
   })
 })
