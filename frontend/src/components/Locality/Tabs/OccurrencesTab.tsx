@@ -102,7 +102,7 @@ const NewOccurrenceDialogContent = ({
     comSpecies: EditDataType<SpeciesDetailsType>
   ) => void
   onClose: () => void
-  localityData: EditDataType<LocalityDetailsType> | undefined
+  localityData: EditDataType<LocalityDetailsType>
   validateOccurrenceFields: (editData: EditDataType<OccurrenceDetailsType>) => ValidationObject[]
 }) => {
   const { editData, fieldsWithErrors, setFieldsWithErrors } = useDetailContext<OccurrenceDetailsType>()
@@ -155,10 +155,7 @@ const NewOccurrenceDialogContent = ({
   return (
     <>
       <DialogContent dividers>
-        <OccurrenceCoreTab
-          clickableLocName={false}
-          existingOccurrences={(localityData?.now_ls ?? []) as Array<LocalitySpeciesDetailsType>}
-        />
+        <OccurrenceCoreTab clickableLocName={false} existingOccurrences={localityData.now_ls} />
         <OccurrenceWearTab />
         <OccurrenceIsotopeTab />
       </DialogContent>
@@ -500,7 +497,9 @@ export const OccurrencesTab = () => {
         renderReadRowActions={({ row }) => (
           <>
             <Tooltip title={`See details for species ${row.original.species_id}`}>
-              <Link to={`/species/${row.original.species_id}`}>{<ManageSearchIcon />}</Link>
+              <Link id={`go-to-species-${row.original.species_id}`} to={`/species/${row.original.species_id}`}>
+                {<ManageSearchIcon />}
+              </Link>
             </Tooltip>
             <EntryUpdateHistory
               row={row.original}

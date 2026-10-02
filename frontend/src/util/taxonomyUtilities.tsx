@@ -24,7 +24,7 @@ Please contact the NOW administration to fix this taxonomy.`
 const isDuplicateTaxon = (newSpecies: EditDataType<Species>, existingSpecies: TaxonomySpecies) => {
   if (
     // the check for undefined species_id is here to make sure you cannot add two new,
-    // identical species at the same time (e.g. in Locality -> Species -> Add new species)
+    // identical species at the same time (e.g. in Locality -> Occurrence -> Create new occurrence)
     ((newSpecies.species_id === undefined && existingSpecies.species_id === undefined) ||
       newSpecies.species_id !== existingSpecies.species_id) &&
     newSpecies.genus_name === existingSpecies.genus_name &&

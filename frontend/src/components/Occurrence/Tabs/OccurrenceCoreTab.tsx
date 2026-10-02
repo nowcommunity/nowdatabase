@@ -7,6 +7,7 @@ import { useGetAllSpeciesQuery } from '@/redux/speciesReducer'
 import { SelectingTable } from '@/components/DetailView/common/SelectingTable'
 import { MRT_ColumnDef } from 'material-react-table'
 import { NewSpeciesForm } from '@/components/common/NewSpeciesForm'
+import { TaxonomySpecies } from '@/util/taxonomyUtilities'
 
 const toText = (value: string | number | null | undefined) =>
   value === null || value === undefined || value === '' ? '-' : String(value)
@@ -46,15 +47,16 @@ const speciesColumns: MRT_ColumnDef<Species>[] = [
 ]
 export const OccurrenceCoreTab = ({
   clickableLocName = true,
-  existingOccurrences,
+  existingLocalitySpecies,
 }: {
   clickableLocName?: boolean
-  existingOccurrences?: LocalitySpeciesDetailsType[]
+  existingLocalitySpecies?: EditDataType<LocalitySpeciesDetailsType[]>
+  additionalTaxonomyCheckSpecies?: TaxonomySpecies[]
 }) => {
   const { data: speciesQueryData, isError } = useGetAllSpeciesQuery()
   const { data, editData, setEditData, mode, textField, dropdown } = useDetailContext<OccurrenceDetailsType>()
 
-  const existingOccurrenceSpeciesIds = (existingOccurrences ?? []).map(occurrence => occurrence.species_id)
+  const existingOccurrenceSpeciesIds = (existingLocalitySpecies ?? []).map(ls => ls.species_id)
 
   const locNameArray = clickableLocName
     ? [
@@ -79,6 +81,7 @@ export const OccurrenceCoreTab = ({
                     '',
                     <NewSpeciesForm
                       key={'new-species-form'}
+                      existingLocalitySpecies={existingLocalitySpecies}
                       afterTaxonomyCheck={(convertedSpecies: EditDataType<Species>) => {
                         setEditData({
                           ...editData,
