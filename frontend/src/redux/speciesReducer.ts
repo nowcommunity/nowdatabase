@@ -71,6 +71,7 @@ const speciesApi = api.injectEndpoints({
 export const {
   useGetAllSpeciesQuery,
   useGetAllSynonymsQuery,
+  useLazyGetSpeciesDetailsQuery,
   useGetSpeciesDetailsQuery,
   useEditSpeciesMutation,
   useDeleteSpeciesMutation,

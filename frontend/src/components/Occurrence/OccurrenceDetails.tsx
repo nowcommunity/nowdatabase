@@ -11,12 +11,16 @@ import {
   EditMetaData,
   LocalityDetailsType,
   OccurrenceDetailsType,
+  LocalitySpeciesDetailsType,
+  SpeciesDetailsType,
 } from '@/shared/types'
 import { validateOccurrence, validateOccurrenceFields } from '@/shared/validators/occurrence'
 import { getErrorMessage, useNotify } from '@/hooks/notification'
 import { useGetOccurrenceDetailsQuery } from '@/redux/api'
 import { useEditLocalityMutation, useGetLocalityDetailsQuery } from '@/redux/localityReducer'
 import { emptyOccurrence } from './emptyOccurrence'
+import { useLazyGetSpeciesDetailsQuery } from '@/redux/speciesReducer'
+import { toSpeciesDetailsDraft } from '../common/toSpeciesDetailsDraft'
 
 const occurrenceFields: Array<keyof EditableOccurrenceData> = [
   'nis',
@@ -53,7 +57,8 @@ const occurrenceFields: Array<keyof EditableOccurrenceData> = [
 export const OccurrenceDetails = () => {
   const { id, lid, speciesId } = useParams()
   const [searchParams] = useSearchParams()
-  const isNew = id === 'new'
+
+  const [getSpeciesDetails] = useLazyGetSpeciesDetailsQuery()
 
   const parsedLid = lid ? parseInt(lid, 10) : -1
   const parsedSpeciesId = speciesId ? parseInt(speciesId, 10) : -1
@@ -71,7 +76,7 @@ export const OccurrenceDetails = () => {
   } = useGetOccurrenceDetailsQuery(
     { lid: parsedLid, speciesId: parsedSpeciesId },
     {
-      skip: isNew || Number.isNaN(parsedLid) || Number.isNaN(parsedSpeciesId),
+      skip: Number.isNaN(parsedLid) || Number.isNaN(parsedSpeciesId),
     }
   )
 
@@ -86,23 +91,11 @@ export const OccurrenceDetails = () => {
   const { notify } = useNotify()
   const navigate = useNavigate()
 
-  if (isNew && (!lidFromSearchParams || !locNameFromSearchParams)) {
-    return <div>Missing search parameters for new occurrence</div>
-  }
-  if (isNew && (lid || speciesId)) {
-    return <div>Error loading data</div>
-  }
   if (occurrenceQueryError) return <div>Error loading occurrence data</div>
   if (localityQueryError) return <div>Error loading locality data</div>
   if (occurrenceDataLoading || localityDataLoading || mutationLoading) return <CircularProgress />
 
   const initialOccurrence: OccurrenceDetailsType = { ...emptyOccurrence }
-
-  if (isNew) {
-    initialOccurrence.lid = parseInt(localityId, 10)
-    initialOccurrence.loc_name = locNameFromSearchParams ?? ''
-    document.title = `New Occurrence`
-  }
 
   if (occurrenceData) {
     document.title = `Occurrence - ${occurrenceData.lid}/${occurrenceData.species_id}`
@@ -112,41 +105,53 @@ export const OccurrenceDetails = () => {
     try {
       if (!localityData) throw new Error('Could not load the linked locality.')
 
-      const occurrenceSpeciesId = isNew ? editData.species_id : parsedSpeciesId
-      const existingOccurrence = localityData.now_ls.find(row => row.species_id === occurrenceSpeciesId)
+      const isSpeciesChanged = editData.species_id !== Number(speciesId)
+      console.log(editData.species_id)
+      console.log(speciesId)
+      console.log(isSpeciesChanged)
+
+      let changedSpeciesDetails: SpeciesDetailsType | null = null
+      if (isSpeciesChanged) {
+        changedSpeciesDetails = await getSpeciesDetails(String(editData.species_id)).unwrap()
+      }
+      console.log('changedSpeciesDetails', changedSpeciesDetails)
+
+      const existingOccurrence = localityData.now_ls.find(ls => ls.species_id === editData.species_id)
       const occurrenceData = occurrenceFields.reduce<Record<string, unknown>>((data, field) => {
         if (field in editData) data[field] = editData[field]
         return data
       }, {})
+      console.log(editData)
       const occurrence = {
         ...(existingOccurrence ?? {}),
         lid: localityData.lid,
-        species_id: occurrenceSpeciesId ?? existingOccurrence?.species_id,
+        species_id: editData.species_id,
+        com_species: editData.species_id
+          ? toSpeciesDetailsDraft(changedSpeciesDetails)
+          : toSpeciesDetailsDraft(editData),
         ...occurrenceData,
-        ...(isNew
-          ? {
-              rowState: 'new' as const,
-              com_species: {
-                com_taxa_synonym: [],
-                now_sau: [],
-                species_id: editData.species_id,
-                family_name: editData.family_name,
-                genus_name: editData.genus_name,
-                species_name: editData.species_name,
-                unique_identifier: editData.unique_identifier,
-              },
-            }
-          : {}),
-      }
+        ...(isSpeciesChanged && { rowState: 'new' }),
+      } as LocalitySpeciesDetailsType
 
-      const nowLs = (
-        isNew
-          ? [...localityData.now_ls, occurrence]
-          : localityData.now_ls.map(row => (row.species_id === occurrenceSpeciesId ? occurrence : row))
-      ) as EditDataType<LocalityDetailsType>['now_ls']
+      console.log(occurrence)
+
+      let updatedNowLs
+      if (isSpeciesChanged) {
+        // if species was changed, removes this occurrence from the now_ls, and adds a new occurrence with the new species
+        const removedRow = localityData.now_ls.find(row => row.species_id === Number(speciesId))
+        updatedNowLs = [
+          ...localityData.now_ls.filter(row => row.species_id !== removedRow?.species_id),
+          { ...removedRow, rowState: 'removed' } as LocalitySpeciesDetailsType,
+          occurrence,
+        ]
+      } else {
+        // if species was not changed, simply updates the occurrence
+        updatedNowLs = [...localityData.now_ls, occurrence]
+      }
+      console.log(updatedNowLs)
       await editLocalityRequest({
         ...localityData,
-        now_ls: nowLs,
+        now_ls: updatedNowLs,
         comment: editData.comment,
         references: editData.references ?? [],
       }).unwrap()
@@ -175,7 +180,6 @@ export const OccurrenceDetails = () => {
     <DetailView<OccurrenceDetailsType>
       tabs={tabs}
       data={occurrenceData ?? initialOccurrence}
-      isNew={isNew}
       validator={validateOccurrence}
       validateFields={validateOccurrenceFields}
       onWrite={onWrite}
