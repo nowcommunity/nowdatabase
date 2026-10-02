@@ -514,7 +514,7 @@ describe('Editing a locality', () => {
     cy.contains('1221')
   })
 
-  it.only('canceling occurrence creation does not add an occurrence', () => {
+  it('canceling occurrence creation does not add an occurrence', () => {
     cy.visit(`/locality/20920?tab=2`)
     cy.get('tbody tr')
       .its('length')
