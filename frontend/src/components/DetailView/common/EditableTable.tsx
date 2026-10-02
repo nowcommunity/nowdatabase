@@ -1,13 +1,13 @@
+import { usePageContext } from '@/components/Page'
 import { EditDataType, RowState } from '@/shared/types'
-import { CircularProgress, Box, Button, Tooltip } from '@mui/material'
-import { type MRT_ColumnDef, type MRT_Row, type MRT_RowData, type MRT_TableInstance } from 'material-react-table'
-import { useDetailContext } from '../Context/DetailContext'
-import RemoveCircleOutlineIcon from '@mui/icons-material/RemoveCircleOutline'
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline'
 import PolicyIcon from '@mui/icons-material/Policy'
+import RemoveCircleOutlineIcon from '@mui/icons-material/RemoveCircleOutline'
+import { Box, Button, CircularProgress, Divider, Stack, Tooltip } from '@mui/material'
+import { type MRT_ColumnDef, type MRT_Row, type MRT_RowData, type MRT_TableInstance } from 'material-react-table'
 import { useEffect, type ReactNode } from 'react'
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom'
-import { usePageContext } from '@/components/Page'
+import { useDetailContext } from '../Context/DetailContext'
 import { checkFieldErrors } from './checkFieldErrors'
 import { DetailTabTable } from './DetailTabTable'
 
@@ -143,12 +143,21 @@ export const EditableTable = <
     )
   }
 
-  const readRowActions = ({ row }: { row: MRT_Row<T> }) => (
-    <Box className="row-actions-column">
-      {renderReadRowActions?.({ row })}
-      {restrictionIndicator({ row })}
-    </Box>
-  )
+  const readRowActions = ({ row }: { row: MRT_Row<T> }) => {
+    return (
+      <Stack
+        className="row-actions-column"
+        direction={'row'}
+        justifyContent={'flex-start'}
+        divider={<Divider orientation="vertical" flexItem />}
+        spacing={2}
+        onClick={event => event.stopPropagation()}
+      >
+        {renderReadRowActions?.({ row })}
+        {restrictionIndicator({ row })}
+      </Stack>
+    )
+  }
 
   const resolveRenderRowActions = () => {
     if (mode.read) {

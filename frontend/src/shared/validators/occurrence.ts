@@ -1,5 +1,5 @@
-import { EditableOccurrenceData } from '../types'
-import { Validators, validator } from './validator'
+import { EditDataType, OccurrenceDetailsType } from '../types'
+import { validateFields, validator, Validators } from './validator'
 
 export const occurrenceDropdownValues = {
   idStatus: ['family id uncertain', 'genus id uncertain', 'species id uncertain'] as const,
@@ -44,8 +44,10 @@ const validateDecimalNumber = (name: string, value: number) => {
   return
 }
 
-export const validateOccurrence = (editData: EditableOccurrenceData, fieldName: keyof EditableOccurrenceData) => {
-  const validators: Validators<Partial<EditableOccurrenceData>> = {
+const createOccurrenceValidators = (
+  editData: EditDataType<OccurrenceDetailsType>
+): Validators<Partial<EditDataType<OccurrenceDetailsType>>> => {
+  return {
     id_status: {
       name: 'ID status',
       condition: () => editData.id_status !== null && editData.id_status !== undefined && editData.id_status !== '',
@@ -155,6 +157,18 @@ export const validateOccurrence = (editData: EditableOccurrenceData, fieldName: 
     },
     do18_stdev: { name: 'δ18O Stdev', asNumber: value => validatePositiveDecimal('δ18O Stdev', value) },
   }
+}
 
-  return validator<EditableOccurrenceData>(validators, editData, fieldName)
+export const validateOccurrence = (
+  editData: EditDataType<OccurrenceDetailsType>,
+  fieldName: keyof EditDataType<OccurrenceDetailsType>
+) => {
+  return validator<EditDataType<OccurrenceDetailsType>>(createOccurrenceValidators(editData), editData, fieldName)
+}
+
+export const validateOccurrenceFields = (editData: Partial<EditDataType<OccurrenceDetailsType>>) => {
+  return validateFields<EditDataType<OccurrenceDetailsType>>(
+    createOccurrenceValidators(editData as EditDataType<OccurrenceDetailsType>),
+    editData
+  )
 }

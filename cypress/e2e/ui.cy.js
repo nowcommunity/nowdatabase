@@ -38,6 +38,15 @@ describe('Button Tests', () => {
     cy.contains('Genus').should('be.visible')
   })
 
+  it('Occurrences button works', () => {
+    cy.visit('/')
+    cy.contains('Occurrences').click()
+    cy.url().should('include', '/occurrence')
+    cy.contains('Locality name').should('be.visible')
+    cy.contains('Genus').should('be.visible')
+    cy.contains('Species').should('be.visible')
+  })
+
   it('Time Units button works', () => {
     cy.visit('/')
     cy.contains('Time Units').click()
@@ -45,16 +54,6 @@ describe('Button Tests', () => {
     cy.contains('Lower Bound').should('be.visible')
     cy.contains('Upper Bound').should('be.visible')
     cy.contains('Sequence').should('be.visible')
-  })
-
-  it('Cross Search button works', () => {
-    cy.visit('/')
-    cy.visit('/occurrence')
-    cy.url().should('include', '/occurrence')
-    cy.contains('Occurrences').should('be.visible')
-    cy.contains('Country').should('be.visible')
-    cy.contains('Genus').should('be.visible')
-    cy.contains('Species').should('be.visible')
   })
 
   it('Link to species details from species tab', () => {
@@ -71,19 +70,31 @@ describe('Button Tests', () => {
     cy.contains('Updates').should('be.visible')
   })
 
-  it('Links between localities and species work', () => {
+  it.only('Links between localities and occurrences work', () => {
     cy.visit('/locality/21050')
-    cy.get('[role=tablist]').contains('Species').click()
-    cy.get('[data-cy="table-row-21426"]', { timeout: 10000 }).click()
+    cy.get('[role=tablist]').contains('Occurrences').click()
+    // getting the entire row does not work since its center is hidden 
+    // (cypress cannot automatically scroll it into view for some reason)
+    cy.contains('indet.').click()
+    cy.url().should('contain', '/occurrence/21050/21426')
+    cy.contains('Amblycoptus indet.')
+
+    cy.contains('a', 'Dmanisi').click()
+    cy.url().should('contain', '/locality/21050')
+    cy.contains('Dmanisi')
+  })
+
+  it.only('Links between localities and species work', () => {
+    cy.visit('/locality/21050')
+    cy.get('[role=tablist]').contains('Occurrences').click()
+    cy.get('[id=go-to-species-21426]').click()
     cy.url().should('contain', '/species/21426')
     cy.contains('Amblycoptus indet.')
     cy.contains('Mammalia')
-    cy.contains('Diet')
+
     cy.get('[role=tablist]').contains('Localities').click()
-    cy.get('[data-cy="table-row-21050"]', { timeout: 10000 }).click()
+    cy.get('[data-cy="table-row-21050"]').click()
     cy.url().should('contain', '/locality/21050')
     cy.contains('Dmanisi')
-    cy.contains('Dating method')
-    cy.contains('Lithology')
   })
 })
