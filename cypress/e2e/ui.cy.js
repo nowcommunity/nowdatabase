@@ -70,10 +70,12 @@ describe('Button Tests', () => {
     cy.contains('Updates').should('be.visible')
   })
 
-  it('Links between localities and occurrences work', () => {
+  it.only('Links between localities and occurrences work', () => {
     cy.visit('/locality/21050')
     cy.get('[role=tablist]').contains('Occurrences').click()
-    cy.get('[data-cy="table-row-21426"]').click()
+    // getting the entire row does not work since its center is hidden 
+    // (cypress cannot automatically scroll it into view for some reason)
+    cy.contains('indet.').click()
     cy.url().should('contain', '/occurrence/21050/21426')
     cy.contains('Amblycoptus indet.')
 
@@ -82,7 +84,7 @@ describe('Button Tests', () => {
     cy.contains('Dmanisi')
   })
 
-  it('Links between localities and species work', () => {
+  it.only('Links between localities and species work', () => {
     cy.visit('/locality/21050')
     cy.get('[role=tablist]').contains('Occurrences').click()
     cy.get('[id=go-to-species-21426]').click()

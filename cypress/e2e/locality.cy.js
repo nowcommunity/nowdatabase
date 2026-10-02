@@ -480,7 +480,7 @@ describe('Editing a locality', () => {
   })
 
   it('adds collecting methods from the selector and persists them', () => {
-    cy.visit(`/locality/20920?tab=5`)
+    cy.visit(`/locality/20920?tab=4`)
     cy.contains('Lantian-Shuijiazui')
     cy.get('[id=edit-button]').click()
 
@@ -491,7 +491,7 @@ describe('Editing a locality', () => {
     cy.addReferenceAndSave()
     cy.contains('Edited item successfully.')
 
-    cy.visit(`/locality/20920?tab=5`)
+    cy.visit(`/locality/20920?tab=4`)
     cy.contains('wet_screen')
   })
 
@@ -543,8 +543,8 @@ describe('Editing a locality', () => {
     cy.get('[id=edit-button]').click()
     cy.get('[data-cy=new-occurrence-button]').click()
     cy.contains('Select Species').click()
-    cy.get('[data-cy=table-cell-species_name]').first().click()
-    cy.contains('simplicidens')
+    cy.get('[data-cy=table-row-21426]').click()
+    cy.contains('indet.')
 
     cy.get('[id=mw_scale_min-textfield]').type('1')
     cy.get('[id=mw_scale_max-textfield]').type('10')
@@ -555,7 +555,7 @@ describe('Editing a locality', () => {
 
     cy.addReferenceAndSave()
     cy.visit(`/locality/20920?tab=2`)
-    cy.get('[data-cy=table-row-21052]').within(() => {
+    cy.get('[data-cy=table-row-21426]').within(() => {
       cy.contains('1')
       cy.contains('10')
       cy.contains('5')

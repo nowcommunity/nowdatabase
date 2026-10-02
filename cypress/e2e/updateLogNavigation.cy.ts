@@ -25,7 +25,7 @@ describe('Update log navigation', () => {
   }
 
   it('returns to the update log after viewing a reference detail', () => {
-    cy.visit('/locality/21050?tab=11')
+    cy.visit('/locality/21050?tab=10')
     cy.contains('Updates')
 
     openFirstUpdateWithReference()
@@ -39,7 +39,7 @@ describe('Update log navigation', () => {
     cy.contains('button', 'Return to table').should('be.visible').click()
 
     cy.url().should('include', '/locality/21050')
-    cy.url().should('include', 'tab=11')
+    cy.url().should('include', 'tab=10')
     cy.contains('Updates')
   })
 })
