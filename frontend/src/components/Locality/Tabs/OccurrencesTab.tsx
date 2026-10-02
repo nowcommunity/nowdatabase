@@ -155,7 +155,7 @@ const NewOccurrenceDialogContent = ({
   return (
     <>
       <DialogContent dividers>
-        <OccurrenceCoreTab clickableLocName={false} existingOccurrences={localityData.now_ls} />
+        <OccurrenceCoreTab clickableLocName={false} existingLocalitySpecies={localityData.now_ls} />
         <OccurrenceWearTab />
         <OccurrenceIsotopeTab />
       </DialogContent>

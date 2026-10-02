@@ -161,7 +161,7 @@ export const OccurrenceDetails = () => {
   const tabs: TabType[] = [
     {
       title: 'Occurrence',
-      content: <OccurrenceCoreTab clickableLocName={true} existingOccurrences={localityData!.now_ls} />,
+      content: <OccurrenceCoreTab clickableLocName={true} existingLocalitySpecies={localityData!.now_ls} />,
     },
     { title: 'Wear', content: <OccurrenceWearTab /> },
     { title: 'Isotopes', content: <OccurrenceIsotopeTab /> },
