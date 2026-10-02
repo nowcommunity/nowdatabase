@@ -78,11 +78,11 @@ describe('Button Tests', () => {
     cy.contains('Amblycoptus indet.')
 
     cy.contains('a', 'Dmanisi').click()
-    cy.url.should('contain', '/locality/21050')
+    cy.url().should('contain', '/locality/21050')
     cy.contains('Dmanisi')
   })
 
-  it.todo('Links between localities and species work', () => {
+  it('Links between localities and species work', () => {
     cy.visit('/locality/21050')
     cy.get('[role=tablist]').contains('Occurrences').click()
     cy.get('[id=go-to-species-21426]').click()
