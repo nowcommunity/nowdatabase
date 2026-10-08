@@ -1,3 +1,4 @@
+import { EditDataType, EditMetaData, OccurrenceDetailsType } from '@/shared/types'
 import {
   BaseQueryFn,
   createApi,
@@ -8,7 +9,6 @@ import {
 } from '@reduxjs/toolkit/query/react'
 import { BACKEND_URL } from '../util/config'
 import type { RootState } from './store'
-import { EditDataType, OccurrenceDetailsType } from '@/shared/types'
 
 type RefreshTokenResult = {
   data?: { token?: string }
@@ -116,7 +116,7 @@ const occurrenceApi = api.injectEndpoints({
       }),
       providesTags: result => (result ? [{ type: 'occurrence', id: `${result.lid}-${result.species_id}` }] : []),
     }),
-    editOccurrence: builder.mutation<OccurrenceDetailsType, EditDataType<OccurrenceDetailsType>>({
+    editOccurrence: builder.mutation<OccurrenceDetailsType, EditDataType<OccurrenceDetailsType> & EditMetaData>({
       query: occurrence => ({
         url: `/occurrence/${occurrence.lid}/${occurrence.species_id}`,
         method: 'PUT',
