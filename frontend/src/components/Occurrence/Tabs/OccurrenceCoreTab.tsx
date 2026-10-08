@@ -85,11 +85,14 @@ export const OccurrenceCoreTab = ({
                       afterTaxonomyCheck={(convertedSpecies: EditDataType<Species>) => {
                         setEditData({
                           ...editData,
+                          species_id: undefined,
                           order_name: convertedSpecies.order_name ?? '',
                           family_name: convertedSpecies.family_name ?? '',
                           genus_name: convertedSpecies.genus_name ?? '',
                           species_name: convertedSpecies.species_name ?? '',
-                          species_id: undefined,
+                          subclass_or_superorder_name: convertedSpecies.subclass_or_superorder_name,
+                          suborder_or_superfamily_name: convertedSpecies.suborder_or_superfamily_name,
+                          subfamily_name: convertedSpecies.subfamily_name,
                           unique_identifier: convertedSpecies.unique_identifier,
                         })
                       }}

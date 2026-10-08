@@ -43,6 +43,9 @@ export type OccurrenceDetailsType = {
   family_name: string
   genus_name: string
   species_name: string
+  subclass_or_superorder_name: string | null
+  suborder_or_superfamily_name: string | null
+  subfamily_name: string | null
   unique_identifier: string | null
   dms_lat: string | null
   dms_long: string | null

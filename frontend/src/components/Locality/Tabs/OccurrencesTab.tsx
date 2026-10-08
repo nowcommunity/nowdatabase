@@ -143,6 +143,10 @@ const NewOccurrenceDialogContent = ({
         family_name: editData.family_name ?? emptySpecies.family_name,
         species_name: editData.species_name ?? emptySpecies.species_name,
         unique_identifier: editData.unique_identifier ?? emptySpecies.unique_identifier,
+        subclass_or_superorder_name: editData.subclass_or_superorder_name ?? emptySpecies.subclass_or_superorder_name,
+        suborder_or_superfamily_name:
+          editData.suborder_or_superfamily_name ?? emptySpecies.suborder_or_superfamily_name,
+        subfamily_name: editData.subfamily_name ?? emptySpecies.subfamily_name,
       }
 
       onSave({ ...occurrenceSpecificFields, now_oau: [] }, comSpecies)
