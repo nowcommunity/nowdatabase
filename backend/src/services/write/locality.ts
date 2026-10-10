@@ -75,6 +75,7 @@ export const writeLocality = async (
 
     /* Write possible new species of now_ls, and save those id's to now_ls objects */
     for (const localitySpecies of locality.now_ls) {
+      console.log(localitySpecies.com_species?.species_name, localitySpecies.rowState)
       const species = localitySpecies.com_species!
       if (species.species_id) continue
       const { species_id } = await writeHandler.createObject('com_species', species, ['species_id'])

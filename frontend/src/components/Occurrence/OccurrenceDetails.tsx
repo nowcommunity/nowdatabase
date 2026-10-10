@@ -21,6 +21,7 @@ import { OccurrenceCoreTab } from './Tabs/OccurrenceCoreTab'
 import { OccurrenceIsotopeTab } from './Tabs/OccurrenceIsotopeTab'
 import { OccurrenceWearTab } from './Tabs/OccurrenceWearTab'
 import { emptyOccurrence } from './emptyOccurrence'
+import { fixNullValuesInTaxonomyFields } from '@/util/taxonomyUtilities'
 
 const occurrenceFields: Array<keyof EditableOccurrenceData> = [
   'nis',
@@ -93,7 +94,14 @@ export const OccurrenceDetails = () => {
 
   if (occurrenceQueryError) return <div>Error loading occurrence data</div>
   if (localityQueryError) return <div>Error loading locality data</div>
-  if (occurrenceDataLoading || localityDataLoading || occurrenceMutationLoading || localityMutationLoading)
+  if (
+    !occurrenceData ||
+    !localityData ||
+    occurrenceDataLoading ||
+    localityDataLoading ||
+    occurrenceMutationLoading ||
+    localityMutationLoading
+  )
     return <CircularProgress />
 
   const initialOccurrence: OccurrenceDetailsType = { ...emptyOccurrence }
@@ -104,74 +112,62 @@ export const OccurrenceDetails = () => {
 
   const onWrite = async (editData: EditDataType<OccurrenceDetailsType> & EditMetaData) => {
     try {
-      if (!localityData) throw new Error('Could not load the linked locality.')
-
       const isSpeciesChanged = editData.species_id !== Number(speciesId)
       const isSpeciesNew = editData.species_id === undefined
 
-      // Get this Occurrence, but as a LocalitySpeciesDetailsType
-      const existingOccurrence = localityData.now_ls.find(ls => ls.species_id === Number(speciesId))
-      let changedSpeciesDetails: SpeciesDetailsType | null = null
-      let comSpecies: EditDataType<SpeciesDetailsType> | null = null
+      if (isSpeciesChanged) {
+        // If the Occurrence's species was changed, we need to create a new Occurrence,
+        // Since Occurrence ID contains the species ID.
 
-      if (isSpeciesNew) {
-        comSpecies = {
-          ...emptySpecies,
-          species_id: undefined,
-          order_name: editData.order_name ?? emptySpecies.order_name,
-          genus_name: editData.genus_name ?? emptySpecies.genus_name,
-          family_name: editData.family_name ?? emptySpecies.family_name,
-          species_name: editData.species_name ?? emptySpecies.species_name,
-          subclass_or_superorder_name: editData.subclass_or_superorder_name ?? emptySpecies.subclass_or_superorder_name,
-          suborder_or_superfamily_name:
-            editData.suborder_or_superfamily_name ?? emptySpecies.suborder_or_superfamily_name,
-          subfamily_name: editData.subfamily_name ?? emptySpecies.subfamily_name,
-          unique_identifier: editData.unique_identifier ?? emptySpecies.unique_identifier,
-        }
-      } else if (isSpeciesChanged) {
-        changedSpeciesDetails = await getSpeciesDetails(String(editData.species_id)).unwrap()
-        if (!changedSpeciesDetails) {
-          notify('Could not get details of the changed species.')
+        // Get this Occurrence, but as a LocalitySpeciesDetailsType
+        const existingOccurrence = localityData.now_ls.find(ls => ls.species_id === Number(speciesId))
+        if (!existingOccurrence) {
+          notify('Could not find this Occurrence from the linked locality!', 'error')
           return
         }
-        comSpecies = {
-          ...emptySpecies,
-          species_id: editData.species_id ?? undefined,
-          order_name: editData.order_name ?? emptySpecies.order_name,
-          genus_name: editData.genus_name ?? emptySpecies.genus_name,
-          family_name: editData.family_name ?? emptySpecies.family_name,
-          species_name: editData.species_name ?? emptySpecies.species_name,
-          subclass_or_superorder_name: editData.subclass_or_superorder_name ?? emptySpecies.subclass_or_superorder_name,
-          suborder_or_superfamily_name:
-            editData.suborder_or_superfamily_name ?? emptySpecies.suborder_or_superfamily_name,
-          subfamily_name: editData.subfamily_name ?? emptySpecies.subfamily_name,
-          unique_identifier: editData.unique_identifier ?? emptySpecies.unique_identifier,
+        let changedSpeciesDetails: SpeciesDetailsType | null = null
+        let comSpecies: EditDataType<SpeciesDetailsType> | null = null
+
+        if (isSpeciesNew) {
+          comSpecies = {
+            ...emptySpecies,
+            species_id: undefined,
+            order_name: editData.order_name ?? emptySpecies.order_name,
+            genus_name: editData.genus_name ?? emptySpecies.genus_name,
+            family_name: editData.family_name ?? emptySpecies.family_name,
+            species_name: editData.species_name ?? emptySpecies.species_name,
+            subclass_or_superorder_name:
+              editData.subclass_or_superorder_name ?? emptySpecies.subclass_or_superorder_name,
+            suborder_or_superfamily_name:
+              editData.suborder_or_superfamily_name ?? emptySpecies.suborder_or_superfamily_name,
+            subfamily_name: editData.subfamily_name ?? emptySpecies.subfamily_name,
+            unique_identifier: editData.unique_identifier ?? emptySpecies.unique_identifier,
+          }
+        } else {
+          changedSpeciesDetails = await getSpeciesDetails(String(editData.species_id)).unwrap()
+          if (!changedSpeciesDetails) {
+            notify('Could not get details of the changed species.')
+            return
+          }
+          console.log(changedSpeciesDetails)
+          comSpecies = fixNullValuesInTaxonomyFields(changedSpeciesDetails)
         }
-      } else {
-        comSpecies = existingOccurrence!.com_species
-      }
 
-      const occurrenceData = occurrenceFields.reduce<Record<string, unknown>>((data, field) => {
-        if (field in editData) data[field] = editData[field]
-        return data
-      }, {})
+        const occurrenceAsNowLs = {
+          ...existingOccurrence,
+          species_id: editData.species_id,
+          com_species: comSpecies,
+          rowState: 'new',
+        } as LocalitySpeciesDetailsType
 
-      const occurrence = {
-        ...(existingOccurrence ?? {}),
-        lid: localityData.lid,
-        species_id: editData.species_id,
-        com_species: comSpecies,
-        ...occurrenceData,
-        ...(isSpeciesChanged && { rowState: 'new' }),
-      }
+        console.log(occurrenceAsNowLs.now_oau)
 
-      if (isSpeciesChanged) {
         //  removes the old occurrence before adding the update version back in
         const removedRow = localityData.now_ls.find(row => row.species_id === Number(speciesId))
         const updatedNowLs = [
-          ...localityData.now_ls,
+          ...localityData.now_ls.filter(row => row.species_id !== Number(speciesId)),
           { ...removedRow, rowState: 'removed' as RowState } as LocalitySpeciesDetailsType,
-          occurrence as LocalitySpeciesDetailsType,
+          occurrenceAsNowLs,
         ]
 
         await editLocalityRequest({
@@ -186,15 +182,16 @@ export const OccurrenceDetails = () => {
           // navigates to occurrence table, since getting the ID of the newly created species is difficult
           setTimeout(() => navigate('/occurrence'), 15)
         } else {
-          setTimeout(() => navigate(`/occurrence/${occurrence.lid}/${occurrence.species_id}`), 15)
+          setTimeout(() => navigate(`/occurrence/${occurrenceAsNowLs.lid}/${occurrenceAsNowLs.species_id}`), 15)
         }
       } else {
         // edit Occurrence directly since species is not updated and the combined ID does not change
         const updatedOccurrence = await editOccurrenceRequest({
-          ...(occurrence as EditDataType<OccurrenceDetailsType>),
+          ...editData,
           comment: editData.comment,
           references: editData.references ?? [],
         }).unwrap()
+        console.log(updatedOccurrence.now_oau)
         notify('Occurrence entry finalized successfully.')
         setTimeout(() => navigate(`/occurrence/${updatedOccurrence.lid}/${updatedOccurrence.species_id}`), 15)
       }
