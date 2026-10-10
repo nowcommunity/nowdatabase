@@ -77,6 +77,7 @@ export const OccurrenceDetails = () => {
     { lid: parsedLid, speciesId: parsedSpeciesId },
     {
       skip: Number.isNaN(parsedLid) || Number.isNaN(parsedSpeciesId),
+      refetchOnMountOrArgChange: true,
     }
   )
 
