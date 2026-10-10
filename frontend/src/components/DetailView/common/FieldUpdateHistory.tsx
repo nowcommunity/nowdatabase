@@ -146,6 +146,12 @@ const formatDate = (value: unknown): string => {
   return date.toISOString().split('T')[0]
 }
 
+const formatDateTime = (value: unknown): string => {
+  if (!value) return ''
+  const date = new Date(value as string | number | Date)
+  return Number.isNaN(date.getTime()) ? formatValue(value) : date.toISOString()
+}
+
 const findFirstBySuffix = (container: UpdateContainer, suffix: string): unknown => {
   const entry = Object.entries(container).find(([key]) => key.endsWith(suffix))
   return entry?.[1]
@@ -193,7 +199,7 @@ const getReferencesSignature = (container: UpdateContainer) =>
 
 const getHistoryUpdateSignature = ({ logs, container }: HistoryUpdate) =>
   [
-    formatDate(getDate(container)),
+    formatDateTime(getDate(container)),
     formatValue(getEditor(container)),
     formatValue(getCoordinator(container)),
     formatValue(getComment(container)),

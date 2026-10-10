@@ -198,6 +198,8 @@ export const TableView = <T extends MRT_RowData>({
   svgExport,
   isCrossSearchTable,
   clickableRows = true,
+  showContactButton = true,
+  showNewButton = true,
   enableColumnFilterModes,
   serverSidePagination,
   isFetching,
@@ -225,6 +227,8 @@ export const TableView = <T extends MRT_RowData>({
   svgExport?: (table: MRT_TableInstance<T>) => void | Promise<void>
   isCrossSearchTable?: boolean
   clickableRows?: boolean
+  showContactButton?: boolean
+  showNewButton?: boolean
   enableColumnFilterModes?: boolean
   serverSidePagination?: boolean
   isFetching: boolean
@@ -799,10 +803,9 @@ export const TableView = <T extends MRT_RowData>({
               tableName={title}
               kmlExport={kmlExport}
               svgExport={svgExport}
-              showNewButton={editRights.new && !selectorFn && !isCrossSearchTable}
+              showContactButton={showContactButton}
+              showNewButton={!!editRights.new && showNewButton}
               isCrossSearchTable={isCrossSearchTable}
-              selectorFn={selectorFn}
-              hideLeftButtons={false}
               columnVisibilityGroups={columnVisibilityGroups}
               renderExtraExportMenuItems={renderExtraExportMenuItems}
             />

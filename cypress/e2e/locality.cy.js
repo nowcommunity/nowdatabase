@@ -4,12 +4,15 @@ before('Reset database', () => {
 
 const buildLocalityName = (base = 'Bugat') => `${base} ${Date.now()}-${Math.floor(Math.random() * 1e6)}`
 
+// TODO: these tests are obsolete now that the Species tab has been removed from Locality details.
+// I'm leaving the code here in case it has to be re-enabled in the future.
+// Some of these tests should also probably be modified and copied over to the Occurrence tab testing.
 describe('Adding species in Locality -> Species tab for an existing locality', () => {
   beforeEach('Login as admin with session caching', () => {
     cy.loginWithSession('testSu')
   })
 
-  it('works with valid, unique species', () => {
+  it.skip('works with valid, unique species', () => {
     cy.visit(`/locality/20920?tab=2`)
     cy.contains('Lantian-Shuijiazui')
     cy.get('[id=edit-button]').click()
@@ -29,14 +32,13 @@ describe('Adding species in Locality -> Species tab for an existing locality', (
     cy.contains('somespecies')
   })
 
-  it('works through "copy species taxonomy" button', () => {
+  it.skip('works through "copy species taxonomy" button', () => {
     cy.visit(`/locality/20920?tab=2`)
     cy.contains('Lantian-Shuijiazui')
     cy.get('[id=edit-button]').click()
     cy.contains('Add new Species').click()
     cy.get('[data-cy=copy_existing_taxonomy_button]').click()
     cy.get('[data-cy=add-button-21426]').click()
-    cy.contains('Close').click()
     cy.get('[name=species_name]').clear()
     cy.get('[name=species_name]').type('Newspecies')
     cy.contains('Save').click()
@@ -47,7 +49,7 @@ describe('Adding species in Locality -> Species tab for an existing locality', (
     cy.contains('newspecies')
   })
 
-  it('does not work with invalid species', () => {
+  it.skip('does not work with invalid species', () => {
     cy.visit(`/locality/20920?tab=2`)
     cy.contains('Lantian-Shuijiazui')
     cy.get('[id=edit-button]').click()
@@ -63,7 +65,7 @@ describe('Adding species in Locality -> Species tab for an existing locality', (
     cy.contains('Order must not contain any spaces, unless the value is "incertae sedis".')
   })
 
-  it('does not work if the species has already been added', () => {
+  it.skip('does not work if the species has already been added', () => {
     cy.visit(`/locality/20920?tab=2`)
     cy.contains('Lantian-Shuijiazui')
     cy.get('[id=edit-button]').click()
@@ -108,7 +110,7 @@ describe('Adding species in Locality -> Species tab for an existing locality', (
     cy.contains('The taxon already exists in the database.')
   })
 
-  it('does not work with species with invalid taxonomic order', () => {
+  it.skip('does not work with species with invalid taxonomic order', () => {
     cy.visit(`/locality/20920?tab=2`)
     cy.contains('Lantian-Shuijiazui')
     cy.get('[id=edit-button]').click()
@@ -146,7 +148,7 @@ describe('Adding species in Locality -> Species tab for an existing locality', (
     cy.contains('Genus Amblycoptus belongs to family Soricidae, not Bovidae.')
   })
 
-  it('minus action only marks the clicked species row as removed', () => {
+  it.skip('minus action only marks the clicked species row as removed', () => {
     cy.visit(`/locality/20920?tab=2`)
     cy.contains('Lantian-Shuijiazui')
     cy.get('[id=edit-button]').click()
@@ -179,14 +181,13 @@ describe('Adding species in Locality -> Species tab for an existing locality', (
       })
   })
 
-  it('does not work through "copy species taxonomy" button if nothing is changed', () => {
+  it.skip('does not work through "copy species taxonomy" button if nothing is changed', () => {
     cy.visit(`/locality/20920?tab=2`)
     cy.contains('Lantian-Shuijiazui')
     cy.get('[id=edit-button]').click()
     cy.contains('Add new Species').click()
     cy.get('[data-cy=copy_existing_taxonomy_button]').click()
     cy.get('[data-cy=add-button-21052]').click()
-    cy.contains('Close').click()
     cy.contains('Save').click()
     cy.contains('The taxon already exists in the database.')
   })
@@ -479,7 +480,7 @@ describe('Editing a locality', () => {
   })
 
   it('adds collecting methods from the selector and persists them', () => {
-    cy.visit(`/locality/20920?tab=5`)
+    cy.visit(`/locality/20920?tab=4`)
     cy.contains('Lantian-Shuijiazui')
     cy.get('[id=edit-button]').click()
 
@@ -490,8 +491,202 @@ describe('Editing a locality', () => {
     cy.addReferenceAndSave()
     cy.contains('Edited item successfully.')
 
-    cy.visit(`/locality/20920?tab=5`)
+    cy.visit(`/locality/20920?tab=4`)
     cy.contains('wet_screen')
+  })
+
+  it('and creating a new Occurrence through the Occurrences tab works', () => {
+    cy.visit(`/locality/20920?tab=2`)
+    cy.get('[id=edit-button]').click()
+    cy.get('[data-cy=new-occurrence-button]').click()
+    cy.contains('Save occurrence').should('be.disabled')
+
+    cy.contains('Select Species').click()
+    cy.get('[data-cy=table-cell-species_name]').first().click()
+    cy.contains('simplicidens')
+    cy.get('[id=nis-textfield]').type('1221')
+    cy.contains('Save occurrence').click()
+
+    cy.addReferenceAndSave()
+    cy.visit(`/locality/20920?tab=2`)
+    cy.contains('simplicidens')
+    cy.contains('1221')
+  })
+
+  it('canceling occurrence creation does not add an occurrence', () => {
+    cy.visit(`/locality/20920?tab=2`)
+    cy.get('tbody tr')
+      .its('length')
+      .then(initialRowCount => {
+        cy.get('[id=edit-button]').click()
+        cy.get('[data-cy=new-occurrence-button]').click()
+        cy.contains('Select Species').click()
+        cy.get('[data-cy=table-cell-species_name]').first().click()
+        cy.get('[id=occurrence-creation-modal-cancel-button]').click()
+        cy.get('tbody tr').should('have.length', initialRowCount)
+      })
+  })
+
+  it('does not save an occurrence with an invalid NISP value', () => {
+    cy.visit(`/locality/20920?tab=2`)
+    cy.get('[id=edit-button]').click()
+    cy.get('[data-cy=new-occurrence-button]').click()
+    cy.contains('Select Species').click()
+    cy.get('[data-cy=table-cell-species_name]').first().click()
+    cy.get('[id=nis-textfield]').type('0')
+    cy.contains('NISP must be a positive integer.').should('be.visible')
+    cy.contains('Save occurrence').should('be.disabled')
+  })
+
+  it('persists occurrence wear and isotope values', () => {
+    cy.visit(`/locality/20920?tab=2`)
+    cy.get('[id=edit-button]').click()
+    cy.get('[data-cy=new-occurrence-button]').click()
+    cy.contains('Select Species').click()
+    cy.get('[data-cy=table-row-21426]').click()
+    cy.contains('indet.')
+
+    cy.get('[id=mw_scale_min-textfield]').type('1')
+    cy.get('[id=mw_scale_max-textfield]').type('10')
+    cy.get('[id=mw_value-textfield]').type('5')
+    cy.get('[id=dc13_mean-textfield]').type('12.5')
+    cy.get('[id=dc13_n-textfield]').type('2')
+    cy.contains('Save occurrence').click()
+
+    cy.addReferenceAndSave()
+    cy.visit(`/locality/20920?tab=2`)
+    cy.get('[data-cy=table-row-21426]').within(() => {
+      cy.contains('1')
+      cy.contains('10')
+      cy.contains('5')
+      cy.contains('12.5')
+      cy.contains('2')
+    })
+  })
+
+  it('creates a new species from the occurrence creation window and saves the occurrence', () => {
+    const speciesName = `newspecies${Date.now()}`
+
+    cy.visit(`/locality/20920?tab=2`)
+    cy.contains('Lantian-Shuijiazui')
+    cy.get('[id=edit-button]').click()
+    cy.get('[data-cy=new-occurrence-button]').click()
+    cy.contains('Add new Species').click()
+    cy.get('[name=order_name]').type('Neworder')
+    cy.get('[name=family_name]').type('Newfamily')
+    cy.get('[name=genus_name]').type('Newgenus')
+    cy.get('[name=species_name]').type(speciesName)
+    cy.get('[id=editing-modal-save-button]').click()
+
+    cy.contains('Save occurrence').should('not.be.disabled').click()
+
+    cy.addReferenceAndSave()
+    cy.visit(`/locality/20920?tab=2`)
+    cy.contains(speciesName)
+  })
+
+  it('creates a new species by copying taxonomy in the occurrence creation window and saves the occurrence', () => {
+    const speciesName = `copiedspecies${Date.now()}`
+
+    cy.visit(`/locality/20920?tab=2`)
+    cy.contains('Lantian-Shuijiazui')
+    cy.get('[id=edit-button]').click()
+    cy.get('[data-cy=new-occurrence-button]').click()
+    cy.contains('Add new Species').click()
+    cy.get('[data-cy=copy_existing_taxonomy_button]').click()
+    cy.get('[data-cy=add-button-21426]').click()
+    cy.get('[name=species_name]').clear()
+    cy.get('[name=species_name]').type(speciesName)
+    cy.get('[id=editing-modal-save-button]').click()
+
+    cy.contains('Save occurrence').should('not.be.disabled').click()
+
+    cy.addReferenceAndSave()
+    cy.visit(`/locality/20920?tab=2`)
+    cy.contains(speciesName)
+  })
+
+  it('does not create a species already used by another, saved occurrence', () => {
+    const speciesName = `saveddoublespecies`
+
+    cy.visit(`/locality/20920?tab=2`)
+    cy.contains('Lantian-Shuijiazui')
+    cy.get('[id=edit-button]').click()
+    cy.get('[data-cy=new-occurrence-button]').click()
+    cy.contains('Add new Species').click()
+    cy.get('[name=order_name]').type('Neworder')
+    cy.get('[name=family_name]').type('Newfamily')
+    cy.get('[name=genus_name]').type('Newgenus')
+    cy.get('[name=species_name]').type(speciesName)
+    cy.get('[id=editing-modal-save-button]').click()
+    cy.contains('Save occurrence').should('not.be.disabled').click()
+    cy.addReferenceAndSave()
+
+    cy.visit(`/locality/20920?tab=2`)
+    cy.contains('Lantian-Shuijiazui')
+    cy.get('[id=edit-button]').click()
+    cy.contains(speciesName)
+    cy.get('[data-cy=new-occurrence-button]').click()
+    cy.contains('Add new Species').click()
+    cy.get('[name=order_name]').type('Neworder')
+    cy.get('[name=family_name]').type('Newfamily')
+    cy.get('[name=genus_name]').type('Newgenus')
+    cy.get('[name=species_name]').type(speciesName)
+    cy.get('[id=editing-modal-save-button]').click()
+    cy.contains('The taxon already exists in the database.').should('be.visible')
+    cy.contains('Save occurrence').should('be.disabled')
+  })
+
+  it('does not create a species already used by another, unsaved occurrence', () => {
+    const speciesName = `unsaveddoublespecies`
+
+    cy.visit(`/locality/20920?tab=2`)
+    cy.contains('Lantian-Shuijiazui')
+    cy.get('[id=edit-button]').click()
+    cy.get('[data-cy=new-occurrence-button]').click()
+    cy.contains('Add new Species').click()
+    cy.get('[name=order_name]').type('Neworder')
+    cy.get('[name=family_name]').type('Newfamily')
+    cy.get('[name=genus_name]').type('Newgenus')
+    cy.get('[name=species_name]').type(speciesName)
+    cy.get('[id=editing-modal-save-button]').click()
+    cy.contains('Save occurrence').should('not.be.disabled').click()
+    cy.contains(speciesName)
+
+    cy.get('[data-cy=new-occurrence-button]').click()
+    cy.contains('Add new Species').click()
+    cy.get('[name=order_name]').type('Neworder')
+    cy.get('[name=family_name]').type('Newfamily')
+    cy.get('[name=genus_name]').type('Newgenus')
+    cy.get('[name=species_name]').type(speciesName)
+    cy.get('[id=editing-modal-save-button]').click()
+    cy.contains('The taxon already exists in the database.').should('be.visible')
+    cy.contains('Save occurrence').should('be.disabled')
+  })
+
+  it('shows taxonomy check error when copied taxonomy is unchanged', () => {
+    cy.visit(`/locality/20920?tab=2`)
+    cy.contains('Lantian-Shuijiazui')
+    cy.get('[id=edit-button]').click()
+    cy.get('[data-cy=new-occurrence-button]').click()
+    cy.contains('Add new Species').click()
+    cy.get('[data-cy=copy_existing_taxonomy_button]').click()
+    cy.get('[data-cy=add-button-21052]').click()
+    cy.get('[id=editing-modal-save-button]').click()
+    cy.contains('The taxon already exists in the database.').should('be.visible')
+  })
+
+  it('and creating a new Occurrence does not show species that are already used in other Occurrences', () => {
+    cy.visit(`/locality/21050?tab=2`)
+    cy.contains('meneghinii')
+    cy.get('simplicidens').should('not.exist')
+    cy.get('legidensis').should('not.exist')
+    cy.get('[id=edit-button]').click()
+    cy.get('[data-cy=new-occurrence-button]').click()
+    cy.contains('Select Species').click()
+    cy.get('meneghinii').should('not.exist')
+    cy.contains('simplicidens')
+    cy.contains('legidensis')
   })
 })
 
@@ -610,7 +805,7 @@ describe('Linking projects to an existing locality', () => {
 
   beforeEach('Login as admin and open projects tab', () => {
     cy.loginWithSession('testSu')
-    cy.visit(`/locality/${localityId}?tab=10`)
+    cy.visit(`/locality/${localityId}?tab=9`)
     cy.contains('Dmanisi')
   })
 
@@ -625,7 +820,7 @@ describe('Linking projects to an existing locality', () => {
 
     cy.addReferenceAndSave()
     cy.contains('Edited item successfully.')
-    cy.visit(`/locality/${localityId}?tab=10`)
+    cy.visit(`/locality/${localityId}?tab=9`)
     cy.contains(newProjectCode)
 
     cy.get('[id=edit-button]').click()
@@ -633,7 +828,7 @@ describe('Linking projects to an existing locality', () => {
 
     cy.addReferenceAndSave()
     cy.contains('Edited item successfully.')
-    cy.visit(`/locality/${localityId}?tab=10`)
+    cy.visit(`/locality/${localityId}?tab=9`)
     cy.contains(newProjectCode).should('not.exist')
   })
 })

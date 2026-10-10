@@ -83,8 +83,9 @@ export const generateOccurrenceDetailSql = (lid: number, speciesId: number) => {
       now_loc.min_age,
       now_loc.bfa_max,
       now_loc.bfa_min,
-      com_species.genus_name,
+      com_species.order_name,
       com_species.family_name,
+      com_species.genus_name,
       com_species.species_name,
       com_species.unique_identifier
     FROM now_ls

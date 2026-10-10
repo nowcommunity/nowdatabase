@@ -1,6 +1,8 @@
 import {
+  EditDataType,
   EditMetaData,
   EditableOccurrenceData,
+  OccurrenceDetailsType,
   OccurrenceEditableField,
   Reference,
   Role,
@@ -93,7 +95,7 @@ const buildOccurrenceUpdateData = (
 export const updateOccurrenceByCompositeKey = async (
   lid: number,
   speciesId: number,
-  editedOccurrence: EditableOccurrenceData & EditMetaData,
+  editedOccurrence: EditDataType<OccurrenceDetailsType> & EditMetaData,
   user?: User
 ) => {
   if (!user || ![Role.Admin, Role.EditUnrestricted, Role.EditRestricted].includes(user.role)) {
