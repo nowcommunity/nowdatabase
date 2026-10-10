@@ -94,6 +94,9 @@ export const OccurrenceCoreTab = ({
                           suborder_or_superfamily_name: convertedSpecies.suborder_or_superfamily_name,
                           subfamily_name: convertedSpecies.subfamily_name,
                           unique_identifier: convertedSpecies.unique_identifier,
+                          taxonomic_status: convertedSpecies.taxonomic_status,
+                          sp_comment: convertedSpecies.sp_comment,
+                          sp_author: convertedSpecies.sp_author,
                         })
                       }}
                     />,
@@ -118,12 +121,18 @@ export const OccurrenceCoreTab = ({
                       editingAction={(newSpecies: Species) => {
                         setEditData({
                           ...editData,
+                          species_id: newSpecies.species_id,
                           order_name: newSpecies.order_name ?? '',
                           family_name: newSpecies.family_name ?? '',
                           genus_name: newSpecies.genus_name ?? '',
                           species_name: newSpecies.species_name ?? '',
-                          species_id: newSpecies.species_id,
+                          subclass_or_superorder_name: newSpecies.subclass_or_superorder_name,
+                          suborder_or_superfamily_name: newSpecies.suborder_or_superfamily_name,
+                          subfamily_name: newSpecies.subfamily_name,
                           unique_identifier: newSpecies.unique_identifier,
+                          taxonomic_status: newSpecies.taxonomic_status,
+                          sp_comment: newSpecies.sp_comment,
+                          sp_author: newSpecies.sp_author,
                         })
                       }}
                     />,

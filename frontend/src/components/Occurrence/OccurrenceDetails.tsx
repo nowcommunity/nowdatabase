@@ -5,7 +5,6 @@ import { useEditOccurrenceMutation, useGetOccurrenceDetailsQuery } from '@/redux
 import { useEditLocalityMutation, useGetLocalityDetailsQuery } from '@/redux/localityReducer'
 import { useLazyGetSpeciesDetailsQuery } from '@/redux/speciesReducer'
 import {
-  EditableOccurrenceData,
   EditDataType,
   EditMetaData,
   LocalitySpeciesDetailsType,
@@ -22,38 +21,6 @@ import { OccurrenceIsotopeTab } from './Tabs/OccurrenceIsotopeTab'
 import { OccurrenceWearTab } from './Tabs/OccurrenceWearTab'
 import { emptyOccurrence } from './emptyOccurrence'
 import { fixNullValuesInTaxonomyFields } from '@/util/taxonomyUtilities'
-
-const occurrenceFields: Array<keyof EditableOccurrenceData> = [
-  'nis',
-  'pct',
-  'quad',
-  'mni',
-  'qua',
-  'id_status',
-  'orig_entry',
-  'source_name',
-  'body_mass',
-  'mesowear',
-  'mw_or_high',
-  'mw_or_low',
-  'mw_cs_sharp',
-  'mw_cs_round',
-  'mw_cs_blunt',
-  'mw_scale_min',
-  'mw_scale_max',
-  'mw_value',
-  'microwear',
-  'dc13_mean',
-  'dc13_n',
-  'dc13_max',
-  'dc13_min',
-  'dc13_stdev',
-  'do18_mean',
-  'do18_n',
-  'do18_max',
-  'do18_min',
-  'do18_stdev',
-]
 
 export const OccurrenceDetails = () => {
   const { lid, speciesId } = useParams()
@@ -143,6 +110,9 @@ export const OccurrenceDetails = () => {
               editData.suborder_or_superfamily_name ?? emptySpecies.suborder_or_superfamily_name,
             subfamily_name: editData.subfamily_name ?? emptySpecies.subfamily_name,
             unique_identifier: editData.unique_identifier ?? emptySpecies.unique_identifier,
+            taxonomic_status: editData.taxonomic_status ?? emptySpecies.taxonomic_status,
+            sp_comment: editData.sp_comment ?? emptySpecies.sp_comment,
+            sp_author: editData.sp_author ?? emptySpecies.sp_author,
           }
         } else {
           changedSpeciesDetails = await getSpeciesDetails(String(editData.species_id)).unwrap()
@@ -150,7 +120,6 @@ export const OccurrenceDetails = () => {
             notify('Could not get details of the changed species.')
             return
           }
-          console.log(changedSpeciesDetails)
           comSpecies = fixNullValuesInTaxonomyFields(changedSpeciesDetails)
         }
 
@@ -160,8 +129,6 @@ export const OccurrenceDetails = () => {
           com_species: comSpecies,
           rowState: 'new',
         } as LocalitySpeciesDetailsType
-
-        console.log(occurrenceAsNowLs.now_oau)
 
         //  removes the old occurrence before adding the update version back in
         const removedRow = localityData.now_ls.find(row => row.species_id === Number(speciesId))
@@ -192,7 +159,6 @@ export const OccurrenceDetails = () => {
           comment: editData.comment,
           references: editData.references ?? [],
         }).unwrap()
-        console.log(updatedOccurrence.now_oau)
         notify('Occurrence entry finalized successfully.')
         setTimeout(() => navigate(`/occurrence/${updatedOccurrence.lid}/${updatedOccurrence.species_id}`), 15)
       }
@@ -205,7 +171,7 @@ export const OccurrenceDetails = () => {
   const tabs: TabType[] = [
     {
       title: 'Occurrence',
-      content: <OccurrenceCoreTab clickableLocName={true} existingLocalitySpecies={localityData!.now_ls} />,
+      content: <OccurrenceCoreTab clickableLocName={true} existingLocalitySpecies={localityData.now_ls} />,
     },
     { title: 'Wear', content: <OccurrenceWearTab /> },
     { title: 'Isotopes', content: <OccurrenceIsotopeTab /> },
