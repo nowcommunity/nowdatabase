@@ -70,7 +70,7 @@ describe('Button Tests', () => {
     cy.contains('Updates').should('be.visible')
   })
 
-  it.only('Links between localities and occurrences work', () => {
+  it('Links between localities and occurrences work', () => {
     cy.visit('/locality/21050')
     cy.get('[role=tablist]').contains('Occurrences').click()
     // getting the entire row does not work since its center is hidden 
@@ -84,7 +84,7 @@ describe('Button Tests', () => {
     cy.contains('Dmanisi')
   })
 
-  it.only('Links between localities and species work', () => {
+  it('Links between localities and species work', () => {
     cy.visit('/locality/21050')
     cy.get('[role=tablist]').contains('Occurrences').click()
     cy.get('[id=go-to-species-21426]').click()

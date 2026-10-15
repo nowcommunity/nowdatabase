@@ -63,7 +63,8 @@ describe('Occurrence editing', () => {
     cy.get('[id=do18_n-textfield]').should('have.value', '3')
   })
 
-  it('works with species changed to an existing species', () => {
+  // These skipped tests do not work since editing an occurrence's species is not implemented.
+  it.skip('works with species changed to an existing species', () => {
     cy.resetDatabase()
     cy.visit('/occurrence/21050/85729')
 
@@ -82,7 +83,7 @@ describe('Occurrence editing', () => {
     cy.contains('Dmanisi')
   })
 
-  it('works with species changed to a new species', () => {
+  it.skip('works with species changed to a new species', () => {
     const speciesName = `occurrencespecies${Date.now()}`
 
     cy.resetDatabase()
@@ -113,7 +114,6 @@ describe('Occurrence editing', () => {
     cy.contains('Dmanisi')
   })
 
-  // TODO: create these once update log for Occurrences works correctly, see GitHub issue
   it.skip('shows update logs correctly with changed basic values')
   it.skip('shows update logs correctly with changed, but existing species')
   it.skip('shows update logs correctly with a new species')

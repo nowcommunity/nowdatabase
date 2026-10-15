@@ -1,13 +1,13 @@
 import { useDetailContext } from '@/components/DetailView/Context/DetailContext'
+import { SelectingTable } from '@/components/DetailView/common/SelectingTable'
 import { ArrayFrame, HalfFrames } from '@/components/DetailView/common/tabLayoutHelpers'
+import { NewSpeciesForm } from '@/components/common/NewSpeciesForm'
+import { useGetAllSpeciesQuery } from '@/redux/speciesReducer'
 import { EditDataType, LocalitySpeciesDetailsType, OccurrenceDetailsType, Species } from '@/shared/types'
+import { skipToken } from '@reduxjs/toolkit/query'
+import { MRT_ColumnDef } from 'material-react-table'
 import { Link } from 'react-router-dom'
 import { idStatusOptions, quantityOptions } from '../constants'
-import { useGetAllSpeciesQuery } from '@/redux/speciesReducer'
-import { SelectingTable } from '@/components/DetailView/common/SelectingTable'
-import { MRT_ColumnDef } from 'material-react-table'
-import { NewSpeciesForm } from '@/components/common/NewSpeciesForm'
-import { TaxonomySpecies } from '@/util/taxonomyUtilities'
 
 const toText = (value: string | number | null | undefined) =>
   value === null || value === undefined || value === '' ? '-' : String(value)
@@ -48,13 +48,14 @@ const speciesColumns: MRT_ColumnDef<Species>[] = [
 export const OccurrenceCoreTab = ({
   clickableLocName = true,
   existingLocalitySpecies,
+  showSpeciesEditButtons = true,
 }: {
   clickableLocName?: boolean
   existingLocalitySpecies?: EditDataType<LocalitySpeciesDetailsType[]>
-  additionalTaxonomyCheckSpecies?: TaxonomySpecies[]
+  showSpeciesEditButtons?: boolean
 }) => {
-  const { data: speciesQueryData, isError } = useGetAllSpeciesQuery()
   const { data, editData, setEditData, mode, textField, dropdown } = useDetailContext<OccurrenceDetailsType>()
+  const { data: speciesQueryData, isError } = useGetAllSpeciesQuery(mode.read ? skipToken : undefined)
 
   const existingOccurrenceSpeciesIds = (existingLocalitySpecies ?? []).map(ls => ls.species_id)
 
@@ -76,7 +77,7 @@ export const OccurrenceCoreTab = ({
             title="Identification"
             array={[
               locNameArray,
-              !mode.read
+              !mode.read && showSpeciesEditButtons
                 ? [
                     '',
                     <NewSpeciesForm
@@ -102,7 +103,7 @@ export const OccurrenceCoreTab = ({
                     />,
                   ]
                 : [],
-              !mode.read
+              !mode.read && showSpeciesEditButtons
                 ? [
                     '',
                     <SelectingTable
