@@ -39,10 +39,17 @@ export type OccurrenceDetailsType = {
   loc_status: boolean | null
   loc_name: string
   country: string
+  order_name: string
+  family_name: string
   genus_name: string
-  family_name: string | null
   species_name: string
+  subclass_or_superorder_name: string | null
+  suborder_or_superfamily_name: string | null
+  subfamily_name: string | null
   unique_identifier: string | null
+  taxonomic_status: string | null
+  sp_comment: string | null
+  sp_author: string | null
   dms_lat: string | null
   dms_long: string | null
   bfa_max: string | null

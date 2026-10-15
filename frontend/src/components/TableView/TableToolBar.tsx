@@ -34,10 +34,9 @@ export const TableToolBar = <T extends MRT_RowData>({
   tableName,
   kmlExport,
   svgExport,
-  isCrossSearchTable,
-  selectorFn,
+  isCrossSearchTable = false,
+  showContactButton,
   showNewButton,
-  hideLeftButtons,
   columnVisibilityGroups,
   renderExtraExportMenuItems,
 }: {
@@ -46,9 +45,8 @@ export const TableToolBar = <T extends MRT_RowData>({
   kmlExport?: (table: MRT_TableInstance<T>) => void | Promise<void>
   svgExport?: (table: MRT_TableInstance<T>) => void | Promise<void>
   isCrossSearchTable?: boolean
-  selectorFn?: (id: T) => void
-  showNewButton?: boolean
-  hideLeftButtons?: boolean
+  showContactButton: boolean
+  showNewButton: boolean
   columnVisibilityGroups?: ColumnVisibilityGroup[]
   renderExtraExportMenuItems?: ((handleClose: () => void, key: number) => ReactNode)[]
 }) => {
@@ -203,24 +201,23 @@ export const TableToolBar = <T extends MRT_RowData>({
 
   return (
     <div className="table-tool-bar">
-      {!selectorFn && !hideLeftButtons && (
-        <Box className="left-buttons">
-          <ContactForm<T> buttonText="Contact" noContext={true} />
+      <Box className="left-buttons">
+        {showContactButton && <ContactForm<T> buttonText="Contact" noContext={true} />}
+        {showNewButton && (
+          <Button
+            id="new-button"
+            variant="outlined"
+            component={Link}
+            to="new"
+            className="button"
+            startIcon={<AddCircleIcon />}
+            onClick={() => setPreviousTableUrls([...previousTableUrls, `${location.pathname}`])}
+          >
+            New
+          </Button>
+        )}
+      </Box>
 
-          {showNewButton && (
-            <Button
-              variant="outlined"
-              component={Link}
-              to="new"
-              className="button"
-              startIcon={<AddCircleIcon />}
-              onClick={() => setPreviousTableUrls([...previousTableUrls, `${location.pathname}`])}
-            >
-              New
-            </Button>
-          )}
-        </Box>
-      )}
       <Box className="icon-buttons">
         <Tooltip title="Show/hide columns">
           <IconButton

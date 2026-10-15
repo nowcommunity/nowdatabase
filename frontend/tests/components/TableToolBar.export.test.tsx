@@ -44,6 +44,8 @@ describe('TableToolBar export menu', () => {
         <TableToolBar
           table={{} as MRT_TableInstance<MRT_RowData>}
           tableName="Localities"
+          showContactButton={false}
+          showNewButton={false}
           kmlExport={kmlExport}
           svgExport={svgExport}
         />

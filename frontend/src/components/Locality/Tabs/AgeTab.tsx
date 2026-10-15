@@ -284,7 +284,7 @@ export const AgeTab = () => {
         targetField="bfa_max"
         fraction={editData.frac_max}
         timeUnit={bfaMaxData}
-        selectorTable={<TimeUnitTable />}
+        selectorTable={<TimeUnitTable clickableRows={false} />}
         disabled={maxAgeTimeUnitDisabled}
         displayValue={maxTimeUnitDisplay}
       />,

@@ -1,71 +1,29 @@
-import {
-  EditDataType,
-  LocalityDetailsType,
-  LocalitySpeciesDetailsType,
-  RowState,
-  Species,
-  SpeciesDetailsType,
-} from '@/shared/types'
+import { NewSpeciesForm } from '@/components/common/NewSpeciesForm'
+import { applyDefaultSpeciesOrdering, hasActiveSortingInSearch } from '@/components/DetailView/common/DetailTabTable'
 import { EditableTable } from '@/components/DetailView/common/EditableTable'
-import { EditingForm, type EditingFormField } from '@/components/DetailView/common/EditingForm'
 import { SelectingTable } from '@/components/DetailView/common/SelectingTable'
 import { Grouped } from '@/components/DetailView/common/tabLayoutHelpers'
 import { useDetailContext } from '@/components/DetailView/Context/DetailContext'
 import { useGetAllSpeciesQuery } from '@/redux/speciesReducer'
+import { EditDataType, LocalityDetailsType, LocalitySpeciesDetailsType, RowState, Species } from '@/shared/types'
+import { fixNullValuesInTaxonomyFields } from '@/util/taxonomyUtilities'
 import { Box, CircularProgress } from '@mui/material'
 import { skipToken } from '@reduxjs/toolkit/query'
 import { MRT_ColumnDef } from 'material-react-table'
-import {
-  checkSpeciesTaxonomy,
-  convertSpeciesTaxonomyFields,
-  fixNullValuesInTaxonomyFields,
-} from '@/util/taxonomyUtilities'
-import { useNotify } from '@/hooks/notification'
-import { validateSpecies } from '@/shared/validators/species'
-import { smallSpeciesTableColumns } from '@/common'
-import { useMemo, useState } from 'react'
-import { SynonymsModal } from '@/components/Species/SynonymsModal'
-import { taxonStatusSelectOptions } from '@/constants/taxonStatusOptions'
-import { applyDefaultSpeciesOrdering, hasActiveSortingInSearch } from '@/components/DetailView/common/DetailTabTable'
+import { useMemo } from 'react'
 import { useLocation } from 'react-router-dom'
+import { toSpeciesDetailsDraft } from '@/components/common/toSpeciesDetailsDraft'
 
 export const SpeciesTab = () => {
   const { mode, editData, setEditData } = useDetailContext<LocalityDetailsType>()
   const location = useLocation()
   const { data: speciesData, isError } = useGetAllSpeciesQuery(mode.read ? skipToken : undefined)
-  const { notify } = useNotify()
-  const [replacedValues, setReplacedValues] = useState<EditDataType<Species> | undefined>()
-  const [selectedSpecies, setSelectedSpecies] = useState<string | undefined>()
-  const [modalOpen, setModalOpen] = useState<boolean>(false)
 
   const hasUrlSorting = hasActiveSortingInSearch(location.search)
 
   const sortedSpeciesData = useMemo(() => {
     return applyDefaultSpeciesOrdering(speciesData, { skip: hasUrlSorting })
   }, [hasUrlSorting, speciesData])
-
-  const toSpeciesDetailsDraft = (
-    input: Partial<EditDataType<Species>> & { class_name?: string | null }
-  ): EditDataType<SpeciesDetailsType> => {
-    return {
-      now_ls: [],
-      com_taxa_synonym: [],
-      now_sau: [],
-      species_id: input.species_id,
-      class_name: input.class_name ?? undefined,
-      subclass_or_superorder_name: input.subclass_or_superorder_name ?? undefined,
-      order_name: input.order_name ?? undefined,
-      suborder_or_superfamily_name: input.suborder_or_superfamily_name ?? undefined,
-      family_name: input.family_name ?? undefined,
-      subfamily_name: input.subfamily_name ?? undefined,
-      genus_name: input.genus_name ?? undefined,
-      species_name: input.species_name ?? undefined,
-      unique_identifier: input.unique_identifier ?? undefined,
-      taxonomic_status: input.taxonomic_status ?? undefined,
-      sp_comment: input.sp_comment,
-      sp_author: input.sp_author,
-    }
-  }
 
   type LocalitySpeciesRow = EditDataType<LocalitySpeciesDetailsType> & { rowState?: RowState; index: number }
 
@@ -79,94 +37,6 @@ export const SpeciesTab = () => {
       skip: hasUrlSorting,
     })
   }, [indexedLocalitySpeciesData, hasUrlSorting])
-
-  const handleRowActionClick = (row: Species) => {
-    setSelectedSpecies(row.species_id.toString())
-    setModalOpen(true)
-  }
-
-  const copyTaxonomyButton = (
-    <Box key="copy_existing_taxonomy_button">
-      <SelectingTable<Species, Species>
-        dataCy="copy_existing_taxonomy_button"
-        buttonText="Copy existing taxonomy"
-        title="Copy existing taxonomy"
-        data={sortedSpeciesData}
-        isError={isError}
-        columns={smallSpeciesTableColumns}
-        fieldName="order_name" // this doesn't do anything here but is required
-        idFieldName="species_id"
-        useObject={true}
-        tableRowAction={handleRowActionClick}
-        editingAction={(selectedSpecies: Species) => {
-          const fixedSpecies = fixNullValuesInTaxonomyFields(selectedSpecies)
-          setReplacedValues({
-            subclass_or_superorder_name: fixedSpecies.subclass_or_superorder_name,
-            order_name: fixedSpecies.order_name!,
-            suborder_or_superfamily_name: fixedSpecies.suborder_or_superfamily_name,
-            family_name: fixedSpecies.family_name!,
-            subfamily_name: fixedSpecies.subfamily_name,
-            genus_name: fixedSpecies.genus_name!,
-            species_name: fixedSpecies.species_name!,
-            unique_identifier: fixedSpecies.unique_identifier!,
-            taxonomic_status: '',
-            sp_comment: '',
-            sp_author: '',
-          })
-        }}
-      />
-      <SynonymsModal open={modalOpen} onClose={() => setModalOpen(false)} selectedSpecies={selectedSpecies} />
-    </Box>
-  )
-
-  const convertAndCheckNewSpeciesTaxonomy = (newSpecies: EditDataType<Species>) => {
-    const speciesForValidation = toSpeciesDetailsDraft(newSpecies)
-    const fieldsToValidate: Array<keyof EditDataType<SpeciesDetailsType>> = [
-      'subclass_or_superorder_name',
-      'order_name',
-      'suborder_or_superfamily_name',
-      'family_name',
-      'subfamily_name',
-      'genus_name',
-      'species_name',
-      'taxonomic_status',
-      'unique_identifier',
-    ]
-
-    const errors = fieldsToValidate
-      .map(fieldName => validateSpecies(speciesForValidation, fieldName))
-      .filter(({ error }) => Boolean(error))
-
-    if (errors.length > 0) {
-      notify('Following validators failed: \n' + errors.map(e => `${e.name}: ${e.error}`).join('\n'), 'error')
-      return false
-    }
-
-    const convertedSpecies = convertSpeciesTaxonomyFields(newSpecies)
-    const draftExistingTaxa = editData.now_ls
-      .filter(ls => ls.rowState === 'new')
-      .map(ls => ls.com_species)
-      .filter((species): species is EditDataType<SpeciesDetailsType> => Boolean(species))
-      .map(species => ({
-        species_id: species.species_id,
-        subclass_or_superorder_name: species.subclass_or_superorder_name,
-        order_name: species.order_name,
-        suborder_or_superfamily_name: species.suborder_or_superfamily_name,
-        family_name: species.family_name,
-        subfamily_name: species.subfamily_name,
-        genus_name: species.genus_name,
-        species_name: species.species_name,
-        unique_identifier: species.unique_identifier,
-      }))
-
-    const taxonomyErrors = checkSpeciesTaxonomy(convertedSpecies, [...(speciesData ?? []), ...draftExistingTaxa], [])
-    if (taxonomyErrors.size > 0) {
-      const errorMessage = [...taxonomyErrors].reduce((acc, currentError) => acc + `\n${currentError}`)
-      notify(errorMessage, 'error', null)
-      return false
-    }
-    return convertedSpecies
-  }
 
   const speciesColumns: MRT_ColumnDef<Species>[] = [
     {
@@ -244,19 +114,6 @@ export const SpeciesTab = () => {
       header: 'Author',
     },
   ]
-  const formFields: EditingFormField[] = [
-    { name: 'order_name', label: 'Order', required: true },
-    { name: 'family_name', label: 'Family', required: true },
-    { name: 'genus_name', label: 'Genus', required: true },
-    { name: 'species_name', label: 'Species', required: true },
-    { name: 'subclass_or_superorder_name', label: 'Subclass or Superorder' },
-    { name: 'suborder_or_superfamily_name', label: 'Suborder or Superfamily' },
-    { name: 'subfamily_name', label: 'Subfamily or Tribe' },
-    { name: 'unique_identifier', label: 'Unique Identifier', required: true },
-    { name: 'taxonomic_status', label: 'Taxon status', selectOptions: taxonStatusSelectOptions },
-    { name: 'sp_comment', label: 'Comment' },
-    { name: 'sp_author', label: 'Author' },
-  ]
 
   if (!mode.read && !speciesData) return <CircularProgress />
 
@@ -264,15 +121,9 @@ export const SpeciesTab = () => {
     <Grouped title="Species">
       {!mode.read && (
         <Box display="flex" gap={1}>
-          <EditingForm<EditDataType<Species>, LocalityDetailsType>
-            buttonText="Add new Species"
-            formFields={formFields}
-            existingObject={{ unique_identifier: '-' }}
-            replacedValues={replacedValues}
-            copyTaxonomyButton={copyTaxonomyButton}
-            editAction={(newSpecies: EditDataType<Species>) => {
-              const convertedSpecies = convertAndCheckNewSpeciesTaxonomy(newSpecies)
-              if (!convertedSpecies) return
+          <NewSpeciesForm
+            existingLocalitySpecies={editData.now_ls}
+            afterTaxonomyCheck={(convertedSpecies: EditDataType<Species>) => {
               setEditData({
                 ...editData,
                 now_ls: [
@@ -280,7 +131,7 @@ export const SpeciesTab = () => {
                   {
                     lid: editData.lid,
                     species_id: undefined,
-                    com_species: toSpeciesDetailsDraft({ ...convertedSpecies, class_name: 'Mammalia' }),
+                    com_species: toSpeciesDetailsDraft(fixNullValuesInTaxonomyFields(convertedSpecies)),
                     rowState: 'new',
                   },
                 ],

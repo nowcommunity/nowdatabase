@@ -192,6 +192,8 @@ export const DetailTabTable = <T extends MRT_RowData>(props: DetailTabTableProps
       url={url}
       checkRowRestriction={checkRowRestriction}
       clickableRows={clickableRows}
+      showContactButton={false}
+      showNewButton={false}
       enableColumnFilterModes={enableColumnFilterModes}
       paginationPlacement={paginationPlacement}
       isError={isError}
@@ -280,7 +282,8 @@ const DetailTabEditableToolbar = <T extends MRT_RowData>({
         <TableToolBar<T>
           table={table}
           tableName={tableName}
-          hideLeftButtons={true}
+          showContactButton={false}
+          showNewButton={false}
           kmlExport={kmlExport}
           svgExport={svgExport}
         />

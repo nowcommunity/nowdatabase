@@ -201,6 +201,7 @@ export const SpeciesTable = ({ selectorFn }: { selectorFn?: (id: Species) => voi
         accessorFn: row => row.unique_identifier || '',
         header: 'Unique Identifier',
         size: 20,
+        enableHiding: false,
         filterFn: 'contains',
       },
       {

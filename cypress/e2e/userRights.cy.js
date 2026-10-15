@@ -10,9 +10,14 @@ describe('Broadly test what different user rights see', () => {
 
     it('Sees new button in tableviews', () => {
       cy.visit('/locality')
-      cy.contains('New').click()
+      cy.get('#new-button').click()
       cy.contains('Time Unit')
       cy.contains('Creating new locality')
+    })
+
+    it('Does not see new button in Occurrence tableview', () => {
+      cy.visit('/occurrence')
+      cy.get('#new-button').should('not.exist')
     })
 
     it('Regions view shows correctly', () => {
