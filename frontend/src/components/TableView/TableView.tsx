@@ -728,17 +728,7 @@ export const TableView = <T extends MRT_RowData>({
       replace: true,
     })
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [
-    columnFilters,
-    sorting,
-    columnVisibility,
-    selectorFn,
-    table,
-    idFieldName,
-    navigate,
-    tableStateId,
-    hasLoadedTableState,
-  ])
+  }, [columnFilters, sorting, columnVisibility, selectorFn, idFieldName, navigate, tableStateId, hasLoadedTableState])
 
   useEffect(() => {
     if (!serverSidePagination) return
