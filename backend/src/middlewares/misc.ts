@@ -3,6 +3,9 @@ import { Middleware } from '../types'
 /* Disables all write routes except the ones excluded by "allowedRoutes" */
 export const blockWriteRequests: Middleware = (req, res, next) => {
   const allowedRoutes = [
+    '/crosssearch/all',
+    '/crosssearch/localities',
+    '/crosssearch/export',
     '/user/login',
     '/locality-species',
     '/refreshToken',

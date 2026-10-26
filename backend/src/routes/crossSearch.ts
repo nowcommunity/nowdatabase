@@ -175,7 +175,7 @@ const streamCrossSearchExport = async (req: Request, res: Response, parameters: 
   let dataArray: Partial<CrossSearch[][]>
   try {
     dataArray = (await getCrossSearchRawSql(
-      req.user,
+      req.user, // req.user comes from the userExtractor middleware, so should be secure
       undefined,
       undefined,
       parsedValues.validatedValues.validatedColumnFilters,
