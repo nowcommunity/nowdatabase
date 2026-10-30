@@ -6,7 +6,7 @@ import { useGetLocalityDetailsQuery } from '@/redux/localityReducer'
 import { EditDataType, EditMetaData, OccurrenceDetailsType } from '@/shared/types'
 import { validateOccurrence, validateOccurrenceFields } from '@/shared/validators/occurrence'
 import { CircularProgress } from '@mui/material'
-import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
+import { useLocation, useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { OccurrenceCoreTab } from './Tabs/OccurrenceCoreTab'
 import { OccurrenceIsotopeTab } from './Tabs/OccurrenceIsotopeTab'
 import { OccurrenceWearTab } from './Tabs/OccurrenceWearTab'
@@ -46,6 +46,8 @@ export const OccurrenceDetails = () => {
 
   const { notify } = useNotify()
   const navigate = useNavigate()
+  const location = useLocation()
+  const returnTo = (location.state as { returnTo?: string } | null)?.returnTo
 
   if (occurrenceQueryError) return <div>Error loading occurrence data</div>
   if (localityQueryError) return <div>Error loading locality data</div>
@@ -72,7 +74,13 @@ export const OccurrenceDetails = () => {
         references: editData.references ?? [],
       }).unwrap()
       notify('Occurrence entry finalized successfully.')
-      setTimeout(() => navigate(`/occurrence/${updatedOccurrence.lid}/${updatedOccurrence.species_id}`), 15)
+      setTimeout(() => {
+        if (returnTo) {
+          navigate(returnTo, { replace: true })
+          return
+        }
+        navigate(`/occurrence/${updatedOccurrence.lid}/${updatedOccurrence.species_id}`)
+      }, 15)
     } catch (error) {
       notify(getErrorMessage(error, 'Could not finalize occurrence entry.'), 'error')
       throw error
