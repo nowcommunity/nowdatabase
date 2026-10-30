@@ -122,7 +122,11 @@ const occurrenceApi = api.injectEndpoints({
         method: 'PUT',
         body: { occurrence },
       }),
-      invalidatesTags: (_result, _error, { lid, species_id }) => [{ type: 'occurrence', id: `${lid}-${species_id}` }],
+      invalidatesTags: (_result, _error, { lid, species_id }) => [
+        { type: 'occurrence', id: `${lid}-${species_id}` },
+        { type: 'locality', id: lid },
+        { type: 'species', id: species_id },
+      ],
     }),
   }),
 })
