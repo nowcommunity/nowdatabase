@@ -1,5 +1,5 @@
 import { useSearchParams } from 'react-router-dom'
-import { Box, Button, Paper, Stack, Tab, Tabs, useTheme } from '@mui/material'
+import { Box, Button, Paper, Tooltip, Stack, Tab, Tabs, useTheme } from '@mui/material'
 import EditIcon from '@mui/icons-material/Edit'
 import { useState, JSX } from 'react'
 import {
@@ -115,6 +115,8 @@ export const DetailView = <T extends object>({
   taxonomy = false,
   hasStagingMode = false,
   deleteFunction,
+  deleteDisabled = false,
+  deleteDisabledReason,
   wrapWithUnsavedChangesProvider = true,
 }: {
   tabs: TabType[]
@@ -132,6 +134,8 @@ export const DetailView = <T extends object>({
   taxonomy?: boolean
   hasStagingMode?: boolean
   deleteFunction?: () => Promise<void>
+  deleteDisabled?: boolean
+  deleteDisabledReason?: string
   wrapWithUnsavedChangesProvider?: boolean
 }) => {
   const [searchParams] = useSearchParams()
@@ -263,15 +267,20 @@ export const DetailView = <T extends object>({
               setFieldsWithErrors={setFieldsWithErrors}
             />
             {editRights.delete && !isNew && !isUserPage && (
-              <Button
-                id="delete-button"
-                onClick={onDelete}
-                variant="contained"
-                sx={{ width: '8em', color: 'white' }}
-                color="error"
-              >
-                Delete
-              </Button>
+              <Tooltip title={deleteDisabled ? deleteDisabledReason ?? '' : ''}>
+                <span>
+                  <Button
+                    id="delete-button"
+                    onClick={onDelete}
+                    variant="contained"
+                    sx={{ width: '8em', color: 'white' }}
+                    color="error"
+                    disabled={deleteDisabled}
+                  >
+                    Delete
+                  </Button>
+                </span>
+              </Tooltip>
             )}
             {!mode.read && <ErrorBox />}
             {(!mode.read || initialState.mode.new) && onWrite && (
