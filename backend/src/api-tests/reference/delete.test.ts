@@ -64,6 +64,40 @@ describe('Deleting a reference', () => {
     expect(stillExistsStatus).toEqual(200)
   })
 
+  it('can-delete reports linked references as not deletable', async () => {
+    await login('testSu')
+
+    const { body, status } = await send<{ canDelete: boolean; linkedEntities: string[] }>(
+      'reference/10039/can-delete',
+      'GET'
+    )
+
+    expect(status).toEqual(200)
+    expect(body.canDelete).toEqual(false)
+    expect(body.linkedEntities.length).toBeGreaterThan(0)
+  })
+
+  it('can-delete reports unlinked references as deletable', async () => {
+    await login('testSu')
+
+    const { body: created } = await send<{ rid: number }>('reference/', 'PUT', { reference: { ...newReferenceBasis } })
+    const { body, status } = await send<{ canDelete: boolean; linkedEntities: string[] }>(
+      `reference/${created.rid}/can-delete`,
+      'GET'
+    )
+
+    expect(status).toEqual(200)
+    expect(body).toEqual({ canDelete: true, linkedEntities: [] })
+    await send(`reference/${created.rid}`, 'DELETE')
+  })
+
+  it('can-delete requires admin rights', async () => {
+    logout()
+    await login('testEu')
+    const { status } = await send('reference/10039/can-delete', 'GET')
+    expect(status).toEqual(403)
+  })
+
   it('without permissions fails', async () => {
     logout()
     const deleteResultNoPerm = await send('reference/10039', 'DELETE')

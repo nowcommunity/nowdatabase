@@ -58,6 +58,10 @@ const referencesApi = api.injectEndpoints({
       }),
       invalidatesTags: (result, _error, { rid }) => (result ? [{ type: 'reference', id: rid }, 'references'] : []),
     }),
+    getReferenceCanDelete: builder.query<{ canDelete: boolean; linkedEntities: string[] }, number>({
+      query: id => ({ url: `/reference/${id}/can-delete` }),
+      providesTags: (_result, _error, id) => [{ type: 'reference', id }],
+    }),
     deleteReference: builder.mutation<void, number>({
       query: id => ({
         url: `/reference/${id}`,
@@ -75,6 +79,7 @@ export const {
   useGetReferenceLocalitiesQuery,
   useGetReferenceSpeciesQuery,
   useGetReferenceTypesQuery,
+  useGetReferenceCanDeleteQuery,
   useGetReferenceAuthorsQuery,
   useGetReferenceJournalsQuery,
   useEditReferenceMutation,
