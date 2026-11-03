@@ -8,23 +8,29 @@ import { useUser } from '@/hooks/user'
 
 type CapturedTableOptions = {
   onColumnFiltersChange?: (filters: Array<{ id: string; value: unknown }>) => void
+  onSortingChange?: (sorting: Array<{ id: string; desc: boolean }>) => void
+  onPaginationChange?: (pagination: { pageIndex: number; pageSize: number }) => void
   onColumnVisibilityChange?: (visibility: Record<string, boolean>) => void
   state?: {
     columnVisibility?: Record<string, boolean>
+    pagination?: { pageIndex: number; pageSize: number }
   }
 }
 
 let lastMaterialReactTableOptions: CapturedTableOptions | null = null
 
-jest.mock('material-react-table', () => ({
-  useMaterialReactTable: (options: CapturedTableOptions) => {
-    lastMaterialReactTableOptions = options
-    return {
-      getPrePaginationRowModel: () => ({ rows: [] }),
-    }
-  },
-  MaterialReactTable: () => <div data-testid="material-react-table" />,
-}))
+jest.mock('material-react-table', () => {
+  const table = {
+    getPrePaginationRowModel: () => ({ rows: [] }),
+  }
+  return {
+    useMaterialReactTable: (options: CapturedTableOptions) => {
+      lastMaterialReactTableOptions = options
+      return table
+    },
+    MaterialReactTable: () => <div data-testid="material-react-table" />,
+  }
+})
 
 jest.mock('../Page', () => ({
   usePageContext: jest.fn(),
@@ -247,6 +253,54 @@ describe('TableView table help integration', () => {
     expect(JSON.parse(window.sessionStorage.getItem('nowdatabase-table-state:stored-state') ?? '{}')).toEqual(
       storedState
     )
+  })
+
+  it('preserves page size when server-side filters or sorting reset pagination', async () => {
+    render(
+      <TableView<TestRow>
+        title="Test Table"
+        idFieldName="id"
+        columns={[
+          { header: 'Name', accessorKey: 'name' },
+          { header: 'Id', accessorKey: 'id' },
+        ]}
+        visibleColumns={{ name: true, id: true }}
+        data={[{ id: '1', name: 'Alpha', full_count: 1 }]}
+        url="test"
+        isFetching={false}
+        serverSidePagination
+      />
+    )
+
+    await waitFor(() => {
+      expect(lastMaterialReactTableOptions?.state?.pagination).toEqual({ pageIndex: 0, pageSize: 50 })
+    })
+
+    act(() => {
+      lastMaterialReactTableOptions?.onPaginationChange?.({ pageIndex: 2, pageSize: 5 })
+    })
+
+    expect(lastMaterialReactTableOptions?.state?.pagination).toEqual({ pageIndex: 2, pageSize: 5 })
+
+    act(() => {
+      lastMaterialReactTableOptions?.onSortingChange?.([{ id: 'name', desc: false }])
+    })
+
+    await waitFor(() => {
+      expect(lastMaterialReactTableOptions?.state?.pagination).toEqual({ pageIndex: 0, pageSize: 5 })
+    })
+
+    act(() => {
+      lastMaterialReactTableOptions?.onPaginationChange?.({ pageIndex: 1, pageSize: 5 })
+    })
+
+    act(() => {
+      lastMaterialReactTableOptions?.onColumnFiltersChange?.([{ id: 'name', value: 'Alpha' }])
+    })
+
+    await waitFor(() => {
+      expect(lastMaterialReactTableOptions?.state?.pagination).toEqual({ pageIndex: 0, pageSize: 5 })
+    })
   })
 
   it('restores persisted column filters for normal table visits', async () => {
