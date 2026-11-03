@@ -117,6 +117,7 @@ NOTE: Users with the **EditRestricted** role can only update occurrences that re
 | EditUnrestricted | ALL      | ALL     | ALL        | ALL        | ALL         | X       | X\*\*\* | R\*\*    | ALL     | ALL                    | C             |
 | EditRestricted   | CRU      | CRU     | CRU        | R          | R           | X       | X\*\*\* | R\*\*    | CRU     | R                      | C             |
 | ReadOnly         | R        | R       | R          | R          | R           | X       | X\*\*\* | R\*\*    | R       | R                      | C             |
+| Not logged in    | R        | R       | R          | R          | R           | X       | X       | X        | X       | R                      | C             |
 
 C = Create
 
@@ -132,7 +133,7 @@ ALL = All rights
 
 \* = Requires a Project association
 
-\*\* = Any user can view a list of projects, but viewing the details of a project requires the **Admin** role.
+\*\* = Any logged-in user can view a list of projects, but viewing the details of a project requires the **Admin** role.
 
 \*\*\* = Users can only get their information.
 
