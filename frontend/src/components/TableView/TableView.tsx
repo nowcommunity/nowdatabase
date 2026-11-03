@@ -746,7 +746,7 @@ export const TableView = <T extends MRT_RowData>({
     setIdList(table.getPrePaginationRowModel().rows.map(row => row.original[idFieldName] as string))
     if (serverSidePagination) {
       // resets pagination when filters or sorting change
-      setPagination(selectorFn ? defaultPaginationSmall : defaultPagination)
+      setPagination(currentPagination => ({ ...currentPagination, pageIndex: 0 }))
     }
     // Don't put setIdList in the dependency array: it will cause re-render loop.
     // eslint-disable-next-line react-hooks/exhaustive-deps
