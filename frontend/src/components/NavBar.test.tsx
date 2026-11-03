@@ -48,4 +48,15 @@ describe('NavBar', () => {
 
     expect(screen.getByText(occurrenceLabels.plural)).toBeTruthy()
   })
+
+  it('hides Museums and Projects from non-logged-in users', () => {
+    render(
+      <MemoryRouter>
+        <NavBar />
+      </MemoryRouter>
+    )
+
+    expect(screen.queryByText('Museums')).toBeNull()
+    expect(screen.queryByText('Projects')).toBeNull()
+  })
 })

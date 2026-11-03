@@ -167,6 +167,14 @@ describe('Broadly test what different user rights see', () => {
     it('Direct routes to protected views do not work', () => {
       cy.pageForbidden('/region')
       cy.pageForbidden('/time-bound')
+      cy.pageForbidden('/museum')
+      cy.pageForbidden('/museum/1')
+      cy.pageForbidden('/project')
+    })
+
+    it('Does not see museums and projects in navbar', () => {
+      cy.contains('Museums').should('not.exist')
+      cy.contains('Projects').should('not.exist')
     })
 
     it('Direct route to project details does not work', () => {
