@@ -91,15 +91,14 @@ NOTE: Users with the **EditRestricted** role can only update occurrences that re
 
 ## Project
 
-- Any user can get a list of Projects.
+- Logged-in users can get a list of Projects. Non-logged-in users cannot (403), and the Projects navigation link and page are hidden from them.
 - Viewing project details requires the **Admin** role.
 - Creating or updating a Project requires the **Admin** role.
 - Deleting a Project requires the **Admin** role.
 
 ## Museum
 
-- Any user can get a list of museums.
-- Any user can view the details of a Museum.
+- Logged-in users can get a list of museums and view the details of a Museum. Non-logged-in users cannot (403), and the Museums navigation link and page are hidden from them.
 - Creating or updating a Museum requires the **Admin**, **EditUnrestricted**, or **EditRestricted** roles.
 
 ## Sedimentary Structure
