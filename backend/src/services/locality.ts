@@ -369,6 +369,7 @@ export const validateEntireLocality = async (editedFields: EditDataType<Prisma.n
     for (const species of editedFields.now_ls as Array<Editable<LocalitySpeciesDetailsType>>) {
       if (species.rowState === 'new') {
         const keys = Object.keys(species.com_species)
+        if (!species.com_species.species_id && !keys.includes('unique_identifier')) keys.push('unique_identifier')
         for (const key of keys) {
           const newSpeciesError = validateSpecies(species.com_species, key as keyof SpeciesDetailsType)
           if (newSpeciesError.error) errors.push(newSpeciesError)

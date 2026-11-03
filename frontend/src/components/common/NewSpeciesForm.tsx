@@ -199,8 +199,9 @@ export const NewSpeciesForm = ({
       copyTaxonomyButton={copyTaxonomyButton}
       editAction={(newSpecies: EditDataType<Species>) => {
         const convertedSpecies = convertAndCheckNewSpeciesTaxonomy(newSpecies)
-        if (!convertedSpecies) return
+        if (!convertedSpecies) return false
         afterTaxonomyCheck(convertedSpecies)
+        return true
       }}
     />
   )

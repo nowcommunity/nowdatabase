@@ -154,7 +154,7 @@ export const newLocalityBasis = {
   now_ls: [
     {
       rowState: 'new',
-      com_species: { species_name: 'Newspecies' } as SpeciesDetailsType,
+      com_species: { species_name: 'Newspecies', unique_identifier: 'new-locality-species' } as SpeciesDetailsType,
     },
     {
       rowState: 'new',

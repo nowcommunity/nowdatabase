@@ -46,7 +46,7 @@ const createContextValue = (): DetailContextType<ParentType> => ({
 describe('EditingForm select support', () => {
   it('renders a select field and submits the selected value', async () => {
     const user = userEvent.setup()
-    const editAction = jest.fn()
+    const editAction = jest.fn<(newObject: FormValues) => void>()
     const formFields: EditingFormField[] = [
       {
         name: 'taxonomic_status',
@@ -94,12 +94,39 @@ describe('EditingForm select support', () => {
       <EditingForm<{ author_surname: string }, ParentType>
         buttonText="Add new author"
         formFields={formFields}
-        editAction={jest.fn()}
+        editAction={jest.fn<(newObject: { author_surname: string }) => void>()}
       />
     )
 
     await user.click(screen.getByRole('button', { name: /add new author/i }))
 
     expect(screen.getByLabelText('Field information for Surname')).toBeTruthy()
+  })
+
+  it('keeps the form open and preserves values when the edit action rejects submission', async () => {
+    const user = userEvent.setup()
+    const editAction = jest.fn<(newObject: { unique_identifier: string }) => boolean>(() => false)
+    const formFields: EditingFormField[] = [{ name: 'unique_identifier', label: 'Unique Identifier', required: true }]
+
+    mockUseDetailContext.mockReturnValue(createContextValue())
+
+    render(
+      <EditingForm<{ unique_identifier: string }, ParentType>
+        buttonText="Add new Species"
+        formFields={formFields}
+        editAction={editAction}
+      />
+    )
+
+    await user.click(screen.getByRole('button', { name: /add new species/i }))
+    const identifierField = screen.getByRole('textbox', { name: /unique identifier/i })
+    await user.type(identifierField, ' ')
+    await user.click(screen.getByRole('button', { name: /save/i }))
+
+    await waitFor(() => {
+      expect(editAction).toHaveBeenCalledWith({ unique_identifier: ' ', rowState: 'new' })
+    })
+    expect(screen.getByRole('button', { name: /cancel/i })).toBeTruthy()
+    expect((identifierField as HTMLInputElement).value).toBe(' ')
   })
 })
