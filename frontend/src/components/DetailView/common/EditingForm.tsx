@@ -13,6 +13,7 @@ export type EditingFormField = {
   name: string
   label: string
   required?: boolean
+  requiredMessage?: string
   type?: 'number' | 'string'
   selectOptions?: EditingFormSelectOption[]
 }
@@ -41,7 +42,7 @@ export const EditingForm = <T extends object, ParentType extends object>({
   buttonText: string
   formFields: EditingFormField[]
   arrayFieldName?: keyof ParentType
-  editAction?: (newObject: T) => void
+  editAction?: (newObject: T) => void | boolean
   existingObject?: T | undefined
   replacedValues?: T | undefined
   copyTaxonomyButton?: JSX.Element | undefined
@@ -73,12 +74,12 @@ export const EditingForm = <T extends object, ParentType extends object>({
     if (!result) return false
     const values = getValues()
     const newObject: Editable<T> = { ...(values as T), rowState: 'new' }
+    if (editAction?.(newObject) === false) return false
     if (arrayFieldName)
       setEditData({
         ...editData,
         [arrayFieldName]: [...(editData[arrayFieldName as keyof EditDataType<ParentType>] as Array<T>), newObject],
       })
-    if (editAction) editAction(newObject)
     reset(buildDefaultValues(existingObject))
     return true
   }
@@ -117,7 +118,7 @@ export const EditingForm = <T extends object, ParentType extends object>({
               select={!!field.selectOptions}
               defaultValue={defaultValues[field.name] ?? (field.selectOptions ? '' : undefined)}
               {...register(field.name, {
-                required: field.required ? 'This field is required' : false,
+                required: field.required ? field.requiredMessage ?? 'This field is required' : false,
                 ...(field.type === 'number' &&
                   !field.selectOptions && {
                     pattern: { value: /^(0|[1-9]\d*)(\.\d+)?$/, message: 'Value must be a valid number' },

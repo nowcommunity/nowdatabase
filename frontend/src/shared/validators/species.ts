@@ -3,7 +3,7 @@ import { EditDataType, SpeciesDetailsType } from '../types'
 import { Validators, validateFields, validator } from './validator'
 
 const isEmptyUniqIdentifier = (unique_identifier: string) => {
-  if (unique_identifier === '' || unique_identifier === '-') return true
+  if (unique_identifier.trim() === '' || unique_identifier.trim() === '-') return true
   return false
 }
 
@@ -177,8 +177,9 @@ const createSpeciesValidators = (
   },
   unique_identifier: {
     name: 'Unique Identifier',
-    required: true,
+    required: () => 'Unique Identifier must have a value.',
     asString: (uniqueIdentifier: string) => {
+      if (uniqueIdentifier.trim() === '') return 'Unique Identifier must have a value.'
       if (editData.species_name === 'sp.' && isEmptyUniqIdentifier(uniqueIdentifier ?? ''))
         return 'when the species is sp., Unique Identifier must have a value.'
       return

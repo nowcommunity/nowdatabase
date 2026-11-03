@@ -70,7 +70,12 @@ const formFields: EditingFormField[] = [
   { name: 'subclass_or_superorder_name', label: 'Subclass or Superorder' },
   { name: 'suborder_or_superfamily_name', label: 'Suborder or Superfamily' },
   { name: 'subfamily_name', label: 'Subfamily or Tribe' },
-  { name: 'unique_identifier', label: 'Unique Identifier', required: true },
+  {
+    name: 'unique_identifier',
+    label: 'Unique Identifier',
+    required: true,
+    requiredMessage: 'Unique Identifier must have a value.',
+  },
   { name: 'taxonomic_status', label: 'Taxon status', selectOptions: taxonStatusSelectOptions },
   { name: 'sp_comment', label: 'Comment' },
   { name: 'sp_author', label: 'Author' },
@@ -194,8 +199,9 @@ export const NewSpeciesForm = ({
       copyTaxonomyButton={copyTaxonomyButton}
       editAction={(newSpecies: EditDataType<Species>) => {
         const convertedSpecies = convertAndCheckNewSpeciesTaxonomy(newSpecies)
-        if (!convertedSpecies) return
+        if (!convertedSpecies) return false
         afterTaxonomyCheck(convertedSpecies)
+        return true
       }}
     />
   )

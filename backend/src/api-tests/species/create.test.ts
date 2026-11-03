@@ -63,6 +63,26 @@ describe('Creating new species works', () => {
     expect(res.status).toEqual(403)
   })
 
+  it('Creation fails when Unique Identifier is missing', async () => {
+    const { unique_identifier: identifier, ...speciesWithoutIdentifier } = newSpeciesBasis
+    expect(identifier).toEqual('-')
+    const res = await send<{ name: string; error: string }[]>('species', 'PUT', {
+      species: { ...speciesWithoutIdentifier, comment: 'species test' },
+    })
+
+    expect(res.status).toEqual(403)
+    expect(res.body.some(error => error.name === 'Unique Identifier')).toBe(true)
+  })
+
+  it('Creation fails when Unique Identifier is empty', async () => {
+    const res = await send<{ name: string; error: string }[]>('species', 'PUT', {
+      species: { ...newSpeciesBasis, unique_identifier: '', comment: 'species test' },
+    })
+
+    expect(res.status).toEqual(403)
+    expect(res.body.some(error => error.name === 'Unique Identifier')).toBe(true)
+  })
+
   it('Creation fails without reference', async () => {
     const speciesWithoutRef = { ...newSpeciesBasis, species_name: 'anotherspecies', references: [] }
     const resultNoRef = await send('species', 'PUT', {
