@@ -194,6 +194,13 @@ describe('Creating new locality works', () => {
       },
       {
         oldValue: null,
+        value: 'new-locality-species',
+        type: 'add',
+        column: 'unique_identifier',
+        table: 'com_species',
+      },
+      {
+        oldValue: null,
         value: speciesId.toString(),
         type: 'add',
         column: 'species_id',
@@ -214,6 +221,6 @@ describe('Creating new locality works', () => {
         table: 'now_ls',
       },
     ]
-    testLogRows(logRows, expectedLogRows, 4)
+    testLogRows(logRows, expectedLogRows, 5)
   })
 })
