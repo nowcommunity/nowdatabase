@@ -273,6 +273,11 @@ export const WriteButton = <T,>({
                 id="write-button"
                 sx={{ width: '20em' }}
                 onClick={() => {
+                  if (mode.staging) {
+                    void handleWriteButtonClick()
+                    return
+                  }
+
                   // Check for out-of-boundness before saving
 
                   if (

@@ -539,12 +539,20 @@ describe('Editing a locality', () => {
   })
 
   it('persists occurrence wear and isotope values', () => {
+    let selectedSpeciesId
+
     cy.visit(`/locality/20920?tab=2`)
     cy.get('[id=edit-button]').click()
     cy.get('[data-cy=new-occurrence-button]').click()
     cy.contains('Select Species').click()
-    cy.get('[data-cy=table-row-21426]').click()
-    cy.contains('indet.')
+    cy.get('.MuiModal-root')
+      .last()
+      .find('[data-cy^="table-row-"]')
+      .first()
+      .then($row => {
+        selectedSpeciesId = $row.attr('data-cy')?.replace('table-row-', '')
+        cy.wrap($row).click()
+      })
 
     cy.get('[id=mw_scale_min-textfield]').type('1')
     cy.get('[id=mw_scale_max-textfield]').type('10')
@@ -555,12 +563,15 @@ describe('Editing a locality', () => {
 
     cy.addReferenceAndSave()
     cy.visit(`/locality/20920?tab=2`)
-    cy.get('[data-cy=table-row-21426]').within(() => {
-      cy.contains('1')
-      cy.contains('10')
-      cy.contains('5')
-      cy.contains('12.5')
-      cy.contains('2')
+    cy.then(() => {
+      expect(selectedSpeciesId).to.be.a('string')
+      cy.get(`[data-cy=table-row-${selectedSpeciesId}]`).within(() => {
+        cy.contains('1')
+        cy.contains('10')
+        cy.contains('5')
+        cy.contains('12.5')
+        cy.contains('2')
+      })
     })
   })
 
