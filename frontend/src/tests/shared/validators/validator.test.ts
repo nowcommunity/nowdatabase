@@ -4,10 +4,11 @@ import { validateLocalityFields } from '@/shared/validators/locality'
 import { validateMuseumFields } from '@/shared/validators/museum'
 import { validatePersonFields } from '@/shared/validators/person'
 import { validateRegionFields } from '@/shared/validators/region'
-import { validateSpeciesFields } from '@/shared/validators/species'
+import { validateSpecies, validateSpeciesFields } from '@/shared/validators/species'
 import { validateTimeBoundFields } from '@/shared/validators/timeBound'
 import { validateTimeUnitFields } from '@/shared/validators/timeUnit'
 import { validateFields, type Validators } from '@/shared/validators/validator'
+import type { EditDataType, SpeciesDetailsType } from '@/shared/types'
 
 type TestData = {
   id?: number
@@ -106,9 +107,24 @@ describe('entity full-field validators', () => {
         { name: 'Family', error: 'This field is required' },
         { name: 'Genus', error: 'This field is required' },
         { name: 'Species', error: 'This field is required' },
-        { name: 'Unique Identifier', error: 'This field is required' },
+        { name: 'Unique Identifier', error: 'Unique Identifier must have a value.' },
       ])
     )
+  })
+
+  it.each(['', '   '])('rejects an empty Unique Identifier (%j)', uniqueIdentifier => {
+    const result = validateSpecies(
+      { unique_identifier: uniqueIdentifier } as EditDataType<SpeciesDetailsType>,
+      'unique_identifier'
+    )
+
+    expect(result.error).toEqual('Unique Identifier must have a value.')
+  })
+
+  it('accepts a hyphen as the Unique Identifier for a named species', () => {
+    const result = validateSpecies({ unique_identifier: '-' } as EditDataType<SpeciesDetailsType>, 'unique_identifier')
+
+    expect(result.error).toBeFalsy()
   })
 
   it('reports missing Locality required and conditional fields', () => {
