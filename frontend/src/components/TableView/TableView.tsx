@@ -82,7 +82,11 @@ const withDataCy = <TProps extends object>(props: TProps, dataCy: string): TProp
 })
 
 const sanitizeColumnFilters = (filters: MRT_ColumnFiltersState): MRT_ColumnFiltersState => {
-  return filters.filter(filter => !isEmptyFilterValue(filter.value))
+  // Copy array values: the result is passed to RTK Query, which freezes its arguments, while the table
+  // mutates its own range filter arrays in place.
+  return filters
+    .filter(filter => !isEmptyFilterValue(filter.value))
+    .map(filter => (Array.isArray(filter.value) ? { ...filter, value: [...(filter.value as unknown[])] } : filter))
 }
 
 const createTableStateId = () => {
