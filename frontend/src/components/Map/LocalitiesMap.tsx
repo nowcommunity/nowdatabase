@@ -190,9 +190,9 @@ export const LocalitiesMap = ({ localities, isFetching, loadLayers = true, onOpe
           <button className="cluster" onClick={() => setClusteringEnabled(cluster => !cluster)}>
             {clusteringEnabled ? 'Show individual' : 'Show cluster'}
           </button>
-          <div className="gradient" onClick={() => setIsOpen(v => !v)}></div>
+          <div className="gradient" onClick={() => setIsOpen(v => !v)} title={isOpen ? undefined : 'Open map'}></div>
         </div>
-        <div className="open-button" onClick={() => setIsOpen(v => !v)} title="Close map">
+        <div className="open-button" onClick={() => setIsOpen(v => !v)} title={isOpen ? 'Close map' : 'Open map'}>
           <span className="downarrow"></span>
         </div>
       </article>
