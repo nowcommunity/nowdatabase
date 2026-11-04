@@ -1,4 +1,5 @@
-import { lazy, Suspense, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
+import { skipToken } from '@reduxjs/toolkit/query'
 import { MRT_TableInstance, type MRT_ColumnDef, MRT_RowData } from 'material-react-table'
 import { useGetAllLocalitiesQuery } from '../../redux/localityReducer'
 import { Locality, SimplifiedLocality } from '@/shared/types'
@@ -11,23 +12,31 @@ import { LocalitySynonymsModal } from './LocalitySynonymsModal'
 import { currentDateAsString } from '@/shared/currentDateAsString'
 import { matchesCountryOrContinent } from '@/shared/validators/countryContinents'
 import { LocalityDwcExportMenuItem } from './LocalityDwcExportMenuItem'
-
-const LocalitiesMap = lazy(async () => {
-  const module = await import('../Map/LocalitiesMap')
-  return { default: module.LocalitiesMap }
-})
+import { LazyLocalitiesMap } from '../Map/LazyLocalitiesMap'
+import { LOCALITY_LIST_OPTIONAL_FIELDS } from '@/shared/localityListFields'
 
 export const LocalityTable = ({ selectorFn }: { selectorFn?: (newObject: Locality) => void }) => {
   const [selectedLocality, setSelectedLocality] = useState<string | undefined>()
   const [modalOpen, setModalOpen] = useState<boolean>(false)
+  // Optional columns requested from the backend. Only grows, so hiding a column does not trigger a refetch.
+  const [requestedFields, setRequestedFields] = useState<string[] | null>(null)
   const {
     data: localitiesQueryData,
     isFetching: localitiesQueryIsFetching,
     isError: localitiesQueryIsError,
     error: localitiesQueryError,
-  } = useGetAllLocalitiesQuery()
+  } = useGetAllLocalitiesQuery(requestedFields ?? skipToken)
   const [filteredLocalities, setFilteredLocalities] = useState<SimplifiedLocality[]>()
   const columnFilters = usePageContext()
+
+  const handleColumnVisibilityChange = useCallback((visibility: Record<string, boolean>) => {
+    // Columns missing from the visibility state are visible.
+    const needed = LOCALITY_LIST_OPTIONAL_FIELDS.filter(columnId => visibility[columnId] !== false)
+    setRequestedFields(previous => {
+      const merged = [...new Set([...(previous ?? []), ...needed])].sort()
+      return previous && merged.length === previous.length ? previous : merged
+    })
+  }, [])
 
   const handleLocalityRowActionClick = (row: Locality) => {
     setSelectedLocality(row.lid.toString())
@@ -39,9 +48,10 @@ export const LocalityTable = ({ selectorFn }: { selectorFn?: (newObject: Localit
     const localityIds = columnFilters.idList as unknown as number[]
     const validIds = localityIds.filter(id => typeof id === 'number')
 
-    if (validIds.length > 0)
-      setFilteredLocalities(localitiesQueryData?.filter(locality => validIds.includes(locality.lid)))
-    else setFilteredLocalities(localitiesQueryData as SimplifiedLocality[])
+    if (validIds.length > 0) {
+      const validIdSet = new Set(validIds)
+      setFilteredLocalities(localitiesQueryData?.filter(locality => validIdSet.has(locality.lid)))
+    } else setFilteredLocalities(localitiesQueryData as SimplifiedLocality[])
   }, [columnFilters, localitiesQueryData])
 
   const columns = useMemo<MRT_ColumnDef<Locality>[]>(
@@ -503,9 +513,7 @@ export const LocalityTable = ({ selectorFn }: { selectorFn?: (newObject: Localit
 
   return (
     <>
-      <Suspense fallback={<div />}>
-        <LocalitiesMap localities={filteredLocalities} isFetching={localitiesQueryIsFetching} />
-      </Suspense>
+      <LazyLocalitiesMap localities={filteredLocalities} isFetching={localitiesQueryIsFetching} />
       <TableView<Locality>
         title="Localities"
         selectorFn={selectorFn}
@@ -513,11 +521,12 @@ export const LocalityTable = ({ selectorFn }: { selectorFn?: (newObject: Localit
         idFieldName="lid"
         defaultSorting={[{ id: 'loc_name', desc: false }]}
         columns={columns}
-        isFetching={localitiesQueryIsFetching}
+        isFetching={localitiesQueryIsFetching || requestedFields === null}
         isError={localitiesQueryIsError}
         error={localitiesQueryError}
         visibleColumns={visibleColumns}
         columnVisibilityGroups={columnVisibilityGroups}
+        onColumnVisibilityChange={handleColumnVisibilityChange}
         data={localitiesQueryData}
         url="locality"
         kmlExport={kmlExport}

@@ -1,6 +1,7 @@
 import { Router } from 'express'
 import { createTestUsers } from '../services/user'
 import { resetTestDb } from '../utils/db'
+import { invalidateLocalityListCache } from '../services/locality'
 const router = Router()
 
 router.get('/create-test-users', async (_req, res) => {
@@ -14,6 +15,7 @@ router.get('/ping', (_req, res) => {
 
 router.get('/reset-test-database', async (_req, res) => {
   await resetTestDb()
+  invalidateLocalityListCache()
   res.status(200).send()
 })
 

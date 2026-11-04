@@ -11,9 +11,11 @@ const sanitizeLocalityProjects = (locality?: EditDataType<LocalityDetailsType>) 
 
 const localitiesApi = api.injectEndpoints({
   endpoints: builder => ({
-    getAllLocalities: builder.query<Locality[], void>({
-      query: () => ({
+    // `fields` limits the optional columns in the response; all columns are returned when omitted.
+    getAllLocalities: builder.query<Locality[], string[] | void>({
+      query: fields => ({
         url: `/locality/all`,
+        params: fields ? { fields: fields.join(',') } : undefined,
       }),
       providesTags: result => (result ? [{ type: 'localities' }] : []),
     }),

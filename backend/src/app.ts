@@ -29,6 +29,7 @@ import { errorHandler } from './middlewares/errorHandler'
 import { requireOneOf } from './middlewares/authorizer'
 import { Role } from './../../frontend/src/shared/types'
 import { blockWriteRequests } from './middlewares/misc'
+import { invalidateLocalityListCacheAfterWrites } from './middlewares/localityListCache'
 import { maintenanceGate } from './middlewares/maintenanceGate'
 import testRouter from './routes/test'
 import occurrenceRouter from './routes/occurrence'
@@ -41,6 +42,7 @@ app.use(express.json({ limit: '50mb' }))
 app.use(cors())
 app.use(compression())
 app.use(responseLogger)
+app.use(invalidateLocalityListCacheAfterWrites)
 if (!ENABLE_WRITE && RUNNING_ENV !== 'dev') {
   app.use(blockWriteRequests)
 }
