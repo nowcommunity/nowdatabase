@@ -117,7 +117,7 @@ NOTE: Users with the **EditRestricted** role can only update occurrences that re
 | EditUnrestricted | ALL      | ALL     | ALL        | ALL        | ALL         | X       | X\*\*\* | R\*\*    | ALL     | ALL                    | C             |
 | EditRestricted   | CRU      | CRU     | CRU        | R          | R           | X       | X\*\*\* | R\*\*    | CRU     | R                      | C             |
 | ReadOnly         | R        | R       | R          | R          | R           | X       | X\*\*\* | R\*\*    | R       | R                      | C             |
-| Not logged in    | R        | R       | R          | R          | R           | X       | X       | X        | X       | R                      | C             |
+| Not logged in    | R        | R       | R          | R          | X           | X       | X       | X        | X       | R                      | C             |
 
 C = Create
 
