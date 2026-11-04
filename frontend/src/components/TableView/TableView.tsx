@@ -210,6 +210,7 @@ export const TableView = <T extends MRT_RowData>({
   paginationPlacement,
   tableContainerMaxHeight,
   columnVisibilityGroups,
+  onColumnVisibilityChange,
   renderExtraExportMenuItems,
 }: {
   data: T[] | undefined
@@ -240,6 +241,8 @@ export const TableView = <T extends MRT_RowData>({
   paginationPlacement?: 'top' | 'bottom' | 'both'
   tableContainerMaxHeight?: string | number
   columnVisibilityGroups?: ColumnVisibilityGroup[]
+  // Called with the columns whose data is needed (visible, filtered or sorted) once the initial (possibly stored) state is known, and on changes.
+  onColumnVisibilityChange?: (visibility: MRT_VisibilityState) => void
 }) => {
   const location = useLocation()
   const {
@@ -717,6 +720,14 @@ export const TableView = <T extends MRT_RowData>({
     setHasLoadedTableState(true)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
+
+  useEffect(() => {
+    if (!selectorFn && !hasLoadedTableState) return
+    // Columns that are filtered or sorted need their data even when hidden.
+    const sortedColumns = Object.fromEntries(sorting.map(({ id }) => [id, true]))
+    onColumnVisibilityChange?.({ ...showFilteredColumns(columnVisibility, columnFilters), ...sortedColumns })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [columnVisibility, columnFilters, sorting, selectorFn, hasLoadedTableState])
 
   // Save state to url whenever it changes
   useEffect(() => {

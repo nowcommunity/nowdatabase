@@ -1,6 +1,8 @@
 import { Request, Response, Router } from 'express'
 import {
   getAllLocalities,
+  InvalidLocalityFieldsError,
+  parseLocalityListFields,
   canEditRestrictedWriteLocality,
   getLocalityDetails,
   normalizeLocalityAges,
@@ -17,8 +19,15 @@ import { parseRequiredNumericIdsBody } from './utils/exportFilters'
 const router = Router()
 
 router.get('/all', async (req, res) => {
-  const localities = await getAllLocalities(req.user)
-  return res.status(200).send(fixBigInt(localities))
+  let fields: ReturnType<typeof parseLocalityListFields>
+  try {
+    fields = parseLocalityListFields(req.query.fields)
+  } catch (error) {
+    if (error instanceof InvalidLocalityFieldsError) return res.status(400).send({ error: error.message })
+    throw error
+  }
+  const localities = await getAllLocalities(req.user, fields)
+  return res.status(200).send(localities)
 })
 
 const sendDwcArchive = async (ids: number[] | undefined, res: Response) => {

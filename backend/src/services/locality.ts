@@ -22,6 +22,13 @@ import { buildPersonLookupByInitials, getPersonDisplayName, getPersonFromLookup 
 import { getReferenceDetails } from './reference'
 import { addNullExactDateToReferenceJoins, referenceWithoutExactDateSelect } from './utils/referenceDate'
 import { getOccurrenceUpdatesForRows } from './occurrenceService'
+import { TtlCache } from './utils/ttlCache'
+import {
+  LOCALITY_LIST_CORE_FIELDS,
+  LOCALITY_LIST_OPTIONAL_FIELDS,
+  LocalityListOptionalField,
+  isLocalityListOptionalField,
+} from '../../../frontend/src/shared/localityListFields'
 
 const normalizeNumberField = (value: unknown) => {
   if (typeof value === 'string') {
@@ -132,78 +139,43 @@ type LocalityPreFilter = {
   }[]
 }
 
-export const getAllLocalities = async (user?: User) => {
-  const showAll = user && [Role.Admin, Role.EditUnrestricted].includes(user.role)
-  const removeProjects = (
-    loc: Omit<LocalityPreFilter, 'now_syn_loc'> & {
-      synonyms: string[]
-      has_synonym: boolean
-    }
-  ) => {
-    const { now_plr, ...rest } = loc
-    return rest
+const LOCALITY_LIST_CACHE_TTL_MS = 60 * 1000
+const LOCALITY_LIST_CACHE_MAX_ENTRIES = 16
+
+const localityListCache = new TtlCache<Awaited<ReturnType<typeof loadLocalityList>>>(
+  LOCALITY_LIST_CACHE_TTL_MS,
+  LOCALITY_LIST_CACHE_MAX_ENTRIES
+)
+
+export const invalidateLocalityListCache = () => localityListCache.invalidate()
+
+export class InvalidLocalityFieldsError extends Error {}
+
+// Parses the `fields` query parameter. Returns undefined when all fields should be returned.
+export const parseLocalityListFields = (rawFields: unknown): LocalityListOptionalField[] | undefined => {
+  if (rawFields === undefined) return undefined
+  if (typeof rawFields !== 'string') throw new InvalidLocalityFieldsError('fields must be a comma-separated string')
+
+  const requested = rawFields
+    .split(',')
+    .map(field => field.trim())
+    .filter(field => field.length > 0)
+  const unknownFields = requested.filter(field => !isLocalityListOptionalField(field))
+  if (unknownFields.length > 0) {
+    throw new InvalidLocalityFieldsError(`Unknown locality fields: ${unknownFields.join(', ')}`)
+  }
+  return [...new Set(requested)].filter(isLocalityListOptionalField).sort()
+}
+
+const loadLocalityList = async (optionalFields: readonly LocalityListOptionalField[]) => {
+  const columns = [...LOCALITY_LIST_CORE_FIELDS, ...optionalFields]
+  const select = {
+    ...Object.fromEntries(columns.map(column => [column, true])),
+    now_plr: { select: { pid: true } },
+    now_syn_loc: { select: { synonym: true } },
   }
 
-  const localityResult = (await nowDb.now_loc.findMany({
-    select: {
-      lid: true,
-      loc_name: true,
-      bfa_max: true,
-      bfa_min: true,
-      max_age: true,
-      min_age: true,
-      bfa_max_abs: true,
-      bfa_min_abs: true,
-      frac_max: true,
-      frac_min: true,
-      chron: true,
-      age_comm: true,
-      basin: true,
-      subbasin: true,
-      dms_lat: true,
-      dms_long: true,
-      dec_lat: true,
-      dec_long: true,
-      altitude: true,
-      country: true,
-      state: true,
-      county: true,
-      appr_num_spm: true,
-      site_area: true,
-      gen_loc: true,
-      plate: true,
-      formation: true,
-      member: true,
-      bed: true,
-      loc_status: true,
-      estimate_precip: true,
-      estimate_temp: true,
-      estimate_npp: true,
-      pers_woody_cover: true,
-      pers_pollen_ap: true,
-      pers_pollen_nap: true,
-      pers_pollen_other: true,
-      hominin_skeletal_remains: true,
-      bipedal_footprints: true,
-      stone_tool_cut_marks_on_bones: true,
-      stone_tool_technology: true,
-      technological_mode_1: true,
-      technological_mode_2: true,
-      technological_mode_3: true,
-      cultural_stage_1: true,
-      cultural_stage_2: true,
-      cultural_stage_3: true,
-      regional_culture_1: true,
-      regional_culture_2: true,
-      regional_culture_3: true,
-      now_plr: {
-        select: { pid: true },
-      },
-      now_syn_loc: {
-        select: { synonym: true },
-      },
-    },
-  })) as LocalityPreFilter[]
+  const localityResult = (await nowDb.now_loc.findMany({ select })) as unknown as LocalityPreFilter[]
 
   const result = localityResult.map(loc => {
     const synonyms = loc.now_syn_loc
@@ -216,6 +188,19 @@ export const getAllLocalities = async (user?: User) => {
       has_synonym: synonyms.length > 0,
     }
   })
+
+  return fixBigInt(result) as typeof result
+}
+
+export const getAllLocalities = async (user?: User, optionalFields?: readonly LocalityListOptionalField[]) => {
+  const showAll = user && [Role.Admin, Role.EditUnrestricted].includes(user.role)
+  const removeProjects = <T extends { now_plr: unknown }>(loc: T) => {
+    const { now_plr, ...rest } = loc
+    return rest
+  }
+
+  const fields = optionalFields ?? LOCALITY_LIST_OPTIONAL_FIELDS
+  const result = await localityListCache.get([...fields].sort().join(','), () => loadLocalityList(fields))
 
   if (showAll) return result.map(removeProjects)
 

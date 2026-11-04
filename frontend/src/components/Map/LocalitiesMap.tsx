@@ -15,17 +15,24 @@ import northarrow from './images/north-arrow.png'
 interface Props {
   localities?: SimplifiedLocality[]
   isFetching: boolean
+  // Expands the map right after mounting, used when the user already asked to open it.
+  openOnMount?: boolean
 }
 
 type CustomCircleMarkerOptions = L.CircleMarkerOptions & { localityId: number }
 type CustomCircleMarker = L.CircleMarker & { options: CustomCircleMarkerOptions }
 
-export const LocalitiesMap = ({ localities, isFetching }: Props) => {
+export const LocalitiesMap = ({ localities, isFetching, openOnMount = false }: Props) => {
   const [selectedLocality, setSelectedLocality] = useState<string | null>(null)
   const mapRef = useRef<HTMLDivElement | null>(null)
   const [map, setMap] = useState<L.Map | null>(null)
   const borderLayerRef = useRef<L.LayerGroup | null>(null)
   const [isOpen, setIsOpen] = useState(false)
+
+  useEffect(() => {
+    if (openOnMount) setIsOpen(true)
+  }, [openOnMount])
+
   const [localityDetailsIsOpen, setLocalityDetailsIsOpen] = useState(false)
   const [clusteringEnabled, setClusteringEnabled] = useState(true)
 
