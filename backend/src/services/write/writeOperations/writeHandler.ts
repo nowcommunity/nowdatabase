@@ -4,6 +4,7 @@ import { logAllUpdates } from './updateLogger/prepareUpdates'
 import { DatabaseHandler, DbWriteItem } from './databaseHandler'
 import { fixBoolean, getItemList, isEmptyValue, valueIsDifferent } from './utils'
 import { ActionType, AllowedTables, DbValue, Item, PrimaryTables, WriteItem } from './types'
+import { invalidateLocalityListCache } from '../../locality'
 
 type WriteHandlerParams = {
   dbName: string
@@ -129,6 +130,7 @@ export class WriteHandler extends DatabaseHandler {
       await logAllUpdates(this, this.writeList, this.table, this.idValue!, authorizer, this.type, comment, references)
     }
     await this.commit()
+    invalidateLocalityListCache()
     await this.end()
   }
 }

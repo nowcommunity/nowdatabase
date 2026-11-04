@@ -17,18 +17,19 @@ interface Props {
   isFetching: boolean
   // When false, only the base map is shown; markers and country borders are skipped until it becomes true.
   loadLayers?: boolean
+  initiallyOpen?: boolean
   onOpen?: () => void
 }
 
 type CustomCircleMarkerOptions = L.CircleMarkerOptions & { localityId: number }
 type CustomCircleMarker = L.CircleMarker & { options: CustomCircleMarkerOptions }
 
-export const LocalitiesMap = ({ localities, isFetching, loadLayers = true, onOpen }: Props) => {
+export const LocalitiesMap = ({ localities, isFetching, loadLayers = true, initiallyOpen = false, onOpen }: Props) => {
   const [selectedLocality, setSelectedLocality] = useState<string | null>(null)
   const mapRef = useRef<HTMLDivElement | null>(null)
   const [map, setMap] = useState<L.Map | null>(null)
   const borderLayerRef = useRef<L.LayerGroup | null>(null)
-  const [isOpen, setIsOpen] = useState(false)
+  const [isOpen, setIsOpen] = useState(initiallyOpen)
 
   useEffect(() => {
     if (isOpen) onOpen?.()

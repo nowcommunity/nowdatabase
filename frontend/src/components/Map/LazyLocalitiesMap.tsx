@@ -12,12 +12,18 @@ type Props = {
   isFetching: boolean
 }
 
-const MapPlaceholder = () => (
+const MapPlaceholder = ({ onOpen }: { onOpen?: () => void }) => (
   <article id="localities-map">
     <div className="map-container">
       <div className="map map-placeholder" />
     </div>
-    <div className="open-button" />
+    {onOpen ? (
+      <button className="open-button" onClick={onOpen} title="Open map" type="button">
+        <span className="downarrow" />
+      </button>
+    ) : (
+      <div className="open-button" />
+    )}
   </article>
 )
 
@@ -26,12 +32,17 @@ const MapPlaceholder = () => (
 export const LazyLocalitiesMap = ({ localities, isFetching }: Props) => {
   const [hasBeenOpened, setHasBeenOpened] = useState(false)
 
+  if (!hasBeenOpened) {
+    return <MapPlaceholder onOpen={() => setHasBeenOpened(true)} />
+  }
+
   return (
     <Suspense fallback={<MapPlaceholder />}>
       <LocalitiesMap
         localities={localities}
         isFetching={isFetching}
-        loadLayers={hasBeenOpened}
+        initiallyOpen
+        loadLayers
         onOpen={() => setHasBeenOpened(true)}
       />
     </Suspense>

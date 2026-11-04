@@ -58,7 +58,7 @@
   padding: 0.3em 0.6em;
   z-index: 1000;
   left: 4.2em;
-  top: 0.90em;
+  top: 0.9em;
   border-radius: 0.25em;
   border: none;
   box-shadow: 0 0 0 0.15em rgba(0, 0, 0, 0.22);
@@ -74,6 +74,12 @@
   margin-bottom: 1rem;
   height: 4em;
   cursor: pointer;
+}
+
+#localities-map button.open-button {
+  padding: 0;
+  border: 0;
+  background: transparent;
 }
 
 #localities-map .downarrow {
@@ -94,7 +100,7 @@
 
 #localities-map .downarrow::before,
 #localities-map .downarrow::after {
-  content: "";
+  content: '';
   display: block;
   background-color: #a5a5a5;
   transition: background-color 0.2s ease-out;
@@ -123,4 +129,3 @@
   transform-origin: 0% 50%;
   margin-left: calc(-1 * var(--line-width));
 }
-
