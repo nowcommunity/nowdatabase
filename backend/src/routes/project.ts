@@ -1,12 +1,12 @@
 import { Request, Router } from 'express'
 import { deleteProject, getAllProjects, getProjectDetails, validateEntireProject } from '../services/project'
-import { requireOneOf } from '../middlewares/authorizer'
+import { requireLogin, requireOneOf } from '../middlewares/authorizer'
 import { EditDataType, EditMetaData, ProjectDetailsType, Role } from '../../../frontend/src/shared/types'
 import { writeProject } from '../services/write/project'
 
 const router = Router()
 
-router.get('/all', async (req, res) => {
+router.get('/all', requireLogin(), async (req, res) => {
   const projects = await getAllProjects(req.user)
   return res.status(200).send(projects)
 })

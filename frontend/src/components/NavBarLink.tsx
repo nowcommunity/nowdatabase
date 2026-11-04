@@ -6,7 +6,13 @@ import { Link } from 'react-router-dom'
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown'
 import { useUser } from '@/hooks/user'
 
-export type LinkDefinition = { title: string; url: string; children?: LinkDefinition[]; allowedRoles?: Role[] }
+export type LinkDefinition = {
+  title: string
+  url: string
+  children?: LinkDefinition[]
+  allowedRoles?: Role[]
+  requiresLogin?: boolean
+}
 
 interface Props {
   link: LinkDefinition

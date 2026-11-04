@@ -1,7 +1,7 @@
 import { Router, Request } from 'express'
 import { getAllMuseums, getMuseumDetails, validateEntireMuseum } from '../services/museum'
 import { fixBigInt } from '../utils/common'
-import { requireOneOf } from '../middlewares/authorizer'
+import { requireLogin, requireOneOf } from '../middlewares/authorizer'
 import { Role, EditDataType, EditMetaData, Museum } from '../../../frontend/src/shared/types'
 import { DuplicateMuseumCodeError, writeMuseum } from '../services/write/museum'
 import { parseTabListQuery } from '../services/tabularQuery'
@@ -13,12 +13,12 @@ const museumLocalitiesTabQueryValidation = validateTabListQuery({
   allowedSortingColumns: ['loc_name', 'country', 'max_age', 'min_age', 'lid'],
 })
 
-router.get('/all', async (_req, res) => {
+router.get('/all', requireLogin(), async (_req, res) => {
   const museums = await getAllMuseums()
   return res.status(200).send(museums)
 })
 
-router.get('/:id', ...museumLocalitiesTabQueryValidation, async (req, res) => {
+router.get('/:id', requireLogin(), ...museumLocalitiesTabQueryValidation, async (req, res) => {
   const id = req.params.id
   const parsedQuery = parseTabListQuery({
     query: req.query,
