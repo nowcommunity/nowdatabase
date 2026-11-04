@@ -1,23 +1,26 @@
 import { describe, expect, it, jest } from '@jest/globals'
-import { fireEvent, render, screen, waitFor } from '@testing-library/react'
+import { act, render, screen, waitFor } from '@testing-library/react'
 
-const mockLocalitiesMap = jest.fn((_props: unknown) => <div data-testid="real-map" />)
+type MapProps = { loadLayers?: boolean; onOpen?: () => void }
+
+const mockLocalitiesMap = jest.fn((props: MapProps) => (
+  <div data-testid="real-map" data-layers={`${props.loadLayers}`} />
+))
 
 jest.mock('../../src/components/Map/LocalitiesMap', () => ({
-  LocalitiesMap: (props: unknown) => mockLocalitiesMap(props),
+  LocalitiesMap: (props: MapProps) => mockLocalitiesMap(props),
 }))
 
 describe('LazyLocalitiesMap', () => {
-  it('only mounts the real map after the user opens it', async () => {
+  it('shows the base map first and loads layers only after the map is opened', async () => {
     const { LazyLocalitiesMap } = await import('../../src/components/Map/LazyLocalitiesMap')
     render(<LazyLocalitiesMap localities={[]} isFetching={false} />)
 
-    expect(screen.queryByTestId('real-map')).toBeNull()
-    expect(mockLocalitiesMap).not.toHaveBeenCalled()
+    await waitFor(() => expect(screen.getByTestId('real-map').getAttribute('data-layers')).toBe('false'))
 
-    fireEvent.click(screen.getByTitle('Open map'))
+    const onOpen = mockLocalitiesMap.mock.calls[0][0].onOpen
+    act(() => onOpen?.())
 
-    await waitFor(() => expect(screen.getByTestId('real-map')).toBeTruthy())
-    expect(mockLocalitiesMap).toHaveBeenCalledWith(expect.objectContaining({ openOnMount: true }))
+    await waitFor(() => expect(screen.getByTestId('real-map').getAttribute('data-layers')).toBe('true'))
   })
 })

@@ -12,28 +12,28 @@ type Props = {
   isFetching: boolean
 }
 
-const EmptyMap = ({ onOpen }: { onOpen?: () => void }) => (
+const MapPlaceholder = () => (
   <article id="localities-map">
     <div className="map-container">
       <div className="map map-placeholder" />
-      <div className="gradient" onClick={onOpen} data-cy="localities-map-placeholder"></div>
     </div>
-    <div className="open-button" onClick={onOpen} title="Open map">
-      <span className="downarrow"></span>
-    </div>
+    <div className="open-button" />
   </article>
 )
 
-// Shows a lightweight empty map until the user opens it. The real map (Leaflet, country borders and
-// one marker per locality) is only loaded and built after that.
+// Shows the base map right away, but the localities (one marker each) and country borders are only
+// added after the user has opened the map.
 export const LazyLocalitiesMap = ({ localities, isFetching }: Props) => {
   const [hasBeenOpened, setHasBeenOpened] = useState(false)
 
-  if (!hasBeenOpened) return <EmptyMap onOpen={() => setHasBeenOpened(true)} />
-
   return (
-    <Suspense fallback={<EmptyMap />}>
-      <LocalitiesMap localities={localities} isFetching={isFetching} openOnMount />
+    <Suspense fallback={<MapPlaceholder />}>
+      <LocalitiesMap
+        localities={localities}
+        isFetching={isFetching}
+        loadLayers={hasBeenOpened}
+        onOpen={() => setHasBeenOpened(true)}
+      />
     </Suspense>
   )
 }

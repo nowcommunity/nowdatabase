@@ -15,14 +15,15 @@ import northarrow from './images/north-arrow.png'
 interface Props {
   localities?: SimplifiedLocality[]
   isFetching: boolean
-  // Expands the map right after mounting, used when the user already asked to open it.
-  openOnMount?: boolean
+  // When false, only the base map is shown; markers and country borders are skipped until it becomes true.
+  loadLayers?: boolean
+  onOpen?: () => void
 }
 
 type CustomCircleMarkerOptions = L.CircleMarkerOptions & { localityId: number }
 type CustomCircleMarker = L.CircleMarker & { options: CustomCircleMarkerOptions }
 
-export const LocalitiesMap = ({ localities, isFetching, openOnMount = false }: Props) => {
+export const LocalitiesMap = ({ localities, isFetching, loadLayers = true, onOpen }: Props) => {
   const [selectedLocality, setSelectedLocality] = useState<string | null>(null)
   const mapRef = useRef<HTMLDivElement | null>(null)
   const [map, setMap] = useState<L.Map | null>(null)
@@ -30,8 +31,8 @@ export const LocalitiesMap = ({ localities, isFetching, openOnMount = false }: P
   const [isOpen, setIsOpen] = useState(false)
 
   useEffect(() => {
-    if (openOnMount) setIsOpen(true)
-  }, [openOnMount])
+    if (isOpen) onOpen?.()
+  }, [isOpen, onOpen])
 
   const [localityDetailsIsOpen, setLocalityDetailsIsOpen] = useState(false)
   const [clusteringEnabled, setClusteringEnabled] = useState(true)
@@ -45,6 +46,7 @@ export const LocalitiesMap = ({ localities, isFetching, openOnMount = false }: P
   const [countryPolygons, setCountryPolygons] = useState<unknown[] | null>(null)
 
   useEffect(() => {
+    if (!loadLayers) return
     let mounted = true
 
     // Dynamically import country polygons to avoid blocking on initial load
@@ -59,7 +61,7 @@ export const LocalitiesMap = ({ localities, isFetching, openOnMount = false }: P
     return () => {
       mounted = false
     }
-  }, [])
+  }, [loadLayers])
 
   useEffect(() => {
     if (!mapRef.current) return
@@ -133,7 +135,7 @@ export const LocalitiesMap = ({ localities, isFetching, openOnMount = false }: P
   }, [countryPolygons, map])
 
   useEffect(() => {
-    if (!map || isFetching) return
+    if (!map || isFetching || !loadLayers) return
 
     // To prevent eslint from complaining about that 'markers' variable below:
     /* eslint-disable @typescript-eslint/no-unsafe-assignment */
@@ -176,7 +178,7 @@ export const LocalitiesMap = ({ localities, isFetching, openOnMount = false }: P
       // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
       map.removeLayer(newMarkers)
     }
-  }, [localities, isFetching, map, clusteringEnabled])
+  }, [localities, isFetching, map, clusteringEnabled, loadLayers])
 
   document.title = 'Map'
 

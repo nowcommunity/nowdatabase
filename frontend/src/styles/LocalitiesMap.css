@@ -124,6 +124,3 @@
   margin-left: calc(-1 * var(--line-width));
 }
 
-#localities-map .map-placeholder {
-  background-color: #e6ecef;
-}
