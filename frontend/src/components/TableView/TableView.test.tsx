@@ -303,6 +303,62 @@ describe('TableView table help integration', () => {
     })
   })
 
+  it('copies range filter values before forwarding them to the page context', async () => {
+    const setSqlColumnFilters = jest.fn((filters: Array<{ id: string; value: unknown }>) => {
+      const forwardedValue = filters[0]?.value
+      if (Array.isArray(forwardedValue)) Object.freeze(forwardedValue)
+    })
+    mockUsePageContext.mockReturnValue({
+      editRights: {},
+      idList: [],
+      idFieldName: 'id',
+      viewName: 'test',
+      previousTableUrls: [],
+      createTitle: () => '',
+      createSubtitle: () => '',
+      sqlLimit: 25,
+      sqlOffset: 0,
+      sqlColumnFilters: [],
+      sqlOrderBy: [],
+      setIdList: jest.fn(),
+      setSqlLimit: jest.fn(),
+      setSqlOffset: jest.fn(),
+      setSqlColumnFilters,
+      setSqlOrderBy: jest.fn(),
+      setPreviousTableUrls: jest.fn(),
+    })
+
+    render(
+      <TableView<TestRow>
+        title="Test Table"
+        idFieldName="id"
+        columns={[{ header: 'Max age', accessorKey: 'maxAge', filterVariant: 'range' }]}
+        visibleColumns={{ maxAge: true }}
+        data={[]}
+        url="test"
+        isFetching={false}
+      />
+    )
+
+    const sourceRange = [1, 10]
+    act(() => {
+      lastMaterialReactTableOptions?.onColumnFiltersChange?.([{ id: 'maxAge', value: sourceRange }])
+    })
+
+    await waitFor(() => {
+      expect(setSqlColumnFilters).toHaveBeenLastCalledWith([{ id: 'maxAge', value: [1, 10] }])
+    })
+
+    const forwardedValue = setSqlColumnFilters.mock.lastCall?.[0][0]?.value
+    expect(forwardedValue).not.toBe(sourceRange)
+    expect(Array.isArray(forwardedValue) && Object.isFrozen(forwardedValue)).toBe(true)
+    expect(() => {
+      sourceRange[0] = 5
+    }).not.toThrow()
+    expect(sourceRange).toEqual([5, 10])
+    expect(forwardedValue).toEqual([1, 10])
+  })
+
   it('restores persisted column filters for normal table visits', async () => {
     const setSqlColumnFilters = jest.fn()
     const persistedFilters = [{ id: 'name', value: 'Alpha' }]
