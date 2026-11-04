@@ -1,11 +1,26 @@
 import { ParsedCrossSearchRouteParameters } from '../types'
 import { Validators, validator, ValidationError } from './validator'
 
+const isEmptyRangeBound = (bound: unknown) => bound === null || bound === undefined || bound === ''
+
+const isValidRangeBound = (bound: unknown) => {
+  if (isEmptyRangeBound(bound)) return true
+  if (typeof bound === 'number') return Number.isFinite(bound)
+  return typeof bound === 'string' && bound.trim() !== '' && Number.isFinite(Number(bound))
+}
+
 const columnFilterCheck = (columnFilters: unknown) => {
   if (!Array.isArray(columnFilters)) return 'Column filters is not an array'
   for (const filter of columnFilters as Record<string, unknown>[]) {
     if (!('id' in filter) || typeof filter.id !== 'string' || filter.id === '') {
       return 'Invalid or missing id field in filter'
+    }
+    if (Array.isArray(filter.value)) {
+      const range = filter.value as unknown[]
+      if (range.length !== 2 || !range.every(isValidRangeBound) || range.every(isEmptyRangeBound)) {
+        return 'Range filter value must be an array of two numeric bounds, at least one of which is set'
+      }
+      continue
     }
     if (!('value' in filter) || typeof filter.value !== 'string' || filter.value === '') {
       return 'Invalid or missing value field in filter'
