@@ -133,7 +133,8 @@ export const LocalityTab = () => {
           { value: 'false', display: 'No' },
           { value: 'true', display: 'Yes' },
         ],
-        'Approximate Coordinates'
+        'Approximate Coordinates',
+        { preserveEmptyValue: true }
       ),
     ],
     ['Altitude (m)', textField('altitude', { type: 'number', integerOnly: true, min: -500, max: 9000 })],

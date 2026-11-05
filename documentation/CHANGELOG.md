@@ -12,6 +12,7 @@
 - Resolved Update log detail navigation so Return buttons honor the originating table using the new shared return-navigation helper.
 - Restored Locality edit view synonym creation so saving a valid synonym immediately appears in the Synonyms table.
 - Locality Age tab now preserves age-entry drafts per dating method (`time_unit`, `absolute`, `composite`) so switching methods no longer clears previously entered min/max age and basis values.
+- Locality Approximate Coordinates now remains unset when its value is unknown instead of defaulting to 0/No.
 - Locality age validation now enforces required age-basis rules against the active dating method while tolerating preserved values from non-active methods.
 - Locality -> Species (`/locality/:id?tab=2`) edit-mode minus action now consistently targets the clicked species row when table ordering differs from source data, preventing incorrect red highlight on other rows.
 - Added Cypress regression coverage in `cypress/e2e/locality.cy.js` to verify row-action remove state is applied only to the clicked species row.
