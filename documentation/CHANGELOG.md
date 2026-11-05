@@ -2,6 +2,7 @@
 
 ## Unreleased
 ### Changed
+- Merge species (`/admin/merge-species`) copy-parameters list now also shows fields where the Obsolete value is empty and Accepted has a value, so the empty Obsolete value can be selected to clear the Accepted value.
 - Museums and Projects (navbar links, lists and details, and the `GET /museum/all`, `GET /museum/:id`, `GET /project/all` endpoints) are now restricted to logged-in users; non-logged-in users see a permission denied page or a `403`.
 - UI terminology now uses Occurrence/Occurrences instead of Locality-Species in user-facing captions; backend/database contracts remain unchanged (including `now_ls`).
 - Repositioned table row action icons to the right edge, tightened spacing, and added aria labels so Locality, Species, and related tables reclaim horizontal room while keeping tooltips and restriction markers accessible.
