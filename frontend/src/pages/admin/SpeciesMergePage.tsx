@@ -532,9 +532,7 @@ export const SpeciesMergePage = () => {
                     {summary.speciesFieldChoices
                       .filter(
                         choice =>
-                          !taxonomyFields.has(choice.field) &&
-                          !isEmptyValue(choice.obsoleteValue) &&
-                          !isSameValue(choice.obsoleteValue, choice.acceptedValue)
+                          !taxonomyFields.has(choice.field) && !isSameValue(choice.obsoleteValue, choice.acceptedValue)
                       )
                       .map(choice => {
                         const selected = speciesFieldChoices[choice.field] ?? choice.defaultChoice

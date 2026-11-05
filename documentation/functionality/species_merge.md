@@ -24,7 +24,7 @@ After a successful merge, the UI navigates to the accepted species detail page.
 ## Copy Selected Parameters
 
 The copy list is intentionally tight:
-- **Shows only** fields where the **obsolete value is non-empty** and **differs** from the accepted value.
+- **Shows only** fields where the obsolete value **differs** from the accepted value. This includes fields where the obsolete value is empty and the accepted value is set, so the empty obsolete value (shown as `-`) can be selected to clear the accepted value.
 - **Taxonomic fields are excluded** (see list below).
 - Additional excluded fields: `class_name`, `used_morph`, `used_now`, `used_gene`, `sp_status`.
 
