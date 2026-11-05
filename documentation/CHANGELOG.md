@@ -8,6 +8,7 @@
 - Species detail Locality-Species tab now renders MW Score as a computed, read-only display field based on mw_scale_min, mw_scale_max, and mw_value instead of a placeholder value.
 
 ### Fixed
+- Password validation (backend and frontend) now requires at least one lowercase letter, uppercase letter, digit and special character (`^?$%&~!`) in addition to the 8-character minimum; the random password generator always satisfies this.
 - Occurrence table (`/occurrence`) filtering by range columns such as Max age / Min age no longer fails with "You do not have permission to view this data."; cross-search endpoints now accept `[min, max]` range filter values and apply them as numeric comparisons. Setting Min / Max range filters no longer throws "Cannot assign to read only property" (filter arrays are copied before being passed to RTK Query).
 - Resolved Update log detail navigation so Return buttons honor the originating table using the new shared return-navigation helper.
 - Restored Locality edit view synonym creation so saving a valid synonym immediately appears in the Synonyms table.

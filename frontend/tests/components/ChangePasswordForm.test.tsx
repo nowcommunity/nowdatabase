@@ -44,7 +44,7 @@ describe('ChangePasswordForm', () => {
     expect((submitButton as HTMLButtonElement).disabled).toBe(true)
 
     await user.type(screen.getByTestId('old-password-input'), 'oldPassword123')
-    await user.type(screen.getByTestId('new-password-input'), 'ValidPass1')
+    await user.type(screen.getByTestId('new-password-input'), 'ValidPass1!')
 
     expect((submitButton as HTMLButtonElement).disabled).toBe(true)
   })
@@ -56,8 +56,8 @@ describe('ChangePasswordForm', () => {
     const submitButton = screen.getByRole('button', { name: /change password/i })
 
     await user.type(screen.getByTestId('old-password-input'), 'oldPassword123')
-    await user.type(screen.getByTestId('new-password-input'), 'ValidPass1')
-    await user.type(screen.getByTestId('verify-password-input'), 'DifferentPass1')
+    await user.type(screen.getByTestId('new-password-input'), 'ValidPass1!')
+    await user.type(screen.getByTestId('verify-password-input'), 'DifferentPass1!')
 
     expect((submitButton as HTMLButtonElement).disabled).toBe(true)
   })
@@ -69,8 +69,8 @@ describe('ChangePasswordForm', () => {
     const submitButton = screen.getByRole('button', { name: /change password/i })
 
     await user.type(screen.getByTestId('old-password-input'), 'oldPassword123')
-    await user.type(screen.getByTestId('new-password-input'), 'ValidPass1')
-    await user.type(screen.getByTestId('verify-password-input'), 'ValidPass1')
+    await user.type(screen.getByTestId('new-password-input'), 'ValidPass1!')
+    await user.type(screen.getByTestId('verify-password-input'), 'ValidPass1!')
 
     expect((submitButton as HTMLButtonElement).disabled).toBe(false)
   })
