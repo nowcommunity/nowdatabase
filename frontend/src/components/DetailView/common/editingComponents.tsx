@@ -201,12 +201,14 @@ export const RadioSelector = <T extends object>({
   field,
   defaultValue,
   handleSetEditData,
+  preserveEmptyValue = false,
 }: {
   options: Array<DropdownOption | DropdownOptionValue>
   name: string
   field: keyof EditDataType<T>
   defaultValue?: DropdownOptionValue
   handleSetEditData?: (value: number | string | boolean) => void
+  preserveEmptyValue?: boolean
 }) => {
   const { setEditData, editData, validator, fieldsWithErrors, setFieldsWithErrors } = useDetailContext<T>()
   const errorObject = validator(editData, field)
@@ -221,7 +223,7 @@ export const RadioSelector = <T extends object>({
   }
 
   useEffect(() => {
-    if (editData[field] === null || editData[field] === '') {
+    if (!preserveEmptyValue && (editData[field] === null || editData[field] === '')) {
       setEditData({ ...editData, [field]: defaultValue })
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -242,7 +244,7 @@ export const RadioSelector = <T extends object>({
           const asNumber = typeof options[0] === 'number'
           setDropdownOptionValue(setValue, event?.currentTarget?.value, asNumber)
         }}
-        value={editData[field]}
+        value={editData[field] ?? ''}
         sx={{ display: 'flex', flexDirection: 'row' }}
       >
         {options.map(option => (

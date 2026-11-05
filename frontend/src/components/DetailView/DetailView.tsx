@@ -62,6 +62,7 @@ export type TextFieldOptions =
 export type OptionalRadioSelectionProps = {
   defaultValue?: DropdownOptionValue
   handleSetEditData?: (value: number | string | boolean) => void
+  preserveEmptyValue?: boolean
 }
 
 export type FieldsWithErrorsType = { [field: string]: ValidationObject }

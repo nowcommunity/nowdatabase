@@ -31,6 +31,7 @@ describe('writeLocality', () => {
   it('does not individually update existing occurrences while saving a locality', async () => {
     const locality = {
       lid: 42,
+      approx_coord: null,
       now_ls: [
         {
           lid: 42,
@@ -52,6 +53,31 @@ describe('writeLocality', () => {
 
     expect(updateObjectSpy).toHaveBeenCalledTimes(1)
     expect(updateObjectSpy).toHaveBeenCalledWith('now_loc', expect.any(Object), ['lid'])
+    expect(updateObjectSpy).toHaveBeenCalledWith('now_loc', expect.objectContaining({ approx_coord: null }), ['lid'])
     expect(applyListChangesSpy).toHaveBeenCalledWith('now_ls', locality.now_ls, ['lid', 'species_id'])
+  })
+
+  it.each([
+    ['true', true],
+    ['false', false],
+  ])('persists explicit Approximate Coordinates value %s', async (value, expected) => {
+    const locality = {
+      lid: 42,
+      approx_coord: value,
+      now_ls: [],
+      now_mus: [],
+      projects: [],
+      now_plr: [],
+      now_syn_loc: [],
+      now_ss: [],
+      now_coll_meth: [],
+      now_lau: [],
+    } as unknown as EditDataType<LocalityDetailsType>
+
+    await expect(writeLocality(locality, undefined, undefined, mockUser)).resolves.toBe(42)
+
+    expect(updateObjectSpy).toHaveBeenCalledWith('now_loc', expect.objectContaining({ approx_coord: expected }), [
+      'lid',
+    ])
   })
 })
