@@ -12,12 +12,13 @@ jest.mock('../../src/components/Map/LocalitiesMap', () => ({
 }))
 
 describe('LazyLocalitiesMap', () => {
-  it('mounts the map only after it is opened', async () => {
+  it('mounts the map immediately with loadLayers=false and collapsed, and sets loadLayers=true after opening', async () => {
     const { LazyLocalitiesMap } = await import('../../src/components/Map/LazyLocalitiesMap')
     render(<LazyLocalitiesMap localities={[]} isFetching={false} />)
 
-    expect(screen.queryByTestId('real-map')).toBeNull()
-    expect(mockLocalitiesMap).not.toHaveBeenCalled()
+    expect(mockLocalitiesMap).toHaveBeenCalled()
+    expect(screen.getByTestId('real-map').getAttribute('data-layers')).toBe('false')
+    expect(screen.getByTestId('real-map').getAttribute('data-open')).toBe('false')
 
     fireEvent.click(screen.getByRole('button', { name: 'Open map' }))
 
