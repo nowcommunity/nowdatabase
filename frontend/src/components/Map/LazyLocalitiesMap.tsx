@@ -32,17 +32,13 @@ const MapPlaceholder = ({ onOpen }: { onOpen?: () => void }) => (
 export const LazyLocalitiesMap = ({ localities, isFetching }: Props) => {
   const [hasBeenOpened, setHasBeenOpened] = useState(false)
 
-  if (!hasBeenOpened) {
-    return <MapPlaceholder onOpen={() => setHasBeenOpened(true)} />
-  }
-
   return (
     <Suspense fallback={<MapPlaceholder />}>
       <LocalitiesMap
         localities={localities}
         isFetching={isFetching}
-        initiallyOpen
-        loadLayers
+        loadLayers={hasBeenOpened}
+        initiallyOpen={false}
         onOpen={() => setHasBeenOpened(true)}
       />
     </Suspense>
