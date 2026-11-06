@@ -9,6 +9,7 @@
 - Species detail Locality-Species tab now renders MW Score as a computed, read-only display field based on mw_scale_min, mw_scale_max, and mw_value instead of a placeholder value.
 
 ### Fixed
+- Occurrence isotope sample-count inputs now preserve decimal entry so fractional δ13C N / δ18O N values are rejected by positive-integer validation instead of being silently changed.
 - Locality list map now shows the base map tiles immediately on page load in a collapsed state, with markers and country borders loading only after clicking "Open map" (re-applying the fix from commit e5465527 that was inadvertently reverted).
 - Password validation (backend and frontend) now requires at least one lowercase letter, uppercase letter, digit and special character (`^?$%&~!`) in addition to the 8-character minimum; the random password generator always satisfies this.
 - Occurrence table (`/occurrence`) filtering by range columns such as Max age / Min age no longer fails with "You do not have permission to view this data."; cross-search endpoints now accept `[min, max]` range filter values and apply them as numeric comparisons. Setting Min / Max range filters no longer throws "Cannot assign to read only property" (filter arrays are copied before being passed to RTK Query).
