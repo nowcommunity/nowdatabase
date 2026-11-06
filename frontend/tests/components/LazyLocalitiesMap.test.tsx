@@ -16,11 +16,9 @@ describe('LazyLocalitiesMap', () => {
     const { LazyLocalitiesMap } = await import('../../src/components/Map/LazyLocalitiesMap')
     render(<LazyLocalitiesMap localities={[]} isFetching={false} />)
 
-    await waitFor(() => {
-      expect(screen.getByTestId('real-map')).toBeInTheDocument()
-      expect(screen.getByTestId('real-map').getAttribute('data-layers')).toBe('false')
-      expect(screen.getByTestId('real-map').getAttribute('data-open')).toBe('false')
-    })
+    expect(mockLocalitiesMap).toHaveBeenCalled()
+    expect(screen.getByTestId('real-map').getAttribute('data-layers')).toBe('false')
+    expect(screen.getByTestId('real-map').getAttribute('data-open')).toBe('false')
 
     fireEvent.click(screen.getByRole('button', { name: 'Open map' }))
 
