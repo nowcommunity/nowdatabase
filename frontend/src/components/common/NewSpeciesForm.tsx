@@ -5,6 +5,7 @@ import {
   EditDataType,
   LocalityDetailsType,
   LocalitySpeciesDetailsType,
+  Role,
   Species,
   SpeciesDetailsType,
 } from '@/shared/types'
@@ -13,8 +14,10 @@ import {
   checkSpeciesTaxonomy,
   convertSpeciesTaxonomyFields,
   fixNullValuesInTaxonomyFields,
+  getSpeciesTaxonomyKey,
   TaxonomySpecies,
 } from '@/util/taxonomyUtilities'
+import { useUser } from '@/hooks/user'
 import { Box } from '@mui/material'
 import { MRT_ColumnDef } from 'material-react-table'
 import { useMemo, useState } from 'react'
@@ -89,6 +92,7 @@ export const NewSpeciesForm = ({
   afterTaxonomyCheck: (newSpecies: EditDataType<Species>) => void
 }) => {
   const { notify } = useNotify()
+  const user = useUser()
   const { data: speciesData, isError } = useGetAllSpeciesQuery()
 
   const [selectedSpecies, setSelectedSpecies] = useState<string | undefined>()
@@ -98,6 +102,51 @@ export const NewSpeciesForm = ({
   const sortedSpeciesData = useMemo(() => {
     return applyDefaultSpeciesOrdering(speciesData)
   }, [speciesData])
+
+  const getDraftExistingTaxa = (): TaxonomySpecies[] =>
+    (existingLocalitySpecies ?? [])
+      .map(localitySpecies => localitySpecies.com_species)
+      .filter((species): species is EditDataType<SpeciesDetailsType> => Boolean(species))
+      .map(species => ({
+        species_id: species.species_id,
+        subclass_or_superorder_name: species.subclass_or_superorder_name,
+        order_name: species.order_name,
+        suborder_or_superfamily_name: species.suborder_or_superfamily_name,
+        family_name: species.family_name,
+        subfamily_name: species.subfamily_name,
+        genus_name: species.genus_name,
+        species_name: species.species_name,
+        unique_identifier: species.unique_identifier,
+      }))
+
+  const getTaxonomyConfirmation = (newSpecies: EditDataType<Species>) => {
+    if (user.role !== Role.Admin || !speciesData) return undefined
+
+    const convertedSpecies = convertSpeciesTaxonomyFields(newSpecies)
+    const taxonomyValues = [
+      convertedSpecies.subclass_or_superorder_name,
+      convertedSpecies.order_name,
+      convertedSpecies.suborder_or_superfamily_name,
+      convertedSpecies.family_name,
+      convertedSpecies.subfamily_name,
+      convertedSpecies.genus_name,
+      convertedSpecies.species_name,
+    ]
+    if (!taxonomyValues.some(value => value?.trim())) return undefined
+
+    let hierarchyErrors: string[] = []
+    checkSpeciesTaxonomy(convertedSpecies, [...speciesData, ...getDraftExistingTaxa()], [], {
+      onTaxonomyHierarchyMismatch: errors => {
+        hierarchyErrors = errors
+      },
+    })
+    if (hierarchyErrors.length === 0) return undefined
+
+    return {
+      key: getSpeciesTaxonomyKey(convertedSpecies),
+      message: `${hierarchyErrors.join('\n')}\nConfirm that you understand the mismatch before adding the species.`,
+    }
+  }
 
   const copyTaxonomyButton = (
     <Box key="copy_existing_taxonomy_button">
@@ -162,27 +211,12 @@ export const NewSpeciesForm = ({
 
     const convertedSpecies = convertSpeciesTaxonomyFields(newSpecies)
 
-    let draftExistingTaxa: TaxonomySpecies[] = []
-
-    if (existingLocalitySpecies) {
-      draftExistingTaxa = existingLocalitySpecies
-        .map(ls => ls.com_species)
-        // make sure that species is not a falsy value
-        .filter((species): species is EditDataType<SpeciesDetailsType> => Boolean(species))
-        .map(species => ({
-          species_id: species.species_id,
-          subclass_or_superorder_name: species.subclass_or_superorder_name,
-          order_name: species.order_name,
-          suborder_or_superfamily_name: species.suborder_or_superfamily_name,
-          family_name: species.family_name,
-          subfamily_name: species.subfamily_name,
-          genus_name: species.genus_name,
-          species_name: species.species_name,
-          unique_identifier: species.unique_identifier,
-        }))
-    }
-
-    const taxonomyErrors = checkSpeciesTaxonomy(convertedSpecies, [...(speciesData ?? []), ...draftExistingTaxa], [])
+    const taxonomyErrors = checkSpeciesTaxonomy(
+      convertedSpecies,
+      [...(speciesData ?? []), ...getDraftExistingTaxa()],
+      [],
+      { allowTaxonomyHierarchyMismatch: user.role === Role.Admin }
+    )
     if (taxonomyErrors.size > 0) {
       const errorMessage = [...taxonomyErrors].reduce((acc, currentError) => acc + `\n${currentError}`)
       notify(errorMessage, 'error', null)
@@ -197,6 +231,7 @@ export const NewSpeciesForm = ({
       existingObject={{ unique_identifier: '-' }}
       replacedValues={replacedValues}
       copyTaxonomyButton={copyTaxonomyButton}
+      getConfirmation={getTaxonomyConfirmation}
       editAction={(newSpecies: EditDataType<Species>) => {
         const convertedSpecies = convertAndCheckNewSpeciesTaxonomy(newSpecies)
         if (!convertedSpecies) return false
