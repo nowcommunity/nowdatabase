@@ -135,7 +135,7 @@ describe('EditingForm select support', () => {
     const editAction = jest.fn<(newObject: { unique_identifier: string }) => void>()
     const getConfirmation = (values: { unique_identifier: string }) =>
       values.unique_identifier?.startsWith('conflict')
-        ? { key: values.unique_identifier, message: 'Taxonomy conflicts with an existing entry.' }
+        ? { key: values.unique_identifier, message: 'Family Felidae belongs to order Carnivora, not Rodentia.' }
         : undefined
 
     mockUseDetailContext.mockReturnValue(createContextValue())
@@ -153,7 +153,7 @@ describe('EditingForm select support', () => {
     const identifierField = screen.getByRole('textbox', { name: /unique identifier/i })
     await user.type(identifierField, 'conflict-one')
 
-    expect(screen.getByText('Taxonomy conflicts with an existing entry.')).toBeTruthy()
+    expect(screen.getByText('Family Felidae belongs to order Carnivora, not Rodentia.')).toBeTruthy()
     const saveButton = screen.getByRole('button', { name: /save/i })
     expect((saveButton as HTMLButtonElement).disabled).toBe(true)
 

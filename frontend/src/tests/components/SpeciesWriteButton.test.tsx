@@ -198,7 +198,7 @@ describe('WriteButton behavior', () => {
     const setMode = jest.fn()
     const onWrite = jest.fn(() => Promise.resolve())
     mockCheckSpeciesTaxonomy.mockImplementation((_species, _existingSpecies, _synonyms, options) => {
-      options?.onTaxonomyHierarchyMismatch?.()
+      options?.onTaxonomyHierarchyMismatch?.(['Subfamily Caninae belongs to family Canidae, not Felidae.'])
       return new Set()
     })
 
@@ -211,14 +211,14 @@ describe('WriteButton behavior', () => {
 
     const finalizeButton = screen.getByRole('button', { name: /finalize entry/i })
     expect((finalizeButton as HTMLButtonElement).disabled).toBe(true)
-    expect(screen.getByText(/this taxonomy conflicts with existing entries/i)).toBeTruthy()
+    expect(screen.getByText(/Subfamily Caninae belongs to family Canidae, not Felidae/i)).toBeTruthy()
 
     fireEvent.click(screen.getByRole('checkbox', { name: /i understand and want to continue/i }))
 
     await waitFor(() => {
       expect((finalizeButton as HTMLButtonElement).disabled).toBe(false)
     })
-    expect(screen.getByText(/this taxonomy conflicts with existing entries/i)).toBeTruthy()
+    expect(screen.getByText(/Subfamily Caninae belongs to family Canidae, not Felidae/i)).toBeTruthy()
     expect(screen.getByRole('checkbox')).toHaveProperty('checked', true)
 
     fireEvent.click(finalizeButton)

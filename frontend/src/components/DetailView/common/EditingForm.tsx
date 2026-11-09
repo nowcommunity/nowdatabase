@@ -111,7 +111,7 @@ export const EditingForm = <T extends object, ParentType extends object>({
     <EditingModal {...{ dataCy, buttonText, onSave }} saveDisabled={needsConfirmation}>
       <Box sx={{ display: 'flex', flexDirection: 'column', gap: '1em' }}>
         {confirmation && (
-          <Alert severity="warning">
+          <Alert severity="warning" sx={{ whiteSpace: 'pre-line' }}>
             {confirmation.message}
             <FormControlLabel
               control={

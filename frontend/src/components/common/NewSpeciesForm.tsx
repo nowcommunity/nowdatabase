@@ -102,17 +102,33 @@ export const NewSpeciesForm = ({
     return applyDefaultSpeciesOrdering(speciesData)
   }, [speciesData])
 
+  const getDraftExistingTaxa = (): TaxonomySpecies[] =>
+    (existingLocalitySpecies ?? [])
+      .map(localitySpecies => localitySpecies.com_species)
+      .filter((species): species is EditDataType<SpeciesDetailsType> => Boolean(species))
+      .map(species => ({
+        species_id: species.species_id,
+        subclass_or_superorder_name: species.subclass_or_superorder_name,
+        order_name: species.order_name,
+        suborder_or_superfamily_name: species.suborder_or_superfamily_name,
+        family_name: species.family_name,
+        subfamily_name: species.subfamily_name,
+        genus_name: species.genus_name,
+        species_name: species.species_name,
+        unique_identifier: species.unique_identifier,
+      }))
+
   const getTaxonomyConfirmation = (newSpecies: EditDataType<Species>) => {
     if (user.role !== Role.Admin || !speciesData) return undefined
 
     const convertedSpecies = convertSpeciesTaxonomyFields(newSpecies)
-    let hasHierarchyMismatch = false
-    checkSpeciesTaxonomy(convertedSpecies, speciesData, [], {
-      onTaxonomyHierarchyMismatch: () => {
-        hasHierarchyMismatch = true
+    let hierarchyErrors: string[] = []
+    checkSpeciesTaxonomy(convertedSpecies, [...speciesData, ...getDraftExistingTaxa()], [], {
+      onTaxonomyHierarchyMismatch: errors => {
+        hierarchyErrors = errors
       },
     })
-    if (!hasHierarchyMismatch) return undefined
+    if (hierarchyErrors.length === 0) return undefined
 
     return {
       key: JSON.stringify([
@@ -125,8 +141,7 @@ export const NewSpeciesForm = ({
         convertedSpecies.species_name,
         convertedSpecies.unique_identifier,
       ]),
-      message:
-        'This taxonomy conflicts with existing entries. Confirm that you understand the mismatch before adding the species.',
+      message: `${hierarchyErrors.join('\n')}\nConfirm that you understand the mismatch before adding the species.`,
     }
   }
 
@@ -193,29 +208,12 @@ export const NewSpeciesForm = ({
 
     const convertedSpecies = convertSpeciesTaxonomyFields(newSpecies)
 
-    let draftExistingTaxa: TaxonomySpecies[] = []
-
-    if (existingLocalitySpecies) {
-      draftExistingTaxa = existingLocalitySpecies
-        .map(ls => ls.com_species)
-        // make sure that species is not a falsy value
-        .filter((species): species is EditDataType<SpeciesDetailsType> => Boolean(species))
-        .map(species => ({
-          species_id: species.species_id,
-          subclass_or_superorder_name: species.subclass_or_superorder_name,
-          order_name: species.order_name,
-          suborder_or_superfamily_name: species.suborder_or_superfamily_name,
-          family_name: species.family_name,
-          subfamily_name: species.subfamily_name,
-          genus_name: species.genus_name,
-          species_name: species.species_name,
-          unique_identifier: species.unique_identifier,
-        }))
-    }
-
-    const taxonomyErrors = checkSpeciesTaxonomy(convertedSpecies, [...(speciesData ?? []), ...draftExistingTaxa], [], {
-      allowTaxonomyHierarchyMismatch: user.role === Role.Admin,
-    })
+    const taxonomyErrors = checkSpeciesTaxonomy(
+      convertedSpecies,
+      [...(speciesData ?? []), ...getDraftExistingTaxa()],
+      [],
+      { allowTaxonomyHierarchyMismatch: user.role === Role.Admin }
+    )
     if (taxonomyErrors.size > 0) {
       const errorMessage = [...taxonomyErrors].reduce((acc, currentError) => acc + `\n${currentError}`)
       notify(errorMessage, 'error', null)

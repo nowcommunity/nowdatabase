@@ -91,22 +91,22 @@ export const WriteButton = <T,>({
       !convertedEditSpecies ||
       !editedTaxonomyKey
     ) {
-      return { hasMismatch: false, key: undefined }
+      return { hasMismatch: false, hierarchyErrors: [], key: undefined }
     }
 
     const convertedOriginalData = convertSpeciesTaxonomyFields(data as EditDataType<Species>)
     if (!mode.new && !hasTaxonomyChanges(convertedEditSpecies, convertedOriginalData)) {
-      return { hasMismatch: false, key: undefined }
+      return { hasMismatch: false, hierarchyErrors: [], key: undefined }
     }
 
-    let hasMismatch = false
+    let hierarchyErrors: string[] = []
     checkSpeciesTaxonomy(convertedEditSpecies, speciesData, synonymData, {
-      onTaxonomyHierarchyMismatch: () => {
-        hasMismatch = true
+      onTaxonomyHierarchyMismatch: errors => {
+        hierarchyErrors = errors
       },
     })
 
-    return { hasMismatch, key: editedTaxonomyKey }
+    return { hasMismatch: hierarchyErrors.length > 0, hierarchyErrors, key: editedTaxonomyKey }
   }, [data, editedTaxonomyKey, mode.new, mode.staging, speciesData, synonymData, taxonomy, user.role])
 
   const needsTaxonomyAcknowledgement =
@@ -336,9 +336,9 @@ export const WriteButton = <T,>({
             <Box>
               {taxonomyConfirmation.hasMismatch && (
                 <Alert severity="warning" sx={{ mb: 1, textAlign: 'left' }}>
-                  <Typography>
-                    This taxonomy conflicts with existing entries. Confirm that you understand the mismatch before
-                    finalizing.
+                  <Typography sx={{ whiteSpace: 'pre-line' }}>
+                    {taxonomyConfirmation.hierarchyErrors.join('\n')}
+                    {'\n'}Confirm that you understand the mismatch before finalizing.
                   </Typography>
                   <FormControlLabel
                     control={

@@ -59,6 +59,9 @@ describe('checkSpeciesTaxonomy', () => {
 
     checkSpeciesTaxonomy(editedSpecies, [existingSpecies], [], { onTaxonomyHierarchyMismatch })
 
-    expect(onTaxonomyHierarchyMismatch).toHaveBeenCalledTimes(1)
+    expect(onTaxonomyHierarchyMismatch).toHaveBeenCalledWith([
+      'Genus Canis belongs to family Canidae, not Felidae.',
+      'Subfamily Caninae belongs to family Canidae, not Felidae.',
+    ])
   })
 })

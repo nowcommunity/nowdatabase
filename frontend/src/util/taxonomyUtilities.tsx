@@ -154,7 +154,7 @@ export const checkSpeciesTaxonomy = (
   synonyms: SpeciesSynonym[],
   options: {
     allowTaxonomyHierarchyMismatch?: boolean
-    onTaxonomyHierarchyMismatch?: () => void
+    onTaxonomyHierarchyMismatch?: (errors: string[]) => void
   } = {}
 ) => {
   const {
@@ -168,13 +168,13 @@ export const checkSpeciesTaxonomy = (
   } = newSpecies
 
   const errors = new Set<string>()
-  let hasTaxonomyHierarchyMismatch = false
+  const hierarchyErrors = new Set<string>()
   const addHierarchyError = (error: string) => {
-    hasTaxonomyHierarchyMismatch = true
+    hierarchyErrors.add(error)
     errors.add(error)
   }
   const getErrors = () => {
-    if (hasTaxonomyHierarchyMismatch) options.onTaxonomyHierarchyMismatch?.()
+    if (hierarchyErrors.size > 0) options.onTaxonomyHierarchyMismatch?.([...hierarchyErrors])
     return errors
   }
   let speciesWithSameOrder = undefined
