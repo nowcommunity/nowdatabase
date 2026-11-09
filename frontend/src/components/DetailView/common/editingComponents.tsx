@@ -329,18 +329,14 @@ export const EditableTextField = <T extends object>(props: EditableTextFieldProp
       }
 
       if (integerOnly) {
-        if (!isAllowedIntegerInputValue(value, allowNegative)) return
+        if (!isAllowedIntegerFieldInputValue(value, allowNegative)) return
       } else {
         if (!isAllowedNumberInputValue(value)) return
       }
       setNumberInputValue(value)
 
       const asNumber = Number(value)
-      if (
-        (integerOnly ? isPartialIntegerInputValue(value, allowNegative) : isPartialNumberInputValue(value)) ||
-        Number.isNaN(asNumber)
-      )
-        return
+      if (isPartialNumberInputValue(value) || Number.isNaN(asNumber)) return
 
       if (setNumberValue) {
         setNumberValue(asNumber)
@@ -382,8 +378,7 @@ export const EditableTextField = <T extends object>(props: EditableTextFieldProp
     const value = numberInputValue
     const setNumberValue = handleSetEditData as EditableTextFieldNumberProps<T>['handleSetEditData']
     if (value === '') return
-    const allowNegative = min === undefined || min < 0
-    if (integerOnly ? isPartialIntegerInputValue(value, allowNegative) : isPartialNumberInputValue(value)) {
+    if (isPartialNumberInputValue(value)) {
       setNumberInputValue('')
       if (setNumberValue) setNumberValue('')
       else setEditData({ ...editData, [field]: '' })
@@ -401,7 +396,6 @@ export const EditableTextField = <T extends object>(props: EditableTextFieldProp
       onKeyDown={event => {
         if (type !== 'number') return
         if (event.key === 'e' || event.key === 'E' || event.key === '+') event.preventDefault()
-        if (integerOnly && event.key === '.') event.preventDefault()
       }}
       id={`${String(field)}-textfield`}
       value={type === 'number' ? numberInputValue : editData[field] ?? ''}
@@ -427,10 +421,8 @@ const isAllowedNumberInputValue = (value: string) => /^-?\d*(\.\d*)?$/.test(valu
 
 const isPartialNumberInputValue = (value: string) => value === '-' || value === '.' || value === '-.'
 
-const isAllowedIntegerInputValue = (value: string, allowNegative: boolean) =>
-  (allowNegative ? /^-?\d*$/.test(value) : /^\d*$/.test(value)) || isPartialIntegerInputValue(value, allowNegative)
-
-const isPartialIntegerInputValue = (value: string, allowNegative: boolean) => allowNegative && value === '-'
+const isAllowedIntegerFieldInputValue = (value: string, allowNegative: boolean) =>
+  allowNegative ? /^-?\d*(\.\d*)?$/.test(value) : /^\d*(\.\d*)?$/.test(value)
 
 type EditableTextFieldCommonProps<T extends object> = {
   field: keyof EditDataType<T>
