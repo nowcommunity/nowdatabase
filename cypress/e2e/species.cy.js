@@ -99,16 +99,34 @@ describe('Editing a species', () => {
 })
 
 describe('Taxonomy checks work', () => {
+  const acknowledgeTaxonomyMismatchIfShown = () => {
+    cy.get('body').then($body => {
+      if ($body.text().includes('I understand and want to continue.')) {
+        cy.contains('I understand and want to continue.').click()
+      }
+    })
+  }
+
   const acknowledgeTaxonomyMismatchAndSave = (...expectedMessages) => {
     expectedMessages.forEach(message => cy.contains(message).should('be.visible'))
     cy.get('[id=write-button]').should('be.disabled')
     cy.contains('I understand and want to continue.').click()
     cy.get('[id=write-button]').should('not.be.disabled')
-    cy.addReferenceAndSave()
+
+    cy.get('[id=write-button]').click()
+    cy.get('[id=write-button]').should('contain.text', 'Complete and save')
+    cy.get('[id=write-button]').then($button => {
+      if ($button.is(':disabled')) {
+        cy.contains('button', 'Add existing reference').click()
+        cy.get('button[data-cy^="add-button"]').first().click()
+        cy.contains('button', 'Close').click()
+      }
+    })
+    cy.get('[id=write-button]').should('not.be.disabled').click()
     cy.contains('Saved species entry successfully.')
   }
 
-  before('Reset database', () => {
+  beforeEach('Reset database', () => {
     cy.resetDatabase()
   })
 
@@ -128,7 +146,7 @@ describe('Taxonomy checks work', () => {
     cy.visit('/species/new')
     cy.get('[data-cy=copy_existing_taxonomy_button]').click()
     cy.get('[data-cy=add-button-21052]').click()
-    cy.get('[id=unique_identifier-textfield]').type('{backspace}new identifier') // change identifier so it's not a duplicate species
+    cy.get('[id=unique_identifier-textfield]').type('{backspace}new identifier main') // change identifier so it's not a duplicate species
     cy.get('[id=order_name-textfield]').should('have.value', 'Rodentia')
     cy.get('[id=order_name-textfield]').clear()
     cy.get('[id=order_name-textfield]').type('Carnivora')
@@ -149,7 +167,7 @@ describe('Taxonomy checks work', () => {
     cy.visit('/species/new')
     cy.get('[data-cy=copy_existing_taxonomy_button]').click()
     cy.get('[data-cy=add-button-21052]').click()
-    cy.get('[id=unique_identifier-textfield]').type('{backspace}new identifier')
+    cy.get('[id=unique_identifier-textfield]').type('{backspace}new identifier superorder')
     cy.get('[id=subclass_or_superorder_name-textfield]').should('have.value', 'Eutheria')
     cy.get('[id=subclass_or_superorder_name-textfield]').clear()
     cy.get('[id=subclass_or_superorder_name-textfield]').type('somethingelse')
@@ -160,7 +178,7 @@ describe('Taxonomy checks work', () => {
     cy.visit('/species/new')
     cy.get('[data-cy=copy_existing_taxonomy_button]').click()
     cy.get('[data-cy=add-button-84357]').click()
-    cy.get('[id=unique_identifier-textfield]').type('{backspace}new identifier')
+    cy.get('[id=unique_identifier-textfield]').type('{backspace}new identifier suborder trio')
     cy.get('[id=order_name-textfield]').should('have.value', 'Carnivora')
     cy.get('[id=order_name-textfield]').clear()
     cy.get('[id=order_name-textfield]').type('Rodentia')
@@ -174,7 +192,7 @@ describe('Taxonomy checks work', () => {
     cy.visit('/species/new')
     cy.get('[data-cy=copy_existing_taxonomy_button]').click()
     cy.get('[data-cy=add-button-84357]').click()
-    cy.get('[id=unique_identifier-textfield]').type('{backspace}new identifier')
+    cy.get('[id=unique_identifier-textfield]').type('{backspace}new identifier suborder pair')
     cy.get('[id=suborder_or_superfamily_name-textfield]').should('have.value', 'Pinnipedia')
     cy.get('[id=suborder_or_superfamily_name-textfield]').clear()
     cy.get('[id=suborder_or_superfamily_name-textfield]').type('somethingelse')
@@ -185,7 +203,7 @@ describe('Taxonomy checks work', () => {
     cy.visit('/species/new')
     cy.get('[data-cy=copy_existing_taxonomy_button]').click()
     cy.get('[data-cy=add-button-23065]').click()
-    cy.get('[id=unique_identifier-textfield]').type('{backspace}new identifier')
+    cy.get('[id=unique_identifier-textfield]').type('{backspace}new identifier family trio')
     cy.get('[id=family_name-textfield]').should('have.value', 'Soricidae')
     cy.get('[id=family_name-textfield]').clear()
     cy.get('[id=family_name-textfield]').type('Gliridae')
@@ -199,7 +217,7 @@ describe('Taxonomy checks work', () => {
     cy.visit('/species/new')
     cy.get('[data-cy=copy_existing_taxonomy_button]').click()
     cy.get('[data-cy=add-button-23065]').click()
-    cy.get('[id=unique_identifier-textfield]').type('{backspace}new identifier')
+    cy.get('[id=unique_identifier-textfield]').type('{backspace}new identifier subfamily')
     cy.get('[id=subfamily_name-textfield]').should('have.value', 'Soricinae')
     cy.get('[id=subfamily_name-textfield]').clear()
     cy.get('[id=subfamily_name-textfield]').type('somethingelse')
@@ -217,6 +235,7 @@ describe('Taxonomy checks work', () => {
     cy.get('[id=write-button]').should('be.disabled')
     cy.get('[id=species_name-textfield]').clear()
     cy.get('[id=species_name-textfield]').type('indet.')
+    acknowledgeTaxonomyMismatchIfShown()
     cy.get('[id=write-button]').should('not.be.disabled')
   })
 
@@ -231,6 +250,7 @@ describe('Taxonomy checks work', () => {
     cy.get('[id=write-button]').should('be.disabled')
     cy.get('[id=species_name-textfield]').clear()
     cy.get('[id=species_name-textfield]').type('sp.')
+    acknowledgeTaxonomyMismatchIfShown()
     cy.get('[id=write-button]').should('not.be.disabled')
   })
 
