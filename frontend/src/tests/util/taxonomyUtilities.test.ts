@@ -1,4 +1,4 @@
-import { describe, expect, it } from '@jest/globals'
+import { describe, expect, it, jest } from '@jest/globals'
 import { checkSpeciesTaxonomy, TaxonomySpecies } from '@/util/taxonomyUtilities'
 import { EditDataType, Species } from '@/shared/types'
 
@@ -34,7 +34,7 @@ describe('checkSpeciesTaxonomy', () => {
   })
 
   it('allows admins to bypass taxonomy hierarchy conflicts', () => {
-    const errors = checkSpeciesTaxonomy(editedSpecies, [existingSpecies], [], true)
+    const errors = checkSpeciesTaxonomy(editedSpecies, [existingSpecies], [], { allowTaxonomyHierarchyMismatch: true })
 
     expect(errors).toEqual(new Set())
   })
@@ -47,8 +47,18 @@ describe('checkSpeciesTaxonomy', () => {
       unique_identifier: existingSpecies.unique_identifier,
     }
 
-    const errors = checkSpeciesTaxonomy(duplicateSpecies, [existingSpecies], [], true)
+    const errors = checkSpeciesTaxonomy(duplicateSpecies, [existingSpecies], [], {
+      allowTaxonomyHierarchyMismatch: true,
+    })
 
     expect(errors).toContain('The taxon already exists in the database.')
+  })
+
+  it('reports hierarchy mismatches to callers when an admin override is available', () => {
+    const onTaxonomyHierarchyMismatch = jest.fn()
+
+    checkSpeciesTaxonomy(editedSpecies, [existingSpecies], [], { onTaxonomyHierarchyMismatch })
+
+    expect(onTaxonomyHierarchyMismatch).toHaveBeenCalledTimes(1)
   })
 })

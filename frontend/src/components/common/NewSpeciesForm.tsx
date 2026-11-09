@@ -185,12 +185,9 @@ export const NewSpeciesForm = ({
         }))
     }
 
-    const taxonomyErrors = checkSpeciesTaxonomy(
-      convertedSpecies,
-      [...(speciesData ?? []), ...draftExistingTaxa],
-      [],
-      user.role === Role.Admin
-    )
+    const taxonomyErrors = checkSpeciesTaxonomy(convertedSpecies, [...(speciesData ?? []), ...draftExistingTaxa], [], {
+      allowTaxonomyHierarchyMismatch: user.role === Role.Admin,
+    })
     if (taxonomyErrors.size > 0) {
       const errorMessage = [...taxonomyErrors].reduce((acc, currentError) => acc + `\n${currentError}`)
       notify(errorMessage, 'error', null)

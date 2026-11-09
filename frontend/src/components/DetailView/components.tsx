@@ -1,8 +1,21 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { Button, Box, Typography, CircularProgress, Divider, alpha, List, ListItemText, Tooltip } from '@mui/material'
+import {
+  Alert,
+  Button,
+  Box,
+  Typography,
+  CircularProgress,
+  Divider,
+  alpha,
+  List,
+  ListItemText,
+  Tooltip,
+  Checkbox,
+  FormControlLabel,
+} from '@mui/material'
 import { useDetailContext } from './Context/DetailContext'
 import { EditDataType, Editable, Reference, Role, Species } from '@/shared/types'
-import { useState, useEffect, Fragment } from 'react'
+import { useState, useEffect, Fragment, useMemo } from 'react'
 import SaveIcon from '@mui/icons-material/Save'
 import { referenceValidator } from '@/shared/validators/validator'
 import { checkSpeciesTaxonomy, convertSpeciesTaxonomyFields, hasTaxonomyChanges } from '../../util/taxonomyUtilities'
@@ -53,6 +66,52 @@ export const WriteButton = <T,>({
   const { notify } = useNotify()
   const { data: speciesData } = useGetAllSpeciesQuery(!taxonomy ? skipToken : undefined)
   const { data: synonymData } = useGetAllSynonymsQuery(!taxonomy ? skipToken : undefined)
+  const [acknowledgedTaxonomyKey, setAcknowledgedTaxonomyKey] = useState<string>()
+  const convertedEditSpecies = taxonomy ? convertSpeciesTaxonomyFields(editData as EditDataType<Species>) : undefined
+  const editedTaxonomyKey = convertedEditSpecies
+    ? JSON.stringify([
+        convertedEditSpecies.subclass_or_superorder_name,
+        convertedEditSpecies.order_name,
+        convertedEditSpecies.suborder_or_superfamily_name,
+        convertedEditSpecies.family_name,
+        convertedEditSpecies.subfamily_name,
+        convertedEditSpecies.genus_name,
+        convertedEditSpecies.species_name,
+        convertedEditSpecies.unique_identifier,
+      ])
+    : undefined
+
+  const taxonomyConfirmation = useMemo(() => {
+    if (
+      mode.staging ||
+      !taxonomy ||
+      user.role !== Role.Admin ||
+      !speciesData ||
+      !synonymData ||
+      !convertedEditSpecies ||
+      !editedTaxonomyKey
+    ) {
+      return { hasMismatch: false, key: undefined }
+    }
+
+    const convertedOriginalData = convertSpeciesTaxonomyFields(data as EditDataType<Species>)
+    if (!mode.new && !hasTaxonomyChanges(convertedEditSpecies, convertedOriginalData)) {
+      return { hasMismatch: false, key: undefined }
+    }
+
+    let hasMismatch = false
+    checkSpeciesTaxonomy(convertedEditSpecies, speciesData, synonymData, {
+      onTaxonomyHierarchyMismatch: () => {
+        hasMismatch = true
+      },
+    })
+
+    return { hasMismatch, key: editedTaxonomyKey }
+  }, [data, editedTaxonomyKey, mode.new, mode.staging, speciesData, synonymData, taxonomy, user.role])
+
+  const needsTaxonomyAcknowledgement =
+    taxonomyConfirmation.hasMismatch && acknowledgedTaxonomyKey !== taxonomyConfirmation.key
+  const taxonomyDataLoading = Boolean(taxonomy && (!speciesData || !synonymData))
 
   // For coordinate out of bounds warning
   const [warningModalState, setWarningModalState] = useState<OutOfBoundsWarningModalState>({
@@ -74,9 +133,8 @@ export const WriteButton = <T,>({
   }
 
   useEffect(() => {
-    if (taxonomy && (!speciesData || !synonymData)) setLoading(true)
-    else setLoading(false)
-  }, [speciesData, synonymData])
+    setLoading(taxonomyDataLoading)
+  }, [taxonomyDataLoading])
 
   const shouldHideWriteButton = (() => {
     if (!mode.new || user.role !== Role.EditRestricted) return false
@@ -191,7 +249,9 @@ export const WriteButton = <T,>({
           notify('Could not fetch synonyms to check taxonomy data.', 'error')
           return
         }
-        const errors = checkSpeciesTaxonomy(convertedEditData, speciesData, synonymData, user.role === Role.Admin)
+        const errors = checkSpeciesTaxonomy(convertedEditData, speciesData, synonymData, {
+          allowTaxonomyHierarchyMismatch: user.role === Role.Admin,
+        })
         if (errors.size > 0) {
           const errorMessage = [...errors].reduce((acc, currentError) => acc + `\n${currentError}`)
           notify(errorMessage, 'error', null)
@@ -257,19 +317,51 @@ export const WriteButton = <T,>({
             state={warningModalState}
           />
           <Tooltip
-            disableHoverListener={Object.keys(fieldsWithErrors).length === 0 && isDirty}
-            disableFocusListener={Object.keys(fieldsWithErrors).length === 0 && isDirty}
+            disableHoverListener={
+              Object.keys(fieldsWithErrors).length === 0 && isDirty && !needsTaxonomyAcknowledgement
+            }
+            disableFocusListener={
+              Object.keys(fieldsWithErrors).length === 0 && isDirty && !needsTaxonomyAcknowledgement
+            }
             title={
               Object.keys(fieldsWithErrors).length > 0
                 ? 'Resolve validation errors before saving.'
-                : isDirty
-                  ? ''
-                  : 'Make changes before finalizing the entry.'
+                : needsTaxonomyAcknowledgement
+                  ? 'Acknowledge the taxonomy mismatch before finalizing.'
+                  : isDirty
+                    ? ''
+                    : 'Make changes before finalizing the entry.'
             }
           >
-            <span>
+            <Box>
+              {taxonomyConfirmation.hasMismatch && (
+                <Alert severity="warning" sx={{ mb: 1, textAlign: 'left' }}>
+                  <Typography>
+                    This taxonomy conflicts with existing entries. Confirm that you understand the mismatch before
+                    finalizing.
+                  </Typography>
+                  <FormControlLabel
+                    control={
+                      <Checkbox
+                        checked={acknowledgedTaxonomyKey === taxonomyConfirmation.key}
+                        onChange={event => {
+                          setAcknowledgedTaxonomyKey(event.target.checked ? taxonomyConfirmation.key : undefined)
+                        }}
+                      />
+                    }
+                    label="I understand and want to continue."
+                  />
+                </Alert>
+              )}
               <Button
-                disabled={disabled || Object.keys(fieldsWithErrors).length > 0 || !isDirty}
+                disabled={
+                  disabled ||
+                  taxonomyDataLoading ||
+                  loading ||
+                  Object.keys(fieldsWithErrors).length > 0 ||
+                  !isDirty ||
+                  needsTaxonomyAcknowledgement
+                }
                 id="write-button"
                 sx={{ width: '20em' }}
                 onClick={() => {
@@ -308,14 +400,14 @@ export const WriteButton = <T,>({
                 }}
                 variant="contained"
               >
-                {loading ? (
+                {loading || taxonomyDataLoading ? (
                   <CircularProgress size="1.2em" sx={{ color: 'white', marginRight: '1em' }} />
                 ) : (
                   <SaveIcon style={{ marginRight: '0.5em' }} />
                 )}
                 {getButtonText()}
               </Button>
-            </span>
+            </Box>
           </Tooltip>
         </>
       )}

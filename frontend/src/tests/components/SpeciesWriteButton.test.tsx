@@ -172,7 +172,7 @@ describe('WriteButton behavior', () => {
     fireEvent.click(screen.getByRole('button', { name: /save changes/i }))
 
     await waitFor(() => {
-      expect(mockCheckSpeciesTaxonomy).toHaveBeenCalledTimes(1)
+      expect(mockCheckSpeciesTaxonomy).toHaveBeenCalled()
     })
     expect(onWrite).not.toHaveBeenCalled()
     expect(mockNotify).toHaveBeenCalledWith(expect.stringContaining('taxon already exists'), 'error', null)
@@ -189,12 +189,43 @@ describe('WriteButton behavior', () => {
     await waitFor(() => {
       expect(onWrite).toHaveBeenCalledTimes(1)
     })
-    expect(mockCheckSpeciesTaxonomy).toHaveBeenCalledWith(
-      expect.any(Object),
-      expect.any(Array),
-      expect.any(Array),
-      true
+    expect(mockCheckSpeciesTaxonomy).toHaveBeenCalledWith(expect.any(Object), expect.any(Array), expect.any(Array), {
+      allowTaxonomyHierarchyMismatch: true,
+    })
+  })
+
+  it('requires admins to acknowledge a taxonomy mismatch before finalizing a new species', async () => {
+    const setMode = jest.fn()
+    const onWrite = jest.fn(() => Promise.resolve())
+    mockCheckSpeciesTaxonomy.mockImplementation((_species, _existingSpecies, _synonyms, options) => {
+      options?.onTaxonomyHierarchyMismatch?.()
+      return new Set()
+    })
+
+    renderButton(
+      { ...baseSpecies, family_name: 'Canidae' } as EditDataType<Species>,
+      onWrite,
+      { mode: modeNew, setMode },
+      { taxonomy: true, hasStagingMode: true }
     )
+
+    const finalizeButton = screen.getByRole('button', { name: /finalize entry/i })
+    expect((finalizeButton as HTMLButtonElement).disabled).toBe(true)
+    expect(screen.getByText(/this taxonomy conflicts with existing entries/i)).toBeTruthy()
+
+    fireEvent.click(screen.getByRole('checkbox', { name: /i understand and want to continue/i }))
+
+    await waitFor(() => {
+      expect((finalizeButton as HTMLButtonElement).disabled).toBe(false)
+    })
+    expect(screen.getByText(/this taxonomy conflicts with existing entries/i)).toBeTruthy()
+    expect(screen.getByRole('checkbox')).toHaveProperty('checked', true)
+
+    fireEvent.click(finalizeButton)
+    await waitFor(() => {
+      expect(setMode).toHaveBeenCalledWith('staging-new')
+    })
+    expect(onWrite).not.toHaveBeenCalled()
   })
 
   it('blocks taxonomy hierarchy mismatches for non-administrators', async () => {
@@ -214,12 +245,9 @@ describe('WriteButton behavior', () => {
     fireEvent.click(screen.getByRole('button', { name: /save changes/i }))
 
     await waitFor(() => {
-      expect(mockCheckSpeciesTaxonomy).toHaveBeenCalledWith(
-        expect.any(Object),
-        expect.any(Array),
-        expect.any(Array),
-        false
-      )
+      expect(mockCheckSpeciesTaxonomy).toHaveBeenCalledWith(expect.any(Object), expect.any(Array), expect.any(Array), {
+        allowTaxonomyHierarchyMismatch: false,
+      })
     })
     expect(onWrite).not.toHaveBeenCalled()
     expect(mockNotify).toHaveBeenCalledWith(expect.stringContaining('belongs to family'), 'error', null)

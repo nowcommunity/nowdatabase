@@ -152,7 +152,10 @@ export const checkSpeciesTaxonomy = (
   newSpecies: EditDataType<Species>,
   existingSpeciesArray: TaxonomySpecies[],
   synonyms: SpeciesSynonym[],
-  allowTaxonomyHierarchyMismatch = false
+  options: {
+    allowTaxonomyHierarchyMismatch?: boolean
+    onTaxonomyHierarchyMismatch?: () => void
+  } = {}
 ) => {
   const {
     subclass_or_superorder_name: subClass,
@@ -165,6 +168,15 @@ export const checkSpeciesTaxonomy = (
   } = newSpecies
 
   const errors = new Set<string>()
+  let hasTaxonomyHierarchyMismatch = false
+  const addHierarchyError = (error: string) => {
+    hasTaxonomyHierarchyMismatch = true
+    errors.add(error)
+  }
+  const getErrors = () => {
+    if (hasTaxonomyHierarchyMismatch) options.onTaxonomyHierarchyMismatch?.()
+    return errors
+  }
   let speciesWithSameOrder = undefined
   let speciesWithSameFamily = undefined
   let speciesWithSameGenus = undefined
@@ -174,7 +186,7 @@ export const checkSpeciesTaxonomy = (
   for (const existingSpecies of existingSpeciesArray) {
     if (isDuplicateTaxon(newSpecies, existingSpecies)) {
       errors.add('The taxon already exists in the database.')
-      return errors
+      return getErrors()
     }
 
     const relatedSynonyms =
@@ -185,7 +197,7 @@ export const checkSpeciesTaxonomy = (
       errors.add(
         `${existingSpecies.genus_name} ${existingSpecies.species_name} already has ${genus} ${speciesName} as a synonym.`
       )
-      return errors
+      return getErrors()
     }
 
     if (speciesEqualsUniqueIdentifier(newSpecies, existingSpecies)) {
@@ -193,20 +205,22 @@ export const checkSpeciesTaxonomy = (
       errors.add(
         `(${existingSpecies.genus_name} ${existingSpecies.species_name} already has ${newSpecies.species_name} as a unique identifier.)`
       )
-      return errors
+      return getErrors()
     }
 
-    if (allowTaxonomyHierarchyMismatch) continue
+    if (options.allowTaxonomyHierarchyMismatch) continue
 
     if (checkOrderFamily(newSpecies, existingSpecies)) {
       if (!speciesWithSameFamily) speciesWithSameFamily = existingSpecies
       if (existingSpecies.order_name !== speciesWithSameFamily.order_name) {
         errors.clear()
-        errors.add(generateMultipleParentsError('order', existingSpecies.order_name, speciesWithSameFamily.order_name))
-        return errors
+        addHierarchyError(
+          generateMultipleParentsError('order', existingSpecies.order_name, speciesWithSameFamily.order_name)
+        )
+        return getErrors()
       } else {
         if (newSpecies.order_name !== existingSpecies.order_name) {
-          errors.add(`Family ${family} belongs to order ${existingSpecies.order_name}, not ${order}.`)
+          addHierarchyError(`Family ${family} belongs to order ${existingSpecies.order_name}, not ${order}.`)
         }
       }
     }
@@ -215,13 +229,13 @@ export const checkSpeciesTaxonomy = (
       if (!speciesWithSameGenus) speciesWithSameGenus = existingSpecies
       if (existingSpecies.family_name !== speciesWithSameGenus.family_name) {
         errors.clear()
-        errors.add(
+        addHierarchyError(
           generateMultipleParentsError('family', existingSpecies.family_name, speciesWithSameGenus.family_name)
         )
-        return errors
+        return getErrors()
       } else {
         if (newSpecies.family_name !== existingSpecies.family_name) {
-          errors.add(`Genus ${genus} belongs to family ${existingSpecies.family_name}, not ${family}.`)
+          addHierarchyError(`Genus ${genus} belongs to family ${existingSpecies.family_name}, not ${family}.`)
         }
       }
     }
@@ -230,17 +244,17 @@ export const checkSpeciesTaxonomy = (
       if (!speciesWithSameOrder) speciesWithSameOrder = existingSpecies
       if (existingSpecies.subclass_or_superorder_name !== speciesWithSameOrder.subclass_or_superorder_name) {
         errors.clear()
-        errors.add(
+        addHierarchyError(
           generateMultipleParentsError(
             'subclass',
             existingSpecies.subclass_or_superorder_name,
             speciesWithSameOrder.subclass_or_superorder_name
           )
         )
-        return errors
+        return getErrors()
       } else {
         if (newSpecies.subclass_or_superorder_name !== existingSpecies.subclass_or_superorder_name) {
-          errors.add(
+          addHierarchyError(
             `Order ${order} belongs to subclass ${existingSpecies.subclass_or_superorder_name}, not ${subClass}.`
           )
         }
@@ -251,13 +265,13 @@ export const checkSpeciesTaxonomy = (
       if (!speciesWithSameSuborder) speciesWithSameSuborder = existingSpecies
       if (existingSpecies.order_name !== speciesWithSameSuborder.order_name) {
         errors.clear()
-        errors.add(
+        addHierarchyError(
           generateMultipleParentsError('order', existingSpecies.order_name, speciesWithSameSuborder.order_name)
         )
-        return errors
+        return getErrors()
       } else {
         if (newSpecies.order_name !== existingSpecies.order_name) {
-          errors.add(`Suborder ${subOrder} belongs to order ${existingSpecies.order_name}, not ${order}.`)
+          addHierarchyError(`Suborder ${subOrder} belongs to order ${existingSpecies.order_name}, not ${order}.`)
         }
       }
     }
@@ -266,17 +280,17 @@ export const checkSpeciesTaxonomy = (
       if (!speciesWithSameFamily) speciesWithSameFamily = existingSpecies
       if (existingSpecies.suborder_or_superfamily_name !== speciesWithSameFamily.suborder_or_superfamily_name) {
         errors.clear()
-        errors.add(
+        addHierarchyError(
           generateMultipleParentsError(
             'suborder',
             existingSpecies.suborder_or_superfamily_name,
             speciesWithSameFamily.suborder_or_superfamily_name
           )
         )
-        return errors
+        return getErrors()
       } else {
         if (newSpecies.suborder_or_superfamily_name !== existingSpecies.suborder_or_superfamily_name) {
-          errors.add(
+          addHierarchyError(
             `Family ${family} belongs to suborder ${existingSpecies.suborder_or_superfamily_name}, not ${subOrder}.`
           )
         }
@@ -287,13 +301,13 @@ export const checkSpeciesTaxonomy = (
       if (!speciesWithSameSubfamily) speciesWithSameSubfamily = existingSpecies
       if (existingSpecies.family_name !== speciesWithSameSubfamily.family_name) {
         errors.clear()
-        errors.add(
+        addHierarchyError(
           generateMultipleParentsError('family', existingSpecies.family_name, speciesWithSameSubfamily.family_name)
         )
-        return errors
+        return getErrors()
       } else {
         if (newSpecies.family_name !== existingSpecies.family_name) {
-          errors.add(`Subfamily ${subfamily} belongs to family ${existingSpecies.family_name}, not ${family}.`)
+          addHierarchyError(`Subfamily ${subfamily} belongs to family ${existingSpecies.family_name}, not ${family}.`)
         }
       }
     }
@@ -302,18 +316,18 @@ export const checkSpeciesTaxonomy = (
       if (!speciesWithSameGenus) speciesWithSameGenus = existingSpecies
       if (existingSpecies.subfamily_name !== speciesWithSameGenus.subfamily_name) {
         errors.clear()
-        errors.add(
+        addHierarchyError(
           generateMultipleParentsError('subfamily', existingSpecies.subfamily_name, speciesWithSameGenus.subfamily_name)
         )
-        return errors
+        return getErrors()
       } else {
         if (newSpecies.subfamily_name !== existingSpecies.subfamily_name) {
-          errors.add(`Genus ${genus} belongs to subfamily ${existingSpecies.subfamily_name}, not ${subfamily}.`)
+          addHierarchyError(`Genus ${genus} belongs to subfamily ${existingSpecies.subfamily_name}, not ${subfamily}.`)
         }
       }
     }
   }
-  return errors
+  return getErrors()
 }
 
 const convertTaxonomyField = (value: string | null | undefined) => {
