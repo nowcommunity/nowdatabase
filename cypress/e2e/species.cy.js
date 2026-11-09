@@ -99,6 +99,15 @@ describe('Editing a species', () => {
 })
 
 describe('Taxonomy checks work', () => {
+  const acknowledgeTaxonomyMismatchAndSave = (...expectedMessages) => {
+    expectedMessages.forEach(message => cy.contains(message).should('be.visible'))
+    cy.get('[id=write-button]').should('be.disabled')
+    cy.contains('I understand and want to continue.').click()
+    cy.get('[id=write-button]').should('not.be.disabled')
+    cy.addReferenceAndSave()
+    cy.contains('Saved species entry successfully.')
+  }
+
   before('Reset database', () => {
     cy.resetDatabase()
   })
@@ -115,7 +124,7 @@ describe('Taxonomy checks work', () => {
     cy.contains('The taxon already exists in the database.')
   })
 
-  it('Invalid main taxonomy values do not work', () => {
+  it('allows admins to add a species with invalid main taxonomy values after acknowledgement', () => {
     cy.visit('/species/new')
     cy.get('[data-cy=copy_existing_taxonomy_button]').click()
     cy.get('[data-cy=add-button-21052]').click()
@@ -126,16 +135,17 @@ describe('Taxonomy checks work', () => {
     cy.get('[id=family_name-textfield]').should('have.value', 'Gliridae')
     cy.get('[id=family_name-textfield]').clear()
     cy.get('[id=family_name-textfield]').type('Soricidae')
-    cy.get('[id=write-button]').click()
-    cy.contains('Family Soricidae belongs to order Eulipotyphla, not Carnivora.')
-    cy.contains('Genus Simplomys belongs to family Gliridae, not Soricidae.')
+    acknowledgeTaxonomyMismatchAndSave(
+      'Family Soricidae belongs to order Eulipotyphla, not Carnivora.',
+      'Genus Simplomys belongs to family Gliridae, not Soricidae.'
+    )
   })
 
   // TODO
   // it.skip('Creating a species whose family is included in multiple existing suborders does not work')
   // it.skip('Editing a species whose family is included in multiple existing suborders does not work')
 
-  it('Invalid superorder/order pair does not work', () => {
+  it('allows admins to add a species with an invalid superorder/order pair after acknowledgement', () => {
     cy.visit('/species/new')
     cy.get('[data-cy=copy_existing_taxonomy_button]').click()
     cy.get('[data-cy=add-button-21052]').click()
@@ -143,11 +153,10 @@ describe('Taxonomy checks work', () => {
     cy.get('[id=subclass_or_superorder_name-textfield]').should('have.value', 'Eutheria')
     cy.get('[id=subclass_or_superorder_name-textfield]').clear()
     cy.get('[id=subclass_or_superorder_name-textfield]').type('somethingelse')
-    cy.get('[id=write-button]').click()
-    cy.contains('Order Rodentia belongs to subclass Eutheria, not Somethingelse.')
+    acknowledgeTaxonomyMismatchAndSave('Order Rodentia belongs to subclass Eutheria, not Somethingelse.')
   })
 
-  it('Invalid order/suborder/family trio does not work', () => {
+  it('allows admins to add a species with an invalid order/suborder/family trio after acknowledgement', () => {
     cy.visit('/species/new')
     cy.get('[data-cy=copy_existing_taxonomy_button]').click()
     cy.get('[data-cy=add-button-84357]').click()
@@ -155,12 +164,13 @@ describe('Taxonomy checks work', () => {
     cy.get('[id=order_name-textfield]').should('have.value', 'Carnivora')
     cy.get('[id=order_name-textfield]').clear()
     cy.get('[id=order_name-textfield]').type('Rodentia')
-    cy.get('[id=write-button]').click()
-    cy.contains('Suborder Pinnipedia belongs to order Carnivora, not Rodentia.')
-    cy.contains('Family Odobenidae belongs to order Carnivora, not Rodentia.')
+    acknowledgeTaxonomyMismatchAndSave(
+      'Suborder Pinnipedia belongs to order Carnivora, not Rodentia.',
+      'Family Odobenidae belongs to order Carnivora, not Rodentia.'
+    )
   })
 
-  it('Invalid suborder/family pair does not work', () => {
+  it('allows admins to add a species with an invalid suborder/family pair after acknowledgement', () => {
     cy.visit('/species/new')
     cy.get('[data-cy=copy_existing_taxonomy_button]').click()
     cy.get('[data-cy=add-button-84357]').click()
@@ -168,11 +178,10 @@ describe('Taxonomy checks work', () => {
     cy.get('[id=suborder_or_superfamily_name-textfield]').should('have.value', 'Pinnipedia')
     cy.get('[id=suborder_or_superfamily_name-textfield]').clear()
     cy.get('[id=suborder_or_superfamily_name-textfield]').type('somethingelse')
-    cy.get('[id=write-button]').click()
-    cy.contains('Family Odobenidae belongs to suborder Pinnipedia, not Somethingelse.')
+    acknowledgeTaxonomyMismatchAndSave('Family Odobenidae belongs to suborder Pinnipedia, not Somethingelse.')
   })
 
-  it('Invalid family/subfamily/genus trio does not work', () => {
+  it('allows admins to add a species with an invalid family/subfamily/genus trio after acknowledgement', () => {
     cy.visit('/species/new')
     cy.get('[data-cy=copy_existing_taxonomy_button]').click()
     cy.get('[data-cy=add-button-23065]').click()
@@ -180,12 +189,13 @@ describe('Taxonomy checks work', () => {
     cy.get('[id=family_name-textfield]').should('have.value', 'Soricidae')
     cy.get('[id=family_name-textfield]').clear()
     cy.get('[id=family_name-textfield]').type('Gliridae')
-    cy.get('[id=write-button]').click()
-    cy.contains('Subfamily Soricinae belongs to family Soricidae, not Gliridae.')
-    cy.contains('Genus Petenyia belongs to family Soricidae, not Gliridae.')
+    acknowledgeTaxonomyMismatchAndSave(
+      'Subfamily Soricinae belongs to family Soricidae, not Gliridae.',
+      'Genus Petenyia belongs to family Soricidae, not Gliridae.'
+    )
   })
 
-  it('Invalid subfamily/genus pair does not work', () => {
+  it('allows admins to add a species with an invalid subfamily/genus pair after acknowledgement', () => {
     cy.visit('/species/new')
     cy.get('[data-cy=copy_existing_taxonomy_button]').click()
     cy.get('[data-cy=add-button-23065]').click()
@@ -193,8 +203,7 @@ describe('Taxonomy checks work', () => {
     cy.get('[id=subfamily_name-textfield]').should('have.value', 'Soricinae')
     cy.get('[id=subfamily_name-textfield]').clear()
     cy.get('[id=subfamily_name-textfield]').type('somethingelse')
-    cy.get('[id=write-button]').click()
-    cy.contains('Genus Petenyia belongs to subfamily Soricinae, not Somethingelse.')
+    acknowledgeTaxonomyMismatchAndSave('Genus Petenyia belongs to subfamily Soricinae, not Somethingelse.')
   })
 
   it('When genus is indet. species has to be indet.', () => {
