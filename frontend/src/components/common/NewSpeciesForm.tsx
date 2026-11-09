@@ -122,6 +122,17 @@ export const NewSpeciesForm = ({
     if (user.role !== Role.Admin || !speciesData) return undefined
 
     const convertedSpecies = convertSpeciesTaxonomyFields(newSpecies)
+    const taxonomyValues = [
+      convertedSpecies.subclass_or_superorder_name,
+      convertedSpecies.order_name,
+      convertedSpecies.suborder_or_superfamily_name,
+      convertedSpecies.family_name,
+      convertedSpecies.subfamily_name,
+      convertedSpecies.genus_name,
+      convertedSpecies.species_name,
+    ]
+    if (!taxonomyValues.some(value => value?.trim())) return undefined
+
     let hierarchyErrors: string[] = []
     checkSpeciesTaxonomy(convertedSpecies, [...speciesData, ...getDraftExistingTaxa()], [], {
       onTaxonomyHierarchyMismatch: errors => {

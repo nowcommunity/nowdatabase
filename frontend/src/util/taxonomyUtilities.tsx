@@ -52,6 +52,8 @@ const speciesEqualsUniqueIdentifier = (newSpecies: EditDataType<Species>, existi
   )
 }
 
+const hasTaxonValue = (value: string | null | undefined) => Boolean(value?.trim())
+
 const checkOrderFamily = (newSpecies: EditDataType<Species>, existingSpecies: TaxonomySpecies) => {
   return (
     newSpecies.subclass_or_superorder_name !== 'indet.' &&
@@ -59,6 +61,8 @@ const checkOrderFamily = (newSpecies: EditDataType<Species>, existingSpecies: Ta
     newSpecies.order_name !== 'incertae sedis' &&
     existingSpecies.order_name !== 'incertae sedis' &&
     newSpecies.suborder_or_superfamily_name !== 'indet.' &&
+    hasTaxonValue(newSpecies.family_name) &&
+    hasTaxonValue(existingSpecies.family_name) &&
     newSpecies.family_name !== 'indet.' &&
     newSpecies.family_name !== 'incertae sedis' &&
     newSpecies.family_name !== 'fam.' &&
@@ -76,6 +80,8 @@ const checkFamilyGenus = (newSpecies: EditDataType<Species>, existingSpecies: Ta
     newSpecies.family_name !== 'incertae sedis' &&
     existingSpecies.family_name !== 'incertae sedis' &&
     newSpecies.subfamily_name !== 'indet.' &&
+    hasTaxonValue(newSpecies.genus_name) &&
+    hasTaxonValue(existingSpecies.genus_name) &&
     newSpecies.genus_name !== 'indet.' &&
     newSpecies.genus_name !== 'gen.' &&
     newSpecies.genus_name === existingSpecies.genus_name
@@ -86,6 +92,7 @@ const checkSubClassOrder = (newSpecies: EditDataType<Species>, existingSpecies: 
   return (
     newSpecies.subclass_or_superorder_name &&
     newSpecies.subclass_or_superorder_name !== 'indet.' &&
+    hasTaxonValue(newSpecies.order_name) &&
     newSpecies.order_name !== 'indet.' &&
     newSpecies.order_name !== 'incertae sedis' &&
     existingSpecies.subclass_or_superorder_name &&
@@ -97,6 +104,7 @@ const checkOrderSubOrder = (newSpecies: EditDataType<Species>, existingSpecies: 
     newSpecies.subclass_or_superorder_name !== 'indet.' &&
     newSpecies.order_name !== 'indet.' &&
     newSpecies.order_name !== 'incertae sedis' &&
+    hasTaxonValue(newSpecies.suborder_or_superfamily_name) &&
     newSpecies.suborder_or_superfamily_name &&
     newSpecies.suborder_or_superfamily_name !== 'indet.' &&
     newSpecies.suborder_or_superfamily_name === existingSpecies.suborder_or_superfamily_name
@@ -110,9 +118,11 @@ const checkSubOrderFamily = (newSpecies: EditDataType<Species>, existingSpecies:
     newSpecies.order_name !== 'incertae sedis' &&
     newSpecies.suborder_or_superfamily_name &&
     newSpecies.suborder_or_superfamily_name !== 'indet.' &&
+    hasTaxonValue(newSpecies.family_name) &&
     newSpecies.family_name !== 'indet.' &&
     newSpecies.family_name !== 'incertae sedis' &&
     existingSpecies.suborder_or_superfamily_name &&
+    hasTaxonValue(existingSpecies.family_name) &&
     newSpecies.family_name === existingSpecies.family_name
   )
 }
@@ -125,6 +135,7 @@ const checkFamilySubFamily = (newSpecies: EditDataType<Species>, existingSpecies
     newSpecies.suborder_or_superfamily_name !== 'indet.' &&
     newSpecies.family_name !== 'indet.' &&
     newSpecies.family_name !== 'incertae sedis' &&
+    hasTaxonValue(newSpecies.subfamily_name) &&
     newSpecies.subfamily_name &&
     newSpecies.subfamily_name !== 'indet.' &&
     newSpecies.subfamily_name === existingSpecies.subfamily_name
@@ -139,6 +150,8 @@ const checkSubFamilyGenus = (newSpecies: EditDataType<Species>, existingSpecies:
     newSpecies.suborder_or_superfamily_name !== 'indet.' &&
     newSpecies.family_name !== 'indet.' &&
     newSpecies.family_name !== 'incertae sedis' &&
+    hasTaxonValue(newSpecies.genus_name) &&
+    hasTaxonValue(existingSpecies.genus_name) &&
     newSpecies.subfamily_name &&
     newSpecies.subfamily_name !== 'indet.' &&
     newSpecies.genus_name !== 'indet.' &&

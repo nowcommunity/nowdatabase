@@ -64,4 +64,27 @@ describe('checkSpeciesTaxonomy', () => {
       'Subfamily Caninae belongs to family Canidae, not Felidae.',
     ])
   })
+
+  it('does not report hierarchy mismatches when a shared taxon field is empty', () => {
+    const emptySpecies = {
+      ...editedSpecies,
+      subclass_or_superorder_name: '',
+      order_name: '',
+      suborder_or_superfamily_name: '',
+      family_name: '',
+      subfamily_name: '',
+      genus_name: '',
+      species_name: '',
+      unique_identifier: '',
+    }
+    const existingSpeciesWithNoFamily = { ...existingSpecies, family_name: '', order_name: 'Artiodactyla' }
+    const onTaxonomyHierarchyMismatch = jest.fn()
+
+    const errors = checkSpeciesTaxonomy(emptySpecies, [existingSpeciesWithNoFamily], [], {
+      onTaxonomyHierarchyMismatch,
+    })
+
+    expect(errors).toEqual(new Set())
+    expect(onTaxonomyHierarchyMismatch).not.toHaveBeenCalled()
+  })
 })
