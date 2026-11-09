@@ -129,4 +129,46 @@ describe('EditingForm select support', () => {
     expect(screen.getByRole('button', { name: /cancel/i })).toBeTruthy()
     expect((identifierField as HTMLInputElement).value).toBe(' ')
   })
+
+  it('requires acknowledgement for the current form value before saving', async () => {
+    const user = userEvent.setup()
+    const editAction = jest.fn<(newObject: { unique_identifier: string }) => void>()
+    const getConfirmation = (values: { unique_identifier: string }) =>
+      values.unique_identifier?.startsWith('conflict')
+        ? { key: values.unique_identifier, message: 'Taxonomy conflicts with an existing entry.' }
+        : undefined
+
+    mockUseDetailContext.mockReturnValue(createContextValue())
+
+    render(
+      <EditingForm<{ unique_identifier: string }, ParentType>
+        buttonText="Add new Species"
+        formFields={[{ name: 'unique_identifier', label: 'Unique Identifier', required: true }]}
+        editAction={editAction}
+        getConfirmation={getConfirmation}
+      />
+    )
+
+    await user.click(screen.getByRole('button', { name: /add new species/i }))
+    const identifierField = screen.getByRole('textbox', { name: /unique identifier/i })
+    await user.type(identifierField, 'conflict-one')
+
+    expect(screen.getByText('Taxonomy conflicts with an existing entry.')).toBeTruthy()
+    const saveButton = screen.getByRole('button', { name: /save/i })
+    expect((saveButton as HTMLButtonElement).disabled).toBe(true)
+
+    await user.click(screen.getByRole('checkbox', { name: /i understand and want to continue/i }))
+    expect((saveButton as HTMLButtonElement).disabled).toBe(false)
+
+    await user.clear(identifierField)
+    await user.type(identifierField, 'conflict-two')
+    expect((saveButton as HTMLButtonElement).disabled).toBe(true)
+
+    await user.click(screen.getByRole('checkbox', { name: /i understand and want to continue/i }))
+    await user.click(saveButton)
+
+    await waitFor(() => {
+      expect(editAction).toHaveBeenCalledWith({ unique_identifier: 'conflict-two', rowState: 'new' })
+    })
+  })
 })

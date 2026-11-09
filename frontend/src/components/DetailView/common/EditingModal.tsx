@@ -20,12 +20,14 @@ export const EditingModal = ({
   buttonText,
   children,
   onSave,
+  saveDisabled = false,
   showCloseButton = true,
   dataCy,
 }: {
   buttonText: string
   children: EditingModalChildren
   onSave?: () => Promise<boolean>
+  saveDisabled?: boolean
   showCloseButton?: boolean
   dataCy?: string
 }) => {
@@ -62,6 +64,7 @@ export const EditingModal = ({
           {onSave && (
             <Button
               id="editing-modal-save-button"
+              disabled={saveDisabled}
               sx={{ marginRight: '0.5em' }}
               variant="contained"
               onClick={() => void closeWithSave()}

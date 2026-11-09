@@ -102,6 +102,34 @@ export const NewSpeciesForm = ({
     return applyDefaultSpeciesOrdering(speciesData)
   }, [speciesData])
 
+  const getTaxonomyConfirmation = (newSpecies: EditDataType<Species>) => {
+    if (user.role !== Role.Admin || !speciesData) return undefined
+
+    const convertedSpecies = convertSpeciesTaxonomyFields(newSpecies)
+    let hasHierarchyMismatch = false
+    checkSpeciesTaxonomy(convertedSpecies, speciesData, [], {
+      onTaxonomyHierarchyMismatch: () => {
+        hasHierarchyMismatch = true
+      },
+    })
+    if (!hasHierarchyMismatch) return undefined
+
+    return {
+      key: JSON.stringify([
+        convertedSpecies.subclass_or_superorder_name,
+        convertedSpecies.order_name,
+        convertedSpecies.suborder_or_superfamily_name,
+        convertedSpecies.family_name,
+        convertedSpecies.subfamily_name,
+        convertedSpecies.genus_name,
+        convertedSpecies.species_name,
+        convertedSpecies.unique_identifier,
+      ]),
+      message:
+        'This taxonomy conflicts with existing entries. Confirm that you understand the mismatch before adding the species.',
+    }
+  }
+
   const copyTaxonomyButton = (
     <Box key="copy_existing_taxonomy_button">
       <SelectingTable<Species, Species>
@@ -202,6 +230,7 @@ export const NewSpeciesForm = ({
       existingObject={{ unique_identifier: '-' }}
       replacedValues={replacedValues}
       copyTaxonomyButton={copyTaxonomyButton}
+      getConfirmation={getTaxonomyConfirmation}
       editAction={(newSpecies: EditDataType<Species>) => {
         const convertedSpecies = convertAndCheckNewSpeciesTaxonomy(newSpecies)
         if (!convertedSpecies) return false
