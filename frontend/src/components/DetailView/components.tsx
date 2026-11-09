@@ -18,7 +18,12 @@ import { EditDataType, Editable, Reference, Role, Species } from '@/shared/types
 import { useState, useEffect, Fragment, useMemo } from 'react'
 import SaveIcon from '@mui/icons-material/Save'
 import { referenceValidator } from '@/shared/validators/validator'
-import { checkSpeciesTaxonomy, convertSpeciesTaxonomyFields, hasTaxonomyChanges } from '../../util/taxonomyUtilities'
+import {
+  checkSpeciesTaxonomy,
+  convertSpeciesTaxonomyFields,
+  getSpeciesTaxonomyKey,
+  hasTaxonomyChanges,
+} from '../../util/taxonomyUtilities'
 import { useGetAllSpeciesQuery, useGetAllSynonymsQuery } from '@/redux/speciesReducer'
 import { useNotify } from '@/hooks/notification'
 import { useUser } from '@/hooks/user'
@@ -68,18 +73,7 @@ export const WriteButton = <T,>({
   const { data: synonymData } = useGetAllSynonymsQuery(!taxonomy ? skipToken : undefined)
   const [acknowledgedTaxonomyKey, setAcknowledgedTaxonomyKey] = useState<string>()
   const convertedEditSpecies = taxonomy ? convertSpeciesTaxonomyFields(editData as EditDataType<Species>) : undefined
-  const editedTaxonomyKey = convertedEditSpecies
-    ? JSON.stringify([
-        convertedEditSpecies.subclass_or_superorder_name,
-        convertedEditSpecies.order_name,
-        convertedEditSpecies.suborder_or_superfamily_name,
-        convertedEditSpecies.family_name,
-        convertedEditSpecies.subfamily_name,
-        convertedEditSpecies.genus_name,
-        convertedEditSpecies.species_name,
-        convertedEditSpecies.unique_identifier,
-      ])
-    : undefined
+  const editedTaxonomyKey = convertedEditSpecies ? getSpeciesTaxonomyKey(convertedEditSpecies) : undefined
 
   const taxonomyConfirmation = useMemo(() => {
     if (
@@ -87,7 +81,6 @@ export const WriteButton = <T,>({
       !taxonomy ||
       user.role !== Role.Admin ||
       !speciesData ||
-      !synonymData ||
       !convertedEditSpecies ||
       !editedTaxonomyKey
     ) {
@@ -100,14 +93,14 @@ export const WriteButton = <T,>({
     }
 
     let hierarchyErrors: string[] = []
-    checkSpeciesTaxonomy(convertedEditSpecies, speciesData, synonymData, {
+    checkSpeciesTaxonomy(convertedEditSpecies, speciesData, [], {
       onTaxonomyHierarchyMismatch: errors => {
         hierarchyErrors = errors
       },
     })
 
     return { hasMismatch: hierarchyErrors.length > 0, hierarchyErrors, key: editedTaxonomyKey }
-  }, [data, editedTaxonomyKey, mode.new, mode.staging, speciesData, synonymData, taxonomy, user.role])
+  }, [data, editedTaxonomyKey, mode.new, mode.staging, speciesData, taxonomy, user.role])
 
   const needsTaxonomyAcknowledgement =
     taxonomyConfirmation.hasMismatch && acknowledgedTaxonomyKey !== taxonomyConfirmation.key

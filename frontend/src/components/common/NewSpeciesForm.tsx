@@ -14,6 +14,7 @@ import {
   checkSpeciesTaxonomy,
   convertSpeciesTaxonomyFields,
   fixNullValuesInTaxonomyFields,
+  getSpeciesTaxonomyKey,
   TaxonomySpecies,
 } from '@/util/taxonomyUtilities'
 import { useUser } from '@/hooks/user'
@@ -142,16 +143,7 @@ export const NewSpeciesForm = ({
     if (hierarchyErrors.length === 0) return undefined
 
     return {
-      key: JSON.stringify([
-        convertedSpecies.subclass_or_superorder_name,
-        convertedSpecies.order_name,
-        convertedSpecies.suborder_or_superfamily_name,
-        convertedSpecies.family_name,
-        convertedSpecies.subfamily_name,
-        convertedSpecies.genus_name,
-        convertedSpecies.species_name,
-        convertedSpecies.unique_identifier,
-      ]),
+      key: getSpeciesTaxonomyKey(convertedSpecies),
       message: `${hierarchyErrors.join('\n')}\nConfirm that you understand the mismatch before adding the species.`,
     }
   }

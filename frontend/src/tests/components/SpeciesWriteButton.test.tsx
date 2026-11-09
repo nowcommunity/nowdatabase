@@ -228,6 +228,62 @@ describe('WriteButton behavior', () => {
     expect(onWrite).not.toHaveBeenCalled()
   })
 
+  it('rechecks and requires acknowledgement when only taxonomic status changes', () => {
+    const onWrite = jest.fn(() => Promise.resolve())
+    mockCheckSpeciesTaxonomy.mockImplementation((_species, _existingSpecies, _synonyms, options) => {
+      options?.onTaxonomyHierarchyMismatch?.(['Family Felidae belongs to order Carnivora, not Rodentia.'])
+      return new Set()
+    })
+    const view = renderButton(baseSpecies, onWrite)
+    expect(screen.queryByText(/Family Felidae belongs/)).toBeNull()
+
+    const context = mockUseDetailContext()
+    mockUseDetailContext.mockReturnValue({
+      ...context,
+      editData: { ...baseSpecies, taxonomic_status: 'informal species' },
+    })
+    view.rerender(<WriteButton onWrite={onWrite} taxonomy />)
+    expect(screen.getByText(/Family Felidae belongs/)).toBeTruthy()
+    expect(screen.getByRole('button', { name: /save changes/i })).toHaveProperty('disabled', true)
+    fireEvent.click(screen.getByRole('checkbox', { name: /i understand and want to continue/i }))
+    expect(screen.getByRole('button', { name: /save changes/i })).toHaveProperty('disabled', false)
+
+    mockUseDetailContext.mockReturnValue({
+      ...context,
+      editData: { ...baseSpecies, taxonomic_status: 'nomen dubium' },
+    })
+    view.rerender(<WriteButton onWrite={onWrite} taxonomy />)
+    expect(screen.getByRole('button', { name: /save changes/i })).toHaveProperty('disabled', true)
+  })
+
+  it('omits synonyms during the live preview but checks them when saving', async () => {
+    const onWrite = jest.fn(() => Promise.resolve())
+    const synonyms = [
+      { synonym_id: 1, species_id: 1, syn_genus_name: 'Gorilla', syn_species_name: 'troglodytes', syn_comment: null },
+    ]
+    mockCheckSpeciesTaxonomy.mockImplementation((_species, _existingSpecies, checkedSynonyms) =>
+      checkedSynonyms.length ? new Set(['Duplicate synonym']) : new Set()
+    )
+    const view = renderButton({ ...baseSpecies, genus_name: 'Gorilla' }, onWrite)
+    mockUseGetAllSynonymsQuery.mockReturnValue({ data: synonyms } as never)
+    view.rerender(<WriteButton onWrite={onWrite} taxonomy />)
+
+    expect(mockCheckSpeciesTaxonomy).toHaveBeenCalledWith(
+      expect.any(Object),
+      expect.any(Array),
+      [],
+      expect.objectContaining({ onTaxonomyHierarchyMismatch: expect.any(Function) })
+    )
+    fireEvent.click(screen.getByRole('button', { name: /save changes/i }))
+    await waitFor(() => {
+      expect(mockCheckSpeciesTaxonomy).toHaveBeenCalledWith(expect.any(Object), expect.any(Array), synonyms, {
+        allowTaxonomyHierarchyMismatch: true,
+      })
+    })
+    expect(onWrite).not.toHaveBeenCalled()
+    expect(mockNotify).toHaveBeenCalledWith('Duplicate synonym', 'error', null)
+  })
+
   it('blocks taxonomy hierarchy mismatches for non-administrators', async () => {
     const onWrite = jest.fn(() => Promise.resolve())
     mockUseUser.mockReturnValue({

@@ -203,7 +203,7 @@ export const checkSpeciesTaxonomy = (
     }
 
     const relatedSynonyms =
-      existingSpecies.species_id === undefined
+      existingSpecies.species_id === undefined || synonyms.length === 0
         ? []
         : synonyms.filter(syn => syn.species_id === existingSpecies.species_id)
     if (isDuplicateSynonym(newSpecies, relatedSynonyms)) {
@@ -349,8 +349,8 @@ const convertTaxonomyField = (value: string | null | undefined) => {
     if (!['incertae sedis', 'indet.', 'fam.', 'gen.', 'sp.'].includes(value)) {
       if (value.indexOf('/') !== -1) {
         const words = value.split('/')
-        const convertedWord1 = words[0][0].toUpperCase() + words[0].slice(1).toLowerCase()
-        const convertedWord2 = words[1][0].toUpperCase() + words[1].slice(1).toLowerCase()
+        const convertedWord1 = words[0].charAt(0).toUpperCase() + words[0].slice(1).toLowerCase()
+        const convertedWord2 = words[1].charAt(0).toUpperCase() + words[1].slice(1).toLowerCase()
         convertedValue = `${convertedWord1}/${convertedWord2}`
       } else {
         convertedValue = value[0].toUpperCase() + value.slice(1).toLowerCase()
@@ -400,6 +400,9 @@ const TAXONOMY_FIELDS: Array<keyof Species> = [
 export const hasTaxonomyChanges = (editedSpecies: EditDataType<Species>, originalSpecies: EditDataType<Species>) => {
   return TAXONOMY_FIELDS.some(field => (editedSpecies[field] ?? '') !== (originalSpecies[field] ?? ''))
 }
+
+export const getSpeciesTaxonomyKey = (species: EditDataType<Species>) =>
+  JSON.stringify(TAXONOMY_FIELDS.map(field => species[field] ?? ''))
 
 type TaxonomyNullFixable = {
   subclass_or_superorder_name?: string | null | undefined

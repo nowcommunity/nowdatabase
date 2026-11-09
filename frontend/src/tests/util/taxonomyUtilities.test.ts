@@ -1,5 +1,10 @@
 import { describe, expect, it, jest } from '@jest/globals'
-import { checkSpeciesTaxonomy, TaxonomySpecies } from '@/util/taxonomyUtilities'
+import {
+  checkSpeciesTaxonomy,
+  convertSpeciesTaxonomyFields,
+  getSpeciesTaxonomyKey,
+  TaxonomySpecies,
+} from '@/util/taxonomyUtilities'
 import { EditDataType, Species } from '@/shared/types'
 
 const existingSpecies: TaxonomySpecies = {
@@ -54,6 +59,25 @@ describe('checkSpeciesTaxonomy', () => {
     expect(errors).toContain('The taxon already exists in the database.')
   })
 
+  it('continues to reject duplicate synonyms when hierarchy conflicts are allowed', () => {
+    const errors = checkSpeciesTaxonomy(
+      editedSpecies,
+      [existingSpecies],
+      [
+        {
+          synonym_id: 1,
+          species_id: 1,
+          syn_genus_name: 'Canis',
+          syn_species_name: 'familiaris',
+          syn_comment: null,
+        },
+      ],
+      { allowTaxonomyHierarchyMismatch: true }
+    )
+
+    expect(errors).toContain('Canis lupus already has Canis familiaris as a synonym.')
+  })
+
   it('reports hierarchy mismatches to callers when an admin override is available', () => {
     const onTaxonomyHierarchyMismatch = jest.fn()
 
@@ -63,6 +87,23 @@ describe('checkSpeciesTaxonomy', () => {
       'Genus Canis belongs to family Canidae, not Felidae.',
       'Subfamily Caninae belongs to family Canidae, not Felidae.',
     ])
+  })
+
+  describe('taxonomy normalization and keys', () => {
+    it.each([
+      ['canis/', 'Canis/'],
+      ['/CANIS', '/Canis'],
+      ['/', '/'],
+      ['canis/LUPUS', 'Canis/Lupus'],
+    ])('normalizes slash-separated live input %s safely', (value, expected) => {
+      expect(convertSpeciesTaxonomyFields({ genus_name: value }).genus_name).toBe(expected)
+    })
+
+    it('includes taxonomic status in the acknowledgement key', () => {
+      expect(getSpeciesTaxonomyKey({ ...editedSpecies, taxonomic_status: 'valid' })).not.toBe(
+        getSpeciesTaxonomyKey({ ...editedSpecies, taxonomic_status: 'invalid' })
+      )
+    })
   })
 
   it('does not report hierarchy mismatches when a shared taxon field is empty', () => {
