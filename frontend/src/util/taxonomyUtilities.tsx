@@ -151,7 +151,8 @@ const checkSubFamilyGenus = (newSpecies: EditDataType<Species>, existingSpecies:
 export const checkSpeciesTaxonomy = (
   newSpecies: EditDataType<Species>,
   existingSpeciesArray: TaxonomySpecies[],
-  synonyms: SpeciesSynonym[]
+  synonyms: SpeciesSynonym[],
+  allowTaxonomyHierarchyMismatch = false
 ) => {
   const {
     subclass_or_superorder_name: subClass,
@@ -194,6 +195,8 @@ export const checkSpeciesTaxonomy = (
       )
       return errors
     }
+
+    if (allowTaxonomyHierarchyMismatch) continue
 
     if (checkOrderFamily(newSpecies, existingSpecies)) {
       if (!speciesWithSameFamily) speciesWithSameFamily = existingSpecies

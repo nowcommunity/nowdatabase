@@ -5,6 +5,7 @@ import {
   EditDataType,
   LocalityDetailsType,
   LocalitySpeciesDetailsType,
+  Role,
   Species,
   SpeciesDetailsType,
 } from '@/shared/types'
@@ -15,6 +16,7 @@ import {
   fixNullValuesInTaxonomyFields,
   TaxonomySpecies,
 } from '@/util/taxonomyUtilities'
+import { useUser } from '@/hooks/user'
 import { Box } from '@mui/material'
 import { MRT_ColumnDef } from 'material-react-table'
 import { useMemo, useState } from 'react'
@@ -89,6 +91,7 @@ export const NewSpeciesForm = ({
   afterTaxonomyCheck: (newSpecies: EditDataType<Species>) => void
 }) => {
   const { notify } = useNotify()
+  const user = useUser()
   const { data: speciesData, isError } = useGetAllSpeciesQuery()
 
   const [selectedSpecies, setSelectedSpecies] = useState<string | undefined>()
@@ -182,7 +185,12 @@ export const NewSpeciesForm = ({
         }))
     }
 
-    const taxonomyErrors = checkSpeciesTaxonomy(convertedSpecies, [...(speciesData ?? []), ...draftExistingTaxa], [])
+    const taxonomyErrors = checkSpeciesTaxonomy(
+      convertedSpecies,
+      [...(speciesData ?? []), ...draftExistingTaxa],
+      [],
+      user.role === Role.Admin
+    )
     if (taxonomyErrors.size > 0) {
       const errorMessage = [...taxonomyErrors].reduce((acc, currentError) => acc + `\n${currentError}`)
       notify(errorMessage, 'error', null)

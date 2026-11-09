@@ -191,7 +191,7 @@ export const WriteButton = <T,>({
           notify('Could not fetch synonyms to check taxonomy data.', 'error')
           return
         }
-        const errors = checkSpeciesTaxonomy(convertedEditData, speciesData, synonymData)
+        const errors = checkSpeciesTaxonomy(convertedEditData, speciesData, synonymData, user.role === Role.Admin)
         if (errors.size > 0) {
           const errorMessage = [...errors].reduce((acc, currentError) => acc + `\n${currentError}`)
           notify(errorMessage, 'error', null)

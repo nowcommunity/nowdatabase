@@ -178,6 +178,53 @@ describe('WriteButton behavior', () => {
     expect(mockNotify).toHaveBeenCalledWith(expect.stringContaining('taxon already exists'), 'error', null)
   })
 
+  it('allows administrators to save species with a taxonomy hierarchy mismatch', async () => {
+    const onWrite = jest.fn(() => Promise.resolve())
+    mockCheckSpeciesTaxonomy.mockReturnValue(new Set())
+
+    renderButton({ ...baseSpecies, family_name: 'Canidae' } as EditDataType<Species>, onWrite)
+
+    fireEvent.click(screen.getByRole('button', { name: /save changes/i }))
+
+    await waitFor(() => {
+      expect(onWrite).toHaveBeenCalledTimes(1)
+    })
+    expect(mockCheckSpeciesTaxonomy).toHaveBeenCalledWith(
+      expect.any(Object),
+      expect.any(Array),
+      expect.any(Array),
+      true
+    )
+  })
+
+  it('blocks taxonomy hierarchy mismatches for non-administrators', async () => {
+    const onWrite = jest.fn(() => Promise.resolve())
+    mockUseUser.mockReturnValue({
+      token: null,
+      username: 'tester',
+      role: Role.EditUnrestricted,
+      initials: null,
+      localities: [],
+      isFirstLogin: undefined,
+    })
+    mockCheckSpeciesTaxonomy.mockReturnValue(new Set(['Subfamily Caninae belongs to family Canidae, not Felidae.']))
+
+    renderButton({ ...baseSpecies, family_name: 'Felidae' } as EditDataType<Species>, onWrite)
+
+    fireEvent.click(screen.getByRole('button', { name: /save changes/i }))
+
+    await waitFor(() => {
+      expect(mockCheckSpeciesTaxonomy).toHaveBeenCalledWith(
+        expect.any(Object),
+        expect.any(Array),
+        expect.any(Array),
+        false
+      )
+    })
+    expect(onWrite).not.toHaveBeenCalled()
+    expect(mockNotify).toHaveBeenCalledWith(expect.stringContaining('belongs to family'), 'error', null)
+  })
+
   it('converts a cleared comment field to null so it can be persisted', async () => {
     const onWrite = jest.fn(() => Promise.resolve())
     const setEditData = jest.fn()
