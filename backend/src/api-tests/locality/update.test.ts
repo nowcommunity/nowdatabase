@@ -278,6 +278,14 @@ describe('Locality update', () => {
       expect(result.body.editAccess).toEqual(true)
     })
 
+    it('does not allow removing a project the user is not a member of', async () => {
+      const result = await send('locality', 'PUT', {
+        locality: buildUpdatePayload({ now_plr: [{ lid: editedLocality.lid, pid: 35, rowState: 'removed' }] }),
+      })
+      expect(result.status).toEqual(403)
+      expect(result.body).toEqual(noPermError)
+    })
+
     it('allows removing the last project of the user and then denies further edits', async () => {
       const unlink = await send<{ id: number; editAccess?: boolean }>('locality', 'PUT', {
         locality: buildUpdatePayload({ now_plr: [{ lid: editedLocality.lid, pid: 3, rowState: 'removed' }] }),
