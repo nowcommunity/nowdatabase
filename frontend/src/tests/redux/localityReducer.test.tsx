@@ -57,7 +57,7 @@ const EditLocalityButton = ({
   onSettled,
 }: {
   locality: EditDataType<LocalityDetailsType> & EditMetaData
-  onSettled: () => void
+  onSettled: (succeeded: boolean) => void
 }) => {
   const [editLocality] = useEditLocalityMutation()
 
@@ -67,8 +67,8 @@ const EditLocalityButton = ({
         void editLocality(locality)
           .unwrap()
           .then(
-            () => onSettled(),
-            () => onSettled()
+            () => onSettled(true),
+            () => onSettled(false)
           )
       }}
     >
@@ -77,7 +77,10 @@ const EditLocalityButton = ({
   )
 }
 
-const renderEditLocality = (locality: EditDataType<LocalityDetailsType> & EditMetaData, onSettled: () => void) => {
+const renderEditLocality = (
+  locality: EditDataType<LocalityDetailsType> & EditMetaData,
+  onSettled: (succeeded: boolean) => void
+) => {
   const store = createStore()
   render(
     <Provider store={store}>
@@ -99,7 +102,7 @@ describe('editLocality project access state', () => {
 
     fireEvent.click(screen.getByRole('button', { name: 'Save' }))
 
-    await waitFor(() => expect(onSettled).toHaveBeenCalledTimes(1))
+    await waitFor(() => expect(onSettled).toHaveBeenCalledWith(true))
     expect(store.getState().user.localities).not.toContain(localityId)
   })
 
@@ -116,7 +119,7 @@ describe('editLocality project access state', () => {
 
     fireEvent.click(screen.getByRole('button', { name: 'Save' }))
 
-    await waitFor(() => expect(onSettled).toHaveBeenCalledTimes(1))
+    await waitFor(() => expect(onSettled).toHaveBeenCalledWith(true))
     expect(store.getState().user.localities).toContain(localityId)
   })
 
@@ -127,7 +130,7 @@ describe('editLocality project access state', () => {
 
     fireEvent.click(screen.getByRole('button', { name: 'Save' }))
 
-    await waitFor(() => expect(onSettled).toHaveBeenCalledTimes(1))
+    await waitFor(() => expect(onSettled).toHaveBeenCalledWith(false))
     expect(store.getState().user.localities).toContain(localityId)
   })
 })

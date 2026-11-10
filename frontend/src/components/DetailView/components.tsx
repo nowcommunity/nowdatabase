@@ -36,7 +36,12 @@ import { checkFieldErrors } from './common/checkFieldErrors'
 export { ReturnButton } from '@/components/common/ReturnButton'
 
 export type AfterWriteCallback = () => void
-export type WriteResult = AfterWriteCallback | void
+// Returned by onWrite when the user declined to continue; the view stays in edit mode with the edits intact
+export type WriteCancelled = { cancelled: true }
+export type WriteResult = AfterWriteCallback | WriteCancelled | void
+
+const isWriteCancelled = (result: WriteResult): result is WriteCancelled =>
+  typeof result === 'object' && result !== null && 'cancelled' in result
 
 export const WriteButton = <T,>({
   onWrite,
@@ -262,6 +267,7 @@ export const WriteButton = <T,>({
     }
 
     const afterWrite = await onWrite((speciesEditData as EditDataType<T>) ?? editData, setEditData, markEditDataClean)
+    if (isWriteCancelled(afterWrite)) return
     setMode('read')
     setTimeout(() => afterWrite?.(), 0)
   }
@@ -284,6 +290,7 @@ export const WriteButton = <T,>({
       setLoading(true)
       const afterWrite = await onWrite(editData, setEditData, markEditDataClean)
       setLoading(false)
+      if (isWriteCancelled(afterWrite)) return
       setMode('read')
       setTimeout(() => afterWrite?.(), 0)
     }

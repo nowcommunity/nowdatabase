@@ -95,7 +95,11 @@ export const ProjectTab = () => {
         idFieldName="pid"
         url="project"
         isRowRemovalDisabled={project =>
-          user.role === Role.EditRestricted && project.pid !== undefined && !user.projects?.includes(project.pid)
+          // Sessions stored before memberships were added to the login state have no project list; the backend still enforces the rule
+          user.role === Role.EditRestricted &&
+          user.projects !== undefined &&
+          project.pid !== undefined &&
+          !user.projects.includes(project.pid)
         }
         renderReadRowActions={({ row }) => (
           <EntryUpdateHistory

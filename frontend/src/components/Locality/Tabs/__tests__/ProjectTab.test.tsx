@@ -5,6 +5,8 @@ import { ProjectTab } from '../ProjectTab'
 import { useDetailContext, modeOptionToMode } from '@/components/DetailView/Context/DetailContext'
 import { useGetAllProjectsQuery } from '@/redux/projectReducer'
 import { usePageContext } from '@/components/Page'
+import { useUser } from '@/hooks/user'
+import { Role } from '@/shared/types'
 
 jest.mock('@/components/DetailView/Context/DetailContext', () => ({
   useDetailContext: jest.fn(),
@@ -21,6 +23,10 @@ jest.mock('@/redux/projectReducer', () => ({
   useGetAllProjectsQuery: jest.fn(),
 }))
 
+jest.mock('@/hooks/user', () => ({
+  useUser: jest.fn(),
+}))
+
 jest.mock('@/components/Page', () => ({
   usePageContext: jest.fn(),
 }))
@@ -30,8 +36,19 @@ jest.mock('@/components/DetailView/common/tabLayoutHelpers', () => ({
 }))
 
 jest.mock('@/components/DetailView/common/EditableTable', () => ({
-  EditableTable: ({ enableAdvancedTableControls }: { enableAdvancedTableControls?: boolean }) => (
-    <div data-testid="editable-table" data-advanced={enableAdvancedTableControls ? 'true' : 'false'} />
+  EditableTable: ({
+    enableAdvancedTableControls,
+    isRowRemovalDisabled,
+  }: {
+    enableAdvancedTableControls?: boolean
+    isRowRemovalDisabled?: (row: { pid: number }) => boolean
+  }) => (
+    <div
+      data-testid="editable-table"
+      data-advanced={enableAdvancedTableControls ? 'true' : 'false'}
+      data-own-disabled={String(isRowRemovalDisabled?.({ pid: 3 }))}
+      data-foreign-disabled={String(isRowRemovalDisabled?.({ pid: 35 }))}
+    />
   ),
 }))
 
@@ -44,6 +61,17 @@ jest.mock('@/components/DetailView/common/SelectingTable', () => ({
 const mockUseDetailContext = useDetailContext as jest.MockedFunction<typeof useDetailContext>
 const mockUseGetAllProjectsQuery = useGetAllProjectsQuery as jest.MockedFunction<typeof useGetAllProjectsQuery>
 const mockUsePageContext = usePageContext as jest.MockedFunction<typeof usePageContext>
+const mockUseUser = useUser as jest.MockedFunction<typeof useUser>
+
+const createUser = (overrides: Partial<ReturnType<typeof useUser>>) => ({
+  token: 'token',
+  username: 'user',
+  role: Role.EditRestricted,
+  initials: 'TE',
+  localities: [],
+  isFirstLogin: undefined,
+  ...overrides,
+})
 
 describe('ProjectTab selection regression', () => {
   const setEditData = jest.fn<(value: unknown) => void>()
@@ -51,6 +79,7 @@ describe('ProjectTab selection regression', () => {
   beforeEach(() => {
     jest.clearAllMocks()
     mockUsePageContext.mockReturnValue({ editRights: { edit: true, new: true } } as never)
+    mockUseUser.mockReturnValue(createUser({ projects: [3] }))
     mockUseGetAllProjectsQuery.mockReturnValue({ data: [], isError: false } as never)
   })
 
@@ -98,5 +127,36 @@ describe('ProjectTab selection regression', () => {
     fireEvent.click(screen.getByRole('button', { name: /select project/i }))
 
     expect(screen.getByTestId('project-selection-error').textContent).toContain('already linked')
+  })
+
+  const renderEditTab = () => {
+    mockUseDetailContext.mockReturnValue({
+      mode: modeOptionToMode.edit,
+      editData: { lid: 1, now_plr: [] },
+      setEditData,
+    } as never)
+    render(<ProjectTab />)
+    return screen.getByTestId('editable-table')
+  }
+
+  it('disables removing projects the EditRestricted user is not a member of', () => {
+    const table = renderEditTab()
+
+    expect(table.getAttribute('data-own-disabled')).toBe('false')
+    expect(table.getAttribute('data-foreign-disabled')).toBe('true')
+  })
+
+  it('does not disable removal for sessions without a stored project list', () => {
+    mockUseUser.mockReturnValue(createUser({ projects: undefined }))
+    const table = renderEditTab()
+
+    expect(table.getAttribute('data-foreign-disabled')).toBe('false')
+  })
+
+  it('does not disable removal for unrestricted users', () => {
+    mockUseUser.mockReturnValue(createUser({ role: Role.EditUnrestricted, projects: [3] }))
+    const table = renderEditTab()
+
+    expect(table.getAttribute('data-foreign-disabled')).toBe('false')
   })
 })

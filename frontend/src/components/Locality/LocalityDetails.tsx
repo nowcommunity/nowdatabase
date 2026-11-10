@@ -99,7 +99,7 @@ export const LocalityDetails = ({
       const confirmed = window.confirm(
         'You are removing the last project that enables you to edit this locality. After saving, you will no longer be able to edit it. Continue?'
       )
-      if (!confirmed) return
+      if (!confirmed) return { cancelled: true } as const
     }
     try {
       const { id, editAccess } = await editLocalityRequest(editData).unwrap()
