@@ -1,5 +1,5 @@
 import { api } from './api'
-import { addLocality } from '@/redux/userReducer'
+import { addLocality, removeLocality } from '@/redux/userReducer'
 import { EditDataType, EditMetaData, Locality, LocalityDetailsType, LocalitySpeciesDetailsType } from '@/shared/types'
 
 const sanitizeLocalityProjects = (locality?: EditDataType<LocalityDetailsType>) => {
@@ -54,6 +54,9 @@ const localitiesApi = api.injectEndpoints({
         )
         try {
           await queryFulfilled
+          if (locality.now_plr && sanitizeLocalityProjects(locality).length === 0) {
+            dispatch(removeLocality(locality.lid))
+          }
         } catch {
           patchResult.undo()
         }

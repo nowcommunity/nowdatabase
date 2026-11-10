@@ -80,6 +80,9 @@ const userSlice = createSlice({
       if (state.localities.includes(action.payload)) return state
       return { ...state, localities: [...state.localities, action.payload] }
     },
+    removeLocality(state, action: PayloadAction<number>) {
+      return { ...state, localities: state.localities.filter(lid => lid !== action.payload) }
+    },
     removeFirstLogin(state) {
       return { ...state, isFirstLogin: undefined }
     },
@@ -89,6 +92,6 @@ const userSlice = createSlice({
   },
 })
 
-export const { setUser, setToken, addLocality, clearUser, removeFirstLogin } = userSlice.actions
+export const { setUser, setToken, addLocality, removeLocality, clearUser, removeFirstLogin } = userSlice.actions
 export const userReducer = userSlice.reducer
 export const { useTryLoginMutation, useChangePasswordMutation, useCreateUserMutation } = userApi
