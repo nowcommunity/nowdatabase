@@ -8,6 +8,7 @@ export type LoginResponse = {
   role: Role
   initials: string
   localities: Array<number>
+  projects?: Array<number>
   isFirstLogin: undefined | true
 }
 
@@ -54,6 +55,7 @@ export interface UserState {
   role: Role
   initials: string | null
   localities: number[]
+  projects?: number[]
   isFirstLogin: undefined | true
 }
 

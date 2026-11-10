@@ -87,6 +87,7 @@ router.post('/login', async (req, res) => {
     role: getRole(foundUser.now_user_group ?? ''),
     initials: personResult.initials,
     localities: associatedLocalityIds,
+    projects: projectIds,
     isFirstLogin,
   })
 })

@@ -92,8 +92,8 @@ afterEach(() => {
 })
 
 describe('editLocality project access state', () => {
-  it('removes locality edit access after successfully unlinking its final project', async () => {
-    jest.spyOn(global, 'fetch').mockResolvedValue(createResponse(200, { id: localityId }))
+  it('removes locality edit access when the server reports editAccess false', async () => {
+    jest.spyOn(global, 'fetch').mockResolvedValue(createResponse(200, { id: localityId, editAccess: false }))
     const onSettled = jest.fn()
     const store = renderEditLocality(createLocality([{ pid: 7, rowState: 'removed' }]), onSettled)
 
@@ -103,8 +103,8 @@ describe('editLocality project access state', () => {
     expect(store.getState().user.localities).not.toContain(localityId)
   })
 
-  it('keeps locality edit access when another project remains linked', async () => {
-    jest.spyOn(global, 'fetch').mockResolvedValue(createResponse(200, { id: localityId }))
+  it('keeps locality edit access when the server reports editAccess true', async () => {
+    jest.spyOn(global, 'fetch').mockResolvedValue(createResponse(200, { id: localityId, editAccess: true }))
     const onSettled = jest.fn()
     const store = renderEditLocality(
       createLocality([
