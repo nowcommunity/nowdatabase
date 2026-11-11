@@ -1,5 +1,5 @@
 import { api } from './api'
-import { addLocality } from '@/redux/userReducer'
+import { addLocality, removeLocality } from '@/redux/userReducer'
 import { EditDataType, EditMetaData, Locality, LocalityDetailsType, LocalitySpeciesDetailsType } from '@/shared/types'
 
 const sanitizeLocalityProjects = (locality?: EditDataType<LocalityDetailsType>) => {
@@ -28,7 +28,10 @@ const localitiesApi = api.injectEndpoints({
     getLocalityOccurrences: builder.query<LocalitySpeciesDetailsType[], string>({
       query: lid => `/locality/${lid}/occurrences`,
     }),
-    editLocality: builder.mutation<{ id: number }, EditDataType<LocalityDetailsType> & EditMetaData>({
+    editLocality: builder.mutation<
+      { id: number; editAccess?: boolean },
+      EditDataType<LocalityDetailsType> & EditMetaData
+    >({
       query: locality => ({
         url: `/locality`,
         method: 'PUT',
@@ -53,7 +56,9 @@ const localitiesApi = api.injectEndpoints({
           })
         )
         try {
-          await queryFulfilled
+          const { data } = await queryFulfilled
+          // The backend reports whether the user still belongs to one of the locality's projects.
+          if (data.editAccess === false) dispatch(removeLocality(locality.lid))
         } catch {
           patchResult.undo()
         }

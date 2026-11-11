@@ -4,6 +4,7 @@ import {
   InvalidLocalityFieldsError,
   parseLocalityListFields,
   canEditRestrictedWriteLocality,
+  canEditRestrictedUserStillEditLocality,
   getLocalityDetails,
   normalizeLocalityAges,
   validateEntireLocality,
@@ -86,6 +87,10 @@ router.put(
       return res.status(403).send(validationErrors)
     }
     const result = await writeLocality(normalizedLocality, comment, references, req.user)
+    if (req.user?.role === Role.EditRestricted) {
+      const editAccess = await canEditRestrictedUserStillEditLocality(result!, req.user)
+      return res.status(200).send({ id: result, editAccess })
+    }
     return res.status(200).send({ id: result })
   }
 )

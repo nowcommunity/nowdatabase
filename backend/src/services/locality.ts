@@ -65,10 +65,10 @@ export const getIdsOfUsersProjects = async (user: User) => {
   return new Set(usersProjects.map(({ pid }) => pid))
 }
 
-const getActiveProjectIds = (locality: EditDataType<LocalityDetailsType>) => {
+const getProjectIds = (locality: EditDataType<LocalityDetailsType>, removed: boolean) => {
   if (!locality.now_plr) return [] as number[]
   return locality.now_plr
-    .filter(link => link.rowState !== 'removed')
+    .filter(link => (link.rowState === 'removed') === removed)
     .map(link => link.pid ?? link.now_proj?.pid)
     .flatMap(pid => {
       if (typeof pid === 'string') {
@@ -83,23 +83,34 @@ const getActiveProjectIds = (locality: EditDataType<LocalityDetailsType>) => {
 export const canEditRestrictedWriteLocality = async (locality: EditDataType<LocalityDetailsType>, user: User) => {
   const userProjectIds = await getIdsOfUsersProjects(user)
 
-  let activeProjectIds: number[] = []
   if (locality.lid) {
-    // this ensures that a user without edit rights cannot simply add the needed projects to the locality while editing it
-    const existingLocality = await nowDb.now_loc.findUnique({
-      where: { lid: locality.lid },
-      select: { now_plr: { select: { pid: true } } },
-    })
-    if (existingLocality) {
-      activeProjectIds = existingLocality.now_plr.map(link => link.pid)
-    }
-  } else {
-    activeProjectIds = getActiveProjectIds(locality)
+    // Only the stored project links count, so that a user without edit rights cannot simply add the needed
+    // projects to the locality while editing it. Membership in any one linked project is enough to edit.
+    const removedProjectIds = getRemovedProjectIds(locality)
+    if (removedProjectIds.some(pid => !userProjectIds.has(pid))) return false
+    return await userHasStoredProjectAccessToLocality(locality.lid, userProjectIds)
   }
 
+  const activeProjectIds = getActiveProjectIds(locality)
   if (activeProjectIds.length === 0) return false
   return activeProjectIds.every(pid => userProjectIds.has(pid))
 }
+
+const getActiveProjectIds = (locality: EditDataType<LocalityDetailsType>) => getProjectIds(locality, false)
+// Projects the user is not a member of cannot be unlinked by an EditRestricted user
+const getRemovedProjectIds = (locality: EditDataType<LocalityDetailsType>) => getProjectIds(locality, true)
+
+const userHasStoredProjectAccessToLocality = async (lid: number, userProjectIds: Set<number>) => {
+  const existingLocality = await nowDb.now_loc.findUnique({
+    where: { lid },
+    select: { now_plr: { select: { pid: true } } },
+  })
+  return existingLocality?.now_plr.some(link => userProjectIds.has(link.pid)) ?? false
+}
+
+// Used after a write to tell an EditRestricted user whether they can still edit the locality.
+export const canEditRestrictedUserStillEditLocality = async (lid: number, user: User) =>
+  userHasStoredProjectAccessToLocality(lid, await getIdsOfUsersProjects(user))
 
 type LocalityPreFilter = {
   lid: number

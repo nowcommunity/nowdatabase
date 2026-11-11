@@ -16,15 +16,27 @@ import { MuseumTab } from './Tabs/MuseumTab'
 import { OccurrencesTab } from './Tabs/OccurrencesTab'
 import { ProjectTab } from './Tabs/ProjectTab'
 import { TaphonomyTab } from './Tabs/TaphonomyTab'
-import { EditDataType, LocalityDetailsType, ValidationErrors } from '@/shared/types'
+import { EditDataType, LocalityDetailsType, Role, ValidationErrors } from '@/shared/types'
 import { validateLocality, validateLocalityFields } from '@/shared/validators/locality'
 import { UpdateTab } from '../DetailView/common/UpdateTab'
 import { emptyLocality } from '../DetailView/common/defaultValues'
 import { useNotify } from '@/hooks/notification'
+import { useUser } from '@/hooks/user'
+import { UserState } from '@/redux/userReducer'
 import { useEffect } from 'react'
 import { FetchBaseQueryError } from '@reduxjs/toolkit/query'
 import { makeEditData } from '../DetailView/Context/DetailContext'
 import { occurrenceLabels } from '@/constants/occurrenceLabels'
+
+const removesLastEditEnablingProject = (user: UserState, editData: EditDataType<LocalityDetailsType>) => {
+  if (user.role !== Role.EditRestricted || !user.projects || !editData.now_plr) return false
+  const userProjects = new Set(user.projects)
+  const remaining = editData.now_plr.filter(link => link.rowState !== 'removed')
+  const hadAccess = editData.now_plr.some(
+    link => link.rowState !== 'new' && link.pid !== undefined && userProjects.has(link.pid)
+  )
+  return hadAccess && !remaining.some(link => link.pid !== undefined && userProjects.has(link.pid))
+}
 
 export const LocalityDetails = ({
   wrapWithUnsavedChangesProvider = true,
@@ -43,6 +55,7 @@ export const LocalityDetails = ({
   })
 
   const { notify } = useNotify()
+  const user = useUser()
   const [deleteMutation, { isSuccess: deleteSuccess, isError: deleteError }] = useDeleteLocalityMutation()
 
   useEffect(() => {
@@ -82,15 +95,21 @@ export const LocalityDetails = ({
     editData: EditDataType<LocalityDetailsType>,
     setEditData: (next: EditDataType<LocalityDetailsType>) => void
   ) => {
+    if (!isNew && removesLastEditEnablingProject(user, editData)) {
+      const confirmed = window.confirm(
+        'You are removing the last project that enables you to edit this locality. After saving, you will no longer be able to edit it. Continue?'
+      )
+      if (!confirmed) return { cancelled: true } as const
+    }
     try {
-      const { id } = await editLocalityRequest(editData).unwrap()
-      if (!isNew) {
+      const { id, editAccess } = await editLocalityRequest(editData).unwrap()
+      if (!isNew && editAccess !== false) {
         const refreshed = await refetch()
         if (refreshed.data) {
           setEditData(makeEditData(refreshed.data))
         }
       }
-      setTimeout(() => navigate(`/locality/${id}`), 15)
+      setTimeout(() => navigate(editAccess === false ? '/locality' : `/locality/${id}`), 15)
       notify('Edited item successfully.')
     } catch (e) {
       if (isFetchError(e) && e.status === 403 && isValidationError(e.data)) {

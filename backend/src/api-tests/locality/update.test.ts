@@ -228,7 +228,12 @@ describe('Locality update', () => {
 
     it('Editing locality fails as an EditRestricted user, when the locality is not in the same project as the user', async () => {
       const changeProjectResult = await send<{ id: number }>('locality', 'PUT', {
-        locality: buildUpdatePayload({ now_plr: [{ pid: 35, rowState: 'new' }] }),
+        locality: buildUpdatePayload({
+          now_plr: [
+            { lid: editedLocality.lid, pid: 3, rowState: 'removed' },
+            { pid: 35, rowState: 'new' },
+          ],
+        }),
       })
       expect(changeProjectResult.status).toBe(200)
 
@@ -245,6 +250,52 @@ describe('Locality update', () => {
       })
       expect(resultErWithAddedPlr.body).toEqual(noPermError)
       expect(resultErWithAddedPlr.status).toEqual(403)
+    })
+  })
+  describe('EditRestricted access with several linked projects', () => {
+    // testEr is a member of project 3 only; project 35 is added so the locality has two linked projects
+    beforeEach(async () => {
+      await resetDatabase()
+      await login()
+      const addProject = await send('locality', 'PUT', {
+        locality: buildUpdatePayload({
+          now_plr: [
+            { pid: 3, rowState: 'new' },
+            { lid: editedLocality.lid, pid: 35, rowState: 'new' },
+          ],
+        }),
+      })
+      expect(addProject.status).toEqual(200)
+      logout()
+      await login('testEr', 'test')
+    }, resetDatabaseTimeout)
+
+    it('allows editing when the user is a member of only some of the linked projects', async () => {
+      const result = await send<{ id: number; editAccess?: boolean }>('locality', 'PUT', {
+        locality: buildUpdatePayload(),
+      })
+      expect(result.status).toEqual(200)
+      expect(result.body.editAccess).toEqual(true)
+    })
+
+    it('does not allow removing a project the user is not a member of', async () => {
+      const result = await send('locality', 'PUT', {
+        locality: buildUpdatePayload({ now_plr: [{ lid: editedLocality.lid, pid: 35, rowState: 'removed' }] }),
+      })
+      expect(result.status).toEqual(403)
+      expect(result.body).toEqual(noPermError)
+    })
+
+    it('allows removing the last project of the user and then denies further edits', async () => {
+      const unlink = await send<{ id: number; editAccess?: boolean }>('locality', 'PUT', {
+        locality: buildUpdatePayload({ now_plr: [{ lid: editedLocality.lid, pid: 3, rowState: 'removed' }] }),
+      })
+      expect(unlink.status).toEqual(200)
+      expect(unlink.body.editAccess).toEqual(false)
+
+      const afterwards = await send('locality', 'PUT', { locality: buildUpdatePayload() })
+      expect(afterwards.status).toEqual(403)
+      expect(afterwards.body).toEqual(noPermError)
     })
   })
 })

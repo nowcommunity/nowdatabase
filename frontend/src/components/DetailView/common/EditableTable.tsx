@@ -34,6 +34,7 @@ export const EditableTable = <
   url,
   getDetailPath,
   checkRowRestriction,
+  isRowRemovalDisabled,
   renderReadRowActions,
   kmlExport,
   svgExport,
@@ -50,6 +51,7 @@ export const EditableTable = <
   url?: string
   getDetailPath?: (row: T) => string
   checkRowRestriction?: (row: T) => boolean
+  isRowRemovalDisabled?: (row: T) => boolean
   renderReadRowActions?: (props: { row: MRT_Row<T> }) => ReactNode
   kmlExport?: (table: MRT_TableInstance<T>) => void | Promise<void>
   svgExport?: (table: MRT_TableInstance<T>) => void | Promise<void>
@@ -121,7 +123,9 @@ export const EditableTable = <
 
     return (
       <Box>
-        <Button onClick={rowClicked}>{getIcon()}</Button>
+        <Button onClick={rowClicked} disabled={state === 'clean' && Boolean(isRowRemovalDisabled?.(row.original))}>
+          {getIcon()}
+        </Button>
       </Box>
     )
   }
