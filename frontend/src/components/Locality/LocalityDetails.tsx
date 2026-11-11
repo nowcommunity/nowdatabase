@@ -109,7 +109,7 @@ export const LocalityDetails = ({
           setEditData(makeEditData(refreshed.data))
         }
       }
-      setTimeout(() => navigate(`/locality/${id}`), 15)
+      setTimeout(() => navigate(editAccess === false ? '/locality' : `/locality/${id}`), 15)
       notify('Edited item successfully.')
     } catch (e) {
       if (isFetchError(e) && e.status === 403 && isValidationError(e.data)) {
