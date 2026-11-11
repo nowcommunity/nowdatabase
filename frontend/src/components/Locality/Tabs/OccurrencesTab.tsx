@@ -501,7 +501,11 @@ export const OccurrencesTab = () => {
         renderReadRowActions={({ row }) => (
           <>
             <Tooltip title={`See details for species ${row.original.species_id}`}>
-              <Link id={`go-to-species-${row.original.species_id}`} to={`/species/${row.original.species_id}`}>
+              <Link
+                id={`go-to-species-${row.original.species_id}`}
+                to={`/species/${row.original.species_id}`}
+                state={{ returnTo: `${location.pathname}${location.search}` }}
+              >
                 {<ManageSearchIcon />}
               </Link>
             </Tooltip>
