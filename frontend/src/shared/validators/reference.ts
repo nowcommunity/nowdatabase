@@ -85,6 +85,16 @@ const dateCheck: (dateString: string) => ValidationError = (dateString: string) 
   if (day < 1 || day > maxDaysInMonth) {
     return `Day must be between 01 and ${maxDaysInMonth} for month ${month}`
   }
+
+  const now = new Date()
+  const today = `${now.getFullYear().toString().padStart(4, '0')}-${(now.getMonth() + 1).toString().padStart(2, '0')}-${now
+    .getDate()
+    .toString()
+    .padStart(2, '0')}`
+  if (dateString > today) {
+    return 'Date cannot be in the future'
+  }
+
   return null
 }
 
