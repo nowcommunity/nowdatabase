@@ -7,6 +7,8 @@ import { usePageContext } from '../Page'
 import { useUser } from '@/hooks/user'
 
 type CapturedTableOptions = {
+  enableTopToolbar?: boolean
+  positionPagination?: 'top' | 'bottom' | 'both'
   onColumnFiltersChange?: (filters: Array<{ id: string; value: unknown }>) => void
   onSortingChange?: (sorting: Array<{ id: string; desc: boolean }>) => void
   onPaginationChange?: (pagination: { pageIndex: number; pageSize: number }) => void
@@ -147,6 +149,26 @@ describe('TableView table help integration', () => {
     )
 
     expect(setSqlOrderBy).toHaveBeenCalledWith([{ id: 'name', desc: false }])
+  })
+
+  it('places selector pagination in the enabled bottom toolbar by default', () => {
+    render(
+      <TableView<TestRow>
+        title="Test Table"
+        idFieldName="id"
+        columns={[{ header: 'Name', accessorKey: 'name' }]}
+        visibleColumns={{ name: true }}
+        data={[{ id: '1', name: 'Alpha' }]}
+        url="test"
+        isFetching={false}
+        selectorFn={() => undefined}
+      />
+    )
+
+    expect(lastMaterialReactTableOptions).toMatchObject({
+      enableTopToolbar: false,
+      positionPagination: 'bottom',
+    })
   })
 
   it('stores table state outside the URL and navigates with a short state id', async () => {
