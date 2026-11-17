@@ -1,4 +1,4 @@
-import { describe, expect, it } from '@jest/globals'
+import { describe, expect, it, jest } from '@jest/globals'
 
 import {
   buildReferenceDisplayLabelMap,
@@ -69,5 +69,22 @@ describe('reference validation display labels', () => {
         }),
       ])
     )
+  })
+})
+
+describe('reference exact date validation', () => {
+  it('rejects future exact dates through backend reference validation', () => {
+    jest.useFakeTimers().setSystemTime(new Date('2026-01-01T12:00:00'))
+
+    try {
+      const errors = validateEntireReference({
+        ref_type_id: 6,
+        exact_date: '2026-01-02',
+      } as EditDataType<ReferenceDetailsType>)
+
+      expect(errors).toContainEqual({ name: 'exact_date', error: 'Date cannot be in the future' })
+    } finally {
+      jest.useRealTimers()
+    }
   })
 })

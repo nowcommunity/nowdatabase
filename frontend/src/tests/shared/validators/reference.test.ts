@@ -148,3 +148,43 @@ describe('validateReference year fields', () => {
     expect(result.error).toBeNull()
   })
 })
+
+describe('validateReference exact date fields', () => {
+  it('rejects an exact date in the future', () => {
+    jest.useFakeTimers().setSystemTime(new Date('2026-01-01T12:00:00'))
+
+    try {
+      const validator = createReferenceValidatorWithLabels()
+      const result = validator(createReferenceDetails({ ref_type_id: 6, exact_date: '2026-01-02' }), 'exact_date')
+
+      expect(result.error).toBe('Date cannot be in the future')
+    } finally {
+      jest.useRealTimers()
+    }
+  })
+
+  it('allows valid exact dates that are today or earlier', () => {
+    jest.useFakeTimers().setSystemTime(new Date('2026-01-01T12:00:00'))
+
+    try {
+      const validator = createReferenceValidatorWithLabels()
+
+      expect(validator(createReferenceDetails({ ref_type_id: 6, exact_date: '2026-01-01' }), 'exact_date').error).toBe(
+        null
+      )
+      expect(validator(createReferenceDetails({ ref_type_id: 6, exact_date: '2025-12-31' }), 'exact_date').error).toBe(
+        null
+      )
+    } finally {
+      jest.useRealTimers()
+    }
+  })
+
+  it('rejects an impossible exact date', () => {
+    const validator = createReferenceValidatorWithLabels()
+
+    const result = validator(createReferenceDetails({ ref_type_id: 6, exact_date: '2026-02-30' }), 'exact_date')
+
+    expect(result.error).toContain('Day')
+  })
+})
