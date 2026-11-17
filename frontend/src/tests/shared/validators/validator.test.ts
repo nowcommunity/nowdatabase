@@ -98,6 +98,16 @@ describe('entity full-field validators', () => {
     )
   })
 
+  it('validates person email format', () => {
+    const base = { email: 'not-an-email' }
+    expect(validatePersonFields(base)).toEqual(
+      expect.arrayContaining([{ name: 'Email', error: 'Email must be a valid email address' }])
+    )
+    expect(validatePersonFields({ email: 'jane.doe@example.org' })).not.toEqual(
+      expect.arrayContaining([expect.objectContaining({ name: 'Email' })])
+    )
+  })
+
   it('reports missing Species taxonomy fields', () => {
     const errors = validateSpeciesFields({})
 

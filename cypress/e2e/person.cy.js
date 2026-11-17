@@ -59,7 +59,7 @@ describe('Editing a person', () => {
     cy.get('[id=email-textfield]').clear()
     cy.contains('Email: This field is required')
     cy.get('[id=write-button]').should('be.disabled')
-    cy.get('[id=email-textfield]').type('test email')
+    cy.get('[id=email-textfield]').type('test.email@provider.com')
 
     cy.get('[id=organization-textfield]').clear()
     cy.contains('Organization: This field is required')
