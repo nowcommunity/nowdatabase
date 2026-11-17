@@ -1,6 +1,8 @@
 import { EditDataType, PersonDetailsType } from '../types'
 import { Validators, validateFields, validator } from './validator'
 
+const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+
 const personValidators: Validators<Partial<EditDataType<PersonDetailsType>>> = {
   initials: {
     name: 'initials',
@@ -26,9 +28,9 @@ const personValidators: Validators<Partial<EditDataType<PersonDetailsType>>> = {
   email: {
     name: 'Email',
     required: true,
-    asString: true,
     minLength: 5,
     maxLength: 30,
+    asString: (value: string) => (EMAIL_PATTERN.test(value) ? null : 'Email must be a valid email address'),
   },
   organization: {
     name: 'Organization',
