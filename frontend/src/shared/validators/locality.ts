@@ -2,8 +2,26 @@ import { EditDataType, LocalityDetailsType } from '../types'
 import { Validators, validateFields, validator } from './validator'
 import { validCountries } from './countryList'
 
-const pollenFields = ['pers_pollen_ap', 'pers_pollen_nap', 'pers_pollen_other'] as const
+export const validateLocalitySynonymNames = (synonyms: readonly object[]) => {
+  const names = new Set<string>()
 
+  for (const synonym of synonyms) {
+    const rowState = 'rowState' in synonym ? synonym.rowState : undefined
+    if (rowState === 'removed' || rowState === 'cancelled') continue
+
+    const name = 'synonym' in synonym && typeof synonym.synonym === 'string' ? synonym.synonym.trim() : ''
+    if (name.length < 2) return 'Locality synonym must be at least 2 characters'
+    if (name.length > 30) return 'Locality synonym must be 30 characters or fewer'
+
+    const normalizedName = name.toLowerCase()
+    if (names.has(normalizedName)) return 'This synonym already exists for this locality'
+    names.add(normalizedName)
+  }
+
+  return undefined
+}
+
+const pollenFields = ['pers_pollen_ap', 'pers_pollen_nap', 'pers_pollen_other'] as const
 export const pollenTotalValidationError =
   'Combined Arboreal (AP%), Non-arboreal (NAP%), and Other pollen (OP%) must be less than or equal to 100'
 export const estimateTempRangeValidationError = 'Estimated temperature must be between -999.9 and 999.9'
@@ -263,6 +281,10 @@ const createLocalityValidators = (
       condition: (data: Partial<EditDataType<LocalityDetailsType>>) =>
         data.frac_max !== null && data.frac_max !== undefined && data.frac_max !== '',
       asString: (value: string) => validateFraction('Maximum fraction', value),
+    },
+    now_syn_loc: {
+      name: 'Locality synonyms',
+      miscArray: synonyms => validateLocalitySynonymNames(synonyms),
     },
   }
 }
