@@ -685,7 +685,7 @@ export const TableView = <T extends MRT_RowData>({
     manualSorting: serverSidePagination,
     rowCount: serverSidePagination ? rowCount : undefined,
     autoResetPageIndex: !serverSidePagination,
-    positionPagination: paginationPlacement ?? (selectorFn ? 'top' : 'both'),
+    positionPagination: paginationPlacement ?? (selectorFn ? 'bottom' : 'both'),
     paginationDisplayMode: 'pages',
     muiTablePaperProps: {
       elevation: 0,
