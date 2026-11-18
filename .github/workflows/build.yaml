@@ -11,7 +11,7 @@ env:
   FRONTEND_IMAGE_NAME: ${{ github.event_name == 'release' && 'nowdb-frontend' || 'nowdb-frontend-staging' }}
   BACKEND_URL: ${{ github.event_name == 'release' && secrets.BACKEND_URL_PROD || secrets.BACKEND_URL_STAGING }}
   RUNNING_ENV: ${{ github.event_name == 'release' && 'prod' || 'staging' }}
-  ENABLE_WRITE: ${{ github.event_name == 'release' && 'false' || 'true' }}
+  ENABLE_WRITE: ${{ 'true' }}
   # Backend env's are defined inside the cluster, whereas frontend's have to be defined at build stage, that's why they're here
 
 jobs:
