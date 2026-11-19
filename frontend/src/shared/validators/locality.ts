@@ -95,7 +95,8 @@ const createLocalityValidators = (
     !maxUsesTimeUnitBasis &&
     !maxUsesAbsoluteBasis
 
-  const compositeDatingMethodRequiredText = 'One age row must follow the rules for Absolute, the other for Time Unit'
+  const compositeDatingMethodRequiredText =
+    'Composite dating requires two age rows: one with Absolute basis and one with Time Unit basis'
 
   return {
     // const isNew = editData.lid === undefined
