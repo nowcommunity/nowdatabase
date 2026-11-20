@@ -114,6 +114,7 @@ describe('LocalitySpeciesTab MW score prerequisites', () => {
       data: { now_ls: [] },
       editData: { now_ls: [] },
       mode: modeOptionToMode.edit,
+      notify: () => null,
     } as never)
 
     render(<LocalitySpeciesTab />)
