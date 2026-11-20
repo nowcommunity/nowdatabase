@@ -1,23 +1,23 @@
-import { Editable, SpeciesDetailsType, SpeciesLocality } from '@/shared/types'
+import { applyDefaultSpeciesOrdering, hasActiveSortingInSearch } from '@/components/DetailView/common/DetailTabTable'
 import { EditableTable } from '@/components/DetailView/common/EditableTable'
 import { EditingModal } from '@/components/DetailView/common/EditingModal'
+import { EntryUpdateHistory } from '@/components/DetailView/common/FieldUpdateHistory'
 import { Grouped } from '@/components/DetailView/common/tabLayoutHelpers'
 import { useDetailContext } from '@/components/DetailView/Context/DetailContext'
+import { occurrenceLabels } from '@/constants/occurrenceLabels'
+import { Editable, SpeciesDetailsType, SpeciesLocality } from '@/shared/types'
+import { calculateNormalizedMesowearScore } from '@/shared/utils/mesowear'
+import { matchesCountryOrContinent } from '@/shared/validators/countryContinents'
 import { Box, TextField } from '@mui/material'
 import { MRT_ColumnDef, MRT_Row, MRT_RowData, MRT_TableInstance } from 'material-react-table'
-import { matchesCountryOrContinent } from '@/shared/validators/countryContinents'
-import { useForm } from 'react-hook-form'
-import { calculateNormalizedMesowearScore } from '@/shared/utils/mesowear'
-import { applyDefaultSpeciesOrdering, hasActiveSortingInSearch } from '@/components/DetailView/common/DetailTabTable'
-import { useLocation } from 'react-router-dom'
 import { useMemo } from 'react'
-import { occurrenceLabels } from '@/constants/occurrenceLabels'
+import { useForm } from 'react-hook-form'
+import { useLocation } from 'react-router-dom'
 import {
   exportOccurrenceMapKml,
   exportOccurrenceMapSvg,
   getUniqueSpeciesLocalityMapExportLocalities,
 } from '../localitySpeciesMapExport'
-import { EntryUpdateHistory } from '@/components/DetailView/common/FieldUpdateHistory'
 
 const hasMesowearScoreInputs = (row: SpeciesLocality) => {
   return (
@@ -212,8 +212,12 @@ export const LocalitySpeciesTab = () => {
     exportOccurrenceMapKml(table, 'locality-species', getExportLocalities)
   }
 
-  const svgExport = async <T extends MRT_RowData>(table: MRT_TableInstance<T>) => {
-    await exportOccurrenceMapSvg(table, 'locality-species-map', getExportLocalities)
+  const svgExport = async () => {
+    const locsWithCoordinates = data.now_ls
+      .filter(ls => ls.now_loc !== undefined && ls.now_loc.dec_lat && ls.now_loc.dec_long)
+      .map(ls => ls.now_loc)
+
+    await exportOccurrenceMapSvg('locality-species-map', locsWithCoordinates)
   }
 
   const editingModal = (

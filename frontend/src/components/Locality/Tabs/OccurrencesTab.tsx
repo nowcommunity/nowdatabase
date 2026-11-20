@@ -23,7 +23,6 @@ import { OccurrenceIsotopeTab } from '@/components/Occurrence/Tabs/OccurrenceIso
 import { OccurrenceWearTab } from '@/components/Occurrence/Tabs/OccurrenceWearTab'
 import {
   exportOccurrenceMapKml,
-  exportOccurrenceMapSvg,
   getUniqueLocalityOccurrenceMapExportLocalities,
 } from '@/components/Species/localitySpeciesMapExport'
 import { occurrenceLabels } from '@/constants/occurrenceLabels'
@@ -378,10 +377,6 @@ export const OccurrencesTab = () => {
     exportOccurrenceMapKml(table, 'locality-occurrences', getExportLocalities)
   }
 
-  const svgExport = async <T extends MRT_RowData>(table: MRT_TableInstance<T>) => {
-    await exportOccurrenceMapSvg(table, 'locality-occurrences-map', getExportLocalities)
-  }
-
   const textField = (field: keyof EditDataType<OccurrenceDetailsType>, options?: TextFieldOptions) => (
     <EditableTextField<OccurrenceDetailsType> field={field} {...options} />
   )
@@ -497,7 +492,6 @@ export const OccurrencesTab = () => {
         url="occurrence"
         getDetailPath={row => `/occurrence/${row.lid}/${row.species_id}`}
         kmlExport={kmlExport}
-        svgExport={svgExport}
         renderReadRowActions={({ row }) => (
           <>
             <Tooltip title={`See details for species ${row.original.species_id}`}>

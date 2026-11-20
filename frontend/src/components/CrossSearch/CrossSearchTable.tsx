@@ -1,21 +1,22 @@
-import { lazy, Suspense, useMemo } from 'react'
-import { type MRT_ColumnDef, type MRT_RowData, type MRT_TableInstance } from 'material-react-table'
-import { CrossSearch, formatDevelopmentalCrownType } from '@/shared/types'
-import { TableView } from '../TableView/TableView'
-import type { ColumnVisibilityGroup } from '../TableView/TableToolBar'
-import { useGetAllCrossSearchQuery, useGetAllCrossSearchLocalitiesQuery } from '@/redux/crossSearchReducer'
-import { usePageContext } from '../Page'
-import { formatWithMaxThreeDecimals } from '@/util/numberFormatting'
-import { occurrenceLabels } from '@/constants/occurrenceLabels'
-import { OccurrenceDwcExportMenuItem } from '@/components/Occurrence/OccurrenceDwcExportMenuItem'
 import { OccurrenceDwcDpExportMenuItem } from '@/components/Occurrence/OccurrenceDwcDpExportMenuItem'
+import { OccurrenceDwcExportMenuItem } from '@/components/Occurrence/OccurrenceDwcExportMenuItem'
 import { OccurrenceFullDarwinCoreExportMenuItem } from '@/components/Occurrence/OccurrenceFullDarwinCoreExportMenuItem'
-import { matchesCountryOrContinent } from '@/shared/validators/countryContinents'
 import {
   exportOccurrenceMapKml,
   exportOccurrenceMapSvg,
   getUniqueCrossSearchMapExportLocalities,
 } from '@/components/Species/localitySpeciesMapExport'
+import { occurrenceLabels } from '@/constants/occurrenceLabels'
+import { useGetAllCrossSearchLocalitiesQuery, useGetAllCrossSearchQuery } from '@/redux/crossSearchReducer'
+import { CrossSearch, formatDevelopmentalCrownType } from '@/shared/types'
+import { matchesCountryOrContinent } from '@/shared/validators/countryContinents'
+import { formatWithMaxThreeDecimals } from '@/util/numberFormatting'
+import { CircularProgress } from '@mui/material'
+import { type MRT_ColumnDef, type MRT_RowData, type MRT_TableInstance } from 'material-react-table'
+import { lazy, Suspense, useMemo } from 'react'
+import { usePageContext } from '../Page'
+import type { ColumnVisibilityGroup } from '../TableView/TableToolBar'
+import { TableView } from '../TableView/TableView'
 
 const LocalitiesMap = lazy(async () => {
   const module = await import('../Map/LocalitiesMap')
@@ -1078,6 +1079,8 @@ export const CrossSearchTable = ({ selectorFn }: { selectorFn?: (newObject: Cros
     []
   )
 
+  if (!localitiesData) return <CircularProgress />
+
   const checkRowRestriction = (row: CrossSearch) => {
     return !!row.loc_status
   }
@@ -1091,8 +1094,8 @@ export const CrossSearchTable = ({ selectorFn }: { selectorFn?: (newObject: Cros
     exportOccurrenceMapKml(table, 'occurrences', getExportLocalities)
   }
 
-  const svgExport = async <T extends MRT_RowData>(table: MRT_TableInstance<T>) => {
-    await exportOccurrenceMapSvg(table, 'occurrences-map', getExportLocalities)
+  const svgExport = async () => {
+    await exportOccurrenceMapSvg('occurrences-map', localitiesData)
   }
 
   return (

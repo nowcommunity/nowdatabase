@@ -1,6 +1,13 @@
-import type { CrossSearch, Locality, LocalityDetailsType, LocalitySpecies, SpeciesLocality } from '@/shared/types'
-import { generateKml } from '@/util/kml'
 import { currentDateAsString } from '@/shared/currentDateAsString'
+import type {
+  CrossSearch,
+  Locality,
+  LocalityCoord,
+  LocalityDetailsType,
+  LocalitySpecies,
+  SpeciesLocality,
+} from '@/shared/types'
+import { generateKml } from '@/util/kml'
 import type { MRT_RowData, MRT_TableInstance } from 'material-react-table'
 
 type SpeciesSource = {
@@ -177,11 +184,7 @@ export const exportOccurrenceMapKml = <T extends MRT_RowData>(
   downloadTextFile(generateKml(getLocalities(table)), 'text/kml', `${filenamePrefix}-${currentDateAsString()}.kml`)
 }
 
-export const exportOccurrenceMapSvg = async <T extends MRT_RowData>(
-  table: MRT_TableInstance<T>,
-  filenamePrefix: string,
-  getLocalities: (table: MRT_TableInstance<T>) => MapExportLocality[]
-) => {
+export const exportOccurrenceMapSvg = async (filenamePrefix: string, localities: LocalityCoord[]) => {
   const { generateSvg } = await import('@/components/Map/generateSvg')
-  downloadTextFile(generateSvg(getLocalities(table)), 'image/svg+xml', `${filenamePrefix}-${currentDateAsString()}.svg`)
+  downloadTextFile(generateSvg(localities), 'image/svg+xml', `${filenamePrefix}-${currentDateAsString()}.svg`)
 }
