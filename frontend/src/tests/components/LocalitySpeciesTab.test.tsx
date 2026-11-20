@@ -1,11 +1,12 @@
-import type { ReactNode } from 'react'
+import { modeOptionToMode, useDetailContext } from '@/components/DetailView/Context/DetailContext'
+import { NotificationContextProvider } from '@/components/Notification'
+import { LocalitySpeciesTab } from '@/components/Species/Tabs/LocalitySpeciesTab'
+import { occurrenceLabels } from '@/constants/occurrenceLabels'
+import type { SpeciesLocality } from '@/shared/types'
 import { beforeEach, describe, expect, it, jest } from '@jest/globals'
 import { render } from '@testing-library/react'
-import { LocalitySpeciesTab } from '@/components/Species/Tabs/LocalitySpeciesTab'
-import { modeOptionToMode, useDetailContext } from '@/components/DetailView/Context/DetailContext'
-import type { SpeciesLocality } from '@/shared/types'
 import type { MRT_ColumnDef, MRT_Row } from 'material-react-table'
-import { occurrenceLabels } from '@/constants/occurrenceLabels'
+import type { ReactNode } from 'react'
 
 jest.mock('react-router-dom', () => {
   const actual = jest.requireActual<typeof import('react-router-dom')>('react-router-dom')
@@ -75,7 +76,11 @@ describe('LocalitySpeciesTab MW score prerequisites', () => {
   })
 
   it('passes MW scale/value columns and MW Score cell can read values from row data', () => {
-    render(<LocalitySpeciesTab />)
+    render(
+      <NotificationContextProvider>
+        <LocalitySpeciesTab />
+      </NotificationContextProvider>
+    )
 
     const firstCall = editableTableMock.mock.calls[0]
     expect(firstCall).toBeDefined()
@@ -116,7 +121,11 @@ describe('LocalitySpeciesTab MW score prerequisites', () => {
       mode: modeOptionToMode.edit,
     } as never)
 
-    render(<LocalitySpeciesTab />)
+    render(
+      <NotificationContextProvider>
+        <LocalitySpeciesTab />
+      </NotificationContextProvider>
+    )
 
     const grouped = document.querySelector('[data-testid="grouped"]')
 

@@ -192,8 +192,6 @@ export const TableToolBar = <T extends MRT_RowData>({
 
   const runMapExport = async (label: string, exportFn: (table: MRT_TableInstance<T>) => void | Promise<void>) => {
     notify(`Preparing ${label} export...`, 'info', null)
-    const rowCount = table.getPrePaginationRowModel().rows.length
-    setNotificationMessage(`Generating ${label} export from ${rowCount} rows...`)
     await exportFn(table)
     setNotificationMessage(`Saving ${label} export...`)
     notify('Download finished.')

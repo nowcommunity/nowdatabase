@@ -24,7 +24,7 @@ import { OccurrenceWearTab } from '@/components/Occurrence/Tabs/OccurrenceWearTa
 import {
   exportOccurrenceMapKml,
   exportOccurrenceMapSvg,
-  getUniqueLocalityOccurrenceMapExportLocalities,
+  toMapExportLocality,
 } from '@/components/Species/localitySpeciesMapExport'
 import { occurrenceLabels } from '@/constants/occurrenceLabels'
 import { useNotify } from '@/hooks/notification'
@@ -44,7 +44,7 @@ import { ValidationObject } from '@/shared/validators/validator'
 import ManageSearchIcon from '@mui/icons-material/ManageSearch'
 import SaveIcon from '@mui/icons-material/Save'
 import { Box, Button, DialogActions, DialogContent, Tooltip } from '@mui/material'
-import type { MRT_ColumnDef, MRT_Row, MRT_RowData, MRT_TableInstance } from 'material-react-table'
+import type { MRT_ColumnDef, MRT_Row } from 'material-react-table'
 import { useMemo, useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 
@@ -184,6 +184,7 @@ export const OccurrencesTab = () => {
   const { mode, data, editData, setEditData } = useDetailContext<LocalityDetailsType>()
   const [fieldsWithErrors, setFieldsWithErrors] = useState<FieldsWithErrorsType>({})
   const location = useLocation()
+  const { notify } = useNotify()
 
   const sortedOccurrenceRows = useMemo(() => {
     const sourceRows = (mode.read ? data.now_ls : editData.now_ls) as unknown as Editable<LocalitySpecies>[]
@@ -369,17 +370,22 @@ export const OccurrencesTab = () => {
     },
   ]
 
-  const getExportLocalities = <T extends MRT_RowData>(table: MRT_TableInstance<T>) => {
-    const rows = table.getPrePaginationRowModel().rows.map(row => row.original as unknown as LocalitySpecies)
-    return getUniqueLocalityOccurrenceMapExportLocalities(data, rows)
+  const kmlExport = () => {
+    const exportedLocality = toMapExportLocality(editData)
+    if (!exportedLocality) {
+      notify('Failed to export locality.', 'error', 5)
+      return
+    }
+    exportOccurrenceMapKml('locality-species', [exportedLocality])
   }
 
-  const kmlExport = <T extends MRT_RowData>(table: MRT_TableInstance<T>) => {
-    exportOccurrenceMapKml(table, 'locality-occurrences', getExportLocalities)
-  }
-
-  const svgExport = async <T extends MRT_RowData>(table: MRT_TableInstance<T>) => {
-    await exportOccurrenceMapSvg(table, 'locality-occurrences-map', getExportLocalities)
+  const svgExport = async () => {
+    const exportedLocality = toMapExportLocality(editData)
+    if (!exportedLocality) {
+      notify('Failed to export locality.', 'error', 5)
+      return
+    }
+    await exportOccurrenceMapSvg('locality-species-map', [exportedLocality])
   }
 
   const textField = (field: keyof EditDataType<OccurrenceDetailsType>, options?: TextFieldOptions) => (
