@@ -97,7 +97,7 @@ const EditToggleButton = <T,>({
       id="edit-button"
       onClick={handleClick}
       variant={mode.read ? 'contained' : 'outlined'}
-      style={{ width: '8em' }}
+      style={{ width: '12em', height: '3em' }}
     >
       <EditIcon style={{ marginRight: '0.5em' }} /> {mode.read ? 'Edit' : 'Cancel edit'}
     </Button>
@@ -254,13 +254,11 @@ export const DetailView = <T extends object>({
             <DetailBrowser<T> />
           </Box>
         )}
-        <Box
-          sx={{ display: 'flex', justifyContent: 'space-between', alignContent: 'space-between', marginTop: 'auto' }}
-        >
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 'auto' }}>
           <Box sx={{ display: 'flex' }} gap={3}>
             {!isUserPage && <ReturnButton />}
           </Box>
-          <Box sx={{ display: 'flex' }} gap={1}>
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }} gap={1}>
             {!isPersonPage && !isNew && <ContactForm<T> buttonText="Contact" />}
             <EditToggleButton<T>
               canEdit={!!editRights.edit && !mode.staging}
@@ -274,7 +272,7 @@ export const DetailView = <T extends object>({
                     id="delete-button"
                     onClick={onDelete}
                     variant="contained"
-                    sx={{ width: '8em', color: 'white' }}
+                    sx={{ width: '8em', height: '3em' }}
                     color="error"
                     disabled={deleteDisabled}
                   >

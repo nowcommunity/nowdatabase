@@ -363,7 +363,7 @@ export const WriteButton = <T,>({
                   needsTaxonomyAcknowledgement
                 }
                 id="write-button"
-                sx={{ width: '20em' }}
+                sx={{ width: '20em', height: '3em' }}
                 onClick={() => {
                   if (mode.staging) {
                     void handleWriteButtonClick()
