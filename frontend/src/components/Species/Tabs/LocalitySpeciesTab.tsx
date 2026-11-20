@@ -9,15 +9,17 @@ import { Editable, SpeciesDetailsType, SpeciesLocality } from '@/shared/types'
 import { calculateNormalizedMesowearScore } from '@/shared/utils/mesowear'
 import { matchesCountryOrContinent } from '@/shared/validators/countryContinents'
 import { Box, TextField } from '@mui/material'
-import { MRT_ColumnDef, MRT_Row, MRT_RowData, MRT_TableInstance } from 'material-react-table'
+import { MRT_ColumnDef, MRT_Row } from 'material-react-table'
 import { useMemo } from 'react'
 import { useForm } from 'react-hook-form'
 import { useLocation } from 'react-router-dom'
 import {
   exportOccurrenceMapKml,
   exportOccurrenceMapSvg,
-  getUniqueSpeciesLocalityMapExportLocalities,
+  MapExportLocality,
+  toMapExportLocality,
 } from '../localitySpeciesMapExport'
+import { useNotify } from '@/hooks/notification'
 
 const hasMesowearScoreInputs = (row: SpeciesLocality) => {
   return (
@@ -37,6 +39,7 @@ export const LocalitySpeciesTab = () => {
     register,
     formState: { errors },
   } = useForm()
+  const { notify } = useNotify()
 
   const sortedLocalitySpeciesRows = useMemo(() => {
     const sourceRows = (mode.read ? data.now_ls : editData.now_ls) as unknown as Editable<SpeciesLocality>[]
@@ -203,21 +206,22 @@ export const LocalitySpeciesTab = () => {
     return Object.keys(errors).length === 0
   }
 
-  const getExportLocalities = <T extends MRT_RowData>(table: MRT_TableInstance<T>) => {
-    const rows = table.getPrePaginationRowModel().rows.map(row => row.original as unknown as SpeciesLocality)
-    return getUniqueSpeciesLocalityMapExportLocalities(data, rows)
-  }
-
-  const kmlExport = <T extends MRT_RowData>(table: MRT_TableInstance<T>) => {
-    exportOccurrenceMapKml(table, 'locality-species', getExportLocalities)
+  const kmlExport = () => {
+    const exportedLocalities = data.now_ls.map(loc => toMapExportLocality(loc))
+    if (exportedLocalities.filter(loc => loc === null).length > 0) {
+      notify('Some localities failed to export, aborting.', 'error', 5)
+      return
+    }
+    exportOccurrenceMapKml('locality-species', exportedLocalities as MapExportLocality[])
   }
 
   const svgExport = async () => {
-    const locsWithCoordinates = data.now_ls
-      .filter(ls => ls.now_loc !== undefined && ls.now_loc.dec_lat && ls.now_loc.dec_long)
-      .map(ls => ls.now_loc)
-
-    await exportOccurrenceMapSvg('locality-species-map', locsWithCoordinates)
+    const exportedLocalities = data.now_ls.map(loc => toMapExportLocality(loc))
+    if (exportedLocalities.filter(loc => loc === null).length > 0) {
+      notify('Some localities failed to export, aborting.', 'error', 5)
+      return
+    }
+    await exportOccurrenceMapSvg('locality-species-map', exportedLocalities as MapExportLocality[])
   }
 
   const editingModal = (

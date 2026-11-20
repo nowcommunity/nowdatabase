@@ -1,6 +1,6 @@
-import { LocalityCoord } from '@/shared/types'
 import { SVG } from '@svgdotjs/svg.js'
 import { countryPolygons } from '../../country_data/countryPolygons.ts'
+import { MapExportLocality } from '../Species/localitySpeciesMapExport.ts'
 
 interface PixelCoordinates {
   x: number
@@ -22,7 +22,7 @@ const webMercatorConvert = (lat: number, long: number, width: number): PixelCoor
 
 // Generates and returns an SVG image of localities on a map.
 export const generateSvg = (
-  localityCoords: LocalityCoord[],
+  localities: MapExportLocality[],
   mapBorderColor = '#000000',
   mapFillColor = '#ffffff',
   markerBorderColor = '#ff0000',
@@ -48,8 +48,8 @@ export const generateSvg = (
     draw.polygon(polygon).stroke({ width: 1, color: mapBorderColor }).fill(mapFillColor)
   })
 
-  localityCoords.forEach(coord => {
-    const pixelCoords = webMercatorConvert(coord.dec_lat, coord.dec_long, width)
+  localities.forEach(loc => {
+    const pixelCoords = webMercatorConvert(loc.dec_lat, loc.dec_long, width)
     const radius = 10
     const topLeftX = pixelCoords.x - radius
     const topLeftY = pixelCoords.y - radius

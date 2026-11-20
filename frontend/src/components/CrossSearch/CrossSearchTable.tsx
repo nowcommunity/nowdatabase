@@ -4,7 +4,8 @@ import { OccurrenceFullDarwinCoreExportMenuItem } from '@/components/Occurrence/
 import {
   exportOccurrenceMapKml,
   exportOccurrenceMapSvg,
-  getUniqueCrossSearchMapExportLocalities,
+  MapExportLocality,
+  toMapExportLocality,
 } from '@/components/Species/localitySpeciesMapExport'
 import { occurrenceLabels } from '@/constants/occurrenceLabels'
 import { useGetAllCrossSearchLocalitiesQuery, useGetAllCrossSearchQuery } from '@/redux/crossSearchReducer'
@@ -12,11 +13,12 @@ import { CrossSearch, formatDevelopmentalCrownType } from '@/shared/types'
 import { matchesCountryOrContinent } from '@/shared/validators/countryContinents'
 import { formatWithMaxThreeDecimals } from '@/util/numberFormatting'
 import { CircularProgress } from '@mui/material'
-import { type MRT_ColumnDef, type MRT_RowData, type MRT_TableInstance } from 'material-react-table'
+import { type MRT_ColumnDef } from 'material-react-table'
 import { lazy, Suspense, useMemo } from 'react'
 import { usePageContext } from '../Page'
 import type { ColumnVisibilityGroup } from '../TableView/TableToolBar'
 import { TableView } from '../TableView/TableView'
+import { useNotify } from '@/hooks/notification'
 
 const LocalitiesMap = lazy(async () => {
   const module = await import('../Map/LocalitiesMap')
@@ -41,6 +43,7 @@ export const CrossSearchTable = ({ selectorFn }: { selectorFn?: (newObject: Cros
     columnFilters: sqlColumnFilters,
     sorting: sqlOrderBy,
   })
+  const { notify } = useNotify()
 
   // Show/Hide columns in the following order
   const columns = useMemo<MRT_ColumnDef<CrossSearch>[]>(
@@ -1085,17 +1088,22 @@ export const CrossSearchTable = ({ selectorFn }: { selectorFn?: (newObject: Cros
     return !!row.loc_status
   }
 
-  const getExportLocalities = <T extends MRT_RowData>(table: MRT_TableInstance<T>) => {
-    const rows = table.getPrePaginationRowModel().rows.map(row => row.original as unknown as CrossSearch)
-    return getUniqueCrossSearchMapExportLocalities(rows)
-  }
-
-  const kmlExport = <T extends MRT_RowData>(table: MRT_TableInstance<T>) => {
-    exportOccurrenceMapKml(table, 'occurrences', getExportLocalities)
+  const kmlExport = () => {
+    const exportedLocalities = localitiesData.map(loc => toMapExportLocality(loc))
+    if (exportedLocalities.filter(loc => loc === null).length > 0) {
+      notify('Some localities failed to export, aborting.', 'error', 5)
+      return
+    }
+    exportOccurrenceMapKml('occurrences', exportedLocalities as MapExportLocality[])
   }
 
   const svgExport = async () => {
-    await exportOccurrenceMapSvg('occurrences-map', localitiesData)
+    const exportedLocalities = localitiesData.map(loc => toMapExportLocality(loc))
+    if (exportedLocalities.filter(loc => loc === null).length > 0) {
+      notify('Some localities failed to export, aborting.', 'error', 5)
+      return
+    }
+    await exportOccurrenceMapSvg('occurrences-map', exportedLocalities as MapExportLocality[])
   }
 
   return (

@@ -810,8 +810,3 @@ export type SimplifiedLocality = {
   dec_long: number
   loc_name: string
 }
-
-export type LocalityCoord = {
-  dec_lat: number
-  dec_long: number
-}

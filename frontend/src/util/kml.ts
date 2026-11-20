@@ -1,3 +1,4 @@
+import { MapExportLocality } from '@/components/Species/localitySpeciesMapExport'
 import { Locality } from '@/shared/types'
 
 type KmlLocality = Locality & {
@@ -78,7 +79,7 @@ const generatePlacemarkKml = (locality: KmlLocality) => {
 }
 
 // Returns an XML / KML string containing locality information as map markers, openable in Google Earth for example.
-export const generateKml = (localities: KmlLocality[]) => {
+export const generateKml = (localities: MapExportLocality[]) => {
   let kmlString = `<?xml version="1.0" encoding="UTF-8"?>\n`
   kmlString +=
     `<kml xmlns="http://www.opengis.net/kml/2.2" xmlns:gx="http://www.google.com/kml/ext/2.2" ` +
