@@ -205,6 +205,7 @@ export const TableToolBar = <T extends MRT_RowData>({
         {showContactButton && <ContactForm<T> buttonText="Contact" noContext={true} />}
         {showNewButton && (
           <Button
+            style={{ height: '3em' }}
             id="new-button"
             variant="outlined"
             component={Link}
