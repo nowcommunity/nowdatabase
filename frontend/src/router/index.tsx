@@ -134,6 +134,20 @@ const router = createBrowserRouter([
           return { Component: MaintenancePage }
         },
       },
+      {
+        path: 'privacy-policy',
+        lazy: async () => {
+          const { PrivacyPolicy } = await import('../pages/PrivacyPolicy')
+          return { Component: PrivacyPolicy }
+        },
+      },
+      {
+        path: 'accessibility-statement',
+        lazy: async () => {
+          const { AccessibilityStatement } = await import('../pages/AccessibilityStatement')
+          return { Component: AccessibilityStatement }
+        },
+      },
       { path: '*', element: <div>Page not found.</div> },
     ],
   },
