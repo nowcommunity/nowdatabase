@@ -30,7 +30,7 @@ route to navigate back to.
 | ---- | --------- | ------- | ------------- |
 | `frontend/src/components/DetailView/common/SimpleTable.tsx` | `SimpleTable` | Clicking a row in read mode | ``${location.pathname}?tab=${searchParams.get('tab')}`` |
 | `frontend/src/components/TableView/ActionComponent.tsx` | `ActionComponent` (detail button) | Clicking the action button when `selectorFn` and `tableRowAction` are undefined | ``${location.pathname}?tab=${searchParams.get('tab')}`` |
-| `frontend/src/components/TableView/TableView.tsx` | `TableView` | Clicking a table row when `clickableRows` is true | ``${location.pathname}?&columnfilters=...&sorting=...&pagination=...`` |
+| `frontend/src/components/TableView/TableView.tsx` | `TableView` | Clicking a table row when `navigateOnRowClick` is true | ``${location.pathname}?&columnfilters=...&sorting=...&pagination=...`` |
 | `frontend/src/components/TableView/TableToolBar.tsx` | `TableToolBar` | Clicking the "New" button | ``${location.pathname}`` |
 
 ## Navigation Gaps Identified

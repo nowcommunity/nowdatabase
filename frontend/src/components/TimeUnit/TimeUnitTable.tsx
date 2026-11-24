@@ -6,10 +6,10 @@ import { TableView } from '../TableView/TableView'
 
 export const TimeUnitTable = ({
   selectorFn,
-  clickableRows = true,
+  navigateOnRowClick = true,
 }: {
   selectorFn?: (newTimeUnit: TimeUnit) => void
-  clickableRows?: boolean
+  navigateOnRowClick?: boolean
 }) => {
   const { data: timeUnitQueryData, isFetching, isError, error } = useGetAllTimeUnitsQuery()
   const columns = useMemo<MRT_ColumnDef<TimeUnit>[]>(
@@ -68,7 +68,7 @@ export const TimeUnitTable = ({
       isError={isError}
       error={error}
       visibleColumns={visibleColumns}
-      clickableRows={clickableRows}
+      navigateOnRowClick={navigateOnRowClick}
       data={timeUnitQueryData}
       url="time-unit"
       enableColumnFilterModes={true}

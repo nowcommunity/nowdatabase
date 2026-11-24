@@ -86,7 +86,7 @@ export const TimeUnitTab = () => {
       url="time-unit"
       isFetching={false}
       enableColumnFilterModes={true}
-      clickableRows={true}
+      navigateOnRowClick={mode.read}
       paginationPlacement="bottom"
     />
   )

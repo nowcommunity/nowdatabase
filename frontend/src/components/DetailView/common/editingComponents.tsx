@@ -569,7 +569,7 @@ export const TimeBoundSelection = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [errorObject])
 
-  const selectorTableWithFn = cloneElement(<TimeBoundTable showBid />, { selectorFn })
+  const selectorTableWithFn = cloneElement(<TimeBoundTable navigateOnRowClick={false} showBid={true} />, { selectorFn })
   if (open)
     return (
       <Box>

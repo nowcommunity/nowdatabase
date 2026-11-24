@@ -92,7 +92,7 @@ export const SelectingTable = <T extends MRT_RowData, ParentType extends object>
             if (closeOnSelect) close()
           }}
           idFieldName={idFieldName}
-          clickableRows={false}
+          navigateOnRowClick={false}
           tableRowAction={tableRowAction}
           paginationPlacement={paginationPlacement}
         />

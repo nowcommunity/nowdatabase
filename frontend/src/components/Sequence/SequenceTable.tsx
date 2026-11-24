@@ -87,7 +87,7 @@ export const SequenceTable = ({ selectorFn }: { selectorFn?: (id: Sequence) => v
         title="Sequences"
         isFetching={Boolean(isFetching)}
         visibleColumns={visibleColumns}
-        clickableRows={false}
+        navigateOnRowClick={false}
         data={sequenceQueryData}
         url="sequence"
         isError={Boolean(isError)}

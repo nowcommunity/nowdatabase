@@ -201,7 +201,7 @@ export const TableView = <T extends MRT_RowData>({
   kmlExport,
   svgExport,
   isCrossSearchTable,
-  clickableRows = true,
+  navigateOnRowClick = true,
   showContactButton = true,
   showNewButton = true,
   enableColumnFilterModes,
@@ -231,7 +231,7 @@ export const TableView = <T extends MRT_RowData>({
   kmlExport?: (table: MRT_TableInstance<T>) => void | Promise<void>
   svgExport?: (table: MRT_TableInstance<T>) => void | Promise<void>
   isCrossSearchTable?: boolean
-  clickableRows?: boolean
+  navigateOnRowClick?: boolean
   showContactButton?: boolean
   showNewButton?: boolean
   enableColumnFilterModes?: boolean
@@ -512,7 +512,7 @@ export const TableView = <T extends MRT_RowData>({
   }
 
   const muiTableBodyRowProps = ({ row }: { row: MRT_Row<T> }) => {
-    const clickSelectsRow = Boolean(selectorFn) && !clickableRows
+    const clickSelectsRow = Boolean(selectorFn) && !navigateOnRowClick
 
     return {
       'data-cy': `table-row-${String(row.original[idFieldName])}`,
@@ -529,7 +529,7 @@ export const TableView = <T extends MRT_RowData>({
         })
       },
       sx: {
-        cursor: clickSelectsRow || clickableRows ? 'pointer' : undefined,
+        cursor: clickSelectsRow || navigateOnRowClick ? 'pointer' : undefined,
       },
     }
   }
@@ -583,7 +583,7 @@ export const TableView = <T extends MRT_RowData>({
         },
         `table-cell-${toDataCyPart(cell.column.id)}`
       ),
-    muiTableBodyRowProps: clickableRows || selectorFn ? muiTableBodyRowProps : undefined,
+    muiTableBodyRowProps: navigateOnRowClick || selectorFn ? muiTableBodyRowProps : undefined,
     muiTableContainerProps: tableContainerMaxHeight
       ? {
           sx: {
@@ -636,7 +636,7 @@ export const TableView = <T extends MRT_RowData>({
       const showSynonymAction = Boolean(tableRowAction && row.original.has_synonym)
       const showNoLocalityIndicator = Boolean(row.original.has_no_locality)
       const showRestrictionIndicator = Boolean(checkRowRestriction && checkRowRestriction(row.original))
-      const showBaseAction = Boolean(selectorFn) || !clickableRows
+      const showBaseAction = Boolean(selectorFn) || !navigateOnRowClick
 
       return (
         <Box className="row-actions-column">

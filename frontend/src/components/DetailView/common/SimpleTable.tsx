@@ -35,7 +35,7 @@ export const SimpleTable = <T extends MRT_RowData, ParentType extends MRT_RowDat
       idFieldName={idFieldName}
       url={url}
       isFetching={false}
-      clickableRows={mode.read}
+      navigateOnRowClick={mode.read}
       enableColumnFilterModes={true}
       paginationPlacement="bottom"
     />
