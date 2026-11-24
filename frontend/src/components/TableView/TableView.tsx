@@ -283,21 +283,18 @@ export const TableView = <T extends MRT_RowData>({
   const allowColumnFilterModes = (enableColumnFilterModes ?? true) && !serverSidePagination
 
   useEffect(() => {
-    if (serverSidePagination) {
-      setSqlLimit(pagination.pageSize)
-      setSqlOffset(pagination.pageIndex * pagination.pageSize)
+    if (!serverSidePagination) return
+    setSqlLimit(pagination.pageSize)
+    setSqlOffset(pagination.pageIndex * pagination.pageSize)
 
-      // only change sqlColumnFilters if the new ones differ, this avoids an infinite loop
-      const sanitizedFilters = sanitizeColumnFilters(columnFilters)
-      if (JSON.stringify(sqlColumnFilters) !== JSON.stringify(sanitizedFilters)) {
-        setSqlColumnFilters(sanitizedFilters)
-      }
-
-      setSqlColumnFilters(sanitizeColumnFilters(columnFilters))
-      setSqlOrderBy(sorting)
+    const sanitizedFilters = sanitizeColumnFilters(columnFilters)
+    if (JSON.stringify(sqlColumnFilters) !== JSON.stringify(sanitizedFilters)) {
+      setSqlColumnFilters(sanitizedFilters)
     }
+
+    setSqlOrderBy(sorting)
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [pagination, columnFilters, sqlColumnFilters, sorting])
+  }, [pagination, columnFilters, serverSidePagination, sqlColumnFilters, sorting])
 
   const safeJsonParse = (value: string): unknown => {
     try {
