@@ -59,7 +59,7 @@
     "jszip": "^3.10.1",
     "mariadb": "^3.3.0",
     "md5": "^2.3.0",
-    "nodemailer": "^9.0.5",
+    "nodemailer": "^10.0.5",
     "typescript": "^5.4.5"
   }
 }
