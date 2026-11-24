@@ -1,3 +1,5 @@
+import { PermissionDenied } from '@/components/PermissionDenied'
+import { useUser } from '@/hooks/user'
 import { fullRights, noRights } from '@/components/pages'
 import { ProjectDetails } from '@/components/Project/ProjectDetails'
 import { ProjectTable } from '@/components/Project/ProjectTable'
@@ -7,6 +9,9 @@ import { ProjectDetailsType, Role } from '@/shared/types'
 import { Page } from '../components/Page'
 
 export const ProjectPage = () => {
+  const user = useUser()
+  if (!user.username) return <PermissionDenied message="Please log in to view Projects." />
+
   return (
     <Page
       tableView={<ProjectTable />}

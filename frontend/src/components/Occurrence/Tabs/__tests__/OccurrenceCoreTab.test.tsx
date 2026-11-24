@@ -55,7 +55,7 @@ describe('OccurrenceCoreTab', () => {
 
     render(
       <MemoryRouter>
-        <OccurrenceCoreTab />
+        <OccurrenceCoreTab existingLocalitySpecies={[]} />
       </MemoryRouter>
     )
 
@@ -88,7 +88,7 @@ describe('OccurrenceCoreTab', () => {
 
     render(
       <MemoryRouter>
-        <OccurrenceCoreTab />
+        <OccurrenceCoreTab existingLocalitySpecies={[]} />
       </MemoryRouter>
     )
 

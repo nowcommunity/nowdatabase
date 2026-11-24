@@ -31,7 +31,7 @@ The **EditRestricted** role is enforced in the backend for specific write operat
 - Creating or updating a locality requires the **Admin**, **EditUnrestricted**, or **EditRestricted** roles.
 - Deleting a locality requires the **Admin** or **EditUnrestricted** roles.
 
-NOTE: Users with the **EditRestricted** role can only create or update localities that belong to the same project as the user. Otherwise, they have reading rights only.
+NOTE: Users with the **EditRestricted** role can update an existing locality when at least one of the projects linked to it has the user as a member. If the user removes the last project that gives them access, the save succeeds (after a confirmation warning) and the user loses edit rights to that locality. An EditRestricted user cannot unlink a project they are not a member of. Creating a locality requires all selected projects to be the user's own. Otherwise, they have reading rights only.
 When creating a new locality, EditRestricted users can only select projects where they are a member.
 Users with the **EditUnrestricted** role are not limited by project membership when creating or updating localities.
 
@@ -91,15 +91,14 @@ NOTE: Users with the **EditRestricted** role can only update occurrences that re
 
 ## Project
 
-- Any user can get a list of Projects.
+- Logged-in users can get a list of Projects. Non-logged-in users cannot (403), and the Projects navigation link and page are hidden from them.
 - Viewing project details requires the **Admin** role.
 - Creating or updating a Project requires the **Admin** role.
 - Deleting a Project requires the **Admin** role.
 
 ## Museum
 
-- Any user can get a list of museums.
-- Any user can view the details of a Museum.
+- Logged-in users can get a list of museums and view the details of a Museum. Non-logged-in users cannot (403), and the Museums navigation link and page are hidden from them.
 - Creating or updating a Museum requires the **Admin**, **EditUnrestricted**, or **EditRestricted** roles.
 
 ## Sedimentary Structure
@@ -118,6 +117,7 @@ NOTE: Users with the **EditRestricted** role can only update occurrences that re
 | EditUnrestricted | ALL      | ALL     | ALL        | ALL        | ALL         | X       | X\*\*\* | R\*\*    | ALL     | ALL                    | C             |
 | EditRestricted   | CRU      | CRU     | CRU        | R          | R           | X       | X\*\*\* | R\*\*    | CRU     | R                      | C             |
 | ReadOnly         | R        | R       | R          | R          | R           | X       | X\*\*\* | R\*\*    | R       | R                      | C             |
+| Not logged in    | R        | R       | R          | R          | X           | X       | X       | X        | X       | R                      | C             |
 
 C = Create
 
@@ -133,7 +133,7 @@ ALL = All rights
 
 \* = Requires a Project association
 
-\*\* = Any user can view a list of projects, but viewing the details of a project requires the **Admin** role.
+\*\* = Any logged-in user can view a list of projects, but viewing the details of a project requires the **Admin** role.
 
 \*\*\* = Users can only get their information.
 

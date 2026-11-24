@@ -144,7 +144,7 @@ describe('Museum e2e flows', () => {
   it('links an existing museum to a locality and saves the locality', () => {
     cy.intercept('PUT', '**/locality').as('saveLocality')
 
-    cy.visit('/locality/20920?tab=9')
+    cy.visit('/locality/20920?tab=8')
     cy.get('[id=edit-button]').click()
 
     cy.contains('Select Museum').click()
@@ -157,7 +157,7 @@ describe('Museum e2e flows', () => {
     cy.addReferenceAndSave()
     cy.wait('@saveLocality').its('response.statusCode').should('eq', 200)
 
-    cy.visit('/locality/20920?tab=9')
+    cy.visit('/locality/20920?tab=8')
     cy.contains(seedMuseum.institution).should('be.visible')
   })
 
@@ -170,7 +170,7 @@ describe('Museum e2e flows', () => {
     cy.intercept('PUT', '**/museum').as('saveMuseum')
     cy.intercept('PUT', '**/locality').as('saveLocality')
 
-    cy.visit('/locality/20920?tab=9')
+    cy.visit('/locality/20920?tab=8')
     cy.get('[id=edit-button]').click()
 
     cy.contains('Create Museum').click()
@@ -185,7 +185,7 @@ describe('Museum e2e flows', () => {
     cy.addReferenceAndSave()
     cy.wait('@saveLocality').its('response.statusCode').should('eq', 200)
 
-    cy.visit('/locality/20920?tab=9')
+    cy.visit('/locality/20920?tab=8')
     cy.contains(institution).should('be.visible')
   })
 })

@@ -1,10 +1,20 @@
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline'
-import { Box, IconButton, InputAdornment, MenuItem, TextField, Tooltip } from '@mui/material'
+import {
+  Alert,
+  Box,
+  Checkbox,
+  FormControlLabel,
+  IconButton,
+  InputAdornment,
+  MenuItem,
+  TextField,
+  Tooltip,
+} from '@mui/material'
 import { EditingModal } from './EditingModal'
 import { useForm } from 'react-hook-form'
 import { Editable, EditDataType } from '@/shared/types'
 import { useDetailContext } from '../Context/DetailContext'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { getFieldInfoText } from '@/shared/fieldInfo'
 
 export type EditingFormSelectOption = { value: string | number; label: string }
@@ -13,8 +23,14 @@ export type EditingFormField = {
   name: string
   label: string
   required?: boolean
+  requiredMessage?: string
   type?: 'number' | 'string'
   selectOptions?: EditingFormSelectOption[]
+}
+
+export type EditingFormConfirmation = {
+  key: string
+  message: string
 }
 
 /* 
@@ -36,15 +52,17 @@ export const EditingForm = <T extends object, ParentType extends object>({
   arrayFieldName,
   replacedValues,
   copyTaxonomyButton,
+  getConfirmation,
 }: {
   dataCy?: string
   buttonText: string
   formFields: EditingFormField[]
   arrayFieldName?: keyof ParentType
-  editAction?: (newObject: T) => void
+  editAction?: (newObject: T) => void | boolean
   existingObject?: T | undefined
   replacedValues?: T | undefined
   copyTaxonomyButton?: JSX.Element | undefined
+  getConfirmation?: (values: T) => EditingFormConfirmation | undefined
 }) => {
   const buildDefaultValues = (values?: T) => {
     const defaults = (values ? { ...values } : {}) as Record<string, unknown>
@@ -59,9 +77,12 @@ export const EditingForm = <T extends object, ParentType extends object>({
   }
 
   const defaultValues = buildDefaultValues(existingObject)
-  const { register, trigger, formState, getValues, reset } = useForm({ defaultValues, shouldUnregister: true })
+  const { register, trigger, formState, getValues, reset, watch } = useForm({ defaultValues, shouldUnregister: true })
   const { errors } = formState
   const { editData, setEditData } = useDetailContext<ParentType>()
+  const [acknowledgedConfirmationKey, setAcknowledgedConfirmationKey] = useState<string>()
+  const confirmation = getConfirmation?.(watch() as T)
+  const needsConfirmation = confirmation !== undefined && acknowledgedConfirmationKey !== confirmation.key
 
   useEffect(() => {
     if (replacedValues) reset(buildDefaultValues(replacedValues))
@@ -72,20 +93,39 @@ export const EditingForm = <T extends object, ParentType extends object>({
     const result = await trigger()
     if (!result) return false
     const values = getValues()
+    const currentConfirmation = getConfirmation?.(values as T)
+    if (currentConfirmation && acknowledgedConfirmationKey !== currentConfirmation.key) return false
     const newObject: Editable<T> = { ...(values as T), rowState: 'new' }
+    if (editAction?.(newObject) === false) return false
     if (arrayFieldName)
       setEditData({
         ...editData,
         [arrayFieldName]: [...(editData[arrayFieldName as keyof EditDataType<ParentType>] as Array<T>), newObject],
       })
-    if (editAction) editAction(newObject)
     reset(buildDefaultValues(existingObject))
+    setAcknowledgedConfirmationKey(undefined)
     return true
   }
 
   return (
-    <EditingModal {...{ dataCy, buttonText, onSave }}>
+    <EditingModal {...{ dataCy, buttonText, onSave }} saveDisabled={needsConfirmation}>
       <Box sx={{ display: 'flex', flexDirection: 'column', gap: '1em' }}>
+        {confirmation && (
+          <Alert severity="warning" sx={{ whiteSpace: 'pre-line' }}>
+            {confirmation.message}
+            <FormControlLabel
+              control={
+                <Checkbox
+                  checked={!needsConfirmation}
+                  onChange={event => {
+                    setAcknowledgedConfirmationKey(event.target.checked ? confirmation.key : undefined)
+                  }}
+                />
+              }
+              label="I understand and want to continue."
+            />
+          </Alert>
+        )}
         {copyTaxonomyButton}
         {formFields.map(field => {
           const fieldInfo = getFieldInfoText(field.name)
@@ -117,7 +157,7 @@ export const EditingForm = <T extends object, ParentType extends object>({
               select={!!field.selectOptions}
               defaultValue={defaultValues[field.name] ?? (field.selectOptions ? '' : undefined)}
               {...register(field.name, {
-                required: field.required ? 'This field is required' : false,
+                required: field.required ? field.requiredMessage ?? 'This field is required' : false,
                 ...(field.type === 'number' &&
                   !field.selectOptions && {
                     pattern: { value: /^(0|[1-9]\d*)(\.\d+)?$/, message: 'Value must be a valid number' },

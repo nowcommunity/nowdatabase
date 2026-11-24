@@ -43,6 +43,42 @@ describe('Creating new reference works', () => {
     expect(journal_id).toBeDefined()
   })
 
+  it('Renumbers the replacement author when all existing authors are removed', async () => {
+    const removedAuthors = createdRef!.ref_authors.map(author => ({ ...author, rowState: 'removed' as const }))
+    const replacementAuthor = {
+      ...createdRef!.ref_authors[0],
+      au_num: removedAuthors.length + 1,
+      author_surname: 'replacement author',
+      rowState: 'new' as const,
+    }
+
+    const { status } = await send<{ rid: number }>('reference/', 'PUT', {
+      reference: {
+        ...createdRef,
+        ref_type_id: 2,
+        ref_authors: [...removedAuthors, replacementAuthor],
+        ref_journal: { ...createdRef!.ref_journal, rowState: 'removed' },
+      },
+    })
+    expect(status).toEqual(200)
+
+    const { body: updatedReference } = await send<ReferenceDetailsType>(`reference/${createdRef!.rid}`, 'GET')
+    expect(updatedReference.ref_authors).toHaveLength(1)
+    expect(updatedReference.ref_authors[0]).toMatchObject({
+      au_num: 1,
+      author_surname: 'replacement author',
+    })
+
+    const { body: references } = await send<
+      Array<{ rid: number; ref_authors: Array<{ au_num: number; author_surname: string }> }>
+    >('reference/all', 'GET')
+    const listedReference = references.find(reference => reference.rid === createdRef!.rid)
+    expect(listedReference?.ref_authors[0]).toMatchObject({
+      au_num: 1,
+      author_surname: 'replacement author',
+    })
+  })
+
   it('Adding "removed" in rowstate of authors & journal deletes author and clear journal data from reference', async () => {
     const { status: getReqStatus } = await send<{ rid: number }>(`reference/`, 'PUT', {
       reference: {

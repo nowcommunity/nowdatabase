@@ -5,6 +5,8 @@ import Prisma from '../../../prisma/generated/now_test_client'
 
 export const writeReferenceAuthors = async (rid: number, authors: EditDataType<FixBigInt<ReferenceAuthorType>>[]) => {
   const allowedColumns = getFieldsOfTables(['ref_authors'])
+  const authorNumbersByField = new Map<number | undefined, number>()
+
   //transaction so if adding a new author fails later on the deleted authors aren't lost
   await nowDb.$transaction(async prisma => {
     // All previous authors are deleted before inserting new ones. Check documentation for why this is
@@ -13,7 +15,10 @@ export const writeReferenceAuthors = async (rid: number, authors: EditDataType<F
     })
 
     for (const author of authors) {
-      const filteredAuthor = filterAllowedKeys(author, allowedColumns) as FixBigInt<Prisma.ref_authors>
+      const au_num = (authorNumbersByField.get(author.field_id) ?? 0) + 1
+      authorNumbersByField.set(author.field_id, au_num)
+
+      const filteredAuthor = filterAllowedKeys({ ...author, au_num }, allowedColumns) as FixBigInt<Prisma.ref_authors>
 
       await prisma.ref_authors.create({
         data: {

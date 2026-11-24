@@ -67,6 +67,28 @@ export const writeReference = async (reference: EditDataType<ReferenceDetailsTyp
   return referenceId
 }
 
+type ReferenceCountClient = Pick<typeof nowDb, 'now_lr' | 'now_sr' | 'now_br' | 'now_tr' | 'now_tur'>
+
+export const getReferenceDeleteStatus = async (rid: number, client: ReferenceCountClient = nowDb) => {
+  const [localities, species, timeBounds, timeUnits, timeUnitBounds] = await Promise.all([
+    client.now_lr.count({ where: { rid } }),
+    client.now_sr.count({ where: { rid } }),
+    client.now_br.count({ where: { rid } }),
+    client.now_tr.count({ where: { rid } }),
+    client.now_tur.count({ where: { rid } }),
+  ])
+
+  const linkedEntities = [
+    localities > 0 ? 'Localities' : null,
+    species > 0 ? 'Species' : null,
+    timeBounds > 0 ? 'Time Bounds' : null,
+    timeUnits > 0 ? 'Time Units' : null,
+    timeUnitBounds > 0 ? 'Time Unit Bounds' : null,
+  ].filter((entity): entity is string => entity !== null)
+
+  return { canDelete: linkedEntities.length === 0, linkedEntities }
+}
+
 export const deleteReference = async (rid: number) => {
   const reference = (await getReferenceDetails(rid)) as EditDataType<FixBigInt<Prisma.ref_ref>>
 
@@ -74,17 +96,9 @@ export const deleteReference = async (rid: number) => {
 
   try {
     await nowDb.$transaction(async prisma => {
-      const linkedUpdateCounts = await Promise.all([
-        prisma.now_lr.count({ where: { rid } }),
-        prisma.now_sr.count({ where: { rid } }),
-        prisma.now_br.count({ where: { rid } }),
-        prisma.now_tr.count({ where: { rid } }),
-        prisma.now_tur.count({ where: { rid } }),
-      ])
+      const { canDelete } = await getReferenceDeleteStatus(rid, prisma)
 
-      const hasLinkedUpdates = linkedUpdateCounts.some(count => count > 0)
-
-      if (hasLinkedUpdates) {
+      if (!canDelete) {
         throw new ConflictError(REFERENCE_HAS_UPDATES_ERROR_MESSAGE)
       }
 

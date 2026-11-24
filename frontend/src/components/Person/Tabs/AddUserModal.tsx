@@ -46,13 +46,19 @@ const UserPasswordInput = ({ onChange, value }: { onChange: (value: string) => v
 
   const randomPassword = () => {
     const passwordLength = 14
-    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789^?$%&~!'
-    let result: string = ''
+    const groups = ['abcdefghijklmnopqrstuvwxyz', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', '0123456789', '^?$%&~!']
+    const all = groups.join('')
+    const randomInt = (max: number) => crypto.getRandomValues(new Uint32Array(1))[0] % max
+    const chars = groups.map(group => group.charAt(randomInt(group.length)))
 
-    for (let i = 0; i < passwordLength; i++) {
-      result += characters.charAt(Math.floor(Math.random() * characters.length))
+    while (chars.length < passwordLength) {
+      chars.push(all.charAt(randomInt(all.length)))
     }
-    onChange(result)
+    for (let i = chars.length - 1; i > 0; i--) {
+      const j = randomInt(i + 1)
+      ;[chars[i], chars[j]] = [chars[j], chars[i]]
+    }
+    onChange(chars.join(''))
   }
 
   return (

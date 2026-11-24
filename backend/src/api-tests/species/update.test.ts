@@ -20,6 +20,15 @@ describe('Updating species works', () => {
     await pool.end()
   })
 
+  it('Update fails when Unique Identifier is empty', async () => {
+    const result = await send<{ name: string; error: string }[]>('species', 'PUT', {
+      species: { ...editedSpecies, unique_identifier: '' },
+    })
+
+    expect(result.status).toEqual(403)
+    expect(result.body.some(error => error.name === 'Unique Identifier')).toBe(true)
+  })
+
   describe('after updating species successfully', () => {
     beforeEach(async () => {
       const writeResult = await send<{ species_id: number }>('species', 'PUT', { species: editedSpecies })

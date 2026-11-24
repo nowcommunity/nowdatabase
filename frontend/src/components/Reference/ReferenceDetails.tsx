@@ -9,6 +9,7 @@ import {
   useGetReferenceDetailsQuery,
   useDeleteReferenceMutation,
   useGetReferenceTypesQuery,
+  useGetReferenceCanDeleteQuery,
 } from '@/redux/referenceReducer'
 import { EditDataType, ReferenceDetailsType } from '@/shared/types'
 import { emptyReference } from '../DetailView/common/defaultValues'
@@ -61,6 +62,9 @@ export const ReferenceDetails = ({
   const { notify } = useNotify()
   const navigate = useNavigate()
   const { fallbackTarget } = useReturnNavigation({ fallback: '/reference' })
+  const { data: deleteStatus, isError: deleteStatusError } = useGetReferenceCanDeleteQuery(parseInt(id!), {
+    skip: isNew,
+  })
   const { data: referenceTypes } = useGetReferenceTypesQuery()
 
   const referenceFieldDisplayLabelMap = useMemo(() => {
@@ -121,6 +125,11 @@ export const ReferenceDetails = ({
     }
   }
 
+  const deleteDisabled = !isNew && !deleteStatusError && !deleteStatus?.canDelete
+  const deleteDisabledReason = deleteStatus?.linkedEntities.length
+    ? `This reference cannot be deleted because it is linked to: ${deleteStatus.linkedEntities.join(', ')}.`
+    : undefined
+
   const tabs: TabType[] = [
     {
       title: 'Reference',
@@ -145,6 +154,8 @@ export const ReferenceDetails = ({
       validator={referenceValidator}
       validateFields={validateReferenceFields}
       deleteFunction={deleteFunction}
+      deleteDisabled={deleteDisabled}
+      deleteDisabledReason={deleteDisabledReason}
       wrapWithUnsavedChangesProvider={wrapWithUnsavedChangesProvider}
     />
   )

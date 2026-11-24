@@ -75,6 +75,33 @@ describe('Getting cross-search data', () => {
       expect(body.every(row => row.country === 'Spain')).toBe(true)
     })
 
+    it('POST all rejects injected column and sorting ids', async () => {
+      const invalidFilter = await send(`crosssearch/all`, 'POST', {
+        columnFilters: [{ id: "country' OR 1=1 --", value: 'Spain' }],
+        sorting: [],
+      })
+      expect(invalidFilter.status).toEqual(403)
+      expect(invalidFilter.body).toEqual({ error: 'columnFilters has an invalid column id.' })
+
+      const invalidSorting = await send(`crosssearch/all`, 'POST', {
+        columnFilters: [],
+        sorting: [{ id: "country' OR 1=1 --", desc: false }],
+      })
+      expect(invalidSorting.status).toEqual(403)
+      expect(invalidSorting.body).toEqual({ error: 'orderBy was not a valid column id.' })
+    })
+
+    it('POST all treats SQL-like filter values as data', async () => {
+      const { body, status } = await send<CrossSearch[]>(`crosssearch/all`, 'POST', {
+        limit: 20,
+        offset: 0,
+        columnFilters: [{ id: 'country', value: "' OR 1=1 --" }],
+        sorting: [],
+      })
+      expect(status).toEqual(200)
+      expect(body).toHaveLength(0)
+    })
+
     it('Requesting get all with column filters has correct data', async () => {
       const { body: responseBody1, status: responseStatus1 } = await send<CrossSearch[]>(
         `crosssearch/all/20/0/[{"id": "lid_now_loc", "value": "21050"}]/[]`,
@@ -155,6 +182,31 @@ describe('Getting cross-search data', () => {
       expect(status).toEqual(200)
       expect(body.length).toBeGreaterThan(0)
       expect(body).toEqual(legacyResponse.body)
+    })
+
+    it('POST localities rejects injected column and sorting ids', async () => {
+      const invalidFilter = await send(`crosssearch/localities`, 'POST', {
+        columnFilters: [{ id: "country' OR 1=1 --", value: 'Spain' }],
+        sorting: [],
+      })
+      expect(invalidFilter.status).toEqual(403)
+      expect(invalidFilter.body).toEqual({ error: 'columnFilters has an invalid column id.' })
+
+      const invalidSorting = await send(`crosssearch/localities`, 'POST', {
+        columnFilters: [],
+        sorting: [{ id: "country' OR 1=1 --", desc: false }],
+      })
+      expect(invalidSorting.status).toEqual(403)
+      expect(invalidSorting.body).toEqual({ error: 'orderBy was not a valid column id.' })
+    })
+
+    it('POST localities treats SQL-like filter values as data', async () => {
+      const { body, status } = await send(`crosssearch/localities`, 'POST', {
+        columnFilters: [{ id: 'country', value: "' OR 1=1 --" }],
+        sorting: [],
+      })
+      expect(status).toEqual(200)
+      expect(body).toEqual([])
     })
 
     it('Requesting get all with column filtering does not allow invalid arrays or column names', async () => {

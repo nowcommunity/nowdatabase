@@ -1,21 +1,24 @@
-import { lazy, Suspense, useMemo } from 'react'
-import { type MRT_ColumnDef, type MRT_RowData, type MRT_TableInstance } from 'material-react-table'
-import { CrossSearch, formatDevelopmentalCrownType } from '@/shared/types'
-import { TableView } from '../TableView/TableView'
-import type { ColumnVisibilityGroup } from '../TableView/TableToolBar'
-import { useGetAllCrossSearchQuery, useGetAllCrossSearchLocalitiesQuery } from '@/redux/crossSearchReducer'
-import { usePageContext } from '../Page'
-import { formatWithMaxThreeDecimals } from '@/util/numberFormatting'
-import { occurrenceLabels } from '@/constants/occurrenceLabels'
-import { OccurrenceDwcExportMenuItem } from '@/components/Occurrence/OccurrenceDwcExportMenuItem'
 import { OccurrenceDwcDpExportMenuItem } from '@/components/Occurrence/OccurrenceDwcDpExportMenuItem'
+import { OccurrenceDwcExportMenuItem } from '@/components/Occurrence/OccurrenceDwcExportMenuItem'
 import { OccurrenceFullDarwinCoreExportMenuItem } from '@/components/Occurrence/OccurrenceFullDarwinCoreExportMenuItem'
-import { matchesCountryOrContinent } from '@/shared/validators/countryContinents'
 import {
   exportOccurrenceMapKml,
   exportOccurrenceMapSvg,
-  getUniqueCrossSearchMapExportLocalities,
+  MapExportLocality,
+  toMapExportLocality,
 } from '@/components/Species/localitySpeciesMapExport'
+import { occurrenceLabels } from '@/constants/occurrenceLabels'
+import { useGetAllCrossSearchLocalitiesQuery, useGetAllCrossSearchQuery } from '@/redux/crossSearchReducer'
+import { CrossSearch, formatDevelopmentalCrownType } from '@/shared/types'
+import { matchesCountryOrContinent } from '@/shared/validators/countryContinents'
+import { formatWithMaxThreeDecimals } from '@/util/numberFormatting'
+import { CircularProgress } from '@mui/material'
+import { type MRT_ColumnDef } from 'material-react-table'
+import { lazy, Suspense, useMemo } from 'react'
+import { usePageContext } from '../Page'
+import type { ColumnVisibilityGroup } from '../TableView/TableToolBar'
+import { TableView } from '../TableView/TableView'
+import { useNotify } from '@/hooks/notification'
 
 const LocalitiesMap = lazy(async () => {
   const module = await import('../Map/LocalitiesMap')
@@ -40,6 +43,7 @@ export const CrossSearchTable = ({ selectorFn }: { selectorFn?: (newObject: Cros
     columnFilters: sqlColumnFilters,
     sorting: sqlOrderBy,
   })
+  const { notify } = useNotify()
 
   // Show/Hide columns in the following order
   const columns = useMemo<MRT_ColumnDef<CrossSearch>[]>(
@@ -426,6 +430,7 @@ export const CrossSearchTable = ({ selectorFn }: { selectorFn?: (newObject: Cros
         accessorFn: row => row.unique_identifier || '',
         header: 'Unique Identifier',
         size: 20,
+        enableHiding: false,
         filterFn: 'contains',
       },
       {
@@ -869,7 +874,7 @@ export const CrossSearchTable = ({ selectorFn }: { selectorFn?: (newObject: Cros
     suborder_or_superfamily_name: false,
     family_name: false,
     subfamily_name: false,
-    unique_identifier: false,
+    unique_identifier: true,
     taxonomic_status: false,
     orig_entry: false,
     source_name: false,
@@ -1077,21 +1082,28 @@ export const CrossSearchTable = ({ selectorFn }: { selectorFn?: (newObject: Cros
     []
   )
 
+  if (!localitiesData) return <CircularProgress />
+
   const checkRowRestriction = (row: CrossSearch) => {
     return !!row.loc_status
   }
 
-  const getExportLocalities = <T extends MRT_RowData>(table: MRT_TableInstance<T>) => {
-    const rows = table.getPrePaginationRowModel().rows.map(row => row.original as unknown as CrossSearch)
-    return getUniqueCrossSearchMapExportLocalities(rows)
+  const kmlExport = () => {
+    const exportedLocalities = localitiesData.map(loc => toMapExportLocality(loc))
+    if (exportedLocalities.filter(loc => loc === null).length > 0) {
+      notify('Some localities failed to export, aborting.', 'error', 5)
+      return
+    }
+    exportOccurrenceMapKml('occurrences', exportedLocalities as MapExportLocality[])
   }
 
-  const kmlExport = <T extends MRT_RowData>(table: MRT_TableInstance<T>) => {
-    exportOccurrenceMapKml(table, 'occurrences', getExportLocalities)
-  }
-
-  const svgExport = async <T extends MRT_RowData>(table: MRT_TableInstance<T>) => {
-    await exportOccurrenceMapSvg(table, 'occurrences-map', getExportLocalities)
+  const svgExport = async () => {
+    const exportedLocalities = localitiesData.map(loc => toMapExportLocality(loc))
+    if (exportedLocalities.filter(loc => loc === null).length > 0) {
+      notify('Some localities failed to export, aborting.', 'error', 5)
+      return
+    }
+    await exportOccurrenceMapSvg('occurrences-map', exportedLocalities as MapExportLocality[])
   }
 
   return (
@@ -1114,6 +1126,7 @@ export const CrossSearchTable = ({ selectorFn }: { selectorFn?: (newObject: Cros
         enableColumnFilterModes={true}
         serverSidePagination={true}
         isCrossSearchTable={true}
+        showNewButton={false}
         kmlExport={kmlExport}
         svgExport={svgExport}
         isError={isError}

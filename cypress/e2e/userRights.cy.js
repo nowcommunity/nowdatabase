@@ -10,9 +10,14 @@ describe('Broadly test what different user rights see', () => {
 
     it('Sees new button in tableviews', () => {
       cy.visit('/locality')
-      cy.contains('New').click()
+      cy.get('#new-button').click()
       cy.contains('Time Unit')
       cy.contains('Creating new locality')
+    })
+
+    it('Does not see new button in Occurrence tableview', () => {
+      cy.visit('/occurrence')
+      cy.get('#new-button').should('not.exist')
     })
 
     it('Regions view shows correctly', () => {
@@ -162,6 +167,14 @@ describe('Broadly test what different user rights see', () => {
     it('Direct routes to protected views do not work', () => {
       cy.pageForbidden('/region')
       cy.pageForbidden('/time-bound')
+      cy.pageForbidden('/museum')
+      cy.pageForbidden('/museum/1')
+      cy.pageForbidden('/project')
+    })
+
+    it('Does not see museums and projects in navbar', () => {
+      cy.contains('Museums').should('not.exist')
+      cy.contains('Projects').should('not.exist')
     })
 
     it('Direct route to project details does not work', () => {

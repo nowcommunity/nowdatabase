@@ -143,7 +143,13 @@ describe('BasisForAgeSelection', () => {
   })
 })
 
-const NumberInputWrapper = ({ handleSetEditData }: { handleSetEditData?: (value: number | string) => void }) => {
+const NumberInputWrapper = ({
+  handleSetEditData,
+  integerOnly = false,
+}: {
+  handleSetEditData?: (value: number | string) => void
+  integerOnly?: boolean
+}) => {
   const initialEditData = { min_age: '' } as unknown as EditDataType<LocalityDetailsType>
   const [editData, setEditData] = useState<EditDataType<LocalityDetailsType>>(initialEditData)
 
@@ -160,7 +166,16 @@ const NumberInputWrapper = ({ handleSetEditData }: { handleSetEditData?: (value:
     dropdown: () => <></>,
     dropdownWithSearch: () => <></>,
     radioSelection: () => <></>,
-    validator: () => ({ name: '', error: null }),
+    validator: (currentEditData, field) => {
+      if (
+        field === 'min_age' &&
+        typeof currentEditData.min_age === 'number' &&
+        !Number.isInteger(currentEditData.min_age)
+      ) {
+        return { name: 'Minimum age', error: 'Minimum age must be a whole number.' }
+      }
+      return { name: '', error: null }
+    },
     fieldsWithErrors: {},
     setFieldsWithErrors: () => undefined,
   }
@@ -168,7 +183,13 @@ const NumberInputWrapper = ({ handleSetEditData }: { handleSetEditData?: (value:
   return (
     <DetailContext.Provider value={contextValue as DetailContextType<unknown>}>
       <div data-testid="min-age">{String(editData.min_age ?? '')}</div>
-      <EditableTextField<LocalityDetailsType> field="min_age" type="number" handleSetEditData={handleSetEditData} />
+      <EditableTextField<LocalityDetailsType>
+        field="min_age"
+        type="number"
+        integerOnly={integerOnly}
+        min={integerOnly ? 1 : undefined}
+        handleSetEditData={handleSetEditData}
+      />
     </DetailContext.Provider>
   )
 }
@@ -194,6 +215,18 @@ describe('EditableTextField (number)', () => {
 
     expect(input.value).toBe('-1.5')
     expect(screen.getByTestId('min-age').textContent).toBe('-1.5')
+  })
+
+  it('keeps decimal input in integer-only fields visible and reports it as invalid', async () => {
+    const user = userEvent.setup()
+    render(<NumberInputWrapper integerOnly />)
+
+    const input = screen.getByRole<HTMLInputElement>('spinbutton')
+    await user.type(input, '0.5')
+
+    expect(input.value).toBe('0.5')
+    expect(screen.getByTestId('min-age').textContent).toBe('0.5')
+    expect(screen.getByText('Minimum age must be a whole number.')).toBeTruthy()
   })
 
   it('calls handleSetEditData only with numbers or empty string', async () => {

@@ -10,10 +10,7 @@ import { SynonymsModal } from '../SynonymsModal'
 import { useMemo, useState } from 'react'
 import { taxonStatusOptions } from '@/shared/taxonStatusOptions'
 import { TaxonomySuggestionField } from '../TaxonomySuggestionField'
-import {
-  buildTaxonomySuggestionOptions,
-  TaxonomySuggestionField as TaxonomySuggestionFieldName,
-} from '../taxonomySuggestions'
+import { buildTaxonomySuggestionOptions, TaxonomySuggestionFieldName } from '../taxonomySuggestions'
 
 export const TaxonomyTab = () => {
   const { textField, dropdown, bigTextField, editData, setEditData, mode } = useDetailContext<SpeciesDetailsType>()

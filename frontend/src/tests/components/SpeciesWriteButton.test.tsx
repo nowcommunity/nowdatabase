@@ -44,7 +44,9 @@ const mockCheckSpeciesTaxonomy = checkSpeciesTaxonomy as jest.MockedFunction<typ
 const mockUseUser = useUser as jest.MockedFunction<typeof useUser>
 
 const modeEdit = { read: false, staging: false, new: false, option: 'edit' as const }
+const modeNew = { read: false, staging: false, new: true, option: 'new' as const }
 const modeStagingEdit = { read: false, staging: true, new: false, option: 'staging-edit' as const }
+const modeStagingNew = { read: false, staging: true, new: true, option: 'staging-new' as const }
 
 const textField: DetailContextType<Species>['textField'] = () => <span />
 const bigTextField: DetailContextType<Species>['bigTextField'] = () => <span />
@@ -102,7 +104,8 @@ const baseSpecies: Species = {
 const renderButton = (
   editData: EditDataType<Species>,
   onWrite = jest.fn(() => Promise.resolve()),
-  overrides?: Partial<DetailContextType<Species>>
+  overrides?: Partial<DetailContextType<Species>>,
+  buttonProps: { taxonomy?: boolean; hasStagingMode?: boolean } = { taxonomy: true }
 ) => {
   mockUseDetailContext.mockReturnValue({
     data: baseSpecies,
@@ -126,10 +129,12 @@ const renderButton = (
   mockUseGetAllSpeciesQuery.mockReturnValue({ data: [baseSpecies] } as never)
   mockUseGetAllSynonymsQuery.mockReturnValue({ data: [] } as never)
 
-  return render(<WriteButton onWrite={onWrite} taxonomy />)
+  return render(
+    <WriteButton onWrite={onWrite} taxonomy={buttonProps.taxonomy} hasStagingMode={buttonProps.hasStagingMode} />
+  )
 }
 
-describe('WriteButton taxonomy handling', () => {
+describe('WriteButton behavior', () => {
   beforeEach(() => {
     jest.clearAllMocks()
     const mockUser: UserState = {
@@ -167,10 +172,141 @@ describe('WriteButton taxonomy handling', () => {
     fireEvent.click(screen.getByRole('button', { name: /save changes/i }))
 
     await waitFor(() => {
-      expect(mockCheckSpeciesTaxonomy).toHaveBeenCalledTimes(1)
+      expect(mockCheckSpeciesTaxonomy).toHaveBeenCalled()
     })
     expect(onWrite).not.toHaveBeenCalled()
     expect(mockNotify).toHaveBeenCalledWith(expect.stringContaining('taxon already exists'), 'error', null)
+  })
+
+  it('allows administrators to save species with a taxonomy hierarchy mismatch', async () => {
+    const onWrite = jest.fn(() => Promise.resolve())
+    mockCheckSpeciesTaxonomy.mockReturnValue(new Set())
+
+    renderButton({ ...baseSpecies, family_name: 'Canidae' } as EditDataType<Species>, onWrite)
+
+    fireEvent.click(screen.getByRole('button', { name: /save changes/i }))
+
+    await waitFor(() => {
+      expect(onWrite).toHaveBeenCalledTimes(1)
+    })
+    expect(mockCheckSpeciesTaxonomy).toHaveBeenCalledWith(expect.any(Object), expect.any(Array), expect.any(Array), {
+      allowTaxonomyHierarchyMismatch: true,
+    })
+  })
+
+  it('requires admins to acknowledge a taxonomy mismatch before finalizing a new species', async () => {
+    const setMode = jest.fn()
+    const onWrite = jest.fn(() => Promise.resolve())
+    mockCheckSpeciesTaxonomy.mockImplementation((_species, _existingSpecies, _synonyms, options) => {
+      options?.onTaxonomyHierarchyMismatch?.(['Subfamily Caninae belongs to family Canidae, not Felidae.'])
+      return new Set()
+    })
+
+    renderButton(
+      { ...baseSpecies, family_name: 'Canidae' } as EditDataType<Species>,
+      onWrite,
+      { mode: modeNew, setMode },
+      { taxonomy: true, hasStagingMode: true }
+    )
+
+    const finalizeButton = screen.getByRole('button', { name: /finalize entry/i })
+    expect((finalizeButton as HTMLButtonElement).disabled).toBe(true)
+    expect(screen.getByText(/Subfamily Caninae belongs to family Canidae, not Felidae/i)).toBeTruthy()
+
+    fireEvent.click(screen.getByRole('checkbox', { name: /i understand and want to continue/i }))
+
+    await waitFor(() => {
+      expect((finalizeButton as HTMLButtonElement).disabled).toBe(false)
+    })
+    expect(screen.getByText(/Subfamily Caninae belongs to family Canidae, not Felidae/i)).toBeTruthy()
+    expect(screen.getByRole('checkbox')).toHaveProperty('checked', true)
+
+    fireEvent.click(finalizeButton)
+    await waitFor(() => {
+      expect(setMode).toHaveBeenCalledWith('staging-new')
+    })
+    expect(onWrite).not.toHaveBeenCalled()
+  })
+
+  it('rechecks and requires acknowledgement when only taxonomic status changes', () => {
+    const onWrite = jest.fn(() => Promise.resolve())
+    mockCheckSpeciesTaxonomy.mockImplementation((_species, _existingSpecies, _synonyms, options) => {
+      options?.onTaxonomyHierarchyMismatch?.(['Family Felidae belongs to order Carnivora, not Rodentia.'])
+      return new Set()
+    })
+    const view = renderButton(baseSpecies, onWrite)
+    expect(screen.queryByText(/Family Felidae belongs/)).toBeNull()
+
+    const context = mockUseDetailContext()
+    mockUseDetailContext.mockReturnValue({
+      ...context,
+      editData: { ...baseSpecies, taxonomic_status: 'informal species' },
+    })
+    view.rerender(<WriteButton onWrite={onWrite} taxonomy />)
+    expect(screen.getByText(/Family Felidae belongs/)).toBeTruthy()
+    expect(screen.getByRole('button', { name: /save changes/i })).toHaveProperty('disabled', true)
+    fireEvent.click(screen.getByRole('checkbox', { name: /i understand and want to continue/i }))
+    expect(screen.getByRole('button', { name: /save changes/i })).toHaveProperty('disabled', false)
+
+    mockUseDetailContext.mockReturnValue({
+      ...context,
+      editData: { ...baseSpecies, taxonomic_status: 'nomen dubium' },
+    })
+    view.rerender(<WriteButton onWrite={onWrite} taxonomy />)
+    expect(screen.getByRole('button', { name: /save changes/i })).toHaveProperty('disabled', true)
+  })
+
+  it('omits synonyms during the live preview but checks them when saving', async () => {
+    const onWrite = jest.fn(() => Promise.resolve())
+    const synonyms = [
+      { synonym_id: 1, species_id: 1, syn_genus_name: 'Gorilla', syn_species_name: 'troglodytes', syn_comment: null },
+    ]
+    mockCheckSpeciesTaxonomy.mockImplementation((_species, _existingSpecies, checkedSynonyms) =>
+      checkedSynonyms.length ? new Set(['Duplicate synonym']) : new Set()
+    )
+    const view = renderButton({ ...baseSpecies, genus_name: 'Gorilla' }, onWrite)
+    mockUseGetAllSynonymsQuery.mockReturnValue({ data: synonyms } as never)
+    view.rerender(<WriteButton onWrite={onWrite} taxonomy />)
+
+    expect(mockCheckSpeciesTaxonomy).toHaveBeenCalledWith(
+      expect.any(Object),
+      expect.any(Array),
+      [],
+      expect.objectContaining({ onTaxonomyHierarchyMismatch: expect.any(Function) })
+    )
+    fireEvent.click(screen.getByRole('button', { name: /save changes/i }))
+    await waitFor(() => {
+      expect(mockCheckSpeciesTaxonomy).toHaveBeenCalledWith(expect.any(Object), expect.any(Array), synonyms, {
+        allowTaxonomyHierarchyMismatch: true,
+      })
+    })
+    expect(onWrite).not.toHaveBeenCalled()
+    expect(mockNotify).toHaveBeenCalledWith('Duplicate synonym', 'error', null)
+  })
+
+  it('blocks taxonomy hierarchy mismatches for non-administrators', async () => {
+    const onWrite = jest.fn(() => Promise.resolve())
+    mockUseUser.mockReturnValue({
+      token: null,
+      username: 'tester',
+      role: Role.EditUnrestricted,
+      initials: null,
+      localities: [],
+      isFirstLogin: undefined,
+    })
+    mockCheckSpeciesTaxonomy.mockReturnValue(new Set(['Subfamily Caninae belongs to family Canidae, not Felidae.']))
+
+    renderButton({ ...baseSpecies, family_name: 'Felidae' } as EditDataType<Species>, onWrite)
+
+    fireEvent.click(screen.getByRole('button', { name: /save changes/i }))
+
+    await waitFor(() => {
+      expect(mockCheckSpeciesTaxonomy).toHaveBeenCalledWith(expect.any(Object), expect.any(Array), expect.any(Array), {
+        allowTaxonomyHierarchyMismatch: false,
+      })
+    })
+    expect(onWrite).not.toHaveBeenCalled()
+    expect(mockNotify).toHaveBeenCalledWith(expect.stringContaining('belongs to family'), 'error', null)
   })
 
   it('converts a cleared comment field to null so it can be persisted', async () => {
@@ -227,5 +363,58 @@ describe('WriteButton taxonomy handling', () => {
 
     const button = screen.getByRole('button', { name: /complete and save/i })
     expect((button as HTMLButtonElement).disabled).toBe(true)
+  })
+
+  it('only shows the coordinate warning before entering reference staging', async () => {
+    const onWrite = jest.fn(() => Promise.resolve())
+    const setMode = jest.fn()
+    const editData = {
+      ...baseSpecies,
+      country: 'Finland',
+      dec_lat: 0,
+      dec_long: 0,
+      references: [{ rid: 1, rowState: 'new' as const }],
+    } as EditDataType<Species> & {
+      country: string
+      dec_lat: number
+      dec_long: number
+      references: Array<{ rid: number; rowState: 'new' }>
+    }
+
+    const view = renderButton(editData, onWrite, { mode: modeNew, setMode }, { taxonomy: false, hasStagingMode: true })
+
+    fireEvent.click(screen.getByRole('button', { name: /finalize entry/i }))
+    expect(await screen.findByText('Coordinate warning')).toBeTruthy()
+
+    fireEvent.click(screen.getByRole('button', { name: 'Proceed' }))
+    await waitFor(() => {
+      expect(setMode).toHaveBeenCalledWith('staging-new')
+    })
+    expect(onWrite).not.toHaveBeenCalled()
+
+    mockUseDetailContext.mockReturnValue({
+      data: baseSpecies,
+      mode: modeStagingNew,
+      setMode,
+      editData,
+      setEditData: jest.fn(),
+      isDirty: true,
+      resetEditData: jest.fn(),
+      textField,
+      bigTextField,
+      dropdown,
+      dropdownWithSearch,
+      radioSelection,
+      validator,
+      fieldsWithErrors: {},
+      setFieldsWithErrors: jest.fn(),
+    })
+    view.rerender(<WriteButton onWrite={onWrite} hasStagingMode />)
+
+    fireEvent.click(screen.getByRole('button', { name: /complete and save/i }))
+    await waitFor(() => {
+      expect(onWrite).toHaveBeenCalledTimes(1)
+    })
+    expect(screen.queryByText('Coordinate warning')).toBeNull()
   })
 })

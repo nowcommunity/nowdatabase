@@ -1,3 +1,5 @@
+import { PermissionDenied } from '@/components/PermissionDenied'
+import { useUser } from '@/hooks/user'
 import { MuseumDetails } from '@/components/Museum/MuseumDetails'
 import { MuseumTable } from '@/components/Museum/MuseumTable'
 import { fullRights, limitedRights, noRights } from '@/components/pages'
@@ -8,6 +10,9 @@ import { Page } from '../components/Page'
 import { UnsavedChangesProvider } from '../components/UnsavedChangesProvider'
 
 export const MuseumPage = () => {
+  const user = useUser()
+  if (!user.username) return <PermissionDenied message="Please log in to view Museums." />
+
   return (
     <UnsavedChangesProvider>
       <Page

@@ -27,7 +27,8 @@ type ValidationErrorItem = {
   error: string
 }
 
-export type ColumnFilter = { id: string; value: string }
+export type RangeFilterBound = string | number | null
+export type ColumnFilter = { id: string; value: string | [RangeFilterBound, RangeFilterBound] }
 export type SortingState = { desc: boolean; id: string }
 
 export type CrossSearchRouteParameters = {

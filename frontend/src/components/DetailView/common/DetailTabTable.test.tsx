@@ -1,12 +1,21 @@
-import { describe, expect, it, jest, beforeEach } from '@jest/globals'
+import { beforeEach, describe, expect, it, jest } from '@jest/globals'
 import '@testing-library/jest-dom'
-import { render, screen } from '@testing-library/react'
+import { act, render, screen, waitFor } from '@testing-library/react'
+import { useState } from 'react'
 import { applyDefaultSpeciesOrdering, DetailTabTable, hasActiveSortingInSearch } from './DetailTabTable'
 
 const tableViewMock = jest.fn<(props: Record<string, unknown>) => JSX.Element>()
 const useMaterialReactTableMock = jest.fn<(options: Record<string, unknown>) => Record<string, unknown>>()
 
 type CapturedMrtOptions = {
+  data?: Array<{ id: number; name: string }>
+  onPaginationChange?: (pagination: { pageIndex: number; pageSize: number }) => void
+  state?: {
+    pagination?: {
+      pageIndex: number
+      pageSize: number
+    }
+  }
   muiTableProps?: {
     'data-cy'?: string
   }
@@ -24,12 +33,42 @@ jest.mock('@/components/TableView/TableView', () => ({
 
 jest.mock('material-react-table', () => ({
   useMaterialReactTable: (options: Record<string, unknown>) => useMaterialReactTableMock(options),
-  MaterialReactTable: () => <div data-testid="material-react-table" />,
+  MaterialReactTable: () => {
+    const options = useMaterialReactTableMock.mock.calls.at(-1)?.[0] as CapturedMrtOptions | undefined
+    const data = options?.data ?? []
+    const pagination = options?.state?.pagination ?? { pageIndex: 0, pageSize: data.length }
+    const firstVisibleRow = pagination.pageIndex * pagination.pageSize
+    const visibleRows = data.slice(firstVisibleRow, firstVisibleRow + pagination.pageSize)
+
+    return (
+      <div data-testid="material-react-table">
+        {visibleRows.map(row => (
+          <div key={row.id} data-testid={`detail-table-row-${row.id}`}>
+            {row.name}
+          </div>
+        ))}
+      </div>
+    )
+  },
 }))
 
 type TestRow = {
   id: number
   name: string
+}
+
+const PaginationHarness = ({ data }: { data: TestRow[] }) => {
+  const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: 5 })
+
+  return (
+    <DetailTabTable<TestRow>
+      mode="edit"
+      data={data}
+      columns={[{ accessorKey: 'name', header: 'Name' }]}
+      paginationState={pagination}
+      onPaginationChange={setPagination}
+    />
+  )
 }
 
 describe('DetailTabTable', () => {
@@ -93,6 +132,37 @@ describe('DetailTabTable', () => {
     expect(options?.muiTableProps?.['data-cy']).toEqual('Editable-table-table')
     expect(options?.muiTableHeadCellProps?.({ column: { id: 'name' } })['data-cy']).toEqual('table-header-name')
     expect(options?.muiTableBodyCellProps?.({ cell: { column: { id: 'name' } } })['data-cy']).toEqual('table-cell-name')
+  })
+
+  it('updates visible rows when page size or page index changes', async () => {
+    const expectVisibleRows = async (ids: number[]) => {
+      await waitFor(() => {
+        expect(screen.getAllByTestId(/^detail-table-row-/)).toHaveLength(ids.length)
+        ids.forEach(id => {
+          expect(screen.getByTestId(`detail-table-row-${id}`)).toBeTruthy()
+        })
+      })
+    }
+    const data = Array.from({ length: 10 }, (_, index) => ({
+      id: index + 1,
+      name: `Item ${index + 1}`,
+    }))
+
+    render(<PaginationHarness data={data} />)
+
+    await expectVisibleRows([1, 2, 3, 4, 5])
+
+    const initialOptions = useMaterialReactTableMock.mock.calls.at(-1)?.[0] as CapturedMrtOptions
+    act(() => {
+      initialOptions.onPaginationChange?.({ pageIndex: 0, pageSize: 10 })
+    })
+    await expectVisibleRows([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
+
+    const pageSizeOptions = useMaterialReactTableMock.mock.calls.at(-1)?.[0] as CapturedMrtOptions
+    act(() => {
+      pageSizeOptions.onPaginationChange?.({ pageIndex: 1, pageSize: 5 })
+    })
+    await expectVisibleRows([6, 7, 8, 9, 10])
   })
 })
 

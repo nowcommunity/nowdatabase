@@ -8,13 +8,24 @@ import { ReferenceDetails } from '@/components/Reference/ReferenceDetails'
 import {
   useDeleteReferenceMutation,
   useEditReferenceMutation,
+  useGetReferenceCanDeleteQuery,
   useGetReferenceDetailsQuery,
 } from '@/redux/referenceReducer'
 import type { ReferenceDetailsType } from '@/shared/types'
 
 jest.mock('@/components/DetailView/DetailView', () => ({
-  DetailView: ({ deleteFunction }: { deleteFunction?: () => Promise<void> }) => (
-    <button onClick={() => void deleteFunction?.()}>Delete</button>
+  DetailView: ({
+    deleteFunction,
+    deleteDisabled,
+    deleteDisabledReason,
+  }: {
+    deleteFunction?: () => Promise<void>
+    deleteDisabled?: boolean
+    deleteDisabledReason?: string
+  }) => (
+    <button disabled={deleteDisabled} title={deleteDisabledReason} onClick={() => void deleteFunction?.()}>
+      Delete
+    </button>
   ),
 }))
 
@@ -30,6 +41,8 @@ jest.mock('@/util/config', () => ({
 
 jest.mock('@/redux/referenceReducer', () => ({
   useGetReferenceDetailsQuery: jest.fn(),
+  useGetReferenceCanDeleteQuery: jest.fn(),
+  useGetReferenceTypesQuery: jest.fn(() => ({ data: undefined })),
   useEditReferenceMutation: jest.fn(),
   useDeleteReferenceMutation: jest.fn(),
 }))
@@ -84,6 +97,10 @@ describe('ReferenceDetails deletion', () => {
         exact_date: null,
       } as unknown as ReferenceDetailsType,
     })
+    ;(useGetReferenceCanDeleteQuery as jest.Mock).mockReturnValue({
+      data: { canDelete: true, linkedEntities: [] },
+      isError: false,
+    })
     ;(useEditReferenceMutation as jest.Mock).mockReturnValue([
       jest.fn(() => ({ unwrap: jest.fn() })),
       { isLoading: false },
@@ -119,5 +136,26 @@ describe('ReferenceDetails deletion', () => {
     await waitFor(() => {
       expect(screen.getByText('The Reference with associated updates cannot be deleted.')).toBeTruthy()
     })
+  })
+
+  it('disables the delete button when the reference is linked to other entities', async () => {
+    ;(useGetReferenceCanDeleteQuery as jest.Mock).mockReturnValue({
+      data: { canDelete: false, linkedEntities: ['Localities', 'Species'] },
+      isError: false,
+    })
+
+    render(
+      <NotificationContextProvider>
+        <MemoryRouter initialEntries={[{ pathname: '/reference/1' }]}>
+          <Routes>
+            <Route path="/reference/:id" element={<ReferenceDetails />} />
+          </Routes>
+        </MemoryRouter>
+      </NotificationContextProvider>
+    )
+
+    const button = await screen.findByRole('button', { name: /delete/i })
+    expect((button as HTMLButtonElement).disabled).toBe(true)
+    expect(button.getAttribute('title')).toContain('Localities, Species')
   })
 })

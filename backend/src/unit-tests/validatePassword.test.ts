@@ -3,14 +3,14 @@ import { validatePassword } from '../utils/validatePassword'
 
 describe('Password validation utils', () => {
   it('Accepts correct password', () => {
-    expect(validatePassword('thisisavalidpassword').isValid).toBeTruthy()
+    expect(validatePassword('thisIsAvalidpassword1!').isValid).toBeTruthy()
   })
   it('Accepts correct password with symbols', () => {
-    expect(validatePassword('thisisav~!%ali&dpas$sword').isValid).toBeTruthy()
+    expect(validatePassword('thisIsav~!%ali&dpas$sw0rd').isValid).toBeTruthy()
   })
   it('Accepts generated password symbols', () => {
-    expect(validatePassword('valid^password').isValid).toBeTruthy()
-    expect(validatePassword('valid?password').isValid).toBeTruthy()
+    expect(validatePassword('Valid^password1').isValid).toBeTruthy()
+    expect(validatePassword('Valid?password1').isValid).toBeTruthy()
   })
   it('Rejects invalid password with unsupported symbols in the middle', () => {
     expect(validatePassword('thisisav~%a€li&dpas$sword').isValid).toBeFalsy()
@@ -24,7 +24,14 @@ describe('Password validation utils', () => {
     expect(validatePassword('aaaaa').isValid).toBeFalsy()
   })
   it('Accepts password that is 8 characters or more', () => {
-    expect(validatePassword('aaaaaaaa').isValid).toBeTruthy()
-    expect(validatePassword('aaaaaaaaaaaa').isValid).toBeTruthy()
+    expect(validatePassword('aaaaaA1!').isValid).toBeTruthy()
+    expect(validatePassword('aaaaaaaaaaaA1!').isValid).toBeTruthy()
+  })
+  it('Rejects password missing a character class', () => {
+    expect(validatePassword('12345678').isValid).toBeFalsy()
+    expect(validatePassword('ABCDEFG1!').isValid).toBeFalsy()
+    expect(validatePassword('abcdefg1!').isValid).toBeFalsy()
+    expect(validatePassword('abcdefgA!').isValid).toBeFalsy()
+    expect(validatePassword('abcdefgA1').isValid).toBeFalsy()
   })
 })

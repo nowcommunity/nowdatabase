@@ -24,7 +24,13 @@ export const ContactModal = ({
 
   return (
     <Box>
-      <Button onClick={() => setOpen(true)} variant="outlined" startIcon={<EmailIcon />} className="button">
+      <Button
+        style={{ width: '8em', height: '3em' }}
+        onClick={() => setOpen(true)}
+        variant="outlined"
+        startIcon={<EmailIcon />}
+        className="button"
+      >
         {buttonText}
       </Button>
       <Modal

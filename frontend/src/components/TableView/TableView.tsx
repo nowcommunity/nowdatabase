@@ -82,7 +82,11 @@ const withDataCy = <TProps extends object>(props: TProps, dataCy: string): TProp
 })
 
 const sanitizeColumnFilters = (filters: MRT_ColumnFiltersState): MRT_ColumnFiltersState => {
-  return filters.filter(filter => !isEmptyFilterValue(filter.value))
+  // Copy array values: the result is passed to RTK Query, which freezes its arguments, while the table
+  // mutates its own range filter arrays in place.
+  return filters
+    .filter(filter => !isEmptyFilterValue(filter.value))
+    .map(filter => (Array.isArray(filter.value) ? { ...filter, value: [...(filter.value as unknown[])] } : filter))
 }
 
 const createTableStateId = () => {
@@ -198,6 +202,8 @@ export const TableView = <T extends MRT_RowData>({
   svgExport,
   isCrossSearchTable,
   clickableRows = true,
+  showContactButton = true,
+  showNewButton = true,
   enableColumnFilterModes,
   serverSidePagination,
   isFetching,
@@ -208,6 +214,7 @@ export const TableView = <T extends MRT_RowData>({
   paginationPlacement,
   tableContainerMaxHeight,
   columnVisibilityGroups,
+  onColumnVisibilityChange,
   renderExtraExportMenuItems,
 }: {
   data: T[] | undefined
@@ -225,6 +232,8 @@ export const TableView = <T extends MRT_RowData>({
   svgExport?: (table: MRT_TableInstance<T>) => void | Promise<void>
   isCrossSearchTable?: boolean
   clickableRows?: boolean
+  showContactButton?: boolean
+  showNewButton?: boolean
   enableColumnFilterModes?: boolean
   serverSidePagination?: boolean
   isFetching: boolean
@@ -236,12 +245,15 @@ export const TableView = <T extends MRT_RowData>({
   paginationPlacement?: 'top' | 'bottom' | 'both'
   tableContainerMaxHeight?: string | number
   columnVisibilityGroups?: ColumnVisibilityGroup[]
+  // Called with the columns whose data is needed (visible, filtered or sorted) once the initial (possibly stored) state is known, and on changes.
+  onColumnVisibilityChange?: (visibility: MRT_VisibilityState) => void
 }) => {
   const location = useLocation()
   const {
     editRights,
     setSqlLimit,
     setSqlOffset,
+    sqlColumnFilters,
     setSqlColumnFilters,
     setSqlOrderBy,
     previousTableUrls,
@@ -271,12 +283,18 @@ export const TableView = <T extends MRT_RowData>({
   const allowColumnFilterModes = (enableColumnFilterModes ?? true) && !serverSidePagination
 
   useEffect(() => {
+    if (!serverSidePagination) return
     setSqlLimit(pagination.pageSize)
     setSqlOffset(pagination.pageIndex * pagination.pageSize)
-    setSqlColumnFilters(sanitizeColumnFilters(columnFilters))
+
+    const sanitizedFilters = sanitizeColumnFilters(columnFilters)
+    if (JSON.stringify(sqlColumnFilters) !== JSON.stringify(sanitizedFilters)) {
+      setSqlColumnFilters(sanitizedFilters)
+    }
+
     setSqlOrderBy(sorting)
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [pagination, columnFilters, sorting])
+  }, [pagination, columnFilters, serverSidePagination, sqlColumnFilters, sorting])
 
   const safeJsonParse = (value: string): unknown => {
     try {
@@ -674,7 +692,7 @@ export const TableView = <T extends MRT_RowData>({
     manualSorting: serverSidePagination,
     rowCount: serverSidePagination ? rowCount : undefined,
     autoResetPageIndex: !serverSidePagination,
-    positionPagination: paginationPlacement ?? (selectorFn ? 'top' : 'both'),
+    positionPagination: paginationPlacement ?? (selectorFn ? 'bottom' : 'both'),
     paginationDisplayMode: 'pages',
     muiTablePaperProps: {
       elevation: 0,
@@ -714,6 +732,14 @@ export const TableView = <T extends MRT_RowData>({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
+  useEffect(() => {
+    if (!selectorFn && !hasLoadedTableState) return
+    // Columns that are filtered or sorted need their data even when hidden.
+    const sortedColumns = Object.fromEntries(sorting.map(({ id }) => [id, true]))
+    onColumnVisibilityChange?.({ ...showFilteredColumns(columnVisibility, columnFilters), ...sortedColumns })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [columnVisibility, columnFilters, sorting, selectorFn, hasLoadedTableState])
+
   // Save state to url whenever it changes
   useEffect(() => {
     if (selectorFn || !hasLoadedTableState) return
@@ -724,17 +750,7 @@ export const TableView = <T extends MRT_RowData>({
       replace: true,
     })
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [
-    columnFilters,
-    sorting,
-    columnVisibility,
-    selectorFn,
-    table,
-    idFieldName,
-    navigate,
-    tableStateId,
-    hasLoadedTableState,
-  ])
+  }, [columnFilters, sorting, columnVisibility, selectorFn, idFieldName, navigate, tableStateId, hasLoadedTableState])
 
   useEffect(() => {
     if (!serverSidePagination) return
@@ -752,11 +768,11 @@ export const TableView = <T extends MRT_RowData>({
     setIdList(table.getPrePaginationRowModel().rows.map(row => row.original[idFieldName] as string))
     if (serverSidePagination) {
       // resets pagination when filters or sorting change
-      setPagination(selectorFn ? defaultPaginationSmall : defaultPagination)
+      setPagination(currentPagination => ({ ...currentPagination, pageIndex: 0 }))
     }
     // Don't put setIdList in the dependency array: it will cause re-render loop.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [table, columnFilters, sorting])
+  }, [columnFilters, sorting])
 
   if (isError) {
     const severity = errorStatus === 401 || errorStatus === 403 ? 'warning' : 'error'
@@ -799,10 +815,9 @@ export const TableView = <T extends MRT_RowData>({
               tableName={title}
               kmlExport={kmlExport}
               svgExport={svgExport}
-              showNewButton={editRights.new && !selectorFn && !isCrossSearchTable}
+              showContactButton={showContactButton && !selectorFn}
+              showNewButton={!!editRights.new && showNewButton && !selectorFn && !isCrossSearchTable}
               isCrossSearchTable={isCrossSearchTable}
-              selectorFn={selectorFn}
-              hideLeftButtons={false}
               columnVisibilityGroups={columnVisibilityGroups}
               renderExtraExportMenuItems={renderExtraExportMenuItems}
             />

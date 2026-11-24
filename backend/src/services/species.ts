@@ -254,7 +254,8 @@ export const getAllSynonyms = async () => {
 }
 
 export const validateEntireSpecies = async (editedFields: EditDataType<Prisma.com_species> & EditMetaData) => {
-  const keys = Object.keys(editedFields)
+  const keys = new Set(Object.keys(editedFields))
+  if (!editedFields.species_id) keys.add('unique_identifier')
   const errors: ValidationObject[] = []
   for (const key of keys) {
     const error = validateSpecies(editedFields as EditDataType<SpeciesDetailsType>, key as keyof SpeciesDetailsType)

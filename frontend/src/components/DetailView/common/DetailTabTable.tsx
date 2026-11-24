@@ -147,6 +147,11 @@ type DetailTabTableEditProps<T extends MRT_RowData> = {
 
 type DetailTabTableProps<T extends MRT_RowData> = DetailTabTableReadSelectProps<T> | DetailTabTableEditProps<T>
 
+/** Used for all tables inside detail views.
+ *
+ * Uses the DetailTabEditableTable component when in edit mode, and the normal TableView component otherwise.
+ * Take this into account when writing tests, since state such as pagination needs to be handled differently.
+ *  */
 export const DetailTabTable = <T extends MRT_RowData>(props: DetailTabTableProps<T>) => {
   if (props.mode === 'edit') {
     return <DetailTabEditableTable {...props} />
@@ -192,6 +197,8 @@ export const DetailTabTable = <T extends MRT_RowData>(props: DetailTabTableProps
       url={url}
       checkRowRestriction={checkRowRestriction}
       clickableRows={clickableRows}
+      showContactButton={false}
+      showNewButton={false}
       enableColumnFilterModes={enableColumnFilterModes}
       paginationPlacement={paginationPlacement}
       isError={isError}
@@ -280,7 +287,8 @@ const DetailTabEditableToolbar = <T extends MRT_RowData>({
         <TableToolBar<T>
           table={table}
           tableName={tableName}
-          hideLeftButtons={true}
+          showContactButton={false}
+          showNewButton={false}
           kmlExport={kmlExport}
           svgExport={svgExport}
         />

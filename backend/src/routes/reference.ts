@@ -13,7 +13,7 @@ import {
 import { buildReferenceDisplayLabelMap, validateEntireReference } from '../services/referenceValidation'
 import { requireOneOf } from '../middlewares/authorizer'
 import { Role, EditMetaData, ReferenceDetailsType, EditDataType } from '../../../frontend/src/shared/types'
-import { deleteReference, writeReference } from '../services/write/reference'
+import { deleteReference, getReferenceDeleteStatus, writeReference } from '../services/write/reference'
 import { fixBigInt } from '../utils/common'
 import { parseTabListQuery } from '../services/tabularQuery'
 import { validateTabListQuery } from '../middlewares/tabListQueryValidator'
@@ -123,6 +123,13 @@ router.put(
     return res.status(200).send({ rid })
   }
 )
+
+router.get('/:id/can-delete', requireOneOf([Role.Admin]), async (req, res) => {
+  const rid = parseInt(req.params.id)
+  if (Number.isNaN(rid)) return res.status(400).send({ message: 'Invalid reference id' })
+  const status = await getReferenceDeleteStatus(rid)
+  return res.status(200).send(status)
+})
 
 router.delete('/:id', requireOneOf([Role.Admin]), async (req, res) => {
   const rid = parseInt(req.params.id)

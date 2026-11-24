@@ -51,6 +51,8 @@ describe('OccurrenceIsotopeTab', () => {
     render(<OccurrenceIsotopeTab />)
 
     expect(textField).toHaveBeenCalledWith('dc13_mean', { type: 'number' })
+    expect(textField).toHaveBeenCalledWith('dc13_n', { type: 'number', integerOnly: true, min: 1 })
+    expect(textField).toHaveBeenCalledWith('do18_n', { type: 'number', integerOnly: true, min: 1 })
     expect(textField).toHaveBeenCalledWith('do18_stdev', { type: 'number' })
   })
 })

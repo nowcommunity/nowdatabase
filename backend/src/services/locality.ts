@@ -22,6 +22,13 @@ import { buildPersonLookupByInitials, getPersonDisplayName, getPersonFromLookup 
 import { getReferenceDetails } from './reference'
 import { addNullExactDateToReferenceJoins, referenceWithoutExactDateSelect } from './utils/referenceDate'
 import { getOccurrenceUpdatesForRows } from './occurrenceService'
+import { TtlCache } from './utils/ttlCache'
+import {
+  LOCALITY_LIST_CORE_FIELDS,
+  LOCALITY_LIST_OPTIONAL_FIELDS,
+  LocalityListOptionalField,
+  isLocalityListOptionalField,
+} from '../../../frontend/src/shared/localityListFields'
 
 const normalizeNumberField = (value: unknown) => {
   if (typeof value === 'string') {
@@ -58,10 +65,10 @@ export const getIdsOfUsersProjects = async (user: User) => {
   return new Set(usersProjects.map(({ pid }) => pid))
 }
 
-const getActiveProjectIds = (locality: EditDataType<LocalityDetailsType>) => {
+const getProjectIds = (locality: EditDataType<LocalityDetailsType>, removed: boolean) => {
   if (!locality.now_plr) return [] as number[]
   return locality.now_plr
-    .filter(link => link.rowState !== 'removed')
+    .filter(link => (link.rowState === 'removed') === removed)
     .map(link => link.pid ?? link.now_proj?.pid)
     .flatMap(pid => {
       if (typeof pid === 'string') {
@@ -76,23 +83,34 @@ const getActiveProjectIds = (locality: EditDataType<LocalityDetailsType>) => {
 export const canEditRestrictedWriteLocality = async (locality: EditDataType<LocalityDetailsType>, user: User) => {
   const userProjectIds = await getIdsOfUsersProjects(user)
 
-  let activeProjectIds: number[] = []
   if (locality.lid) {
-    // this ensures that a user without edit rights cannot simply add the needed projects to the locality while editing it
-    const existingLocality = await nowDb.now_loc.findUnique({
-      where: { lid: locality.lid },
-      select: { now_plr: { select: { pid: true } } },
-    })
-    if (existingLocality) {
-      activeProjectIds = existingLocality.now_plr.map(link => link.pid)
-    }
-  } else {
-    activeProjectIds = getActiveProjectIds(locality)
+    // Only the stored project links count, so that a user without edit rights cannot simply add the needed
+    // projects to the locality while editing it. Membership in any one linked project is enough to edit.
+    const removedProjectIds = getRemovedProjectIds(locality)
+    if (removedProjectIds.some(pid => !userProjectIds.has(pid))) return false
+    return await userHasStoredProjectAccessToLocality(locality.lid, userProjectIds)
   }
 
+  const activeProjectIds = getActiveProjectIds(locality)
   if (activeProjectIds.length === 0) return false
   return activeProjectIds.every(pid => userProjectIds.has(pid))
 }
+
+const getActiveProjectIds = (locality: EditDataType<LocalityDetailsType>) => getProjectIds(locality, false)
+// Projects the user is not a member of cannot be unlinked by an EditRestricted user
+const getRemovedProjectIds = (locality: EditDataType<LocalityDetailsType>) => getProjectIds(locality, true)
+
+const userHasStoredProjectAccessToLocality = async (lid: number, userProjectIds: Set<number>) => {
+  const existingLocality = await nowDb.now_loc.findUnique({
+    where: { lid },
+    select: { now_plr: { select: { pid: true } } },
+  })
+  return existingLocality?.now_plr.some(link => userProjectIds.has(link.pid)) ?? false
+}
+
+// Used after a write to tell an EditRestricted user whether they can still edit the locality.
+export const canEditRestrictedUserStillEditLocality = async (lid: number, user: User) =>
+  userHasStoredProjectAccessToLocality(lid, await getIdsOfUsersProjects(user))
 
 type LocalityPreFilter = {
   lid: number
@@ -132,78 +150,43 @@ type LocalityPreFilter = {
   }[]
 }
 
-export const getAllLocalities = async (user?: User) => {
-  const showAll = user && [Role.Admin, Role.EditUnrestricted].includes(user.role)
-  const removeProjects = (
-    loc: Omit<LocalityPreFilter, 'now_syn_loc'> & {
-      synonyms: string[]
-      has_synonym: boolean
-    }
-  ) => {
-    const { now_plr, ...rest } = loc
-    return rest
+const LOCALITY_LIST_CACHE_TTL_MS = 60 * 1000
+const LOCALITY_LIST_CACHE_MAX_ENTRIES = 16
+
+const localityListCache = new TtlCache<Awaited<ReturnType<typeof loadLocalityList>>>(
+  LOCALITY_LIST_CACHE_TTL_MS,
+  LOCALITY_LIST_CACHE_MAX_ENTRIES
+)
+
+export const invalidateLocalityListCache = () => localityListCache.invalidate()
+
+export class InvalidLocalityFieldsError extends Error {}
+
+// Parses the `fields` query parameter. Returns undefined when all fields should be returned.
+export const parseLocalityListFields = (rawFields: unknown): LocalityListOptionalField[] | undefined => {
+  if (rawFields === undefined) return undefined
+  if (typeof rawFields !== 'string') throw new InvalidLocalityFieldsError('fields must be a comma-separated string')
+
+  const requested = rawFields
+    .split(',')
+    .map(field => field.trim())
+    .filter(field => field.length > 0)
+  const unknownFields = requested.filter(field => !isLocalityListOptionalField(field))
+  if (unknownFields.length > 0) {
+    throw new InvalidLocalityFieldsError(`Unknown locality fields: ${unknownFields.join(', ')}`)
+  }
+  return [...new Set(requested)].filter(isLocalityListOptionalField).sort()
+}
+
+const loadLocalityList = async (optionalFields: readonly LocalityListOptionalField[]) => {
+  const columns = [...LOCALITY_LIST_CORE_FIELDS, ...optionalFields]
+  const select = {
+    ...Object.fromEntries(columns.map(column => [column, true])),
+    now_plr: { select: { pid: true } },
+    now_syn_loc: { select: { synonym: true } },
   }
 
-  const localityResult = (await nowDb.now_loc.findMany({
-    select: {
-      lid: true,
-      loc_name: true,
-      bfa_max: true,
-      bfa_min: true,
-      max_age: true,
-      min_age: true,
-      bfa_max_abs: true,
-      bfa_min_abs: true,
-      frac_max: true,
-      frac_min: true,
-      chron: true,
-      age_comm: true,
-      basin: true,
-      subbasin: true,
-      dms_lat: true,
-      dms_long: true,
-      dec_lat: true,
-      dec_long: true,
-      altitude: true,
-      country: true,
-      state: true,
-      county: true,
-      appr_num_spm: true,
-      site_area: true,
-      gen_loc: true,
-      plate: true,
-      formation: true,
-      member: true,
-      bed: true,
-      loc_status: true,
-      estimate_precip: true,
-      estimate_temp: true,
-      estimate_npp: true,
-      pers_woody_cover: true,
-      pers_pollen_ap: true,
-      pers_pollen_nap: true,
-      pers_pollen_other: true,
-      hominin_skeletal_remains: true,
-      bipedal_footprints: true,
-      stone_tool_cut_marks_on_bones: true,
-      stone_tool_technology: true,
-      technological_mode_1: true,
-      technological_mode_2: true,
-      technological_mode_3: true,
-      cultural_stage_1: true,
-      cultural_stage_2: true,
-      cultural_stage_3: true,
-      regional_culture_1: true,
-      regional_culture_2: true,
-      regional_culture_3: true,
-      now_plr: {
-        select: { pid: true },
-      },
-      now_syn_loc: {
-        select: { synonym: true },
-      },
-    },
-  })) as LocalityPreFilter[]
+  const localityResult = (await nowDb.now_loc.findMany({ select })) as unknown as LocalityPreFilter[]
 
   const result = localityResult.map(loc => {
     const synonyms = loc.now_syn_loc
@@ -216,6 +199,19 @@ export const getAllLocalities = async (user?: User) => {
       has_synonym: synonyms.length > 0,
     }
   })
+
+  return fixBigInt(result) as typeof result
+}
+
+export const getAllLocalities = async (user?: User, optionalFields?: readonly LocalityListOptionalField[]) => {
+  const showAll = user && [Role.Admin, Role.EditUnrestricted].includes(user.role)
+  const removeProjects = <T extends { now_plr: unknown }>(loc: T) => {
+    const { now_plr, ...rest } = loc
+    return rest
+  }
+
+  const fields = optionalFields ?? LOCALITY_LIST_OPTIONAL_FIELDS
+  const result = await localityListCache.get([...fields].sort().join(','), () => loadLocalityList(fields))
 
   if (showAll) return result.map(removeProjects)
 
@@ -335,7 +331,7 @@ export const getLocalityDetails = async (id: number, user: User | undefined) => 
   return fixBigInt(localityWithTimeUnitDisplayValues) as LocalityDetailsType
 }
 
-// also validates possible new species that were added to this locality
+// also validates possible new species/occurrences that were added to this locality
 export const validateEntireLocality = async (editedFields: EditDataType<Prisma.now_loc> & EditMetaData) => {
   const localityForValidation = { ...editedFields }
 
@@ -369,6 +365,7 @@ export const validateEntireLocality = async (editedFields: EditDataType<Prisma.n
     for (const species of editedFields.now_ls as Array<Editable<LocalitySpeciesDetailsType>>) {
       if (species.rowState === 'new') {
         const keys = Object.keys(species.com_species)
+        if (!species.com_species.species_id && !keys.includes('unique_identifier')) keys.push('unique_identifier')
         for (const key of keys) {
           const newSpeciesError = validateSpecies(species.com_species, key as keyof SpeciesDetailsType)
           if (newSpeciesError.error) errors.push(newSpeciesError)

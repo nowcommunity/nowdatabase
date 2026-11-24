@@ -157,6 +157,25 @@ describe('Creating new locality works', () => {
     )
   })
 
+  it('Creation fails when a new species has no unique identifier', async () => {
+    const { body, status } = await send<ValidationObject[]>('locality', 'PUT', {
+      locality: {
+        ...newLocalityBasis,
+        now_ls: [{ rowState: 'new', com_species: { species_name: 'Newspecies' } }],
+      },
+    })
+
+    expect(status).toEqual(403)
+    expect(body).toEqual(
+      expect.arrayContaining([
+        {
+          name: 'Unique Identifier',
+          error: 'Unique Identifier must have a value.',
+        },
+      ])
+    )
+  })
+
   it('Species update also logged correctly', async () => {
     const speciesId = createdLocality!.now_ls.find(ls => ls.com_species.species_name === 'Newspecies')?.species_id
     const speciesResult = await send<SpeciesDetailsType>(`species/${speciesId}`, 'GET')
@@ -171,6 +190,13 @@ describe('Creating new locality works', () => {
         value: 'Newspecies',
         type: 'add',
         column: 'species_name',
+        table: 'com_species',
+      },
+      {
+        oldValue: null,
+        value: 'new-locality-species',
+        type: 'add',
+        column: 'unique_identifier',
         table: 'com_species',
       },
       {
@@ -195,6 +221,6 @@ describe('Creating new locality works', () => {
         table: 'now_ls',
       },
     ]
-    testLogRows(logRows, expectedLogRows, 4)
+    testLogRows(logRows, expectedLogRows, 5)
   })
 })

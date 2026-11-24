@@ -1,30 +1,52 @@
-import { describe, expect, it, jest, beforeEach } from '@jest/globals'
-import '@testing-library/jest-dom'
-import { act, fireEvent, render, waitFor } from '@testing-library/react'
-import { Role } from '@/shared/types'
-import { TableView } from './TableView'
-import { usePageContext } from '../Page'
 import { useUser } from '@/hooks/user'
+import { Role } from '@/shared/types'
+import { beforeEach, describe, expect, it, jest } from '@jest/globals'
+import '@testing-library/jest-dom'
+import { act, fireEvent, render, screen, waitFor } from '@testing-library/react'
+import { usePageContext } from '../Page'
+import { TableView } from './TableView'
 
 type CapturedTableOptions = {
+  data?: Array<{ id: string; name: string }>
   onColumnFiltersChange?: (filters: Array<{ id: string; value: unknown }>) => void
+  onSortingChange?: (sorting: Array<{ id: string; desc: boolean }>) => void
+  onPaginationChange?: (pagination: { pageIndex: number; pageSize: number }) => void
   onColumnVisibilityChange?: (visibility: Record<string, boolean>) => void
   state?: {
     columnVisibility?: Record<string, boolean>
+    pagination?: { pageIndex: number; pageSize: number }
   }
 }
 
 let lastMaterialReactTableOptions: CapturedTableOptions | null = null
 
-jest.mock('material-react-table', () => ({
-  useMaterialReactTable: (options: CapturedTableOptions) => {
-    lastMaterialReactTableOptions = options
-    return {
-      getPrePaginationRowModel: () => ({ rows: [] }),
-    }
-  },
-  MaterialReactTable: () => <div data-testid="material-react-table" />,
-}))
+jest.mock('material-react-table', () => {
+  const table = {
+    getPrePaginationRowModel: () => ({ rows: [] }),
+  }
+  return {
+    useMaterialReactTable: (options: CapturedTableOptions) => {
+      lastMaterialReactTableOptions = options
+      return table
+    },
+    MaterialReactTable: () => {
+      const data = lastMaterialReactTableOptions?.data ?? []
+      const pagination = lastMaterialReactTableOptions?.state?.pagination ?? { pageIndex: 0, pageSize: data.length }
+      const firstVisibleRow = pagination.pageIndex * pagination.pageSize
+      const visibleRows = data.slice(firstVisibleRow, firstVisibleRow + pagination.pageSize)
+
+      return (
+        <div data-testid="material-react-table">
+          {visibleRows.map(row => (
+            <div key={row.id} data-testid={`table-row-${row.id}`}>
+              {row.name}
+            </div>
+          ))}
+        </div>
+      )
+    },
+  }
+})
 
 jest.mock('../Page', () => ({
   usePageContext: jest.fn(),
@@ -247,6 +269,159 @@ describe('TableView table help integration', () => {
     expect(JSON.parse(window.sessionStorage.getItem('nowdatabase-table-state:stored-state') ?? '{}')).toEqual(
       storedState
     )
+  })
+
+  it('preserves page size when server-side filters or sorting reset pagination', async () => {
+    render(
+      <TableView<TestRow>
+        title="Test Table"
+        idFieldName="id"
+        columns={[
+          { header: 'Name', accessorKey: 'name' },
+          { header: 'Id', accessorKey: 'id' },
+        ]}
+        visibleColumns={{ name: true, id: true }}
+        data={[{ id: '1', name: 'Alpha', full_count: 1 }]}
+        url="test"
+        isFetching={false}
+        serverSidePagination
+      />
+    )
+
+    await waitFor(() => {
+      expect(lastMaterialReactTableOptions?.state?.pagination).toEqual({ pageIndex: 0, pageSize: 50 })
+    })
+
+    act(() => {
+      lastMaterialReactTableOptions?.onPaginationChange?.({ pageIndex: 2, pageSize: 5 })
+    })
+
+    expect(lastMaterialReactTableOptions?.state?.pagination).toEqual({ pageIndex: 2, pageSize: 5 })
+
+    act(() => {
+      lastMaterialReactTableOptions?.onSortingChange?.([{ id: 'name', desc: false }])
+    })
+
+    await waitFor(() => {
+      expect(lastMaterialReactTableOptions?.state?.pagination).toEqual({ pageIndex: 0, pageSize: 5 })
+    })
+
+    act(() => {
+      lastMaterialReactTableOptions?.onPaginationChange?.({ pageIndex: 1, pageSize: 5 })
+    })
+
+    act(() => {
+      lastMaterialReactTableOptions?.onColumnFiltersChange?.([{ id: 'name', value: 'Alpha' }])
+    })
+
+    await waitFor(() => {
+      expect(lastMaterialReactTableOptions?.state?.pagination).toEqual({ pageIndex: 0, pageSize: 5 })
+    })
+  })
+
+  it('updates visible rows when page size or page index changes', async () => {
+    const data = Array.from({ length: 10 }, (_, index) => ({
+      id: String(index + 1),
+      name: `Item ${index + 1}`,
+      full_count: 10,
+    }))
+    mockLocationSearch = `?pagination=${encodeURIComponent(JSON.stringify({ pageIndex: 0, pageSize: 5 }))}`
+
+    render(
+      <TableView<TestRow>
+        title="Test Table"
+        idFieldName="id"
+        columns={[{ header: 'Name', accessorKey: 'name' }]}
+        visibleColumns={{ name: true }}
+        data={data}
+        url="test"
+        isFetching={false}
+        serverSidePagination
+      />
+    )
+
+    await waitFor(() => {
+      expect(screen.getAllByTestId(/^table-row-/)).toHaveLength(5)
+      expect(screen.getByTestId('table-row-1')).toBeTruthy()
+      expect(screen.getByTestId('table-row-5')).toBeTruthy()
+      expect(screen.queryByTestId('table-row-6')).toBeNull()
+    })
+
+    act(() => {
+      lastMaterialReactTableOptions?.onPaginationChange?.({ pageIndex: 0, pageSize: 10 })
+    })
+
+    await waitFor(() => {
+      expect(screen.getAllByTestId(/^table-row-/)).toHaveLength(10)
+      expect(screen.getByTestId('table-row-10')).toBeTruthy()
+    })
+
+    act(() => {
+      lastMaterialReactTableOptions?.onPaginationChange?.({ pageIndex: 1, pageSize: 5 })
+    })
+
+    await waitFor(() => {
+      expect(screen.getAllByTestId(/^table-row-/)).toHaveLength(5)
+      expect(screen.getByTestId('table-row-6')).toBeTruthy()
+      expect(screen.getByTestId('table-row-10')).toBeTruthy()
+      expect(screen.queryByTestId('table-row-1')).toBeNull()
+    })
+  })
+
+  it('copies range filter values before forwarding them to the page context', async () => {
+    const setSqlColumnFilters = jest.fn((filters: Array<{ id: string; value: unknown }>) => {
+      const forwardedValue = filters[0]?.value
+      if (Array.isArray(forwardedValue)) Object.freeze(forwardedValue)
+    })
+    mockUsePageContext.mockReturnValue({
+      editRights: {},
+      idList: [],
+      idFieldName: 'id',
+      viewName: 'test',
+      previousTableUrls: [],
+      createTitle: () => '',
+      createSubtitle: () => '',
+      sqlLimit: 25,
+      sqlOffset: 0,
+      sqlColumnFilters: [],
+      sqlOrderBy: [],
+      setIdList: jest.fn(),
+      setSqlLimit: jest.fn(),
+      setSqlOffset: jest.fn(),
+      setSqlColumnFilters,
+      setSqlOrderBy: jest.fn(),
+      setPreviousTableUrls: jest.fn(),
+    })
+
+    render(
+      <TableView<TestRow>
+        title="Test Table"
+        idFieldName="id"
+        columns={[{ header: 'Max age', accessorKey: 'maxAge', filterVariant: 'range' }]}
+        visibleColumns={{ maxAge: true }}
+        data={[]}
+        url="test"
+        isFetching={false}
+      />
+    )
+
+    const sourceRange = [1, 10]
+    act(() => {
+      lastMaterialReactTableOptions?.onColumnFiltersChange?.([{ id: 'maxAge', value: sourceRange }])
+    })
+
+    await waitFor(() => {
+      expect(setSqlColumnFilters).toHaveBeenLastCalledWith([{ id: 'maxAge', value: [1, 10] }])
+    })
+
+    const forwardedValue = setSqlColumnFilters.mock.lastCall?.[0][0]?.value
+    expect(forwardedValue).not.toBe(sourceRange)
+    expect(Array.isArray(forwardedValue) && Object.isFrozen(forwardedValue)).toBe(true)
+    expect(() => {
+      sourceRange[0] = 5
+    }).not.toThrow()
+    expect(sourceRange).toEqual([5, 10])
+    expect(forwardedValue).toEqual([1, 10])
   })
 
   it('restores persisted column filters for normal table visits', async () => {

@@ -46,7 +46,7 @@ const createContextValue = (): DetailContextType<ParentType> => ({
 describe('EditingForm select support', () => {
   it('renders a select field and submits the selected value', async () => {
     const user = userEvent.setup()
-    const editAction = jest.fn()
+    const editAction = jest.fn<(newObject: FormValues) => void>()
     const formFields: EditingFormField[] = [
       {
         name: 'taxonomic_status',
@@ -94,12 +94,81 @@ describe('EditingForm select support', () => {
       <EditingForm<{ author_surname: string }, ParentType>
         buttonText="Add new author"
         formFields={formFields}
-        editAction={jest.fn()}
+        editAction={jest.fn<(newObject: { author_surname: string }) => void>()}
       />
     )
 
     await user.click(screen.getByRole('button', { name: /add new author/i }))
 
     expect(screen.getByLabelText('Field information for Surname')).toBeTruthy()
+  })
+
+  it('keeps the form open and preserves values when the edit action rejects submission', async () => {
+    const user = userEvent.setup()
+    const editAction = jest.fn<(newObject: { unique_identifier: string }) => boolean>(() => false)
+    const formFields: EditingFormField[] = [{ name: 'unique_identifier', label: 'Unique Identifier', required: true }]
+
+    mockUseDetailContext.mockReturnValue(createContextValue())
+
+    render(
+      <EditingForm<{ unique_identifier: string }, ParentType>
+        buttonText="Add new Species"
+        formFields={formFields}
+        editAction={editAction}
+      />
+    )
+
+    await user.click(screen.getByRole('button', { name: /add new species/i }))
+    const identifierField = screen.getByRole('textbox', { name: /unique identifier/i })
+    await user.type(identifierField, ' ')
+    await user.click(screen.getByRole('button', { name: /save/i }))
+
+    await waitFor(() => {
+      expect(editAction).toHaveBeenCalledWith({ unique_identifier: ' ', rowState: 'new' })
+    })
+    expect(screen.getByRole('button', { name: /cancel/i })).toBeTruthy()
+    expect((identifierField as HTMLInputElement).value).toBe(' ')
+  })
+
+  it('requires acknowledgement for the current form value before saving', async () => {
+    const user = userEvent.setup()
+    const editAction = jest.fn<(newObject: { unique_identifier: string }) => void>()
+    const getConfirmation = (values: { unique_identifier: string }) =>
+      values.unique_identifier?.startsWith('conflict')
+        ? { key: values.unique_identifier, message: 'Family Felidae belongs to order Carnivora, not Rodentia.' }
+        : undefined
+
+    mockUseDetailContext.mockReturnValue(createContextValue())
+
+    render(
+      <EditingForm<{ unique_identifier: string }, ParentType>
+        buttonText="Add new Species"
+        formFields={[{ name: 'unique_identifier', label: 'Unique Identifier', required: true }]}
+        editAction={editAction}
+        getConfirmation={getConfirmation}
+      />
+    )
+
+    await user.click(screen.getByRole('button', { name: /add new species/i }))
+    const identifierField = screen.getByRole('textbox', { name: /unique identifier/i })
+    await user.type(identifierField, 'conflict-one')
+
+    expect(screen.getByText('Family Felidae belongs to order Carnivora, not Rodentia.')).toBeTruthy()
+    const saveButton = screen.getByRole('button', { name: /save/i })
+    expect((saveButton as HTMLButtonElement).disabled).toBe(true)
+
+    await user.click(screen.getByRole('checkbox', { name: /i understand and want to continue/i }))
+    expect((saveButton as HTMLButtonElement).disabled).toBe(false)
+
+    await user.clear(identifierField)
+    await user.type(identifierField, 'conflict-two')
+    expect((saveButton as HTMLButtonElement).disabled).toBe(true)
+
+    await user.click(screen.getByRole('checkbox', { name: /i understand and want to continue/i }))
+    await user.click(saveButton)
+
+    await waitFor(() => {
+      expect(editAction).toHaveBeenCalledWith({ unique_identifier: 'conflict-two', rowState: 'new' })
+    })
   })
 })

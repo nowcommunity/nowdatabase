@@ -3,13 +3,14 @@ import { Alert, Box } from '@mui/material'
 import { MRT_ColumnDef } from 'material-react-table'
 import { skipToken } from '@reduxjs/toolkit/query'
 
-import { Editable, LocalityDetailsType, Project } from '@/shared/types'
+import { Editable, LocalityDetailsType, Project, Role } from '@/shared/types'
 import { EditableTable } from '@/components/DetailView/common/EditableTable'
 import { Grouped } from '@/components/DetailView/common/tabLayoutHelpers'
 import { SelectingTable } from '@/components/DetailView/common/SelectingTable'
 import { useDetailContext } from '@/components/DetailView/Context/DetailContext'
 import { useGetAllProjectsQuery } from '@/redux/projectReducer'
 import { usePageContext } from '@/components/Page'
+import { useUser } from '@/hooks/user'
 import { EntryUpdateHistory } from '@/components/DetailView/common/FieldUpdateHistory'
 
 const getRelationLid = (row: unknown) => (row as { lid?: unknown }).lid
@@ -19,6 +20,7 @@ export const ProjectTab = () => {
   const { editRights } = usePageContext<LocalityDetailsType>()
   const canModifyProjects = !mode.read && Boolean(editRights.edit || editRights.new)
   const { data: projectData, isError } = useGetAllProjectsQuery(canModifyProjects ? undefined : skipToken)
+  const user = useUser()
   const [selectionError, setSelectionError] = useState<string | null>(null)
 
   const activeProjectIds = useMemo(() => {
@@ -92,6 +94,13 @@ export const ProjectTab = () => {
         enableAdvancedTableControls={true}
         idFieldName="pid"
         url="project"
+        isRowRemovalDisabled={project =>
+          // Sessions stored before memberships were added to the login state have no project list; the backend still enforces the rule
+          user.role === Role.EditRestricted &&
+          user.projects !== undefined &&
+          project.pid !== undefined &&
+          !user.projects.includes(project.pid)
+        }
         renderReadRowActions={({ row }) => (
           <EntryUpdateHistory
             row={row.original}

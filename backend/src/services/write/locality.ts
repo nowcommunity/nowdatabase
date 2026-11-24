@@ -41,7 +41,7 @@ export const writeLocality = async (
   locality.hominin_skeletal_remains = getHomininSkeletalRemains(locality)
 
   locality.loc_status = fixRadioSelection(locality.loc_status)
-  locality.approx_coord = fixRadioSelection(locality.approx_coord)
+  locality.approx_coord = locality.approx_coord == null ? null : fixRadioSelection(locality.approx_coord)
   locality.stone_tool_cut_marks_on_bones = fixRadioSelection(locality.stone_tool_cut_marks_on_bones) as boolean
   locality.bipedal_footprints = fixRadioSelection(locality.bipedal_footprints) as boolean
   locality.stone_tool_technology = fixRadioSelection(locality.stone_tool_technology) as boolean

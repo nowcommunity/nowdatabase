@@ -10,6 +10,7 @@ import { EditingModal } from '@/components/DetailView/common/EditingModal'
 import { emptyOption } from '@/components/DetailView/common/misc'
 import { convertDmsToDec, convertDecToDms } from '@/util/coordinateConversion'
 import { validCountries } from '@/shared/validators/countryList'
+import { validateLocalitySynonymNames } from '@/shared/validators/locality'
 import { useNotify } from '@/hooks/notification'
 import { EntryUpdateHistory } from '@/components/DetailView/common/FieldUpdateHistory'
 
@@ -133,7 +134,8 @@ export const LocalityTab = () => {
           { value: 'false', display: 'No' },
           { value: 'true', display: 'Yes' },
         ],
-        'Approximate Coordinates'
+        'Approximate Coordinates',
+        { preserveEmptyValue: true }
       ),
     ],
     ['Altitude (m)', textField('altitude', { type: 'number', integerOnly: true, min: -500, max: 9000 })],
@@ -197,15 +199,10 @@ export const LocalityTab = () => {
             validate: value => {
               const trimmedValue = value.trim()
               if (!trimmedValue) return 'Synonym is required'
-              if (trimmedValue.length > 30) return 'Synonym must be 30 characters or fewer'
-
-              const duplicate = editData.now_syn_loc.some(existing => {
-                if (existing.rowState === 'removed' || existing.rowState === 'cancelled') return false
-                return (existing.synonym ?? '').trim().toLowerCase() === trimmedValue.toLowerCase()
-              })
-
-              if (duplicate) return 'This synonym already exists for this locality'
-              return true
+              return (
+                validateLocalitySynonymNames([...editData.now_syn_loc, { synonym: trimmedValue, rowState: 'new' }]) ??
+                true
+              )
             },
           })}
           label="Synonym"

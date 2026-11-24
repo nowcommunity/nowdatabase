@@ -35,12 +35,9 @@ export const FrontPage = () => {
           <h1>Welcome to NOW database</h1>
           <p>
             The NOW (New and Old Worlds) fossil mammal database contains information about Cenozoic land mammal taxa and
-            localities. The emphasis of the database has been on the European Miocene and Pliocene but North American
-            localities, covering the whole Cenozoic, were added to the public database in 2016. African localities are
-            currently being added and updated, and the temporal scale is also becoming wider for both Eurasia and
-            Africa, with Pleistocene and Paleogene localities being added into the database. The NOW database is
-            maintained and coordinated by <a href="mailto:indre-dot-zliobaite-at-helsinki-dot-fi">Indrė Žliobaitė</a> in
-            collaboration with associate coordinators, a steering group and an international{' '}
+            localities. The NOW database is maintained and coordinated by{' '}
+            <a href="mailto:indre-dot-zliobaite-at-helsinki-dot-fi">Indrė Žliobaitė</a> in collaboration with associate
+            coordinators, a steering group and an international{' '}
             <a href="https://nowdatabase.org/now/board/">advisory board</a>.
           </p>
           <p>

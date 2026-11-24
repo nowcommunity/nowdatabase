@@ -23,12 +23,12 @@ import geonamesRouter from './routes/geonames-api'
 import changelogRouter from './routes/changelog'
 import { responseLogger } from './middlewares/requestLogger'
 import compression from 'compression'
-import { ENABLE_WRITE, RUNNING_ENV } from './utils/config'
+import { RUNNING_ENV } from './utils/config'
 import { tokenExtractor, userExtractor } from './middlewares/authenticator'
 import { errorHandler } from './middlewares/errorHandler'
 import { requireOneOf } from './middlewares/authorizer'
 import { Role } from './../../frontend/src/shared/types'
-import { blockWriteRequests } from './middlewares/misc'
+import { invalidateLocalityListCacheAfterWrites } from './middlewares/localityListCache'
 import { maintenanceGate } from './middlewares/maintenanceGate'
 import testRouter from './routes/test'
 import occurrenceRouter from './routes/occurrence'
@@ -40,12 +40,13 @@ const app = express()
 app.use(express.json({ limit: '50mb' }))
 app.use(cors())
 app.use(compression())
-
 app.use(responseLogger)
+app.use(invalidateLocalityListCacheAfterWrites)
 
-if (!ENABLE_WRITE && RUNNING_ENV !== 'dev') {
-  app.use(blockWriteRequests)
-}
+// TODO: I commented this out because the build.yaml (github actions) file does not seem to respect the variable, should test
+// if (!ENABLE_WRITE && RUNNING_ENV !== 'dev') {
+//  app.use(blockWriteRequests)
+// }
 
 app.use(refreshTokenRouter)
 

@@ -1,5 +1,5 @@
 import { useSearchParams } from 'react-router-dom'
-import { Box, Button, Paper, Stack, Tab, Tabs, useTheme } from '@mui/material'
+import { Box, Button, Paper, Tooltip, Stack, Tab, Tabs, useTheme } from '@mui/material'
 import EditIcon from '@mui/icons-material/Edit'
 import { useState, JSX } from 'react'
 import {
@@ -62,6 +62,7 @@ export type TextFieldOptions =
 export type OptionalRadioSelectionProps = {
   defaultValue?: DropdownOptionValue
   handleSetEditData?: (value: number | string | boolean) => void
+  preserveEmptyValue?: boolean
 }
 
 export type FieldsWithErrorsType = { [field: string]: ValidationObject }
@@ -96,7 +97,7 @@ const EditToggleButton = <T,>({
       id="edit-button"
       onClick={handleClick}
       variant={mode.read ? 'contained' : 'outlined'}
-      style={{ width: '8em' }}
+      style={{ width: '12em', height: '3em' }}
     >
       <EditIcon style={{ marginRight: '0.5em' }} /> {mode.read ? 'Edit' : 'Cancel edit'}
     </Button>
@@ -115,6 +116,8 @@ export const DetailView = <T extends object>({
   taxonomy = false,
   hasStagingMode = false,
   deleteFunction,
+  deleteDisabled = false,
+  deleteDisabledReason,
   wrapWithUnsavedChangesProvider = true,
 }: {
   tabs: TabType[]
@@ -132,6 +135,8 @@ export const DetailView = <T extends object>({
   taxonomy?: boolean
   hasStagingMode?: boolean
   deleteFunction?: () => Promise<void>
+  deleteDisabled?: boolean
+  deleteDisabledReason?: string
   wrapWithUnsavedChangesProvider?: boolean
 }) => {
   const [searchParams] = useSearchParams()
@@ -249,13 +254,11 @@ export const DetailView = <T extends object>({
             <DetailBrowser<T> />
           </Box>
         )}
-        <Box
-          sx={{ display: 'flex', justifyContent: 'space-between', alignContent: 'space-between', marginTop: 'auto' }}
-        >
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 'auto' }}>
           <Box sx={{ display: 'flex' }} gap={3}>
             {!isUserPage && <ReturnButton />}
           </Box>
-          <Box sx={{ display: 'flex' }} gap={1}>
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }} gap={1}>
             {!isPersonPage && !isNew && <ContactForm<T> buttonText="Contact" />}
             <EditToggleButton<T>
               canEdit={!!editRights.edit && !mode.staging}
@@ -263,15 +266,20 @@ export const DetailView = <T extends object>({
               setFieldsWithErrors={setFieldsWithErrors}
             />
             {editRights.delete && !isNew && !isUserPage && (
-              <Button
-                id="delete-button"
-                onClick={onDelete}
-                variant="contained"
-                sx={{ width: '8em', color: 'white' }}
-                color="error"
-              >
-                Delete
-              </Button>
+              <Tooltip title={deleteDisabled ? deleteDisabledReason ?? '' : ''}>
+                <span>
+                  <Button
+                    id="delete-button"
+                    onClick={onDelete}
+                    variant="contained"
+                    sx={{ width: '8em', height: '3em' }}
+                    color="error"
+                    disabled={deleteDisabled}
+                  >
+                    Delete
+                  </Button>
+                </span>
+              </Tooltip>
             )}
             {!mode.read && <ErrorBox />}
             {(!mode.read || initialState.mode.new) && onWrite && (

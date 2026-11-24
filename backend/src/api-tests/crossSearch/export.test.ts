@@ -60,6 +60,22 @@ describe('Getting cross-search export', () => {
     expect(response.body).toEqual({ error: 'ColumnFilters is not an array.' })
   })
 
+  it('POST rejects injected column and sorting ids', async () => {
+    const invalidFilter = await send(`crosssearch/export`, 'POST', {
+      columnFilters: [{ id: "country' OR 1=1 --", value: 'Spain' }],
+      sorting: [],
+    })
+    expect(invalidFilter.status).toEqual(403)
+    expect(invalidFilter.body).toEqual({ error: 'columnFilters has an invalid column id.' })
+
+    const invalidSorting = await send(`crosssearch/export`, 'POST', {
+      columnFilters: [],
+      sorting: [{ id: "country' OR 1=1 --", desc: false }],
+    })
+    expect(invalidSorting.status).toEqual(403)
+    expect(invalidSorting.body).toEqual({ error: 'orderBy was not a valid column id.' })
+  })
+
   it('with invalid column filters content does not work', async () => {
     const { body: responseBody1, status: responseStatus1 } = await send(
       `crosssearch/export/[{"id": "not_a_column", "value": "Dmanisi"}]/[]`,
@@ -109,6 +125,17 @@ describe('Getting cross-search export', () => {
     expect(rows.every(row => row.country === 'Spain')).toBe(true)
     expect(rows.map(row => row.loc_name)).toContain("Romanyà d'Empordà")
     expect(rows.map(row => row.species_name)).toContain('dubia')
+  })
+
+  it('POST export treats SQL-like filter values as data', async () => {
+    const response = await exportCrossSearchCsv({
+      columnFilters: [{ id: 'country', value: "' OR 1=1 --" }],
+      sorting: [],
+    })
+
+    expect(response.status).toEqual(200)
+    const rows = await parseCsvRows(response.csvContent)
+    expect(rows).toHaveLength(0)
   })
 
   it('exports CSV content in the requested sorting order', async () => {

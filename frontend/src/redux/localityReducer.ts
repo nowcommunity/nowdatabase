@@ -1,6 +1,6 @@
 import { api } from './api'
-import { addLocality } from '@/redux/userReducer'
-import { EditDataType, Locality, LocalityDetailsType } from '@/shared/types'
+import { addLocality, removeLocality } from '@/redux/userReducer'
+import { EditDataType, EditMetaData, Locality, LocalityDetailsType, LocalitySpeciesDetailsType } from '@/shared/types'
 
 const sanitizeLocalityProjects = (locality?: EditDataType<LocalityDetailsType>) => {
   if (!locality || !locality.now_plr) return [] as LocalityDetailsType['now_plr']
@@ -11,9 +11,11 @@ const sanitizeLocalityProjects = (locality?: EditDataType<LocalityDetailsType>) 
 
 const localitiesApi = api.injectEndpoints({
   endpoints: builder => ({
-    getAllLocalities: builder.query<Locality[], void>({
-      query: () => ({
+    // `fields` limits the optional columns in the response; all columns are returned when omitted.
+    getAllLocalities: builder.query<Locality[], string[] | void>({
+      query: fields => ({
         url: `/locality/all`,
+        params: fields ? { fields: fields.join(',') } : undefined,
       }),
       providesTags: result => (result ? [{ type: 'localities' }] : []),
     }),
@@ -23,14 +25,20 @@ const localitiesApi = api.injectEndpoints({
       }),
       providesTags: result => (result ? [{ type: 'locality', id: result.lid }] : []),
     }),
-    editLocality: builder.mutation<{ id: number }, EditDataType<LocalityDetailsType>>({
+    getLocalityOccurrences: builder.query<LocalitySpeciesDetailsType[], string>({
+      query: lid => `/locality/${lid}/occurrences`,
+    }),
+    editLocality: builder.mutation<
+      { id: number; editAccess?: boolean },
+      EditDataType<LocalityDetailsType> & EditMetaData
+    >({
       query: locality => ({
         url: `/locality`,
         method: 'PUT',
         body: { locality },
       }),
       invalidatesTags: (result, _error, { lid }) =>
-        result ? [{ type: 'locality', id: lid }, 'localities', 'specieslist'] : [],
+        result ? [{ type: 'locality', id: lid }, 'localities', 'specieslist', 'occurrence'] : [],
       async onQueryStarted(locality, { dispatch, queryFulfilled }) {
         if (!locality.lid) {
           try {
@@ -48,7 +56,9 @@ const localitiesApi = api.injectEndpoints({
           })
         )
         try {
-          await queryFulfilled
+          const { data } = await queryFulfilled
+          // The backend reports whether the user still belongs to one of the locality's projects.
+          if (data.editAccess === false) dispatch(removeLocality(locality.lid))
         } catch {
           patchResult.undo()
         }
@@ -68,6 +78,7 @@ const localitiesApi = api.injectEndpoints({
 export const {
   useGetAllLocalitiesQuery,
   useGetLocalityDetailsQuery,
+  useLazyGetLocalityOccurrencesQuery,
   useEditLocalityMutation,
   useDeleteLocalityMutation,
 } = localitiesApi

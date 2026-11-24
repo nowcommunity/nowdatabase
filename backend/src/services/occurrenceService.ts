@@ -1,9 +1,16 @@
-import { AnyReference, EditableOccurrenceData, Role, User } from '../../../frontend/src/shared/types'
+import {
+  AnyReference,
+  EditableOccurrenceData,
+  EditDataType,
+  OccurrenceDetailsType,
+  Role,
+  User,
+} from '../../../frontend/src/shared/types'
 import { validateOccurrence } from '../../../frontend/src/shared/validators/occurrence'
 import { AccessError } from '../middlewares/authorizer'
 import { logDb, nowDb } from '../utils/db'
-import { buildPersonLookupByInitials, getPersonDisplayName, getPersonFromLookup } from './utils/person'
 import { generateOccurrenceDetailSql } from './queries/crossSearchQuery'
+import { buildPersonLookupByInitials, getPersonDisplayName, getPersonFromLookup } from './utils/person'
 import { addNullExactDateToReferenceJoins, referenceWithoutExactDateSelect } from './utils/referenceDate'
 
 const getAllowedLocalities = async (user: User) => {
@@ -47,7 +54,7 @@ export const ensureOccurrenceEditAccess = async (lid: number, user: User) => {
   throw new AccessError()
 }
 
-export const validateOccurrencePayload = (payload: EditableOccurrenceData) => {
+export const validateOccurrencePayload = (payload: EditDataType<OccurrenceDetailsType>) => {
   const validationErrors = (Object.keys(payload) as Array<keyof EditableOccurrenceData>)
     .map(fieldName => validateOccurrence(payload, fieldName))
     .filter(validation => !!validation.error)
@@ -322,8 +329,9 @@ export const getOccurrenceByCompositeKey = async (lid: number, speciesId: number
       loc_status: boolean | null
       loc_name: string
       country: string
+      order_name: string
+      family_name: string
       genus_name: string
-      family_name: string | null
       species_name: string
       unique_identifier: string | null
       dms_lat: string | null

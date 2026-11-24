@@ -11,5 +11,11 @@ export const validatePassword = (password: string): PasswordValidationResult => 
       error: 'Password must only contain characters a-z, A-Z, 0-9 and ^?$%&~!',
     }
 
+  if (!/[a-z]/.test(password) || !/[A-Z]/.test(password) || !/[0-9]/.test(password) || !/[\^?$%&~!]/.test(password))
+    return {
+      isValid: false,
+      error: 'Password must contain at least one of each: a-z, A-Z, 0-9 and ^?$%&~!',
+    }
+
   return { isValid: true }
 }

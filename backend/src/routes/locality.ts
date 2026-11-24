@@ -1,7 +1,10 @@
 import { Request, Response, Router } from 'express'
 import {
   getAllLocalities,
+  InvalidLocalityFieldsError,
+  parseLocalityListFields,
   canEditRestrictedWriteLocality,
+  canEditRestrictedUserStillEditLocality,
   getLocalityDetails,
   normalizeLocalityAges,
   validateEntireLocality,
@@ -17,8 +20,15 @@ import { parseRequiredNumericIdsBody } from './utils/exportFilters'
 const router = Router()
 
 router.get('/all', async (req, res) => {
-  const localities = await getAllLocalities(req.user)
-  return res.status(200).send(fixBigInt(localities))
+  let fields: ReturnType<typeof parseLocalityListFields>
+  try {
+    fields = parseLocalityListFields(req.query.fields)
+  } catch (error) {
+    if (error instanceof InvalidLocalityFieldsError) return res.status(400).send({ error: error.message })
+    throw error
+  }
+  const localities = await getAllLocalities(req.user, fields)
+  return res.status(200).send(localities)
 })
 
 const sendDwcArchive = async (ids: number[] | undefined, res: Response) => {
@@ -40,6 +50,13 @@ router.post('/export/dwc-archive', requireOneOf([Role.Admin]), async (req, res) 
     return res.status(400).send({ error: error instanceof Error ? error.message : 'Invalid export filters.' })
   }
   return sendDwcArchive(ids, res)
+})
+
+router.get('/:id/occurrences', async (req, res) => {
+  const id = parseInt(req.params.id)
+  const locality = await getLocalityDetails(id, req.user)
+  if (!locality) return res.status(404).send()
+  return res.status(200).send(fixBigInt(locality.now_ls))
 })
 
 router.get('/:id', async (req, res) => {
@@ -70,6 +87,10 @@ router.put(
       return res.status(403).send(validationErrors)
     }
     const result = await writeLocality(normalizedLocality, comment, references, req.user)
+    if (req.user?.role === Role.EditRestricted) {
+      const editAccess = await canEditRestrictedUserStillEditLocality(result!, req.user)
+      return res.status(200).send({ id: result, editAccess })
+    }
     return res.status(200).send({ id: result })
   }
 )

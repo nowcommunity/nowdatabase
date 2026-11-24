@@ -15,17 +15,26 @@ import northarrow from './images/north-arrow.png'
 interface Props {
   localities?: SimplifiedLocality[]
   isFetching: boolean
+  // When false, only the base map is shown; markers and country borders are skipped until it becomes true.
+  loadLayers?: boolean
+  initiallyOpen?: boolean
+  onOpen?: () => void
 }
 
 type CustomCircleMarkerOptions = L.CircleMarkerOptions & { localityId: number }
 type CustomCircleMarker = L.CircleMarker & { options: CustomCircleMarkerOptions }
 
-export const LocalitiesMap = ({ localities, isFetching }: Props) => {
+export const LocalitiesMap = ({ localities, isFetching, loadLayers = true, initiallyOpen = false, onOpen }: Props) => {
   const [selectedLocality, setSelectedLocality] = useState<string | null>(null)
   const mapRef = useRef<HTMLDivElement | null>(null)
   const [map, setMap] = useState<L.Map | null>(null)
   const borderLayerRef = useRef<L.LayerGroup | null>(null)
-  const [isOpen, setIsOpen] = useState(false)
+  const [isOpen, setIsOpen] = useState(initiallyOpen)
+
+  useEffect(() => {
+    if (isOpen) onOpen?.()
+  }, [isOpen, onOpen])
+
   const [localityDetailsIsOpen, setLocalityDetailsIsOpen] = useState(false)
   const [clusteringEnabled, setClusteringEnabled] = useState(true)
 
@@ -38,6 +47,7 @@ export const LocalitiesMap = ({ localities, isFetching }: Props) => {
   const [countryPolygons, setCountryPolygons] = useState<unknown[] | null>(null)
 
   useEffect(() => {
+    if (!loadLayers) return
     let mounted = true
 
     // Dynamically import country polygons to avoid blocking on initial load
@@ -52,7 +62,7 @@ export const LocalitiesMap = ({ localities, isFetching }: Props) => {
     return () => {
       mounted = false
     }
-  }, [])
+  }, [loadLayers])
 
   useEffect(() => {
     if (!mapRef.current) return
@@ -126,7 +136,7 @@ export const LocalitiesMap = ({ localities, isFetching }: Props) => {
   }, [countryPolygons, map])
 
   useEffect(() => {
-    if (!map || isFetching) return
+    if (!map || isFetching || !loadLayers) return
 
     // To prevent eslint from complaining about that 'markers' variable below:
     /* eslint-disable @typescript-eslint/no-unsafe-assignment */
@@ -169,7 +179,7 @@ export const LocalitiesMap = ({ localities, isFetching }: Props) => {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
       map.removeLayer(newMarkers)
     }
-  }, [localities, isFetching, map, clusteringEnabled])
+  }, [localities, isFetching, map, clusteringEnabled, loadLayers])
 
   document.title = 'Map'
 
@@ -181,9 +191,9 @@ export const LocalitiesMap = ({ localities, isFetching }: Props) => {
           <button className="cluster" onClick={() => setClusteringEnabled(cluster => !cluster)}>
             {clusteringEnabled ? 'Show individual' : 'Show cluster'}
           </button>
-          <div className="gradient" onClick={() => setIsOpen(v => !v)}></div>
+          <div className="gradient" onClick={() => setIsOpen(v => !v)} title={isOpen ? undefined : 'Open map'}></div>
         </div>
-        <div className="open-button" onClick={() => setIsOpen(v => !v)} title="Close map">
+        <div className="open-button" onClick={() => setIsOpen(v => !v)} title={isOpen ? 'Close map' : 'Open map'}>
           <span className="downarrow"></span>
         </div>
       </article>

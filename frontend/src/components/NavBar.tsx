@@ -25,8 +25,8 @@ export const NavBar = () => {
     { title: 'References', url: '/reference' },
     { title: 'Time Units', url: '/time-unit' },
     { title: 'Time Bounds', url: '/time-bound', allowedRoles: [Role.Admin, Role.EditUnrestricted] },
-    { title: 'Museums', url: '/museum' },
-    { title: 'Projects', url: '/project' },
+    { title: 'Museums', url: '/museum', requiresLogin: true },
+    { title: 'Projects', url: '/project', requiresLogin: true },
     {
       title: 'Admin',
       url: '/admin',
@@ -66,6 +66,7 @@ export const NavBar = () => {
         </MenuItem>
         <MenuList className="menu-list">
           {pages
+            .filter(childLink => !childLink.requiresLogin || Boolean(user.username))
             .filter(childLink => !childLink.allowedRoles || childLink.allowedRoles.includes(user.role))
             .map(page => (
               <NavBarLink key={page.url} link={page} />

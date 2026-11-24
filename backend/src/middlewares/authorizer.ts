@@ -10,6 +10,14 @@ export class AccessError extends Error {
   }
 }
 
+export const requireLogin = () => {
+  const f: Middleware = (req, _res, next) => {
+    if (!req.user) throw new AccessError()
+    next()
+  }
+  return f
+}
+
 export const requireOneOf = (roles: Role[]) => {
   const f: Middleware = (req, _res, next) => {
     if (!req.user || !roles.includes(req.user.role)) throw new AccessError()

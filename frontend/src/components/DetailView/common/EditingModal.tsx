@@ -20,11 +20,15 @@ export const EditingModal = ({
   buttonText,
   children,
   onSave,
+  saveDisabled = false,
+  showCloseButton = true,
   dataCy,
 }: {
   buttonText: string
   children: EditingModalChildren
   onSave?: () => Promise<boolean>
+  saveDisabled?: boolean
+  showCloseButton?: boolean
   dataCy?: string
 }) => {
   const [open, setOpen] = useState(false)
@@ -37,6 +41,8 @@ export const EditingModal = ({
     setOpen(false)
   }
 
+  // If the child of this modal is a function, then the function receives the close function as a prop.
+  // This can be used by the child to close the modal.
   const content = typeof children === 'function' ? children({ close }) : children
 
   return (
@@ -56,13 +62,21 @@ export const EditingModal = ({
             {content}
           </Box>
           {onSave && (
-            <Button sx={{ marginRight: '0.5em' }} variant="contained" onClick={() => void closeWithSave()}>
+            <Button
+              id="editing-modal-save-button"
+              disabled={saveDisabled}
+              sx={{ marginRight: '0.5em' }}
+              variant="contained"
+              onClick={() => void closeWithSave()}
+            >
               Save
             </Button>
           )}
-          <Button variant="contained" onClick={close}>
-            {onSave ? 'Cancel' : 'Close'}
-          </Button>
+          {showCloseButton && (
+            <Button id="editing-modal-cancel-button" variant="contained" onClick={close}>
+              {onSave ? 'Cancel' : 'Close'}
+            </Button>
+          )}
         </Box>
       </Modal>
     </Box>

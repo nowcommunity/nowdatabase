@@ -16,6 +16,12 @@ const generateWhereClause = (showAll: boolean, allowedLocalities: Array<number>,
   else {
     const conditions: Prisma.Sql[] = []
     for (const filter of columnFilters) {
+      if (Array.isArray(filter.value)) {
+        const [min, max] = filter.value.map(bound => (bound === null || bound === '' ? null : Number(bound)))
+        if (min !== null) conditions.push(Prisma.sql`${Prisma.raw(filter.id)} >= ${min}`)
+        if (max !== null) conditions.push(Prisma.sql`${Prisma.raw(filter.id)} <= ${max}`)
+        continue
+      }
       if (filter.id === 'now_loc.country') {
         const continentCountries = getCountriesForContinentFilter(filter.value)
         if (continentCountries.length > 0) {
@@ -83,8 +89,9 @@ export const generateOccurrenceDetailSql = (lid: number, speciesId: number) => {
       now_loc.min_age,
       now_loc.bfa_max,
       now_loc.bfa_min,
-      com_species.genus_name,
+      com_species.order_name,
       com_species.family_name,
+      com_species.genus_name,
       com_species.species_name,
       com_species.unique_identifier
     FROM now_ls

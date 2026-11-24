@@ -1,6 +1,7 @@
 import { describe, expect, it, jest } from '@jest/globals'
 import '@testing-library/jest-dom'
-import { render, screen } from '@testing-library/react'
+import { render, screen, within } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { MemoryRouter } from 'react-router-dom'
 import { SpeciesMergePage } from '@/pages/admin/SpeciesMergePage'
 import { Role, Species, SpeciesMergeSummary, SpeciesMergeSummaryField, Reference } from '@/shared/types'
@@ -11,6 +12,17 @@ const mockUseGetAllSpeciesQuery = jest.fn()
 const mockUseGetSpeciesMergeSummaryQuery = jest.fn()
 const mockUseMergeSpeciesMutation = jest.fn()
 const mockUseGetAllReferencesQuery = jest.fn()
+
+jest.mock('@/components/DetailView/components', () => ({
+  ErrorBox: () => null,
+  WriteButton: ({ onWrite }: { onWrite: (data: { references: Reference[]; comment: string }) => Promise<void> }) => (
+    <button onClick={() => void onWrite({ references: [referenceFactory()], comment: '' })}>Save merge</button>
+  ),
+}))
+
+jest.mock('@/components/DetailView/StagingView', () => ({
+  StagingView: () => null,
+}))
 
 jest.mock('@/hooks/user', () => ({
   useUser: () => mockUseUser(),
@@ -223,5 +235,61 @@ describe('SpeciesMergePage', () => {
     expect(screen.getByText('Merge Species (Admin)')).toBeTruthy()
     expect(screen.getByLabelText('Obsolete taxonomy')).toBeTruthy()
     expect(screen.getByLabelText('Accepted taxonomy')).toBeTruthy()
+  })
+
+  it('allows selecting an empty obsolete parameter value and hides fields where both values are empty', async () => {
+    const user = userEvent.setup()
+    const obsoleteSpecies = speciesFactory({ species_id: 1, species_name: 'obsolete', unique_identifier: 'old-id' })
+    const acceptedSpecies = speciesFactory({ species_id: 2, species_name: 'accepted', unique_identifier: 'new-id' })
+    const summary = summaryFactory()
+    summary.speciesFieldChoices = [
+      { field: 'body_mass', obsoleteValue: null, acceptedValue: 2, defaultChoice: 'accepted' },
+      { field: 'microwear', obsoleteValue: null, acceptedValue: null, defaultChoice: 'accepted' },
+    ]
+    const mockMergeSpecies = jest.fn()
+    mockMergeSpecies.mockReturnValue({ unwrap: () => Promise.resolve(undefined) })
+
+    mockUseUser.mockReturnValue({ role: Role.Admin })
+    mockUseGetAllSpeciesQuery.mockReturnValue({ data: [obsoleteSpecies, acceptedSpecies], isError: false })
+    mockUseGetAllReferencesQuery.mockReturnValue({ data: [referenceFactory()], isError: false })
+    mockUseGetSpeciesMergeSummaryQuery.mockReturnValue({ data: summary, isFetching: false, isError: false })
+    mockUseMergeSpeciesMutation.mockReturnValue([mockMergeSpecies, { isLoading: false, data: undefined }])
+
+    render(
+      <MemoryRouter>
+        <SpeciesMergePage />
+      </MemoryRouter>
+    )
+
+    const obsoleteInput = screen.getByLabelText('Obsolete taxonomy')
+    await user.click(obsoleteInput)
+    await user.type(obsoleteInput, '1')
+    await user.click(screen.getByRole('option', { name: /1 Genus obsolete/ }))
+
+    const acceptedInput = screen.getByLabelText('Accepted taxonomy')
+    await user.click(acceptedInput)
+    await user.type(acceptedInput, '2')
+    await user.click(screen.getByRole('option', { name: /2 Genus accepted/ }))
+
+    await user.click(screen.getAllByLabelText('Yes')[0])
+
+    const bodyMassRow = screen
+      .getAllByRole('row')
+      .find(row => row.textContent?.includes('body_mass') && within(row).queryAllByRole('radio').length > 0)
+    expect(bodyMassRow).toBeTruthy()
+    expect(screen.queryByText('microwear')).toBeNull()
+
+    if (!bodyMassRow) throw new Error('Expected the body_mass parameter choice to be visible.')
+    await user.click(within(bodyMassRow).getByRole('radio', { name: '-' }))
+    await user.click(screen.getByRole('button', { name: /Remove 1 Genus obsolete/ }))
+    await user.click(screen.getByLabelText('I reviewed the merge details and parameter selections.'))
+    await user.click(screen.getByLabelText('I understand the obsolete species will be removed after saving.'))
+    await user.click(screen.getByRole('button', { name: 'Save merge' }))
+
+    expect(mockMergeSpecies).toHaveBeenCalledWith(
+      expect.objectContaining({
+        selectedSpeciesFieldValues: { body_mass: null },
+      })
+    )
   })
 })
