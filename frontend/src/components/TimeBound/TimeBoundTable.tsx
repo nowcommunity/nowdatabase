@@ -1,17 +1,22 @@
-import { useMemo } from 'react'
-import { type MRT_ColumnDef } from 'material-react-table'
-import { useGetAllTimeBoundsQuery } from '../../redux/timeBoundReducer'
 import { TimeBound } from '@/shared/types'
+import { type MRT_ColumnDef } from 'material-react-table'
+import { useMemo } from 'react'
+import { useGetAllTimeBoundsQuery } from '../../redux/timeBoundReducer'
 import { TableView } from '../TableView/TableView'
+
+import { CircularProgress } from '@mui/material'
 
 export const TimeBoundTable = ({
   selectorFn,
+  navigateOnRowClick = true,
   showBid = false,
 }: {
   selectorFn?: (newTimeBound: TimeBound) => void
+  navigateOnRowClick?: boolean
   showBid?: boolean
 }) => {
   const { data: timeBoundQueryData, isFetching, isError, error } = useGetAllTimeBoundsQuery()
+
   const columns = useMemo<MRT_ColumnDef<TimeBound>[]>(
     () => [
       {
@@ -43,6 +48,8 @@ export const TimeBoundTable = ({
     []
   )
 
+  if (!timeBoundQueryData) return <CircularProgress />
+
   const visibleColumns = {
     bid: showBid,
   }
@@ -54,12 +61,13 @@ export const TimeBoundTable = ({
       idFieldName="bid"
       columns={columns}
       isFetching={isFetching}
+      isError={isError}
+      error={error}
       visibleColumns={visibleColumns}
       data={timeBoundQueryData}
       url="time-bound"
       enableColumnFilterModes={true}
-      isError={isError}
-      error={error}
+      navigateOnRowClick={navigateOnRowClick}
     />
   )
 }

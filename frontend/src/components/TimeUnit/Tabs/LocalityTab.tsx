@@ -5,7 +5,7 @@ import { useDetailContext } from '@/components/DetailView/Context/DetailContext'
 import { DetailTabTable } from '@/components/DetailView/common/DetailTabTable'
 
 export const LocalityTab = () => {
-  const { data } = useDetailContext<TimeUnitDetailsType>()
+  const { data, mode } = useDetailContext<TimeUnitDetailsType>()
   const { data: localitiesData, isError } = useGetTimeUnitLocalitiesQuery(encodeURIComponent(data.tu_name))
 
   if (isError) return 'Error loading Localities.'
@@ -49,7 +49,7 @@ export const LocalityTab = () => {
       url="locality"
       isFetching={false}
       enableColumnFilterModes={true}
-      clickableRows={true}
+      navigateOnRowClick={mode.read}
       paginationPlacement="bottom"
     />
   )

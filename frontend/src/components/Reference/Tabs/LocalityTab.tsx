@@ -5,7 +5,7 @@ import { useDetailContext } from '@/components/DetailView/Context/DetailContext'
 import { DetailTabTable } from '@/components/DetailView/common/DetailTabTable'
 
 export const LocalityTab = () => {
-  const { data } = useDetailContext<ReferenceDetailsType>()
+  const { data, mode } = useDetailContext<ReferenceDetailsType>()
   const { data: localitiesData, isError } = useGetReferenceLocalitiesQuery(encodeURIComponent(data.rid))
 
   if (isError) return 'Error loading Localities.'
@@ -40,7 +40,7 @@ export const LocalityTab = () => {
       url="locality"
       isFetching={false}
       enableColumnFilterModes={true}
-      clickableRows={true}
+      navigateOnRowClick={mode.read}
       paginationPlacement="bottom"
     />
   )

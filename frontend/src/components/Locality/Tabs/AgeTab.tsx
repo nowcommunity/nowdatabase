@@ -269,7 +269,7 @@ export const AgeTab = () => {
         targetField="bfa_min"
         fraction={editData.frac_min}
         timeUnit={bfaMinData}
-        selectorTable={<TimeUnitTable clickableRows={false} />}
+        selectorTable={<TimeUnitTable navigateOnRowClick={false} />}
         disabled={minAgeTimeUnitDisabled}
         displayValue={minTimeUnitDisplay}
       />,
@@ -284,7 +284,7 @@ export const AgeTab = () => {
         targetField="bfa_max"
         fraction={editData.frac_max}
         timeUnit={bfaMaxData}
-        selectorTable={<TimeUnitTable clickableRows={false} />}
+        selectorTable={<TimeUnitTable navigateOnRowClick={false} />}
         disabled={maxAgeTimeUnitDisabled}
         displayValue={maxTimeUnitDisplay}
       />,

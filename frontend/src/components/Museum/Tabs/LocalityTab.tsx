@@ -3,7 +3,7 @@ import { useDetailContext } from '@/components/DetailView/Context/DetailContext'
 import { MuseumLocalities } from '@/shared/types'
 
 export const LocalityTab = ({ isNew }: { isNew: boolean }) => {
-  const { data } = useDetailContext<MuseumLocalities>()
+  const { data, mode } = useDetailContext<MuseumLocalities>()
 
   const columns = [
     {
@@ -44,7 +44,7 @@ export const LocalityTab = ({ isNew }: { isNew: boolean }) => {
       url="locality"
       isFetching={false}
       enableColumnFilterModes={true}
-      clickableRows={true}
+      navigateOnRowClick={mode.read}
       paginationPlacement="bottom"
     />
   )

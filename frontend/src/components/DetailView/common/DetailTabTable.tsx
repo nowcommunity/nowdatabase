@@ -120,7 +120,7 @@ type DetailTabTableReadSelectProps<T extends MRT_RowData> = {
   selectorFn?: (id: T) => void
   tableRowAction?: (row: T) => void
   url?: string
-  clickableRows?: boolean
+  navigateOnRowClick?: boolean
   enableColumnFilterModes?: boolean
   paginationPlacement?: 'top' | 'bottom' | 'both'
   tableContainerMaxHeight?: string | number
@@ -168,7 +168,7 @@ export const DetailTabTable = <T extends MRT_RowData>(props: DetailTabTableProps
     tableRowAction,
     url,
     checkRowRestriction,
-    clickableRows,
+    navigateOnRowClick,
     enableColumnFilterModes,
     paginationPlacement,
     isError,
@@ -196,7 +196,7 @@ export const DetailTabTable = <T extends MRT_RowData>(props: DetailTabTableProps
       tableRowAction={tableRowAction}
       url={url}
       checkRowRestriction={checkRowRestriction}
-      clickableRows={clickableRows}
+      navigateOnRowClick={navigateOnRowClick}
       showContactButton={false}
       showNewButton={false}
       enableColumnFilterModes={enableColumnFilterModes}

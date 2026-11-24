@@ -10,7 +10,7 @@ import {
 import { useLocation } from 'react-router-dom'
 
 export const SpeciesTab = () => {
-  const { data } = useDetailContext<ReferenceDetailsType>()
+  const { data, mode } = useDetailContext<ReferenceDetailsType>()
   const location = useLocation()
   const { data: speciesData, isError } = useGetReferenceSpeciesQuery(encodeURIComponent(data.rid))
 
@@ -66,7 +66,7 @@ export const SpeciesTab = () => {
       url="species"
       isFetching={false}
       enableColumnFilterModes={true}
-      clickableRows={true}
+      navigateOnRowClick={mode.read}
       paginationPlacement="bottom"
     />
   )
