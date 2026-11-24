@@ -1,12 +1,13 @@
-import { describe, expect, it, jest, beforeEach } from '@jest/globals'
-import '@testing-library/jest-dom'
-import { act, fireEvent, render, waitFor } from '@testing-library/react'
-import { Role } from '@/shared/types'
-import { TableView } from './TableView'
-import { usePageContext } from '../Page'
 import { useUser } from '@/hooks/user'
+import { Role } from '@/shared/types'
+import { beforeEach, describe, expect, it, jest } from '@jest/globals'
+import '@testing-library/jest-dom'
+import { act, fireEvent, render, screen, waitFor } from '@testing-library/react'
+import { usePageContext } from '../Page'
+import { TableView } from './TableView'
 
 type CapturedTableOptions = {
+  data?: Array<{ id: string; name: string }>
   onColumnFiltersChange?: (filters: Array<{ id: string; value: unknown }>) => void
   onSortingChange?: (sorting: Array<{ id: string; desc: boolean }>) => void
   onPaginationChange?: (pagination: { pageIndex: number; pageSize: number }) => void
@@ -28,7 +29,22 @@ jest.mock('material-react-table', () => {
       lastMaterialReactTableOptions = options
       return table
     },
-    MaterialReactTable: () => <div data-testid="material-react-table" />,
+    MaterialReactTable: () => {
+      const data = lastMaterialReactTableOptions?.data ?? []
+      const pagination = lastMaterialReactTableOptions?.state?.pagination ?? { pageIndex: 0, pageSize: data.length }
+      const firstVisibleRow = pagination.pageIndex * pagination.pageSize
+      const visibleRows = data.slice(firstVisibleRow, firstVisibleRow + pagination.pageSize)
+
+      return (
+        <div data-testid="material-react-table">
+          {visibleRows.map(row => (
+            <div key={row.id} data-testid={`table-row-${row.id}`}>
+              {row.name}
+            </div>
+          ))}
+        </div>
+      )
+    },
   }
 })
 
@@ -300,6 +316,55 @@ describe('TableView table help integration', () => {
 
     await waitFor(() => {
       expect(lastMaterialReactTableOptions?.state?.pagination).toEqual({ pageIndex: 0, pageSize: 5 })
+    })
+  })
+
+  it('updates visible rows when page size or page index changes', async () => {
+    const data = Array.from({ length: 10 }, (_, index) => ({
+      id: String(index + 1),
+      name: `Item ${index + 1}`,
+      full_count: 10,
+    }))
+    mockLocationSearch = `?pagination=${encodeURIComponent(JSON.stringify({ pageIndex: 0, pageSize: 5 }))}`
+
+    render(
+      <TableView<TestRow>
+        title="Test Table"
+        idFieldName="id"
+        columns={[{ header: 'Name', accessorKey: 'name' }]}
+        visibleColumns={{ name: true }}
+        data={data}
+        url="test"
+        isFetching={false}
+        serverSidePagination
+      />
+    )
+
+    await waitFor(() => {
+      expect(screen.getAllByTestId(/^table-row-/)).toHaveLength(5)
+      expect(screen.getByTestId('table-row-1')).toBeTruthy()
+      expect(screen.getByTestId('table-row-5')).toBeTruthy()
+      expect(screen.queryByTestId('table-row-6')).toBeNull()
+    })
+
+    act(() => {
+      lastMaterialReactTableOptions?.onPaginationChange?.({ pageIndex: 0, pageSize: 10 })
+    })
+
+    await waitFor(() => {
+      expect(screen.getAllByTestId(/^table-row-/)).toHaveLength(10)
+      expect(screen.getByTestId('table-row-10')).toBeTruthy()
+    })
+
+    act(() => {
+      lastMaterialReactTableOptions?.onPaginationChange?.({ pageIndex: 1, pageSize: 5 })
+    })
+
+    await waitFor(() => {
+      expect(screen.getAllByTestId(/^table-row-/)).toHaveLength(5)
+      expect(screen.getByTestId('table-row-6')).toBeTruthy()
+      expect(screen.getByTestId('table-row-10')).toBeTruthy()
+      expect(screen.queryByTestId('table-row-1')).toBeNull()
     })
   })
 
