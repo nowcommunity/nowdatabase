@@ -325,7 +325,7 @@ describe('Creating a new locality', () => {
     cy.visit('/locality/new')
     cy.get('[name=dating-method][value=composite]').click()
     cy.get('[id=bfa_min-tableselection-helper-text]').contains(
-      'One age row must follow the rules for Absolute, the other for Time Unit'
+      'Composite dating requires two age rows: one with Absolute basis and one with Time Unit basis'
     )
     cy.get('[id="Max Basis for age (absolute)-multiselect"]').click()
     cy.get('[data-value=chemical]').click()
