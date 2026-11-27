@@ -36,9 +36,6 @@ export const MuseumDetails = ({
 
   if (isError) return <div>Error loading data</div>
   if (isFetching || (!data && !isNew) || mutationLoading) return <CircularProgress />
-  if (data) {
-    document.title = `Museum - ${data.institution}`
-  }
 
   const onWrite = async (editData: EditDataType<Museum>) => {
     try {

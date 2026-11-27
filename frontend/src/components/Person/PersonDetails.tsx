@@ -93,8 +93,6 @@ export const PersonDetails = () => {
   if (isError) return <div>Error loading data</div>
   if (isLoading || (!data && !isNew) || mutationLoading || deleteLoading) return <CircularProgress />
 
-  document.title = isNew ? 'New person' : `User - ${data!.user?.user_name}`
-
   const deleteFunction = async () => {
     if (!id) return
 

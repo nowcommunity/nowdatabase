@@ -46,9 +46,6 @@ export const LocalityDetails = ({
   const { id } = useParams()
   const navigate = useNavigate()
   const isNew = id === 'new'
-  if (isNew) {
-    document.title = 'New locality'
-  }
   const [editLocalityRequest, { isLoading: mutationLoading }] = useEditLocalityMutation()
   const { isFetching, isError, data, refetch } = useGetLocalityDetailsQuery(id!, {
     skip: isNew,
@@ -69,9 +66,6 @@ export const LocalityDetails = ({
 
   if (isError) return <div>Error loading data</div>
   if (isFetching || (!data && !isNew) || mutationLoading) return <CircularProgress />
-  if (data) {
-    document.title = `Locality - ${data.loc_name}`
-  }
 
   const deleteFunction = async () => {
     await deleteMutation(parseInt(id!)).unwrap()

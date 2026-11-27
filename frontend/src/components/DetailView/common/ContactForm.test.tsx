@@ -72,6 +72,7 @@ const createMockPageContext = (
     setPreviousTableUrls,
     createTitle,
     createSubtitle: () => '',
+    createDocumentTitle: () => 'NOW Database',
     editRights: {},
     sqlLimit: 0,
     sqlOffset: 0,

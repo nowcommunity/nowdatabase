@@ -26,9 +26,6 @@ export const SpeciesDetails = ({
 } = {}) => {
   const { id } = useParams()
   const isNew = id === 'new'
-  if (isNew) {
-    document.title = 'New species'
-  }
   const [editSpeciesRequest, { isLoading: mutationLoading }] = useEditSpeciesMutation()
   const { isError, isFetching, data } = useGetSpeciesDetailsQuery(encodeURIComponent(id!), { skip: isNew })
   const { notify } = useNotify()
@@ -56,10 +53,6 @@ export const SpeciesDetails = ({
 
   if (isError) return <div>Error loading data</div>
   if (isFetching || (!modifiedData && !isNew) || mutationLoading) return <CircularProgress />
-
-  if (data) {
-    document.title = `Species - ${data.species_name}`
-  }
 
   const deleteFunction = async () => {
     await deleteMutation(parseInt(id!)).unwrap()

@@ -22,9 +22,6 @@ export const TimeBoundDetails = ({
 } = {}) => {
   const { id } = useParams()
   const isNew = id === 'new'
-  if (isNew) {
-    document.title = 'New Time Bound'
-  }
   const { isLoading, isFetching, isError, data } = useGetTimeBoundDetailsQuery(decodeURIComponent(id!), {
     skip: isNew,
   })
@@ -45,9 +42,6 @@ export const TimeBoundDetails = ({
 
   if (isError) return <div>Error loading data</div>
   if (isLoading || isFetching || (!data && !isNew)) return <CircularProgress />
-  if (data) {
-    document.title = `Time Bound - ${data.b_name}`
-  }
 
   const deleteFunction = async () => {
     await deleteMutation(parseInt(id!)).unwrap()

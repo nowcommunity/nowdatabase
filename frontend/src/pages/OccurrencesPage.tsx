@@ -28,6 +28,9 @@ ${speciesDisplay} (species_id: ${occurrence.species_id})`
         `${occurrence.dms_lat ?? ''}, ${occurrence.dms_long ?? ''}
 ${occurrence.max_age ?? ''} Ma (${occurrence.bfa_max ?? ''}) – ${occurrence.min_age ?? ''} Ma (${occurrence.bfa_min ?? ''})`
       }
+      createDocumentTitle={(occurrence: OccurrenceDetailsType) =>
+        `Occurrence - ${occurrence.lid}/${occurrence.species_id}`
+      }
       getEditRights={(user: UserState, id: string | number) => {
         if ([Role.Admin, Role.EditUnrestricted].includes(user.role)) return fullRights
         if (user.role === Role.EditRestricted && userHasLocalityAccess(user, id)) return limitedRights

@@ -199,6 +199,7 @@ export const DetailTabTable = <T extends MRT_RowData>(props: DetailTabTableProps
       clickableRows={clickableRows}
       showContactButton={false}
       showNewButton={false}
+      updateDocumentTitle={false}
       enableColumnFilterModes={enableColumnFilterModes}
       paginationPlacement={paginationPlacement}
       isError={isError}

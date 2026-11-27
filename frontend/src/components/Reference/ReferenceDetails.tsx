@@ -21,7 +21,6 @@ import {
 } from '@/shared/validators/reference'
 import { useNotify } from '@/hooks/notification'
 import { useEffect, useMemo } from 'react'
-import { createReferenceTitle } from './referenceFormatting'
 import { useReturnNavigation } from '@/hooks/useReturnNavigation'
 import type { FetchBaseQueryError } from '@reduxjs/toolkit/query'
 import type { SerializedError } from '@reduxjs/toolkit'
@@ -53,9 +52,6 @@ export const ReferenceDetails = ({
 } = {}) => {
   const { id } = useParams()
   const isNew = id === 'new'
-  if (isNew) {
-    document.title = 'New reference'
-  }
   const { isFetching, isError, data } = useGetReferenceDetailsQuery(id!, { skip: isNew })
   const [editReferenceRequest, { isLoading: mutationLoading }] = useEditReferenceMutation()
   const [deleteMutation, { isSuccess: deleteSuccess }] = useDeleteReferenceMutation()
@@ -101,9 +97,6 @@ export const ReferenceDetails = ({
 
   if (isError) return <div>Error loading data</div>
   if (isFetching || (!data && !isNew) || mutationLoading) return <CircularProgress />
-  if (data) {
-    document.title = `Reference - ${createReferenceTitle(data)}`
-  }
 
   const onWrite = async (editData: EditDataType<ReferenceDetailsType>) => {
     try {

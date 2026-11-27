@@ -19,6 +19,7 @@ export const LocalityPage = () => {
         createSubtitle={(loc: LocalityDetailsType) =>
           `${loc.dms_lat}, ${loc.dms_long}\n${loc.max_age} Ma (${loc.bfa_max}) – ${loc.min_age} Ma (${loc.bfa_min})`
         }
+        createDocumentTitle={(loc: LocalityDetailsType) => (loc.lid ? `Locality - ${loc.loc_name}` : 'New locality')}
         getEditRights={(user: UserState, id: string | number) => {
           if ([Role.Admin, Role.EditUnrestricted].includes(user.role)) return fullRights
           if (user.role === Role.EditRestricted) {

@@ -23,6 +23,9 @@ export const SpeciesPage = () => {
           `\nFamily ${species.family_name}` +
           `\nSubfamily or Tribe ${species.subfamily_name}`
         }
+        createDocumentTitle={(species: SpeciesDetailsType) =>
+          species.species_id ? `Species - ${species.species_name}` : 'New species'
+        }
         getEditRights={(user: UserState) => {
           if ([Role.Admin, Role.EditUnrestricted].includes(user.role)) return fullRights
           if (user.role === Role.EditRestricted) return limitedRights

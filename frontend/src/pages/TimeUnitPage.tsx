@@ -21,6 +21,9 @@ export const TimeUnitPage = () => {
           `\n${tu.now_tu_sequence.seq_name}` +
           ` (${tu.rank ? tu.rank : 'No rank'})`
         }
+        createDocumentTitle={(tu: TimeUnitDetailsType) =>
+          tu.tu_name ? `Time Unit - ${tu.tu_display_name}` : 'New Time Unit'
+        }
         getEditRights={(user: UserState) => {
           if ([Role.Admin, Role.EditUnrestricted].includes(user.role)) return fullRights
           return noRights

@@ -15,6 +15,7 @@ export const RegionPage = () => {
       viewName="region"
       idFieldName="reg_coord_id"
       createTitle={(region: RegionDetailsType) => `${region.region}`}
+      createDocumentTitle={(region: RegionDetailsType) => (region.reg_coord_id ? region.region : 'New region')}
       getEditRights={(user: UserState) => {
         if (user.role === Role.Admin) return fullRights
         return noRights
