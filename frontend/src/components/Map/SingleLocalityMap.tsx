@@ -123,8 +123,6 @@ export const SingleLocalityMap = ({ decLat, decLong, boxes }: Props) => {
     }
   }, [map, decLat, decLong, boxes])
 
-  document.title = 'Map'
-
   return (
     <article id="locality-map">
       <div className={'map-locality-container'}>

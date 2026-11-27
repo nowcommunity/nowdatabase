@@ -204,6 +204,7 @@ export const TableView = <T extends MRT_RowData>({
   clickableRows = true,
   showContactButton = true,
   showNewButton = true,
+  updateDocumentTitle = true,
   enableColumnFilterModes,
   serverSidePagination,
   isFetching,
@@ -234,6 +235,7 @@ export const TableView = <T extends MRT_RowData>({
   clickableRows?: boolean
   showContactButton?: boolean
   showNewButton?: boolean
+  updateDocumentTitle?: boolean
   enableColumnFilterModes?: boolean
   serverSidePagination?: boolean
   isFetching: boolean
@@ -281,6 +283,13 @@ export const TableView = <T extends MRT_RowData>({
   )
 
   const allowColumnFilterModes = (enableColumnFilterModes ?? true) && !serverSidePagination
+
+  useEffect(() => {
+    if (updateDocumentTitle) {
+      document.title = title
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   useEffect(() => {
     if (!serverSidePagination) return

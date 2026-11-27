@@ -181,8 +181,6 @@ export const LocalitiesMap = ({ localities, isFetching, loadLayers = true, initi
     }
   }, [localities, isFetching, map, clusteringEnabled, loadLayers])
 
-  document.title = 'Map'
-
   return (
     <>
       <article id="localities-map" className={isOpen ? 'open' : ''}>

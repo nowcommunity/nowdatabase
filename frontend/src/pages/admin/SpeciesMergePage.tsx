@@ -180,6 +180,8 @@ export const SpeciesMergePage = () => {
     reviewedDetails: false,
     confirmRemoval: false,
   })
+
+  document.title = 'Merge Species'
   const initializedMergeKeyRef = useRef<string | null>(null)
 
   const obsoleteId = obsoleteSpecies?.species_id
