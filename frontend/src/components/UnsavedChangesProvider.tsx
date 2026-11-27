@@ -63,12 +63,13 @@ export const UnsavedChangesProvider = ({
 
   const shouldBlockNavigation = useCallback(() => {
     if (!isDirty) return false
+    if (isSamePathNavigation) return false
     if (allowNextNavigationRef.current) {
       allowNextNavigationRef.current = false
       return false
     }
     return true
-  }, [isDirty])
+  }, [isDirty, isSamePathNavigation])
 
   const handleConfirm = useCallback(() => {
     if (blocker.state === 'blocked') {
@@ -88,13 +89,6 @@ export const UnsavedChangesProvider = ({
       setBlocker(unblockedState)
     }
   }, [dataRouterContext])
-
-  useEffect(() => {
-    const proceed = blocker.proceed as (() => void) | undefined
-    if (isSamePathNavigation && proceed) {
-      proceed()
-    }
-  }, [blocker, isSamePathNavigation])
 
   const value = useMemo(
     () => ({
