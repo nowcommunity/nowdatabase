@@ -1,13 +1,13 @@
+import { beforeEach, describe, expect, it, jest } from '@jest/globals'
 import '@testing-library/jest-dom'
-import { describe, expect, it, beforeEach, jest } from '@jest/globals'
-import { render, screen } from '@testing-library/react'
+import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { useContext, useEffect } from 'react'
 import { RouterProvider, createMemoryRouter } from 'react-router-dom'
 
 import { UnsavedChangesProvider } from '@/components/UnsavedChangesProvider'
 import { UnsavedChangesContext } from '@/components/unsavedChangesContext'
-import { useBlocker, type Location, type BlockerFunction } from 'react-router-dom'
+import { NavigationType, useBlocker, type BlockerFunction, type Location } from 'react-router-dom'
 
 jest.mock('react-router-dom', () => {
   const actual = jest.requireActual<typeof import('react-router-dom')>('react-router-dom')
@@ -44,8 +44,15 @@ const TestConsumer = ({ setDirtyOnMount = true }: { setDirtyOnMount?: boolean })
   return <div data-testid="dirty-state">{context?.isDirty ? 'dirty' : 'clean'}</div>
 }
 
-const renderWithProvider = (blocker: MockedBlocker, setDirtyOnMount = true) => {
+const renderWithProvider = (
+  blocker: MockedBlocker,
+  setDirtyOnMount = true,
+  onBlockerPredicate?: (predicate: BlockerFunction) => void
+) => {
   mockUseBlocker.mockImplementation((shouldBlock: boolean | BlockerFunction) => {
+    if (typeof shouldBlock === 'function') {
+      onBlockerPredicate?.(shouldBlock)
+    }
     if (!shouldBlock || (typeof shouldBlock === 'boolean' && !shouldBlock)) {
       return unblockedBlocker
     }
@@ -72,9 +79,9 @@ describe('UnsavedChangesProvider', () => {
   const proceed = jest.fn(() => undefined)
   const reset = jest.fn(() => undefined)
 
-  const createLocation = (pathname: string): Location => ({
+  const createLocation = (pathname: string, search: string = ''): Location => ({
     pathname,
-    search: '',
+    search: search,
     hash: '',
     state: null,
     key: 'test',
@@ -108,19 +115,33 @@ describe('UnsavedChangesProvider', () => {
     expect(proceed).toHaveBeenCalledTimes(1)
   })
 
-  it('auto-proceeds without showing a dialog when navigating within the same path', () => {
+  it('does not block navigation within the same path', async () => {
+    let blockerPredicate: BlockerFunction | undefined
+
     renderWithProvider(
       {
-        state: 'blocked',
-        location: createLocation(window.location.pathname),
+        state: 'unblocked',
+        location: createLocation('/'),
         proceed,
         reset,
       },
-      true
+      true,
+      predicate => {
+        blockerPredicate = predicate
+      }
     )
 
-    expect(proceed).toHaveBeenCalledTimes(1)
+    await waitFor(() => expect(screen.getByTestId('dirty-state').textContent).toBe('dirty'))
+
+    expect(
+      blockerPredicate?.({
+        currentLocation: createLocation('/species/123', '?tab=0'),
+        nextLocation: createLocation('/species/123', '?tab=1'),
+        historyAction: NavigationType.Replace,
+      })
+    ).toBe(false)
     expect(screen.queryByText('Unsaved changes')).toBeNull()
+    expect(proceed).not.toHaveBeenCalled()
   })
 
   it('does not show a dialog when not dirty', () => {

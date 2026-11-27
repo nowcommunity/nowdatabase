@@ -1,5 +1,5 @@
 import { useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
-import { UNSAFE_DataRouterContext, useBlocker } from 'react-router-dom'
+import { UNSAFE_DataRouterContext, useBlocker, type BlockerFunction } from 'react-router-dom'
 
 import { UnsavedChangesDialog } from './UnsavedChangesDialog'
 import { UnsavedChangesContext } from './unsavedChangesContext'
@@ -49,8 +49,7 @@ export const UnsavedChangesProvider = ({
   const allowNextNavigationRef = useRef(false)
   const dataRouterContext = useContext(UNSAFE_DataRouterContext)
 
-  const isSamePathNavigation = blocker.state === 'blocked' && blocker.location?.pathname === window.location.pathname
-  const showDialog = blocker.state === 'blocked' && !isSamePathNavigation
+  const showDialog = blocker.state === 'blocked' && blocker.location?.pathname !== window.location.pathname
 
   const resetMessage = useCallback(() => {
     setMessage(defaultMessage)
@@ -61,15 +60,18 @@ export const UnsavedChangesProvider = ({
     setDirty(false)
   }, [])
 
-  const shouldBlockNavigation = useCallback(() => {
-    if (!isDirty) return false
-    if (isSamePathNavigation) return false
-    if (allowNextNavigationRef.current) {
-      allowNextNavigationRef.current = false
-      return false
-    }
-    return true
-  }, [isDirty, isSamePathNavigation])
+  const shouldBlockNavigation = useCallback<BlockerFunction>(
+    ({ currentLocation, nextLocation }) => {
+      if (!isDirty) return false
+      if (currentLocation.pathname === nextLocation.pathname) return false
+      if (allowNextNavigationRef.current) {
+        allowNextNavigationRef.current = false
+        return false
+      }
+      return true
+    },
+    [isDirty]
+  )
 
   const handleConfirm = useCallback(() => {
     if (blocker.state === 'blocked') {
