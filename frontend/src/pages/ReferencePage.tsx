@@ -2,7 +2,7 @@ import { fullRights, limitedRights, noRights } from '@/components/pages'
 import { ReferenceDetails } from '@/components/Reference/ReferenceDetails'
 import { ReferenceTable } from '@/components/Reference/ReferenceTable'
 import { UserState } from '@/redux/userReducer'
-import { Role } from '@/shared/types'
+import { ReferenceDetailsType, Role } from '@/shared/types'
 
 import { Page } from '../components/Page'
 import { createReferenceSubtitle, createReferenceTitle } from '../components/Reference/referenceFormatting'
@@ -18,6 +18,9 @@ export const ReferencePage = () => {
         idFieldName="rid"
         createTitle={createReferenceTitle}
         createSubtitle={createReferenceSubtitle}
+        createDocumentTitle={(reference: ReferenceDetailsType) =>
+          reference.rid ? `Reference - ${createReferenceTitle(reference)}` : 'New reference'
+        }
         getEditRights={(user: UserState) => {
           if (user.role === Role.Admin) return fullRights
           if (user.role === Role.EditUnrestricted) return limitedRights

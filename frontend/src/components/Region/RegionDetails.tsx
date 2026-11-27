@@ -31,8 +31,6 @@ export const RegionDetails = () => {
 
   if (isLoading || (!data && !isNew) || mutationLoading) return <CircularProgress />
 
-  document.title = isNew ? 'New region' : data!.region
-
   const onWrite = async (editData: EditDataType<RegionDetailsType>) => {
     try {
       const { reg_coord_id } = await editRegionRequest(editData).unwrap()

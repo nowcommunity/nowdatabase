@@ -40,6 +40,7 @@ const pageContextValue: PageContextType<unknown> = {
   setPreviousTableUrls: jest.fn(),
   createTitle: () => timeUnitData.tu_display_name,
   createSubtitle: () => '',
+  createDocumentTitle: () => 'NOW Database',
   editRights: { edit: true },
   sqlLimit: 20,
   sqlOffset: 0,

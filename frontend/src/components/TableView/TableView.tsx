@@ -502,9 +502,6 @@ export const TableView = <T extends MRT_RowData>({
 
     return defaultState
   }
-  if (title) {
-    document.title = `${title}`
-  }
 
   const resolveDetailPath = (row: T) => {
     if (getDetailPath) return getDetailPath(row)

@@ -56,10 +56,6 @@ export const OccurrenceDetails = () => {
 
   const initialOccurrence: OccurrenceDetailsType = { ...emptyOccurrence }
 
-  if (occurrenceData) {
-    document.title = `Occurrence - ${occurrenceData.lid}/${occurrenceData.species_id}`
-  }
-
   const onWrite = async (editData: EditDataType<OccurrenceDetailsType> & EditMetaData) => {
     const isSpeciesChanged = editData.species_id !== Number(speciesId)
     if (isSpeciesChanged) {

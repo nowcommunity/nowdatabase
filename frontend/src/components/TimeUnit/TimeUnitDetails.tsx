@@ -27,9 +27,6 @@ export const TimeUnitDetails = ({
 } = {}) => {
   const { id } = useParams()
   const isNew = id === 'new'
-  if (isNew) {
-    document.title = 'New Time Unit'
-  }
   const { isLoading, isError, isFetching, data } = useGetTimeUnitDetailsQuery(encodeURIComponent(id!), { skip: isNew })
   const [editTimeUnitRequest] = useEditTimeUnitMutation()
 
@@ -43,9 +40,6 @@ export const TimeUnitDetails = ({
 
   if (isError) return <div>Error loading data</div>
   if (isLoading || isFetching || (!data && !isNew)) return <CircularProgress />
-  if (data) {
-    document.title = `Time Unit - ${data.tu_display_name}`
-  }
 
   const deleteFunction = async () => {
     await deleteTimeUnit(id!)

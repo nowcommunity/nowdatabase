@@ -17,6 +17,7 @@ export const TimeBoundPage = () => {
         viewName="time-bound"
         idFieldName="bid"
         createTitle={(tb: TimeBoundDetailsType) => `${tb.bid} ${tb.b_name}`}
+        createDocumentTitle={(tb: TimeBoundDetailsType) => (tb.bid ? `Time Bound - ${tb.b_name}` : 'New Time Bound')}
         getEditRights={(user: UserState) => {
           if ([Role.Admin, Role.EditUnrestricted].includes(user.role)) return fullRights
           return noRights

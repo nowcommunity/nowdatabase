@@ -27,9 +27,6 @@ export const ProjectDetails = () => {
     return <div>Error loading data</div>
   }
   if (isLoading || !data || isDeleting || isUpdating) return <CircularProgress />
-  if (data) {
-    document.title = `Project - ${data.proj_name}`
-  }
 
   const deleteFunction = async () => {
     if (!projectId) return

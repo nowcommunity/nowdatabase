@@ -18,6 +18,7 @@ export type PageContextType<T> = {
   setPreviousTableUrls: (newPreviousTableUrls: string[]) => void
   createTitle: (data: T) => string
   createSubtitle: (data: T) => string
+  createDocumentTitle: (data: T) => string
   editRights: EditRights
   sqlLimit: number
   sqlOffset: number
@@ -37,6 +38,7 @@ export const PageContextProvider = <T extends object>({
   viewName,
   createTitle,
   createSubtitle,
+  createDocumentTitle,
   editRights,
 }: {
   children: ReactNode | ReactNode[]
@@ -44,6 +46,7 @@ export const PageContextProvider = <T extends object>({
   viewName: string
   createTitle: (data: T) => string
   createSubtitle: (data: T) => string
+  createDocumentTitle?: (data: T) => string
   editRights: EditRights
 }) => {
   const [idList, setIdList] = useState<string[]>([])
@@ -66,6 +69,7 @@ export const PageContextProvider = <T extends object>({
         setPreviousTableUrls,
         createTitle: (data: unknown) => createTitle(data as T),
         createSubtitle: (data: unknown) => createSubtitle(data as T),
+        createDocumentTitle: (data: unknown) => (createDocumentTitle ? createDocumentTitle(data as T) : 'NOW Database'),
         sqlLimit,
         sqlOffset,
         sqlColumnFilters,
@@ -96,6 +100,7 @@ export const Page = <T extends Record<string, unknown>>({
   viewName,
   createTitle,
   createSubtitle,
+  createDocumentTitle,
   allowedRoles,
   getEditRights,
 }: {
@@ -105,6 +110,7 @@ export const Page = <T extends Record<string, unknown>>({
   viewName: string
   createTitle: (data: T) => string
   createSubtitle?: (data: T) => string
+  createDocumentTitle?: (data: T) => string
   allowedRoles?: Role[]
   getEditRights: (user: UserState, id: string | number) => EditRights
 }) => {
@@ -123,6 +129,7 @@ export const Page = <T extends Record<string, unknown>>({
       viewName={viewName}
       createTitle={createTitle}
       createSubtitle={createSubtitle ? createSubtitle : () => ''}
+      createDocumentTitle={createDocumentTitle ? createDocumentTitle : () => 'NOW Database'}
     >
       {hasDetailParams ? detailView : tableView}
     </PageContextProvider>

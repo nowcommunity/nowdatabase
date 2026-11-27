@@ -1,7 +1,7 @@
 import { useSearchParams } from 'react-router-dom'
 import { Box, Button, Paper, Tooltip, Stack, Tab, Tabs, useTheme } from '@mui/material'
 import EditIcon from '@mui/icons-material/Edit'
-import { useState, JSX } from 'react'
+import { useState, JSX, useEffect } from 'react'
 import {
   DetailContextProvider,
   ModeOptions,
@@ -146,11 +146,15 @@ export const DetailView = <T extends object>({
     if (typeof tabFromUrl !== 'string' || isNaN(parseInt(tabFromUrl))) return 0
     return parseInt(tabFromUrl)
   }
-  const { editRights } = usePageContext()
+  const { editRights, createDocumentTitle } = usePageContext()
   const [mode, setModeState] = useState<ModeType>(isNew ? modeOptionToMode['new'] : modeOptionToMode['read'])
   const [fieldsWithErrors, setFieldsWithErrors] = useState<FieldsWithErrorsType>({})
   const [tab, setTab] = useState(getUrl())
   useSyncTabSearch(tab)
+
+  useEffect(() => {
+    document.title = createDocumentTitle(data)
+  })
 
   const setMode = (newMode: ModeOptions) => {
     setModeState(modeOptionToMode[newMode])

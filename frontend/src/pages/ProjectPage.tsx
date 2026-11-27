@@ -19,6 +19,7 @@ export const ProjectPage = () => {
       viewName="project"
       idFieldName="pid"
       createTitle={(project: ProjectDetailsType) => `${project.proj_name}`}
+      createDocumentTitle={(project: ProjectDetailsType) => `Project - ${project.proj_name}`}
       getEditRights={(user: UserState) => {
         if (user.role === Role.Admin) return fullRights
         return noRights

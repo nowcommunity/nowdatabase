@@ -17,6 +17,9 @@ export const PersonPage = () => {
       viewName="person"
       idFieldName="initials"
       createTitle={(person: PersonDetailsType) => `${person.surname}`}
+      createDocumentTitle={(person: PersonDetailsType) =>
+        person.initials ? `User - ${person.user?.user_name}` : 'New person'
+      }
       getEditRights={(user: UserState, id: number | string) => {
         if (user.role === Role.Admin) return fullRights
         if (user.initials === id || id === 'user-page') return { edit: true }
