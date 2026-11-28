@@ -23,7 +23,7 @@
     "lint:frontend": "cd frontend && npm run lint",
     "lint:cypress": "eslint --cache --report-unused-disable-directives --max-warnings 0 \"cypress/e2e/**/*.{cy,spec}.{js,ts,tsx}\"",
     "lint:staged": "npx lint-staged",
-    "tsc": "npm run tsc:backend && npm run tsc:frontend",
+    "tsc": "npm run tsc:backend; npm run tsc:frontend",
     "tsc:backend": "cd backend && npx tsc --noEmit",
     "tsc:frontend": "cd frontend && npx tsc --noEmit",
     "test:backend": "npm run test:unit:backend && npm run test:api",
