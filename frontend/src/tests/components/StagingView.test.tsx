@@ -1,15 +1,15 @@
-import { beforeEach, describe, expect, it, jest } from '@jest/globals'
-import '@testing-library/jest-dom'
-import { render, screen, waitFor } from '@testing-library/react'
-import userEvent from '@testing-library/user-event'
 import {
   DetailContextProvider,
   modeOptionToMode,
   useDetailContext,
 } from '@/components/DetailView/Context/DetailContext'
 import { StagingView } from '@/components/DetailView/StagingView'
-import type { EditDataType, Reference, ReferenceDetailsType } from '@/shared/types'
+import type { Reference, ReferenceDetailsType } from '@/shared/types'
 import type { ValidationObject } from '@/shared/validators/validator'
+import { beforeEach, describe, expect, it, jest } from '@jest/globals'
+import '@testing-library/jest-dom'
+import { render, screen, waitFor } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 
 const mockUseGetAllReferencesQuery = jest.fn()
 const mockUseGetReferenceTypesQuery = jest.fn()

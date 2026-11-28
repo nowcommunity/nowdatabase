@@ -4,7 +4,6 @@ import {
   EditableOccurrenceData,
   OccurrenceDetailsType,
   OccurrenceEditableField,
-  Reference,
   Role,
   User,
 } from '../../../../frontend/src/shared/types'

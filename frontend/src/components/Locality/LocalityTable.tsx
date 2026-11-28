@@ -51,7 +51,7 @@ export const LocalityTable = ({ selectorFn }: { selectorFn?: (newObject: Localit
     if (validIds.length > 0) {
       const validIdSet = new Set(validIds)
       setFilteredLocalities(localitiesQueryData?.filter(locality => validIdSet.has(locality.lid)))
-    } else setFilteredLocalities(localitiesQueryData as SimplifiedLocality[])
+    } else setFilteredLocalities(localitiesQueryData)
   }, [columnFilters, localitiesQueryData])
 
   const columns = useMemo<MRT_ColumnDef<Locality>[]>(

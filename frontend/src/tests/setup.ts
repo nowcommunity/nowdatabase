@@ -8,7 +8,7 @@ if (typeof global.TextEncoder === 'undefined') {
 }
 
 if (typeof global.TextDecoder === 'undefined') {
-  global.TextDecoder = TextDecoder
+  global.TextDecoder = TextDecoder as typeof global.TextDecoder
 }
 
 if (typeof global.Request === 'undefined') {

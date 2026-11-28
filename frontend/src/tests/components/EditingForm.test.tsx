@@ -1,13 +1,12 @@
+import { EditingForm, type EditingFormField } from '@/components/DetailView/common/EditingForm'
+import {
+  modeOptionToMode,
+  useDetailContext,
+  type DetailContextType,
+} from '@/components/DetailView/Context/DetailContext'
 import { describe, expect, it, jest } from '@jest/globals'
 import { render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { EditingForm, type EditingFormField } from '@/components/DetailView/common/EditingForm'
-import {
-  useDetailContext,
-  type DetailContextType,
-  modeOptionToMode,
-} from '@/components/DetailView/Context/DetailContext'
-import type { EditDataType } from '@/shared/types'
 
 jest.mock('@/components/DetailView/Context/DetailContext', () => ({
   useDetailContext: jest.fn(),

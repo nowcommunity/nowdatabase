@@ -182,7 +182,7 @@ describe('WriteButton behavior', () => {
     const onWrite = jest.fn(() => Promise.resolve())
     mockCheckSpeciesTaxonomy.mockReturnValue(new Set())
 
-    renderButton({ ...baseSpecies, family_name: 'Canidae' } as EditDataType<Species>, onWrite)
+    renderButton({ ...baseSpecies, family_name: 'Canidae' }, onWrite)
 
     fireEvent.click(screen.getByRole('button', { name: /save changes/i }))
 
@@ -203,7 +203,7 @@ describe('WriteButton behavior', () => {
     })
 
     renderButton(
-      { ...baseSpecies, family_name: 'Canidae' } as EditDataType<Species>,
+      { ...baseSpecies, family_name: 'Canidae' },
       onWrite,
       { mode: modeNew, setMode },
       { taxonomy: true, hasStagingMode: true }
@@ -296,7 +296,7 @@ describe('WriteButton behavior', () => {
     })
     mockCheckSpeciesTaxonomy.mockReturnValue(new Set(['Subfamily Caninae belongs to family Canidae, not Felidae.']))
 
-    renderButton({ ...baseSpecies, family_name: 'Felidae' } as EditDataType<Species>, onWrite)
+    renderButton({ ...baseSpecies, family_name: 'Felidae' }, onWrite)
 
     fireEvent.click(screen.getByRole('button', { name: /save changes/i }))
 

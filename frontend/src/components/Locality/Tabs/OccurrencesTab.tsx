@@ -470,7 +470,7 @@ export const OccurrencesTab = () => {
                   data: newOccurrenceContextData,
                   mode: modeOptionToMode.new,
                   setMode: () => undefined,
-                  editData: newOccurrenceContextData as EditDataType<OccurrenceDetailsType>,
+                  editData: newOccurrenceContextData,
                   textField,
                   dropdown,
                   dropdownWithSearch,

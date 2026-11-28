@@ -1,8 +1,8 @@
 import { Request, Router } from 'express'
+import { sign } from 'jsonwebtoken'
 import { verify } from '../middlewares/authenticator'
-import { Secret, sign } from 'jsonwebtoken'
 import { AccessError } from '../middlewares/authorizer'
-import { SECRET, GRACE_PERIOD_SECONDS, LOGIN_VALID_SECONDS } from '../utils/config'
+import { GRACE_PERIOD_SECONDS, LOGIN_VALID_SECONDS, SECRET } from '../utils/config'
 import { nowDb } from '../utils/db'
 
 const router = Router()
