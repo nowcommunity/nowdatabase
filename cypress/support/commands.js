@@ -25,7 +25,7 @@
 // Cypress.Commands.overwrite('visit', (originalFn, url, options) => { ... })
 
 Cypress.Commands.overwrite('visit', (originalFn, url, options) => {
-  const baseUrl = Cypress.expose('baseUrl')
+  const baseUrl = Cypress.config('baseUrl')
   const appWaitTimeoutMs = Number(Cypress.expose('appWaitTimeoutMs') ?? 60000)
 
   return cy
