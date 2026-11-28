@@ -15,10 +15,7 @@ const openMuseumFromList = (institution, code) => {
   cy.visit('/museum')
   cy.get('[aria-label="Filter by Institution"]', { timeout: 10000 }).clear()
   cy.get('[aria-label="Filter by Institution"]').type(institution)
-  cy.contains(institution, { timeout: 10000 })
-    .should('be.visible')
-    .closest(`[data-cy="table-row-${code}"]`)
-    .click()
+  cy.contains(institution, { timeout: 10000 }).should('be.visible').closest(`[data-cy="table-row-${code}"]`).click()
 }
 
 const fillMuseumForm = ({ code, institution, city, country, altName, state, stateCode }) => {
@@ -34,7 +31,7 @@ const fillMuseumForm = ({ code, institution, city, country, altName, state, stat
   typeIfNotEmpty('#state_code-textfield', stateCode)
 }
 
-  const fillCreateMuseumModal = ({ code, institution, city, country, altName, state, stateCode }) => {
+const fillCreateMuseumModal = ({ code, institution, city, country, altName, state, stateCode }) => {
   cy.get('.modal-content').within(() => {
     typeIfNotEmpty('input[name="institution"]', institution)
     typeIfNotEmpty('input[name="alt_int_name"]', altName)
@@ -57,7 +54,6 @@ const fillMuseumForm = ({ code, institution, city, country, altName, state, stat
   })
 }
 
-const apiBaseUrl = Cypress.env('apiBaseUrl') ?? 'http://localhost:4000'
 let seedMuseum = { code: 'AM', institution: 'Australian Museum' }
 
 before(() => {
@@ -73,7 +69,7 @@ before(() => {
     }
     cy.request({
       method: 'PUT',
-      url: `${apiBaseUrl}/museum`,
+      url: `${Cypress.expose('apiBaseUrl') ?? 'http://localhost:4000'}/museum`,
       headers: { Authorization: `Bearer ${token}` },
       body: {
         museum: {
@@ -99,8 +95,7 @@ describe('Museum e2e flows', () => {
     cy.visit('/museum')
     cy.get('[aria-label="Filter by Institution"]', { timeout: 10000 }).clear()
     cy.get('[aria-label="Filter by Institution"]').type(seedMuseum.institution)
-    cy.contains(seedMuseum.institution, { timeout: 10000 })
-      .should('be.visible')
+    cy.contains(seedMuseum.institution, { timeout: 10000 }).should('be.visible')
   })
 
   it('creates a new museum and lands on its details view', () => {

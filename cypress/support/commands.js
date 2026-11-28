@@ -25,10 +25,8 @@
 // Cypress.Commands.overwrite('visit', (originalFn, url, options) => { ... })
 
 Cypress.Commands.overwrite('visit', (originalFn, url, options) => {
-  const targetUrl = typeof url === 'string' ? url : url?.url
-  const baseUrl = Cypress.config('baseUrl')
-  const resolvedUrl = targetUrl ? new URL(targetUrl, baseUrl).toString() : baseUrl
-  const appWaitTimeoutMs = Number(Cypress.env('appWaitTimeoutMs') ?? 60000)
+  const baseUrl = Cypress.expose('baseUrl')
+  const appWaitTimeoutMs = Number(Cypress.expose('appWaitTimeoutMs') ?? 60000)
 
   return cy
     .task('waitForAppHealthy', { url: baseUrl }, { timeout: appWaitTimeoutMs })
@@ -82,9 +80,11 @@ Cypress.Commands.add('pageForbidden', url => {
 })
 
 Cypress.Commands.add('resetDatabase', () => {
-  const dbWaitTimeoutMs = Number(Cypress.env('dbWaitTimeoutMs') ?? 30000)
+  const dbWaitTimeoutMs = Number(Cypress.expose('dbWaitTimeoutMs') ?? 30000)
   cy.task('waitForDbHealthy', undefined, { timeout: dbWaitTimeoutMs })
-  cy.request({ url: Cypress.env('databaseResetUrl'), timeout: dbWaitTimeoutMs }).its('status').should('eq', 200)
+  cy.request({ url: Cypress.expose('databaseResetUrl'), timeout: dbWaitTimeoutMs })
+    .its('status')
+    .should('eq', 200)
 })
 
 // Optimized database reset that only resets once per test file
@@ -99,36 +99,40 @@ Cypress.Commands.add('resetDatabaseOnce', () => {
 })
 
 // Login command with session caching for better performance
-Cypress.Commands.add('loginWithSession', (username) => {
-  cy.session(username, () => {
-    cy.clearAllLocalStorage()
-    cy.clearAllSessionStorage()
-    cy.clearCookies()
-    cy.intercept('POST', '**/user/login').as('loginRequest')
-    cy.visit('/login')
-    cy.get('[data-cy="username-basic"] input', { timeout: 10000 }).should('be.visible').clear().type(username)
-    cy.get('[data-cy="password-basic"] input').should('be.visible').clear().type('test', { log: false })
-    cy.get('[data-cy="login-button"]').should('be.visible').click()
-    cy.wait('@loginRequest').its('response.statusCode').should('eq', 200)
-    cy.window().should(window => {
-      const storedUserState = window.localStorage.getItem('userState')
-      expect(storedUserState, 'stored user state').to.not.be.null
-
-      const parsedUserState = JSON.parse(storedUserState)
-      expect(parsedUserState?.token, 'stored login token').to.be.a('string').and.not.be.empty
-    })
-  }, {
-    validate: () => {
+Cypress.Commands.add('loginWithSession', username => {
+  cy.session(
+    username,
+    () => {
+      cy.clearAllLocalStorage()
+      cy.clearAllSessionStorage()
+      cy.clearCookies()
+      cy.intercept('POST', '**/user/login').as('loginRequest')
+      cy.visit('/login')
+      cy.get('[data-cy="username-basic"] input', { timeout: 10000 }).should('be.visible').clear().type(username)
+      cy.get('[data-cy="password-basic"] input').should('be.visible').clear().type('test', { log: false })
+      cy.get('[data-cy="login-button"]').should('be.visible').click()
+      cy.wait('@loginRequest').its('response.statusCode').should('eq', 200)
       cy.window().should(window => {
         const storedUserState = window.localStorage.getItem('userState')
         expect(storedUserState, 'stored user state').to.not.be.null
 
         const parsedUserState = JSON.parse(storedUserState)
-        expect(parsedUserState?.username, 'stored username').to.eq(username)
         expect(parsedUserState?.token, 'stored login token').to.be.a('string').and.not.be.empty
       })
     },
-  })
+    {
+      validate: () => {
+        cy.window().should(window => {
+          const storedUserState = window.localStorage.getItem('userState')
+          expect(storedUserState, 'stored user state').to.not.be.null
+
+          const parsedUserState = JSON.parse(storedUserState)
+          expect(parsedUserState?.username, 'stored username').to.eq(username)
+          expect(parsedUserState?.token, 'stored login token').to.be.a('string').and.not.be.empty
+        })
+      },
+    }
+  )
 })
 
 // use this once you have edited some data and want to save it
