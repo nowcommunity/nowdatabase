@@ -1,13 +1,12 @@
+import { EditingForm, type EditingFormField } from '@/components/DetailView/common/EditingForm'
+import {
+  modeOptionToMode,
+  useDetailContext,
+  type DetailContextType,
+} from '@/components/DetailView/Context/DetailContext'
 import { describe, expect, it, jest } from '@jest/globals'
 import { render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { EditingForm, type EditingFormField } from '@/components/DetailView/common/EditingForm'
-import {
-  useDetailContext,
-  type DetailContextType,
-  modeOptionToMode,
-} from '@/components/DetailView/Context/DetailContext'
-import type { EditDataType } from '@/shared/types'
 
 jest.mock('@/components/DetailView/Context/DetailContext', () => ({
   useDetailContext: jest.fn(),
@@ -29,14 +28,14 @@ const createContextValue = (): DetailContextType<ParentType> => ({
   data: { species: [] },
   mode: modeOptionToMode.edit,
   setMode: jest.fn(),
-  editData: { species: [] } as EditDataType<ParentType>,
+  editData: { species: [] },
   setEditData: jest.fn(),
-  textField: (() => <span />) as DetailContextType<ParentType>['textField'],
-  bigTextField: (() => <span />) as DetailContextType<ParentType>['bigTextField'],
-  dropdown: (() => <span />) as DetailContextType<ParentType>['dropdown'],
-  dropdownWithSearch: (() => <span />) as DetailContextType<ParentType>['dropdownWithSearch'],
-  radioSelection: (() => <span />) as DetailContextType<ParentType>['radioSelection'],
-  validator: (() => ({ name: '', error: null })) as DetailContextType<ParentType>['validator'],
+  textField: () => <span />,
+  bigTextField: () => <span />,
+  dropdown: () => <span />,
+  dropdownWithSearch: () => <span />,
+  radioSelection: () => <span />,
+  validator: () => ({ name: '', error: null }),
   fieldsWithErrors: {},
   setFieldsWithErrors: jest.fn(),
   isDirty: false,

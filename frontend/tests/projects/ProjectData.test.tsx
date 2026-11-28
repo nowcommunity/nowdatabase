@@ -177,7 +177,7 @@ describe('project mapping helpers', () => {
   })
 
   it('returns null when coordinator cannot be matched to a user', () => {
-    const payload = mapProjectEditDataToUpdatePayload(baseProject as EditDataType<ProjectDetailsType>, [
+    const payload = mapProjectEditDataToUpdatePayload(baseProject, [
       { userId: 99, label: 'Other, Person', initials: 'XX' },
     ])
 

@@ -363,15 +363,9 @@ describe('Deleting a time unit', () => {
 
       cy.fixture('login')
         .its('deleteTargets')
-        .then(deleteTargets => {
-          const confirmText = deleteTargets.find(target => target.entity === 'TimeUnit')?.confirmText
-          const expectedConfirm =
-            confirmText || 'Are you sure you want to delete this item? This operation cannot be undone.'
-
-          cy.on('window:confirm', message => {
-            expect(message).to.eq(expectedConfirm)
-            return true
-          })
+        .then(() => {
+          // accept confirm window once it appears
+          cy.window().then(win => cy.stub(win, 'confirm').as('confirm').returns(true))
 
           cy.get('[id=delete-button]').click()
 

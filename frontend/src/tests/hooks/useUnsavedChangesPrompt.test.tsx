@@ -28,7 +28,7 @@ describe('useUnsavedChangesPrompt', () => {
       proceed: undefined,
       reset: undefined,
       location: undefined,
-    } as ReturnType<typeof useBlocker>)
+    })
   })
 
   afterEach(() => {

@@ -1,7 +1,7 @@
 import { afterAll, beforeAll, describe, expect, it } from '@jest/globals'
-import request from 'supertest'
 import JSZip from 'jszip'
 import type { Response } from 'superagent'
+import request from 'supertest'
 import app from '../../app'
 import { pool } from '../../utils/db'
 import { noPermError, resetDatabase, resetDatabaseTimeout, send } from '../utils'
@@ -44,7 +44,7 @@ describe('DwC-A species export (admin-only)', () => {
     expect(result.headers['content-type']).toMatch(/application\/zip/i)
     expect(result.headers['content-disposition']).toMatch(/attachment;\s*filename="now_dwc_export_/i)
 
-    const zip = await JSZip.loadAsync(result.body as unknown as Buffer)
+    const zip = await JSZip.loadAsync(result.body as Buffer)
     expect(zip.file('taxon.csv')).toBeTruthy()
     expect(zip.file('measurementorfact.csv')).toBeTruthy()
     expect(zip.file('meta.xml')).toBeTruthy()
@@ -80,7 +80,7 @@ describe('DwC-A species export (admin-only)', () => {
     expect(result.status).toEqual(200)
     expect(result.headers['content-type']).toMatch(/application\/zip/i)
 
-    const zip = await JSZip.loadAsync(result.body as unknown as Buffer)
+    const zip = await JSZip.loadAsync(result.body as Buffer)
     const taxonCsv = await zip.file('taxon.csv')!.async('string')
     expect(taxonCsv).toContain('NOW:85729')
     expect(taxonCsv).not.toContain('NOW:85730')

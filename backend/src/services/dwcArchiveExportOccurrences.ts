@@ -411,7 +411,7 @@ async function* iterateOccurrenceRows(occurrenceKeys?: DwcOccurrenceKey[]): Asyn
       })
 
       for (const occurrence of page) {
-        yield occurrence as unknown as OccurrenceForExport
+        yield occurrence
       }
     }
     return
@@ -430,7 +430,7 @@ async function* iterateOccurrenceRows(occurrenceKeys?: DwcOccurrenceKey[]): Asyn
     if (page.length === 0) return
 
     for (const occurrence of page) {
-      yield occurrence as unknown as OccurrenceForExport
+      yield occurrence
     }
 
     const last = page[page.length - 1]

@@ -81,7 +81,7 @@ const conflictError = Object.assign(new Error('The Reference with associated upd
 })
 
 describe('ReferenceDetails deletion', () => {
-  const originalConfirm = window.confirm
+  const originalConfirm = window.confirm.bind(window)
   const mockDeleteTrigger = jest.fn()
 
   beforeEach(() => {

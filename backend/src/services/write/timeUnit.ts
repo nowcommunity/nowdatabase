@@ -43,7 +43,7 @@ const isForeignKeyConstraintError = (error: unknown) => {
     typeof error === 'object' &&
     error !== null &&
     'code' in error &&
-    typeof (error as { code: unknown }).code === 'string' &&
+    typeof error.code === 'string' &&
     FOREIGN_KEY_ERROR_CODES.includes((error as { code: string }).code)
   )
 }
@@ -59,7 +59,7 @@ const isForeignKeyReferenceMissingError = (error: unknown) => {
     typeof error === 'object' &&
     error !== null &&
     'code' in error &&
-    typeof (error as { code: unknown }).code === 'string' &&
+    typeof error.code === 'string' &&
     FOREIGN_KEY_REFERENCE_MISSING_ERROR_CODES.includes((error as { code: string }).code)
   )
 }
@@ -89,7 +89,7 @@ const isDuplicateEntryError = (error: unknown) => {
     typeof error === 'object' &&
     error !== null &&
     'code' in error &&
-    typeof (error as { code: unknown }).code === 'string' &&
+    typeof error.code === 'string' &&
     (error as { code: string }).code === DUPLICATE_ENTRY_ERROR_CODE
   )
 }
@@ -186,7 +186,7 @@ export const writeTimeUnit = async (
       const { cascadeErrors, calculatorErrors, localitiesToUpdate } = await checkTimeUnitCascade({
         ...normalizedTimeUnit,
         now_time_update: normalizedTimeUnit.now_time_update ?? [],
-      } as EditDataType<TimeUnitDetailsType>)
+      })
 
       if (calculatorErrors.length > 0 || cascadeErrors.length > 0) {
         const calculatorErrorsString =

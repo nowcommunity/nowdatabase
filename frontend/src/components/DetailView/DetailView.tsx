@@ -29,23 +29,12 @@ import { useSyncTabSearch } from '@/hooks/useSyncTabSearch'
 import { useUnsavedChangesPrompt } from '@/hooks/useUnsavedChangesPrompt'
 import { UnsavedChangesProvider } from '../UnsavedChangesProvider'
 
-export type TabType = {
-  title: string
-  content: JSX.Element
-}
+export type TabType = { title: string; content: JSX.Element }
 
-type CommonTextFieldOptions = {
-  disabled?: boolean
-  big?: boolean
-  readonly?: boolean
-}
+type CommonTextFieldOptions = { disabled?: boolean; big?: boolean; readonly?: boolean }
 
 export type TextFieldOptions =
-  | ({
-      type?: 'text'
-      trim?: boolean
-      handleSetEditData?: (value: string) => void
-    } & CommonTextFieldOptions)
+  | ({ type?: 'text'; trim?: boolean; handleSetEditData?: (value: string) => void } & CommonTextFieldOptions)
   | ({
       type: 'number'
       integerOnly?: boolean
@@ -54,10 +43,7 @@ export type TextFieldOptions =
       round?: number
       handleSetEditData?: (value: number | '') => void
     } & CommonTextFieldOptions)
-  | ({
-      type: 'date'
-      handleSetEditData?: (value: string) => void
-    } & CommonTextFieldOptions)
+  | ({ type: 'date'; handleSetEditData?: (value: string) => void } & CommonTextFieldOptions)
 
 export type OptionalRadioSelectionProps = {
   defaultValue?: DropdownOptionValue
@@ -206,11 +192,7 @@ export const DetailView = <T extends object>({
   }
 
   const paperProps = {
-    style: {
-      minHeight: '10em',
-      padding: '1em',
-      backgroundColor: theme.palette.grey[300],
-    },
+    style: { minHeight: '10em', padding: '1em', backgroundColor: theme.palette.grey[300] },
     elevation: 5,
   }
 
@@ -266,7 +248,7 @@ export const DetailView = <T extends object>({
               setFieldsWithErrors={setFieldsWithErrors}
             />
             {editRights.delete && !isNew && !isUserPage && (
-              <Tooltip title={deleteDisabled ? deleteDisabledReason ?? '' : ''}>
+              <Tooltip title={deleteDisabled ? (deleteDisabledReason ?? '') : ''}>
                 <span>
                   <Button
                     id="delete-button"

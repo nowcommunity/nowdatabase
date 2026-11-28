@@ -1,7 +1,8 @@
-import { MRT_RowData, MRT_TableInstance } from 'material-react-table'
-import { mkConfig, generateCsv, download } from 'export-to-csv'
-import { AcceptedData } from 'node_modules/export-to-csv/output/lib/types'
 import { currentDateAsString } from '@/shared/currentDateAsString'
+import { download, generateCsv, mkConfig } from 'export-to-csv'
+import { MRT_RowData, MRT_TableInstance } from 'material-react-table'
+
+type AcceptedData = number | string | boolean | null | undefined
 
 export type ExportFn<T> = (data: T) => { [k: string]: AcceptedData }
 

@@ -49,8 +49,10 @@ export const UnsavedChangesProvider = ({
   const allowNextNavigationRef = useRef(false)
   const dataRouterContext = useContext(UNSAFE_DataRouterContext)
 
-  const isSamePathNavigation = blocker.state === 'blocked' && blocker.location?.pathname === window.location.pathname
-  const showDialog = blocker.state === 'blocked' && !isSamePathNavigation
+  const isSamePathNavigation = () => {
+    return blocker.state === 'blocked' && blocker.location?.pathname === window.location.pathname
+  }
+  const showDialog = blocker.state === 'blocked' && !isSamePathNavigation()
 
   const resetMessage = useCallback(() => {
     setMessage(defaultMessage)
@@ -90,11 +92,11 @@ export const UnsavedChangesProvider = ({
   }, [dataRouterContext])
 
   useEffect(() => {
-    const proceed = blocker.proceed as (() => void) | undefined
-    if (isSamePathNavigation && proceed) {
-      proceed()
+    if (isSamePathNavigation()) {
+      blocker.proceed!()
     }
-  }, [blocker, isSamePathNavigation])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [blocker])
 
   const value = useMemo(
     () => ({

@@ -50,21 +50,21 @@ const authorCheck: (data: ReferenceAuthorType[]) => ValidationError = (data: Ref
     }
   }
   if (errors.length > 0) {
-    return ('Authors gave the following errors: ' + errors.join(', ')) as ValidationError
+    return 'Authors gave the following errors: ' + errors.join(', ')
   }
   return null as ValidationError
 }
 
 const journalCheck: (journal: ReferenceJournalType) => ValidationError = (journal: ReferenceJournalType) => {
   if (!journal) {
-    return 'You must select or create a new journal' as ValidationError
+    return 'You must select or create a new journal'
   }
   //Existing journal can't have rowState 'removed' if journal is mandatory
   if (journal.rowState && journal.rowState == 'removed') {
-    return 'You must select or create a new journal' as ValidationError
+    return 'You must select or create a new journal'
   }
   if (typeof journal.journal_title !== 'string' || journal.journal_title?.length < 1) {
-    return 'Journal must have a title' as ValidationError
+    return 'Journal must have a title'
   }
   return null as ValidationError
 }

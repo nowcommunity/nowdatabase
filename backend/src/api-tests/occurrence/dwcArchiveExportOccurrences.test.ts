@@ -44,7 +44,7 @@ describe('DwC-A occurrence export (admin-only)', () => {
     expect(result.headers['content-type']).toMatch(/application\/zip/i)
     expect(result.headers['content-disposition']).toMatch(/attachment;\s*filename="now_dwc_occurrences_export_/i)
 
-    const zip = await JSZip.loadAsync(result.body as unknown as Buffer)
+    const zip = await JSZip.loadAsync(result.body as Buffer<ArrayBufferLike>)
     expect(zip.file('location.csv')).toBeTruthy()
     expect(zip.file('geologicalcontext.csv')).toBeTruthy()
     expect(zip.file('taxon.csv')).toBeTruthy()
@@ -76,7 +76,7 @@ describe('DwC-A occurrence export (admin-only)', () => {
     expect(result.status).toEqual(200)
     expect(result.headers['content-type']).toMatch(/application\/zip/i)
 
-    const zip = await JSZip.loadAsync(result.body as unknown as Buffer)
+    const zip = await JSZip.loadAsync(result.body as Buffer<ArrayBufferLike>)
     const occurrenceCsv = await zip.file('occurrence.csv')!.async('string')
     expect(occurrenceCsv).toContain('NOW:OCC:21050:')
     expect(occurrenceCsv).not.toContain('NOW:OCC:24750:')
@@ -94,7 +94,7 @@ describe('DwC-A occurrence export (admin-only)', () => {
       .parse(parseBinary)
 
     expect(result.status).toEqual(200)
-    const zip = await JSZip.loadAsync(result.body as unknown as Buffer)
+    const zip = await JSZip.loadAsync(result.body as Buffer<ArrayBufferLike>)
     const occurrenceCsv = await zip.file('occurrence.csv')!.async('string')
     expect(occurrenceCsv).toContain('NOW:OCC:21050:')
     expect(occurrenceCsv).toContain('NOW:OCC:24750:')
@@ -112,7 +112,7 @@ describe('DwC-A occurrence export (admin-only)', () => {
       .parse(parseBinary)
 
     expect(result.status).toEqual(200)
-    const zip = await JSZip.loadAsync(result.body as unknown as Buffer)
+    const zip = await JSZip.loadAsync(result.body as Buffer<ArrayBufferLike>)
     const occurrenceCsv = await zip.file('occurrence.csv')!.async('string')
     expect(occurrenceCsv).toContain('"occurrenceID"')
     expect(occurrenceCsv).not.toContain('NOW:OCC:')
@@ -151,7 +151,7 @@ describe('DwC-A occurrence export (admin-only)', () => {
     expect(result.headers['content-type']).toMatch(/application\/zip/i)
     expect(result.headers['content-disposition']).toMatch(/attachment;\s*filename="now_dwc_dp_export_/i)
 
-    const zip = await JSZip.loadAsync(result.body as unknown as Buffer)
+    const zip = await JSZip.loadAsync(result.body as Buffer<ArrayBufferLike>)
     expect(zip.file('datapackage.json')).toBeTruthy()
     expect(zip.file('event.csv')).toBeTruthy()
     expect(zip.file('geological-context.csv')).toBeTruthy()
@@ -181,7 +181,7 @@ describe('DwC-A occurrence export (admin-only)', () => {
     expect(result.headers['content-type']).toMatch(/application\/zip/i)
     expect(result.headers['content-disposition']).toMatch(/attachment;\s*filename="now_dwc_full_export_/i)
 
-    const zip = await JSZip.loadAsync(result.body as unknown as Buffer)
+    const zip = await JSZip.loadAsync(result.body as Buffer<ArrayBufferLike>)
     expect(zip.file('README.txt')).toBeTruthy()
     expect(zip.file('dwc-dp/datapackage.json')).toBeTruthy()
     expect(zip.file('dwc-dp/occurrence.csv')).toBeTruthy()

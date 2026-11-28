@@ -184,7 +184,7 @@ const NewReferenceDialog = ({
             data: emptyReference,
             mode: modeOptionToMode.new,
             setMode: () => undefined,
-            editData: emptyReference as EditDataType<ReferenceDetailsType>,
+            editData: emptyReference,
             textField,
             dropdown,
             dropdownWithSearch,

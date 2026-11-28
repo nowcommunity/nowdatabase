@@ -36,7 +36,7 @@ export const validateEntireReference = (
   editedFields: EditDataType<ReferenceDetailsType>,
   options?: { displayLabelMap?: ReferenceDisplayLabelMap }
 ) => {
-  const keys = Object.keys(editedFields as Record<string, unknown>) as (keyof EditDataType<ReferenceDetailsType>)[]
+  const keys = Object.keys(editedFields) as (keyof EditDataType<ReferenceDetailsType>)[]
   const errors: ValidationObject[] = []
 
   for (const key of keys) {

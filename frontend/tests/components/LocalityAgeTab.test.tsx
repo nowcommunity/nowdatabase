@@ -1,10 +1,9 @@
-import { beforeEach, describe, expect, it, jest } from '@jest/globals'
-import { render, screen } from '@testing-library/react'
-import '@testing-library/jest-dom'
-
-import { AgeTab } from '@/components/Locality/Tabs/AgeTab'
 import { DetailContext, type DetailContextType, modeOptionToMode } from '@/components/DetailView/Context/DetailContext'
-import type { EditDataType, LocalityDetailsType } from '@/shared/types'
+import { AgeTab } from '@/components/Locality/Tabs/AgeTab'
+import type { LocalityDetailsType } from '@/shared/types'
+import { beforeEach, describe, expect, it, jest } from '@jest/globals'
+import '@testing-library/jest-dom'
+import { render, screen } from '@testing-library/react'
 
 jest.mock('@/redux/timeUnitReducer', () => ({
   useGetTimeUnitDetailsQuery: () => ({ data: undefined, isFetching: false }),
@@ -61,7 +60,7 @@ const createContextValue = (overrides: ContextOverrides = {}): TestDetailContext
     data,
     mode: overrides.mode ?? modeOptionToMode.read,
     setMode: jest.fn(),
-    editData: overrides.editData ?? (data as EditDataType<LocalityDetailsType>),
+    editData: overrides.editData ?? data,
     setEditData: overrides.setEditData ?? jest.fn(),
     textField: () => <input aria-label="text-field" readOnly />,
     bigTextField: () => <textarea aria-label="big-text-field" readOnly />,

@@ -1,15 +1,15 @@
-import { beforeEach, describe, expect, it, jest } from '@jest/globals'
-import '@testing-library/jest-dom'
-import { render, screen, waitFor } from '@testing-library/react'
-import userEvent from '@testing-library/user-event'
 import {
   DetailContextProvider,
   modeOptionToMode,
   useDetailContext,
 } from '@/components/DetailView/Context/DetailContext'
 import { StagingView } from '@/components/DetailView/StagingView'
-import type { EditDataType, Reference, ReferenceDetailsType } from '@/shared/types'
+import type { Reference, ReferenceDetailsType } from '@/shared/types'
 import type { ValidationObject } from '@/shared/validators/validator'
+import { beforeEach, describe, expect, it, jest } from '@jest/globals'
+import '@testing-library/jest-dom'
+import { render, screen, waitFor } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 
 const mockUseGetAllReferencesQuery = jest.fn()
 const mockUseGetReferenceTypesQuery = jest.fn()
@@ -63,7 +63,7 @@ jest.mock('@/components/Reference/Tabs/ReferenceTab', () => ({
                 },
               ],
               ref_journal: undefined,
-            } as unknown as EditDataType<ReferenceDetailsType>)
+            })
           }
         >
           Fill reference
@@ -117,7 +117,7 @@ const renderStagingView = () => {
         data: { references: [], comment: '' },
         mode: modeOptionToMode['staging-new'],
         setMode: jest.fn(),
-        editData: { references: [], comment: '' } as EditDataType<StagingData>,
+        editData: { references: [], comment: '' },
         textField: jest.fn(() => <input aria-label="field" />),
         bigTextField: jest.fn(() => <textarea aria-label="comment" />),
         dropdown: jest.fn(() => <select aria-label="dropdown" />),

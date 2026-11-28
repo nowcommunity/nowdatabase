@@ -40,7 +40,7 @@ const baseTimeBound: TimeBoundDetailsType = {
   age: 12,
   b_comment: '',
   now_bau: [],
-} as unknown as TimeBoundDetailsType
+}
 
 const createDetailContextValue = (overrides: Partial<DetailContextType<TimeBoundDetailsType>> = {}) =>
   ({

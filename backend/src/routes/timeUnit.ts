@@ -100,7 +100,9 @@ router.put(
 
         const { result } = await writeTimeBound(newUpBound, undefined, references, req.user!.initials)
         newUpBoundId = result
-        validationUpBound = (await getTimeBoundDetails(newUpBoundId)) ?? undefined
+        if (typeof newUpBoundId === 'number') {
+          validationUpBound = (await getTimeBoundDetails(newUpBoundId)) ?? undefined
+        }
       } else if (normalizedTimeUnit.up_bnd !== undefined && normalizedTimeUnit.up_bnd !== null) {
         validationUpBound = (await getTimeBoundDetails(normalizedTimeUnit.up_bnd)) ?? undefined
       }
@@ -116,7 +118,9 @@ router.put(
 
         const { result } = await writeTimeBound(newLowBound, undefined, references, req.user!.initials)
         newLowBoundId = result
-        validationLowBound = (await getTimeBoundDetails(newLowBoundId)) ?? undefined
+        if (typeof newLowBoundId === 'number') {
+          validationLowBound = (await getTimeBoundDetails(newLowBoundId)) ?? undefined
+        }
       } else if (normalizedTimeUnit.low_bnd !== undefined && normalizedTimeUnit.low_bnd !== null) {
         validationLowBound = (await getTimeBoundDetails(normalizedTimeUnit.low_bnd)) ?? undefined
       }

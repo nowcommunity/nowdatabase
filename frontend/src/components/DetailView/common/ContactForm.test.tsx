@@ -2,7 +2,7 @@ import { describe, expect, it, beforeEach, afterEach, jest } from '@jest/globals
 import { render, screen, waitFor } from '@testing-library/react'
 import type { ReactNode } from 'react'
 import { ContactForm } from './ContactForm'
-import type { ReferenceDetailsType, EditDataType } from '@/shared/types'
+import type { ReferenceDetailsType } from '@/shared/types'
 import { createReferenceTitle } from '@/components/Reference/referenceFormatting'
 import { useDetailContext, type DetailContextType, type ModeType } from '../Context/DetailContext'
 import { usePageContext, type PageContextType } from '@/components/Page'
@@ -38,7 +38,7 @@ const createMockDetailContext = (reference: ReferenceDetailsType): DetailContext
     data: reference,
     mode: readMode,
     setMode,
-    editData: reference as EditDataType<ReferenceDetailsType>,
+    editData: reference,
     setEditData,
     isDirty: false,
     resetEditData,

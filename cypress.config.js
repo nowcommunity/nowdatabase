@@ -8,6 +8,9 @@ const DEFAULT_DB_PORT = Number(process.env.CYPRESS_DB_PORT ?? process.env.MARIAD
 const DEFAULT_DB_WAIT_TIMEOUT_MS = Number(process.env.CYPRESS_DB_WAIT_TIMEOUT ?? 30_000)
 const DEFAULT_APP_BASE_URL = process.env.CYPRESS_baseUrl ?? 'http://localhost:5173/'
 const DEFAULT_APP_WAIT_TIMEOUT_MS = Number(process.env.CYPRESS_APP_WAIT_TIMEOUT ?? 60_000)
+const DEFAULT_DATABASE_RESET_URL = 'http://localhost:4000/test/reset-test-database'
+const DEFAULT_API_BASE_URL = 'http://localhost:4000'
+const EXPOSED_ENV_KEYS = ['databaseResetUrl', 'apiBaseUrl', 'appWaitTimeoutMs', 'dbWaitTimeoutMs']
 
 const RETRY_DELAY_MS = 1_000
 const SOCKET_TIMEOUT_MS = 2_000
@@ -76,25 +79,21 @@ async function waitForHttpUrl(options = {}, env = {}) {
 
   return new Promise((resolve, reject) => {
     const attemptRequest = () => {
-      const request = client.request(
-        parsedUrl,
-        { method: 'GET', timeout: SOCKET_TIMEOUT_MS },
-        response => {
-          response.resume()
+      const request = client.request(parsedUrl, { method: 'GET', timeout: SOCKET_TIMEOUT_MS }, response => {
+        response.resume()
 
-          if (response.statusCode && response.statusCode < 500) {
-            resolve(null)
-            return
-          }
-
-          if (Date.now() >= deadline) {
-            reject(new Error(`Timed out waiting for app at ${url} (status ${response.statusCode ?? 'unknown'})`))
-            return
-          }
-
-          setTimeout(attemptRequest, RETRY_DELAY_MS)
+        if (response.statusCode && response.statusCode < 500) {
+          resolve(null)
+          return
         }
-      )
+
+        if (Date.now() >= deadline) {
+          reject(new Error(`Timed out waiting for app at ${url} (status ${response.statusCode ?? 'unknown'})`))
+          return
+        }
+
+        setTimeout(attemptRequest, RETRY_DELAY_MS)
+      })
 
       const retry = error => {
         request.destroy()
@@ -119,8 +118,15 @@ async function waitForHttpUrl(options = {}, env = {}) {
 }
 
 module.exports = defineConfig({
+  allowCypressEnv: false,
   e2e: {
     setupNodeEvents(on, config) {
+      for (const key of EXPOSED_ENV_KEYS) {
+        if (config.env[key] !== undefined) {
+          config.expose[key] = config.env[key]
+        }
+      }
+
       require('@cypress/code-coverage/task')(on, config)
 
       on('task', {
@@ -149,12 +155,19 @@ module.exports = defineConfig({
     responseTimeout: 8000,
   },
   env: {
-    databaseResetUrl: 'http://localhost:4000/test/reset-test-database',
+    databaseResetUrl: DEFAULT_DATABASE_RESET_URL,
+    apiBaseUrl: DEFAULT_API_BASE_URL,
     dbHost: DEFAULT_DB_HOST,
     dbPort: DEFAULT_DB_PORT,
     dbWaitTimeoutMs: DEFAULT_DB_WAIT_TIMEOUT_MS,
     appBaseUrl: DEFAULT_APP_BASE_URL,
     appWaitTimeoutMs: DEFAULT_APP_WAIT_TIMEOUT_MS,
+  },
+  expose: {
+    databaseResetUrl: DEFAULT_DATABASE_RESET_URL,
+    apiBaseUrl: DEFAULT_API_BASE_URL,
+    appWaitTimeoutMs: DEFAULT_APP_WAIT_TIMEOUT_MS,
+    dbWaitTimeoutMs: DEFAULT_DB_WAIT_TIMEOUT_MS,
   },
   viewportHeight: 900,
   viewportWidth: 1200,

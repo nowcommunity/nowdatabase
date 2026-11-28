@@ -955,7 +955,7 @@ const fetchOccurrencesForDwcDataPackageExport = async (
     select: occurrenceSelect,
   })
 
-  return occurrences as unknown as OccurrenceForDwcDpExport[]
+  return occurrences
 }
 
 export const buildDwcDataPackageZipBuffer = async (occurrenceKeys?: DwcOccurrenceKey[]): Promise<Buffer> => {

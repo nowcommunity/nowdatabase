@@ -4,7 +4,6 @@ import {
   EditableOccurrenceData,
   OccurrenceDetailsType,
   OccurrenceEditableField,
-  Reference,
   Role,
   User,
 } from '../../../../frontend/src/shared/types'
@@ -131,7 +130,7 @@ export const updateOccurrenceByCompositeKey = async (
       'species_id',
     ])
 
-    await writeHandler.logUpdatesAndComplete(user.initials, comment ?? '', (references ?? []) as Reference[])
+    await writeHandler.logUpdatesAndComplete(user.initials, comment ?? '', references ?? [])
   } catch (error) {
     await writeHandler.end()
     throw error

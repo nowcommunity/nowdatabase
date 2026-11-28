@@ -4,7 +4,6 @@
     "outDir": "./build/",
     "module": "CommonJS",
     "moduleResolution": "node",
-    "baseUrl": ".",
     "strict": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,

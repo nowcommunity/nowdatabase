@@ -134,10 +134,7 @@ export const ReferenceTab = () => {
           }),
         ])
       } else if (field.field_name == 'exact_date') {
-        nonAuthorFieldsArray.push([
-          field.ref_field_name,
-          textField(field.field_name as keyof ReferenceDetailsType, { type: 'date' }),
-        ])
+        nonAuthorFieldsArray.push([field.ref_field_name, textField(field.field_name, { type: 'date' })])
       } else {
         nonAuthorFieldsArray.push([field.ref_field_name, fieldComponent])
       }

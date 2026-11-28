@@ -1,10 +1,11 @@
-import { afterEach, beforeEach, describe, expect, it, jest } from '@jest/globals'
-import { fireEvent, render, screen, waitFor } from '@testing-library/react'
-import { createMemoryRouter, RouterProvider } from 'react-router-dom'
 import { LocalityDetails } from '@/components/Locality/LocalityDetails'
 import { useUser } from '@/hooks/user'
 import { useDeleteLocalityMutation, useEditLocalityMutation, useGetLocalityDetailsQuery } from '@/redux/localityReducer'
 import { EditDataType, LocalityDetailsType, Role } from '@/shared/types'
+import { afterEach, beforeEach, describe, expect, it, jest } from '@jest/globals'
+import { fireEvent, render, screen, waitFor } from '@testing-library/react'
+import { SpyInstance } from 'jest-mock'
+import { createMemoryRouter, RouterProvider } from 'react-router-dom'
 
 jest.mock('@/util/config', () => ({ ENV: 'test', BACKEND_URL: 'http://localhost', ENABLE_WRITE: true }))
 jest.mock('@/hooks/user', () => ({ useUser: jest.fn() }))
@@ -60,6 +61,7 @@ const mockDetails = jest.mocked(useGetLocalityDetailsQuery)
 const mockDelete = jest.mocked(useDeleteLocalityMutation)
 const mockUser = jest.mocked(useUser)
 const refetch = jest.fn()
+let confirmSpy: SpyInstance<typeof window.confirm>
 
 const renderLocality = (path = '/locality/42') => {
   const router = createMemoryRouter(
@@ -76,7 +78,7 @@ const renderLocality = (path = '/locality/42') => {
 describe('Locality save navigation', () => {
   beforeEach(() => {
     jest.clearAllMocks()
-    jest.spyOn(window, 'confirm').mockReturnValue(true)
+    confirmSpy = jest.spyOn(window, 'confirm').mockReturnValue(true)
     mockUser.mockReturnValue({
       token: 'token',
       username: 'test',
@@ -109,7 +111,7 @@ describe('Locality save navigation', () => {
 
     fireEvent.click(screen.getByRole('button', { name: 'Save' }))
 
-    expect(window.confirm).toHaveBeenCalledTimes(1)
+    expect(confirmSpy).toHaveBeenCalledTimes(1)
     expect(await screen.findByText('Localities list')).toBeTruthy()
     expect(router.state.location.pathname).toBe('/locality')
     expect(refetch).not.toHaveBeenCalled()
@@ -132,7 +134,7 @@ describe('Locality save navigation', () => {
   })
 
   it('does not save or navigate when the warning is declined', () => {
-    jest.mocked(window.confirm).mockReturnValue(false)
+    jest.mocked(confirmSpy).mockReturnValue(false)
     const edit = jest.fn()
     mockEdit.mockReturnValue([edit, { isLoading: false }] as never)
     const router = renderLocality()
@@ -164,7 +166,7 @@ describe('Locality save navigation', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Save' }))
 
     await waitFor(() => expect(router.state.location.pathname).toBe('/locality/42'))
-    expect(window.confirm).not.toHaveBeenCalled()
+    expect(confirmSpy).not.toHaveBeenCalled()
     expect(refetch).not.toHaveBeenCalled()
   })
 })

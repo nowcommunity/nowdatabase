@@ -74,7 +74,7 @@ const createProvider = (state: TestContextState) => (
   <DetailContextProvider
     contextState={{
       ...state,
-      editData: state.data as EditDataType<TestData>,
+      editData: state.data,
       textField: () => <></>,
       bigTextField: () => <></>,
       dropdown: () => <></>,

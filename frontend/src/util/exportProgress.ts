@@ -91,7 +91,7 @@ export const downloadExportFileWithProgress = async ({
       throw new Error('Missing response stream.')
     }
 
-    const file: Uint8Array[] = []
+    const file: Uint8Array<ArrayBuffer>[] = []
     let bytes = 0
     let closed = false
 

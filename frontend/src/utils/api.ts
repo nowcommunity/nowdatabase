@@ -13,12 +13,7 @@ type ApiErrorResult = {
 }
 
 const isApiErrorShape = (error: unknown): error is ApiErrorShape => {
-  return (
-    typeof error === 'object' &&
-    error !== null &&
-    'status' in error &&
-    typeof (error as { status: unknown }).status === 'number'
-  )
+  return typeof error === 'object' && error !== null && 'status' in error && typeof error.status === 'number'
 }
 
 const isSerializedError = (error: unknown): error is SerializedError => {

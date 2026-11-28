@@ -152,7 +152,7 @@ describe('WriteButton behavior', () => {
     const onWrite = jest.fn(() => Promise.resolve())
     mockCheckSpeciesTaxonomy.mockReturnValue(new Set(['The taxon already exists in the database.']))
 
-    renderButton({ ...baseSpecies, sp_comment: 'Updated comment' } as EditDataType<Species>, onWrite)
+    renderButton({ ...baseSpecies, sp_comment: 'Updated comment' }, onWrite)
 
     fireEvent.click(screen.getByRole('button', { name: /save changes/i }))
 
@@ -167,7 +167,7 @@ describe('WriteButton behavior', () => {
     const onWrite = jest.fn(() => Promise.resolve())
     mockCheckSpeciesTaxonomy.mockReturnValue(new Set(['The taxon already exists in the database.']))
 
-    renderButton({ ...baseSpecies, genus_name: 'Gorilla' } as EditDataType<Species>, onWrite)
+    renderButton({ ...baseSpecies, genus_name: 'Gorilla' }, onWrite)
 
     fireEvent.click(screen.getByRole('button', { name: /save changes/i }))
 
@@ -182,7 +182,7 @@ describe('WriteButton behavior', () => {
     const onWrite = jest.fn(() => Promise.resolve())
     mockCheckSpeciesTaxonomy.mockReturnValue(new Set())
 
-    renderButton({ ...baseSpecies, family_name: 'Canidae' } as EditDataType<Species>, onWrite)
+    renderButton({ ...baseSpecies, family_name: 'Canidae' }, onWrite)
 
     fireEvent.click(screen.getByRole('button', { name: /save changes/i }))
 
@@ -203,7 +203,7 @@ describe('WriteButton behavior', () => {
     })
 
     renderButton(
-      { ...baseSpecies, family_name: 'Canidae' } as EditDataType<Species>,
+      { ...baseSpecies, family_name: 'Canidae' },
       onWrite,
       { mode: modeNew, setMode },
       { taxonomy: true, hasStagingMode: true }
@@ -296,7 +296,7 @@ describe('WriteButton behavior', () => {
     })
     mockCheckSpeciesTaxonomy.mockReturnValue(new Set(['Subfamily Caninae belongs to family Canidae, not Felidae.']))
 
-    renderButton({ ...baseSpecies, family_name: 'Felidae' } as EditDataType<Species>, onWrite)
+    renderButton({ ...baseSpecies, family_name: 'Felidae' }, onWrite)
 
     fireEvent.click(screen.getByRole('button', { name: /save changes/i }))
 
@@ -313,7 +313,7 @@ describe('WriteButton behavior', () => {
     const onWrite = jest.fn(() => Promise.resolve())
     const setEditData = jest.fn()
 
-    renderButton({ ...baseSpecies, sp_comment: '' } as EditDataType<Species>, onWrite, { setEditData })
+    renderButton({ ...baseSpecies, sp_comment: '' }, onWrite, { setEditData })
 
     fireEvent.click(screen.getByRole('button', { name: /save changes/i }))
 
@@ -326,14 +326,14 @@ describe('WriteButton behavior', () => {
   })
 
   it('disables the button when no edits have been made', () => {
-    renderButton(baseSpecies as EditDataType<Species>, jest.fn(), { isDirty: false })
+    renderButton(baseSpecies, jest.fn(), { isDirty: false })
 
     const button = screen.getByRole('button', { name: /save changes/i })
     expect((button as HTMLButtonElement).disabled).toBe(true)
   })
 
   it('shows helper tooltip when hovering the disabled button', async () => {
-    renderButton(baseSpecies as EditDataType<Species>, jest.fn(), { isDirty: false })
+    renderButton(baseSpecies, jest.fn(), { isDirty: false })
 
     const button = screen.getByRole('button', { name: /save changes/i })
     const tooltipTrigger = button.parentElement
@@ -347,7 +347,7 @@ describe('WriteButton behavior', () => {
   })
 
   it('enables the button after edits have been made', () => {
-    renderButton(baseSpecies as EditDataType<Species>, jest.fn(), { isDirty: true })
+    renderButton(baseSpecies, jest.fn(), { isDirty: true })
 
     const button = screen.getByRole('button', { name: /save changes/i })
     expect((button as HTMLButtonElement).disabled).toBe(false)
@@ -356,7 +356,7 @@ describe('WriteButton behavior', () => {
   it('disables the button in staging mode when no edits have been made', () => {
     const onWrite = jest.fn(() => Promise.resolve())
 
-    renderButton(baseSpecies as EditDataType<Species>, onWrite, {
+    renderButton(baseSpecies, onWrite, {
       isDirty: false,
       mode: modeStagingEdit,
     })

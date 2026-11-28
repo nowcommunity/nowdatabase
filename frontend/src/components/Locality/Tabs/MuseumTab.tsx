@@ -93,19 +93,17 @@ export const MuseumTab = () => {
             alt_int_name: normalized.alt_int_name || null,
             state: normalized.state || null,
             state_code: normalized.state_code || null,
-          } as Museum).unwrap()
+          }).unwrap()
 
           const refetchResult = await refetchMuseums()
           const refreshedMuseums = refetchResult.data ?? museumData ?? []
-          const resolvedMuseum =
-            refreshedMuseums.find(museum => museum.museum === museumId) ??
-            ({
-              ...normalized,
-              museum: museumId,
-              alt_int_name: normalized.alt_int_name || null,
-              state: normalized.state || null,
-              state_code: normalized.state_code || null,
-            } as Museum)
+          const resolvedMuseum = refreshedMuseums.find(museum => museum.museum === museumId) ?? {
+            ...normalized,
+            museum: museumId,
+            alt_int_name: normalized.alt_int_name || null,
+            state: normalized.state || null,
+            state_code: normalized.state_code || null,
+          }
 
           if (editData.now_mus.some(link => link.museum === museumId)) {
             notify('Museum already linked to this locality.', 'warning')

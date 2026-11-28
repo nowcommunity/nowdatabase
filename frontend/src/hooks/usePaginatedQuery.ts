@@ -190,13 +190,13 @@ export const usePaginatedQuery = <
   }, [rows, envelope])
 
   const transformedRows = useMemo(() => {
-    if (!rows) return rows as unknown as TMapped[] | undefined
+    if (!rows) return rows
     if (!selectorFn) return rows as unknown as TMapped[]
 
     return rows.map((item, index) => {
       const mapped = selectorFn(item)
       if (index === 0 && typeof fullCount === 'number' && isObject(mapped) && !('full_count' in mapped)) {
-        return { ...mapped, full_count: fullCount } as TMapped
+        return { ...mapped, full_count: fullCount }
       }
       return mapped
     })
