@@ -18,7 +18,7 @@
     "check:backend": "npm run tsc:backend && npm run lint:backend",
     "check:frontend": "npm run tsc:frontend && npm run lint:frontend",
     "check:cypress": "npm run lint:cypress",
-    "lint": "npm run lint:backend && npm run lint:frontend && npm run lint:cypress",
+    "lint": "npm run lint:backend; npm run lint:frontend; npm run lint:cypress",
     "lint:backend": "cd backend && npm run lint",
     "lint:frontend": "cd frontend && npm run lint",
     "lint:cypress": "eslint --cache --report-unused-disable-directives --max-warnings 0 \"cypress/e2e/**/*.{cy,spec}.{js,ts,tsx}\"",
